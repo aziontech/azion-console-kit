@@ -393,7 +393,7 @@
 <style scoped>
   .afs-filter-row {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.5rem;
     width: 100%;
     align-items: center;
@@ -403,7 +403,7 @@
     display: flex;
     gap: 0.5rem;
     align-items: center;
-    flex: 1 1 280px;
+    flex: 1 1 0%;
     min-width: 0;
   }
 
@@ -463,6 +463,10 @@
     height: 2rem !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+    padding-left: 0.375rem !important;
+    padding-right: 0.375rem !important;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   /* Buttons padding */

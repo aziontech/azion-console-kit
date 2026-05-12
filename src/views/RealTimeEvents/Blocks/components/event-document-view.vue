@@ -305,18 +305,19 @@
             class="doc-list__item group"
             data-testid="event-document-row"
           >
-            <div class="doc-list__header">
-              <span class="doc-list__key">{{ entry.key }}</span>
-            </div>
-            <div
-              class="doc-list__value"
-              :title="String(entry.value).length > 100 ? String(entry.value) : undefined"
-              @mousedown="onValueMouseDown"
-              @mouseup="onValueMouseUp"
-              @click.stop="(e) => onValueClick(e, entry.key, entry.value)"
-            >
-              <span class="doc-list__value-text">{{ formatDisplayValue(entry.value) }}</span>
-              <div class="doc-list__actions">
+            <span
+              class="doc-list__key"
+              :title="entry.key"
+            >{{ entry.key }}</span>
+            <span class="doc-list__value-wrap">
+              <span
+                class="doc-list__value"
+                :title="String(entry.value).length > 30 ? String(entry.value) : undefined"
+                @mousedown="onValueMouseDown"
+                @mouseup="onValueMouseUp"
+                @click.stop="(e) => onValueClick(e, entry.key, entry.value)"
+              ><span class="doc-list__value-text">{{ formatDisplayValue(entry.value) }}</span></span>
+              <span class="doc-list__actions">
                 <PrimeButton
                   v-if="onAddFilter && isValidValue(entry.value)"
                   icon="pi pi-plus-circle"
@@ -347,8 +348,8 @@
                   @click.stop="handleCopy(entry.value)"
                   data-testid="event-document-copy-value"
                 />
-              </div>
-            </div>
+              </span>
+            </span>
           </div>
         </div>
       </TabPanel>
@@ -383,6 +384,9 @@
     overflow: hidden;
     background: var(--surface-card);
     margin-bottom: 0;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
 
   :deep(.event-document-tabs .p-tabview-panels) {
@@ -417,6 +421,7 @@
 
   .doc-search__field {
     width: 100%;
+    max-width: 100%;
     flex: 1;
     min-width: 0;
   }
@@ -472,21 +477,26 @@
     opacity: 0.5;
   }
 
-  /* ── Document list layout (sidebar) — Kibana Discover style ─── */
+  /* ── Document list layout (sidebar) ─── */
   .doc-list {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    min-width: 0;
   }
 
   .doc-list__item {
-    display: grid;
-    grid-template-columns: minmax(120px, 160px) 1fr;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    padding: 0 0.75rem;
+    height: 1.625rem;
+    min-height: 1.625rem;
+    max-height: 1.625rem;
     border-bottom: 1px solid var(--surface-border);
-    transition: background 0.1s;
-    align-items: start;
-    position: relative;
+    min-width: 0;
+    gap: 0.5rem;
+    box-sizing: border-box;
+    contain: layout;
   }
 
   .doc-list__item:last-child {
@@ -497,68 +507,70 @@
     background: var(--surface-hover);
   }
 
-  .doc-list__header {
-    display: flex;
-    align-items: flex-start;
-    min-width: 0;
-    padding-top: 2px;
-  }
-
   .doc-list__key {
     font-family: var(--rte-font-mono);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 600;
     color: var(--series-one-color, #fba86f);
     user-select: all;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    white-space: nowrap;
     letter-spacing: 0.01em;
-    line-height: 1.4;
+    line-height: 1;
+    flex-shrink: 0;
+    width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .doc-list__value-wrap {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    flex: 1;
+    gap: 4px;
+    height: 100%;
   }
 
   .doc-list__value {
     font-family: var(--rte-font-mono);
-    font-size: 0.75rem;
-    line-height: 1.5;
+    font-size: 0.7rem;
+    line-height: 1;
     color: var(--text-color);
     min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    user-select: text;
+    cursor: text;
     display: flex;
-    align-items: flex-start;
-    padding-right: 4rem; /* Reserve space for absolute-positioned actions */
+    align-items: center;
   }
 
   .doc-list__value-text {
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    white-space: pre-wrap;
-    user-select: text;
-    cursor: text;
-    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     min-width: 0;
+    width: 100%;
   }
 
   .doc-list__actions {
-    position: absolute;
-    right: 0.375rem;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
+    display: none;
     align-items: center;
     gap: 2px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.1s ease;
-    background: var(--surface-card);
-    border: 1px solid var(--surface-border);
-    padding: 2px 3px;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    z-index: 2;
+    flex-shrink: 0;
+  }
+
+  .doc-list__actions :deep(.p-button) {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+  }
+
+  .doc-list__actions :deep(.p-button .p-button-icon) {
+    font-size: 0.7rem;
   }
 
   .doc-list__item:hover .doc-list__actions {
-    opacity: 1;
-    pointer-events: auto;
+    display: flex;
   }
 
   /* ── Compact layout (inline expansion) ──────────────────────── */
@@ -569,7 +581,7 @@
 
   .doc-compact {
     display: grid;
-    grid-template-columns: minmax(120px, 180px) 1fr;
+    grid-template-columns: auto 1fr;
     align-content: start;
     max-height: min(420px, 55vh);
     overflow-y: auto;
@@ -581,10 +593,10 @@
 
   .doc-compact__row > .doc-compact__key,
   .doc-compact__row > .doc-compact__value {
-    padding: 0.35rem 0.75rem;
+    padding: 0.3rem 0.5rem;
     border-bottom: 1px solid var(--surface-border);
     transition: background 0.1s;
-    height: 1.75rem;
+    height: 1.6rem;
     display: flex;
     align-items: center;
   }
@@ -608,11 +620,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.4;
+    padding-left: 0.75rem;
+    padding-right: 1rem;
   }
 
   .doc-compact__value {
     font-family: var(--rte-font-mono);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     line-height: 1.4;
     color: var(--text-color);
     white-space: nowrap;
@@ -632,18 +646,17 @@
 
   .doc-compact__actions {
     position: absolute;
-    right: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
+    right: 0;
+    top: 0;
+    bottom: 0;
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 1px;
+    padding: 0 4px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.1s ease;
     background: var(--surface-hover);
-    padding: 0 2px;
-    border-radius: 3px;
   }
 
   .doc-compact__row:hover .doc-compact__actions {

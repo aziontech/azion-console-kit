@@ -38,8 +38,8 @@
 </script>
 
 <template>
-  <div class="flex gap-2 justify-between items-center mb-2 px-2 pt-1 flex-wrap">
-    <div class="flex items-center gap-2 min-w-0">
+  <div class="discover-toolbar">
+    <div class="discover-toolbar__left">
       <PrimeButton
         :icon="sidebarVisible ? 'pi pi-angle-double-left' : 'pi pi-list'"
         :label="sidebarVisible ? '' : 'Fields'"
@@ -53,17 +53,17 @@
       />
       <span
         v-if="recordsFound"
-        class="ml-2 px-2 py-0.5 rounded-md text-color discover-docs-badge"
+        class="discover-docs-badge"
         >{{ recordsFound }} Documents found</span
       >
     </div>
-    <div class="flex gap-2 items-center flex-wrap">
-      <div class="relative hidden md:flex items-center">
-        <i class="pi pi-search absolute left-2.5 text-sm text-color-secondary pointer-events-none" />
+    <div class="discover-toolbar__right">
+      <div class="discover-toolbar__search">
+        <i class="pi pi-search discover-toolbar__search-icon" />
         <InputText
           :modelValue="documentSearchQuery"
           placeholder="Search documents..."
-          class="pl-8 w-56 !h-8 text-sm !shadow-none !outline-none"
+          class="discover-toolbar__search-input !h-8 text-sm !shadow-none !outline-none"
           @update:modelValue="emit('update:documentSearchQuery', $event)"
         />
         <PrimeButton
@@ -88,7 +88,7 @@
         icon="pi pi-window-maximize"
         size="small"
         severity="secondary"
-        class="hidden md:inline-flex !h-8"
+        class="discover-toolbar__btn-hide-sm !h-8"
         :outlined="detailViewMode !== 'sidebar'"
         @click="detailViewMode !== 'sidebar' && emit('toggle-detail-mode')"
         v-tooltip.top="{ value: 'Show in sidebar', showDelay: 200 }"
@@ -97,7 +97,7 @@
         outlined
         size="small"
         :icon="isFullscreen ? 'pi pi-arrows-alt' : 'pi pi-expand'"
-        class="min-w-max !h-8"
+        class="!h-8"
         @click="emit('update:isFullscreen', !isFullscreen)"
         v-tooltip.left="{
           value: isFullscreen ? 'Exit fullscreen' : 'Fullscreen',
@@ -110,13 +110,13 @@
         optionLabel="label"
         optionValue="value"
         @update:modelValue="emit('page-size-change', $event)"
-        class="toolbar-page-size toolbar-page-size--responsive"
+        class="toolbar-page-size"
       />
       <PrimeButton
         outlined
         size="small"
         icon="ai ai-graphql"
-        class="min-w-max hidden md:inline-flex !h-8"
+        class="discover-toolbar__btn-hide-sm !h-8"
         @click="eventsPlaygroundOpener"
         v-tooltip.left="{ value: 'GraphQL Playground', showDelay: 200 }"
       />
@@ -124,7 +124,7 @@
         outlined
         size="small"
         icon="pi pi-download"
-        class="min-w-max !h-8"
+        class="!h-8"
         @click="toggleExport"
         v-tooltip.left="{ value: 'Export data', showDelay: 200 }"
         aria-haspopup="true"
@@ -139,6 +139,52 @@
 </template>
 
 <style scoped>
+  .discover-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
+  .discover-toolbar__left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    flex-shrink: 1;
+    overflow: hidden;
+  }
+
+  .discover-toolbar__right {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex-shrink: 0;
+  }
+
+  .discover-toolbar__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .discover-toolbar__search-icon {
+    position: absolute;
+    left: 0.625rem;
+    font-size: 0.75rem;
+    color: var(--text-color-secondary);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .discover-toolbar__search-input {
+    padding-left: 2rem !important;
+    width: clamp(8rem, 14vw, 14rem);
+  }
+
   /* Toolbar: align page-size dropdown height with small buttons */
   :deep(.toolbar-page-size .p-dropdown-label) {
     padding-top: 0;
@@ -151,17 +197,10 @@
     height: 2rem;
     display: flex;
     align-items: center;
+    width: clamp(4rem, 6vw, 7rem);
   }
   :deep(.toolbar-page-size .p-dropdown-trigger) {
     width: 2rem;
-  }
-  .toolbar-page-size--responsive {
-    width: 7rem;
-  }
-  @media (max-width: 768px) {
-    .toolbar-page-size--responsive {
-      width: 5rem;
-    }
   }
 
   /* Documents found badge */
@@ -172,20 +211,34 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100%;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.375rem;
+    max-width: 20vw;
   }
 
-  @media (max-width: 768px) {
-    .discover-docs-badge {
-      font-size: 0.6875rem;
-      padding: 0.125rem 0.375rem;
+  /* Hide secondary buttons at smaller widths */
+  .discover-toolbar__btn-hide-sm {
+    display: inline-flex;
+  }
+
+  @media (max-width: 1100px) {
+    .discover-toolbar__btn-hide-sm {
+      display: none;
+    }
+
+    .discover-toolbar__search-input {
+      width: clamp(6rem, 10vw, 10rem);
     }
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 900px) {
+    .discover-toolbar__search {
+      display: none;
+    }
+
     .discover-docs-badge {
-      font-size: 0.625rem;
-      max-width: 10rem;
+      max-width: 12vw;
+      font-size: 0.6875rem;
     }
   }
 </style>

@@ -602,10 +602,120 @@ async function loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupBy
  * @param {{ dataset: string, tsRange: object, filters?: object, signal?: AbortSignal }} args
  * @returns {Promise<{total: number, clientErrors: number, serverErrors: number, avgRequestTime: number|null, supportsStatusBreakdown: boolean, supportsRequestTime: boolean}|null>}
  */
+/**
+ * Load KPIs via the Metrics API (Beholder). Used for large time ranges
+ * that exceed the Events API 2h window limit.
+ * Provides status breakdown (4xx/5xx counts) but not avgRequestTime
+ * (not supported by Metrics API).
+ */
+async function loadSummaryKpisFromMetrics({ dataset, tsRange, filters = {} }) {
+  const metricsDataset = METRICS_DATASET_MAP[dataset]
+  if (!metricsDataset) return null
+
+  const { cleaned: metricsFilters } = filterForMetrics(filters, metricsDataset)
+
+  const tsRangeBegin = tsRange.tsRangeBegin instanceof Date
+    ? tsRange.tsRangeBegin.toISOString()
+    : String(tsRange.tsRangeBegin)
+  const tsRangeEnd = tsRange.tsRangeEnd instanceof Date
+    ? tsRange.tsRangeEnd.toISOString()
+    : String(tsRange.tsRangeEnd)
+
+  const statusFilters = { gte: null, lte: null, gt: null, lt: null }
+  Object.entries(metricsFilters?.and || {}).forEach(([key, value]) => {
+    const match = key.match(/^status(Gte|Lte|Gt|Lt)$/)
+    if (match) statusFilters[match[1].toLowerCase()] = Number(value)
+  })
+
+  const extraFilterFragments = []
+  const extraVariables = {}
+  const extraParamDeclarations = []
+  Object.entries(metricsFilters?.and || {}).forEach(([key, value]) => {
+    if (!key.startsWith('status')) {
+      const varName = `filter_${key}`
+      extraVariables[varName] = value
+      extraFilterFragments.push(`${key}: $${varName}`)
+      extraParamDeclarations.push(`$${varName}: ${typeof value === 'number' ? 'Int' : 'String'}`)
+    }
+  })
+  Object.entries(metricsFilters?.in || {}).forEach(([key, value]) => {
+    if (!key.startsWith('status')) {
+      const varName = `in_${key}`
+      const normalized = normalizeInFilterValues(value)
+      extraVariables[varName] = normalized
+      const gqlKey = key.endsWith('In') ? key : `${key}In`
+      extraFilterFragments.push(`${gqlKey}: $${varName}`)
+      extraParamDeclarations.push(`$${varName}: ${inferArrayType(normalized)}`)
+    }
+  })
+
+  const extraFilterStr = extraFilterFragments.length
+    ? `, ${extraFilterFragments.join(', ')}` : ''
+  const extraParamsStr = extraParamDeclarations.length
+    ? `, ${extraParamDeclarations.join(', ')}` : ''
+
+  // Build aliased queries for each status bucket
+  const aliasQuery = STATUS_METRICS_ALIASES.map(({ alias, rangeBegin, rangeEnd }) => {
+    let effectiveBegin = rangeBegin
+    let effectiveEnd = rangeEnd
+    if (statusFilters.gte !== null) effectiveBegin = Math.max(effectiveBegin, statusFilters.gte)
+    if (statusFilters.gt !== null) effectiveBegin = Math.max(effectiveBegin, statusFilters.gt + 1)
+    if (statusFilters.lte !== null) effectiveEnd = Math.min(effectiveEnd, statusFilters.lte)
+    if (statusFilters.lt !== null) effectiveEnd = Math.min(effectiveEnd, statusFilters.lt - 1)
+    if (effectiveBegin > effectiveEnd) return ''
+    return `
+      ${alias}: ${metricsDataset}(
+        limit: 1, aggregate: { sum: requests },
+        filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end }, statusRange: { begin: ${effectiveBegin}, end: ${effectiveEnd} }${extraFilterStr} }
+      ) { sum }`
+  }).filter(Boolean).join('')
+
+  if (!aliasQuery) {
+    return { total: 0, clientErrors: 0, serverErrors: 0, avgRequestTime: null, supportsStatusBreakdown: true, supportsRequestTime: false }
+  }
+
+  const query = {
+    query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!${extraParamsStr}) {${aliasQuery} }`,
+    variables: { tsRange_begin: tsRangeBegin, tsRange_end: tsRangeEnd, ...extraVariables }
+  }
+
+  try {
+    const response = await AxiosHttpClientAdapter.request({
+      baseURL: '/', url: makeBeholderBaseUrl(), method: 'POST', body: JSON.stringify(query)
+    })
+    if (response.statusCode !== 200) return null
+
+    const responseData = response.body?.data || {}
+    const counts = { '2xx': 0, '3xx': 0, '4xx': 0, '5xx': 0 }
+    STATUS_METRICS_ALIASES.forEach(({ alias, bucket }) => {
+      const rows = Array.isArray(responseData[alias]) ? responseData[alias] : []
+      const sum = rows.reduce((acc, row) => acc + (row?.sum || 0), 0)
+      counts[bucket] = sum
+    })
+    const total = counts['2xx'] + counts['3xx'] + counts['4xx'] + counts['5xx']
+    return {
+      total,
+      clientErrors: counts['4xx'],
+      serverErrors: counts['5xx'],
+      avgRequestTime: null,
+      supportsStatusBreakdown: true,
+      supportsRequestTime: false
+    }
+  } catch {
+    return null
+  }
+}
+
 export async function loadSummaryKpis({ dataset, tsRange, filters = {}, signal }) {
   // Only HTTP-like datasets support KPI breakdown
   if (!HTTP_LIKE_DATASETS.has(dataset)) return null
   if (!tsRange?.tsRangeBegin || !tsRange?.tsRangeEnd) return null
+
+  // Route to Metrics API for large ranges (Events API has a 2h window limit)
+  const api = resolveChartApi(tsRange.tsRangeBegin, tsRange.tsRangeEnd)
+  if (api === 'metrics') {
+    return loadSummaryKpisFromMetrics({ dataset, tsRange, filters })
+  }
 
   const normalizedTsRange = {
     tsRangeBegin: tsRange.tsRangeBegin instanceof Date ? tsRange.tsRangeBegin.toISOString() : String(tsRange.tsRangeBegin),

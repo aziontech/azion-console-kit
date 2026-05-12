@@ -75,6 +75,13 @@
     if (percentage < 10) return `${percentage.toFixed(2)}% of total`
     return `${percentage.toFixed(1)}% of total`
   }
+  // Short variant for the inline/collapsed view: "0.42%"
+  const formatPctShort = (percentage) => {
+    if (!Number.isFinite(percentage) || percentage <= 0) return '0%'
+    if (percentage < 0.1) return '<0.1%'
+    if (percentage < 10) return `${percentage.toFixed(2)}%`
+    return `${percentage.toFixed(1)}%`
+  }
 </script>
 
 <template>
@@ -122,6 +129,7 @@
           >
             {{ formatNumber(view.clientErrors) }}
           </span>
+          <span class="events-summary-bar__inline-pct">({{ formatPctShort(view.clientPct) }})</span>
         </span>
         <span
           v-if="view.hasStatusBreakdown"
@@ -134,6 +142,7 @@
           >
             {{ formatNumber(view.serverErrors) }}
           </span>
+          <span class="events-summary-bar__inline-pct">({{ formatPctShort(view.serverPct) }})</span>
         </span>
       </div>
     </button>
@@ -248,6 +257,13 @@
     font-family: var(--rte-font-mono);
     font-weight: 600;
     color: var(--text-color);
+  }
+
+  .events-summary-bar__inline-pct {
+    font-size: 0.6875rem;
+    color: var(--text-color-secondary);
+    font-family: var(--rte-font-mono);
+    margin-left: 2px;
   }
 
   .events-summary-bar__grid {

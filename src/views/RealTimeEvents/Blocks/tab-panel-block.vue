@@ -379,112 +379,114 @@
 
     <!-- Main layout -->
     <div class="discover-layout" :class="{ 'discover-layout--fullscreen': isFullscreen }">
-      <ResizableSplitter
-        direction="vertical"
-        :initialTopPanelPixels="260"
-        :minSize="[15, 50]"
-        :maxSize="[30, 90]"
-        :class="{ 'splitter--sidebar-collapsed': !sidebarVisible }"
-        :key="String(sidebarVisible)"
-      >
-        <template #panel-a>
-          <FieldSidebar
-            :availableFields="availableFieldOptions"
-            v-model:selectedFields="selectedFields"
-            v-model:visible="sidebarVisible"
-            :data="tableData"
-            :datasets="allDatasets"
-            :selectedDataset="props.tabSelected"
-            @add-filter="handleAddFilter"
-            @update:selectedDataset="handleDatasetChange"
-          />
-        </template>
-        <template #panel-b>
-          <div class="flex flex-col h-full w-full min-h-0 min-w-0 overflow-hidden">
-            <div
-              v-if="hasChartConfig || hasMetricsDashboards"
-              class="shrink-0 w-full"
-            >
-              <EventChart
-                ref="eventChartRef"
-                :data="isMetricsView ? metricsChartData : chartData"
-                :configKey="isMetricsView ? metricsChartConfigKey : chartConfigKey"
-                :tsRangeBegin="tsRangeBegin"
-                :tsRangeEnd="tsRangeEnd"
-                :isLoading="isMetricsView ? isLoadingMetricsChart : isChartLoading"
-                :userTimezone="accountTimezone"
-                :stackBy="stackByField"
-                :view="selectedView"
-                :viewOptions="viewOptions"
-                :showView="hasMultipleViewOptions"
-                :showSummary="showChartSummary"
-                :collapsed="isChartCollapsed"
-                @update:view="selectedView = $event"
-                @brush-select="handleBrushSelect"
-                @legend-filter="handleLegendFilter"
-                @total-computed="setRecordsFound"
-                @toggle-collapse="isChartCollapsed = !isChartCollapsed"
-              />
-              <EventsSummaryBar
-                v-if="showChartSummary && !isChartCollapsed"
-                :kpis="summaryKpis"
-              />
-            </div>
-            <DiscoverToolbar
-              :sidebarVisible="sidebarVisible"
-              :recordsFound="recordsFound"
-              :documentSearchQuery="documentSearchQuery"
-              :detailViewMode="detailViewMode"
-              :isFullscreen="isFullscreen"
-              :pageSize="pageSize"
-              :pageSizeOptions="PAGE_SIZE_OPTIONS"
-              :exportMenuItems="exportMenuItems"
-              @update:sidebarVisible="sidebarVisible = $event"
-              @update:documentSearchQuery="documentSearchQuery = $event"
-              @update:isFullscreen="isFullscreen = $event"
-              @toggle-detail-mode="toggleDetailViewMode"
-              @page-size-change="handlePageSizeChange"
+      <div class="discover-layout__main">
+        <ResizableSplitter
+          direction="vertical"
+          :initialTopPanelPixels="260"
+          :minSize="[15, 50]"
+          :maxSize="[30, 90]"
+          :class="{ 'splitter--sidebar-collapsed': !sidebarVisible }"
+          :key="String(sidebarVisible)"
+        >
+          <template #panel-a>
+            <FieldSidebar
+              :availableFields="availableFieldOptions"
+              v-model:selectedFields="selectedFields"
+              v-model:visible="sidebarVisible"
+              :data="tableData"
+              :datasets="allDatasets"
+              :selectedDataset="props.tabSelected"
+              @add-filter="handleAddFilter"
+              @update:selectedDataset="handleDatasetChange"
             />
-            <div
-              ref="tableContainerRef"
-              class="flex flex-col flex-1 min-w-0 min-h-0 overflow-hidden outline-none"
-              tabindex="0"
-            >
-              <DiscoverDataTable
-                ref="discoverDataTableRef"
-                :data="filteredTableData"
-                :selectedFields="selectedFields"
-                :expandedRows="expandedRows"
-                @update:expandedRows="expandedRows = $event"
+          </template>
+          <template #panel-b>
+            <div class="flex flex-col h-full w-full min-h-0 min-w-0 overflow-hidden">
+              <div
+                v-if="hasChartConfig || hasMetricsDashboards"
+                class="shrink-0 w-full"
+              >
+                <EventChart
+                  ref="eventChartRef"
+                  :data="isMetricsView ? metricsChartData : chartData"
+                  :configKey="isMetricsView ? metricsChartConfigKey : chartConfigKey"
+                  :tsRangeBegin="tsRangeBegin"
+                  :tsRangeEnd="tsRangeEnd"
+                  :isLoading="isMetricsView ? isLoadingMetricsChart : isChartLoading"
+                  :userTimezone="accountTimezone"
+                  :stackBy="stackByField"
+                  :view="selectedView"
+                  :viewOptions="viewOptions"
+                  :showView="hasMultipleViewOptions"
+                  :showSummary="showChartSummary"
+                  :collapsed="isChartCollapsed"
+                  @update:view="selectedView = $event"
+                  @brush-select="handleBrushSelect"
+                  @legend-filter="handleLegendFilter"
+                  @total-computed="setRecordsFound"
+                  @toggle-collapse="isChartCollapsed = !isChartCollapsed"
+                />
+                <EventsSummaryBar
+                  v-if="showChartSummary && !isChartCollapsed"
+                  :kpis="summaryKpis"
+                />
+              </div>
+              <DiscoverToolbar
+                :sidebarVisible="sidebarVisible"
+                :recordsFound="recordsFound"
+                :documentSearchQuery="documentSearchQuery"
                 :detailViewMode="detailViewMode"
-                :isLoading="isLoading"
-                :isDetailLoading="isDetailLoading"
-                :exportFilename="`${props.tabSelected.tabRouter}-logs`"
-                :exportFunction="exportFunctionMapper"
-                :rowClass="getRowClass"
-                :debouncedSearchQuery="debouncedSearchQuery"
-                :dataset="props.tabSelected.dataset"
-                :highlightText="highlightText"
-                :isRowActive="isRowActive"
-                :getFieldValue="getFieldValue"
-                @row-click="onRowClick"
-                @select-row="selectRow"
-                @add-filter="handleAddFilter"
-                @exclude-filter="handleExcludeFilter"
-                @notify="(payload) => toast.add(payload)"
+                :isFullscreen="isFullscreen"
+                :pageSize="pageSize"
+                :pageSizeOptions="PAGE_SIZE_OPTIONS"
+                :exportMenuItems="exportMenuItems"
+                @update:sidebarVisible="sidebarVisible = $event"
+                @update:documentSearchQuery="documentSearchQuery = $event"
+                @update:isFullscreen="isFullscreen = $event"
+                @toggle-detail-mode="toggleDetailViewMode"
+                @page-size-change="handlePageSizeChange"
+              />
+              <div
+                ref="tableContainerRef"
+                class="flex flex-col flex-1 min-w-0 min-h-0 overflow-hidden outline-none"
+                tabindex="0"
+              >
+                <DiscoverDataTable
+                  ref="discoverDataTableRef"
+                  :data="filteredTableData"
+                  :selectedFields="selectedFields"
+                  :expandedRows="expandedRows"
+                  @update:expandedRows="expandedRows = $event"
+                  :detailViewMode="detailViewMode"
+                  :isLoading="isLoading"
+                  :isDetailLoading="isDetailLoading"
+                  :exportFilename="`${props.tabSelected.tabRouter}-logs`"
+                  :exportFunction="exportFunctionMapper"
+                  :rowClass="getRowClass"
+                  :debouncedSearchQuery="debouncedSearchQuery"
+                  :dataset="props.tabSelected.dataset"
+                  :highlightText="highlightText"
+                  :isRowActive="isRowActive"
+                  :getFieldValue="getFieldValue"
+                  @row-click="onRowClick"
+                  @select-row="selectRow"
+                  @add-filter="handleAddFilter"
+                  @exclude-filter="handleExcludeFilter"
+                  @notify="(payload) => toast.add(payload)"
+                />
+              </div>
+              <LoadMoreFooter
+                :isLoadingMore="isLoadingMore"
+                :hasMoreData="hasMoreData"
+                :tableLength="tableData.length"
+                :recordsFound="recordsFound"
+                :pageSize="pageSize"
+                @load-more="loadMoreData"
               />
             </div>
-            <LoadMoreFooter
-              :isLoadingMore="isLoadingMore"
-              :hasMoreData="hasMoreData"
-              :tableLength="tableData.length"
-              :recordsFound="recordsFound"
-              :pageSize="pageSize"
-              @load-more="loadMoreData"
-            />
-          </div>
-        </template>
-      </ResizableSplitter>
+          </template>
+        </ResizableSplitter>
+      </div>
       <DetailSidebarPanel
         v-if="detailViewMode === 'sidebar'"
         :visible="detailSidebarVisible"
@@ -505,6 +507,17 @@
     display: flex; align-items: stretch; flex: 1; min-height: 300px;
     border: 1px solid var(--surface-border); border-radius: var(--border-radius);
     overflow: hidden; background: var(--surface-card);
+  }
+  .discover-layout__main {
+    display: flex;
+    flex: 1 1 0%;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .discover-layout__main > :deep(.resizable-splitter) {
+    flex: 1 1 0%;
+    width: auto !important;
+    min-width: 0;
   }
   .discover-layout--fullscreen { flex: 1; border: none; border-radius: 0; }
   :deep(.discover-layout .panel-a) { background: var(--surface-ground); }

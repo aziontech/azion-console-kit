@@ -98,7 +98,8 @@ export function aggregateIntoBuckets(rawData, rangeStart, rangeEnd) {
 }
 
 /**
- * Calculate a "nice" Y-axis maximum (1, 2, 5 pattern).
+ * Calculate a "nice" Y-axis maximum (1, 1.5, 2, 3, 5 pattern).
+ * Uses tighter rounding to keep bars visually proportional.
  */
 export function niceYMax(maxValue) {
   if (maxValue <= 0) return 5
@@ -106,8 +107,11 @@ export function niceYMax(maxValue) {
   const normalized = maxValue / magnitude
   let multiplier = 10
   if (normalized <= 1) multiplier = 1
+  else if (normalized <= 1.5) multiplier = 1.5
   else if (normalized <= 2) multiplier = 2
+  else if (normalized <= 3) multiplier = 3
   else if (normalized <= 5) multiplier = 5
+  else if (normalized <= 7) multiplier = 7
   return multiplier * magnitude
 }
 

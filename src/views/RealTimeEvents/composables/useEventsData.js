@@ -190,10 +190,12 @@ export function useEventsData({
         kpis.value = rk
 
         // KPI fallback: when the chart path (Metrics API) did not attach KPIs,
+        // OR attached incomplete KPIs (missing status breakdown / avg request time),
         // issue a dedicated Events-API KPI request (Requirement 6.1, 6.5, 6.6)
         const needsKpiFallback =
           (tabSelected.value?.showSummary ?? false) &&
-          (rk === null || rk === undefined)
+          (rk === null || rk === undefined ||
+            !rk.supportsStatusBreakdown || !rk.supportsRequestTime)
         if (needsKpiFallback) {
           const fallback = await loadSummaryKpisSafe({
             dataset: tabSelected.value?.dataset,
@@ -203,7 +205,12 @@ export function useEventsData({
           })
           if (myToken !== chartLoadToken) return
           if (fallback) {
-            kpis.value = { ...fallback, partialFilter: !!result?.partialFilter }
+            // Merge: chart-provided total preserved, fallback adds breakdown/avg
+            kpis.value = {
+              ...rk,
+              ...fallback,
+              partialFilter: !!result?.partialFilter
+            }
           }
         }
       }

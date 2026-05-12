@@ -145,9 +145,10 @@
     background: var(--surface-ground);
     align-self: stretch;
     overflow: hidden;
-    width: 360px;
+    width: 30vw;
     min-width: 280px;
-    max-width: 40vw;
+    max-width: 420px;
+    max-height: 100%;
     flex-shrink: 0;
   }
 
@@ -155,7 +156,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.625rem 0.75rem;
+    padding: 0.5rem 0.75rem;
     border-bottom: 1px solid var(--surface-border);
     gap: 0.5rem;
     background: var(--surface-card);
@@ -175,7 +176,7 @@
   }
 
   .detail-sidebar__title {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-color);
     white-space: nowrap;
@@ -185,7 +186,7 @@
   }
 
   .detail-sidebar__subtitle {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-color-secondary);
     font-family: var(--rte-font-mono);
     white-space: nowrap;
@@ -218,15 +219,16 @@
   /* ── Responsive ─────────────────────────────────────────────────── */
   @media (max-width: 1100px) {
     .detail-sidebar {
-      width: 320px;
+      width: 32vw;
       min-width: 260px;
+      max-width: 380px;
     }
   }
 
   @media (max-width: 900px) {
     .detail-sidebar {
-      width: 300px;
-      min-width: 240px;
+      width: 320px;
+      min-width: 260px;
       max-width: 50vw;
     }
   }

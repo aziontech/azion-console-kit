@@ -91,30 +91,32 @@
     flex-direction: column;
     gap: 0.5rem;
     border: 1px solid var(--surface-border);
-    padding: 0.75rem;
+    padding: 0.5rem 0.625rem;
     border-radius: var(--border-radius);
   }
 
   .filter-bar__row {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.375rem;
     flex-wrap: wrap;
+    min-width: 0;
   }
 
   .filter-bar__dataset {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.375rem;
     flex-shrink: 0;
   }
 
   .filter-bar__dataset-dropdown {
-    width: 13rem;
+    flex: 0 0 auto;
+    width: clamp(7rem, 15vw, 10rem);
     height: 2rem;
   }
 
-  /* Force uniform height on all interactive elements inside filter-bar */
+  /* Uniform 2rem height on all interactive elements */
   :deep(.filter-bar__filters .p-button),
   :deep(.filter-bar__filters .p-inputtext),
   :deep(.filter-bar__filters .p-dropdown) {
@@ -134,7 +136,6 @@
     align-items: center;
   }
 
-  /* DataTimeRange inputgroup: force uniform height and remove double borders */
   :deep(.filter-bar__filters .p-inputgroup) {
     height: 2rem;
     display: flex;
@@ -161,14 +162,12 @@
     padding-bottom: 0 !important;
   }
 
-  /* Refresh / Update buttons */
   :deep(.afs-filter-row__actions .p-button) {
     height: 2rem !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
   }
 
-  /* Saved queries button */
   :deep(.filter-bar__filters-inner > .p-button) {
     height: 2rem !important;
     padding-top: 0 !important;
@@ -176,39 +175,27 @@
   }
 
   .filter-bar__filters {
-    flex: 1 1 300px;
+    flex: 1 1 0%;
     min-width: 0;
   }
 
   .filter-bar__filters-inner {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-  }
-
-  .filter-bar__aql {
-    flex: 1;
+    gap: 0.375rem;
     min-width: 0;
   }
 
-  @media (max-width: 768px) {
-    .filter-bar__row {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
+  .filter-bar__aql {
+    flex: 1 1 0%;
+    min-width: 0;
+    max-width: 100%;
+  }
 
-    .filter-bar__dataset {
-      width: 100%;
-    }
-
-    .filter-bar__dataset-dropdown {
-      flex: 1;
-      width: auto;
-    }
-
-    .filter-bar__filters {
-      width: 100%;
-      flex-basis: 100%;
-    }
+  /* AQL input respects container width via flex shrinking */
+  :deep(.filter-bar__aql .p-inputgroup),
+  :deep(.filter-bar__aql .p-inputtext) {
+    width: 100%;
+    min-width: 0;
   }
 </style>

@@ -541,14 +541,17 @@ export function buildC3Config({
       [axisYKey]: {
         ...(yMax !== undefined ? { max: yMax } : {}),
         min: 0,
-        padding: { top: 24, bottom: 0 },
+        padding: { top: 0, bottom: 0 },
         tick: { count: 5, format: formatCompact }
       }
     },
     legend: {
       show: isMulti,
       position: 'bottom',
-      equally: true
+      equally: false,
+      item: {
+        tile: { width: 10, height: 10 }
+      }
     },
     tooltip: {
       grouped: isMulti,

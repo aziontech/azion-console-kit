@@ -106,6 +106,25 @@
     return formatDateSimple(model.value.endDate)
   })
 
+  // Compact display: "May 10 @ 04:43" (no year, no seconds) — saves ~8ch per input
+  const formatCompactDate = (dateStr) => {
+    if (!dateStr) return dateStr
+    // "May 10, 2026 @ 04:43:00" → "May 10 @ 04:43"
+    const match = dateStr.match(/^(\w+ \d+),\s*\d{4}\s*@\s*(\d{2}:\d{2})/)
+    if (match) return `${match[1]} @ ${match[2]}`
+    return dateStr
+  }
+
+  const startDisplayInput = computed(() => {
+    const raw = model.value.labelStart || startDateInput.value
+    return formatCompactDate(raw)
+  })
+
+  const endDisplayInput = computed(() => {
+    const raw = model.value.labelEnd || endDateInput.value
+    return formatCompactDate(raw)
+  })
+
   const isInvalidRange = computed(() => {
     const start = model.value?.startDate
     const end = model.value?.endDate
@@ -126,10 +145,8 @@
   }
 
   const sizeInput = (value) => {
-    if (value.length > 5) {
-      return value.length
-    }
-    return 7
+    if (!value) return 7
+    return value.length
   }
 
   const clampToBounds = (date) => {
@@ -463,9 +480,9 @@
           isOverlayOpen && editingField === 'start' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
         ]"
         :style="{
-          width: `${sizeInput(model.labelStart || startDateInput)}ch`
+          width: `${sizeInput(startDisplayInput)}ch`
         }"
-        :value="model.labelStart ? model.labelStart : startDateInput"
+        :value="startDisplayInput"
         readonly
         @click="openStart"
       />
@@ -485,9 +502,9 @@
           isOverlayOpen && editingField === 'end' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
         ]"
         :style="{
-          width: `${sizeInput(model.labelEnd || endDateInput)}ch`
+          width: `${sizeInput(endDisplayInput)}ch`
         }"
-        :value="model.labelEnd ? model.labelEnd : endDateInput"
+        :value="endDisplayInput"
         readonly
         @click="openEnd"
       />

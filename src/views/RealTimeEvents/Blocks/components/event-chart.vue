@@ -746,13 +746,13 @@
   }
 
   .chart-loading {
-    height: 180px;
+    height: 200px;
     padding: 0.75rem;
   }
 
   .chart-container {
     position: relative;
-    height: 180px;
+    height: 200px;
     padding: 0.25rem;
     cursor: crosshair;
   }
@@ -778,8 +778,22 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    height: 180px;
+    height: 200px;
     color: var(--text-color-secondary);
+  }
+
+  /* ── C3 legend: wrap and contain inside the chart area ── */
+  :deep(.c3-legend-item text) {
+    font-size: 11px !important;
+  }
+
+  :deep(.c3 .c3-legend-background) {
+    display: none;
+  }
+
+  /* Force C3 legend to wrap and not overflow */
+  :deep(svg.c3 g.c3-legend-item) {
+    font-size: 11px;
   }
 
   .chart-empty i {

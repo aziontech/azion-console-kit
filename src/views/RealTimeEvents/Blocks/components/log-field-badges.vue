@@ -13,7 +13,7 @@
     },
     maxFields: {
       type: Number,
-      default: 10
+      default: 5
     },
     highlightFields: {
       type: Array,
@@ -231,14 +231,16 @@
   /* ── More badge ───────────────────────────────────────────────── */
   .log-badge--more {
     color: var(--text-color-secondary);
-    font-weight: 500;
-    border-style: solid;
+    font-weight: 600;
+    border-style: dashed;
     cursor: pointer;
+    background: var(--surface-ground);
   }
 
   .log-badge--more:hover {
     background: var(--surface-200);
-    color: var(--text-color);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
   }
 
   /* ── Badge parts ──────────────────────────────────────────────── */
