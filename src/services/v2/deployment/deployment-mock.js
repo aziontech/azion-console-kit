@@ -22,86 +22,90 @@ const getCurrentTimestamp = () => {
 let deployments = [
   {
     id: '1',
+    name: 'Production Release v2.4.0',
     hash: 'a1b2c3d4',
     environment: 'production',
     isCurrent: true,
     status: formatStatus('ready'),
     resourcePack: {
-      application: { name: 'Console kit', hash: 'qa1hsa' },
-      firewall: { name: 'Azion Global Firewall', hash: 'k12wk' },
-      workload: { name: 'Console Domain', hash: 'ad12la' }
+      application: { name: 'Console kit', hash: 'v2.4.0' },
+      firewall: { name: 'Azion Global Firewall', hash: 'latest' }
     },
-    lastEditor: 'user@azion.com',
+    lastEditor: 'guilherme.santana@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
   },
   {
     id: '2',
+    name: 'Staging Hotfix - Auth Flow',
     hash: 'e5f6g7h8',
     environment: 'staging',
     isCurrent: false,
     status: formatStatus('building'),
     resourcePack: {
-      application: { name: 'Console kit', hash: 'bn3xpd' },
-      firewall: { name: 'Managed WAF', hash: 'x82lm' },
-      workload: { name: 'Staging Domain', hash: 'wz91ca' }
+      application: { name: 'Console kit', hash: 'latest' },
+      firewall: { name: 'Managed WAF', hash: 'latest' }
     },
-    lastEditor: 'admin@azion.com',
+    lastEditor: 'guilherme.santana@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
   },
   {
     id: '3',
+    name: 'Dev Sandbox Build',
     hash: 'i9j0k1l2',
     environment: 'development',
     isCurrent: false,
     status: formatStatus('draft'),
     resourcePack: {
-      application: { name: 'Dev Console kit', hash: 'dh2svl' },
-      firewall: { name: 'Development Firewall', hash: 'fc45km' },
-      workload: { name: 'Dev Domain', hash: 'nm21qy' }
+      application: { name: 'Dev Console kit', hash: 'latest' },
+      firewall: { name: 'Development Firewall', hash: 'latest' }
     },
-    lastEditor: 'dev@azion.com',
+    lastEditor: 'guilherme.santana@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
   },
   {
     id: '4',
+    name: 'Production Release v2.3.9',
     hash: 'm3n4o5p6',
     environment: 'production',
     isCurrent: false,
     status: formatStatus('error'),
     resourcePack: {
-      application: { name: 'Console kit', hash: 'qa1hsa' },
-      firewall: { name: 'Azion Global Firewall', hash: 'k12wk' },
-      workload: { name: 'Console Domain', hash: 'ad12la' }
+      application: { name: 'Console kit', hash: 'v2.3.9' },
+      firewall: { name: 'Azion Global Firewall', hash: 'latest' },
+      customPage: { name: 'Global error page', hash: 'latest' }
     },
-    lastEditor: 'user@azion.com',
+    lastEditor: 'guilherme.santana@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
   },
   {
     id: '5',
+    name: 'Canary Experiment',
     hash: 'q7r8s9t0',
     environment: 'staging',
     isCurrent: false,
     status: formatStatus('canceled'),
     resourcePack: {
-      application: { name: 'Console kit', hash: 'tr82mn' },
-      firewall: { name: 'Azion Global Firewall', hash: 'zb55qx' },
-      workload: { name: 'Canary Domain', hash: 'pd39vr' }
+      application: { name: 'Console kit', hash: 'latest' },
+      firewall: { name: 'Azion Global Firewall', hash: 'latest' },
+      wafRule: { name: 'Managed WAF', hash: 'latest' }
     },
-    lastEditor: 'admin@azion.com',
+    lastEditor: 'guilherme.santana@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
   },
   {
     id: '6',
+    name: 'Production Release v2.4.0',
     hash: 'i9j0k1l2',
     environment: 'production',
     isCurrent: true,
     status: formatStatus('ready'),
     resourcePack: {
-      application: { name: 'Console kit', hash: 'qa1hsa' },
-      firewall: { name: 'Azion Global Firewall', hash: 'k12wk' },
-      workload: { name: 'Console Domain', hash: 'ad12la' }
+      application: { name: 'Console kit', hash: 'v2.4.0' },
+      firewall: { name: 'Azion Global Firewall', hash: 'latest' },
+      customPage: { name: 'Global error page', hash: 'latest' },
+      wafRule: { name: 'Managed WAF', hash: 'latest' }
     },
-    lastEditor: 'dev@azion.com',
+    lastEditor: 'guilherme.santana@azion.com',
     lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
   }
 ]
@@ -254,6 +258,95 @@ export const rollbackDeploymentService = async (id) => {
   })
 
   return { data: deployments.find((deployment) => deployment.id === previousReady.id) }
+}
+
+// Generic placeholder version list — there is no real API for
+// "list versions of a resource" today. Swap when the endpoint exists.
+const PLACEHOLDER_VERSIONS = ['latest', 'v2.4.0', 'v2.3.9', 'v2.3.8']
+
+// eslint-disable-next-line no-unused-vars
+export const listResourceVersionsService = async (_type, _resourceIdentifier) => {
+  await simulateDelay(150)
+  return {
+    data: PLACEHOLDER_VERSIONS.map((version) => ({ value: version, label: version }))
+  }
+}
+
+export const getDeploymentByIdService = async (id) => {
+  await simulateDelay()
+  const deployment = deployments.find((dep) => dep.id === String(id))
+
+  if (!deployment) {
+    throw new Error('Deployment not found')
+  }
+
+  return { data: deployment }
+}
+
+const generateHash = () => Math.random().toString(36).slice(2, 10)
+
+export const createDeploymentService = async (payload) => {
+  await simulateDelay()
+
+  const newDeployment = {
+    id: String(Date.now()),
+    name: payload?.name?.trim() || 'Untitled deployment',
+    hash: generateHash(),
+    environment: payload?.environment || 'development',
+    isCurrent: false,
+    status: formatStatus(payload?.buildOnCreate ? 'building' : 'draft'),
+    resourcePack: payload?.resourcePack || {},
+    publishDomain: payload?.publishDomain || '',
+    description: payload?.description || '',
+    deploymentPolicy: payload?.deploymentPolicy || 'manual-approve',
+    deploymentStrategy: payload?.deploymentStrategy || 'all-at-once',
+    gradualDeploymentEnabled: Boolean(payload?.gradualDeploymentEnabled),
+    gradualVersion: payload?.gradualVersion || '',
+    trafficPercentage: Number(payload?.trafficPercentage ?? 10),
+    skewProtectionEnabled: Boolean(payload?.skewProtectionEnabled),
+    lastEditor: 'guilherme.santana@azion.com',
+    lastModified: formatDateToDayMonthYearHour(getCurrentTimestamp())
+  }
+
+  deployments = [newDeployment, ...deployments]
+
+  return {
+    data: newDeployment,
+    feedback: payload?.buildOnCreate
+      ? 'Deployment version build started'
+      : 'Deployment version saved as draft'
+  }
+}
+
+export const updateDeploymentService = async (id, payload) => {
+  await simulateDelay()
+  const index = findDeploymentIndexOrThrow(String(id))
+
+  if (deployments[index].status?.content !== 'Draft') {
+    throw new Error('Only draft deployments can be edited')
+  }
+
+  deployments[index] = updateDeploymentTimestamp({
+    ...deployments[index],
+    name: payload?.name?.trim() || deployments[index].name,
+    description: payload?.description ?? deployments[index].description ?? '',
+    environment: payload?.environment ?? deployments[index].environment,
+    publishDomain: payload?.publishDomain ?? deployments[index].publishDomain ?? '',
+    deploymentPolicy: payload?.deploymentPolicy ?? deployments[index].deploymentPolicy,
+    deploymentStrategy: payload?.deploymentStrategy ?? deployments[index].deploymentStrategy,
+    gradualDeploymentEnabled: Boolean(payload?.gradualDeploymentEnabled),
+    gradualVersion: payload?.gradualVersion ?? deployments[index].gradualVersion ?? '',
+    trafficPercentage: Number(
+      payload?.trafficPercentage ?? deployments[index].trafficPercentage ?? 10
+    ),
+    skewProtectionEnabled: Boolean(payload?.skewProtectionEnabled),
+    resourcePack: payload?.resourcePack ?? deployments[index].resourcePack ?? {}
+  })
+
+  return {
+    data: deployments[index],
+    feedback: 'Deployment version updated'
+  }
 }
 
 export const promoteDeploymentService = async (id) => {
