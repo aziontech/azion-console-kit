@@ -1,6 +1,8 @@
 // src/services/v2/deployment/deployment-mock.js
 
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 // Helper to format status for display
 const formatStatus = (status) => {
@@ -18,6 +20,88 @@ const formatStatus = (status) => {
 const getCurrentTimestamp = () => {
   return new Date().toISOString()
 }
+
+const kindToQueryKey = {
+  workload: queryKeys.workload.all,
+  application: queryKeys.application.all,
+  firewall: queryKeys.firewall.all,
+  variable: queryKeys.variables.all,
+  connector: queryKeys.edgeConnectors.all,
+  edgeDns: queryKeys.edgeDNS.all,
+  edgeNode: queryKeys.edgeNode.all,
+  dataStream: queryKeys.dataStream.all,
+  digitalCertificate: queryKeys.digitalCertificates.all,
+  customPage: queryKeys.customPages.all,
+  edgeService: queryKeys.edgeService.all,
+  function: queryKeys.edgeFunction.all,
+  networkList: queryKeys.networkLists.all,
+  wafRule: queryKeys.waf.all,
+  objectStorage: queryKeys.edgeStorage.buckets.all(),
+  sqlDatabase: queryKeys.edgeSql.all
+}
+
+const textKeys = ['text', 'content', 'value', 'label', 'name', 'key']
+
+const resolvePrimitiveText = (value) => {
+  if (value == null) return ''
+  if (typeof value === 'string' || typeof value === 'number') return String(value)
+  if (typeof value === 'object') {
+    for (const key of textKeys) {
+      const candidate = value[key]
+      if (typeof candidate === 'string' || typeof candidate === 'number') {
+        return String(candidate)
+      }
+    }
+  }
+  return ''
+}
+
+const extractListItems = (data) => {
+  if (Array.isArray(data)) return data
+  if (Array.isArray(data?.body)) return data.body
+  if (Array.isArray(data?.data)) return data.data
+  if (Array.isArray(data?.results)) return data.results
+  return []
+}
+
+const pickFirstFromCache = (kind) => {
+  const queryKey = kindToQueryKey[kind]
+  if (!queryKey) return null
+
+  try {
+    const entries = queryClient.getQueriesData({ queryKey })
+    for (const [, data] of entries) {
+      const items = extractListItems(data)
+      if (items.length === 0) continue
+
+      const first = items[0]
+      const name = resolvePrimitiveText(first?.name) || resolvePrimitiveText(first?.key)
+      if (!name) continue
+
+      return { name, hash: 'latest' }
+    }
+  } catch {
+    return null
+  }
+
+  return null
+}
+
+const hydrateResourcePack = (resourcePack) => {
+  if (!resourcePack || typeof resourcePack !== 'object') return resourcePack
+
+  const hydrated = {}
+  for (const [kind, entry] of Object.entries(resourcePack)) {
+    const fromCache = pickFirstFromCache(kind)
+    hydrated[kind] = fromCache || entry
+  }
+  return hydrated
+}
+
+const hydrateDeployment = (deployment) =>
+  deployment
+    ? { ...deployment, resourcePack: hydrateResourcePack(deployment.resourcePack) }
+    : deployment
 
 let deployments = [
   {
@@ -130,7 +214,7 @@ export const listDeploymentsService = async () => {
   await simulateDelay()
   // Return deployments sorted by most recent first (reverse order)
   return {
-    data: [...deployments].reverse(),
+    data: [...deployments].reverse().map(hydrateDeployment),
     total: deployments.length
   }
 }
@@ -169,7 +253,7 @@ export const cloneDeploymentToDraftService = async (id) => {
 
   deployments = [updateDeploymentTimestamp(clonedDeployment), ...deployments]
 
-  return { data: deployments[0] }
+  return { data: hydrateDeployment(deployments[0]) }
 }
 
 export const buildDeploymentService = async (id) => {
@@ -280,7 +364,7 @@ export const getDeploymentByIdService = async (id) => {
     throw new Error('Deployment not found')
   }
 
-  return { data: deployment }
+  return { data: hydrateDeployment(deployment) }
 }
 
 const generateHash = () => Math.random().toString(36).slice(2, 10)
@@ -311,7 +395,7 @@ export const createDeploymentService = async (payload) => {
   deployments = [newDeployment, ...deployments]
 
   return {
-    data: newDeployment,
+    data: hydrateDeployment(newDeployment),
     feedback: payload?.buildOnCreate
       ? 'Deployment version build started'
       : 'Deployment version saved as draft'
