@@ -400,6 +400,12 @@
     return vcsField?.required === true || vcsField?.attrs?.required === true
   })
 
+  const vcsFieldDescription = computed(() => {
+    if (!hasIntegrations.value) return ''
+    const vcsField = props.schema?.properties?.[vcsIntegrationFieldName.value]
+    return vcsField?.description || ''
+  })
+
   /**
    * Computed property for repository groups (group[0])
    * Returns the first group from the schema groups array
@@ -836,7 +842,6 @@
             class="flex flex-col gap-2"
           >
             <LabelBlock
-              v-if="isVcsRequired"
               label="Git Scope"
               :for="vcsIntegrationFieldName"
               :isRequired="isVcsRequired"
@@ -869,6 +874,12 @@
                 </div>
               </template>
             </Dropdown>
+            <small
+              v-if="vcsFieldDescription"
+              class="text-xs text-color-secondary font-normal leading-5"
+            >
+              {{ vcsFieldDescription }}
+            </small>
             <small
               v-if="vcsIntegrationError"
               class="p-error text-xs font-normal leading-tight"

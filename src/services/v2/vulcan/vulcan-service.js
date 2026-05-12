@@ -4,7 +4,7 @@ import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { getCacheOptions, CACHE_TYPE } from '@/services/v2/base/query/queryOptions'
 
 export class VulcanService extends BaseService {
-  #baseURL = 'utils/presets'
+  #baseURL = 'v4/utils/presets'
 
   fetchPresets = async ({ signal } = {}) => {
     try {
