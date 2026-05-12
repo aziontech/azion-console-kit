@@ -5,6 +5,16 @@
   import Menu from '@aziontech/webkit/menu'
   import GenericDataView from '@/views/Deployments/components/GenericDataView.vue'
   import { useToast } from '@aziontech/webkit/use-toast'
+  import { DataTableActionsButtons } from '@/components/list-table'
+  import DeploymentsDrawer from '@/views/Deployments/Drawer'
+  import {
+    getStatusIcon,
+    getStatusClass,
+    getDeploymentStatus,
+    getResourcePackRows,
+    resourcePackTypeMeta,
+    normalizeText
+  } from '@/views/Deployments/helpers/deployment-status'
 
   defineOptions({ name: 'list-deployments' })
 
@@ -47,9 +57,9 @@
     {
       key: 'deployment',
       label: 'Deployment',
-      headerClass: 'min-w-[170px] flex-[2_1_170px]',
+      headerClass: 'min-w-[280px] flex-[2.5_1_280px]',
       cellClass:
-        'min-w-[170px] flex-[2_1_170px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
+        'min-w-[280px] flex-[2.5_1_280px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
     },
     {
       key: 'environment',
@@ -93,35 +103,15 @@
 
   const textKeys = ['text', 'content', 'value', 'label', 'name', 'email']
 
-  const statusIconMap = {
-    ready: 'pi pi-check-circle',
-    building: 'pi pi-spinner',
-    draft: 'pi pi-clock',
-    error: 'pi pi-times-circle',
-    canceled: 'pi pi-ban'
+  const drawerRef = ref(null)
+
+  const handleOpenCreateDrawer = () => {
+    drawerRef.value?.openCreateDrawer()
   }
 
-  const resourcePackTypeMeta = [
-    { key: 'application', label: 'Application', icon: 'ai ai-edge-application' },
-    { key: 'firewall', label: 'Firewall', icon: 'ai ai-edge-firewall' },
-    { key: 'workload', label: 'Workload', icon: 'ai ai-workloads' }
-  ]
-
-  const getStatusIcon = (status) => {
-    const normalizedStatus = String(status || '')
-      .trim()
-      .toLowerCase()
-    const baseIcon = statusIconMap[normalizedStatus] || 'pi pi-info-circle'
-
-    return normalizedStatus === 'building' ? `${baseIcon} animate-spin` : baseIcon
+  const handleOpenEditDrawer = (deployment) => {
+    drawerRef.value?.openEditDrawer(deployment)
   }
-  const getStatusClass = (deployment) => `status-${deployment?.status?.severity || 'secondary'}`
-  const getDeploymentStatus = (deployment) => normalizeText(deployment?.status?.content)
-
-  const normalizeText = (value) =>
-    String(value || '')
-      .trim()
-      .toLowerCase()
 
   const statusOptions = computed(() => {
     const statuses = Array.from(
@@ -212,6 +202,7 @@
     return deployments.value.filter((deployment) => {
       const searchableValues = [
         deployment.id,
+        deployment.name,
         deployment.hash,
         deployment.environment,
         deployment.status?.content,
@@ -268,11 +259,7 @@
   }
 
   const normalizeResourcePack = (resourcePack, item) => {
-    const normalized = {
-      application: null,
-      firewall: null,
-      workload: null
-    }
+    const normalized = Object.fromEntries(resourcePackTypeMeta.map((meta) => [meta.key, null]))
 
     if (resourcePack && typeof resourcePack === 'object') {
       for (const meta of resourcePackTypeMeta) {
@@ -280,7 +267,8 @@
       }
     }
 
-    if (!normalized.application && !normalized.firewall && !normalized.workload) {
+    const hasAnyEntry = resourcePackTypeMeta.some((meta) => normalized[meta.key])
+    if (!hasAnyEntry) {
       const legacyType = normalizeLegacyResourceType(item?.resource)
       if (legacyType) {
         normalized[legacyType] = {
@@ -291,23 +279,6 @@
     }
 
     return normalized
-  }
-
-  const getResourcePackRows = (deployment) => {
-    return resourcePackTypeMeta
-      .map((meta) => {
-        const entry = deployment.resourcePack?.[meta.key]
-        if (!entry) return null
-
-        return {
-          key: meta.key,
-          label: meta.label,
-          icon: meta.icon,
-          name: entry.name || '--',
-          hash: entry.hash || '--'
-        }
-      })
-      .filter(Boolean)
   }
 
   const getResourcePackSearchText = (deployment) => {
@@ -354,6 +325,7 @@
   const normalizeDeployments = (list) => {
     return list.map((item, index) => ({
       id: resolvePrimitiveText(item?.id) || `deployment-${index}`,
+      name: resolvePrimitiveText(item?.name),
       hash: resolvePrimitiveText(item?.hash),
       environment: resolvePrimitiveText(item?.environment),
       isCurrent: Boolean(item?.isCurrent),
@@ -637,7 +609,16 @@
         pageTitle="Deployments"
         description="View and manage your deployment history."
         data-testid="deployments-heading"
-      />
+      >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="Deployment Version"
+            @click="handleOpenCreateDrawer"
+            data-testid="create_deployment_version_button"
+          />
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <GenericDataView
@@ -664,18 +645,19 @@
         @open-row-menu="({ event, deployment }) => openRowMenu(event, deployment)"
       >
         <template #cell-deployment="{ item: deployment }">
-          <div class="min-w-0 flex-1">
-            <p
-              class="m-0 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-sm font-normal leading-6 text-[var(--text-color)]"
-            >
-              {{ deployment.hash || '--' }}
-            </p>
-            <div
-              v-if="deployment.isCurrent"
-              class="mt-1 inline-flex items-center gap-2 text-xs leading-6 text-[var(--text-color-secondary)]"
-            >
+          <div class="min-w-0 flex flex-col gap-1">
+            <div class="flex min-w-0 items-center gap-2">
+              <button
+                type="button"
+                class="deployment-name-button m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-medium leading-6 text-[var(--text-color)] hover:text-[var(--primary-color)] focus-visible:text-[var(--primary-color)] focus-visible:outline-none"
+                :data-testid="`deployment-row-open__${deployment.id}`"
+                @click="handleOpenEditDrawer(deployment)"
+              >
+                {{ deployment.name || '--' }}
+              </button>
               <span
-                class="current-badge inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium leading-6"
+                v-if="deployment.isCurrent"
+                class="bg-blue-500/10 text-blue-500 inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium leading-6"
               >
                 <i class="pi pi-arrow-up" />
                 Current
@@ -705,27 +687,31 @@
         </template>
 
         <template #cell-resource-pack="{ item: deployment }">
-          <div class="flex min-w-0 flex-1 flex-col gap-1.5">
+          <div class="flex flex-col gap-1.5">
             <div
               v-for="resourceItem in getResourcePackRows(deployment)"
               :key="`${deployment.id}-${resourceItem.key}`"
-              class="inline-flex min-w-0 items-center gap-1.5"
+              class="flex w-full min-w-0 items-center gap-1.5"
             >
-              <i
-                :class="resourceItem.icon"
-                class="text-sm text-[var(--text-color-secondary)]"
-              />
-              <span class="text-xs leading-6 text-[var(--text-color-secondary)]"
-                >{{ resourceItem.label }}:</span
-              >
-              <span class="overflow-hidden text-ellipsis whitespace-nowrap">{{
-                resourceItem.name
-              }}</span>
-              <span
-                class="resource-hash-tag whitespace-nowrap rounded border border-[var(--surface-border)] px-1.5 py-px font-mono text-[0.6875rem] leading-6 text-[var(--text-color-secondary)]"
-              >
-                {{ resourceItem.hash }}
-              </span>
+              <div class="flex w-[40%] gap-2">
+                <i
+                  :class="resourceItem.icon"
+                  class="text-sm text-[var(--text-color-secondary)]"
+                />
+                <span class="text-xs leading-6 text-[var(--text-color-secondary)]"
+                  >{{ resourceItem.label }}:</span
+                >
+              </div>
+              <div class="flex gap-2 w-full justify-start">
+                <span class="overflow-hidden text-ellipsis whitespace-nowrap">{{
+                  resourceItem.name
+                }}</span>
+                <span
+                  class="resource-hash-tag whitespace-nowrap rounded border border-[var(--surface-border)] px-1.5 py-px font-mono text-[0.6875rem] leading-6 text-[var(--text-color-secondary)]"
+                >
+                  {{ resourceItem.hash }}
+                </span>
+              </div>
             </div>
             <span
               v-if="!getResourcePackRows(deployment).length"
@@ -756,6 +742,11 @@
       />
     </template>
   </ContentBlock>
+
+  <DeploymentsDrawer
+    ref="drawerRef"
+    @onSuccess="loadDeployments"
+  />
 </template>
 
 <style scoped>
@@ -764,33 +755,11 @@
     background: var(--surface-ground);
   }
 
-  .status-success {
-    background: color-mix(in srgb, var(--green-500, #22c55e) 12%, transparent);
-    color: var(--green-500, #22c55e);
-  }
-
-  .status-warning {
-    background: color-mix(in srgb, var(--yellow-500, #f59e0b) 12%, transparent);
-    color: var(--yellow-500, #f59e0b);
-  }
-
-  .status-danger {
-    background: color-mix(in srgb, var(--red-600, #dc2626) 12%, transparent);
-    color: var(--red-600, #dc2626);
-  }
-
-  .status-info {
-    background: color-mix(in srgb, var(--blue-500, #3b82f6) 12%, transparent);
-    color: var(--blue-500, #3b82f6);
-  }
-
-  .status-secondary {
-    background: color-mix(in srgb, var(--text-color-secondary) 12%, transparent);
-    color: var(--text-color-secondary);
-  }
-
-  .current-badge {
-    background: color-mix(in srgb, var(--blue-500, #3b82f6) 15%, transparent);
-    color: var(--blue-500, #3b82f6);
+  .deployment-name-button {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
   }
 </style>
