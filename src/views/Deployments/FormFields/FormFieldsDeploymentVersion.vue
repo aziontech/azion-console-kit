@@ -35,7 +35,6 @@
   const { value: name } = useField('name')
   const { value: description } = useField('description')
   const { value: environment } = useField('environment')
-  const { value: publishDomain } = useField('publishDomain')
   const { value: deploymentPolicy } = useField('deploymentPolicy')
   const { value: deploymentStrategy } = useField('deploymentStrategy')
   const { value: gradualDeploymentEnabled } = useField('gradualDeploymentEnabled')
@@ -465,7 +464,6 @@
             optionLabel="label"
             optionValue="value"
             appendTo="self"
-            description="Target stage for this version."
             :disabled="allFieldsDisabled"
             data-testid="deployment-version-form__environment-field"
           />
@@ -487,16 +485,6 @@
             </span>
           </div>
         </div>
-
-        <FieldText
-          label="Publish domain"
-          name="publishDomain"
-          placeholder="example.azionedge.net"
-          description="Optional. Bind this version to a domain when it's published."
-          :value="publishDomain"
-          :disabled="allFieldsDisabled"
-          data-testid="deployment-version-form__publish-domain-field"
-        />
       </div>
     </template>
   </FormHorizontal>
