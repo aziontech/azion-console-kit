@@ -7,7 +7,9 @@
   const props = defineProps(rendererProps())
 
   const { control, handleChange } = useJsonFormsControl(props)
-  const isChanged = ref(false)
+  const isBlurred = ref(false)
+  // Store the error at blur/change time to prevent updates during interaction
+  const blurredError = ref('')
   // Inject validationAttempted to show errors when validation is triggered
   const validationAttempted = inject('validationAttempted', ref(false))
   // Inject function to check if field is required and empty
@@ -27,14 +29,18 @@
     const fieldName = path.value
     return isFieldRequiredAndEmpty(fieldName)
   })
-  // Show error when field was changed OR when validation was attempted (e.g., on form submit)
+  // Show error only after blur/change or validation attempted - use stored blurredError to prevent updates during interaction
   const errorMessage = computed(() => {
-    // If field is required and empty, show "Required" message
-    if ((isChanged.value || validationAttempted.value) && isRequiredAndEmpty.value) {
-      return 'Required'
+    // If validation was attempted (e.g., form submit), show current error
+    if (validationAttempted.value) {
+      if (isRequiredAndEmpty.value) return 'Required'
+      return error.value
     }
-    // Otherwise show validation error if any
-    return isChanged.value || validationAttempted.value ? error.value : ''
+    // If field was blurred, show the stored error from blur time
+    if (isBlurred.value) {
+      return blurredError.value
+    }
+    return ''
   })
 
   const placeholder = computed(() => control.value.schema.placeholder || '')
@@ -58,12 +64,25 @@
   const optionValue = computed(() => control.value.schema.optionValue || 'value')
 
   const onChange = (value) => {
-    isChanged.value = true
+    isBlurred.value = true
     handleChange(path.value, value)
+    // Capture the error at change time for dropdown
+    if (isRequiredAndEmpty.value) {
+      blurredError.value = 'Required'
+    } else {
+      blurredError.value = error.value
+    }
     emit('change', value)
   }
 
   const onBlur = () => {
+    isBlurred.value = true
+    // Capture the error at blur time
+    if (isRequiredAndEmpty.value) {
+      blurredError.value = 'Required'
+    } else {
+      blurredError.value = error.value
+    }
     emit('blur')
   }
 </script>

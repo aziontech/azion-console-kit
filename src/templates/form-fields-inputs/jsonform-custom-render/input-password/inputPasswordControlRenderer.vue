@@ -7,7 +7,9 @@
   const props = defineProps(rendererProps())
 
   const { control, handleChange } = useJsonFormsControl(props)
-  const isChanged = ref(false)
+  const isBlurred = ref(false)
+  // Store the error at blur time to prevent updates during typing
+  const blurredError = ref('')
   // Inject validationAttempted to show errors when validation is triggered
   const validationAttempted = inject('validationAttempted', ref(false))
   // Inject function to check if field is required and empty
@@ -27,25 +29,35 @@
     const fieldName = path.value
     return isFieldRequiredAndEmpty(fieldName)
   })
-  // Show error when field was changed OR when validation was attempted (e.g., on form submit)
+  // Show error only after blur or validation attempted - use stored blurredError to prevent updates during typing
   const errorMessage = computed(() => {
-    // If field is required and empty, show "Required" message
-    if ((isChanged.value || validationAttempted.value) && isRequiredAndEmpty.value) {
-      return 'Required'
+    // If validation was attempted (e.g., form submit), show current error
+    if (validationAttempted.value) {
+      if (isRequiredAndEmpty.value) return 'Required'
+      return error.value
     }
-    // Otherwise show validation error if any
-    return isChanged.value || validationAttempted.value ? error.value : ''
+    // If field was blurred, show the stored error from blur time
+    if (isBlurred.value) {
+      return blurredError.value
+    }
+    return ''
   })
 
   const onChange = (value) => {
-    isChanged.value = true
     handleChange(path.value, value)
     emit('change', value)
   }
 
   const onBlur = (event) => {
+    isBlurred.value = true
     const value = event.target?.value
     handleChange(path.value, value)
+    // Capture the error at blur time to prevent it from updating during typing
+    if (isRequiredAndEmpty.value) {
+      blurredError.value = 'Required'
+    } else {
+      blurredError.value = error.value
+    }
     emit('blur', value)
   }
 </script>

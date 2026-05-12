@@ -103,9 +103,11 @@
     value: inputValue,
     errorMessage: veeValidateErrorMessage,
     handleBlur,
-    handleChange
+    setValue,
+    validate
   } = useField(name, undefined, {
-    initialValue: props.value
+    initialValue: props.value,
+    validateOnValueUpdate: false
   })
 
   const labelInput = computed(() => {
@@ -117,14 +119,15 @@
 
   const aditionalError = computed(() => props.aditionalError)
 
-  const onBlur = (event) => {
+  const onBlur = async (event) => {
     handleBlur(event)
+    await validate()
     emit('blur', event)
   }
 
-  const onChange = (event) => {
-    handleChange(event)
-    emit('input', event.target.value)
+  const onInput = (value) => {
+    setValue(value, false)
+    emit('input', value)
   }
 
   const togglePrivacy = () => {
@@ -181,7 +184,8 @@
     >
       <InputText
         v-bind="sensitive ? { 'data-sentry-mask': '' } : {}"
-        v-model="inputValue"
+        :modelValue="inputValue"
+        @update:modelValue="onInput"
         ref="inputRef"
         type="text"
         :data-testid="customTestId.input"
@@ -196,7 +200,6 @@
           { 'p-invalid': aditionalError || veeValidateErrorMessage },
           props.class
         ]"
-        @input="onChange"
         @keypress.enter.prevent
         @blur="onBlur"
       />

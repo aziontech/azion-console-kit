@@ -390,12 +390,16 @@
 
     formTools.value = { errors, setFieldValue, validate, validateField }
 
-    // Initialize fields with defineInputBinds (with validateOnInput: true for real-time validation)
+    // Initialize fields with defineInputBinds (validate only on blur, not on input/change)
     const registerFieldWithValueAndValidation = (field) => {
       if (field.value) {
         setFieldValue(field.name, field.value)
       }
-      field.input = defineInputBinds(field.name, { validateOnInput: true })
+      field.input = defineInputBinds(field.name, {
+        validateOnBlur: true,
+        validateOnChange: false,
+        validateOnInput: false
+      })
     }
 
     // Helper function to find a field by name across schema
@@ -565,7 +569,7 @@
   const handlePrivacyToggle = (isPublic) => {
     isEdgeAppNamePublic.value = isPublic
     if (formTools.value.setFieldValue) {
-      formTools.value.setFieldValue('az_repo', isPublic)
+      formTools.value.setFieldValue('az_repo', isPublic, false)
     }
   }
 
@@ -576,7 +580,7 @@
    */
   const updateValueOnChange = (fieldName, value) => {
     if (formTools.value.setFieldValue) {
-      formTools.value.setFieldValue(fieldName, value)
+      formTools.value.setFieldValue(fieldName, value, false)
     }
     // Update setIntegration when VCS integration field changes
     if (fieldName === vcsIntegrationFieldName.value) {
@@ -886,7 +890,6 @@
                   autocomplete="off"
                   toggleMask
                   v-bind="field.input"
-                  v-model="field.input.value"
                   :id="field.name"
                   class="w-full"
                   :class="renderInvalidClass(formTools.errors[field.name])"
@@ -1043,7 +1046,6 @@
                           autocomplete="off"
                           toggleMask
                           v-bind="field.input"
-                          v-model="field.input.value"
                           :id="field.name"
                           class="w-full"
                           :class="renderInvalidClass(formTools.errors[field.name])"
@@ -1188,7 +1190,6 @@
                         autocomplete="off"
                         toggleMask
                         v-bind="field.input"
-                        v-model="field.input.value"
                         :id="field.name"
                         class="w-full"
                         :class="renderInvalidClass(formTools.errors[field.name])"
@@ -1280,7 +1281,6 @@
                           autocomplete="off"
                           toggleMask
                           v-bind="field.input"
-                          v-model="field.input.value"
                           :id="field.name"
                           class="w-full"
                           :class="renderInvalidClass(formTools.errors[field.name])"
@@ -1356,7 +1356,6 @@
                         autocomplete="off"
                         toggleMask
                         v-bind="field.input"
-                        v-model="field.input.value"
                         :id="field.name"
                         class="w-full"
                         :class="renderInvalidClass(formTools.errors[field.name])"
