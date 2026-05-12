@@ -90,6 +90,7 @@
   const isEdgeAppNamePublic = ref(false)
   const vcsIntegrationError = ref('')
   const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
+  const oauthGithubRef = ref(null)
 
   /**
    * Computed property to determine if repository inputs should be disabled
@@ -588,10 +589,15 @@
   }
 
   /**
-   * Triggers GitHub connection via LayoutEngineBlock
+   * Triggers GitHub connection via OAuthGithub component
    */
   const triggerConnectWithGithub = () => {
-    layoutRef.value?.triggerConnectWithGithub()
+    if (oauthGithubRef.value) {
+      const ref = Array.isArray(oauthGithubRef.value)
+        ? oauthGithubRef.value[0]
+        : oauthGithubRef.value
+      ref?.connectWithGithub?.()
+    }
   }
 
   /**

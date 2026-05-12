@@ -822,10 +822,10 @@
       @open-url="handleOpenUrl"
       @next-step="handleNextStep"
     >
-      <!-- GitHub Connection Slot - Keep for OAuth callback but hidden -->
+      <!-- GitHub Connection Slot - Always render OAuthGithub for ref access, hidden via v-show -->
       <template #github-connection="slotProps">
         <OAuthGithub
-          v-if="hasIntegrations && !slotProps.hasIntegrationsList"
+          v-if="hasIntegrations"
           v-show="false"
           ref="oauthGithubRef"
           @onCallbackUrl="setCallbackUrl"
