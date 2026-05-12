@@ -68,7 +68,9 @@ const adapt = ({ body, statusCode }) => {
   const productsGrouped = groupBy(filteredAccountingDetail, ['productSlug', 'metricSlug'])
 
   const filteredProducts = productsGrouped.filter((item) => {
-    return ![BOT_MANAGER_SLUG].includes(item.productSlug)
+    const hasValue = item.accounted > 0
+    const isNotBotManager = ![BOT_MANAGER_SLUG].includes(item.productSlug)
+    return hasValue && isNotBotManager
   })
 
   const productsGroupedByRegion = groupBy(filteredAccountingDetail, [
@@ -170,7 +172,9 @@ const METRIC_SLUGS = {
   waf_requests: { title: 'WAF - Requests' },
   waf_rule_sets: { title: 'WAF - Rule Sets' },
   workload_data_transfer: { title: 'Workload - Data Transfer', unit: 'GB' },
-  workload_workloads: { title: 'Workload - Workloads', unit: 'Unit' }
+  workload_workloads: { title: 'Workload - Workloads' },
+  workload_requests: { title: 'Workload - Requests' },
+  application_requets: { title: 'Application Requests' }
 }
 
 const mapProducts = (productsGrouped, productsGroupedByRegion) => {

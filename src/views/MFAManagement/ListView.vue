@@ -4,9 +4,11 @@
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
+  import { DataTableActionsButtons } from '@/components/list-table'
   import { computed, ref } from 'vue'
   import ListTable from '@/components/list-table'
   import { mfaService } from '@/services/v2/mfa/mfa-service'
+  import { useRouter } from 'vue-router'
 
   const props = defineProps({
     documentationService: {
@@ -19,6 +21,7 @@
 
   const hasContentToList = ref(true)
   const listTableRef = ref()
+  const router = useRouter()
 
   const actions = [
     {
@@ -74,6 +77,10 @@
   const handleLoadData = (event) => {
     hasContentToList.value = event
   }
+
+  const handleNavigateToCreate = () => {
+    router.push('/mfa/setup')
+  }
 </script>
 
 <template>
@@ -82,7 +89,16 @@
       <PageHeadingBlock
         pageTitle="Multi-Factor Authentication Management"
         description="Define and manage multi-factor authentication settings for account security."
-      />
+      >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="MFA"
+            createPagePath="/mfa/setup"
+            data-testid="create_MFA_button"
+          />
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <ListTable
@@ -103,6 +119,8 @@
         v-else
         title="No MFA configurations yet"
         description="Create your first MFA configuration to enhance account security."
+        createButtonLabel="MFA"
+        @click-to-create="handleNavigateToCreate"
         :documentationService="props.documentationService"
       >
         <template #illustration>
