@@ -623,6 +623,15 @@
   }
 
   /**
+   * Detects yup's "X is required" message so we can suppress the helper text
+   * (red border stays via p-invalid / groupBorderClass).
+   */
+  const isRequiredError = (message) => {
+    if (!message) return false
+    return unescapeErrorMessage(message).endsWith('is required')
+  }
+
+  /**
    * Handles the privacy toggle change - updates both isEdgeAppNamePublic and az_repo field
    * @param {boolean} isPublic - Whether the field is public
    */
@@ -935,6 +944,7 @@
               <FieldInputTextPrivacy
                 v-else-if="isHandleField(field.name) && field.info === 'Edge Application Name'"
                 class="w-1/2"
+                :class="{ '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name]) }"
                 :name="field.name"
                 :label="field.label"
                 :value="field.value"
@@ -986,7 +996,7 @@
                   field.description
                 }}</small>
                 <small
-                  v-if="formTools.errors[field.name]"
+                  v-if="formTools.errors[field.name] && !isRequiredError(formTools.errors[field.name])"
                   class="p-error text-xs font-normal leading-tight"
                 >
                   {{ unescapeErrorMessage(formTools.errors[field.name]) }}
@@ -1091,6 +1101,7 @@
                       <!-- Regular field in group -->
                       <FieldInputTextPrivacy
                         v-if="field.info === 'Edge Application Name'"
+                        :class="{ '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name]) }"
                         :name="field.name"
                         :label="field.label"
                         :value="field.value"
@@ -1142,7 +1153,7 @@
                           field.description
                         }}</small>
                         <small
-                          v-if="formTools.errors[field.name]"
+                          v-if="formTools.errors[field.name] && !isRequiredError(formTools.errors[field.name])"
                           class="p-error text-xs font-normal leading-tight"
                         >
                           {{ unescapeErrorMessage(formTools.errors[field.name]) }}
@@ -1235,6 +1246,7 @@
                     <!-- Regular field in single group -->
                     <FieldInputTextPrivacy
                       v-if="field.info === 'Edge Application Name'"
+                      :class="{ '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name]) }"
                       :name="field.name"
                       :label="field.label"
                       :value="field.value"
@@ -1286,7 +1298,7 @@
                         field.description
                       }}</small>
                       <small
-                        v-if="formTools.errors[field.name]"
+                        v-if="formTools.errors[field.name] && !isRequiredError(formTools.errors[field.name])"
                         class="p-error text-xs font-normal leading-tight"
                       >
                         {{ unescapeErrorMessage(formTools.errors[field.name]) }}
@@ -1326,6 +1338,7 @@
                       <!-- Regular field in group -->
                       <FieldInputTextPrivacy
                         v-if="field.info === 'Edge Application Name'"
+                        :class="{ '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name]) }"
                         :name="field.name"
                         :label="field.label"
                         :value="field.value"
@@ -1377,7 +1390,7 @@
                           field.description
                         }}</small>
                         <small
-                          v-if="formTools.errors[field.name]"
+                          v-if="formTools.errors[field.name] && !isRequiredError(formTools.errors[field.name])"
                           class="p-error text-xs font-normal leading-tight"
                         >
                           {{ unescapeErrorMessage(formTools.errors[field.name]) }}
@@ -1402,6 +1415,7 @@
                     <FieldInputTextPrivacy
                       v-if="field.info === 'Edge Application Name'"
                       class="w-[calc(50%-0.75rem)]"
+                      :class="{ '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name]) }"
                       :name="field.name"
                       :label="field.label"
                       :value="field.value"
@@ -1453,7 +1467,7 @@
                         field.description
                       }}</small>
                       <small
-                        v-if="formTools.errors[field.name]"
+                        v-if="formTools.errors[field.name] && !isRequiredError(formTools.errors[field.name])"
                         class="p-error text-xs font-normal leading-tight"
                       >
                         {{ unescapeErrorMessage(formTools.errors[field.name]) }}

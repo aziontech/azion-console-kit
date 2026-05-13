@@ -63,7 +63,10 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
+  <div
+    class="flex flex-col gap-2"
+    :class="{ '[&_small.p-error]:hidden': errorMessage === 'Required' }"
+  >
     <fieldPassword
       :name="path"
       :label="label"
