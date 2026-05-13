@@ -5,11 +5,29 @@ import {
   contractService
 } from '@/services/v2/account'
 import { billingGqlService } from '@/services/v2/billing/billing-gql-service'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { useAccountStore } from '@/stores/account'
 import { setFeatureFlags } from '@/composables/user-flag'
 
-export const loadUserAndAccountInfo = async () => {
+/**
+ * Refresh the account + user + settings caches. Pass `force: true` to drop
+ * the Vue Query entries first so the next fetch hits the network — used
+ * after plan changes/downgrades where stale cached values (e.g.
+ * `has_service_order_plan`) would mislead the billing UI.
+ *
+ * @param {Object} [options]
+ * @param {boolean} [options.force=false] - Skip cached payloads.
+ */
+export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
   const accountStore = useAccountStore()
+
+  if (force) {
+    queryClient.removeQueries({ queryKey: queryKeys.account.info() })
+    queryClient.removeQueries({ queryKey: queryKeys.user.info() })
+    queryClient.removeQueries({ queryKey: queryKeys.accountSettings.all })
+  }
+
   const [accountInfo, userInfo, accountJobRole, accountSettingsInfo] = await Promise.all([
     accountService.getAccountInfo(),
     userService.getUserInfo(),

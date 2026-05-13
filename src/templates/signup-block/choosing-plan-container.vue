@@ -15,8 +15,9 @@
 </template>
 
 <script setup>
-  import CheckoutPlanBlock from './checkout-plan-block.vue'
-  import CheckoutFeaturesBlock from './checkout-features-block.vue'
+  import CheckoutPlanBlock from '@/templates/checkout-block/checkout-plan-block.vue'
+  import CheckoutFeaturesBlock from '@/templates/checkout-block/checkout-features-block.vue'
+  import { getStripeClientService } from '@/services/billing-services'
   import { ref } from 'vue'
 
   defineOptions({
@@ -29,10 +30,6 @@
       required: true,
       validator: (value) => ['hobby', 'pro'].includes(value),
       default: 'pro'
-    },
-    getStripeClientService: {
-      type: Function,
-      required: true
     },
     checkoutSessionClientSecret: {
       type: String,

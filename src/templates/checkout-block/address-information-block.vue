@@ -5,24 +5,30 @@
     </div>
 
     <div class="flex w-full max-w-full flex-col gap-8 p-6">
+      <div
+        v-if="showUseOwnerInfo"
+        class="flex items-start gap-3"
+      >
+        <Checkbox
+          v-model="useOwnerInfo"
+          :binary="true"
+          inputId="address-use-owner-info"
+        />
+        <label
+          for="address-use-owner-info"
+          class="text-[13px] leading-5 font-medium text-color-secondary"
+        >
+          Use the same information of the account owner
+        </label>
+      </div>
+
       <div class="flex w-full flex-col gap-6 md:flex-row">
-        <div class="flex w-full min-w-0 flex-1 flex-col gap-2">
-          <FieldDropdown
-            name="country"
-            label="Country"
-            required
-            :value="country"
-            :options="countriesOptions.options"
-            :loading="!countriesOptions.done"
-            optionLabel="name"
-            optionValue="geonameId"
-            placeholder="Select a Country"
-            appendTo="self"
-            filter
-            class="w-full"
-            @change="handleCountryChange"
-          />
-        </div>
+        <CountrySelector
+          :value="country"
+          :options="countriesOptions.options"
+          :loading="!countriesOptions.done"
+          @change="handleCountryChange"
+        />
 
         <div class="flex w-full min-w-0 flex-1 flex-col gap-2">
           <FieldInput
@@ -38,43 +44,21 @@
       </div>
 
       <div class="flex w-full flex-col gap-6 md:flex-row">
-        <div class="flex w-full min-w-0 flex-1 flex-col gap-2">
-          <FieldDropdown
-            name="region"
-            label="State/Region"
-            required
-            :value="region"
-            :options="regionsOptions.options"
-            :loading="!regionsOptions.done"
-            optionLabel="name"
-            optionValue="geonameId"
-            placeholder="Select a State/Region"
-            appendTo="self"
-            filter
-            :disabled="!country"
-            class="w-full"
-            @change="handleRegionChange"
-          />
-        </div>
+        <RegionSelector
+          :value="region"
+          :options="regionsOptions.options"
+          :loading="!regionsOptions.done"
+          :disabled="!country"
+          @change="handleRegionChange"
+        />
 
-        <div class="flex w-full min-w-0 flex-1 flex-col gap-2">
-          <FieldDropdown
-            name="city"
-            label="City"
-            required
-            :value="city"
-            :options="citiesOptions.options"
-            :loading="!citiesOptions.done"
-            optionLabel="name"
-            optionValue="geonameId"
-            placeholder="Select a City"
-            appendTo="self"
-            filter
-            :disabled="!region"
-            class="w-full"
-            @change="city = $event.value"
-          />
-        </div>
+        <CitySelector
+          :value="city"
+          :options="citiesOptions.options"
+          :loading="!citiesOptions.done"
+          :disabled="!region"
+          @change="city = $event.value"
+        />
       </div>
 
       <div class="flex w-full min-w-0 flex-col gap-2">
@@ -104,13 +88,16 @@
 </template>
 
 <script setup>
-  import { onMounted, ref, watch } from 'vue'
+  import { nextTick, onMounted, ref, watch } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { useAccountStore } from '@/stores/account'
   import FieldInput from '@aziontech/webkit/field-text'
-  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import Checkbox from '@aziontech/webkit/checkbox'
+  import CountrySelector from '@/templates/checkout-block/country-selector.vue'
+  import RegionSelector from '@/templates/checkout-block/region-selector.vue'
+  import CitySelector from '@/templates/checkout-block/city-selector.vue'
   import {
     listCountriesService,
     listRegionsService,
@@ -120,6 +107,10 @@
 
   defineOptions({
     name: 'address-information-block'
+  })
+
+  const props = defineProps({
+    showUseOwnerInfo: { type: Boolean, default: false }
   })
 
   const emit = defineEmits(['readiness-change'])
@@ -159,6 +150,7 @@
   const regionsOptions = ref({ options: [], done: true })
   const citiesOptions = ref({ options: [], done: true })
   const isApplyingInitialValues = ref(false)
+  const useOwnerInfo = ref(props.showUseOwnerInfo)
 
   const isAddressFormReady = () => {
     return Boolean(
@@ -180,9 +172,19 @@
     emitReadinessChange()
   })
 
+  const resolveGeonameId = (options, raw) => {
+    if (raw == null || raw === '') return ''
+    if (typeof raw === 'number') return raw
+    const asNumber = Number(raw)
+    if (!Number.isNaN(asNumber) && /^\d+$/.test(String(raw).trim())) return asNumber
+    // raw is a name string — look up by name in options
+    const match = options.find((opt) => opt?.name === raw)
+    return match?.geonameId ?? raw
+  }
+
   const setInitialValues = async () => {
     const initialAddress = accountStore.accountData || {}
-    const initialValues = {
+    const rawValues = {
       postalCode: initialAddress.postalCode || initialAddress.postal_code || '',
       country: initialAddress.country || '',
       region: initialAddress.region || '',
@@ -191,20 +193,35 @@
       complement: initialAddress.complement || ''
     }
 
-    const hasAddressInfo = Object.values(initialValues).some((value) => !!value)
+    const hasAddressInfo = Object.values(rawValues).some((value) => !!value)
     if (!hasAddressInfo) return
 
     isApplyingInitialValues.value = true
     try {
-      resetForm({ values: initialValues })
+      const countryId = resolveGeonameId(countriesOptions.value.options, rawValues.country)
 
-      if (initialValues.country) {
-        await setRegionsOptions(initialValues.country, { resetSelection: false })
+      if (countryId) {
+        await setRegionsOptions(countryId, { resetSelection: false })
       }
 
-      if (initialValues.region) {
-        await setCitiesOptions(initialValues.region, { resetSelection: false })
+      const regionId = resolveGeonameId(regionsOptions.value.options, rawValues.region)
+
+      if (regionId) {
+        await setCitiesOptions(regionId, { resetSelection: false })
       }
+
+      const cityId = resolveGeonameId(citiesOptions.value.options, rawValues.city)
+
+      resetForm({
+        values: {
+          ...rawValues,
+          country: countryId,
+          region: regionId,
+          city: cityId
+        }
+      })
+
+      await nextTick()
     } finally {
       isApplyingInitialValues.value = false
     }
@@ -318,6 +335,45 @@
   })
 
   watch([postalCode, city, address, country, region], () => {
+    emitReadinessChange()
+  })
+
+  watch(
+    () => accountStore.accountData?.country,
+    (countryFromStore) => {
+      if (
+        useOwnerInfo.value &&
+        countryFromStore &&
+        !country.value &&
+        !isApplyingInitialValues.value
+      ) {
+        setInitialValues()
+      }
+    }
+  )
+
+  watch(useOwnerInfo, async (checked) => {
+    if (checked) {
+      await setInitialValues()
+    } else {
+      isApplyingInitialValues.value = true
+      try {
+        resetForm({
+          values: {
+            postalCode: '',
+            country: '',
+            region: '',
+            city: '',
+            address: '',
+            complement: ''
+          }
+        })
+        regionsOptions.value.options = []
+        citiesOptions.value.options = []
+      } finally {
+        isApplyingInitialValues.value = false
+      }
+    }
     emitReadinessChange()
   })
 

@@ -144,6 +144,11 @@
   import { usePlans } from '@/composables/usePlans'
   import { useAdditionalDataFormState } from '@/composables/useAdditionalDataFormState'
   import { usePlansList } from '@/composables/usePlansService'
+  import {
+    postAdditionalDataService,
+    patchFullnameService,
+    updateAccountInfoService
+  } from '@/services/signup-services'
   import { useToast } from '@aziontech/webkit/use-toast'
   import BoxGridSelection from '@aziontech/webkit/box-grid-selection'
   import FieldText from '@aziontech/webkit/field-text'
@@ -161,21 +166,6 @@
     hydrate: hydrateAdditionalDataForm,
     clear: clearAdditionalDataForm
   } = useAdditionalDataFormState()
-
-  const props = defineProps({
-    postAdditionalDataService: {
-      type: Function,
-      required: true
-    },
-    patchFullnameService: {
-      type: Function,
-      required: true
-    },
-    updateAccountInfoService: {
-      type: Function,
-      required: true
-    }
-  })
 
   defineOptions({
     name: 'additional-data-form-block'
@@ -531,13 +521,13 @@
       }
 
       const requests = [
-        props.updateAccountInfoService(accountPayload),
-        props.patchFullnameService(usersPayload)
+        updateAccountInfoService(accountPayload),
+        patchFullnameService(usersPayload)
       ]
 
       if (!accountStore.accountData?.jobRole) {
         requests.push(
-          props.postAdditionalDataService({
+          postAdditionalDataService({
             payload: additionalDataPayload,
             options: additionalDataInfo.value
           })

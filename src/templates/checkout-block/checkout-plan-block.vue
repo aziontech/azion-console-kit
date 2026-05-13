@@ -20,34 +20,23 @@
         @readiness-change="handleAddressReadinessChange"
       />
     </div>
-    <div
-      class="flex shrink-0 justify-end gap-3 border-t border-[var(--border-default)] bg-surface px-8 py-4"
-    >
-      <Button
-        class="font-protomono flex items-center justify-center text-xs"
-        :disabled="isSubmitting"
-        outlined
-        @click="handleBack"
-        label="Back"
-      />
-      <Button
-        severity="secondary"
-        class="font-protomono flex items-center justify-center text-xs"
-        :icon="showLoading ? 'pi pi-spin pi-spinner' : ''"
-        :disabled="isSubscribeDisabled"
-        @click="handleSubmit"
-        label="Subscribe"
-      />
-    </div>
+    <CheckoutActionFooter
+      :submitting="isSubmitting"
+      :disabled="isSubscribeDisabled"
+      :loading="showLoading"
+      @back="handleBack"
+      @submit="handleSubmit"
+    />
   </div>
 </template>
 
 <script setup>
   import { computed, ref, watch } from 'vue'
-  import Button from '@aziontech/webkit/button'
   import AddressInformationBlock from './address-information-block.vue'
   import PaymentMethodBlock from './payment-method-block.vue'
   import PricingCalculationBlock from './pricing-calculation-block.vue'
+  import CheckoutActionFooter from '@/templates/checkout-block/checkout-action-footer.vue'
+  import { mapStripeError } from '@/templates/checkout-block/helpers/stripe-error-mapper.js'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { useScrollToError } from '@/composables/useScrollToError'
 
@@ -109,10 +98,6 @@
     isAddressFormReady.value = Boolean(isReady)
   }
 
-  const couponCode = computed(() => {
-    return pricingCalculationRef.value?.couponCode?.value || ''
-  })
-
   const handleBack = () => {
     emit('onBack')
   }
@@ -158,7 +143,6 @@
         checkoutSessionStatus: checkoutConfirmation?.session?.status,
         checkoutConfirmationStatus: checkoutConfirmation?.status,
         billingCycle: billingCycle.value,
-        couponCode: couponCode.value,
         address: {
           postalCode: address.postalCode,
           country: addressInformationRef.value?.getCountry(Number(address.country)) || '',
@@ -172,26 +156,13 @@
 
       emit('onSubmit', checkoutData)
     } catch (error) {
-      const errorMessage = String(error?.message || error || '')
-      const knownStripeErrorMap = {
-        authentication_required: 'Authentication is required to complete this payment.',
-        card_declined: 'Your card was declined. Please use a different payment method.',
-        expired_card: 'Your card is expired. Please use a different card.',
-        incorrect_cvc: 'The security code is incorrect. Please review your payment details.',
-        processing_error: 'Payment processing failed. Please try again in a few moments.'
-      }
-
-      const mappedErrorMessage =
-        Object.entries(knownStripeErrorMap).find(([code]) => errorMessage.includes(code))?.[1] ||
-        errorMessage
-
-      const options = {
+      const detail = mapStripeError(error?.message || error)
+      toast.add({
         closable: true,
         severity: 'error',
         summary: 'Error',
-        detail: mappedErrorMessage || 'Unable to confirm payment. Please try again.'
-      }
-      toast.add(options)
+        detail
+      })
     } finally {
       isSubmitting.value = false
       showLoading.value = false
@@ -206,8 +177,7 @@
   )
 
   defineExpose({
-    billingCycle,
-    couponCode
+    billingCycle
   })
 </script>
 
