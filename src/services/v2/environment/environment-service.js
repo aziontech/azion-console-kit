@@ -37,8 +37,7 @@ export class EnvironmentService extends BaseService {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.#baseURL,
-      params,
-      config: { baseURL: '/api' }
+      params
     })
 
     const { results, count } = parseListResponse(data)
