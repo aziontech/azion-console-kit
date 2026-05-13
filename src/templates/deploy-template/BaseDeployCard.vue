@@ -30,11 +30,13 @@
 </script>
 
 <template>
-  <div class="flex flex-col w-full max-w-3xl border bg-surface border-default rounded-md">
+  <div class="flex flex-col w-full md:max-w-3xl border bg-surface border-default rounded-md">
     <!-- Header -->
-    <div class="h-14 px-4 sm:px-6 border-b border-default flex items-center justify-between">
+    <div
+      class="min-h-14 px-4 sm:px-6 py-2 border-b border-default flex flex-wrap items-center justify-between gap-x-3 gap-y-1"
+    >
       <div
-        class="text-color font-semibold leading-5"
+        class="text-color font-semibold leading-5 min-w-0 break-words"
         :class="titleSize"
       >
         <Skeleton
@@ -47,7 +49,7 @@
       </div>
       <div
         v-if="$slots['header-right'] && !loading"
-        class="text-sm font-normal text-color-secondary"
+        class="text-sm font-normal text-color-secondary min-w-0 break-words"
       >
         <slot name="header-right" />
       </div>
@@ -56,7 +58,7 @@
     <!-- Header Meta -->
     <div
       v-if="$slots['header-meta'] && !loading"
-      class="px-6 bg-[var(--surface-section)]"
+      class="px-4 sm:px-6 bg-[var(--surface-section)]"
       :class="{ 'border-b surface-border py-4': !withoutBorder, 'pt-4': withoutBorder }"
     >
       <slot name="header-meta" />
@@ -88,7 +90,7 @@
     <!-- Footer -->
     <div
       v-if="!hideFooter && !loading"
-      class="h-14 px-4 sm:px-6 border-t surface-border flex flex-col justify-center"
+      class="min-h-14 px-4 sm:px-6 py-2 border-t surface-border flex flex-col justify-center"
     >
       <slot name="footer" />
     </div>

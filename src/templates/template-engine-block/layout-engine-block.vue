@@ -628,7 +628,7 @@
 </script>
 
 <template>
-  <div class="layout-engine-block flex flex-col gap-6 min-w-[768px]">
+  <div class="layout-engine-block flex flex-col gap-6">
     <div
       ref="step4Ref"
       v-show="currentStep === 'success'"
@@ -670,7 +670,7 @@
       <template #content>
         <div
           v-if="props.templateTitle && props.templateDescription && props.githubUrl"
-          class="bg-[var(--surface-50)] h-40 rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
+          class="bg-[var(--surface-50)] h-auto md:h-40 rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
         >
           <div class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center">
             <slot
@@ -679,7 +679,7 @@
               :preview-alt="props.previewAlt"
             >
               <div
-                class="w-full h-48 bg-surface-section l-rounded-lg flex flex-col justify-center items-center overflow-hidden"
+                class="w-full h-40 md:h-48 bg-surface-section l-rounded-lg flex flex-col justify-center items-center overflow-hidden"
               >
                 <img
                   v-if="props.previewSrc"
@@ -691,7 +691,7 @@
             </slot>
           </div>
 
-          <div class="flex-1 py-4 pr-4 flex flex-col gap-3">
+          <div class="flex-1 py-4 px-4 md:pl-0 md:pr-4 flex flex-col gap-3">
             <slot
               name="info"
               :template-title="props.templateTitle"

@@ -540,11 +540,11 @@
           <div
             v-for="(step, index) in nextSteps"
             :key="index"
-            class="h-11 rounded-md border surface-border bg-[var(--surface-ground)] flex items-center px-3 cursor-pointer hover:border-surface transition-colors"
+            class="min-h-11 py-2 rounded-md border surface-border bg-[var(--surface-ground)] flex items-center px-3 cursor-pointer hover:border-surface transition-colors gap-2"
             @click="handleStepClick(step)"
           >
             <div
-              class="p-1.5 bg-[var(--surface-100)] rounded mr-3 flex items-center justify-center"
+              class="p-1.5 bg-[var(--surface-100)] rounded shrink-0 flex items-center justify-center"
             >
               <i
                 v-if="step.icon && step.icon.startsWith('pi-')"
@@ -558,12 +558,14 @@
               />
             </div>
 
-            <span class="flex-1 text-xs font-semibold font-['Sora'] leading-7 text-color">
+            <span
+              class="flex-1 min-w-0 text-xs font-semibold font-['Sora'] leading-7 text-color truncate"
+            >
               {{ step.label }}
             </span>
 
             <div
-              class="w-8 h-8 rounded-md flex items-center justify-center hover:bg-[var(--surface-100)] transition-colors"
+              class="w-8 h-8 rounded-md shrink-0 flex items-center justify-center hover:bg-[var(--surface-100)] transition-colors"
             >
               <i class="pi pi-chevron-right w-3.5 h-3.5 text-color-secondary" />
             </div>

@@ -84,7 +84,7 @@
     <div
       :class="[
         'flex-1 flex flex-col gap-3',
-        hasPreview && !props.resourcesOnly ? 'py-4 pr-4' : 'p-4'
+        hasPreview && !props.resourcesOnly ? 'p-4 md:pl-0 md:pr-4 md:py-4' : 'p-4'
       ]"
     >
       <slot

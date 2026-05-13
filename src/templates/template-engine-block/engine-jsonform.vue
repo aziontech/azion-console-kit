@@ -894,11 +894,11 @@
 
       <!-- Repository Step - Inputs Slot with horizontal layout including Git Scope -->
       <template #inputs="slotProps">
-        <div class="w-full flex gap-2">
+        <div class="w-full flex gap-2 flex-wrap sm:flex-nowrap">
           <!-- Git Scope Field - first grid item, inline with Application Name -->
           <div
             v-if="hasIntegrations"
-            class="flex flex-col gap-2 w-1/2"
+            class="flex flex-col gap-2 w-full sm:w-1/2"
           >
             <LabelBlock
               label="Git Scope"
@@ -948,7 +948,7 @@
           </div>
 
           <!-- JSON Forms fields - display: contents allows children to participate in parent grid -->
-          <div class="w-1/2">
+          <div class="w-full sm:w-1/2">
             <JsonForms
               v-if="hasRepositoryFormProperties"
               style="display: contents"
@@ -991,7 +991,12 @@
     display: contents;
   }
   .settings-jsonform-grid :deep(.vertical-layout-item) {
-    width: calc(50% - 0.25rem);
+    width: 100%;
     min-width: 0;
+  }
+  @media (min-width: 640px) {
+    .settings-jsonform-grid :deep(.vertical-layout-item) {
+      width: calc(50% - 0.25rem);
+    }
   }
 </style>
