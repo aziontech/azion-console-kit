@@ -138,6 +138,63 @@
   })
 
   /**
+   * Get required fields for the given step
+   */
+  const getRequiredFieldsForStep = (step) => {
+    const allFields = [
+      ...(inputSchema.value.fields || []),
+      ...(inputSchema.value.groups || []).flatMap((group) => group.fields || [])
+    ]
+
+    return allFields.filter((field) => {
+      if (field.hidden || !field.attrs?.required) return false
+      if (field.name === vcsIntegrationFieldName.value) return false
+      const isRepoField = REPOSITORY_FIELD_NAMES.includes(field.name)
+      return step === 'repository' ? isRepoField : !isRepoField
+    })
+  }
+
+  /**
+   * Check if all required fields for the step are filled and free of current errors
+   */
+  const isStepValid = (step) => {
+    const requiredFields = getRequiredFieldsForStep(step)
+    const formValues = formTools.value.values
+    const formErrorsByName = formTools.value.errors || {}
+
+    const allFilled = requiredFields.every((field) => {
+      const value = formValues?.[field.name]
+      return value !== undefined && value !== null && value !== ''
+    })
+    if (!allFilled) return false
+
+    return !requiredFields.some((field) => formErrorsByName[field.name])
+  }
+
+  /**
+   * Whether the repository step is valid - used to enable/disable Next/Deploy button
+   */
+  const isRepositoryStepValid = computed(() => {
+    if (!isFormReady.value) return false
+    if (!isStepValid('repository')) return false
+
+    if (hasIntegrations.value && isVcsRequired.value) {
+      const hasList = layoutRef.value?.hasIntegrationsList
+      if (!hasList || !setIntegration.value) return false
+    }
+
+    return true
+  })
+
+  /**
+   * Whether the settings step is valid - used to enable/disable the Deploy button
+   */
+  const isSettingsStepValid = computed(() => {
+    if (!isFormReady.value) return false
+    return isStepValid('settings')
+  })
+
+  /**
    * Filters fields from a group based on field names
    * @param {Object} group - Group object containing fields
    * @param {Array<string>} fieldNames - Array of field names to filter
@@ -261,7 +318,10 @@
     // Flow control props - show settings only if there are fields to display
     hasSettings: hasSettingsFields.value,
     loadingDeploy: props.loadingDeploy,
-    disabledDeploy: props.disabledDeploy,
+    disabled: props.disabledDeploy || !isRepositoryStepValid.value,
+    disabledDeploy:
+      props.disabledDeploy ||
+      (hasSettingsFields.value ? !isSettingsStepValid.value : !isRepositoryStepValid.value),
     // Validation prop
     onValidate: validateForm,
     // Deploy simulation props
@@ -384,11 +444,11 @@
    */
   const initializeForm = async () => {
     const schema = await createSchemaObject()
-    const { errors, defineInputBinds, setFieldValue, validate, validateField } = useForm({
+    const { errors, defineInputBinds, setFieldValue, validate, validateField, values } = useForm({
       validationSchema: schema
     })
 
-    formTools.value = { errors, setFieldValue, validate, validateField }
+    formTools.value = { errors, setFieldValue, validate, validateField, values }
 
     // Initialize fields with defineInputBinds (validate only on blur, not on input/change)
     const registerFieldWithValueAndValidation = (field) => {
@@ -775,72 +835,49 @@
       @next-step="handleNextStep"
     >
       <!-- GitHub Connection Slot -->
+      <!--
+        When no integrations are connected, show the visible OAuth "Connect with GitHub" CTA here.
+        When integrations exist, the visible Git Scope dropdown is rendered inside #inputs (paired
+        with Application Name); we still mount OAuthGithub here hidden so the ref stays accessible
+        for triggering re-auth from the dropdown's "Add GitHub Account" option.
+      -->
       <template #github-connection="slotProps">
-        <template v-if="isFormReady">
-          <!-- Top-level VCS Integration Field -->
-          <template v-if="inputSchema.fields">
-            <template
-              v-for="field in removeHiddenFields(inputSchema.fields)"
-              :key="field.name"
+        <template v-if="isFormReady && inputSchema.fields">
+          <template
+            v-for="field in removeHiddenFields(inputSchema.fields)"
+            :key="field.name"
+          >
+            <div
+              v-if="
+                field.name === 'platform_feature__vcs_integration__uuid' &&
+                !slotProps.hasIntegrationsList
+              "
+              class="flex flex-col gap-2"
             >
-              <div
-                v-if="field.name === 'platform_feature__vcs_integration__uuid'"
-                class="flex flex-col gap-2"
+              <label class="text-xs text-color-secondary">
+                GitHub Connection <span class="text-red-500">*</span>
+              </label>
+              <OAuthGithub
+                ref="oauthGithubRef"
+                @onCallbackUrl="setCallbackUrl"
+                :loading="slotProps.isIntegrationsLoading"
+              />
+              <small
+                v-if="vcsIntegrationError"
+                class="p-error text-xs font-normal leading-tight"
               >
-                <label
-                  v-show="!slotProps.hasIntegrationsList"
-                  class="text-xs text-color-secondary"
-                >
-                  GitHub Connection <span class="text-red-500">*</span>
-                </label>
-                <OAuthGithub
-                  v-show="!slotProps.hasIntegrationsList"
-                  ref="oauthGithubRef"
-                  @onCallbackUrl="setCallbackUrl"
-                  :loading="slotProps.isIntegrationsLoading"
-                />
-                <small
-                  v-if="vcsIntegrationError && !slotProps.hasIntegrationsList"
-                  class="p-error text-xs font-normal leading-tight"
-                >
-                  {{ vcsIntegrationError }}
-                </small>
-                <div
-                  v-if="slotProps.hasIntegrationsList"
-                  class="flex flex-col gap-2"
-                >
-                  <FieldDropdown
-                    :options="slotProps.listOfIntegrations"
-                    :name="field.name"
-                    :required="field.attrs?.required"
-                    :label="field.label"
-                    :value="setIntegration"
-                    placeholder="Select a scope"
-                    class="h-8"
-                    :description="field.description"
-                    :additionalError="vcsIntegrationError"
-                    :disabled="isRepositoryDisabled"
-                    optionLabel="label"
-                    optionValue="value"
-                    @onChange="(installationId) => updateValueOnChange(field.name, installationId)"
-                  >
-                    <template #footer>
-                      <div class="p-dropdown-items-wrapper">
-                        <ul class="p-dropdown-items">
-                          <li
-                            class="p-dropdown-item flex items-center"
-                            @click="triggerConnectWithGithub"
-                          >
-                            <i class="pi pi-plus-circle mr-2" />
-                            <div>Add GitHub Account</div>
-                          </li>
-                        </ul>
-                      </div>
-                    </template>
-                  </FieldDropdown>
-                </div>
-              </div>
-            </template>
+                {{ vcsIntegrationError }}
+              </small>
+            </div>
+            <OAuthGithub
+              v-else-if="
+                field.name === 'platform_feature__vcs_integration__uuid' &&
+                slotProps.hasIntegrationsList
+              "
+              v-show="false"
+              ref="oauthGithubRef"
+              @onCallbackUrl="setCallbackUrl"
+            />
           </template>
         </template>
       </template>
@@ -851,15 +888,53 @@
           <!-- Top-level Fields -->
           <div
             v-if="inputSchema.fields"
-            class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 w-full"
+            class="flex gap-x-6 gap-y-4 w-full"
           >
             <template
               v-for="field in removeHiddenFields(inputSchema.fields)"
               :key="field.name"
             >
-              <!-- Skip VCS integration field - handled in github-connection slot -->
+              <!-- Git Scope dropdown (paired side-by-side with Application Name) -->
+              <div
+                v-if="
+                  field.name === 'platform_feature__vcs_integration__uuid' &&
+                  slotProps.hasIntegrationsList
+                "
+                class="flex flex-col gap-2 w-1/2"
+              >
+                <FieldDropdown
+                  :options="slotProps.listOfIntegrations"
+                  :name="field.name"
+                  :required="field.attrs?.required"
+                  :label="field.label"
+                  :value="setIntegration"
+                  placeholder="Select a scope"
+                  class="h-8"
+                  :description="field.description"
+                  :additionalError="vcsIntegrationError"
+                  :disabled="isRepositoryDisabled"
+                  optionLabel="label"
+                  optionValue="value"
+                  @onChange="(installationId) => updateValueOnChange(field.name, installationId)"
+                >
+                  <template #footer>
+                    <div class="p-dropdown-items-wrapper">
+                      <ul class="p-dropdown-items">
+                        <li
+                          class="p-dropdown-item flex items-center"
+                          @click="triggerConnectWithGithub"
+                        >
+                          <i class="pi pi-plus-circle mr-2" />
+                          <div>Add GitHub Account</div>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </FieldDropdown>
+              </div>
               <FieldInputTextPrivacy
-                v-if="isHandleField(field.name) && field.info === 'Edge Application Name'"
+                v-else-if="isHandleField(field.name) && field.info === 'Edge Application Name'"
+                class="w-1/2"
                 :name="field.name"
                 :label="field.label"
                 :value="field.value"
@@ -878,7 +953,7 @@
               />
               <div
                 v-else-if="isHandleField(field.name)"
-                class="flex flex-col gap-2"
+                class="flex flex-col gap-2 w-1/2"
               >
                 <LabelBlock
                   :for="field.name"
@@ -932,7 +1007,7 @@
               <!-- Pair: 2 single-field groups side by side -->
               <div
                 v-if="row.type === 'pair'"
-                class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"
+                class="flex gap-x-6 gap-y-4"
               >
                 <template
                   v-for="group in row.groups"
@@ -1083,7 +1158,7 @@
                 v-else
                 class="flex flex-col gap-4"
               >
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                <div class="flex gap-x-6 gap-y-4">
                   <template
                     v-for="field in removeHiddenFields(row.groups[0].fields)"
                     :key="field.name"
@@ -1237,13 +1312,13 @@
               <!-- Pair: 2 single-field groups side by side -->
               <div
                 v-if="row.type === 'pair'"
-                class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"
+                class="flex flex-wrap gap-x-6 gap-y-4"
               >
                 <template
                   v-for="group in row.groups"
                   :key="group.name"
                 >
-                  <div class="flex flex-col gap-2">
+                  <div class="flex flex-col gap-2 w-[calc(50%-0.75rem)]">
                     <template
                       v-for="field in removeHiddenFields(group.fields)"
                       :key="field.name"
@@ -1318,7 +1393,7 @@
                 v-else
                 class="flex flex-col gap-4"
               >
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                <div class="flex flex-wrap gap-x-6 gap-y-4">
                   <template
                     v-for="field in removeHiddenFields(row.groups[0].fields)"
                     :key="field.name"
@@ -1326,6 +1401,7 @@
                     <!-- Regular field in single group -->
                     <FieldInputTextPrivacy
                       v-if="field.info === 'Edge Application Name'"
+                      class="w-[calc(50%-0.75rem)]"
                       :name="field.name"
                       :label="field.label"
                       :value="field.value"
@@ -1344,7 +1420,7 @@
                     />
                     <div
                       v-else-if="isHandleField(field.name)"
-                      class="flex flex-col gap-2"
+                      class="flex flex-col gap-2 w-[calc(50%-0.75rem)]"
                     >
                       <LabelBlock
                         :for="field.name"

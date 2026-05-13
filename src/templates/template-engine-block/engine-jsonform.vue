@@ -407,6 +407,62 @@
   })
 
   /**
+   * Check if there are validation errors for any of the given fields
+   */
+  const hasErrorsForFields = (fieldNames) => {
+    return errors.value.some((error) => {
+      const missingProperty = error.params?.missingProperty
+      const pathField = error.instancePath?.replace(/^\//, '')
+      return (
+        fieldNames.includes(missingProperty) ||
+        fieldNames.includes(pathField) ||
+        fieldNames.some((name) => error.instancePath?.includes(name))
+      )
+    })
+  }
+
+  /**
+   * Whether the repository step is valid (required filled, no errors, VCS selected when required)
+   * Used to enable/disable the Next/Deploy button on the repository step
+   */
+  const isRepositoryStepValid = computed(() => {
+    const stepFieldNames = Object.keys(repositoryFormSchema.value?.properties || {})
+    const requiredFields = repositoryFormSchema.value?.required || []
+
+    const hasMissingRequired = requiredFields.some((fieldName) => {
+      const value = formData.value[fieldName]
+      return value === undefined || value === null || value === ''
+    })
+    if (hasMissingRequired) return false
+
+    if (hasErrorsForFields(stepFieldNames)) return false
+
+    if (hasIntegrations.value && isVcsRequired.value) {
+      const hasList = layoutRef.value?.hasIntegrationsList
+      if (!hasList || !selectedIntegration.value) return false
+    }
+
+    return true
+  })
+
+  /**
+   * Whether the settings step is valid (required filled, no errors)
+   * Used to enable/disable the Deploy button on the settings card
+   */
+  const isSettingsStepValid = computed(() => {
+    const stepFieldNames = Object.keys(settingsFormSchema.value?.properties || {})
+    const requiredFields = settingsFormSchema.value?.required || []
+
+    const hasMissingRequired = requiredFields.some((fieldName) => {
+      const value = formData.value[fieldName]
+      return value === undefined || value === null || value === ''
+    })
+    if (hasMissingRequired) return false
+
+    return !hasErrorsForFields(stepFieldNames)
+  })
+
+  /**
    * Computed property for repository groups (group[0])
    * Returns the first group from the schema groups array
    * For JSON Forms, groups are not used the same way as Azion form
@@ -447,7 +503,10 @@
     // When false: shows "Deploy" button → deploy directly
     hasSettings: hasSettingsFormProperties.value,
     loadingDeploy: props.loadingDeploy,
-    disabledDeploy: props.disabledDeploy,
+    disabled: props.disabledDeploy || !isRepositoryStepValid.value,
+    disabledDeploy:
+      props.disabledDeploy ||
+      (hasSettingsFormProperties.value ? !isSettingsStepValid.value : !isRepositoryStepValid.value),
     // Validation prop
     onValidate: validateForm,
     // Deploy simulation props
@@ -835,11 +894,11 @@
 
       <!-- Repository Step - Inputs Slot with horizontal layout including Git Scope -->
       <template #inputs="slotProps">
-        <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="w-full flex gap-2">
           <!-- Git Scope Field - first grid item, inline with Application Name -->
           <div
             v-if="hasIntegrations"
-            class="flex flex-col gap-2"
+            class="flex flex-col gap-2 w-1/2"
           >
             <LabelBlock
               label="Git Scope"
@@ -889,21 +948,23 @@
           </div>
 
           <!-- JSON Forms fields - display: contents allows children to participate in parent grid -->
-          <JsonForms
-            v-if="hasRepositoryFormProperties"
-            style="display: contents"
-            :data="formData"
-            :schema="repositoryFormSchemaDisabled"
-            :renderers="renderers"
-            :config="jsonFormConfig"
-            @change="onChangeAzionForm"
-          />
+          <div class="w-1/2">
+            <JsonForms
+              v-if="hasRepositoryFormProperties"
+              style="display: contents"
+              :data="formData"
+              :schema="repositoryFormSchemaDisabled"
+              :renderers="renderers"
+              :config="jsonFormConfig"
+              @change="onChangeAzionForm"
+            />
+          </div>
         </div>
       </template>
 
-      <!-- Settings Step - Settings Inputs Slot with 2-column grid layout -->
+      <!-- Settings Step - Settings Inputs Slot with 2-column layout -->
       <template #settings-inputs>
-        <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="settings-jsonform-grid flex flex-wrap w-full gap-2">
           <JsonForms
             v-if="hasSettingsFormProperties && shouldRenderSettingsForm"
             style="display: contents"
@@ -918,3 +979,19 @@
     </LayoutEngineBlock>
   </div>
 </template>
+
+<style scoped>
+  /*
+   * JsonForms vue-vanilla wraps fields in a VerticalLayout (.vertical-layout / .vertical-layout-item)
+   * which stacks them as blocks. To get a 2-per-row 50%-each layout in the settings step we
+   * promote the layout root to `display: contents` so each item becomes a direct flex child of
+   * the outer container, then size each item at half the row minus half the gap (gap-2 = 0.5rem).
+   */
+  .settings-jsonform-grid :deep(.vertical-layout) {
+    display: contents;
+  }
+  .settings-jsonform-grid :deep(.vertical-layout-item) {
+    width: calc(50% - 0.25rem);
+    min-width: 0;
+  }
+</style>
