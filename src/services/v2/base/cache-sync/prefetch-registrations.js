@@ -179,14 +179,16 @@ export function registerPrefetchQueryFns() {
   // =========================================================================
 
   prefetchRegistry.register(['digital-certificates', 'list'], async () => {
-    const { digitalCertificatesService } =
-      await import('../../digital-certificates/digital-certificates-service')
+    const { digitalCertificatesService } = await import(
+      '../../digital-certificates/digital-certificates-service'
+    )
     return digitalCertificatesService.prefetchList()
   })
 
   prefetchRegistry.register(['digital-certificates', 'detail'], async (queryKey) => {
-    const { digitalCertificatesService } =
-      await import('../../digital-certificates/digital-certificates-service')
+    const { digitalCertificatesService } = await import(
+      '../../digital-certificates/digital-certificates-service'
+    )
     const id = queryKey[2]
     return digitalCertificatesService.loadDigitalCertificate({ id })
   })
@@ -271,14 +273,16 @@ export function registerPrefetchQueryFns() {
   // =========================================================================
 
   prefetchRegistry.register(['digital-certificates-crl', 'list'], async () => {
-    const { digitalCertificatesCRLService } =
-      await import('../../digital-certificates/digital-certificates-crl-service')
+    const { digitalCertificatesCRLService } = await import(
+      '../../digital-certificates/digital-certificates-crl-service'
+    )
     return digitalCertificatesCRLService.prefetchList()
   })
 
   prefetchRegistry.register(['digital-certificates-crl', 'detail'], async (queryKey) => {
-    const { digitalCertificatesCRLService } =
-      await import('../../digital-certificates/digital-certificates-crl-service')
+    const { digitalCertificatesCRLService } = await import(
+      '../../digital-certificates/digital-certificates-crl-service'
+    )
     const id = queryKey[2]
     return digitalCertificatesCRLService.loadDigitalCertificateCRL({ id })
   })
