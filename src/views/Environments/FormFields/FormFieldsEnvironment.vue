@@ -4,7 +4,6 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
-  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import PickList from '@aziontech/webkit/picklist'
   import SelectButton from '@aziontech/webkit/selectbutton'
   import LabelBlock from '@aziontech/webkit/label'
@@ -614,17 +613,6 @@
         >
           Deployment Version Policy cannot be changed after the environment is created.
         </small>
-      </div>
-      <div class="flex w-full gap-10">
-        <span class="text-color text-xl font-medium flex gap-2 p-1">Status</span>
-        <FieldSwitchBlock
-          nameField="active"
-          name="active"
-          :isCard="false"
-          title="Active"
-          :disabled="props.disabledFields"
-          data-testid="environment-form__status-field"
-        />
       </div>
     </template>
   </FormHorizontal>

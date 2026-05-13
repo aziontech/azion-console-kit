@@ -28,7 +28,6 @@
   const validationSchema = yup.object({
     name: yup.string().required().label('Name'),
     description: yup.string().nullable().default(''),
-    active: yup.boolean().required().label('Status'),
     deployment_version_policy: yup
       .string()
       .required()
@@ -57,7 +56,6 @@
   const initialValues = {
     name: '',
     description: '',
-    active: true,
     deployment_version_policy: 'single_version',
     globalVariables: [],
     environmentVariables: {}
@@ -120,7 +118,6 @@
     return {
       name: response.data.name,
       description: response.data.description ?? '',
-      active: Boolean(response.data.active),
       deployment_version_policy: getDeploymentVersionPolicyValue(
         response.data.deployment_version_policy
       ),
@@ -139,7 +136,6 @@
     return {
       name: payload.name,
       description: payload.description ?? '',
-      active: Boolean(payload.active),
       deployment_version_policy: deploymentVersionPolicy
     }
   }
@@ -154,8 +150,7 @@
 
     return await updateEnvironmentService(selectedEnvironmentId.value, {
       name: normalized.name,
-      description: normalized.description,
-      active: normalized.active
+      description: normalized.description
     })
   }
 
