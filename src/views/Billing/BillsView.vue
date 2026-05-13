@@ -203,18 +203,31 @@
     router.push({ name, params })
   }
 
-  const actionsRow = ref([
-    {
-      label: 'Set as default',
-      icon: 'pi pi-download',
-      type: 'action',
-      visibleAction: () => showExportBilling.value,
-      disabled: (item) => item.disabled,
-      commandAction: async (item) => {
-        if (item.invoiceUrl) window.open(item.invoiceUrl, '_blank')
+  const actionsRow = computed(() => {
+    const actions = [
+      {
+        label: 'Details',
+        icon: 'pi pi-file',
+        type: 'action',
+        disabled: (item) => item.isFallback,
+        commandAction: (item) => goToEnvoiceDetails(item)
       }
+    ]
+
+    if (showExportBilling.value) {
+      actions.push({
+        label: 'Download Invoice',
+        icon: 'pi pi-download',
+        type: 'action',
+        disabled: (item) => item.disabled || item.isFallback,
+        commandAction: (item) => {
+          if (item.invoiceUrl) window.open(item.invoiceUrl, '_blank')
+        }
+      })
     }
-  ])
+
+    return actions
+  })
 
   const showChangePlanDrawer = ref(false)
   const showPlanInfoDrawer = ref(false)

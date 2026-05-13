@@ -247,7 +247,6 @@
         <DataTable
           ref="dataTableRef"
           class="overflow-clip rounded-md"
-          scrollable
           removableSort
           :data="data"
           :columns="selectedColumns"
@@ -264,7 +263,6 @@
           :exportFunction="exportFunctionMapper"
           :loading="isLoading"
           :notShowEmptyBlock="true"
-          scrollHeight="auto"
           :pt="{ bodyRow: { 'data-testid': 'table-body-row' } }"
           data-testid="table-tab-panel-block"
           :first="firstItemIndex"

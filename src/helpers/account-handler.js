@@ -46,7 +46,7 @@ export class AccountHandler {
     const accountId = await this.searchAccount(clientId)
     await this.switchAccountService(accountId)
     useAccountStore().setHasSession(true)
-    // Always redirect to home - accountGuard decides if user needs additional-data
+    sessionManager.notifySwitchAccountComplete()
     return { name: 'home' }
   }
 
@@ -58,7 +58,7 @@ export class AccountHandler {
     await sessionManager.switchAccount()
     await this.switchAccountService(accountId)
     useAccountStore().setHasSession(true)
-    // Always redirect to home - accountGuard decides if user needs additional-data
+    sessionManager.notifySwitchAccountComplete()
     window.location.replace('/')
   }
 
@@ -85,7 +85,6 @@ export class AccountHandler {
    * @return {string | object} The URL string or object to redirect to.
    */
   async switchAccountFromSocialIdp(verifyService, refreshService, EnableSocialLogin) {
-    await sessionManager.switchAccount()
     try {
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verifyService()
 

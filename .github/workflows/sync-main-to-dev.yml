@@ -1,0 +1,41 @@
+name: Sync Main to Dev
+
+on:
+  workflow_run:
+    workflows: ["Deploy Console Kit (PRODUCTION)"]
+    types:
+      - completed
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  sync-branches:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git for github-actions[bot]
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global pull.rebase true
+
+      - name: Sync main to dev
+        run: |
+          git checkout dev
+          git pull origin main
+          git push origin dev
+
+      - name: Notify on success
+        run: |
+          echo "✅ Successfully synced main to dev"
+          echo "Branch dev is now up to date with main"
