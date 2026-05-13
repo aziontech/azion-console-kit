@@ -10,7 +10,6 @@ const VALID_BILLING_CYCLES = ['monthly', 'yearly']
 // Shared state (singleton-style)
 const _plan = ref(null)
 const _billingCycle = ref(null)
-const _cupom = ref(null)
 
 // Active router context (refreshed on each usePlans call)
 const activeRoute = ref(null)
@@ -23,7 +22,6 @@ let hasSyncWatcher = false
  * @typedef {Object} PlanParams
  * @property {string|null} plan - The selected plan (hobby, pro)
  * @property {string|null} billingCycle - The billing cycle (monthly, yearly)
- * @property {string|null} cupom - The coupon code
  */
 
 /**
@@ -85,7 +83,6 @@ export function usePlans() {
     const data = {
       plan: _plan.value,
       billingCycle: _billingCycle.value,
-      cupom: _cupom.value,
       expiresAt: getExpirationTimestamp()
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
@@ -108,8 +105,7 @@ export function usePlans() {
 
       return {
         plan: data.plan && isValidPlan(data.plan) ? data.plan : null,
-        billingCycle: data.billingCycle || null,
-        cupom: data.cupom || null
+        billingCycle: data.billingCycle || null
       }
     } catch {
       clearStorage()
@@ -149,10 +145,6 @@ export function usePlans() {
       urlParams.billingCycle = normalizedBillingCycle
     }
 
-    if (query.cupom && typeof query.cupom === 'string') {
-      urlParams.cupom = query.cupom
-    }
-
     return Object.keys(urlParams).length > 0 ? urlParams : null
   }
 
@@ -190,13 +182,6 @@ export function usePlans() {
       }
     }
 
-    // Update or remove cupom
-    if (_cupom.value) {
-      newQuery.cupom = _cupom.value
-    } else if (currentQuery.cupom) {
-      delete newQuery.cupom
-    }
-
     // Only navigate if query actually changed
     const queryChanged = JSON.stringify(currentQuery) !== JSON.stringify(newQuery)
 
@@ -218,7 +203,6 @@ export function usePlans() {
     if (urlParams) {
       _plan.value = urlParams.plan || null
       _billingCycle.value = urlParams.billingCycle || null
-      _cupom.value = urlParams.cupom || null
       saveToStorage()
       return
     }
@@ -228,20 +212,18 @@ export function usePlans() {
     if (storedParams?.plan) {
       _plan.value = storedParams.plan
       _billingCycle.value = storedParams.billingCycle
-      _cupom.value = storedParams.cupom
       return
     }
 
     // Default fallback for signup flow when no plan is provided
     _plan.value = 'pro'
     _billingCycle.value = 'monthly'
-    _cupom.value = storedParams?.cupom || null
     saveToStorage()
   }
 
   /**
    * Set a single parameter
-   * @param {string} key - Parameter name (plan, billingCycle, cupom)
+   * @param {string} key - Parameter name (plan, billingCycle)
    * @param {string|null} value - Parameter value
    */
   const setParam = (key, value) => {
@@ -255,9 +237,6 @@ export function usePlans() {
         if (value === null || isValidBillingCycle(value)) {
           _billingCycle.value = value
         }
-        break
-      case 'cupom':
-        _cupom.value = value
         break
     }
     saveToStorage()
@@ -278,9 +257,6 @@ export function usePlans() {
         _billingCycle.value = params.billingCycle
       }
     }
-    if (params.cupom !== undefined) {
-      _cupom.value = params.cupom
-    }
     saveToStorage()
   }
 
@@ -290,7 +266,6 @@ export function usePlans() {
   const clear = async () => {
     _plan.value = null
     _billingCycle.value = null
-    _cupom.value = null
     clearStorage()
     await syncToUrl()
   }
@@ -300,7 +275,7 @@ export function usePlans() {
    * @returns {boolean}
    */
   const hasParams = computed(() => {
-    return _plan.value !== null || _billingCycle.value !== null || _cupom.value !== null
+    return _plan.value !== null || _billingCycle.value !== null
   })
 
   /**
@@ -309,14 +284,13 @@ export function usePlans() {
    */
   const params = computed(() => ({
     plan: _plan.value,
-    billingCycle: _billingCycle.value,
-    cupom: _cupom.value
+    billingCycle: _billingCycle.value
   }))
 
   // Watch for changes and sync to URL automatically
   if (!hasSyncWatcher) {
     watch(
-      [_plan, _billingCycle, _cupom],
+      [_plan, _billingCycle],
       () => {
         syncToUrl()
       },
@@ -330,7 +304,6 @@ export function usePlans() {
     // State (reactive)
     plan: computed(() => _plan.value),
     billingCycle: computed(() => _billingCycle.value),
-    cupom: computed(() => _cupom.value),
     params,
     hasParams,
 

@@ -309,8 +309,7 @@ export const queryKeys = {
   },
   plans: {
     all: ['plans'],
-    list: () => [...queryKeys.plans.all, 'list'],
-    validateCoupon: (code, planId) => [...queryKeys.plans.all, 'validate-coupon', code, planId]
+    list: () => [...queryKeys.plans.all, 'list']
   },
   edgeService: {
     all: ['edge-services'],

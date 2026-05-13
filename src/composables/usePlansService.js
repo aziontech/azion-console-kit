@@ -1,9 +1,27 @@
-import { useQuery, useMutation } from '@tanstack/vue-query'
+import { useQuery } from '@tanstack/vue-query'
 import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
+import { toMilliseconds } from '@/services/v2/base/query/config'
+
+// Single source of truth for the plans-catalogue query so reactive readers
+// (`usePlansList`) and imperative ones (`ensurePlansList`) hit the exact same
+// cache entry. Plans are effectively static between product launches.
+const PLANS_QUERY = {
+  queryKey: queryKeys.plans.list(),
+  queryFn: () => serviceOrdersService.listPlansService(),
+  staleTime: toMilliseconds({ hours: 1 }),
+  gcTime: toMilliseconds({ hours: 24 })
+}
 
 /**
- * Composable for fetching plans list from server
+ * Composable for fetching the plan catalogue from the server.
+ * Cached across the session (staleTime 1h, gcTime 24h, no refetch on
+ * mount/focus). Shares `queryKeys.plans.list()` with `ensurePlansList`
+ * and `ServiceOrdersService.useListPlansQuery`, so all consumers reuse
+ * the same cache entry.
+ *
  * @param {Object} [options] - Query options
  * @param {boolean} [options.enabled=true] - Controls automatic query execution
  * @returns {Object} Vue Query result object with data, isLoading, error, etc.
@@ -12,21 +30,28 @@ export function usePlansList(options = {}) {
   const { enabled = true } = options
 
   return useQuery({
-    queryKey: queryKeys.plans.list(),
-    queryFn: () => serviceOrdersService.listPlansService(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    ...PLANS_QUERY,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     enabled
   })
 }
 
 /**
- * Composable for validating coupon codes
- * @returns {Object} Vue Query mutation object with mutate, isPending, etc.
+ * Imperative, cache-aware loader for the plan catalogue. Returns the
+ * cached entry when fresh (within `staleTime`), otherwise fetches once
+ * and populates the cache. Concurrent calls dedupe through TanStack
+ * Query's in-flight tracking.
+ *
+ * Prefer this over `usePlansList({ enabled: false }).refetch()` — the
+ * `refetch` API always bypasses `staleTime` and forces a network call,
+ * which defeats the catalogue cache.
+ *
+ * @returns {Promise<Array>} The plans list (possibly served from cache).
  */
-export function useValidateCoupon() {
-  return useMutation({
-    mutationFn: ({ code, planId }) => serviceOrdersService.validateCouponService({ code, planId })
-  })
+export async function ensurePlansList() {
+  await waitForPersistenceRestore()
+  return queryClient.ensureQueryData(PLANS_QUERY)
 }
 
 /**

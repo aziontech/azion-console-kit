@@ -76,42 +76,52 @@ export const ServiceOrdersAdapter = {
     return plans.map((item) => this.transformPlan(item))
   },
 
-  transformDiscountPreview(discount = {}) {
-    return {
-      type: discount.type,
-      value: discount.value,
-      currency: discount.currency
-    }
-  },
-
-  transformModificationsPreview(modifications = {}) {
-    return {
-      applyTo: modifications.apply_to,
-      applyNMonths: modifications.apply_n_months
-    }
-  },
-
-  transformCouponValidation(data = {}) {
-    return {
-      valid: data.valid,
-      code: data.code,
-      planId: data.plan_id,
-      couponId: data.coupon_id,
-      discountPreview: data.discount_preview
-        ? this.transformDiscountPreview(data.discount_preview)
-        : null,
-      modificationsPreview: data.modifications_preview
-        ? this.transformModificationsPreview(data.modifications_preview)
-        : null,
-      reasons: data.reasons ?? []
-    }
-  },
-
   transformServiceOrder(data = {}) {
+    const metadata = data.metadata ?? {}
+    // Backend stores the live Stripe checkout session under the SO so the
+    // drawer can resume an unconfirmed payment instead of issuing a new
+    // PATCH (which the backend rejects while the previous payment is still
+    // being confirmed). The field can land in metadata, at the SO root, or
+    // nested under payment/session/checkout — search all of them.
+    const findClientSecret = (obj) => {
+      if (!obj || typeof obj !== 'object') return null
+      return (
+        pick(
+          obj.checkoutSessionClientSecret,
+          pick(obj.checkout_session_client_secret, pick(obj.clientSecret, obj.client_secret))
+        ) ?? null
+      )
+    }
+    const clientSecret =
+      findClientSecret(metadata) ??
+      findClientSecret(data) ??
+      findClientSecret(data.payment) ??
+      findClientSecret(data.session) ??
+      findClientSecret(data.checkout) ??
+      findClientSecret(data.stripe) ??
+      null
+
+    const findCheckoutSessionId = (obj) => {
+      if (!obj || typeof obj !== 'object') return null
+      return pick(obj.checkoutSessionId, obj.checkout_session_id) ?? null
+    }
+    const checkoutSessionId =
+      findCheckoutSessionId(metadata) ??
+      findCheckoutSessionId(data) ??
+      findCheckoutSessionId(data.payment) ??
+      findCheckoutSessionId(data.session) ??
+      findCheckoutSessionId(data.checkout) ??
+      findCheckoutSessionId(data.stripe) ??
+      null
+
     return {
       serviceOrderId: pick(data.serviceOrderId, data.service_order_id),
       accountId: pick(data.accountId, data.account_id),
       planId: pick(data.planId, data.plan_id),
+      priceId: pick(
+        data.priceId,
+        pick(data.price_id, pick(data.planPricingId, data.plan_pricing_id))
+      ),
       type: data.type,
       status: data.status,
       gatewayId: pick(data.gatewayId, data.gateway_id),
@@ -125,7 +135,9 @@ export const ServiceOrdersAdapter = {
       ipFwd: pick(data.ipFwd, data.ip_fwd),
       portFwd: pick(data.portFwd, data.port_fwd),
       timezone: data.timezone,
-      metadata: data.metadata,
+      metadata,
+      clientSecret: clientSecret ?? null,
+      checkoutSessionId: checkoutSessionId ?? null,
       lastEditor: pick(data.lastEditor, data.last_editor),
       createdAt: pick(data.createdAt, data.created_at),
       updatedAt: pick(data.updatedAt, data.updated_at)
@@ -143,11 +155,23 @@ export const ServiceOrdersAdapter = {
   },
 
   transformPayment(response = {}) {
-    return response.payment
-      ? {
-          clientSecret: pick(response.payment.clientSecret, response.payment.client_secret)
-        }
-      : undefined
+    const payment =
+      response?.payment ??
+      response?.data?.payment ??
+      response?.results?.payment ??
+      response?.session ??
+      response?.checkout ??
+      null
+    if (!payment) return undefined
+    const clientSecret = pick(
+      payment.clientSecret,
+      pick(
+        payment.client_secret,
+        pick(payment.checkoutSessionClientSecret, payment.checkout_session_client_secret)
+      )
+    )
+    if (!clientSecret) return undefined
+    return { clientSecret }
   },
 
   transformListResponse(response = {}) {
@@ -212,6 +236,66 @@ export const ServiceOrdersAdapter = {
       timezone: payload.timezone,
       metadata: payload.metadata,
       lastEditor: payload.lastEditor
+    }
+  },
+
+  toUpgradePayload(payload = {}) {
+    const priceId = pick(payload.priceId, payload.planPricingId)
+    return {
+      accountId: payload.accountId,
+      newPlanId: payload.newPlanId,
+      ...(priceId && { priceId })
+    }
+  },
+
+  toDowngradePayload(payload = {}) {
+    return {
+      newPlanId: payload.newPlanId
+    }
+  },
+
+  transformTransition(transition = {}) {
+    if (!transition || typeof transition !== 'object') return undefined
+    return {
+      from: pick(transition.from, transition.fromPlan),
+      to: pick(transition.to, transition.toPlan),
+      effectiveAt: pick(transition.effectiveAt, transition.effective_at),
+      type: transition.type
+    }
+  },
+
+  transformUpgradeResponse(response = {}) {
+    const data = response.data ?? response
+    const currentOrder = pick(data?.currentOrder, data?.current_order)
+    const newPlan = pick(data?.newPlan, data?.new_plan)
+    const transition = pick(data?.transition, data?.planTransition)
+    const immediate = pick(data?.immediateUpdate, pick(data?.immediate_update, data?.immediate))
+
+    return {
+      success: response.success,
+      serviceOrder: currentOrder ? this.transformServiceOrder(currentOrder) : undefined,
+      newPlan: newPlan ? this.transformPlan(newPlan) : undefined,
+      transition: this.transformTransition(transition),
+      immediate: immediate ?? true,
+      payment: this.transformPayment(response),
+      message: response.message,
+      meta: this.transformMeta(response.meta)
+    }
+  },
+
+  transformDowngradeResponse(response = {}) {
+    const data = response.data ?? response
+    const serviceOrderData = pick(data?.serviceOrder, data?.service_order)
+    const schedule = pick(data?.schedule, data?.subscriptionSchedule)
+    const newPlanId = pick(data?.newPlanId, data?.new_plan_id)
+
+    return {
+      success: response.success,
+      serviceOrder: serviceOrderData ? this.transformServiceOrder(serviceOrderData) : undefined,
+      schedule,
+      newPlanId,
+      message: response.message,
+      meta: this.transformMeta(response.meta)
     }
   }
 }

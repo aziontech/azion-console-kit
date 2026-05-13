@@ -11,12 +11,7 @@
         >
           <template #content>
             <div class="p-6 overflow-visible">
-              <AdditionalDataFormBlock
-                :postAdditionalDataService="SignupServices.postAdditionalDataService"
-                :patchFullnameService="SignupServices.patchFullnameService"
-                :updateAccountInfoService="SignupServices.updateAccountInfoService"
-                ref="additionalDataRef"
-              />
+              <AdditionalDataFormBlock ref="additionalDataRef" />
             </div>
           </template>
 
@@ -51,7 +46,6 @@
           <ChoosingPlanContainer
             :plan="selectedPlan"
             :checkoutSessionClientSecret="checkoutSessionClientSecret"
-            :getStripeClientService="getStripeClientService"
             ref="checkoutRef"
             @onSuccess="handleCheckoutSuccess"
             @onError="handleCheckoutError"
@@ -105,18 +99,21 @@
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { usePlans } from '@/composables/usePlans'
-  import { usePlansList, getPlanPricingId } from '@/composables/usePlansService'
+  import { usePlansList, ensurePlansList, getPlanPricingId } from '@/composables/usePlansService'
   import { useAccountStore } from '@/stores/account'
   import { useServiceOrders } from '@/composables/useServiceOrders'
   import { useAdditionalDataFormState } from '@/composables/useAdditionalDataFormState'
-  import * as SignupServices from '@/services/signup-services'
-  import { getStripeClientService } from '@/services/billing-services'
+  import { loadUserAndAccountInfo } from '@/helpers/account-data'
 
   const router = useRouter()
   const { clear: clearAdditionalDataFormState } = useAdditionalDataFormState()
   const { initialize: initializePlans, billingCycle: storedBillingCycle } = usePlans()
   const accountStore = useAccountStore()
-  const { data: plansData, refetch: loadPlans } = usePlansList({ enabled: false })
+  // Auto-fetch on mount when the cache entry is stale/missing (staleTime
+  // 1h). The view reads `plansData.value` reactively in helpers like
+  // `getPlanIdFromName`; the explicit `ensurePlansList()` below guarantees
+  // the catalogue is loaded before the SO call needs it.
+  const { data: plansData } = usePlansList()
   const {
     loadServiceOrder,
     submitServiceOrder,
@@ -164,22 +161,53 @@
 
     await additionalDataRef.value?.submitForm()
 
-    // Handle service order (create or update) before proceeding
-    if (plan && accountId) {
-      const planId = getPlanIdFromName(plan)
-      const planPricingId = getPlanPricingId(plansData.value, plan, billingCycle)
+    if (!plan || !accountId) return
 
-      if (planId && planPricingId) {
-        const serviceOrderResponse = await submitServiceOrder({ accountId, planId, planPricingId })
-        checkoutSessionClientSecret.value = serviceOrderResponse?.payment?.clientSecret || ''
+    const planId = getPlanIdFromName(plan)
+    if (!planId) return
 
-        if (plan === 'pro' && !checkoutSessionClientSecret.value) {
-          // eslint-disable-next-line no-console
-          console.error('Unable to initialize payment. Please try again.')
-        }
+    if (plan === 'hobby') {
+      // Onboarding only enters when has_service_order_plan === false, so no
+      // ACTIVE SO can exist yet — what may exist is a DRAFT from a previous
+      // attempt. submitServiceOrder already routes: no SO → POST hobby;
+      // DRAFT (any plan) → PATCH to hobby; same plan → no-op.
+      try {
+        await submitServiceOrder({ accountId, planId })
 
+        // Refresh /info so accountGuard sees has_service_order_plan=true and
+        // doesn't bounce back to additional-data on reload.
+        await loadUserAndAccountInfo()
         handleProceedToCheckout()
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to activate hobby plan:', err)
       }
+      return
+    }
+
+    const planPricingId = getPlanPricingId(plansData.value, plan, billingCycle)
+    if (!planPricingId) return
+
+    try {
+      const serviceOrderResponse = await submitServiceOrder({ accountId, planId, planPricingId })
+      // Adapter surfaces the Stripe client secret in two places depending on
+      // where the backend put it: top-level `payment` (explicit field) or on
+      // the SO itself when extracted from `metadata.client_secret`.
+      checkoutSessionClientSecret.value =
+        serviceOrderResponse?.payment?.clientSecret ||
+        serviceOrderResponse?.data?.clientSecret ||
+        ''
+
+      if (!checkoutSessionClientSecret.value) {
+        // eslint-disable-next-line no-console
+        console.error('Unable to initialize payment. Please try again.')
+        return
+      }
+
+      handleProceedToCheckout()
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to submit service order:', err)
     }
   }
 
@@ -215,10 +243,15 @@
 
   onMounted(async () => {
     initializePlans()
-    await loadPlans()
+    // Cache-aware: uses the existing plans entry when fresh, fetches only
+    // when stale/missing. Replaces the previous `refetch()` call that
+    // always hit the network.
+    await ensurePlansList()
     const accountId = accountStore.accountData?.id
     if (accountId) {
-      await loadServiceOrder(accountId)
+      // Onboarding only enters with `has_service_order_plan === false`, so
+      // no ACTIVE SO can exist — skip the fallback to save one list call.
+      await loadServiceOrder(accountId, { preferStatus: 'DRAFT', noFallback: true })
     }
   })
 </script>

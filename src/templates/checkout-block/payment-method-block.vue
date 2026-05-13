@@ -35,16 +35,71 @@
           class="flex flex-col gap-2 w-full"
           :class="{ 'stripe-input-invalid': displayError.paymentElement }"
         >
-          <!-- <LabelBlock
-            label="Payment Details"
-            isRequired
-          /> -->
-          <div
-            id="payment-element"
-            name="paymentElement"
-            data-testid="payment-method-form__payment-element__input"
-            class="stripe-input"
-          />
+          <div class="relative">
+            <div
+              v-if="!paymentElementReady"
+              class="flex flex-col gap-4"
+              aria-hidden="true"
+            >
+              <div class="flex flex-col items-start gap-2 w-full">
+                <Skeleton
+                  height="16px"
+                  width="96px"
+                  borderRadius="3px"
+                />
+                <Skeleton
+                  class="w-full"
+                  height="34px"
+                  borderRadius="6px"
+                />
+              </div>
+              <div class="flex gap-4">
+                <div class="flex-1 min-w-0 flex flex-col items-start gap-2">
+                  <Skeleton
+                    height="16px"
+                    width="120px"
+                    borderRadius="3px"
+                  />
+                  <Skeleton
+                    class="w-full"
+                    height="34px"
+                    borderRadius="6px"
+                  />
+                </div>
+                <div class="flex-1 min-w-0 flex flex-col items-start gap-2">
+                  <Skeleton
+                    height="16px"
+                    width="120px"
+                    borderRadius="3px"
+                  />
+                  <Skeleton
+                    class="w-full"
+                    height="34px"
+                    borderRadius="6px"
+                  />
+                </div>
+              </div>
+              <div class="flex flex-col items-start gap-2 w-full">
+                <Skeleton
+                  height="16px"
+                  width="64px"
+                  borderRadius="3px"
+                />
+                <Skeleton
+                  class="w-full"
+                  height="34px"
+                  borderRadius="6px"
+                />
+              </div>
+            </div>
+            <div
+              id="payment-element"
+              name="paymentElement"
+              data-testid="payment-method-form__payment-element__input"
+              class="stripe-input"
+              :class="{ 'absolute inset-0 invisible': !paymentElementReady }"
+            />
+          </div>
           <small
             v-if="displayError.paymentElement"
             class="p-error text-xs font-normal leading-tight"
@@ -64,8 +119,13 @@
 <script setup>
   import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import Skeleton from '@aziontech/webkit/skeleton'
   import { useAccountStore } from '@/stores/account'
   import { useThemeStore } from '@/stores/theme'
+  import {
+    buildCheckoutAppearance,
+    checkoutFonts
+  } from '@/templates/checkout-block/helpers/stripe-appearance.js'
 
   defineOptions({
     name: 'payment-method-block'
@@ -129,42 +189,6 @@
     emitReadinessChange()
   }
 
-  const buildCheckoutAppearance = () => {
-    const isDarkTheme = themeStore.currentTheme === 'dark'
-    const rootStyles =
-      typeof window !== 'undefined' ? window.getComputedStyle(document.documentElement) : null
-    const surfaceBackgroundToken =
-      rootStyles?.getPropertyValue('--background-surface')?.trim() ||
-      rootStyles?.getPropertyValue('--surface-100')?.trim()
-    const surfaceBackground =
-      surfaceBackgroundToken || (isDarkTheme ? 'rgb(23, 23, 23)' : 'rgb(255, 255, 255)')
-
-    return {
-      theme: isDarkTheme ? 'night' : 'stripe',
-      variables: {
-        colorPrimary: '#f3652b',
-        colorText: isDarkTheme ? '#ffffff' : '#111827',
-        colorTextPlaceholder: isDarkTheme ? '#94a3b8' : '#6b7280',
-        colorBackground: surfaceBackground,
-        colorDanger: '#ef4444',
-        spacingUnit: '4px',
-        borderRadius: '6px',
-        fontFamily: "'Sora', sans-serif"
-      },
-      rules: {
-        '.Input': {
-          backgroundColor: '#282828',
-          border: '1px solid #353535',
-          boxShadow: 'none'
-        },
-        '.Input:focus': {
-          border: '1px solid #f3652b',
-          boxShadow: '0 0 0 0.2rem rgba(243, 100, 43, 0.62)'
-        }
-      }
-    }
-  }
-
   const initializeCheckoutElements = async (clientSecret) => {
     initializationVersion.value += 1
     const currentInitializationVersion = initializationVersion.value
@@ -186,10 +210,10 @@
         return
       }
 
-      const appearance = buildCheckoutAppearance()
+      const appearance = buildCheckoutAppearance(themeStore)
       const checkoutInstance = await stripe.value.initCheckoutElementsSdk({
         clientSecret: normalizedClientSecret,
-        elementsOptions: { appearance }
+        elementsOptions: { appearance, fonts: checkoutFonts }
       })
 
       if (currentInitializationVersion !== initializationVersion.value) {
@@ -247,15 +271,15 @@
       })
 
       paymentElement.value.mount('#payment-element')
-    } catch (error) {
+    } catch {
       if (currentInitializationVersion !== initializationVersion.value) {
         return
       }
 
+      // Failure surfaces in the inline payment-element error message;
+      // Stripe.js also logs the underlying cause to its own console plugin.
       displayError.value.paymentElement = CHECKOUT_ERROR_MESSAGES.initialization
       emitReadinessChange()
-      // eslint-disable-next-line no-console
-      console.error('Failed to initialize Stripe checkout elements:', error)
     }
   }
 
