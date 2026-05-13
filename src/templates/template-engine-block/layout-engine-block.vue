@@ -628,7 +628,7 @@
 </script>
 
 <template>
-  <div class="layout-engine-block flex flex-col gap-6">
+  <div class="layout-engine-block flex flex-col gap-6 w-full md:max-w-3xl">
     <div
       ref="step4Ref"
       v-show="currentStep === 'success'"
@@ -758,11 +758,6 @@
             </slot>
           </div>
         </div>
-
-        <div
-          v-if="currentStep === 'repository'"
-          class="text-xs text-color-secondary leading-4"
-        ></div>
 
         <slot
           v-if="currentStep === 'repository' || isWaitingTemplateInfo"

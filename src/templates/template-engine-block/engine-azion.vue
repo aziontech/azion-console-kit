@@ -1021,13 +1021,13 @@
               <!-- Pair: 2 single-field groups side by side -->
               <div
                 v-if="row.type === 'pair'"
-                class="flex gap-x-6 gap-y-4"
+                class="flex flex-wrap sm:flex-nowrap gap-x-10 gap-y-6"
               >
                 <template
                   v-for="group in row.groups"
                   :key="group.name"
                 >
-                  <div class="flex flex-col gap-2">
+                  <div class="flex flex-col gap-2 w-full sm:w-1/2">
                     <template
                       v-for="field in removeHiddenFields(group.fields)"
                       :key="field.name"
@@ -1178,7 +1178,7 @@
                 v-else
                 class="flex flex-col gap-4"
               >
-                <div class="flex gap-x-6 gap-y-4">
+                <div class="flex flex-wrap sm:flex-nowrap gap-x-6 gap-y-4">
                   <template
                     v-for="field in removeHiddenFields(row.groups[0].fields)"
                     :key="field.name"
@@ -1186,7 +1186,7 @@
                     <!-- VCS integration field in single group -->
                     <div
                       v-if="field.name === 'platform_feature__vcs_integration__uuid'"
-                      class="flex flex-col gap-2"
+                      class="flex flex-col gap-2 w-1/2"
                     >
                       <label
                         v-show="!slotProps.hasIntegrationsList"
@@ -1255,6 +1255,7 @@
                     <!-- Regular field in single group -->
                     <FieldInputTextPrivacy
                       v-if="field.info === 'Edge Application Name'"
+                      class=""
                       :class="{
                         '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name])
                       }"
@@ -1338,13 +1339,13 @@
               <!-- Pair: 2 single-field groups side by side -->
               <div
                 v-if="row.type === 'pair'"
-                class="flex flex-wrap gap-x-6 gap-y-4"
+                class="flex flex-wrap sm:flex-nowrap gap-x-6 gap-y-4"
               >
                 <template
                   v-for="group in row.groups"
                   :key="group.name"
                 >
-                  <div class="flex flex-col gap-2 w-[calc(50%-0.75rem)]">
+                  <div class="flex flex-col gap-2 w-full sm:w-1/2">
                     <template
                       v-for="field in removeHiddenFields(group.fields)"
                       :key="field.name"
@@ -1423,9 +1424,9 @@
               <!-- Single: 1 group in full width -->
               <div
                 v-else
-                class="flex flex-col gap-4"
+                class="flex flex-col gap-4 w-full"
               >
-                <div class="flex flex-wrap gap-x-6 gap-y-4">
+                <div class="flex flex-wrap sm:flex-nowrap gap-x-6 gap-y-4">
                   <template
                     v-for="field in removeHiddenFields(row.groups[0].fields)"
                     :key="field.name"
@@ -1433,7 +1434,7 @@
                     <!-- Regular field in single group -->
                     <FieldInputTextPrivacy
                       v-if="field.info === 'Edge Application Name'"
-                      class="w-[calc(50%-0.75rem)]"
+                      class="w-full sm:w-1/2"
                       :class="{
                         '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name])
                       }"
@@ -1455,7 +1456,7 @@
                     />
                     <div
                       v-else-if="isHandleField(field.name)"
-                      class="flex flex-col gap-2 w-[calc(50%-0.75rem)]"
+                      class="flex flex-col gap-2 w-full sm:w-1/2"
                     >
                       <LabelBlock
                         :for="field.name"
