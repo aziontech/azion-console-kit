@@ -8,6 +8,22 @@ import {
 } from './trackers'
 import { cleanObject } from '../../utils/cleanObject.js'
 
+const logTrackerError = (operation, err) => {
+  // eslint-disable-next-line no-console
+  console.warn(
+    JSON.stringify({
+      level: 'warn',
+      tag: 'analytics-tracker',
+      event: 'operation_failed',
+      operation,
+      msg: err?.message,
+      ts: Date.now()
+    })
+  )
+}
+
+const APPLICATION_TRAIT = 'console-kit'
+
 /**
  * @typedef {Object} TrackerEvent
  * @property {string} eventName - The name of the event.
@@ -21,7 +37,7 @@ import { cleanObject } from '../../utils/cleanObject.js'
 export class AnalyticsTrackerAdapter {
   /** @type {TrackerEvent[]} */
   #events = []
-  /** @type {import('analytics').AnalyticsInstance} */
+  /** @type {import('@/plugins/factories/analytics-tracking-factory').AnalyticsClient} */
   #analyticsClient = null
   /** @type {Boolean} */
   #hasAnalyticsClient = false
@@ -42,7 +58,7 @@ export class AnalyticsTrackerAdapter {
 
   /**
    * Creates an instance of AnalyticsTrackerAdapter.
-   * @param {import('analytics').AnalyticsInstance} analyticsClient - The client for tracking.
+   * @param {import('@/plugins/factories/analytics-tracking-factory').AnalyticsClient} analyticsClient - The client for tracking.
    */
   constructor(analyticsClient) {
     this.#hasAnalyticsClient = !!analyticsClient
@@ -65,52 +81,68 @@ export class AnalyticsTrackerAdapter {
     this.#events.push(event)
   }
 
-  #hasAnalytics() {
-    return this.#hasAnalyticsClient
-  }
   /**
-   * call this method to run each stored tracker event
+   * Flushes queued events to the analytics client. Fire-and-forget: the
+   * underlying client already swallows network failures, but we still guard
+   * synchronous errors (cleanObject, etc) so a single bad event never aborts
+   * the whole batch.
    */
   async track() {
-    if (!this.#hasAnalytics()) return
-    this.#events.forEach(async (action) => {
-      const { eventName, props } = action
-      const propsWithTraits = cleanObject({ ...props, ...this.#traits, application: 'console-kit' })
-      await this.#analyticsClient.track(eventName, propsWithTraits)
-    })
+    if (!this.#hasAnalyticsClient) return
+    const queued = this.#events
     this.#events = []
+    queued.forEach((action) => {
+      try {
+        const propsWithTraits = cleanObject({
+          ...action.props,
+          ...this.#traits,
+          application: APPLICATION_TRAIT
+        })
+        Promise.resolve(this.#analyticsClient.track(action.eventName, propsWithTraits)).catch(
+          (err) => logTrackerError('track', err)
+        )
+      } catch (err) {
+        logTrackerError('track', err)
+      }
+    })
   }
 
   /**
-   * A method to identify a user.
+   * Identifies a user. Empty/null/undefined ids are ignored.
    *
-   * @param {type} id - The identifier of the user
-   * @return {Promise<void>}
+   * @param {string|number} id
+   * @returns {Promise<void>}
    */
   async identify(id) {
-    if (id === undefined || id === null || id === '' || !this.#hasAnalytics()) return
-
-    const cleanedTraits = cleanObject(this.#traits)
-    await this.#analyticsClient.identify(String(id), cleanedTraits)
-  }
-
-  /**
-   * Resets the internal state of the tracker, including any queued events and traits.
-   */
-  reset() {
-    this.#events = []
-    this.#traits = {}
-    if (this.#hasAnalytics()) {
-      this.#analyticsClient.reset()
+    if (!id || !this.#hasAnalyticsClient) return
+    try {
+      await this.#analyticsClient.identify(String(id), cleanObject(this.#traits))
+    } catch (err) {
+      logTrackerError('identify', err)
     }
   }
 
   /**
+   * Clears queued events, traits and the underlying client state.
+   */
+  reset() {
+    this.#events = []
+    this.#traits = {}
+    if (!this.#hasAnalyticsClient) return
+    try {
+      this.#analyticsClient.reset()
+    } catch (err) {
+      logTrackerError('reset', err)
+    }
+  }
+
+  /**
+   * Assigns traits sent with every subsequent event.
    *
-   * @param {Object} traitsToAssign - traits that should be sended with all tracking calls
+   * @param {Object} traitsToAssign
    */
   assignGroupTraits(traitsToAssign) {
-    if (!this.#hasAnalytics()) return
+    if (!this.#hasAnalyticsClient) return
     if (!traitsToAssign || typeof traitsToAssign !== 'object') {
       throw new Error('Invalid traits provided')
     }
