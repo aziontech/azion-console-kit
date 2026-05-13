@@ -4,6 +4,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import Menu from '@aziontech/webkit/menu'
   import GenericDataView from '@/views/Deployments/components/GenericDataView.vue'
+  import ResourcePackCell from '@/views/Deployments/components/ResourcePackCell.vue'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { DataTableActionsButtons } from '@/components/list-table'
   import DeploymentsDrawer from '@/views/Deployments/Drawer'
@@ -12,6 +13,7 @@
     getStatusClass,
     getDeploymentStatus,
     getResourcePackRows,
+    getResourcePackDisplay,
     resourcePackTypeMeta,
     normalizeText
   } from '@/views/Deployments/helpers/deployment-status'
@@ -687,39 +689,7 @@
         </template>
 
         <template #cell-resource-pack="{ item: deployment }">
-          <div class="flex flex-col gap-1.5">
-            <div
-              v-for="resourceItem in getResourcePackRows(deployment)"
-              :key="`${deployment.id}-${resourceItem.key}`"
-              class="flex w-full min-w-0 items-center gap-1.5"
-            >
-              <div class="flex w-[40%] gap-2">
-                <i
-                  :class="resourceItem.icon"
-                  class="text-sm text-[var(--text-color-secondary)]"
-                />
-                <span class="text-xs leading-6 text-[var(--text-color-secondary)]"
-                  >{{ resourceItem.label }}:</span
-                >
-              </div>
-              <div class="flex gap-2 w-full justify-start">
-                <span class="overflow-hidden text-ellipsis whitespace-nowrap">{{
-                  resourceItem.name
-                }}</span>
-                <span
-                  class="resource-hash-tag whitespace-nowrap rounded border border-[var(--surface-border)] px-1.5 py-px font-mono text-[0.6875rem] leading-6 text-[var(--text-color-secondary)]"
-                >
-                  {{ resourceItem.hash }}
-                </span>
-              </div>
-            </div>
-            <span
-              v-if="!getResourcePackRows(deployment).length"
-              class="text-xs leading-6 text-[var(--text-color-secondary)]"
-            >
-              --
-            </span>
-          </div>
+          <ResourcePackCell :display="getResourcePackDisplay(deployment)" />
         </template>
 
         <template #cell-lastEditor="{ item: deployment }">
@@ -750,8 +720,7 @@
 </template>
 
 <style scoped>
-  .environment-tag,
-  .resource-hash-tag {
+  .environment-tag {
     background: var(--surface-ground);
   }
 
