@@ -1,5 +1,4 @@
 import * as SignupService from '@/services/signup-services'
-import { inject } from 'vue'
 import { useAccountStore } from '@/stores/account'
 import SignupView from '@/views/Signup/SignupView.vue'
 
@@ -27,29 +26,19 @@ export const signupRoutes = {
       path: 'additional-data',
       name: 'additional-data',
       component: () => import('@views/Signup/AdditionalDataView.vue'),
-      props: {
-        postAdditionalDataService: SignupService.postAdditionalDataService,
-        patchFullnameService: SignupService.patchFullnameService,
-        updateAccountInfoService: SignupService.updateAccountInfoService
-      },
       meta: {
         hideNavigation: true
       },
-      beforeEnter: (__, ___, next) => {
+      beforeEnter: (to, from, next) => {
         const accountStore = useAccountStore()
-        const isFirstLogin = accountStore.isFirstLogin
 
-        if (isFirstLogin && accountStore.ssoSignUpMethod) {
-          /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-          const tracker = inject('tracker')
-          const signUpMethod = { method: accountStore.ssoSignUpMethod }
-
-          tracker.signUp.userSignedUp(signUpMethod).signUp.userAuthorizedSso(signUpMethod)
-        }
-
-        if (isFirstLogin) {
+        // Only allow access to additional-data if:
+        // 1. User has active session (hasActiveUserId)
+        // 2. hasServiceOrderPlan === false (needs to complete service order)
+        if (accountStore.hasActiveUserId && accountStore.hasServiceOrderPlan === false) {
           next()
         } else {
+          // If user doesn't need service order, redirect to home
           next({ name: 'home' })
         }
       }
