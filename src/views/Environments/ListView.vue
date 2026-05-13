@@ -24,12 +24,6 @@
   const listTableRef = ref(null)
   const drawerRef = ref(null)
 
-  const formatActiveTag = (isActive) => {
-    return isActive
-      ? { content: 'Active', severity: 'success' }
-      : { content: 'Inactive', severity: 'danger' }
-  }
-
   const formatDeploymentPolicyTag = (policy = 'single_version') => {
     const policyValue = typeof policy === 'string' ? policy.toLowerCase() : 'single_version'
 
@@ -75,19 +69,6 @@
         header: 'Name',
         sortField: 'name',
         filterPath: 'name'
-      },
-      {
-        field: 'active',
-        header: 'Status',
-        sortField: 'active',
-        filterPath: 'active',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: formatActiveTag(Boolean(columnData)),
-            columnAppearance: 'tag'
-          })
-        }
       },
       {
         field: 'deployment_version_policy',
