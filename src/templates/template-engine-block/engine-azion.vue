@@ -897,7 +897,7 @@
           <!-- Top-level Fields -->
           <div
             v-if="inputSchema.fields"
-            class="flex gap-x-6 gap-y-4 w-full"
+            class="flex flex-col sm:flex-row gap-y-4 sm:gap-x-6 w-full"
           >
             <template
               v-for="field in removeHiddenFields(inputSchema.fields)"
@@ -909,7 +909,7 @@
                   field.name === 'platform_feature__vcs_integration__uuid' &&
                   slotProps.hasIntegrationsList
                 "
-                class="flex flex-col gap-2 w-1/2"
+                class="flex flex-col gap-2 w-full sm:w-1/2"
               >
                 <FieldDropdown
                   :options="slotProps.listOfIntegrations"
@@ -918,7 +918,6 @@
                   :label="field.label"
                   :value="setIntegration"
                   placeholder="Select a scope"
-                  class="h-8"
                   :description="field.description"
                   :additionalError="vcsIntegrationError"
                   :disabled="isRepositoryDisabled"
@@ -943,7 +942,7 @@
               </div>
               <FieldInputTextPrivacy
                 v-else-if="isHandleField(field.name) && field.info === 'Edge Application Name'"
-                class="w-1/2"
+                class="w-full sm:w-1/2"
                 :class="{
                   '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name])
                 }"
@@ -965,7 +964,7 @@
               />
               <div
                 v-else-if="isHandleField(field.name)"
-                class="flex flex-col gap-2 w-1/2"
+                class="flex flex-col gap-2 w-full sm:w-1/2"
               >
                 <LabelBlock
                   :for="field.name"
@@ -1021,7 +1020,7 @@
               <!-- Pair: 2 single-field groups side by side -->
               <div
                 v-if="row.type === 'pair'"
-                class="flex flex-wrap sm:flex-nowrap gap-x-10 gap-y-6"
+                class="flex flex-col sm:flex-row gap-y-6 sm:gap-x-10"
               >
                 <template
                   v-for="group in row.groups"
@@ -1066,7 +1065,6 @@
                             :label="field.label"
                             :value="setIntegration"
                             placeholder="Select a scope"
-                            class="h-8"
                             :description="field.description"
                             :additionalError="vcsIntegrationError"
                             :disabled="isRepositoryDisabled"
@@ -1186,7 +1184,7 @@
                     <!-- VCS integration field in single group -->
                     <div
                       v-if="field.name === 'platform_feature__vcs_integration__uuid'"
-                      class="flex flex-col gap-2 w-1/2"
+                      class="flex flex-col gap-2 w-full sm:w-1/2"
                     >
                       <label
                         v-show="!slotProps.hasIntegrationsList"
