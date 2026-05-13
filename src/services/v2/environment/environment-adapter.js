@@ -1,3 +1,5 @@
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+
 const isObject = (value) => {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
@@ -53,14 +55,13 @@ const normalizeEnvironment = (environment) => {
     id: source.id ?? null,
     name: source.name ?? '',
     description: source.description ?? '',
-    active: Boolean(source.active),
     deployment_version_policy: source.deployment_version_policy,
     log_verbosity: toStringArray(source.log_verbosity),
     robots_policy: toStringArray(source.robots_policy),
     protection: normalizeProtection(source.protection),
     branch_tracking: normalizeBranchTracking(source.branch_tracking),
     created_at: source.created_at ?? null,
-    updated_at: source.updated_at ?? null,
+    updated_at: source.updated_at ? formatDateToDayMonthYearHour(source.updated_at) : null,
     created_by: source.created_by ?? null,
     last_editor: source.last_editor ?? null
   }
@@ -91,7 +92,6 @@ export const EnvironmentAdapter = {
     return pickDefined({
       name: payload.name,
       description: payload.description,
-      active: payload.active,
       deployment_version_policy: payload.deployment_version_policy,
       log_verbosity: payload.log_verbosity,
       robots_policy: payload.robots_policy,
@@ -104,7 +104,6 @@ export const EnvironmentAdapter = {
     return pickDefined({
       name: payload.name,
       description: payload.description,
-      active: payload.active,
       log_verbosity: payload.log_verbosity,
       robots_policy: payload.robots_policy,
       protection: payload.protection,

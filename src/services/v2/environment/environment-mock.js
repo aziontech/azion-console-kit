@@ -1,5 +1,7 @@
 // src/services/v2/environment/environment-mock.js
 
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+
 const getCurrentTimestamp = () => new Date().toISOString()
 
 const simulateDelay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -49,14 +51,13 @@ const normalizeEnvironment = (environment) => {
     id: source.id ?? null,
     name: source.name ?? '',
     description: source.description ?? '',
-    active: Boolean(source.active),
     deployment_version_policy: source.deployment_version_policy,
     log_verbosity: toStringArray(source.log_verbosity),
     robots_policy: toStringArray(source.robots_policy),
     protection: normalizeProtection(source.protection),
     branch_tracking: normalizeBranchTracking(source.branch_tracking),
     created_at: source.created_at ?? null,
-    updated_at: source.updated_at ?? null,
+    updated_at: source.updated_at ? formatDateToDayMonthYearHour(source.updated_at) : null,
     created_by: source.created_by ?? null,
     last_editor: source.last_editor ?? null
   }
@@ -67,7 +68,6 @@ let environments = [
     id: 'env_01HXYZABCDEF',
     name: 'Production',
     description: 'Primary production environment',
-    active: true,
     deployment_version_policy: 'single_version',
     log_verbosity: ['normal'],
     robots_policy: ['index'],
@@ -95,7 +95,6 @@ let environments = [
     id: 'env_01HXYZABCDEG',
     name: 'Staging',
     description: 'Pre-production validation environment',
-    active: true,
     deployment_version_policy: 'versioned_urls',
     log_verbosity: ['verbose'],
     robots_policy: ['noindex'],
@@ -142,7 +141,6 @@ export const createEnvironmentService = async (payload = {}) => {
     id: createEnvironmentId(),
     name: payload.name,
     description: payload.description,
-    active: payload.active,
     deployment_version_policy: payload.deployment_version_policy,
     log_verbosity: payload.log_verbosity,
     robots_policy: payload.robots_policy,
@@ -175,7 +173,6 @@ export const updateEnvironmentService = async (id, payload = {}) => {
     ...current,
     name: payload.name ?? current.name,
     description: payload.description ?? current.description,
-    active: payload.active ?? current.active,
     deployment_version_policy: current.deployment_version_policy,
     log_verbosity: payload.log_verbosity ?? current.log_verbosity,
     robots_policy: payload.robots_policy ?? current.robots_policy,
