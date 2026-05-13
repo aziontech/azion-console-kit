@@ -205,10 +205,12 @@
       />
 
       <span
-        :data-testid="customTestId.privacySwitch"
-        :title="
-          props.isPublic ? 'Public – click to make private' : 'Private – click to make public'
+        v-tooltip.top="
+          props.isPublic
+            ? 'The project will be created as public. Click to make it private.'
+            : 'The project will be created as private. Click to make it public.'
         "
+        :data-testid="customTestId.privacySwitch"
         :aria-label="
           props.isPublic
             ? 'Field is public. Click to make private.'
