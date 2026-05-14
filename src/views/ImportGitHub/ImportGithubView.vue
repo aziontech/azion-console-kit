@@ -128,8 +128,8 @@
       .string()
       .required()
       .matches(
-        /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.azion\.app$/,
-        'Application Name must end with .azion.app (e.g., myapp.azion.app)'
+        /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/,
+        'Application Name may only contain lowercase letters, numbers and hyphens'
       )
       .label('Application Name'),
     preset: yup.string().required().label('Framework'),
@@ -173,7 +173,7 @@
   const suggestedApplicationName = computed(() => {
     const repoName = route.query.repositoryName || props.repositoryName
     if (!repoName) return ''
-    return `${repoName.toLowerCase().replace(/[^a-z0-9-]/g, '-')}.azion.app`
+    return repoName.toLowerCase().replace(/[^a-z0-9-]/g, '-')
   })
 
   const addVariableLabel = computed(() => {
@@ -406,7 +406,7 @@
     const repo = repositoriesListRaw.value.find((repo) => repo.url === repoUrl)
     if (repo) {
       // Update suggested application name based on repository name
-      applicationName.value = `${repo.name.toLowerCase().replace(/[^a-z0-9-]/g, '-')}.azion.app`
+      applicationName.value = repo.name.toLowerCase().replace(/[^a-z0-9-]/g, '-')
 
       // Detect framework automatically
       await detectAndSetFrameworkPreset(repo.owner?.login, repo.name)
@@ -779,7 +779,7 @@
         </div>
         -->
           <!-- GitHub Account and Repository Selection -->
-          <div class="flex flex-col w-full sm:max-w-lg gap-2">
+          <div class="flex flex-col sm:max-w-lg gap-2">
             <LabelBlock
               for="githubAccount"
               label="Git Scope"
@@ -792,7 +792,6 @@
               optionLabel="label"
               optionValue="value"
               placeholder="Select a scope"
-              class="w-full"
               :class="{ 'p-invalid': githubAccountError }"
               :disabled="isDeploying"
               :loading="isGithubConnectLoading"
@@ -841,7 +840,7 @@
             </small>
           </div>
 
-          <div class="flex flex-col w-full sm:max-w-lg gap-2">
+          <div class="flex flex-col sm:max-w-lg gap-2">
             <LabelBlock
               for="repository"
               label="Repository"
@@ -854,7 +853,6 @@
               optionLabel="name"
               optionValue="url"
               placeholder="Select a repository"
-              class="w-full"
               :class="{ 'p-invalid': repositoryError }"
               :disabled="isDeploying || !selectedIntegration"
               :loading="isLoadingRepositories"
@@ -890,7 +888,7 @@
             </small>
           </div>
 
-          <div class="flex flex-col w-full gap-2">
+          <div class="flex flex-col gap-2">
             <FieldText
               label="Application Name"
               required
@@ -902,7 +900,7 @@
             />
           </div>
 
-          <div class="flex flex-col w-full sm:max-w-lg gap-2">
+          <div class="flex flex-col sm:max-w-lg gap-2">
             <LabelBlock
               for="preset"
               label="Framework"
@@ -917,7 +915,6 @@
               optionValue="value"
               autoFilterFocus
               placeholder="Select a framework"
-              class="w-full"
               :class="{ 'p-invalid': presetError }"
               :disabled="isDeploying"
             >
@@ -962,11 +959,11 @@
             </small>
           </div>
 
-          <div class="flex flex-col w-full gap-2">
+          <div class="flex flex-col gap-2">
             <FieldText
               label="Root Directory"
               required
-              class="w-full"
+              class=""
               name="rootDirectory"
               placeholder="./"
               :value="rootDirectory"

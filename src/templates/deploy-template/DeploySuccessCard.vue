@@ -80,6 +80,8 @@
   const emit = defineEmits(['onSave'])
   const router = useRouter()
 
+  const resolveRouteHref = (location) => router.resolve(location).href
+
   /**
    * Build resources array from deployment results
    */
@@ -92,11 +94,10 @@
     if (props.results.domain?.url) {
       resources.push({
         type: `${hasFlagBlockApiV4() ? 'Domain' : 'Workloads'}`,
-        redirect: () =>
-          router.push({
-            name: `${hasFlagBlockApiV4() ? 'edit-domain' : 'edit-workload'}`,
-            params: { id: props.results.domain.id }
-          }),
+        url: resolveRouteHref({
+          name: `${hasFlagBlockApiV4() ? 'edit-domain' : 'edit-workload'}`,
+          params: { id: props.results.domain.id }
+        }),
         name: props.results.edgeApplication?.name || 'Workload',
         icon: 'ai ai-workloads'
       })
@@ -106,11 +107,10 @@
     if (props.results.edgeApplication?.name) {
       resources.push({
         type: 'Application',
-        redirect: () =>
-          router.push({
-            name: 'edit-application',
-            params: { id: props.results.edgeApplication.id }
-          }),
+        url: resolveRouteHref({
+          name: 'edit-application',
+          params: { id: props.results.edgeApplication.id }
+        }),
         name: props.results.edgeApplication.name,
         icon: 'ai ai-edge-application'
       })
@@ -120,8 +120,10 @@
     if (props.results.extras?.functionName) {
       resources.push({
         type: 'Function',
-        redirect: () =>
-          router.push({ name: 'edit-functions', params: { id: props.results.extras.functionId } }),
+        url: resolveRouteHref({
+          name: 'edit-functions',
+          params: { id: props.results.extras.functionId }
+        }),
         name: props.results.extras.functionName,
         icon: 'ai ai-edge-functions'
       })
@@ -131,8 +133,10 @@
     if (props.results.extras?.firewallName) {
       resources.push({
         type: 'Firewall',
-        redirect: () =>
-          router.push({ name: 'edit-firewall', params: { id: props.results.extras.firewallId } }),
+        url: resolveRouteHref({
+          name: 'edit-firewall',
+          params: { id: props.results.extras.firewallId }
+        }),
         name: props.results.extras.firewallName,
         icon: 'ai ai-edge-functions'
       })
@@ -254,41 +258,22 @@
     }
   })
 
-  /**
-   * Handle click on next step item
-   */
-  const handleStepClick = (step) => {
-    if (step.action) {
-      step.action()
-    } else if (step.href) {
-      window.open(step.href, '_blank', 'noopener,noreferrer')
-    }
-  }
-
-  const openMarketplace = () => {
-    router.push('/marketplace')
-  }
-
-  const openRealTimeEvents = () => {
+  const nextSteps = computed(() => {
+    const steps = []
     if (props.executionId) {
-      router.push({
-        name: 'real-time-events'
+      steps.push({
+        href: resolveRouteHref({ name: 'real-time-events' }),
+        icon: 'pi-chart-line',
+        label: 'View Real-Time Metrics'
       })
     }
-  }
-
-  const nextSteps = [
-    {
-      action: () => openRealTimeEvents(),
-      icon: 'pi-chart-line',
-      label: 'View Real-Time Metrics'
-    },
-    {
-      action: () => openMarketplace(),
+    steps.push({
+      href: resolveRouteHref('/marketplace'),
       icon: 'pi-shopping-cart',
       label: 'Explore Functions from Marketplace'
-    }
-  ]
+    })
+    return steps
+  })
 
   /**
    * Computed loading icon for save button
@@ -537,11 +522,13 @@
       >
         <span class="text-sm font-semibold text-color">Next Steps</span>
         <div class="flex flex-col gap-2">
-          <div
+          <a
             v-for="(step, index) in nextSteps"
             :key="index"
-            class="min-h-11 py-2 rounded-md border surface-border bg-[var(--surface-ground)] flex items-center px-3 cursor-pointer hover:border-surface transition-colors gap-2"
-            @click="handleStepClick(step)"
+            :href="step.href"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="min-h-11 py-2 rounded-md border surface-border bg-[var(--surface-ground)] flex items-center px-3 cursor-pointer hover:border-surface transition-colors gap-2 no-underline"
           >
             <div
               class="p-1.5 bg-[var(--surface-100)] rounded shrink-0 flex items-center justify-center"
@@ -569,7 +556,7 @@
             >
               <i class="pi pi-chevron-right w-3.5 h-3.5 text-color-secondary" />
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </template>

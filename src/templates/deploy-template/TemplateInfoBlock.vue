@@ -169,7 +169,17 @@
               <span class="text-xs font-normal font-['Sora'] text-color-secondary leading-4">
                 {{ resource.type }}:
               </span>
+              <a
+                v-if="resource.url"
+                :href="resource.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-xs font-normal font-['Sora'] text-color leading-4 cursor-pointer hover:text-link transition-colors underline-offset-2 hover:underline"
+              >
+                {{ resource.name }}
+              </a>
               <span
+                v-else
                 class="text-xs font-normal font-['Sora'] text-color leading-4 cursor-pointer hover:text-link transition-colors underline-offset-2 hover:underline"
                 @click="resource.redirect?.()"
               >
