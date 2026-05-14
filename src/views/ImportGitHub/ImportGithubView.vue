@@ -73,7 +73,7 @@
   const deployFailed = ref(false)
   const deployStartTime = ref(null)
   const appUrl = ref('')
-  const applicationName = ref('')
+  const deployedApplicationName = ref('')
   const results = ref(null)
   const isDeploying = ref(false)
   const isRestoringState = ref(false)
@@ -124,14 +124,14 @@
   const validationSchema = yup.object({
     githubAccount: yup.string().required().label('GitHub Account'),
     repository: yup.string().required().label('Repository'),
-    domain: yup
+    applicationName: yup
       .string()
       .required()
       .matches(
         /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.azion\.app$/,
-        'Domain must end with .azion.app (e.g., mydomain.azion.app)'
+        'Application Name must end with .azion.app (e.g., myapp.azion.app)'
       )
-      .label('Domain'),
+      .label('Application Name'),
     preset: yup.string().required().label('Framework'),
     rootDirectory: yup
       .string()
@@ -169,8 +169,8 @@
     )
   })
 
-  // Computed domain suggestion
-  const suggestedDomain = computed(() => {
+  // Computed application name suggestion
+  const suggestedApplicationName = computed(() => {
     const repoName = route.query.repositoryName || props.repositoryName
     if (!repoName) return ''
     return `${repoName.toLowerCase().replace(/[^a-z0-9-]/g, '-')}.azion.app`
@@ -187,7 +187,7 @@
   const initialValues = {
     githubAccount: '',
     repository: '',
-    domain: suggestedDomain.value,
+    applicationName: suggestedApplicationName.value,
     preset: '',
     rootDirectory: '/',
     installCommand: 'npm install',
@@ -207,7 +207,7 @@
   })
 
   // UseField for individual fields
-  const { value: domain } = useField('domain')
+  const { value: applicationName } = useField('applicationName')
   const { value: preset, errorMessage: presetError } = useField('preset')
   const { value: rootDirectory } = useField('rootDirectory')
   const { value: installCommand } = useField('installCommand')
@@ -231,7 +231,7 @@
     const {
       gitScope: queryGitScope,
       repositoryName: queryRepoName,
-      formDomain,
+      formApplicationName,
       formPreset,
       formRootDirectory,
       formInstallCommand,
@@ -241,11 +241,11 @@
     // Check if we're restoring from a previous state (deploying step with saved form values)
     const isRestoringFormState = route.query.step && route.query.executionId
 
-    // Only set domain to suggestedDomain if there's no formDomain in the route and not restoring
-    if (isRestoringFormState && formDomain) {
-      domain.value = formDomain
-    } else if (suggestedDomain.value) {
-      domain.value = suggestedDomain.value
+    // Only set applicationName to suggestedApplicationName if there's no formApplicationName in the route and not restoring
+    if (isRestoringFormState && formApplicationName) {
+      applicationName.value = formApplicationName
+    } else if (suggestedApplicationName.value) {
+      applicationName.value = suggestedApplicationName.value
     }
 
     // Restore other form values from route if available
@@ -276,7 +276,7 @@
       values: {
         githubAccount: githubAccount.value || '',
         repository: repository.value || '',
-        domain: domain.value || suggestedDomain.value || '',
+        applicationName: applicationName.value || suggestedApplicationName.value || '',
         preset: preset.value || '',
         rootDirectory: rootDirectory.value || '/',
         installCommand: installCommand.value || 'npm install',
@@ -402,11 +402,11 @@
   }
 
   const handleRepositoryChange = async (event) => {
-    const repoId = event?.value
-    const repo = repositoriesListRaw.value.find((repo) => repo.id === repoId)
+    const repoUrl = event?.value
+    const repo = repositoriesListRaw.value.find((repo) => repo.url === repoUrl)
     if (repo) {
-      // Update suggested domain based on repository name
-      domain.value = `${repo.name.toLowerCase().replace(/[^a-z0-9-]/g, '-')}.azion.app`
+      // Update suggested application name based on repository name
+      applicationName.value = `${repo.name.toLowerCase().replace(/[^a-z0-9-]/g, '-')}.azion.app`
 
       // Detect framework automatically
       await detectAndSetFrameworkPreset(repo.owner?.login, repo.name)
@@ -441,18 +441,18 @@
   }
 
   // Step Navigation Methods
-  const updateRouteQuery = (step, id = null, domainValue = null, formValues = null) => {
+  const updateRouteQuery = (step, id = null, applicationNameValue = null, formValues = null) => {
     // Preserve existing query params and add/overwrite step-related ones
     const query = { ...route.query, step }
     if (id) {
       query.executionId = id
     }
-    if (domainValue) {
-      query.domain = domainValue
+    if (applicationNameValue) {
+      query.applicationName = applicationNameValue
     }
     // Persist form values in route query to preserve them during navigation
     if (formValues) {
-      query.formDomain = formValues.domain
+      query.formApplicationName = formValues.applicationName
       query.formPreset = formValues.preset
       query.formRootDirectory = formValues.rootDirectory
       query.formInstallCommand = formValues.installCommand
@@ -510,8 +510,8 @@
     try {
       const response = await props.getResultsService(executionId.value)
       results.value = response.result
-      // Update route query to success state with executionId and domain
-      updateRouteQuery('success', executionId.value, applicationName.value)
+      // Update route query to success state with executionId and application name
+      updateRouteQuery('success', executionId.value, deployedApplicationName.value)
       goToSuccess()
     } catch (error) {
       deployFailed.value = true
@@ -582,7 +582,7 @@
       {
         field: 'az_name',
         instantiation_data_path: 'envs.[0].value',
-        value: formValues.domain
+        value: formValues.applicationName
       },
       {
         field: 'git_url_external',
@@ -606,8 +606,8 @@
       }
     ]
 
-    deployStore.addApplicationName(formValues.domain)
-    applicationName.value = formValues.domain
+    deployStore.addApplicationName(formValues.applicationName)
+    deployedApplicationName.value = formValues.applicationName
 
     let response
     try {
@@ -622,11 +622,11 @@
     if (response?.result?.uuid) {
       executionId.value = response.result.uuid
       // Update route query params to preserve state on reload, including form values
-      updateRouteQuery('deploying', executionId.value, formValues.domain, formValues)
+      updateRouteQuery('deploying', executionId.value, formValues.applicationName, formValues)
     }
 
     // Set app URL for success card
-    appUrl.value = `https://${formValues.domain}`
+    appUrl.value = `https://${formValues.applicationName}`
     results.value = response
 
     // Switch to deployment view only after the template instantiation succeeded
@@ -651,7 +651,11 @@
   }
 
   const restoreStateFromRoute = async () => {
-    const { step, executionId: routeExecutionId, domain } = route.query
+    const {
+      step,
+      executionId: routeExecutionId,
+      applicationName: routeApplicationName
+    } = route.query
 
     if (step && routeExecutionId) {
       executionId.value = routeExecutionId
@@ -670,9 +674,12 @@
           loadingStore.startLoading()
           const response = await props.getResultsService(routeExecutionId)
           results.value = response.result
-          // Use domain from query params if available, otherwise from results
-          applicationName.value = domain || response.result?.edgeApplication?.name || ''
-          appUrl.value = response.result?.domain?.url || (domain ? `https://${domain}` : '')
+          // Use application name from query params if available, otherwise from results
+          deployedApplicationName.value =
+            routeApplicationName || response.result?.edgeApplication?.name || ''
+          appUrl.value =
+            response.result?.domain?.url ||
+            (routeApplicationName ? `https://${routeApplicationName}` : '')
           currentStep.value = 'success'
         } catch (error) {
           // If we can't restore success state, fall back to deploying
@@ -722,7 +729,7 @@
         :app-url="appUrl"
         :execution-id="executionId"
         :template-title="'Application Deployed'"
-        :template-description="`Your application ${applicationName} has been successfully deployed.`"
+        :template-description="`Your application ${deployedApplicationName} has been successfully deployed.`"
         :github-url="route.query.repository"
         :results="results"
         :workload-id="results?.domain?.id"
@@ -845,7 +852,7 @@
               v-model="selectedRepository"
               :options="repositoriesListRaw"
               optionLabel="name"
-              optionValue="id"
+              optionValue="url"
               placeholder="Select a repository"
               class="w-full"
               :class="{ 'p-invalid': repositoryError }"
@@ -861,7 +868,7 @@
                 >
                   <i class="pi pi-github"></i>
                   <span>
-                    {{ repositoriesListRaw.find((repo) => repo.id === slotProps.value)?.name }}
+                    {{ repositoriesListRaw.find((repo) => repo.url === slotProps.value)?.name }}
                   </span>
                 </div>
                 <div v-else>
@@ -885,13 +892,13 @@
 
           <div class="flex flex-col w-full gap-2">
             <FieldText
-              label="Domain"
+              label="Application Name"
               required
-              name="domain"
-              :placeholder="suggestedDomain"
-              :value="domain"
+              name="applicationName"
+              :placeholder="suggestedApplicationName"
+              :value="applicationName"
               :disabled="isDeploying"
-              description="This domain can be changed later and replaced with a custom domain."
+              description="Give a unique name to the Application. It’ll also be used for the bucket for storage and the function."
             />
           </div>
 
