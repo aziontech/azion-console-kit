@@ -91,6 +91,9 @@
   const vcsIntegrationError = ref('')
   const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
   const oauthGithubRef = ref(null)
+  const getDisplayError = (fieldName) => {
+    return formTools.value.errors?.[fieldName] || ''
+  }
 
   /**
    * Computed property to determine if repository inputs should be disabled
@@ -453,7 +456,9 @@
     // Initialize fields with defineInputBinds (validate only on blur, not on input/change)
     const registerFieldWithValueAndValidation = (field) => {
       if (field.value) {
-        setFieldValue(field.name, field.value)
+        // Set initial value without triggering validation so errors don't surface
+        // before the user interacts with the field (mirrors engine-jsonform).
+        setFieldValue(field.name, field.value, false)
       }
       field.input = defineInputBinds(field.name, {
         validateOnBlur: true,
@@ -944,7 +949,7 @@
                 v-else-if="isHandleField(field.name) && field.info === 'Edge Application Name'"
                 class="w-full sm:w-1/2"
                 :class="{
-                  '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name])
+                  '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
                 }"
                 :name="field.name"
                 :label="field.label"
@@ -957,8 +962,8 @@
                 :required="field.attrs?.required"
                 :disabled="isRepositoryDisabled"
                 :aditionalError="
-                  formTools.errors[field.name]
-                    ? unescapeErrorMessage(formTools.errors[field.name])
+                  getDisplayError(field.name)
+                    ? unescapeErrorMessage(getDisplayError(field.name))
                     : ''
                 "
               />
@@ -971,14 +976,19 @@
                   :label="field.label"
                   :isRequired="field.attrs?.required"
                 />
+                <!-- Password's root is a wrapper <span>, not the inner <input>, so vee-validate's
+                     defineInputBinds (which targets native inputs) doesn't bind here. Use PrimeVue's
+                     v-model contract directly. Keep this pattern for all Password fields below. -->
                 <Password
                   v-if="field.type === 'password'"
                   autocomplete="off"
                   toggleMask
-                  v-bind="field.input"
+                  :modelValue="formTools.values?.[field.name]"
+                  @update:modelValue="(val) => updateValueOnChange(field.name, val)"
+                  @blur="formTools.validateField?.(field.name)"
                   :id="field.name"
                   class="w-full"
-                  :class="renderInvalidClass(formTools.errors[field.name])"
+                  :class="renderInvalidClass(getDisplayError(field.name))"
                   :feedback="false"
                   :disabled="isRepositoryDisabled"
                   :pt="{ input: { name: field.name } }"
@@ -991,18 +1001,18 @@
                   v-bind="field.input"
                   :name="field.name"
                   :disabled="isRepositoryDisabled"
-                  :class="renderInvalidClass(formTools.errors[field.name])"
+                  :class="renderInvalidClass(getDisplayError(field.name))"
                 />
                 <small class="text-xs font-normal text-color-secondary">{{
                   field.description
                 }}</small>
                 <small
                   v-if="
-                    formTools.errors[field.name] && !isRequiredError(formTools.errors[field.name])
+                    getDisplayError(field.name) && !isRequiredError(getDisplayError(field.name))
                   "
                   class="p-error text-xs font-normal leading-tight"
                 >
-                  {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                  {{ unescapeErrorMessage(getDisplayError(field.name)) }}
                 </small>
               </div>
             </template>
@@ -1104,7 +1114,7 @@
                       <FieldInputTextPrivacy
                         v-if="field.info === 'Edge Application Name'"
                         :class="{
-                          '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name])
+                          '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
                         }"
                         :name="field.name"
                         :label="field.label"
@@ -1117,8 +1127,8 @@
                         :required="field.attrs?.required"
                         :disabled="isRepositoryDisabled"
                         :aditionalError="
-                          formTools.errors[field.name]
-                            ? unescapeErrorMessage(formTools.errors[field.name])
+                          getDisplayError(field.name)
+                            ? unescapeErrorMessage(getDisplayError(field.name))
                             : ''
                         "
                       />
@@ -1135,10 +1145,12 @@
                           v-if="field.type === 'password'"
                           autocomplete="off"
                           toggleMask
-                          v-bind="field.input"
+                          :modelValue="formTools.values?.[field.name]"
+                          @update:modelValue="(val) => updateValueOnChange(field.name, val)"
+                          @blur="formTools.validateField?.(field.name)"
                           :id="field.name"
                           class="w-full"
-                          :class="renderInvalidClass(formTools.errors[field.name])"
+                          :class="renderInvalidClass(getDisplayError(field.name))"
                           :feedback="false"
                           :disabled="isRepositoryDisabled"
                           :pt="{ input: { name: field.name } }"
@@ -1150,7 +1162,7 @@
                           type="text"
                           v-bind="field.input"
                           :disabled="isRepositoryDisabled"
-                          :class="renderInvalidClass(formTools.errors[field.name])"
+                          :class="renderInvalidClass(getDisplayError(field.name))"
                           :name="field.name"
                         />
                         <small class="text-xs font-normal text-color-secondary">{{
@@ -1158,12 +1170,12 @@
                         }}</small>
                         <small
                           v-if="
-                            formTools.errors[field.name] &&
-                            !isRequiredError(formTools.errors[field.name])
+                            getDisplayError(field.name) &&
+                            !isRequiredError(getDisplayError(field.name))
                           "
                           class="p-error text-xs font-normal leading-tight"
                         >
-                          {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                          {{ unescapeErrorMessage(getDisplayError(field.name)) }}
                         </small>
                       </div>
                     </template>
@@ -1216,7 +1228,7 @@
                           :value="setIntegration"
                           placeholder="Select a scope"
                           :description="field.description"
-                          :inputClass="renderInvalidClass(formTools.errors[field.name])"
+                          :inputClass="renderInvalidClass(getDisplayError(field.name))"
                           :disabled="isRepositoryDisabled"
                           optionLabel="label"
                           optionValue="value"
@@ -1255,7 +1267,7 @@
                       v-if="field.info === 'Edge Application Name'"
                       class=""
                       :class="{
-                        '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name])
+                        '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
                       }"
                       :name="field.name"
                       :label="field.label"
@@ -1268,8 +1280,8 @@
                       :required="field.attrs?.required"
                       :disabled="isRepositoryDisabled"
                       :aditionalError="
-                        formTools.errors[field.name]
-                          ? unescapeErrorMessage(formTools.errors[field.name])
+                        getDisplayError(field.name)
+                          ? unescapeErrorMessage(getDisplayError(field.name))
                           : ''
                       "
                     />
@@ -1286,10 +1298,12 @@
                         v-if="field.type === 'password'"
                         autocomplete="off"
                         toggleMask
-                        v-bind="field.input"
+                        :modelValue="formTools.values?.[field.name]"
+                        @update:modelValue="(val) => updateValueOnChange(field.name, val)"
+                        @blur="formTools.validateField?.(field.name)"
                         :id="field.name"
                         class="w-full"
-                        :class="renderInvalidClass(formTools.errors[field.name])"
+                        :class="renderInvalidClass(getDisplayError(field.name))"
                         :feedback="false"
                         :disabled="isRepositoryDisabled"
                         :pt="{ input: { name: field.name } }"
@@ -1301,7 +1315,7 @@
                         type="text"
                         v-bind="field.input"
                         :disabled="isRepositoryDisabled"
-                        :class="renderInvalidClass(formTools.errors[field.name])"
+                        :class="renderInvalidClass(getDisplayError(field.name))"
                         :name="field.name"
                       />
                       <small class="text-xs font-normal text-color-secondary">{{
@@ -1309,12 +1323,12 @@
                       }}</small>
                       <small
                         v-if="
-                          formTools.errors[field.name] &&
-                          !isRequiredError(formTools.errors[field.name])
+                          getDisplayError(field.name) &&
+                          !isRequiredError(getDisplayError(field.name))
                         "
                         class="p-error text-xs font-normal leading-tight"
                       >
-                        {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                        {{ unescapeErrorMessage(getDisplayError(field.name)) }}
                       </small>
                     </div>
                   </template>
@@ -1352,7 +1366,7 @@
                       <FieldInputTextPrivacy
                         v-if="field.info === 'Edge Application Name'"
                         :class="{
-                          '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name])
+                          '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
                         }"
                         :name="field.name"
                         :label="field.label"
@@ -1365,8 +1379,8 @@
                         :required="field.attrs?.required"
                         :disabled="isSettingsDisabled"
                         :aditionalError="
-                          formTools.errors[field.name]
-                            ? unescapeErrorMessage(formTools.errors[field.name])
+                          getDisplayError(field.name)
+                            ? unescapeErrorMessage(getDisplayError(field.name))
                             : ''
                         "
                       />
@@ -1383,10 +1397,12 @@
                           v-if="field.type === 'password'"
                           autocomplete="off"
                           toggleMask
-                          v-bind="field.input"
+                          :modelValue="formTools.values?.[field.name]"
+                          @update:modelValue="(val) => updateValueOnChange(field.name, val)"
+                          @blur="formTools.validateField?.(field.name)"
                           :id="field.name"
                           class="w-full"
-                          :class="renderInvalidClass(formTools.errors[field.name])"
+                          :class="renderInvalidClass(getDisplayError(field.name))"
                           :feedback="false"
                           :disabled="isSettingsDisabled"
                           :pt="{ input: { name: field.name } }"
@@ -1398,7 +1414,7 @@
                           type="text"
                           v-bind="field.input"
                           :disabled="isSettingsDisabled"
-                          :class="renderInvalidClass(formTools.errors[field.name])"
+                          :class="renderInvalidClass(getDisplayError(field.name))"
                           :name="field.name"
                         />
                         <small class="text-xs font-normal text-color-secondary">{{
@@ -1406,12 +1422,12 @@
                         }}</small>
                         <small
                           v-if="
-                            formTools.errors[field.name] &&
-                            !isRequiredError(formTools.errors[field.name])
+                            getDisplayError(field.name) &&
+                            !isRequiredError(getDisplayError(field.name))
                           "
                           class="p-error text-xs font-normal leading-tight"
                         >
-                          {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                          {{ unescapeErrorMessage(getDisplayError(field.name)) }}
                         </small>
                       </div>
                     </template>
@@ -1434,7 +1450,7 @@
                       v-if="field.info === 'Edge Application Name'"
                       class="w-full sm:w-1/2"
                       :class="{
-                        '[&_small.p-error]:hidden': isRequiredError(formTools.errors[field.name])
+                        '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
                       }"
                       :name="field.name"
                       :label="field.label"
@@ -1447,8 +1463,8 @@
                       :required="field.attrs?.required"
                       :disabled="isSettingsDisabled"
                       :aditionalError="
-                        formTools.errors[field.name]
-                          ? unescapeErrorMessage(formTools.errors[field.name])
+                        getDisplayError(field.name)
+                          ? unescapeErrorMessage(getDisplayError(field.name))
                           : ''
                       "
                     />
@@ -1465,10 +1481,12 @@
                         v-if="field.type === 'password'"
                         autocomplete="off"
                         toggleMask
-                        v-bind="field.input"
+                        :modelValue="formTools.values?.[field.name]"
+                        @update:modelValue="(val) => updateValueOnChange(field.name, val)"
+                        @blur="formTools.validateField?.(field.name)"
                         :id="field.name"
                         class="w-full"
-                        :class="renderInvalidClass(formTools.errors[field.name])"
+                        :class="renderInvalidClass(getDisplayError(field.name))"
                         :feedback="false"
                         :disabled="isSettingsDisabled"
                         :pt="{ input: { name: field.name } }"
@@ -1480,7 +1498,7 @@
                         type="text"
                         v-bind="field.input"
                         :disabled="isSettingsDisabled"
-                        :class="renderInvalidClass(formTools.errors[field.name])"
+                        :class="renderInvalidClass(getDisplayError(field.name))"
                         :name="field.name"
                       />
                       <small class="text-xs font-normal text-color-secondary">{{
@@ -1488,12 +1506,12 @@
                       }}</small>
                       <small
                         v-if="
-                          formTools.errors[field.name] &&
-                          !isRequiredError(formTools.errors[field.name])
+                          getDisplayError(field.name) &&
+                          !isRequiredError(getDisplayError(field.name))
                         "
                         class="p-error text-xs font-normal leading-tight"
                       >
-                        {{ unescapeErrorMessage(formTools.errors[field.name]) }}
+                        {{ unescapeErrorMessage(getDisplayError(field.name)) }}
                       </small>
                     </div>
                   </template>

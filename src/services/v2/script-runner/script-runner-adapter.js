@@ -1,3 +1,11 @@
+const safeJsonParse = (value) => {
+  try {
+    return JSON.parse(value)
+  } catch {
+    return null
+  }
+}
+
 const detectLogType = (content) => {
   if (!content) return 'info'
   const lowerContent = content.toLowerCase()
@@ -37,6 +45,28 @@ export const ScriptRunnerAdapter = {
 
   transformStatusResponse(data) {
     return data
+  },
+
+  // The script-runner sometimes nests the upstream provider error inside
+  // `result.errors.stack` as a (possibly double-encoded) JSON string. Mine the
+  // most specific message available, falling back to the generic envelope fields.
+  extractErrorMessage(result) {
+    let parsedStack = result?.errors?.stack
+    for (let attempt = 0; attempt < 2 && typeof parsedStack === 'string'; attempt++) {
+      const next = safeJsonParse(parsedStack)
+      if (next === null) break
+      parsedStack = next
+    }
+
+    if (parsedStack && typeof parsedStack === 'object') {
+      const fieldMessages = Array.isArray(parsedStack.errors)
+        ? parsedStack.errors.map((err) => err?.message).filter(Boolean)
+        : []
+      if (fieldMessages.length) return fieldMessages.join('; ')
+      if (parsedStack.message) return parsedStack.message
+    }
+
+    return result?.message || result?.errors?.message || 'Deployment failed with errors'
   },
 
   transformExecutionResultsResponse(data) {

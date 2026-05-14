@@ -486,8 +486,20 @@
     })
   }
 
-  // const failMessage =
-  //   'There was an issue during the deployment. Check the Deploy Log for more details.'
+  const showErrorToast = (summary, error) => {
+    // v2 services throw ErrorHandler instances that know how to render themselves
+    // (one toast per nested message). Plain errors/strings fall back to a single toast.
+    if (error && typeof error.showErrors === 'function') {
+      error.showErrors(toast)
+      return
+    }
+    toast.add({
+      closable: true,
+      severity: 'error',
+      summary,
+      detail: error?.message || error || 'An unexpected error occurred.'
+    })
+  }
 
   const handleFinish = async () => {
     // Skip if we're restoring state from route (results already populated)
@@ -542,107 +554,86 @@
     }
   }
 
-  const showErrorToast = (summary, error) => {
-    toast.add({
-      closable: true,
-      severity: 'error',
-      summary,
-      detail: error?.message || error || 'An unexpected error occurred.'
-    })
-  }
+  const onDeploy = handleSubmit(async (formValues) => {
+    isDeploying.value = true
 
-  const onDeploy = handleSubmit(
-    async (formValues) => {
-      isDeploying.value = true
+    // Filter out empty variables (variables with no key/value)
+    const validVariables = (formValues.newVariables || []).filter(
+      (variable) =>
+        variable.key && variable.key.trim() !== '' && variable.value && variable.value.trim() !== ''
+    )
 
-      // Filter out empty variables (variables with no key/value)
-      const validVariables = (formValues.newVariables || []).filter(
-        (variable) =>
-          variable.key &&
-          variable.key.trim() !== '' &&
-          variable.value &&
-          variable.value.trim() !== ''
-      )
-
-      if (validVariables.length > 0) {
-        try {
-          await Promise.all(validVariables.map((variable) => variablesService.create(variable)))
-        } catch (error) {
-          showErrorToast('Error creating variables', error)
-          isDeploying.value = false
-          return
-        }
-      }
-
-      const inputSchema = [
-        {
-          field: 'platform_feature__vcs_integration__uuid',
-          instantiation_data_path: '',
-          value: selectedIntegration.value
-        },
-        {
-          field: 'az_name',
-          instantiation_data_path: 'envs.[0].value',
-          value: formValues.domain
-        },
-        {
-          field: 'git_url_external',
-          instantiation_data_path: 'envs.[1].value',
-          value: selectedRepository.value
-        },
-        {
-          field: 'vulcan_preset',
-          instantiation_data_path: 'envs.[2].value',
-          value: formValues.preset
-        },
-        {
-          field: 'az_command',
-          instantiation_data_path: 'envs.[4].value',
-          value: formValues.installCommand
-        },
-        {
-          field: 'az_root_directory',
-          instantiation_data_path: 'envs.[5].value',
-          value: formValues.rootDirectory
-        }
-      ]
-
-      deployStore.addApplicationName(formValues.domain)
-      applicationName.value = formValues.domain
-
-      let response
+    if (validVariables.length > 0) {
       try {
-        response = await props.instantiateTemplateService(templateId.value, inputSchema)
+        await Promise.all(validVariables.map((variable) => variablesService.create(variable)))
       } catch (error) {
-        showErrorToast('Deploy error', error)
+        showErrorToast('Error creating variables', error)
         isDeploying.value = false
         return
       }
-
-      // Set execution ID from response for DeployStatusCard
-      if (response?.result?.uuid) {
-        executionId.value = response.result.uuid
-        // Update route query params to preserve state on reload, including form values
-        updateRouteQuery('deploying', executionId.value, formValues.domain, formValues)
-      }
-
-      // Set app URL for success card
-      appUrl.value = `https://${formValues.domain}`
-      results.value = response
-
-      // Switch to deployment view only after the template instantiation succeeded
-      goToDeploying()
-
-      emit('deploy', formValues)
-    },
-    ({ errors }) => {
-      // Handle validation errors - show first error to user
-      const firstError = Object.values(errors)[0]
-      if (firstError) {
-        showErrorToast('Validation error', firstError)
-      }
     }
-  )
+
+    const inputSchema = [
+      {
+        field: 'platform_feature__vcs_integration__uuid',
+        instantiation_data_path: '',
+        value: selectedIntegration.value
+      },
+      {
+        field: 'az_name',
+        instantiation_data_path: 'envs.[0].value',
+        value: formValues.domain
+      },
+      {
+        field: 'git_url_external',
+        instantiation_data_path: 'envs.[1].value',
+        value: selectedRepository.value
+      },
+      {
+        field: 'vulcan_preset',
+        instantiation_data_path: 'envs.[2].value',
+        value: formValues.preset
+      },
+      {
+        field: 'az_command',
+        instantiation_data_path: 'envs.[4].value',
+        value: formValues.installCommand
+      },
+      {
+        field: 'az_root_directory',
+        instantiation_data_path: 'envs.[5].value',
+        value: formValues.rootDirectory
+      }
+    ]
+
+    deployStore.addApplicationName(formValues.domain)
+    applicationName.value = formValues.domain
+
+    let response
+    try {
+      response = await props.instantiateTemplateService(templateId.value, inputSchema)
+    } catch (error) {
+      showErrorToast('Deploy error', error)
+      isDeploying.value = false
+      return
+    }
+
+    // Set execution ID from response for DeployStatusCard
+    if (response?.result?.uuid) {
+      executionId.value = response.result.uuid
+      // Update route query params to preserve state on reload, including form values
+      updateRouteQuery('deploying', executionId.value, formValues.domain, formValues)
+    }
+
+    // Set app URL for success card
+    appUrl.value = `https://${formValues.domain}`
+    results.value = response
+
+    // Switch to deployment view only after the template instantiation succeeded
+    goToDeploying()
+
+    emit('deploy', formValues)
+  })
 
   const loadSolutionByVendor = async () => {
     try {

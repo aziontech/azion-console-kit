@@ -44,7 +44,7 @@ export class ScriptRunnerService {
       case 200: {
         const hasErrors = data.result?.errors || data.result?.error
         if (hasErrors) {
-          throw new Error(data.result?.message || 'Deployment failed with errors')
+          throw new Error(this.adapter.extractErrorMessage(data.result))
         }
         return this.adapter.transformExecutionResultsResponse(data)
       }
