@@ -957,6 +957,7 @@
                 :isPublic="isEdgeAppNamePublic"
                 @update:isPublic="handlePrivacyToggle"
                 @input="(val) => updateValueOnChange(field.name, val)"
+                @blur="formTools.validateField?.(field.name)"
                 :description="field.description"
                 :data-testid="`field-${field.name}`"
                 :required="field.attrs?.required"
@@ -1002,6 +1003,7 @@
                   :name="field.name"
                   :disabled="isRepositoryDisabled"
                   :class="renderInvalidClass(getDisplayError(field.name))"
+                  @blur="formTools.validateField?.(field.name)"
                 />
                 <small class="text-xs font-normal text-color-secondary">{{
                   field.description
@@ -1122,6 +1124,7 @@
                         :isPublic="isEdgeAppNamePublic"
                         @update:isPublic="handlePrivacyToggle"
                         @input="(val) => updateValueOnChange(field.name, val)"
+                        @blur="formTools.validateField?.(field.name)"
                         :description="field.description"
                         :data-testid="`field-${field.name}`"
                         :required="field.attrs?.required"
@@ -1164,6 +1167,7 @@
                           :disabled="isRepositoryDisabled"
                           :class="renderInvalidClass(getDisplayError(field.name))"
                           :name="field.name"
+                          @blur="formTools.validateField?.(field.name)"
                         />
                         <small class="text-xs font-normal text-color-secondary">{{
                           field.description
@@ -1275,6 +1279,7 @@
                       :isPublic="isEdgeAppNamePublic"
                       @update:isPublic="handlePrivacyToggle"
                       @input="(val) => updateValueOnChange(field.name, val)"
+                      @blur="formTools.validateField?.(field.name)"
                       :description="field.description"
                       :data-testid="`field-${field.name}`"
                       :required="field.attrs?.required"
@@ -1317,6 +1322,7 @@
                         :disabled="isRepositoryDisabled"
                         :class="renderInvalidClass(getDisplayError(field.name))"
                         :name="field.name"
+                        @blur="formTools.validateField?.(field.name)"
                       />
                       <small class="text-xs font-normal text-color-secondary">{{
                         field.description
@@ -1374,6 +1380,7 @@
                         :isPublic="isEdgeAppNamePublic"
                         @update:isPublic="handlePrivacyToggle"
                         @input="(val) => updateValueOnChange(field.name, val)"
+                        @blur="formTools.validateField?.(field.name)"
                         :description="field.description"
                         :data-testid="`field-${field.name}`"
                         :required="field.attrs?.required"
@@ -1416,6 +1423,7 @@
                           :disabled="isSettingsDisabled"
                           :class="renderInvalidClass(getDisplayError(field.name))"
                           :name="field.name"
+                          @blur="formTools.validateField?.(field.name)"
                         />
                         <small class="text-xs font-normal text-color-secondary">{{
                           field.description
@@ -1458,6 +1466,7 @@
                       :isPublic="isEdgeAppNamePublic"
                       @update:isPublic="handlePrivacyToggle"
                       @input="(val) => updateValueOnChange(field.name, val)"
+                      @blur="formTools.validateField?.(field.name)"
                       :description="field.description"
                       :data-testid="`field-${field.name}`"
                       :required="field.attrs?.required"
@@ -1500,6 +1509,7 @@
                         :disabled="isSettingsDisabled"
                         :class="renderInvalidClass(getDisplayError(field.name))"
                         :name="field.name"
+                        @blur="formTools.validateField?.(field.name)"
                       />
                       <small class="text-xs font-normal text-color-secondary">{{
                         field.description
