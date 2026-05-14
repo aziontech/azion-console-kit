@@ -556,7 +556,6 @@
 
 <template>
   <FormHorizontal
-    :isDrawer="true"
     title="General"
     description="Configure the identification and lifecycle status of the environment."
   >
@@ -587,7 +586,6 @@
   </FormHorizontal>
 
   <FormHorizontal
-    :isDrawer="true"
     title="Settings"
     description="Define environment behavior and URL strategy."
   >
@@ -617,7 +615,6 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
-    :isDrawer="true"
     title="Environment Variables"
     description="Select global variables already created in the platform for this environment."
   >
@@ -688,13 +685,12 @@
   </FormHorizontal>
 
   <FormHorizontal
-    :isDrawer="true"
+    title="Custom Variables"
     description="Define environment-specific variables using the form or JSON editor, or import a .env file."
   >
-    <template #title>
-      <div class="flex items-center w-full justify-between">
-        <span>Custom Variables</span>
-        <div class="flex items-center gap-2">
+    <template #inputs>
+      <div class="flex flex-col w-full gap-3">
+        <div class="flex items-center gap-2 self-end">
           <PrimeButton
             label="Upload"
             icon="pi pi-upload"
@@ -711,20 +707,15 @@
             :disabled="props.disabledFields"
             @change="handleEnvFileUpload"
           />
+          <SelectButton
+            v-model="customVariablesView"
+            :options="customVariablesViewOptions"
+            :disabled="props.disabledFields"
+            aria-label="Custom variables view"
+            class="flex h-9 p-1 w-fit"
+            data-testid="environment-form__custom-variables-view-toggle"
+          />
         </div>
-      </div>
-    </template>
-
-    <template #inputs>
-      <div class="flex flex-col w-full gap-3">
-        <SelectButton
-          v-model="customVariablesView"
-          :options="customVariablesViewOptions"
-          :disabled="props.disabledFields"
-          aria-label="Custom variables view"
-          class="flex h-9 p-1 w-fit self-end"
-          data-testid="environment-form__custom-variables-view-toggle"
-        />
         <template v-if="customVariablesView === 'Form'">
           <div class="flex flex-col gap-3">
             <div
