@@ -1,6 +1,10 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { EnvironmentAdapter } from '@/services/v2/environment/environment-adapter'
+import {
+  listEnvironmentsService as listEnvironmentsMock,
+  getEnvironmentByIdService as getEnvironmentByIdMock
+} from '@/services/v2/environment/environment-mock'
 
 const parseListResponse = (data) => {
   if (Array.isArray(data)) {
@@ -45,6 +49,32 @@ export class EnvironmentService extends BaseService {
     return {
       body: EnvironmentAdapter.transformList(results),
       count
+    }
+  }
+
+  // TODO: replace with real API call once `v4/environments` is available.
+  #fetchDropdown = async () => {
+    const { body: results = [], count = 0 } = await listEnvironmentsMock()
+
+    const body = results.map((env) => ({
+      id: env.id,
+      name: env.name,
+      value: env.id,
+      deployment_version_policy: env.deployment_version_policy
+    }))
+
+    return { body, count }
+  }
+
+  listEnvironmentsServiceDropdown = this.#fetchDropdown
+
+  loadEnvironmentService = async ({ id }) => {
+    const { data } = await getEnvironmentByIdMock(id)
+    return {
+      id: data.id,
+      name: data.name,
+      value: data.id,
+      deployment_version_policy: data.deployment_version_policy
     }
   }
 

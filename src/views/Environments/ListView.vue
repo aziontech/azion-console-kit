@@ -1,11 +1,11 @@
 <script setup>
   import { computed, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import { DataTableActionsButtons } from '@/components/list-table'
-  import EnvironmentsDrawer from './Drawer'
   import { environmentService } from '@/services/v2/environment/environment-service'
 
   defineOptions({ name: 'list-environments' })
@@ -21,29 +21,27 @@
     }
   })
 
+  const router = useRouter()
   const listTableRef = ref(null)
-  const drawerRef = ref(null)
+  const createPath = '/environments/create'
+  const editPagePath = '/environments/edit'
 
   const formatDeploymentPolicyTag = (policy = 'single_version') => {
     const policyValue = typeof policy === 'string' ? policy.toLowerCase() : 'single_version'
 
     if (policyValue === 'versioned_urls') {
-      return { content: 'Versioned URL', severity: 'info' }
+      return { content: 'Versioned URL', severity: 'secondary' }
     }
 
-    return { content: 'Single Version', severity: 'info' }
+    return { content: 'Single Version', severity: 'primary' }
   }
 
-  const handleOpenCreateDrawer = () => {
-    drawerRef.value?.openCreateDrawer()
+  const handleNavigateToCreate = () => {
+    router.push(createPath)
   }
 
-  const handleOpenEditDrawer = (environment) => {
-    drawerRef.value?.openEditDrawer(environment.id)
-  }
-
-  const handleDrawerSave = () => {
-    listTableRef.value?.reload()
+  const handleNavigateToEdit = (environment) => {
+    router.push({ name: 'edit-environment', params: { id: environment.id } })
   }
 
   const actions = [
@@ -51,7 +49,7 @@
       type: 'action',
       label: 'Edit',
       icon: 'pi pi-pencil',
-      commandAction: (item) => handleOpenEditDrawer(item)
+      commandAction: (item) => handleNavigateToEdit(item)
     },
     {
       type: 'delete',
@@ -125,7 +123,8 @@
           <DataTableActionsButtons
             size="small"
             label="Environment"
-            @click="handleOpenCreateDrawer"
+            :createPagePath="createPath"
+            @click="handleNavigateToCreate"
             data-testid="create_Environment_button"
           />
         </template>
@@ -138,7 +137,7 @@
         :columns="getColumns"
         :actions="actions"
         :enableEditClick="true"
-        :editInDrawer="handleOpenEditDrawer"
+        :editPagePath="editPagePath"
         defaultOrderingFieldName="name"
         exportFileName="Environments"
         :lazy="false"
@@ -152,13 +151,8 @@
           documentationService: props.documentationService,
           emptyListMessage: 'No Environments found.'
         }"
-        @click-to-create="handleOpenCreateDrawer"
+        @click-to-create="handleNavigateToCreate"
       />
     </template>
   </ContentBlock>
-
-  <EnvironmentsDrawer
-    ref="drawerRef"
-    @onSuccess="handleDrawerSave"
-  />
 </template>
