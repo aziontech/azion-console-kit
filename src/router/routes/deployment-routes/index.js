@@ -15,6 +15,7 @@ export const deploymentRoutes = {
         listDeploymentsService
       },
       meta: {
+        title: 'Deployments',
         breadCrumbs: [
           {
             label: 'Deployments',
