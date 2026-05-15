@@ -255,7 +255,6 @@
   const subscription = useCurrentSubscription()
   const {
     downgrade: downgradeServiceOrderPlan,
-    isPaymentPendingLocked,
     loadServiceOrder,
     serviceOrder
   } = useServiceOrders()
@@ -268,22 +267,6 @@
   // across opens caused the Stripe element to stay in skeleton.
   watch(showPlanInfoDrawer, (visible) => {
     if (!visible) checkoutSessionClientSecret.value = ''
-  })
-
-  // Auto-recovery from "Payment already received" 409s: when a mutation hits
-  // the backend lock, refetch after a short delay to let the Stripe webhook
-  // finalize. The lock clears inside loadServiceOrder once fresh state lands,
-  // and subscription.refetch() updates the cards in the UI.
-  let pendingRefetchTimer = null
-  watch(isPaymentPendingLocked, (locked) => {
-    if (!locked) return
-    if (pendingRefetchTimer) clearTimeout(pendingRefetchTimer)
-    pendingRefetchTimer = setTimeout(async () => {
-      pendingRefetchTimer = null
-      const accountId = accountStore.accountData?.id
-      if (accountId) await loadServiceOrder(accountId)
-      await subscription.refetch()
-    }, 2500)
   })
 
   const defaultCardStatus = computed(() => ({
@@ -301,7 +284,6 @@
     hasContractedPlan: computed(() => subscription.hasContractedPlan.value),
     isHobby: computed(() => subscription.isHobby.value),
     isPro: computed(() => subscription.isPro.value),
-    isDraft: computed(() => subscription.isDraft.value),
     isLoading: computed(() => subscription.isLoading.value)
   })
 

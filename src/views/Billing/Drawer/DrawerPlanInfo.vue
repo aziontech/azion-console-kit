@@ -55,34 +55,14 @@
           />
         </div>
 
-        <div
-          class="flex shrink-0 flex-col gap-2 border-t border-default bg-[var(--surface-50)] px-4 py-3 md:px-8"
-        >
-          <div
-            v-if="submitError"
-            class="flex items-start gap-2 rounded-md border border-error bg-[var(--surface-error)] px-3 py-2 text-xs text-error"
-          >
-            <i class="pi pi-exclamation-circle mt-[2px] shrink-0" />
-            <span class="flex-1">{{ submitError }}</span>
-          </div>
-
-          <div class="flex justify-end gap-3">
-            <Button
-              class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
-              outlined
-              label="Cancel"
-              :disabled="isSubmitting"
-              @click="closeDrawer"
-            />
-            <Button
-              class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
-              :label="confirmLabel"
-              :icon="isSubmitting ? 'pi pi-spin pi-spinner' : ''"
-              :disabled="isSubscribeDisabled"
-              @click="handleSubmit"
-            />
-          </div>
-        </div>
+        <CheckoutSubmissionFooter
+          :submitLabel="submitLabel"
+          :errorMessage="submitError"
+          :isSubmitting="isSubmitting"
+          :isConfirmDisabled="isSubscribeDisabled"
+          @cancel="closeDrawer"
+          @confirm="handleSubmit"
+        />
       </div>
     </div>
   </Sidebar>
@@ -91,11 +71,11 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
   import Sidebar from '@aziontech/webkit/sidebar'
-  import Button from '@aziontech/webkit/button'
   import CheckoutFeaturesBlock from '@/templates/checkout-block/checkout-features-block.vue'
   import PricingCalculationBlock from '@/templates/checkout-block/pricing-calculation-block.vue'
   import PaymentMethodBlock from '@/templates/checkout-block/payment-method-block.vue'
   import AddressInformationBlock from '@/templates/checkout-block/address-information-block.vue'
+  import CheckoutSubmissionFooter from '@/views/Billing/Drawer/CheckoutSubmissionFooter.vue'
   import { usePlans } from '@/composables/usePlans'
   import { useToast } from '@aziontech/webkit/use-toast'
 
@@ -161,8 +141,6 @@
   })
 
   const submitLabel = computed(() => (props.mode === 'edit' ? 'Update Plan' : 'Subscribe'))
-
-  const confirmLabel = computed(() => (submitError.value ? 'Retry' : submitLabel.value))
 
   const isSubscribeDisabled = computed(() => {
     return (

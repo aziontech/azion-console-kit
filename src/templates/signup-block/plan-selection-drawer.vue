@@ -53,9 +53,8 @@
                 severity="secondary"
                 class="h-[42px] font-proto-mono text-sm tracking-[-0.14px]"
                 :label="planOption.buttonLabel"
-                :icon="
-                  isLoadingPlan(planOption.value) ? 'pi pi-spin pi-spinner' : 'pi pi-chevron-right'
-                "
+                icon="pi pi-chevron-right"
+                :loading="isLoadingPlan(planOption.value)"
                 :disabled="isCurrentPlanSelection(planOption.value) || Boolean(props.loadingPlan)"
                 iconPos="left"
                 :outlined="

@@ -1,5 +1,46 @@
 const pick = (value, fallback) => (value !== undefined ? value : fallback)
 
+const firstDefinedKey = (obj, keys) => {
+  if (!obj || typeof obj !== 'object') return null
+  for (const key of keys) {
+    if (obj[key] !== undefined) return obj[key]
+  }
+  return null
+}
+
+const firstDefinedAcrossPaths = (paths, keys) => {
+  for (const obj of paths) {
+    const value = firstDefinedKey(obj, keys)
+    if (value != null) return value
+  }
+  return null
+}
+
+const SO_CLIENT_SECRET_KEYS = [
+  'checkoutSessionClientSecret',
+  'checkout_session_client_secret',
+  'clientSecret',
+  'client_secret'
+]
+
+const PAYMENT_CLIENT_SECRET_KEYS = [
+  'clientSecret',
+  'client_secret',
+  'checkoutSessionClientSecret',
+  'checkout_session_client_secret'
+]
+
+const CHECKOUT_SESSION_ID_KEYS = ['checkoutSessionId', 'checkout_session_id']
+
+const PAYMENT_CONTAINER_PATHS = (data, metadata) => [
+  metadata,
+  data,
+  data.payment,
+  data.session,
+  data.checkout,
+  data.stripe
+]
+
 const hasServiceOrderData = (data = {}) => {
   if (!data || typeof data !== 'object') return false
 
@@ -80,39 +121,11 @@ export const ServiceOrdersAdapter = {
     const metadata = data.metadata ?? {}
     // Backend stores the live Stripe checkout session under the SO so the
     // drawer can resume an unconfirmed payment instead of issuing a new
-    // PATCH (which the backend rejects while the previous payment is still
-    // being confirmed). The field can land in metadata, at the SO root, or
-    // nested under payment/session/checkout — search all of them.
-    const findClientSecret = (obj) => {
-      if (!obj || typeof obj !== 'object') return null
-      return (
-        pick(
-          obj.checkoutSessionClientSecret,
-          pick(obj.checkout_session_client_secret, pick(obj.clientSecret, obj.client_secret))
-        ) ?? null
-      )
-    }
-    const clientSecret =
-      findClientSecret(metadata) ??
-      findClientSecret(data) ??
-      findClientSecret(data.payment) ??
-      findClientSecret(data.session) ??
-      findClientSecret(data.checkout) ??
-      findClientSecret(data.stripe) ??
-      null
-
-    const findCheckoutSessionId = (obj) => {
-      if (!obj || typeof obj !== 'object') return null
-      return pick(obj.checkoutSessionId, obj.checkout_session_id) ?? null
-    }
-    const checkoutSessionId =
-      findCheckoutSessionId(metadata) ??
-      findCheckoutSessionId(data) ??
-      findCheckoutSessionId(data.payment) ??
-      findCheckoutSessionId(data.session) ??
-      findCheckoutSessionId(data.checkout) ??
-      findCheckoutSessionId(data.stripe) ??
-      null
+    // PATCH. Search metadata, root, and payment/session/checkout/stripe
+    // nesting — the backend has emitted all of these shapes.
+    const paymentPaths = PAYMENT_CONTAINER_PATHS(data, metadata)
+    const clientSecret = firstDefinedAcrossPaths(paymentPaths, SO_CLIENT_SECRET_KEYS)
+    const checkoutSessionId = firstDefinedAcrossPaths(paymentPaths, CHECKOUT_SESSION_ID_KEYS)
 
     return {
       serviceOrderId: pick(data.serviceOrderId, data.service_order_id),
@@ -163,13 +176,7 @@ export const ServiceOrdersAdapter = {
       response?.checkout ??
       null
     if (!payment) return undefined
-    const clientSecret = pick(
-      payment.clientSecret,
-      pick(
-        payment.client_secret,
-        pick(payment.checkoutSessionClientSecret, payment.checkout_session_client_secret)
-      )
-    )
+    const clientSecret = firstDefinedKey(payment, PAYMENT_CLIENT_SECRET_KEYS)
     if (!clientSecret) return undefined
     return { clientSecret }
   },

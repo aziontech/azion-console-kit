@@ -3,13 +3,7 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class ServiceOrdersService extends BaseService {
-  // Production: '/v4/service-orders'
-  // Local dev with mock: '/local_api/v4/service-orders'
   #baseURL = '/edge_api/api/v1/service_orders'
-
-  // Plans endpoint
-  // Production: '/v4/product_catalog/plans'
-  // Local dev with mock: '/local_api/v4/product_catalog/plans'
   #plansBaseURL = '/edge_api/api/v1/plans'
 
   listPlansService = async () => {
@@ -21,13 +15,8 @@ export class ServiceOrdersService extends BaseService {
     return ServiceOrdersAdapter.transformPlansList(data?.data ?? data)
   }
 
-  // Plan catalogue is effectively static (SKUs, pricings, IDs) — the backend
-  // updates it only on product launches. Cache aggressively to avoid the
+  // Plan catalogue is effectively static — cache aggressively to avoid the
   // checkout / billing UI re-fetching it on every mount.
-  //   - staleTime 1h: avoid refetch within a session
-  //   - gcTime 24h:   survive the user navigating away and coming back
-  //   - refetchOnMount: only when stale
-  //   - refetchOnWindowFocus: disabled (catalogue doesn't change mid-session)
   useListPlansQuery() {
     return this.useQuery(queryKeys.plans.list(), () => this.listPlansService(), {
       staleTime: this.toMilliseconds({ hours: 1 }),
@@ -61,8 +50,6 @@ export class ServiceOrdersService extends BaseService {
     })
 
     const body = response?.data ?? {}
-    // Backend may envelope the SO as { data }, { results }, or expose it
-    // directly on the body. Pick whichever shape carries the SO fields.
     const raw =
       (body.data && typeof body.data === 'object' && body.data) ??
       (Array.isArray(body.results) ? body.results[0] : body.results) ??
@@ -82,6 +69,8 @@ export class ServiceOrdersService extends BaseService {
       body: ServiceOrdersAdapter.toCreatePayload(payload)
     })
 
+    this.queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
+
     return ServiceOrdersAdapter.transformCreateResponse(response.data)
   }
 
@@ -91,6 +80,8 @@ export class ServiceOrdersService extends BaseService {
       url: `${this.#baseURL}/${id}`,
       body: ServiceOrdersAdapter.toUpdatePayload(payload)
     })
+
+    this.queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
 
     return ServiceOrdersAdapter.transformUpdateResponse(response.data)
   }
@@ -102,6 +93,8 @@ export class ServiceOrdersService extends BaseService {
       body: ServiceOrdersAdapter.toUpgradePayload(payload)
     })
 
+    this.queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
+
     return ServiceOrdersAdapter.transformUpgradeResponse(response.data)
   }
 
@@ -111,6 +104,8 @@ export class ServiceOrdersService extends BaseService {
       url: `${this.#baseURL}/${id}/downgrade`,
       body: ServiceOrdersAdapter.toDowngradePayload(payload)
     })
+
+    this.queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
 
     return ServiceOrdersAdapter.transformDowngradeResponse(response.data)
   }

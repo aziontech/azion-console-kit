@@ -2,8 +2,10 @@ import { ref } from 'vue'
 import { useAccountStore } from '@/stores/account'
 import { useServiceOrders } from '@/composables/useServiceOrders'
 import { ensurePlansList, getPlanPricingId } from '@/composables/usePlansService'
-// eslint-disable-next-line azion-architecture/require-vue-query
 import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { SO_STATUS } from '@/services/v2/service-orders/service-orders-constants'
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
 
 /**
@@ -29,7 +31,7 @@ import { loadUserAndAccountInfo } from '@/helpers/account-data'
  */
 export function useCheckoutSessionPreparer() {
   const accountStore = useAccountStore()
-  const { createServiceOrder, upgrade, getServiceOrder, serviceOrder } = useServiceOrders()
+  const { createServiceOrder, updateServiceOrder, upgrade, getServiceOrder } = useServiceOrders()
 
   const isPreparing = ref(false)
 
@@ -74,9 +76,10 @@ export function useCheckoutSessionPreparer() {
       throw new Error(`Plan pricing not found for ${plan} (${cycle}).`)
     }
 
-    const draftsResponse = await serviceOrdersService.listServiceOrders({
-      accountId,
-      status: 'DRAFT'
+    const draftsResponse = await queryClient.fetchQuery({
+      queryKey: queryKeys.serviceOrders.list({ accountId, status: SO_STATUS.DRAFT }),
+      queryFn: () => serviceOrdersService.listServiceOrders({ accountId, status: SO_STATUS.DRAFT }),
+      staleTime: 0
     })
     const existingDraft = draftsResponse?.data?.[0] ?? null
 
@@ -87,21 +90,21 @@ export function useCheckoutSessionPreparer() {
         return draft.clientSecret
       }
 
-      const updateResponse = await serviceOrdersService.updateServiceOrder(
-        existingDraft.serviceOrderId,
-        { accountId, planId, planPricingId }
-      )
-      if (updateResponse?.data) {
-        serviceOrder.value = updateResponse.data
-      }
+      const updateResponse = await updateServiceOrder(existingDraft.serviceOrderId, {
+        accountId,
+        planId,
+        planPricingId
+      })
       const refreshedSecret = extractSecret(updateResponse)
       if (refreshedSecret) return refreshedSecret
       throw new Error('Unable to refresh the existing checkout session.')
     }
 
-    const activeResponse = await serviceOrdersService.listServiceOrders({
-      accountId,
-      status: 'ACTIVE'
+    const activeResponse = await queryClient.fetchQuery({
+      queryKey: queryKeys.serviceOrders.list({ accountId, status: SO_STATUS.ACTIVE }),
+      queryFn: () =>
+        serviceOrdersService.listServiceOrders({ accountId, status: SO_STATUS.ACTIVE }),
+      staleTime: 0
     })
     const activeSO = activeResponse?.data?.[0] ?? null
 

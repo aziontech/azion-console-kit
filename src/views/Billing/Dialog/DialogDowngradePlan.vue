@@ -74,7 +74,7 @@
         />
         <Button
           :label="error ? 'Retry' : 'Schedule downgrade'"
-          :icon="isSubmitting ? 'pi pi-spin pi-spinner' : ''"
+          :loading="isSubmitting"
           class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
           :disabled="isSubmitting || !canDowngrade"
           @click="confirm"

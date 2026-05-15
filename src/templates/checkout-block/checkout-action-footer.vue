@@ -12,7 +12,7 @@
     <Button
       severity="secondary"
       class="font-protomono flex items-center justify-center text-xs"
-      :icon="loading ? 'pi pi-spin pi-spinner' : ''"
+      :loading="loading"
       :disabled="disabled"
       label="Subscribe"
       @click="$emit('submit')"

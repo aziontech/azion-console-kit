@@ -40,7 +40,7 @@
           severity="secondary"
           label="Upgrade to Pro"
           class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
-          :icon="props.loading ? 'pi pi-spin pi-spinner' : ''"
+          :loading="props.loading"
           :disabled="props.loading"
           @click="handleUpgradeClick"
         />
