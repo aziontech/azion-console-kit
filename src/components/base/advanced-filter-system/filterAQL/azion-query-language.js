@@ -65,6 +65,18 @@ export default class Aql {
         const mappedOperator = this.mapOperatorValue(operator)
         const operatorInfo = this.operatorInfo(suggestion?.value?.operator, mappedOperator)
 
+        // Drop clauses whose textual operator cannot be resolved against
+        // the selected field's supported operator list. This prevents
+        // emitting a clause with `operator: undefined` (or any non-string
+        // / empty operator), which would otherwise flow into the GraphQL
+        // filter builder and produce a malformed key like
+        // `${valueField}undefined`. The trailing `.filter(item !== null)`
+        // step removes the dropped clause from the parsed output. Guards
+        // both the BETWEEN branch and the regular branch below.
+        if (typeof operatorInfo?.value !== 'string' || operatorInfo.value.length === 0) {
+          return null
+        }
+
         if (operator.toUpperCase() === 'BETWEEN') {
           const [begin, end] = value
             .replace(/[()]/g, '')
@@ -472,13 +484,18 @@ export default class Aql {
     const hasErrorInOperatorIn = this.queryValidationForInOperator(normalizedQuery, suggestions)
     const hasErrorNotSpace = this.queryValidatorNoSpaces(normalizedQuery)
     const hasErrorBetweenOperator = this.queryValidatorBetweenOperators(normalizedQuery)
+    const hasErrorUnsupportedFieldOperator = this.queryValidationForUnsupportedFieldOperator(
+      normalizedQuery,
+      suggestions
+    )
 
     const erros = [
       ...hasErrorInCompoundFields,
       ...hasErrorInFields,
       ...hasErrorInOperatorIn,
       ...hasErrorNotSpace,
-      ...hasErrorBetweenOperator
+      ...hasErrorBetweenOperator,
+      ...hasErrorUnsupportedFieldOperator
     ]
 
     const errorMessages = {
@@ -498,10 +515,85 @@ export default class Aql {
       'between-operator-error-not-parentheses':
         'Please enclose the values for the BETWEEN operator in parentheses. For example: status between (200, 300).',
       'between-operator-error-equal-values':
-        'The two values for the BETWEEN operator must be different. For example: status between (200, 300).'
+        'The two values for the BETWEEN operator must be different. For example: status between (200, 300).',
+      'unsupported-operator-for-field-error': ({ field, operator }) =>
+        `the operator '${operator}' is not supported for the field '${field}'.`
     }
 
-    return erros.map((errorCode) => errorMessages[errorCode]).filter((msg) => !!msg)
+    return erros
+      .map((entry) => {
+        if (typeof entry === 'string') return errorMessages[entry]
+        const template = errorMessages[entry?.code]
+        return typeof template === 'function' ? template(entry) : undefined
+      })
+      .filter((msg) => !!msg)
+  }
+
+  queryValidationForUnsupportedFieldOperator(query, suggestions) {
+    if (!query || !suggestions || !suggestions.length) return []
+
+    const errors = []
+    const expressions = query.split(/\s+and\s+/i)
+    if (!expressions) return errors
+
+    // Match a single AQL clause: optional quoted/compound field, then a
+    // textual operator surrounded by whitespace, then the remainder. The
+    // operator alternation is ordered longest-first to avoid `<` matching
+    // ahead of `<=`/`<>` when the whole pattern is evaluated.
+    const expressionRegex =
+      /^(?:"([^"]+)"|'([^']+)'|([\w\s]+?))\s+(<=|>=|<>|BETWEEN|ILIKE|LIKE|IN|=|<|>)\s+(.+)$/i
+
+    expressions.forEach((expression) => {
+      if (!expression) return
+
+      // Strip leading/trailing grouping parentheses that are not part of
+      // an IN/BETWEEN value list. Mirrors the same pre-processing done by
+      // `parse` so that field+operator extraction lines up.
+      let cleaned = expression.trim()
+      if (
+        cleaned.startsWith('(') &&
+        !/\bin\b/i.test(cleaned) &&
+        !/\bbetween\b/i.test(cleaned)
+      ) {
+        cleaned = cleaned.replace(/^\(+/, '')
+      }
+      if (
+        cleaned.endsWith(')') &&
+        !/\bin\b/i.test(cleaned) &&
+        !/\bbetween\b/i.test(cleaned)
+      ) {
+        cleaned = cleaned.replace(/\)+$/, '')
+      }
+      cleaned = cleaned.trim()
+
+      const match = cleaned.match(expressionRegex)
+      if (!match) return
+
+      const field = (match[1] || match[2] || match[3] || '').trim()
+      const textualOperator = match[4]
+      if (!field || !textualOperator) return
+
+      const suggestion = suggestions.find(
+        (item) => item.label.toLowerCase() === field.toLowerCase()
+      )
+      // When the field is not in the catalog, a dedicated validator branch
+      // (`not-exists-field-error`) handles it. Stay silent here so this
+      // method is purely additive and does not duplicate other branches.
+      if (!suggestion) return
+
+      const mappedOperator = this.mapOperatorValue(textualOperator)
+      const resolved = this.operatorInfo(suggestion?.value?.operator, mappedOperator)
+
+      if (typeof resolved?.value !== 'string' || resolved.value.length === 0) {
+        errors.push({
+          code: 'unsupported-operator-for-field-error',
+          field: suggestion.label,
+          operator: textualOperator.toLowerCase()
+        })
+      }
+    })
+
+    return errors
   }
 
   queryValidationForCompoundFields(queryText) {

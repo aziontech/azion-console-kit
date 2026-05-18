@@ -21,3 +21,18 @@ export function formatTimestampCompact(time, timezone = 'UTC') {
 
   return date.toLocaleString('en-US', options)
 }
+
+/**
+ * Collapse a "Mon DD, YYYY @ HH:MM:SS" pill label to "Mon DD @ HH:MM:SS",
+ * dropping the year while preserving seconds. Passthrough strings such as
+ * "now", "last 5 minutes" or empty values are returned unchanged.
+ *
+ * @param {string} dateStr - Pill label to compact
+ * @returns {string} Compact label or the original value when no match
+ */
+export const formatPillDateCompact = (dateStr) => {
+  if (!dateStr) return dateStr
+  const match = dateStr.match(/^(\w+ \d+),\s*\d{4}\s*@\s*(\d{2}:\d{2}:\d{2})/)
+  if (!match) return dateStr
+  return `${match[1]} @ ${match[2]}`
+}

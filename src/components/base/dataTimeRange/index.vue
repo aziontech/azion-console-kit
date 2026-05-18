@@ -18,7 +18,7 @@
 
     <OverlayPanel
       ref="overlayPanel"
-      class="min-w-[200px] max-w-[430px]"
+      style="width: min(23rem, 95vw); min-width: 21rem;"
       :showCloseIcon="false"
       @show="onOverlayShow"
       @hide="onOverlayHide"
@@ -99,9 +99,9 @@
         </TabView>
 
         <div
-          class="flex items-center gap-2 mb-2 pt-4 mt-4 justify-between border-t border-[var(--surface-border)]"
+          class="flex items-center gap-2 pt-2 mt-2 justify-between border-t border-[var(--surface-border)]"
           :class="{
-            'p-1 mb-2': activeTab === 3
+            'p-1': activeTab === 3
           }"
         >
           <div class="text-xs text-color-secondary">

@@ -23,9 +23,13 @@ vi.mock('@/services/real-time-events-service/make-real-time-events-service', () 
 
 const { loadSummaryKpis } = await import('../load-events-aggregation')
 
+// Keep the range ≤ 30 minutes so resolveChartApi routes to the Events API
+// (which uses the mocked AxiosHttpClientSignalDecorator). Ranges > 30 minutes
+// are routed to the Metrics API and would hit the unmocked
+// AxiosHttpClientAdapter, exercising a different code path than this suite asserts.
 const VALID_TS_RANGE = {
   tsRangeBegin: '2024-01-01T00:00:00Z',
-  tsRangeEnd: '2024-01-01T01:00:00Z'
+  tsRangeEnd: '2024-01-01T00:15:00Z'
 }
 
 beforeEach(() => {

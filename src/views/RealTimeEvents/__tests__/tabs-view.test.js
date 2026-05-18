@@ -113,12 +113,12 @@ function createTabsSetup() {
 describe('openNewEventsTab', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   afterEach(() => {
     vi.useRealTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   it('opens a new Events tab with the default dataset (first TABS_EVENTS entry)', () => {
@@ -195,12 +195,12 @@ describe('openNewEventsTab', () => {
 describe('handleCloseTab routing', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   afterEach(() => {
     vi.useRealTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   it('routes to closeEventsTab for events tabs', () => {
@@ -290,12 +290,12 @@ describe('handleCloseTab routing', () => {
 describe('handleShare eventsTab inclusion', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   afterEach(() => {
     vi.useRealTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   it('includes eventsTab when an additional Events tab is active', () => {
@@ -389,12 +389,12 @@ describe('handleShare eventsTab inclusion', () => {
 describe('restoreEventsTabs on mount', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   afterEach(() => {
     vi.useRealTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   it('restores persisted tabs in order', () => {
@@ -402,7 +402,7 @@ describe('restoreEventsTabs on mount', () => {
       { id: 'events:tab-1', label: 'My Tab 1', dataset: 'httpRequests' },
       { id: 'events:tab-2', label: 'My Tab 2', dataset: 'edgeFunctions' }
     ]
-    localStorage.setItem('rte:open-events-tabs', JSON.stringify(persistedTabs))
+    globalThis.localStorage.setItem('rte:open-events-tabs', JSON.stringify(persistedTabs))
 
     const { restoreEventsTabs, eventsTabs } = createTabsSetup()
     restoreEventsTabs()
@@ -430,12 +430,12 @@ describe('restoreEventsTabs on mount', () => {
 describe('Share_State import with tab limit reached', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   afterEach(() => {
     vi.useRealTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   it('shows warn toast when limit is reached and eventsTab is in Share_State', () => {

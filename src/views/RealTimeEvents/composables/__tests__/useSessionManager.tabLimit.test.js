@@ -111,11 +111,11 @@ function createManager(panels, opts = {}) {
 describe('useSessionManager — tab-limit path', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   afterEach(() => {
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   // ── Test 1: canOpenNewTab injected, returns false ─────────────────────────

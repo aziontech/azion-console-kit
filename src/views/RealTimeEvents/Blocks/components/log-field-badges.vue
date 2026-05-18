@@ -1,5 +1,5 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
   import { getSeverity } from '../../composables/useSeverityClassifier'
   import { useClickToFilter } from '../../composables/useClickToFilter.js'
@@ -10,10 +10,6 @@
     summary: {
       type: Array,
       default: () => []
-    },
-    maxFields: {
-      type: Number,
-      default: 5
     },
     highlightFields: {
       type: Array,
@@ -40,26 +36,59 @@
 
   const getBadgeSeverity = (item) => getSeverity(item.key, item.value)
 
-  const visibleFields = computed(() => {
-    // Show highlighted fields first, then the rest
+  // Render every field. CSS clips what doesn't fit the visible band; the
+  // ResizeObserver below measures how many badges actually overflow and
+  // drives an accurate "+N more" badge — no hard-coded maxFields needed.
+  const orderedFields = computed(() => {
     const highlighted = []
     const others = []
-
     props.summary.forEach((item) => {
-      if (highlightSet.value.has(item.key)) {
-        highlighted.push(item)
-      } else {
-        others.push(item)
-      }
+      if (highlightSet.value.has(item.key)) highlighted.push(item)
+      else others.push(item)
     })
-
-    const all = [...highlighted, ...others]
-    return all.slice(0, props.maxFields)
+    return [...highlighted, ...others]
   })
 
-  const hiddenCount = computed(() => {
-    return Math.max(0, props.summary.length - props.maxFields)
+  const containerRef = ref(null)
+  const hiddenCount = ref(0)
+  let resizeObserver = null
+  let measureRaf = 0
+
+  const scheduleMeasure = () => {
+    if (measureRaf) cancelAnimationFrame(measureRaf)
+    measureRaf = requestAnimationFrame(measure)
+  }
+
+  const measure = () => {
+    measureRaf = 0
+    const container = containerRef.value
+    if (!container) return
+    const containerBottom = container.getBoundingClientRect().bottom
+    let hidden = 0
+    // Iterate badges (skip the trailing "+N more" badge itself).
+    container.querySelectorAll('.log-badge:not(.log-badge--more)').forEach((badge) => {
+      const rect = badge.getBoundingClientRect()
+      // A badge counts as hidden when its bottom edge falls past the
+      // container's clipped bottom — i.e. it sits on a row that overflow:
+      // hidden cuts off.
+      if (rect.bottom > containerBottom + 0.5) hidden += 1
+    })
+    if (hidden !== hiddenCount.value) hiddenCount.value = hidden
+  }
+
+  onMounted(() => {
+    if (!containerRef.value) return
+    resizeObserver = new ResizeObserver(scheduleMeasure)
+    resizeObserver.observe(containerRef.value)
+    nextTick(measure)
   })
+
+  onBeforeUnmount(() => {
+    if (measureRaf) cancelAnimationFrame(measureRaf)
+    resizeObserver?.disconnect()
+  })
+
+  watch(orderedFields, () => nextTick(measure))
 
   const truncateValue = (value, maxLen = 80) => {
     if (!value || value === '-') return '-'
@@ -86,11 +115,12 @@
 <template>
   <div class="log-badges-row">
     <div
+      ref="containerRef"
       class="log-badges-container"
       @click="emit('toggle-expand')"
     >
       <span
-        v-for="(item, index) in visibleFields"
+        v-for="(item, index) in orderedFields"
         :key="index"
         class="log-badge"
         :class="{

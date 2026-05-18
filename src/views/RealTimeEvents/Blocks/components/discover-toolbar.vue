@@ -162,13 +162,17 @@
     display: flex;
     align-items: center;
     gap: 0.375rem;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
+    flex-wrap: nowrap;
   }
 
   .discover-toolbar__search {
     position: relative;
     display: flex;
     align-items: center;
+    flex: 0 1 14rem;
+    min-width: 6rem;
   }
 
   .discover-toolbar__search-icon {
@@ -182,7 +186,8 @@
 
   .discover-toolbar__search-input {
     padding-left: 2rem !important;
-    width: clamp(8rem, 14vw, 14rem);
+    width: 100%;
+    max-width: 14rem;
   }
 
   /* Toolbar: align page-size dropdown height with small buttons */
@@ -226,8 +231,12 @@
       display: none;
     }
 
+    .discover-toolbar__search {
+      flex: 0 1 10rem;
+    }
+
     .discover-toolbar__search-input {
-      width: clamp(6rem, 10vw, 10rem);
+      max-width: 10rem;
     }
   }
 

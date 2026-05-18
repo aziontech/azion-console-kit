@@ -95,10 +95,18 @@ function buildGraphQLQuery({
   ].join('\n')
 }
 
+const wrapLikeValue = (rawValue) => {
+  if (typeof rawValue !== 'string') return rawValue
+  // If the user already placed any `%` wildcards, honour them byte-for-byte.
+  // Otherwise default to contains-style %value% so chip / saved-search
+  // entry points (which never type `%`) keep their existing behaviour.
+  return rawValue.includes('%') ? rawValue : `%${rawValue}%`
+}
+
 const formatValueContainOperator = (variable) => {
   for (const key in variable) {
     if (variable[key] && (key.includes('Like') || key.includes('Ilike'))) {
-      variable[key] = `%${variable[key]}%`
+      variable[key] = wrapLikeValue(variable[key])
     }
   }
   return variable

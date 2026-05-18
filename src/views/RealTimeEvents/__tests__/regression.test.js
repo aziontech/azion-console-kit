@@ -39,7 +39,18 @@ vi.mock('@/components/base/advanced-filter-system/filterFields/filterRow/compone
 }))
 
 vi.mock('@stores/account', () => ({
-  useAccountStore: () => ({ accountData: { timezone: 'UTC' } })
+  useAccountStore: () => ({
+    accountData: { timezone: 'UTC' },
+    // Composables that persist per `client_id:user_id` (useSavedSearches,
+    // useQueryHistory) read these fields off `account` directly.
+    account: {
+      client_id: 'test-client-regression',
+      user_id: 'test-user-regression',
+      timezone: 'UTC'
+    },
+    setAccountData() {},
+    resetAccount() {}
+  })
 }))
 
 vi.mock('@stores/graphql-query', () => ({
@@ -422,7 +433,10 @@ describe('Requirement 13.4: Chart rendering for all chart kinds', () => {
 // 13.6 — Session save/edit/delete/share/import operations
 // ────────────────────────────────────────────────────────────────────────────
 describe('Requirement 13.6: Session save/edit/delete/share/import', () => {
-  const SAVED_SEARCHES_KEY = 'rte-saved-searches'
+  // Saved searches are scoped per `client_id:user_id` (see useSavedSearches).
+  // The vi.mock at the top of this file pins both ids so storage lands at the
+  // fully qualified key below.
+  const SAVED_SEARCHES_KEY = 'rte-saved-searches:test-client-regression:test-user-regression'
   let storage
 
   beforeEach(() => {

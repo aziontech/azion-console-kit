@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import fc from 'fast-check'
-import { formatTimestampCompact } from '../format-timestamp.js'
+import { formatTimestampCompact, formatPillDateCompact } from '../format-timestamp.js'
 
 /**
  * Feature: real-time-events-refactor, Property 4: Timezone-parameterized timestamp formatting
@@ -95,6 +95,65 @@ describe('Feature: real-time-events-refactor, Property 4: Timezone-parameterized
         expect(resultDefault).toBe(resultUTC)
       }),
       { numRuns: 100 }
+    )
+  })
+})
+
+/**
+ * Bug 3: formatPillDateCompact preserves seconds (exploration)
+ *
+ * Observation-only on UNFIXED code. The helper does not currently export
+ * formatPillDateCompact, so these tests are expected to FAIL.
+ *
+ * Once implemented, the function should accept a "Mon DD, YYYY @ HH:MM:SS"
+ * (formatDateSimple "@" form) and collapse it to "Mon DD @ HH:MM:SS",
+ * preserving the seconds component. Passthrough strings ("now",
+ * "last 5 minutes", "") are returned unchanged.
+ */
+describe('Bug 3: formatPillDateCompact preserves seconds', () => {
+  const arbPillTimezone = fc.constantFrom('UTC', 'Asia/Tokyo', 'America/New_York', 'Europe/Berlin')
+
+  it('should preserve HH:MM:SS for any (date, tz) routed through formatDateSimple "@" form', () => {
+    fc.assert(
+      fc.property(arbTimestamp, arbPillTimezone, (isoTimestamp, timezone) => {
+        const compact = formatTimestampCompact(isoTimestamp, timezone)
+        // Mirror formatDateSimple's "@" form: replace the first ", " (between date and time)
+        const formatted = compact.replace(', ', ' @ ')
+        const result = formatPillDateCompact(formatted)
+        expect(result).toMatch(/\b\d{2}:\d{2}:\d{2}\b/)
+      }),
+      { numRuns: 200, seed: 20240517 }
+    )
+  })
+
+  it('should return passthrough strings unchanged', () => {
+    expect(formatPillDateCompact('now')).toBe('now')
+    expect(formatPillDateCompact('last 5 minutes')).toBe('last 5 minutes')
+    expect(formatPillDateCompact('')).toBe('')
+  })
+
+  it('should collapse the year while preserving seconds (deterministic counterexample)', () => {
+    expect(formatPillDateCompact('May 17, 2026 @ 17:00:47')).toBe('May 17 @ 17:00:47')
+  })
+})
+
+/**
+ * Bug 3 preservation: non-pill timestamp surfaces are unchanged
+ *
+ * Asserts that the existing formatTimestampCompact contract is unaffected
+ * by the upcoming formatPillDateCompact addition: deterministic across
+ * calls and matches the documented shape "Mon DD, YYYY, HH:MM:SS".
+ */
+describe('Bug 3 preservation: non-pill timestamp surfaces are unchanged', () => {
+  it('should be deterministic and match the documented shape', () => {
+    fc.assert(
+      fc.property(arbTimestamp, arbTimezone, (isoTimestamp, timezone) => {
+        const first = formatTimestampCompact(isoTimestamp, timezone)
+        const second = formatTimestampCompact(isoTimestamp, timezone)
+        expect(second).toBe(first)
+        expect(first).toMatch(/^\w+ \d+,? \d{4}, \d{2}:\d{2}:\d{2}$/)
+      }),
+      { numRuns: 200, seed: 20240517 }
     )
   })
 })
