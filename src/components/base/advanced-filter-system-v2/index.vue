@@ -1,9 +1,9 @@
 <script setup>
   import { ref, onMounted, defineModel, computed, watch } from 'vue'
-  import DataTimeRange from '@/components/base/dataTimeRange'
-  import DialogFilter from '@/components/base/advanced-filter-system/filterFields/temp/index.vue'
-  import AzionQueryLanguage from '@/components/base/advanced-filter-system/filterAQL/azion-query-language.vue'
-  import FilterTagsDisplay from '@/components/base/advanced-filter-system/filterTagsDisplay'
+  import DataTimeRange from '@/components/base/dataTimeRange-v2'
+  import FilterFields from '@/components/base/advanced-filter-system-v2/filterFields/index.vue'
+  import AzionQueryLanguage from '@/components/base/advanced-filter-system-v2/filterAQL/azion-query-language.vue'
+  import FilterTagsDisplay from '@/components/base/advanced-filter-system-v2/filterTagsDisplay'
   import PrimeButton from '@aziontech/webkit/button'
 
   import { useAccountStore } from '@/stores/account'
@@ -329,10 +329,10 @@
     >
       <div class="afs-filter-row">
         <div class="afs-filter-row__query">
-          <DialogFilter
-            v-model:filterAdvanced="filterData.fields"
-            :fieldsInFilter="props.fieldsInFilter"
-            @applyFilter="applyFilters"
+          <FilterFields
+            v-model="filterData.fields"
+            :filtersOptions="props.fieldsInFilter"
+            @apply-filter="applyFilters"
           />
           <AzionQueryLanguage
             :fieldsInFilter="props.fieldsInFilter"

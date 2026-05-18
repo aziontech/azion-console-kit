@@ -156,12 +156,18 @@
   ])
 
   // Initialize filterRows from model if available
+  // Accept both v2-pipeline shape ({ valueField, operator, value, type, ... })
+  // and the internal row shape ({ field, operator, value, ... }).
   if (model.value && Array.isArray(model.value) && model.value.length > 0) {
     filterRows.value = model.value.map((filter, index) => ({
       id: index + 1,
-      field: filter.field || null,
+      field: filter.valueField || filter.field || null,
+      fieldValue: filter.valueField || filter.fieldValue || null,
       operator: filter.operator || null,
+      operatorType: filter.type || filter.operatorType || null,
+      operatorFormat: filter.format || filter.operatorFormat || null,
       value: filter.value || '',
+      rawValue: filter.rawValue ?? filter.value ?? '',
       logicalOperator: filter.logicalOperator || 'OR'
     }))
   }
@@ -220,29 +226,32 @@
     }
   }
 
+  // Output shape consumed by the v2 pipeline (useEventsData, FilterTagsDisplay, AQL).
   const processFilterRow = (row) => {
     return {
-      field: row.field,
+      valueField: row.field,
       operator: row.operator,
-      value: row.value
+      operatorType: row.operatorType,
+      value: row.value,
+      rawValue: row.rawValue,
+      type: row.operatorType || 'String',
+      logicalOperator: row.logicalOperator || 'OR'
     }
   }
 
   const addFilter = () => {
     if (!isFormValid.value) return
 
-    const filterStructure = generateFilterStructure()
+    const flat = filterRows.value.map(processFilterRow)
 
-    const filterData = {
-      filters: filterStructure,
+    // Update the model as a flat array so the rest of the v2 pipeline
+    // (useEventsData buildApiFilters, FilterTagsDisplay) can consume it.
+    model.value = flat
+
+    emit('apply-filter', {
+      filters: flat,
       customLabel: customLabel.value
-    }
-
-    // Update the model
-    model.value = filterStructure
-
-    // Emit the filter data
-    emit('apply-filter', filterData)
+    })
   }
 
   const updateCustomLabel = () => {
