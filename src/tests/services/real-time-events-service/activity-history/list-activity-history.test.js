@@ -2,23 +2,6 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listActivityHistory } from '@/services/real-time-events-service/activity-history'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
-import { localeMock } from '@/tests/utils/localeMock'
-import { getCurrentTimezone } from '@/helpers'
-
-vi.mock('@/modules/filter-loaders/dataset-fields-loader', () => ({
-  loadDatasetFields: vi.fn().mockResolvedValue([]),
-  getDatasetFields: vi
-    .fn()
-    .mockReturnValue([
-      'userIp',
-      'authorName',
-      'title',
-      'resourceType',
-      'resourceId',
-      'userId',
-      'ts'
-    ])
-}))
 
 const fixtures = {
   filter: {
@@ -54,26 +37,57 @@ describe('ActivityHistoryServices', () => {
       body: { data: { activityHistoryEvents: [] } }
     })
 
+    const datasetName = 'activityHistoryEvents'
     const { sut } = makeSut()
     await sut(fixtures.filter)
 
-    expect(requestSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        url: 'v4/events/graphql',
-        method: 'POST',
-        baseURL: '/',
-        body: expect.objectContaining({
-          variables: {
-            tsRange_begin: '2024-02-23T18:07:25',
-            tsRange_end: '2024-02-23T19:07:25'
-          }
-        })
-      })
-    )
+    const query = [
+      `query (`,
+      `\t$tsRange_begin: DateTime!`,
+      `\t$tsRange_end: DateTime!`,
+      `) {`,
+      `\t${datasetName} (`,
+      `\t\tlimit: 10000`,
+      `\t\torderBy: [ts_DESC]`,
+      `\t\tfilter: {`,
+      `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
+      `\t\t}`,
+      `\t) {`,
+      `\t\tuserIp`,
+      `\t\tauthorName`,
+      `\t\ttitle`,
+      `\t\tresourceType`,
+      `\t\tresourceId`,
+      `\t\tuserId`,
+      `\t\tts`,
+      `\t\tcomment`,
+      `\t\tauthorEmail`,
+      `\t\taccountId`,
+      `\t\trequestData`,
+      `\t\tuserAgent`,
+      `\t\tremotePort`,
+      `\t\trefererHeader`,
+      `\t}`,
+      `}`
+    ].join('\n')
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: 'v4/events/graphql',
+      method: 'POST',
+      signal: undefined,
+      baseURL: '/',
+      body: {
+        query,
+        variables: {
+          tsRange_begin: '2024-02-23T18:07:25',
+          tsRange_end: '2024-02-23T19:07:25'
+        }
+      },
+      headers: undefined
+    })
   })
 
   it('should parsed correctly each event', async () => {
-    localeMock()
     vi.mock('@/helpers/generate-timestamp', () => ({
       generateCurrentTimestamp: () => 'mocked-timestamp'
     }))
@@ -84,23 +98,40 @@ describe('ActivityHistoryServices', () => {
 
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
-    const expectedTsFormat = getCurrentTimezone(fixtures.activityHistory.ts)
 
     expect(response).toEqual({
       data: [
         {
           id: 'mocked-timestamp',
           summary: [
-            { key: 'authorName', value: fixtures.activityHistory.authorName },
-            { key: 'resourceId', value: fixtures.activityHistory.resourceId },
-            { key: 'resourceType', value: fixtures.activityHistory.resourceType },
-            { key: 'title', value: fixtures.activityHistory.title },
-            { key: 'userId', value: fixtures.activityHistory.userId },
-            { key: 'userIp', value: fixtures.activityHistory.userIp }
+            {
+              key: 'authorName',
+              value: fixtures.activityHistory.authorName
+            },
+            {
+              key: 'resourceId',
+              value: fixtures.activityHistory.resourceId
+            },
+            {
+              key: 'resourceType',
+              value: fixtures.activityHistory.resourceType
+            },
+            {
+              key: 'title',
+              value: fixtures.activityHistory.title
+            },
+            {
+              key: 'userId',
+              value: fixtures.activityHistory.userId
+            },
+            {
+              key: 'userIp',
+              value: fixtures.activityHistory.userIp
+            }
           ],
           ts: fixtures.activityHistory.ts,
           userId: fixtures.activityHistory.userId,
-          tsFormat: expectedTsFormat
+          tsFormat: 'February 23, 2024 at 06:07:25 PM'
         }
       ]
     })

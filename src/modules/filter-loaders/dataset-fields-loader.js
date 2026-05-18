@@ -13,9 +13,9 @@
  * `sessionid`).
  */
 
-import { loadFieldsEventsData } from '@/services/real-time-events-service'
-import { CURATED_DATASET_FIELDS } from '@/services/real-time-events-service/_shared/dataset-fields'
-import { AGGREGATION_OPERATORS } from '@/services/real-time-events-service/_shared/aggregation-operators'
+import { loadFieldsEventsData } from '@/services/real-time-events-service-v2'
+import { CURATED_DATASET_FIELDS } from '@/services/real-time-events-service-v2/_shared/dataset-fields'
+import { AGGREGATION_OPERATORS } from '@/services/real-time-events-service-v2/_shared/aggregation-operators'
 
 import {
   datasetTypeMapIntrospectionQuery,
