@@ -16,7 +16,6 @@ import { parseViewValue } from './useChartConfig'
  */
 export function useViewSync({ selectedMetricsDashboard, stackByField, reloadListTableWithHash }) {
   const selectedView = ref('events:none')
-  let viewInitialized = false
 
   watch(selectedView, (value) => {
     const { scheme, key } = parseViewValue(value)
@@ -27,8 +26,12 @@ export function useViewSync({ selectedMetricsDashboard, stackByField, reloadList
       stackByField.value = 'none'
       selectedMetricsDashboard.value = key
     }
-    // Skip reload on initial mount — loadData is called by onMounted
-    if (!viewInitialized) { viewInitialized = true; return }
+    // Re-fetch the events list so the documents table reflects the active
+    // view (stack-by change or metrics chart selection). Vue's `watch`
+    // intentionally does not fire on creation (no `immediate: true`), so
+    // every invocation here corresponds to an actual view change driven
+    // by the user (or a programmatic switch such as the metrics-error
+    // fallback in tab-panel-block.vue).
     reloadListTableWithHash()
   })
 

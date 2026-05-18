@@ -30,9 +30,18 @@ const arbSummaryItem = fc.record({
 
 const arbTableRow = fc.record({
   id: fc.uuid(),
-  ts: fc.date({ min: new Date('2020-01-01'), max: new Date('2030-01-01') }).map((d) =>
-    d.toISOString()
-  ),
+  // `fc.date()` may yield `Invalid Date` unless `noInvalidDate: true` is set;
+  // calling `.toISOString()` on an invalid Date throws `RangeError: Invalid
+  // time value`. Pin to a finite calendar window and exclude invalid dates
+  // so the arbitrary always produces a valid ISO string.
+  ts: fc
+    .date({
+      min: new Date('2020-01-01T00:00:00.000Z'),
+      max: new Date('2030-01-01T00:00:00.000Z'),
+      noInvalidDate: true
+    })
+    .filter((d) => Number.isFinite(d.getTime()))
+    .map((d) => d.toISOString()),
   tsFormat: fc.string({ minLength: 5, maxLength: 30 }),
   summary: fc.array(arbSummaryItem, { minLength: 1, maxLength: 8 })
 })

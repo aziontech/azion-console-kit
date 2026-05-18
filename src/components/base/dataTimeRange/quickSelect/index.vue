@@ -38,23 +38,24 @@
       />
     </div>
 
-    <div class="mt-4">
-      <div class="text-sm font-medium leading-5 text-color mb-3">Commonly used</div>
+    <div class="mt-3">
+      <div class="text-xs font-medium leading-5 text-color mb-1">Commonly used</div>
       <div class="grid grid-cols-2 grid-rows-6 grid-flow-col">
         <PrimeButton
           v-for="range in commonDateRanges"
           :key="range.value"
           size="small"
           link
-          class="justify-start text-left w-full"
+          class="justify-start text-left w-full !py-1"
           @click="applyCommonRange(range)"
+          :pt="{ label: { class: 'text-xs' } }"
         >
           {{ range.label }}
         </PrimeButton>
       </div>
     </div>
 
-    <div class="mt-4 pt-4 border-t border-[var(--surface-border)]">
+    <div class="mt-3 pt-3 border-t border-[var(--surface-border)]">
       <div class="flex gap-3 justify-between">
         <div class="flex align-center items-center gap-3">
           <InputSwitch
@@ -63,7 +64,7 @@
           />
           <label
             for="autoRefreshEnabled"
-            class="text-sm font-medium leading-5 text-color"
+            class="text-xs font-medium leading-5 text-color"
             >Refresh Every</label
           >
         </div>

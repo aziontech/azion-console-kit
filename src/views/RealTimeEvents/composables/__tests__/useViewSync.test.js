@@ -34,6 +34,7 @@ describe('useViewSync', () => {
 
       selectedView.value = 'events:status'
       await nextTick()
+      await nextTick()
 
       expect(stackByField.value).toBe('status')
       expect(selectedMetricsDashboard.value).toBeNull()
@@ -44,6 +45,7 @@ describe('useViewSync', () => {
       const { selectedView, stackByField, reloadListTableWithHash } = setup()
 
       selectedView.value = 'events:'
+      await nextTick()
       await nextTick()
 
       expect(stackByField.value).toBe('none')
@@ -66,6 +68,7 @@ describe('useViewSync', () => {
       stackByField.value = 'status'
 
       selectedView.value = 'metrics:wafThreats'
+      await nextTick()
       await nextTick()
 
       expect(selectedMetricsDashboard.value).toBe('wafThreats')
@@ -94,6 +97,7 @@ describe('useViewSync', () => {
       reloadListTableWithHash.mockClear()
       selectedView.value = 'events:none'
       await nextTick()
+      await nextTick()
 
       expect(selectedMetricsDashboard.value).toBeNull()
       expect(stackByField.value).toBe('none')
@@ -106,9 +110,12 @@ describe('useViewSync', () => {
 
     selectedView.value = 'events:status'
     await nextTick()
+    await nextTick()
     selectedView.value = 'metrics:wafThreats'
     await nextTick()
+    await nextTick()
     selectedView.value = 'events:none'
+    await nextTick()
     await nextTick()
 
     expect(reloadListTableWithHash).toHaveBeenCalledTimes(3)

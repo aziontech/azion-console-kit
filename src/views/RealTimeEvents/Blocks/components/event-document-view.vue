@@ -421,9 +421,10 @@
 
   .doc-search__field {
     width: 100%;
-    max-width: 100%;
-    flex: 1;
+    max-width: 20rem;
+    flex: 0 1 20rem;
     min-width: 0;
+    position: relative;
   }
 
   .doc-search__field :deep(.p-inputtext) {

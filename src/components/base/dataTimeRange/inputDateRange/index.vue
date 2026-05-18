@@ -18,6 +18,7 @@
     getCurrentHourAndMinute,
     getCurrentMonthLabel
   } from '@utils/date.js'
+  import { formatPillDateCompact } from '@/views/RealTimeEvents/helpers/format-timestamp'
 
   defineOptions({ name: 'InputDateRange' })
 
@@ -106,14 +107,9 @@
     return formatDateSimple(model.value.endDate)
   })
 
-  // Compact display: "May 10 @ 04:43" (no year, no seconds) — saves ~8ch per input
-  const formatCompactDate = (dateStr) => {
-    if (!dateStr) return dateStr
-    // "May 10, 2026 @ 04:43:00" → "May 10 @ 04:43"
-    const match = dateStr.match(/^(\w+ \d+),\s*\d{4}\s*@\s*(\d{2}:\d{2})/)
-    if (match) return `${match[1]} @ ${match[2]}`
-    return dateStr
-  }
+  // Compact display: "May 10 @ 04:43:00" — keeps seconds and drops the year.
+  // Delegates to formatPillDateCompact so the regex lives in one place.
+  const formatCompactDate = formatPillDateCompact
 
   const startDisplayInput = computed(() => {
     const raw = model.value.labelStart || startDateInput.value
@@ -546,7 +542,7 @@
         </div>
       </div>
 
-      <div class="flex gap-3 mt-2 h-[200px]">
+      <div class="flex items-start gap-2 mt-2">
         <Calendar
           v-model="selectedDate"
           :inline="true"
@@ -556,25 +552,24 @@
           :dateFormat="'dd/mm/yy'"
           :minDate="minDate"
           :maxDate="maxDate"
-          class="w-full"
+          class="flex-1 min-w-0"
           @date-select="onDateSelect"
           :pt="{
             header: { class: 'hidden' },
-            table: { class: 'w-full' },
-            weekday: { class: 'font-medium' },
-            daylabel: {
-              style: {
-                padding: '0px !important',
-                margin: '0px !important',
-                fontSize: '0.875rem'
-              }
+            weekDay: {
+              style:
+                'width: 28px !important; height: 28px !important; margin: 2px !important; font-size: 0.75rem !important; font-weight: 500 !important;'
+            },
+            dayLabel: {
+              style:
+                'width: 28px !important; height: 28px !important; margin: 2px !important; font-size: 0.75rem !important;'
             }
           }"
         />
 
         <!-- Time selector -->
         <div class="border surface-border rounded-lg p-1 w-min">
-          <div class="max-h-48 overflow-y-auto overflow-x-hidden space-y-1">
+          <div class="max-h-[240px] overflow-y-auto overflow-x-hidden space-y-1">
             <PrimeButton
               :label="timeSlot"
               v-for="timeSlot in TIME_SLOTS"

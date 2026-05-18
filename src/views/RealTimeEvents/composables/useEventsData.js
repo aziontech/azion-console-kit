@@ -56,6 +56,12 @@ export function useEventsData({
     const filters = {}
     if (filterData.value?.fields?.length) {
       filterData.value.fields.forEach((ff) => {
+        // Defensive guard: skip clauses whose operator is missing, falsy,
+        // or non-string. This prevents emitting malformed GraphQL filter
+        // keys like `${valueField}undefined` when the parser (or any other
+        // upstream source) hands us a clause without a resolved operator.
+        // See spec: realtime-events-filter-operator-bug — Requirement 2.3, 2.4.
+        if (typeof ff.operator !== 'string' || ff.operator.length === 0) return
         const value = coerceFilterValue(ff.value, ff.type)
         if (ff.operator === 'In') { filters.in = filters.in || {}; filters.in[ff.valueField] = value }
         else { filters.and = filters.and || {}; filters.and[ff.valueField + ff.operator] = value }

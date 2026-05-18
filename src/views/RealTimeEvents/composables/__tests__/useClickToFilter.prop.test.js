@@ -59,9 +59,27 @@ describe('useClickToFilter', () => {
           // Create a fake currentTarget element with no __draggedOut flag
           const fakeEl = {}
 
-          // Create a fake MouseEvent-like object
-          const mouseDownEvent = { currentTarget: fakeEl, clientX: 0, clientY: 0 }
-          const clickEvent = { currentTarget: fakeEl, altKey, clientX: 0, clientY: 0 }
+          // Create a fake MouseEvent-like object. Real MouseEvent instances
+          // expose `stopImmediatePropagation` — the composable calls it on
+          // mousedown to keep PrimeVue's row listener from killing the
+          // selection — so the mock must provide it.
+          const mouseDownEvent = {
+            currentTarget: fakeEl,
+            clientX: 0,
+            clientY: 0,
+            stopImmediatePropagation: vi.fn(),
+            stopPropagation: vi.fn(),
+            preventDefault: vi.fn()
+          }
+          const clickEvent = {
+            currentTarget: fakeEl,
+            altKey,
+            clientX: 0,
+            clientY: 0,
+            stopImmediatePropagation: vi.fn(),
+            stopPropagation: vi.fn(),
+            preventDefault: vi.fn()
+          }
 
           onValueMouseDown(mouseDownEvent)
           onValueClick(clickEvent, key, value)
@@ -95,8 +113,23 @@ describe('useClickToFilter', () => {
           onExclude.mockClear()
 
           const fakeEl = {}
-          const mouseDownEvent = { currentTarget: fakeEl, clientX: 0, clientY: 0 }
-          const clickEvent = { currentTarget: fakeEl, altKey: false, clientX: 0, clientY: 0 }
+          const mouseDownEvent = {
+            currentTarget: fakeEl,
+            clientX: 0,
+            clientY: 0,
+            stopImmediatePropagation: vi.fn(),
+            stopPropagation: vi.fn(),
+            preventDefault: vi.fn()
+          }
+          const clickEvent = {
+            currentTarget: fakeEl,
+            altKey: false,
+            clientX: 0,
+            clientY: 0,
+            stopImmediatePropagation: vi.fn(),
+            stopPropagation: vi.fn(),
+            preventDefault: vi.fn()
+          }
 
           onValueMouseDown(mouseDownEvent)
           onValueClick(clickEvent, 'someKey', value)

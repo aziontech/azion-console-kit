@@ -273,12 +273,12 @@ describe('Property 1: Tab-structure invariants (fc.commands)', () => {
 describe('Property 2: Events-tab persistence round-trip', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   afterEach(() => {
     vi.useRealTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   const DATASETS = [
@@ -309,7 +309,7 @@ describe('Property 2: Events-tab persistence round-trip', () => {
   it('persistEventsTabs then restoreEventsTabs yields the same list', () => {
     fc.assert(
       fc.property(arbTabList, (generatedList) => {
-        localStorage.clear()
+        globalThis.localStorage.clear()
 
         // ── Write side ──────────────────────────────────────────────────────
         const { tabs: writeTabs } = createComposable()
@@ -356,7 +356,7 @@ describe('Property 2: Events-tab persistence round-trip', () => {
           { minLength: 2, maxLength: 5 }
         ),
         (generatedList) => {
-          localStorage.clear()
+          globalThis.localStorage.clear()
 
           const { tabs: writeTabs } = createComposable()
           writeTabs.eventsTabs.value = generatedList
@@ -390,19 +390,19 @@ describe('Property 2: Events-tab persistence round-trip', () => {
 describe('Unit tests: malformed-payload fallback and filterData non-persistence', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   afterEach(() => {
     vi.useRealTimers()
-    localStorage.clear()
+    globalThis.localStorage.clear()
   })
 
   describe('Malformed payloads return [] without console.error', () => {
     it('non-JSON string returns []', () => {
       const consoleSpy = vi.spyOn(console, 'error')
 
-      localStorage.setItem('rte:open-events-tabs', 'not-json')
+      globalThis.localStorage.setItem('rte:open-events-tabs', 'not-json')
 
       const { tabs } = createComposable()
       tabs.restoreEventsTabs()
@@ -416,7 +416,7 @@ describe('Unit tests: malformed-payload fallback and filterData non-persistence'
     it('JSON number returns []', () => {
       const consoleSpy = vi.spyOn(console, 'error')
 
-      localStorage.setItem('rte:open-events-tabs', '42')
+      globalThis.localStorage.setItem('rte:open-events-tabs', '42')
 
       const { tabs } = createComposable()
       tabs.restoreEventsTabs()
@@ -430,7 +430,7 @@ describe('Unit tests: malformed-payload fallback and filterData non-persistence'
     it('JSON object (not array) returns []', () => {
       const consoleSpy = vi.spyOn(console, 'error')
 
-      localStorage.setItem('rte:open-events-tabs', '{"key":"value"}')
+      globalThis.localStorage.setItem('rte:open-events-tabs', '{"key":"value"}')
 
       const { tabs } = createComposable()
       tabs.restoreEventsTabs()
@@ -445,7 +445,7 @@ describe('Unit tests: malformed-payload fallback and filterData non-persistence'
       const consoleSpy = vi.spyOn(console, 'error')
 
       // localStorage.getItem returns null when key is absent
-      localStorage.removeItem('rte:open-events-tabs')
+      globalThis.localStorage.removeItem('rte:open-events-tabs')
 
       const { tabs } = createComposable()
       tabs.restoreEventsTabs()
@@ -465,7 +465,7 @@ describe('Unit tests: malformed-payload fallback and filterData non-persistence'
         { id: null, label: 'Null id', dataset: 'httpRequests' }, // null id
         { label: 'No id', dataset: 'httpRequests' } // missing id entirely
       ])
-      localStorage.setItem('rte:open-events-tabs', payload)
+      globalThis.localStorage.setItem('rte:open-events-tabs', payload)
 
       const { tabs } = createComposable()
       tabs.restoreEventsTabs()
@@ -496,7 +496,7 @@ describe('Unit tests: malformed-payload fallback and filterData non-persistence'
       tabs.persistEventsTabs()
       vi.runAllTimers()
 
-      const raw = localStorage.getItem('rte:open-events-tabs')
+      const raw = globalThis.localStorage.getItem('rte:open-events-tabs')
       expect(raw).not.toBeNull()
 
       const parsed = JSON.parse(raw)
@@ -527,7 +527,7 @@ describe('Unit tests: malformed-payload fallback and filterData non-persistence'
       tabs.persistEventsTabs()
       vi.runAllTimers()
 
-      const raw = localStorage.getItem('rte:open-events-tabs')
+      const raw = globalThis.localStorage.getItem('rte:open-events-tabs')
       const parsed = JSON.parse(raw)
 
       expect(parsed[0]).toEqual({
@@ -558,7 +558,7 @@ describe('Unit tests: malformed-payload fallback and filterData non-persistence'
       tabs.persistEventsTabs()
       vi.runAllTimers()
 
-      const raw = localStorage.getItem('rte:open-events-tabs')
+      const raw = globalThis.localStorage.getItem('rte:open-events-tabs')
       const parsed = JSON.parse(raw)
 
       expect(parsed).toHaveLength(2)
