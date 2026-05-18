@@ -26,7 +26,6 @@
         :disabled="listOperatorsDisabled"
         :options="listOperators"
         optionLabel="value"
-        optionValue="type"
         placeholder="Select an operator"
       />
 
@@ -81,7 +80,6 @@
         v-model="selectedOperator"
         :options="listOperators"
         optionLabel="value"
-        optionValue="type"
         placeholder="Select an operator"
         @change="showOperatorDropdown = false"
         @hide="showOperatorDropdown = false"
@@ -94,7 +92,7 @@
   import { computed, defineModel, ref, watch } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
-  import { FIELDS_MAPPING } from '@/components/base/filterFields/filterRow/component'
+  import { FIELDS_MAPPING } from './component'
 
   defineOptions({ name: 'FilterRow' })
 
@@ -140,26 +138,49 @@
 
   // Computed properties
   const componentRender = computed(() => {
-    return FIELDS_MAPPING[selectedOperator.value] || FIELDS_MAPPING['String']
+    return FIELDS_MAPPING[selectedOperator.value?.type] || FIELDS_MAPPING['String']
   })
 
   const listOperators = computed(() => {
     return props.fields.find((field) => field.value === selectedField.value)?.operator || []
   })
 
+  const selectedFieldOption = computed(() => {
+    return props.fields.find((field) => field.value === selectedField.value) || null
+  })
+
   const listOperatorsDisabled = computed(() => {
-    return selectedField.value?.disabled || false
+    return selectedFieldOption.value?.disabled || false
   })
 
   // Methods
   const selectedFieldChange = () => {
     if (listOperators.value.length === 1) {
-      selectedOperator.value = listOperators.value[0].type
+      selectedOperator.value = listOperators.value[0]
     } else {
       selectedOperator.value = null
     }
     filterValue.value = null
   }
+
+  // Sync selectedField to modelValue.field
+  watch(selectedField, (newField) => {
+    modelValue.value = {
+      ...modelValue.value,
+      field: newField,
+      fieldValue: newField
+    }
+  })
+
+  // Sync selectedOperator (operator name + type) to modelValue
+  watch(selectedOperator, (newOp) => {
+    modelValue.value = {
+      ...modelValue.value,
+      operator: newOp?.value || null,
+      operatorType: newOp?.type || null,
+      operatorFormat: newOp?.format || null
+    }
+  })
 
   // Watch for filter value changes
   watch(filterValue, (newValue) => {

@@ -1,7 +1,7 @@
 <script setup>
   defineOptions({ name: 'filterTagsDisplay' })
   import { computed } from 'vue'
-  import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/components/base/advanced-filter-system/filterFields/filterRow/component'
+  import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/components/base/advanced-filter-system-v2/filterFields/filterRow/component'
   const emit = defineEmits(['removeFilter', 'clickFilter'])
 
   const props = defineProps({
