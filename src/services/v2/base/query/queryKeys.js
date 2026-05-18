@@ -41,6 +41,7 @@ export const queryKeys = {
   },
   accountSettings: {
     all: ['account-settings'],
+    info: () => [...queryKeys.accountSettings.all, 'info'],
     jobRole: () => [...queryKeys.accountSettings.all, 'job-role']
   },
   solutions: {
@@ -305,6 +306,10 @@ export const queryKeys = {
   personalToken: {
     all: ['personal-tokens'],
     list: (params) => [...queryKeys.personalToken.all, 'list', normalizeParams(params)]
+  },
+  plans: {
+    all: ['plans'],
+    list: () => [...queryKeys.plans.all, 'list']
   },
   edgeService: {
     all: ['edge-services'],
