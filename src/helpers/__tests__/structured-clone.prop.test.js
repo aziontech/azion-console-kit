@@ -69,21 +69,18 @@ describe('Feature: real-time-events-refactor, Property 9: structuredClone type p
 
   it('preserves Set instances after cloning', () => {
     fc.assert(
-      fc.property(
-        fc.array(fc.integer(), { minLength: 1, maxLength: 20 }),
-        (values) => {
-          const set = new Set(values)
-          const obj = { items: set }
-          const clone = safeStructuredClone(obj)
+      fc.property(fc.array(fc.integer(), { minLength: 1, maxLength: 20 }), (values) => {
+        const set = new Set(values)
+        const obj = { items: set }
+        const clone = safeStructuredClone(obj)
 
-          expect(clone.items).toBeInstanceOf(Set)
-          expect(clone.items.size).toBe(set.size)
-          for (const value of set) {
-            expect(clone.items.has(value)).toBe(true)
-          }
-          expect(clone.items).not.toBe(set)
+        expect(clone.items).toBeInstanceOf(Set)
+        expect(clone.items.size).toBe(set.size)
+        for (const value of set) {
+          expect(clone.items.has(value)).toBe(true)
         }
-      ),
+        expect(clone.items).not.toBe(set)
+      }),
       { numRuns: 100 }
     )
   })

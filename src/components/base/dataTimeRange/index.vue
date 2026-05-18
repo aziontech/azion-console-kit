@@ -18,7 +18,7 @@
 
     <OverlayPanel
       ref="overlayPanel"
-      style="width: min(23rem, 95vw); min-width: 21rem;"
+      class="min-w-[200px] max-w-[430px]"
       :showCloseIcon="false"
       @show="onOverlayShow"
       @hide="onOverlayHide"
@@ -99,9 +99,9 @@
         </TabView>
 
         <div
-          class="flex items-center gap-2 pt-2 mt-2 justify-between border-t border-[var(--surface-border)]"
+          class="flex items-center gap-2 mb-2 pt-4 mt-4 justify-between border-t border-[var(--surface-border)]"
           :class="{
-            'p-1': activeTab === 3
+            'p-1 mb-2': activeTab === 3
           }"
         >
           <div class="text-xs text-color-secondary">
@@ -298,12 +298,9 @@
   }
 
   const openOverlay = async (payload, tabIndex) => {
-    // When the model has a quick-select label (e.g. "Last 5 minutes"),
-    // default to the Quick tab regardless of which input triggered the open.
-    const effectiveTab = (tabIndex === 1 && model.value?.label) ? 0 : tabIndex
-    activeTab.value = effectiveTab
-    const event = effectiveTab === 0 ? (payload?.event || payload) : payload?.event
-    const field = effectiveTab === 0 ? undefined : payload?.field
+    activeTab.value = tabIndex
+    const event = tabIndex === 0 ? payload : payload?.event
+    const field = tabIndex === 0 ? undefined : payload?.field
 
     if (field === 'start' || field === 'end') editingField.value = field
 

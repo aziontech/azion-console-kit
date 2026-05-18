@@ -31,8 +31,7 @@ export const listDataStream = async (filter) => {
 const adapt = (filter) => {
   const table = {
     dataset: 'dataStreamedEvents',
-    limit: filter?.pageSize || 500,
-    ...(filter?.offset && { offset: filter.offset }),
+    limit: 10000,
     fields: [
       'configurationId',
       'jobName',
