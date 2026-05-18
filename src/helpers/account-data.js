@@ -5,34 +5,15 @@ import {
   contractService
 } from '@/services/v2/account'
 import { billingGqlService } from '@/services/v2/billing/billing-gql-service'
-import { queryClient } from '@/services/v2/base/query/queryClient'
-import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { useAccountStore } from '@/stores/account'
 import { setFeatureFlags } from '@/composables/user-flag'
 
-/**
- * Refresh the account + user + settings caches. Pass `force: true` to drop
- * the Vue Query entries first so the next fetch hits the network — used
- * after plan changes/downgrades where stale cached values (e.g.
- * `has_service_order_plan`) would mislead the billing UI.
- *
- * @param {Object} [options]
- * @param {boolean} [options.force=false] - Skip cached payloads.
- */
-export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
+export const loadUserAndAccountInfo = async () => {
   const accountStore = useAccountStore()
-
-  if (force) {
-    queryClient.removeQueries({ queryKey: queryKeys.account.info() })
-    queryClient.removeQueries({ queryKey: queryKeys.user.info() })
-    queryClient.removeQueries({ queryKey: queryKeys.accountSettings.all })
-  }
-
-  const [accountInfo, userInfo, accountJobRole, accountSettingsInfo] = await Promise.all([
+  const [accountInfo, userInfo, accountJobRole] = await Promise.all([
     accountService.getAccountInfo(),
     userService.getUserInfo(),
-    accountSettingsService.getAccountJobRole(),
-    accountSettingsService.getAccountSettingsInfo().catch(() => null)
+    accountSettingsService.getAccountJobRole()
   ])
   accountInfo.jobRole = accountJobRole.jobRole
   const userResults = userInfo.results || userInfo
@@ -46,15 +27,6 @@ export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
   accountInfo.email = userResults.email
   accountInfo.user_id = userResults.id
   accountInfo.isDeveloperSupportPlan = true
-
-  if (accountSettingsInfo) {
-    accountInfo.postalCode = accountSettingsInfo.postalCode
-    accountInfo.country = accountSettingsInfo.country
-    accountInfo.region = accountSettingsInfo.region
-    accountInfo.city = accountSettingsInfo.city
-    accountInfo.address = accountSettingsInfo.address
-    accountInfo.complement = accountSettingsInfo.complement
-  }
 
   accountStore.setAccountData(accountInfo)
   setFeatureFlags(accountInfo.client_flags)
