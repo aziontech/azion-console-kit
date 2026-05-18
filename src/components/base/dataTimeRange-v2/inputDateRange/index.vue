@@ -18,7 +18,7 @@
     getCurrentHourAndMinute,
     getCurrentMonthLabel
   } from '@utils/date.js'
-  import { formatPillDateCompact } from '@/views/RealTimeEvents/helpers/format-timestamp'
+  import { formatPillDateCompact } from '@/views/RealTimeEventsV2/helpers/format-timestamp'
 
   defineOptions({ name: 'InputDateRange' })
 
