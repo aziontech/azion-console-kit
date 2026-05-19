@@ -37,7 +37,7 @@
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeBadge from '@aziontech/webkit/badge'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import { computed, inject, ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
   const SUBMIT_TIMER = 60
@@ -52,8 +52,6 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
   const showCounter = computed(() => counter.value > 0)
 
   const { email } = route.query
@@ -78,14 +76,6 @@
 
   const resendEmail = async () => {
     disableSubmitByTimer(SUBMIT_TIMER)
-    try {
-      tracker?.signUp
-        ?.emailVerificationClicked?.({ source: 'resend' })
-        ?.track?.()
-        ?.catch?.(() => {})
-    } catch {
-      // intentionally swallowed
-    }
     try {
       const res = await props.resendEmailService({ email: decodedEmail })
       toast.add({ severity: 'success', detail: res, summary: 'Email sent!' })
