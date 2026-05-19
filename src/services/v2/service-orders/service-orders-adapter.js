@@ -217,7 +217,6 @@ export const ServiceOrdersAdapter = {
 
   toCreatePayload(payload = {}) {
     return {
-      accountId: payload.accountId,
       planId: payload.planId,
       priceId: pick(payload.priceId, payload.planPricingId)
     }
@@ -225,7 +224,6 @@ export const ServiceOrdersAdapter = {
 
   toUpdatePayload(payload = {}) {
     return {
-      accountId: payload.accountId,
       planId: payload.planId,
       priceId: pick(payload.priceId, payload.planPricingId),
       status: payload.status,
@@ -249,15 +247,16 @@ export const ServiceOrdersAdapter = {
   toUpgradePayload(payload = {}) {
     const priceId = pick(payload.priceId, payload.planPricingId)
     return {
-      accountId: payload.accountId,
       newPlanId: payload.newPlanId,
       ...(priceId && { priceId })
     }
   },
 
   toDowngradePayload(payload = {}) {
+    const priceId = pick(payload.priceId, payload.planPricingId)
     return {
-      newPlanId: payload.newPlanId
+      newPlanId: payload.newPlanId,
+      ...(priceId && { priceId })
     }
   },
 

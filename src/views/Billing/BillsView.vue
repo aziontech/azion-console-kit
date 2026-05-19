@@ -290,8 +290,7 @@
   const subscription = useCurrentSubscription()
   const {
     downgrade: downgradeServiceOrderPlan,
-    upgrade: upgradeServiceOrder,
-    updateServiceOrder,
+    upgrade: upgradeServiceOrderPlan,
     loadAccountServiceOrders,
     serviceOrder,
     activeServiceOrder
@@ -545,7 +544,7 @@
       billingCycle
     })
 
-    await upgradeServiceOrder({
+    await upgradeServiceOrderPlan({
       id: serviceOrderId,
       accountId,
       newPlanId: planId,
@@ -559,10 +558,11 @@
       billingCycle
     })
 
-    await updateServiceOrder(serviceOrderId, {
+    await downgradeServiceOrderPlan({
+      id: serviceOrderId,
       accountId,
-      planId,
-      planPricingId
+      newPlanId: planId,
+      priceId: planPricingId
     })
   }
 

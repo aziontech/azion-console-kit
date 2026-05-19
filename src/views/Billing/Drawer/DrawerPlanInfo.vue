@@ -59,7 +59,6 @@
 
         <CheckoutSubmissionFooter
           :submitLabel="submitLabel"
-          :errorMessage="submitError"
           :isSubmitting="isSubmitting"
           :isConfirmDisabled="isConfirmDisabled"
           @cancel="closeDrawer"
@@ -117,7 +116,6 @@
   const isAddressFormReady = ref(false)
   const billingCycle = ref('yearly')
   const checkoutSessionClientSecret = ref(props.initialClientSecret)
-  const submitError = ref('')
 
   const isChangeCycleMode = computed(() => props.mode === 'change-cycle')
 
@@ -192,7 +190,6 @@
   const handleSubmit = async () => {
     if (isSubmitting.value) return
     isSubmitting.value = true
-    submitError.value = ''
     try {
       if (isChangeCycleMode.value) {
         await new Promise((resolve, reject) => {
@@ -236,7 +233,6 @@
     } catch (err) {
       const detail =
         (Array.isArray(err?.message) ? err.message[0] : err?.message) || 'Unable to subscribe.'
-      submitError.value = detail
       showError(detail)
     } finally {
       isSubmitting.value = false
