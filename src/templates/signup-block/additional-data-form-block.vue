@@ -161,10 +161,8 @@
   const tracker = inject('tracker')
   const toast = useToast()
   const accountStore = useAccountStore()
-  const {
-    setField: setAdditionalDataField,
-    hydrate: hydrateAdditionalDataForm
-  } = useAdditionalDataFormState()
+  const { setField: setAdditionalDataField, hydrate: hydrateAdditionalDataForm } =
+    useAdditionalDataFormState()
 
   defineOptions({
     name: 'additional-data-form-block'

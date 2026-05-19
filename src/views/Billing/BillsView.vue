@@ -448,7 +448,8 @@
     const currentCycle = subscription.billingCycle.value
 
     const isSamePlan = plan === currentSku
-    const isCycleChange = isSamePlan && billingCycle && currentCycle && billingCycle !== currentCycle
+    const isCycleChange =
+      isSamePlan && billingCycle && currentCycle && billingCycle !== currentCycle
 
     if (isCycleChange) {
       if (billingCycle === 'yearly') {
@@ -539,13 +540,7 @@
     }
   }
 
-  const handleDowngradeConfirm = async ({
-    toPlan,
-    toCycle,
-    cycleChange,
-    done,
-    fail
-  }) => {
+  const handleDowngradeConfirm = async ({ toPlan, toCycle, cycleChange, done, fail }) => {
     try {
       if (cycleChange) {
         await downgradeServiceOrderCycle({
@@ -584,9 +579,7 @@
       })
       done?.()
       showChangePlanDrawer.value = false
-      await subscription.refetchUntil(
-        (so) => so?.metadata?.status === 'downgrade_pending'
-      )
+      await subscription.refetchUntil((so) => so?.metadata?.status === 'downgrade_pending')
     } catch (err) {
       const detail =
         (Array.isArray(err?.message) ? err.message[0] : err?.message) || 'Unable to downgrade plan.'

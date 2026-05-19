@@ -12,11 +12,7 @@ import {
   resolvePlanSku,
   toFiniteNumber
 } from '@/composables/subscription-helpers'
-import {
-  formatBillingPeriod,
-  formatLastUpdate,
-  formatNextChargeDate
-} from '@/utils/billing-date'
+import { formatBillingPeriod, formatLastUpdate, formatNextChargeDate } from '@/utils/billing-date'
 
 const isRefetching = ref(false)
 
