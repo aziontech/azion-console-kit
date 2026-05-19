@@ -1,13 +1,14 @@
 <script setup>
   import { computed, onMounted, ref, watch } from 'vue'
   import { useField } from 'vee-validate'
+  import { RouterLink } from 'vue-router'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
-  import PickList from '@aziontech/webkit/picklist'
   import SelectButton from '@aziontech/webkit/selectbutton'
-  import LabelBlock from '@aziontech/webkit/label'
   import PrimeButton from '@aziontech/webkit/button'
+  import DataTable from '@aziontech/webkit/datatable'
+  import Column from '@aziontech/webkit/column'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { variablesService } from '@/services/v2/variables'
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
@@ -31,7 +32,6 @@
   const { value: name } = useField('name')
   const { value: description } = useField('description')
   const { value: deploymentVersionPolicy } = useField('deployment_version_policy')
-  const { value: globalVariables, errorMessage: globalVariablesError } = useField('globalVariables')
   const { value: environmentVariables, errorMessage: environmentVariablesError } =
     useField('environmentVariables')
 
@@ -45,9 +45,7 @@
   })
 
   const allGlobalVariables = ref([])
-  const globalVariablesPickList = ref([[], []])
   const loadingGlobalVariables = ref(true)
-  const pickListReady = ref(false)
   const envFileInputRef = ref(null)
   const customVariablesViewOptions = ['Form', 'JSON']
   const customVariablesView = ref(customVariablesViewOptions[0])
@@ -379,21 +377,6 @@
     handleEnvironmentVariablesFormChange()
   }
 
-  const areStringArraysEqual = (left, right) => {
-    if (left.length !== right.length) return false
-
-    const leftSet = new Set(left)
-    return right.every((item) => leftSet.has(item))
-  }
-
-  const syncPickListFromFieldValue = () => {
-    const selectedIds = new Set(Array.isArray(globalVariables.value) ? globalVariables.value : [])
-    const selected = allGlobalVariables.value.filter((variable) => selectedIds.has(variable.id))
-    const available = allGlobalVariables.value.filter((variable) => !selectedIds.has(variable.id))
-
-    globalVariablesPickList.value = [available, selected]
-  }
-
   const parseEnvFile = (content) => {
     const parsed = {}
     const invalidLines = []
@@ -442,10 +425,10 @@
 
       allGlobalVariables.value = variables.map((variable) => ({
         id: variable.id,
-        key: variable.key
+        key: variable.key,
+        value: variable.value?.content ?? '',
+        isSecret: !!variable.value?.isSecret
       }))
-
-      syncPickListFromFieldValue()
     } catch {
       toast.add({
         severity: 'error',
@@ -455,7 +438,6 @@
       })
     } finally {
       loadingGlobalVariables.value = false
-      pickListReady.value = true
     }
   }
 
@@ -504,15 +486,6 @@
   }
 
   watch(
-    globalVariables,
-    () => {
-      if (!pickListReady.value) return
-      syncPickListFromFieldValue()
-    },
-    { deep: true }
-  )
-
-  watch(
     environmentVariables,
     () => {
       if (isSyncingEnvironmentVariables.value) return
@@ -527,23 +500,6 @@
     () => {
       if (customVariablesView.value !== 'Form') return
       handleEnvironmentVariablesFormChange()
-    },
-    { deep: true }
-  )
-
-  watch(
-    globalVariablesPickList,
-    (newValue) => {
-      if (!pickListReady.value) return
-
-      const nextSelectedIds = (newValue?.[1] ?? []).map((item) => item.id)
-      const currentSelectedIds = Array.isArray(globalVariables.value) ? globalVariables.value : []
-
-      if (areStringArraysEqual(nextSelectedIds, currentSelectedIds)) {
-        return
-      }
-
-      globalVariables.value = nextSelectedIds
     },
     { deep: true }
   )
@@ -615,71 +571,60 @@
     </template>
   </FormHorizontal>
   <FormHorizontal
-    title="Environment Variables"
-    description="Select global variables already created in the platform for this environment."
+    title="Global Variables"
+    description="Global variables created in the platform are automatically applied to this environment. To override a value here, create a custom variable below using the same key."
   >
     <template #inputs>
       <div class="flex flex-col sm:max-w-3xl w-full gap-2">
-        <LabelBlock label="Global Variables" />
-
         <div
           v-if="loadingGlobalVariables"
           class="text-sm text-color-secondary"
+          data-testid="environment-form__global-variables__loading"
         >
           Loading global variables...
         </div>
 
-        <PickList
+        <div
+          v-else-if="allGlobalVariables.length === 0"
+          class="flex flex-col gap-1 text-sm"
+          data-testid="environment-form__global-variables__empty"
+        >
+          <span class="text-color-secondary">No global variables created yet.</span>
+          <RouterLink
+            :to="{ name: 'list-variables' }"
+            class="text-color-link hover:underline w-fit"
+            data-testid="environment-form__global-variables__manage-link"
+          >
+            Manage global variables
+          </RouterLink>
+        </div>
+
+        <DataTable
           v-else
-          v-model="globalVariablesPickList"
-          data-testid="environment-form__global-variables-picklist"
+          :value="allGlobalVariables"
           dataKey="id"
-          source-selection="multiple"
-          target-selection="multiple"
-          breakpoint="1400px"
-          :showSourceControls="false"
-          :showTargetControls="false"
-          :disabled="props.disabledFields"
-          :move-all-to-source-props="{
-            'data-testid': 'environment-form__global-variables__move-all-to-source-btn'
-          }"
-          :move-all-to-target-props="{
-            'data-testid': 'environment-form__global-variables__move-all-to-target-btn'
-          }"
-          :move-to-target-props="{
-            'data-testid': 'environment-form__global-variables__move-to-target-btn'
-          }"
-          :move-to-source-props="{
-            'data-testid': 'environment-form__global-variables__move-to-source-btn'
-          }"
-          :pt="{
-            sourceList: {
-              class: ['h-80'],
-              'data-testid': 'environment-form__global-variables__source-list'
-            },
-            targetList: {
-              class: ['h-80'],
-              'data-testid': 'environment-form__global-variables__target-list'
-            }
-          }"
+          class="w-full"
+          data-testid="environment-form__global-variables__table"
         >
-          <template #sourceheader>Available Variables</template>
-          <template #targetheader>Selected Variables</template>
-          <template #item="slotProps">
-            <span class="font-normal">{{ slotProps.item.key }}</span>
-          </template>
-        </PickList>
-
-        <small class="text-xs text-color-secondary font-normal leading-5">
-          Select one or more global variables to bind them to this environment.
-        </small>
-
-        <small
-          v-if="globalVariablesError"
-          class="p-error text-xs font-normal leading-tight"
-        >
-          {{ globalVariablesError }}
-        </small>
+          <Column
+            field="key"
+            header="Key"
+            class="font-medium"
+          />
+          <Column
+            header="Value"
+            style="max-width: 320px"
+          >
+            <template #body="{ data }">
+              <span
+                class="text-color-secondary truncate block"
+                :title="data.isSecret ? '' : data.value"
+              >
+                {{ data.isSecret ? '••••••••' : data.value }}
+              </span>
+            </template>
+          </Column>
+        </DataTable>
       </div>
     </template>
   </FormHorizontal>

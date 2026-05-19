@@ -10,7 +10,6 @@ export const validationSchema = yup.object({
     .required()
     .oneOf(['single_version', 'versioned_urls'])
     .label('Deployment Version Policy'),
-  globalVariables: yup.array().of(yup.string()).default([]),
   environmentVariables: yup
     .object()
     .label('Environment Variables')
@@ -34,6 +33,5 @@ export const initialValues = {
   name: '',
   description: '',
   deployment_version_policy: 'single_version',
-  globalVariables: [],
   environmentVariables: {}
 }
