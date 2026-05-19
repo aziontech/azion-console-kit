@@ -63,9 +63,6 @@ export const loadEnvironmentByIdAdapter = async ({ id }) => {
     deployment_version_policy: getDeploymentVersionPolicyValue(
       response.data.deployment_version_policy
     ),
-    globalVariables: Array.isArray(response.data.globalVariables)
-      ? response.data.globalVariables.map((item) => item?.toString())
-      : [],
     environmentVariables: normalizeEnvironmentVariables(response.data.environmentVariables)
   }
 }
