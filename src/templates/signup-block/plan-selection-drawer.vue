@@ -123,10 +123,15 @@
     loadingPlan: {
       type: String,
       default: null
+    },
+    context: {
+      type: String,
+      default: 'signup',
+      validator: (value) => ['signup', 'billing'].includes(value)
     }
   })
 
-  const emit = defineEmits(['update:visible', 'select'])
+  const emit = defineEmits(['update:visible', 'select', 'billing-cycle-toggled'])
   const { windowWidth } = useResize()
   const isHorizontalPricingCard = computed(() => windowWidth.value <= 1000)
   const { setParam } = usePlans()
@@ -138,8 +143,11 @@
 
   const localBillingCycle = ref(props.billingCycle)
 
-  watch(localBillingCycle, (cycle) => {
+  watch(localBillingCycle, (cycle, previousCycle) => {
     setParam('billingCycle', cycle)
+    if (previousCycle && previousCycle !== cycle) {
+      emit('billing-cycle-toggled', { fromCycle: previousCycle, toCycle: cycle })
+    }
   })
 
   const visibleDrawer = computed({
@@ -185,18 +193,24 @@
     return props.plans?.find((plan) => plan.sku?.toLowerCase() === planValue.toLowerCase())
   }
 
-  const getPriceByPeriod = (planValue, period) => {
-    if (planValue === 'enterprise') return ''
-
-    const pricing = getPlanData(planValue)?.pricings?.find((item) => item.periodicity === period)
-    const priceValue = Number(pricing?.priceValue ?? 0)
-    const formatted = Number.isInteger(priceValue) ? String(priceValue) : priceValue.toFixed(2)
+  const formatMonthlyValue = (value) => {
+    const number = Number(value ?? 0)
+    const formatted = Number.isInteger(number) ? String(number) : number.toFixed(2)
     return `$${formatted}`
   }
 
-  const getMonthlyPrice = (planValue) => getPriceByPeriod(planValue, 'monthly')
+  const getMonthlyPrice = (planValue) => {
+    if (planValue === 'enterprise') return ''
+    const pricing = getPlanData(planValue)?.pricings?.find((item) => item.periodicity === 'monthly')
+    return formatMonthlyValue(pricing?.priceValue)
+  }
 
-  const getAnnualPrice = (planValue) => getPriceByPeriod(planValue, 'yearly')
+  const getAnnualPrice = (planValue) => {
+    if (planValue === 'enterprise') return ''
+    const pricing = getPlanData(planValue)?.pricings?.find((item) => item.periodicity === 'yearly')
+    const monthlyEquivalent = Number(pricing?.priceValue ?? 0) / 12
+    return formatMonthlyValue(monthlyEquivalent)
+  }
 
   const getCustomPrice = (planValue) => {
     if (planValue === 'enterprise') return 'Custom'
