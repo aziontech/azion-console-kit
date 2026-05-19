@@ -195,10 +195,7 @@
       .string()
       .trim()
       .max(61, 'Your Full Name must be less than 61 characters')
-      .matches(
-        /[A-Za-zÀ-ž.'-]+ [A-Za-zÀ-ž.'-]+/,
-        'Your Full Name must include first and last name'
-      )
+      .matches(/[A-Za-zÀ-ž.'-]+ [A-Za-zÀ-ž.'-]+/, 'Your Full Name must include first and last name')
       .required('Your Full Name is required')
   })
 
