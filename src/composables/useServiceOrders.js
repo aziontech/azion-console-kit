@@ -30,13 +30,8 @@ export function useServiceOrders() {
   const accountStore = useAccountStore()
   const accountIdRef = computed(() => accountStore.accountData?.id ?? null)
 
-  const {
-    activeServiceOrder,
-    draftServiceOrder,
-    currentServiceOrder,
-    isLoading,
-    refetch
-  } = useServiceOrdersList(accountIdRef)
+  const { activeServiceOrder, draftServiceOrder, currentServiceOrder, isLoading, refetch } =
+    useServiceOrdersList(accountIdRef)
 
   const loadAccountServiceOrders = async (id) => {
     const targetId = id ?? accountIdRef.value

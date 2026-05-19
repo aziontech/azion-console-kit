@@ -68,9 +68,11 @@
           : 'paid'
     }
 
-    await Promise.resolve()
-      .then(() => tracker.group(accountId, traits))
-      .catch(Sentry.captureException)
+    try {
+      await tracker.group(accountId, traits)
+    } catch (err) {
+      Sentry.captureException(err)
+    }
   }
 
   const isLogged = computed(() => {

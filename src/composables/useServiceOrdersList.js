@@ -36,9 +36,7 @@ export function useServiceOrdersList(accountIdRef) {
   const orders = computed(() => query.data.value?.data ?? [])
   const activeServiceOrder = computed(() => pickActive(orders.value))
   const draftServiceOrder = computed(() => pickDraft(orders.value))
-  const currentServiceOrder = computed(
-    () => draftServiceOrder.value ?? activeServiceOrder.value
-  )
+  const currentServiceOrder = computed(() => draftServiceOrder.value ?? activeServiceOrder.value)
 
   return {
     query,

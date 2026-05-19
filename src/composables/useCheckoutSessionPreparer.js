@@ -1,10 +1,7 @@
 import { ref } from 'vue'
 import { useAccountStore } from '@/stores/account'
 import { useServiceOrders } from '@/composables/useServiceOrders'
-import {
-  ensureServiceOrdersList,
-  getCurrentServiceOrder
-} from '@/composables/useServiceOrdersList'
+import { ensureServiceOrdersList, getCurrentServiceOrder } from '@/composables/useServiceOrdersList'
 import { ensurePlansList, getPlanPricingId } from '@/composables/usePlansService'
 import { SO_STATUS } from '@/services/v2/service-orders/service-orders-constants'
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
