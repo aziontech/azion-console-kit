@@ -101,12 +101,20 @@ export const validationSchema = yup.object({
               /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
             )
           })
-          .label('Domain')
+          .label('Domain'),
+        environment: yup
+          .string()
+          .nullable()
+          .when(['subdomain', 'domain'], {
+            is: (subdomain, domain) => !!(subdomain || domain),
+            then: (schema) => schema.required('Environment is required for this domain.'),
+            otherwise: (schema) => schema.nullable()
+          })
+          .label('Environment')
       })
     )
-    .when(['workloadHostnameAllowAccess', 'useCustomDomain'], {
-      is: (workloadHostnameAllowAccess, useCustomDomain) =>
-        workloadHostnameAllowAccess === false && useCustomDomain === false,
+    .when('workloadHostnameAllowAccess', {
+      is: false,
       then: (schema) =>
         schema.test(
           'has-filled-domain',
@@ -125,20 +133,6 @@ export const validationSchema = yup.object({
           (value) => value?.some((domain) => domain.domain)
         )
     }),
-  useCustomDomain: yup.boolean(),
-  customDomain: yup
-    .string()
-    .when('useCustomDomain', {
-      is: true,
-      then: (schema) =>
-        schema
-          .required()
-          .test('valid-custom-domain', 'Invalid custom domain format', function (value) {
-            if (!value) return true // Allow empty hostname
-            return /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(value)
-          })
-    })
-    .label('Custom Domain'),
   workloadHostnameAllowAccess: yup.boolean(),
   letEncrypt: yup.object({
     commonName: yup.string(),

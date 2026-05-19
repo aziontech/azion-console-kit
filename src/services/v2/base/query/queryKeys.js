@@ -151,7 +151,15 @@ export const queryKeys = {
   workload: {
     all: ['workloads'],
     list: (params) => [...queryKeys.workload.all, 'list', normalizeParams(params)],
-    detail: (id) => [...queryKeys.workload.all, 'detail', id]
+    detail: (id) => [...queryKeys.workload.all, 'detail', id],
+    metrics: (id, params) => [...queryKeys.workload.detail(id), 'metrics', normalizeParams(params)],
+    versions: (id, params) => [
+      ...queryKeys.workload.detail(id),
+      'versions',
+      normalizeParams(params)
+    ],
+    currentVersion: (id) => [...queryKeys.workload.detail(id), 'current-version'],
+    versionStats: (id) => [...queryKeys.workload.detail(id), 'version-stats']
   },
   firewall: {
     all: ['edge-firewalls'],
@@ -202,6 +210,39 @@ export const queryKeys = {
     all: ['environments'],
     list: (params) => [...queryKeys.environments.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.environments.all, 'detail', id]
+  },
+  deployments: {
+    all: ['deployments'],
+    list: (params) => [...queryKeys.deployments.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.deployments.all, 'detail', id],
+    versions: {
+      all: (deploymentId) => [...queryKeys.deployments.detail(deploymentId), 'versions'],
+      list: (deploymentId, params) => [
+        ...queryKeys.deployments.versions.all(deploymentId),
+        'list',
+        normalizeParams(params)
+      ],
+      detail: (deploymentId, versionId) => [
+        ...queryKeys.deployments.versions.all(deploymentId),
+        'detail',
+        versionId
+      ],
+      diff: (deploymentId, params) => [
+        ...queryKeys.deployments.versions.all(deploymentId),
+        'diff',
+        normalizeParams(params)
+      ]
+    },
+    history: {
+      all: ['deployments-history'],
+      global: (params) => [...queryKeys.deployments.history.all, 'global', normalizeParams(params)],
+      byDeployment: (deploymentId, params) => [
+        ...queryKeys.deployments.history.all,
+        'by-deployment',
+        deploymentId,
+        normalizeParams(params)
+      ]
+    }
   },
   edgeFunction: {
     all: ['edge-functions'],

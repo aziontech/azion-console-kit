@@ -122,11 +122,10 @@
     domains: [
       {
         subdomain: '',
-        domain: ''
+        domain: '',
+        environment: null
       }
     ],
-    workloadHostnameAllowAccess: true,
-    useCustomDomain: false,
-    customDomain: ''
+    workloadHostnameAllowAccess: true
   }
 </script>
