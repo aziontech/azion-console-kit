@@ -42,12 +42,33 @@ export function useCurrentSubscription() {
     }
   })
 
+  const POST_PAYMENT_POLL_INTERVAL = 2000
+  const POST_PAYMENT_POLL_MAX_ATTEMPTS = 6
+
+  const pollForActiveAfterPayment = async (accountId) => {
+    const singleton = serviceOrder.value
+    const hasPaidDraft = singleton?.status === 'DRAFT' && Boolean(singleton?.priceId)
+    if (activeServiceOrderState.value || !hasPaidDraft) return
+    isRefetching.value = true
+    try {
+      for (let attempt = 0; attempt < POST_PAYMENT_POLL_MAX_ATTEMPTS; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, POST_PAYMENT_POLL_INTERVAL))
+        await loadAccountServiceOrders(accountId).catch(() => {})
+        if (activeServiceOrderState.value) return
+      }
+    } finally {
+      isRefetching.value = false
+    }
+  }
+
   watch(
     () => [accountData.value?.id, hasFinishedOnboarding.value],
     ([accountId, finishedOnboarding]) => {
       if (!accountId || !finishedOnboarding) return
       if (activeServiceOrderState.value || isLoadingServiceOrder.value) return
-      loadAccountServiceOrders(accountId).catch(() => {})
+      loadAccountServiceOrders(accountId)
+        .then(() => pollForActiveAfterPayment(accountId))
+        .catch(() => {})
     },
     { immediate: true }
   )
