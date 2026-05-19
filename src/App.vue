@@ -5,10 +5,10 @@
   import { useAccountStore } from '@/stores/account'
   import { useThemeStore, DARK_SCHEME_QUERY } from '@/stores/theme'
   import { storeToRefs } from 'pinia'
-  import * as Sentry from '@sentry/vue'
   import { themeApply } from '@/helpers'
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
   import { useAdditionalDataFormState } from '@/composables/useAdditionalDataFormState'
+  import { safeTrackerCall } from '@/plugins/analytics/safe-call'
   import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
@@ -68,11 +68,7 @@
           : 'paid'
     }
 
-    try {
-      await tracker.group(accountId, traits)
-    } catch (err) {
-      Sentry.captureException(err)
-    }
+    await safeTrackerCall(() => tracker.group(accountId, traits))
   }
 
   const isLogged = computed(() => {
