@@ -115,7 +115,7 @@
   // the catalogue is loaded before the SO call needs it.
   const { data: plansData } = usePlansList()
   const {
-    loadServiceOrder,
+    loadAccountServiceOrders,
     submitServiceOrder,
     isLoading: isLoadingServiceOrder,
     isSubmitting: isSubmittingServiceOrder
@@ -249,9 +249,10 @@
     await ensurePlansList()
     const accountId = accountStore.accountData?.id
     if (accountId) {
-      // Onboarding only enters with `has_service_order_plan === false`, so
-      // no ACTIVE SO can exist — skip the fallback to save one list call.
-      await loadServiceOrder(accountId, { preferStatus: 'DRAFT', noFallback: true })
+      const { draft } = await loadAccountServiceOrders(accountId)
+      if (draft?.clientSecret) {
+        checkoutSessionClientSecret.value = draft.clientSecret
+      }
     }
   })
 </script>

@@ -5,10 +5,9 @@
   >
     <span class="text-sm text-muted">{{ label }}</span>
     <div :class="disabled ? 'pointer-events-none opacity-60' : ''">
-      <Toggle
-        v-model="toggleValue"
-        mainLabel="Monthly"
-        alternativeLabel="Yearly"
+      <SegmentedButton
+        v-model="cycleValue"
+        :options="CYCLE_OPTIONS"
       />
     </div>
   </div>
@@ -16,19 +15,23 @@
     v-else
     :class="disabled ? 'pointer-events-none opacity-60' : ''"
   >
-    <Toggle
-      v-model="toggleValue"
-      mainLabel="Monthly"
-      alternativeLabel="Yearly"
+    <SegmentedButton
+      v-model="cycleValue"
+      :options="CYCLE_OPTIONS"
     />
   </div>
 </template>
 
 <script setup>
   import { computed } from 'vue'
-  import Toggle from '@aziontech/webkit/toggle'
+  import SegmentedButton from '@aziontech/webkit/segmented-button'
 
   defineOptions({ name: 'billing-cycle-toggle' })
+
+  const CYCLE_OPTIONS = [
+    { label: 'Monthly', value: 'monthly' },
+    { label: 'Yearly', value: 'yearly' }
+  ]
 
   const props = defineProps({
     modelValue: {
@@ -42,11 +45,11 @@
 
   const emit = defineEmits(['update:modelValue'])
 
-  const toggleValue = computed({
-    get: () => (props.modelValue === 'yearly' ? 'alternative' : 'main'),
+  const cycleValue = computed({
+    get: () => props.modelValue,
     set: (value) => {
       if (props.disabled) return
-      emit('update:modelValue', value === 'alternative' ? 'yearly' : 'monthly')
+      emit('update:modelValue', value)
     }
   })
 </script>

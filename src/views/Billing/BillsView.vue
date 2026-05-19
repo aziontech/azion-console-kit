@@ -1,9 +1,14 @@
 <template>
+  <DowngradePendingBanner
+    v-if="cardsReady && isDowngradePending"
+    :effectiveAt="scheduledDowngrade?.effectiveAt"
+    @cancel="showCancelDowngradeDialog = true"
+  />
+
   <div class="w-full flex flex-col sm:flex-row gap-6 mt-4 items-stretch billing-cards">
     <template v-if="cardsReady">
       <SubscriptionPlanCard
         :subscription="subscriptionState"
-        :cardDefault="props.cardDefault"
         @change-plan="showOtherPlans"
         @go-to-payment="goToPayment"
       />
@@ -97,14 +102,23 @@
     :initialClientSecret="checkoutSessionClientSecret"
     :getStripeClientService="props.getStripeClientService"
     @submit="handlePlanInfoSubmit"
+    @submitCycleChange="handleCycleUpgradeSubmit"
   />
 
   <DialogDowngradePlan
     v-model:visible="showDowngradeDialog"
     :fromPlan="subscription.planSku.value"
-    toPlan="hobby"
+    :toPlan="downgradeTarget.toPlan"
     :effectiveAt="downgradeEffectiveAt"
+    :cycleChange="downgradeTarget.cycleChange"
+    :fromCycle="downgradeTarget.fromCycle"
+    :toCycle="downgradeTarget.toCycle"
     @confirm="handleDowngradeConfirm"
+  />
+
+  <DialogCancelDowngrade
+    v-model:visible="showCancelDowngradeDialog"
+    @confirm="handleCancelDowngradeConfirm"
   />
 </template>
 
@@ -123,6 +137,8 @@
   import CurrentInvoiceCard from './components/CurrentInvoiceCard.vue'
   import BillingCardSkeleton from './components/BillingCardSkeleton.vue'
   import DialogDowngradePlan from './Dialog/DialogDowngradePlan.vue'
+  import DialogCancelDowngrade from './Dialog/DialogCancelDowngrade.vue'
+  import DowngradePendingBanner from './components/DowngradePendingBanner.vue'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { usePlans } from '@/composables/usePlans'
   import { usePlansList } from '@/composables/usePlansService'
@@ -232,14 +248,18 @@
   const showChangePlanDrawer = ref(false)
   const showPlanInfoDrawer = ref(false)
   const showDowngradeDialog = ref(false)
+  const showCancelDowngradeDialog = ref(false)
   const drawerMode = ref('subscribe')
   const selectedPlan = ref(null)
   const lockedCycle = ref(null)
   const checkoutSessionClientSecret = ref('')
-  // SKU currently being prepared (set while `prepareCheckoutSession` runs).
-  // Drives the loading state on the upgrade buttons so the user can't fire a
-  // second click that would race the first prepare.
   const preparingPlan = ref(null)
+  const downgradeTarget = ref({
+    toPlan: 'hobby',
+    cycleChange: false,
+    fromCycle: null,
+    toCycle: null
+  })
   const toast = useToast()
 
   const {
@@ -255,18 +275,23 @@
   const subscription = useCurrentSubscription()
   const {
     downgrade: downgradeServiceOrderPlan,
-    loadServiceOrder,
+    upgrade: upgradeServiceOrder,
+    updateServiceOrder,
+    loadAccountServiceOrders,
     serviceOrder
   } = useServiceOrders()
   const { prepare: prepareCheckoutSession } = useCheckoutSessionPreparer()
 
   const downgradeEffectiveAt = ref(null)
 
-  // Drop the pre-fetched secret when the drawer closes so the next open
-  // forces a fresh `prepareCheckoutSession` call. Reusing a stale secret
-  // across opens caused the Stripe element to stay in skeleton.
+  const isDowngradePending = computed(() => subscription.isDowngradePending.value)
+  const scheduledDowngrade = computed(() => subscription.scheduledDowngrade.value)
+
   watch(showPlanInfoDrawer, (visible) => {
-    if (!visible) checkoutSessionClientSecret.value = ''
+    if (!visible) {
+      checkoutSessionClientSecret.value = ''
+      drawerMode.value = 'subscribe'
+    }
   })
 
   const defaultCardStatus = computed(() => ({
@@ -278,6 +303,7 @@
     planTitle: computed(() => subscription.planTitle.value),
     planTag: computed(() => subscription.planTag.value),
     planStartDate: computed(() => subscription.planStartDate.value),
+    billingPeriod: computed(() => subscription.billingPeriod.value),
     nextChargeDate: computed(() => subscription.nextChargeDate.value),
     nextChargeValue: computed(() => subscription.nextChargeValue.value),
     planChargeValue: computed(() => subscription.planChargeValue.value),
@@ -309,27 +335,36 @@
 
   const currentPlanSlug = computed(() => subscription.planSku.value || 'hobby')
 
-  // Source of truth for "is this card the user's current plan?" inside the
-  // PlanSelectionDrawer. Bound to the ACTIVE SO's cycle (not the toggle
-  // state), so the comparison stays stable as the user toggles inside the
-  // drawer — that's how Pro/m → Pro/y becomes a clickable upgrade.
   const currentActiveCycle = computed(() => subscription.billingCycle.value || 'monthly')
 
+  const ensureActiveServiceOrder = async () => {
+    if (serviceOrder.value?.status === 'ACTIVE') return serviceOrder.value
+    const accountId = accountStore.accountData?.id
+    if (!accountId) return null
+    try {
+      const { active } = await loadAccountServiceOrders(accountId)
+      return active
+    } catch {
+      return null
+    }
+  }
+
+  const findPlanIdBySku = (sku) =>
+    plansData.value?.find((plan) => plan.sku?.toLowerCase() === sku.toLowerCase())?.id ?? null
+
+  const findPriceId = (sku, cycle) => {
+    const plan = plansData.value?.find((item) => item.sku?.toLowerCase() === sku.toLowerCase())
+    return plan?.pricings?.find((pricing) => pricing.periodicity === cycle)?.id ?? null
+  }
+
   const showOtherPlans = async () => {
-    setParam('billingCycle', 'monthly')
+    const initialCycle = subscription.isPro.value ? 'yearly' : 'monthly'
+    setParam('billingCycle', initialCycle)
     await syncToUrl()
     showChangePlanDrawer.value = true
   }
 
-  // Pre-fetch the Stripe client secret BEFORE the drawer is rendered so the
-  // PaymentMethodBlock mounts with a valid secret on the first paint —
-  // mirrors the working signup pattern (PR #3511). Any error surfaces as a
-  // toast and aborts opening the drawer to avoid the "skeleton forever"
-  // failure mode.
   const openDrawerWithCheckoutSession = async ({ plan, preferredCycle, lockedCycle: locked }) => {
-    // Reentrancy guard — the upgrade buttons already render with a loading
-    // state while `preparingPlan` is set, but a stray duplicate event (touch
-    // bounce, double-tap) would still slip past the disabled UI without this.
     if (preparingPlan.value) return
     preparingPlan.value = plan
     try {
@@ -364,71 +399,181 @@
     })
   }
 
-  const handlePlanSelect = async ({ plan, billingCycle }) => {
-    // Pro → Hobby goes through the dedicated downgrade dialog only.
-    if (plan === 'hobby') {
-      downgradeEffectiveAt.value = null
-      showDowngradeDialog.value = true
+  const openCycleReviewDrawer = ({ plan, targetCycle }) => {
+    drawerMode.value = 'change-cycle'
+    selectedPlan.value = plan
+    lockedCycle.value = targetCycle
+    checkoutSessionClientSecret.value = ''
+    showPlanInfoDrawer.value = true
+  }
 
-      // Prefer the SO already loaded by useCurrentSubscription on mount.
-      // Only re-fetch when the singleton doesn't carry the ACTIVE SO yet
-      // (e.g. user landed here mid-load) — saves one list call on the
-      // typical path.
-      if (serviceOrder.value?.status === 'ACTIVE') {
-        downgradeEffectiveAt.value = serviceOrder.value.currentPeriodEnd ?? null
-      } else {
-        const accountId = accountStore.accountData?.id
-        if (accountId) {
-          loadServiceOrder(accountId, { preferStatus: 'ACTIVE' })
-            .then(() => {
-              downgradeEffectiveAt.value = serviceOrder.value?.currentPeriodEnd ?? null
-            })
-            .catch(() => {
-              // dialog stays open; effectiveAt falls back to '--'
-            })
-        }
-      }
+  const openCycleDowngradeDialog = async ({ fromCycle, toCycle }) => {
+    downgradeEffectiveAt.value = null
+    downgradeTarget.value = {
+      toPlan: subscription.planSku.value,
+      cycleChange: true,
+      fromCycle,
+      toCycle
+    }
+    const active = await ensureActiveServiceOrder()
+    downgradeEffectiveAt.value = active?.currentPeriodEnd ?? null
+    showDowngradeDialog.value = true
+  }
+
+  const openPlanDowngradeDialog = async () => {
+    downgradeEffectiveAt.value = null
+    downgradeTarget.value = {
+      toPlan: 'hobby',
+      cycleChange: false,
+      fromCycle: null,
+      toCycle: null
+    }
+    const active = await ensureActiveServiceOrder()
+    downgradeEffectiveAt.value = active?.currentPeriodEnd ?? null
+    showDowngradeDialog.value = true
+  }
+
+  const handlePlanSelect = async ({ plan, billingCycle }) => {
+    if (plan === 'hobby') {
+      await openPlanDowngradeDialog()
       return
     }
 
-    // For all paid-plan selections (including same-plan cycle change),
-    // open the subscribe drawer. The preparer picks the right backend call
-    // (POST / PATCH DRAFT / PATCH /upgrade) based on current SO state.
     if (billingCycle) {
       setParam('billingCycle', billingCycle)
       await syncToUrl()
     }
 
-    // Cycle-only change on the same paid plan (e.g. Pro/m → Pro/y): lock the
-    // drawer's toggle so the user can't accidentally pick the other cycle —
-    // the whole point of entering through this card was the cycle choice.
-    const isCycleOnlyChange =
-      plan === subscription.planSku.value &&
-      billingCycle &&
-      subscription.billingCycle.value &&
-      billingCycle !== subscription.billingCycle.value
+    const currentSku = subscription.planSku.value
+    const currentCycle = subscription.billingCycle.value
+
+    const isSamePlan = plan === currentSku
+    const isCycleChange = isSamePlan && billingCycle && currentCycle && billingCycle !== currentCycle
+
+    if (isCycleChange) {
+      if (billingCycle === 'yearly') {
+        openCycleReviewDrawer({ plan, targetCycle: 'yearly' })
+      } else {
+        await openCycleDowngradeDialog({ fromCycle: currentCycle, toCycle: 'monthly' })
+      }
+      return
+    }
 
     await openDrawerWithCheckoutSession({
       plan,
       preferredCycle: billingCycle || storedBillingCycle.value || null,
-      lockedCycle: isCycleOnlyChange ? billingCycle : null
+      lockedCycle: null
     })
   }
 
-  const handleDowngradeConfirm = async ({ toPlan, done, fail }) => {
-    try {
-      const serviceOrderId = serviceOrder.value?.serviceOrderId
-      const hobbyPlan = plansData.value?.find(
-        (plan) => plan.sku?.toLowerCase() === toPlan.toLowerCase()
-      )
+  const resolveCycleChangePayload = async ({ plan, billingCycle }) => {
+    const active = await ensureActiveServiceOrder()
+    if (!active?.serviceOrderId) {
+      throw new Error('Missing active service order.')
+    }
 
-      if (!serviceOrderId || !hobbyPlan?.id) {
+    const accountId = accountStore.accountData?.id
+    const planId = findPlanIdBySku(plan)
+    const planPricingId = findPriceId(plan, billingCycle)
+
+    if (!accountId || !planId || !planPricingId) {
+      throw new Error('Missing data required to change cycle.')
+    }
+
+    return { serviceOrderId: active.serviceOrderId, accountId, planId, planPricingId }
+  }
+
+  const upgradeServiceOrderCycle = async ({ plan, billingCycle }) => {
+    const { serviceOrderId, accountId, planId, planPricingId } = await resolveCycleChangePayload({
+      plan,
+      billingCycle
+    })
+
+    await upgradeServiceOrder({
+      id: serviceOrderId,
+      accountId,
+      newPlanId: planId,
+      priceId: planPricingId
+    })
+  }
+
+  const downgradeServiceOrderCycle = async ({ plan, billingCycle }) => {
+    const { serviceOrderId, accountId, planId, planPricingId } = await resolveCycleChangePayload({
+      plan,
+      billingCycle
+    })
+
+    await updateServiceOrder(serviceOrderId, {
+      accountId,
+      planId,
+      planPricingId
+    })
+  }
+
+  const handleCycleUpgradeSubmit = async ({ plan, billingCycle, done, fail }) => {
+    try {
+      await upgradeServiceOrderCycle({ plan, billingCycle })
+      const targetPriceId = findPriceId(plan, billingCycle)
+      done?.()
+      showPlanInfoDrawer.value = false
+      showChangePlanDrawer.value = false
+      selectedPlan.value = null
+      lockedCycle.value = null
+      if (targetPriceId) {
+        await subscription.refetchUntil((so) => so?.priceId === targetPriceId)
+      } else {
+        await subscription.refetch()
+      }
+      toast.add({
+        severity: 'success',
+        summary: 'Billing cycle updated',
+        detail: 'Your billing cycle has been updated successfully.',
+        life: 6000,
+        closable: true
+      })
+    } catch (err) {
+      const detail =
+        (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
+        'Unable to update billing cycle.'
+      fail?.(detail)
+    }
+  }
+
+  const handleDowngradeConfirm = async ({
+    toPlan,
+    toCycle,
+    cycleChange,
+    done,
+    fail
+  }) => {
+    try {
+      if (cycleChange) {
+        await downgradeServiceOrderCycle({
+          plan: subscription.planSku.value,
+          billingCycle: toCycle
+        })
+        toast.add({
+          severity: 'success',
+          summary: 'Downgrade scheduled',
+          detail: 'Your billing cycle change has been scheduled.',
+          closable: true
+        })
+        done?.()
+        showChangePlanDrawer.value = false
+        await subscription.refetch()
+        return
+      }
+
+      const serviceOrderId = serviceOrder.value?.serviceOrderId
+      const targetPlanId = findPlanIdBySku(toPlan)
+
+      if (!serviceOrderId || !targetPlanId) {
         throw new Error('Missing data required to change plan.')
       }
 
       await downgradeServiceOrderPlan({
         id: serviceOrderId,
-        newPlanId: hobbyPlan.id
+        newPlanId: targetPlanId
       })
 
       toast.add({
@@ -439,7 +584,9 @@
       })
       done?.()
       showChangePlanDrawer.value = false
-      await subscription.refetch()
+      await subscription.refetchUntil(
+        (so) => so?.metadata?.status === 'downgrade_pending'
+      )
     } catch (err) {
       const detail =
         (Array.isArray(err?.message) ? err.message[0] : err?.message) || 'Unable to downgrade plan.'
@@ -447,12 +594,15 @@
     }
   }
 
+  const handleCancelDowngradeConfirm = async ({ fail }) => {
+    fail?.('Cancel scheduled downgrade is not available yet.')
+  }
+
   const planLabel = (sku) => (sku === 'pro' ? 'Pro Plan' : sku === 'hobby' ? 'Hobby Plan' : 'plan')
 
   const handlePlanInfoSubmit = async () => {
-    // Capture the target before resetting drawer state.
     const targetPlan = selectedPlan.value
-    const targetCycle = lockedCycle.value || storedBillingCycle.value || null
+    const targetPlanId = targetPlan ? findPlanIdBySku(targetPlan) : null
 
     showPlanInfoDrawer.value = false
     showChangePlanDrawer.value = false
@@ -461,27 +611,18 @@
     lockedCycle.value = null
     checkoutSessionClientSecret.value = ''
 
-    // Stripe payment confirmed on the client, but the backend transitions
-    // the new DRAFT to ACTIVE via webhook — poll until the SO reflects the
-    // new plan. `useCurrentSubscription.isLoading` stays true throughout,
-    // so the Subscription Plan + Current Invoice cards skeleton until the
-    // new state lands.
     if (targetPlan) {
-      const succeeded = await subscription.refetchUntil(({ planSku, billingCycle }) => {
-        if (planSku !== targetPlan) return false
-        if (!targetCycle) return true
-        return billingCycle === targetCycle
+      toast.add({
+        severity: 'success',
+        summary: `${planLabel(targetPlan)} subscribed`,
+        detail: `Your subscription to the ${planLabel(targetPlan)} is now active.`,
+        life: 6000,
+        closable: true
       })
+    }
 
-      if (succeeded) {
-        toast.add({
-          severity: 'success',
-          summary: `${planLabel(targetPlan)} subscribed`,
-          detail: `Your subscription to the ${planLabel(targetPlan)} is now active.`,
-          life: 6000,
-          closable: true
-        })
-      }
+    if (targetPlanId) {
+      await subscription.refetchUntil((so) => so?.planId === targetPlanId)
     } else {
       await subscription.refetch()
     }

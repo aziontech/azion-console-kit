@@ -41,25 +41,27 @@
             @update:checkout-session-client-secret="handleCheckoutSessionClientSecretChange"
           />
 
-          <PaymentMethodBlock
-            ref="paymentRef"
-            :stripeClientService="getStripeClientService"
-            :checkoutSessionClientSecret="checkoutSessionClientSecret"
-            @readiness-change="handlePaymentReadinessChange"
-          />
+          <template v-if="!isChangeCycleMode">
+            <PaymentMethodBlock
+              ref="paymentRef"
+              :stripeClientService="getStripeClientService"
+              :checkoutSessionClientSecret="checkoutSessionClientSecret"
+              @readiness-change="handlePaymentReadinessChange"
+            />
 
-          <AddressInformationBlock
-            ref="addressRef"
-            :showUseOwnerInfo="true"
-            @readiness-change="handleAddressReadinessChange"
-          />
+            <AddressInformationBlock
+              ref="addressRef"
+              :showUseOwnerInfo="true"
+              @readiness-change="handleAddressReadinessChange"
+            />
+          </template>
         </div>
 
         <CheckoutSubmissionFooter
           :submitLabel="submitLabel"
           :errorMessage="submitError"
           :isSubmitting="isSubmitting"
-          :isConfirmDisabled="isSubscribeDisabled"
+          :isConfirmDisabled="isConfirmDisabled"
           @cancel="closeDrawer"
           @confirm="handleSubmit"
         />
@@ -91,30 +93,18 @@
     mode: {
       type: String,
       default: 'subscribe',
-      validator: (value) => ['subscribe', 'edit'].includes(value)
+      validator: (value) => ['subscribe', 'edit', 'change-cycle'].includes(value)
     },
-    /**
-     * When set, locks the billing cycle toggle inside the drawer. Used when
-     * the drawer was opened specifically to change cycle on the same plan
-     * (e.g. Pro/m → Pro/y), so the user can't accidentally pick the other
-     * cycle here.
-     */
     lockedCycle: {
       type: String,
       default: null,
       validator: (value) => value === null || ['monthly', 'yearly'].includes(value)
     },
-    /**
-     * Stripe checkout session client secret, pre-fetched by the caller before
-     * opening the drawer. Mirrors the working signup pattern: when the drawer
-     * mounts, `PaymentMethodBlock` already receives a valid secret and the
-     * Stripe element renders on the first paint — no async race.
-     */
     initialClientSecret: { type: String, default: '' },
-    getStripeClientService: { type: Function, required: true }
+    getStripeClientService: { type: Function, required: false, default: null }
   })
 
-  const emit = defineEmits(['update:visible', 'submit'])
+  const emit = defineEmits(['update:visible', 'submit', 'submitCycleChange'])
 
   const toast = useToast()
   const { setParam } = usePlans()
@@ -129,25 +119,32 @@
   const checkoutSessionClientSecret = ref(props.initialClientSecret)
   const submitError = ref('')
 
+  const isChangeCycleMode = computed(() => props.mode === 'change-cycle')
+
   const visibleDrawer = computed({
     get: () => props.visible,
     set: (value) => emit('update:visible', value)
   })
 
   const headerLabel = computed(() => {
+    if (isChangeCycleMode.value) {
+      return props.lockedCycle === 'yearly' ? 'Upgrade to Yearly' : 'Change Cycle'
+    }
     if (props.mode === 'edit') return 'Edit Plan'
     const labels = { pro: 'Upgrade to Pro', hobby: 'Subscribe to Hobby' }
     return labels[props.plan] || `Upgrade to ${props.plan}`
   })
 
-  const submitLabel = computed(() => (props.mode === 'edit' ? 'Update Plan' : 'Subscribe'))
+  const submitLabel = computed(() => {
+    if (isChangeCycleMode.value) return 'Confirm'
+    return props.mode === 'edit' ? 'Update Plan' : 'Subscribe'
+  })
 
-  const isSubscribeDisabled = computed(() => {
+  const isConfirmDisabled = computed(() => {
+    if (isSubmitting.value) return true
+    if (isChangeCycleMode.value) return false
     return (
-      isSubmitting.value ||
-      !checkoutSessionClientSecret.value ||
-      !isPaymentFormReady.value ||
-      !isAddressFormReady.value
+      !checkoutSessionClientSecret.value || !isPaymentFormReady.value || !isAddressFormReady.value
     )
   })
 
@@ -175,10 +172,6 @@
     toast.add({ severity: 'error', summary: 'Error', detail: String(detail), closable: true })
   }
 
-  // Keep the URL `?plan=` query in sync with the drawer's target plan so a
-  // reload preserves intent. The actual SO + Stripe secret are prepared by
-  // the caller (BillsView / signup) via `useCheckoutSessionPreparer` BEFORE
-  // the drawer opens — no internal fetch here.
   watch(
     () => props.visible,
     (visible) => {
@@ -187,8 +180,6 @@
     { immediate: true }
   )
 
-  // When the caller re-prepares the session (e.g. switches plan and reopens
-  // the drawer without unmounting), the new secret flows in through the prop.
   watch(
     () => props.initialClientSecret,
     (secret) => {
@@ -203,6 +194,19 @@
     isSubmitting.value = true
     submitError.value = ''
     try {
+      if (isChangeCycleMode.value) {
+        await new Promise((resolve, reject) => {
+          emit('submitCycleChange', {
+            plan: props.plan,
+            billingCycle: billingCycle.value,
+            done: resolve,
+            fail: (err) =>
+              reject(typeof err === 'string' ? new Error(err) : err || new Error('Failed'))
+          })
+        })
+        return
+      }
+
       const paymentErrors = await paymentRef.value?.validate?.()
       if (paymentErrors && Object.keys(paymentErrors).length > 0) return
 
@@ -210,7 +214,9 @@
       if (!address) return
 
       const checkoutConfirmation = await paymentRef.value?.confirmCheckoutSession?.()
-      if (checkoutConfirmation?.type !== 'success') return
+      if (checkoutConfirmation?.type !== 'success') {
+        throw new Error('Payment could not be completed. Please try again.')
+      }
 
       emit('submit', {
         plan: props.plan,

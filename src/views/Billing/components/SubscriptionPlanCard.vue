@@ -66,43 +66,13 @@
           </SubscriptionPlanRow>
 
           <SubscriptionPlanRow label="Payment Method">
-            <SkeletonBlock
-              class="text-color"
-              width="8rem"
-              sizeHeight="small"
-              :isLoaded="cardDefault.loader"
-              elementType="span"
-            >
-              <span
-                v-if="cardDefault.cardData"
-                class="flex gap-2 items-center"
-              >
-                <CardFlagBlock :cardFlag="cardDefault.cardData.cardBrand" />
-                {{ cardDefault.cardData.cardNumber }}
-              </span>
-              <span v-else>--</span>
-            </SkeletonBlock>
+            <span class="text-color">--</span>
           </SubscriptionPlanRow>
         </template>
 
         <template v-if="subscription.isHobby">
           <SubscriptionPlanRow label="Payment Method">
-            <SkeletonBlock
-              class="text-color"
-              width="8rem"
-              sizeHeight="small"
-              :isLoaded="cardDefault.loader"
-              elementType="span"
-            >
-              <span
-                v-if="cardDefault.cardData"
-                class="flex gap-2 items-center"
-              >
-                <CardFlagBlock :cardFlag="cardDefault.cardData.cardBrand" />
-                {{ cardDefault.cardData.cardNumber }}
-              </span>
-              <span v-else>--</span>
-            </SkeletonBlock>
+            <span class="text-color">--</span>
           </SubscriptionPlanRow>
 
           <SubscriptionPlanRow label="Payment Currency">
@@ -135,14 +105,12 @@
   import PrimeButton from '@aziontech/webkit/button'
   import CardBox from '@aziontech/webkit/card-box'
   import SkeletonBlock from '@/templates/skeleton-block'
-  import CardFlagBlock from '@templates/card-flag-block'
   import SubscriptionPlanRow from './SubscriptionPlanRow.vue'
 
   defineOptions({ name: 'subscription-plan-card' })
 
   const props = defineProps({
-    subscription: { type: Object, required: true },
-    cardDefault: { type: Object, default: () => ({ loader: true, cardData: null }) }
+    subscription: { type: Object, required: true }
   })
 
   const emit = defineEmits(['change-plan', 'go-to-payment'])

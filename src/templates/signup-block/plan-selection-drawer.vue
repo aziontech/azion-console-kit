@@ -18,11 +18,10 @@
     </template>
 
     <div class="flex flex-col gap-6 min-h-full">
-      <Toggle
-        v-model="billingCycleToggleValue"
+      <SegmentedButton
+        v-model="localBillingCycle"
+        :options="CYCLE_OPTIONS"
         class="self-center"
-        mainLabel="Monthly"
-        alternativeLabel="Yearly"
       />
 
       <div
@@ -76,7 +75,7 @@
   import Sidebar from '@aziontech/webkit/sidebar'
   import PricingCard from '@aziontech/webkit/pricing-card'
   import Button from '@aziontech/webkit/button'
-  import Toggle from '@aziontech/webkit/toggle'
+  import SegmentedButton from '@aziontech/webkit/segmented-button'
   import { useResize } from '@/composables/useResize'
   import { usePlans } from '@/composables/usePlans'
   import { PLAN_OPTIONS } from '@/templates/signup-block/plan-options'
@@ -132,15 +131,15 @@
   const isHorizontalPricingCard = computed(() => windowWidth.value <= 1000)
   const { setParam } = usePlans()
 
+  const CYCLE_OPTIONS = [
+    { label: 'Monthly', value: 'monthly' },
+    { label: 'Yearly', value: 'yearly' }
+  ]
+
   const localBillingCycle = ref(props.billingCycle)
 
-  const billingCycleToggleValue = computed({
-    get: () => (localBillingCycle.value === 'yearly' ? 'alternative' : 'main'),
-    set: (value) => {
-      const newCycle = value === 'alternative' ? 'yearly' : 'monthly'
-      localBillingCycle.value = newCycle
-      setParam('billingCycle', newCycle)
-    }
+  watch(localBillingCycle, (cycle) => {
+    setParam('billingCycle', cycle)
   })
 
   const visibleDrawer = computed({
@@ -164,12 +163,9 @@
     const current = props.currentPlan?.toLowerCase()
     if (target === 'enterprise') return 'Contact Sales'
     if (target === current) {
-      // Hobby is free and has no cycle, so it's always "Subscribed" for
-      // hobby users — toggling monthly/yearly must not turn it into a
-      // "Change Cycle" CTA.
       if (target === 'hobby') return 'Subscribed'
       if (props.billingCycle === localBillingCycle.value) return 'Subscribed'
-      return 'Change Cycle'
+      return localBillingCycle.value === 'yearly' ? 'Upgrade Cycle' : 'Downgrade Cycle'
     }
     const targetRank = PLAN_RANK[target] ?? 0
     const currentRank = PLAN_RANK[current] ?? 0

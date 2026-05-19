@@ -34,7 +34,6 @@
     "lint:architecture": "eslint src/ --ext .vue,.js,.ts --ignore-path .gitignore --no-fix",
     "lint:architecture:changed": "node scripts/lint-architecture-changed.cjs",
     "architecture:report": "node scripts/architecture-report/index.cjs",
-    "storybook:install": "cd storybook && yarn install; cd ..",
     "storybook:dev": "cd storybook && yarn dev",
     "storybook:install": "cd storybook && yarn install && cd ..",
     "storybook:build": "cd storybook && yarn build"
@@ -43,7 +42,7 @@
     "@analytics/segment": "^2.1.0",
     "@aziontech/icons": "^1.4.0",
     "@aziontech/theme": "^1.12.0",
-    "@aziontech/webkit": "^1.28.1",
+    "@aziontech/webkit": "^2.0.2",
     "@guolao/vue-monaco-editor": "^1.6.0",
     "@jsonforms/core": "3.7.0",
     "@jsonforms/vue": "3.7.0",

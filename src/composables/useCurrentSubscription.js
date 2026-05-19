@@ -4,7 +4,6 @@ import { useAccountStore } from '@/stores/account'
 import { useServiceOrders } from '@/composables/useServiceOrders'
 import { usePlansList } from '@/composables/usePlansService'
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
-import { SO_STATUS } from '@/services/v2/service-orders/service-orders-constants'
 import {
   findPlanById,
   findPricingById,
@@ -13,47 +12,46 @@ import {
   resolvePlanSku,
   toFiniteNumber
 } from '@/composables/subscription-helpers'
+import {
+  formatBillingPeriod,
+  formatLastUpdate,
+  formatNextChargeDate
+} from '@/utils/billing-date'
 
-const isRefreshing = ref(false)
+const isRefetching = ref(false)
 
-/**
- * Resolves the current plan for the billing UI.
- *
- * Source of truth: the ACTIVE service order. `/info.has_service_order_plan`
- * is intentionally NOT consulted for the plan SKU — it can stay `true` after
- * the ACTIVE SO is canceled, which previously made the badge claim "Pro"
- * off of a stale DRAFT. The flag is used only as an optimization gate to
- * skip the SO fetch while the account is still in the signup flow.
- */
 export function useCurrentSubscription() {
   const accountStore = useAccountStore()
   const { accountData } = storeToRefs(accountStore)
 
   const hasFinishedOnboarding = computed(() => accountData.value?.has_service_order_plan !== false)
-  // Preserved name for backwards compatibility with consumers (BillsView etc.)
   const hasContractedPlan = hasFinishedOnboarding
 
-  const { serviceOrder, isLoading: isLoadingServiceOrder, loadServiceOrder } = useServiceOrders()
+  const {
+    serviceOrder,
+    isLoading: isLoadingServiceOrder,
+    loadAccountServiceOrders
+  } = useServiceOrders()
   const { data: plansData, isLoading: isLoadingPlans } = usePlansList()
 
-  // The SO ref in useServiceOrders is a module-level singleton — a DRAFT
-  // created elsewhere (e.g. the change-plan drawer) can leak in. Gate every
-  // derived field on the ACTIVE status to avoid reading the wrong SO.
-  const activeServiceOrderState = computed(() =>
+  const activeServiceOrderState = ref(
     isActiveServiceOrder(serviceOrder.value) ? serviceOrder.value : null
   )
 
-  // Concurrent calls dedupe via `queryClient.fetchQuery` inside
-  // `loadServiceOrder` (same query key → shared in-flight promise).
+  watch(serviceOrder, (so) => {
+    if (isActiveServiceOrder(so)) {
+      activeServiceOrderState.value = so
+    } else if (so === null) {
+      activeServiceOrderState.value = null
+    }
+  })
+
   watch(
     () => [accountData.value?.id, hasFinishedOnboarding.value],
     ([accountId, finishedOnboarding]) => {
       if (!accountId || !finishedOnboarding) return
       if (activeServiceOrderState.value || isLoadingServiceOrder.value) return
-      loadServiceOrder(accountId, {
-        preferStatus: SO_STATUS.ACTIVE,
-        noFallback: true
-      }).catch(() => {})
+      loadAccountServiceOrders(accountId).catch(() => {})
     },
     { immediate: true }
   )
@@ -86,52 +84,84 @@ export function useCurrentSubscription() {
   const planStartDate = computed(() =>
     formatPlanStartDate(activeServiceOrderState.value?.currentPeriodStart)
   )
-  const nextChargeDate = computed(() => null)
+  const billingPeriod = computed(() =>
+    formatBillingPeriod(
+      activeServiceOrderState.value?.currentPeriodStart,
+      activeServiceOrderState.value?.currentPeriodEnd
+    )
+  )
+  const nextChargeDate = computed(() =>
+    formatNextChargeDate(activeServiceOrderState.value?.currentPeriodEnd)
+  )
   const nextChargeValue = computed(() => planChargeValue.value)
+  const lastUpdate = computed(() =>
+    formatLastUpdate(serviceOrder.value?.updatedAt ?? activeServiceOrderState.value?.updatedAt)
+  )
+
+  const scheduledDowngrade = computed(() => {
+    const metadata = activeServiceOrderState.value?.metadata
+    if (!metadata || typeof metadata !== 'object') return null
+    if (metadata.status !== 'downgrade_pending') return null
+    return {
+      effectiveAt: metadata.effective_date ?? metadata.effectiveDate ?? null
+    }
+  })
+
+  const isDowngradePending = computed(() => Boolean(scheduledDowngrade.value))
+
+  const hasResolvedOnce = ref(false)
+  watch(
+    () => planSku.value,
+    (sku) => {
+      if (sku !== null) hasResolvedOnce.value = true
+    },
+    { immediate: true }
+  )
+  watch(
+    () => accountData.value?.id,
+    (newId, oldId) => {
+      if (newId !== oldId) hasResolvedOnce.value = false
+    }
+  )
 
   const isLoading = computed(() => {
-    if (isRefreshing.value) return true
+    if (isRefetching.value) return true
     if (!accountData.value?.id) return true
     if (!hasContractedPlan.value) return false
+    if (hasResolvedOnce.value) return false
     return isLoadingServiceOrder.value || isLoadingPlans.value || planSku.value === null
   })
 
-  /**
-   * Refresh the source of truth (`/info` + ACTIVE SO). Bypasses Vue Query
-   * cache since `has_service_order_plan` flips on the backend immediately
-   * after a transition — a cached value would mislead the billing UI.
-   */
-  const refetch = async () => {
+  const reloadFromBackend = async () => {
     await loadUserAndAccountInfo({ force: true })
     const accountId = accountData.value?.id
     if (accountId && hasContractedPlan.value) {
-      await loadServiceOrder(accountId, { preferStatus: SO_STATUS.ACTIVE, noFallback: true })
+      await loadAccountServiceOrders(accountId)
     }
   }
 
-  /**
-   * Refetch until `predicate({ planSku, billingCycle })` returns true. Used
-   * after payment — the Stripe webhook transitions the new DRAFT to ACTIVE
-   * asynchronously, so an immediate refetch often returns the old plan.
-   */
-  const refetchUntil = async (predicate, options = {}) => {
-    const { attempts = 8, delayMs = 1500 } = options
-    isRefreshing.value = true
+  const refetch = async () => {
+    isRefetching.value = true
     try {
-      for (let attempt = 0; attempt < attempts; attempt += 1) {
-        // eslint-disable-next-line no-await-in-loop
-        await refetch()
-        if (predicate({ planSku: planSku.value, billingCycle: billingCycle.value })) {
-          return true
-        }
-        if (attempt < attempts - 1) {
-          // eslint-disable-next-line no-await-in-loop
-          await new Promise((resolve) => setTimeout(resolve, delayMs))
+      await reloadFromBackend()
+    } finally {
+      isRefetching.value = false
+    }
+  }
+
+  const refetchUntil = async (predicate, { interval = 1500, maxAttempts = 8 } = {}) => {
+    isRefetching.value = true
+    try {
+      for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+        await reloadFromBackend()
+        if (predicate(activeServiceOrderState.value)) return true
+        if (attempt < maxAttempts - 1) {
+          await new Promise((resolve) => setTimeout(resolve, interval))
         }
       }
       return false
     } finally {
-      isRefreshing.value = false
+      isRefetching.value = false
     }
   }
 
@@ -142,12 +172,16 @@ export function useCurrentSubscription() {
     planTitle,
     planTag,
     planStartDate,
+    billingPeriod,
     nextChargeDate,
     nextChargeValue,
+    lastUpdate,
     hasContractedPlan,
     isHobby,
     isPro,
     isLoading,
+    isDowngradePending,
+    scheduledDowngrade,
     refetch,
     refetchUntil
   }

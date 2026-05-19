@@ -4,7 +4,7 @@
       <template #action>
         <BillingCycleToggle
           v-model="billingCycle"
-          :disabled="Boolean(props.lockedCycle)"
+          :disabled="Boolean(props.lockedCycle) || isPreparing"
         />
       </template>
     </PlanCardHeader>
@@ -22,9 +22,9 @@
   import { computed, onBeforeUnmount, ref, watch } from 'vue'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { usePlans } from '@/composables/usePlans'
-  import { useServiceOrders } from '@/composables/useServiceOrders'
+  import { useCheckoutSessionPreparer } from '@/composables/useCheckoutSessionPreparer'
   import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
-  import { getPlanPricing, getPlanPricingId } from '@/composables/usePlansService'
+  import { getPlanPricing } from '@/composables/usePlansService'
   import PlanCardHeader from '@/templates/checkout-block/plan-card-header.vue'
   import BillingCycleToggle from '@/templates/checkout-block/billing-cycle-toggle.vue'
   import PricingSummary from '@/templates/checkout-block/pricing-summary.vue'
@@ -55,7 +55,7 @@
   const toast = useToast()
   const { initialize, billingCycle: sharedBillingCycle, setParam } = usePlans()
   const { data: plans } = serviceOrdersService.useListPlansQuery()
-  const { serviceOrder, updatePlanPricing } = useServiceOrders()
+  const { prepare: prepareCheckoutSession, isPreparing } = useCheckoutSessionPreparer()
 
   const billingCycle = ref('monthly')
 
@@ -107,19 +107,14 @@
   let pendingPlanPricingTimer = null
 
   const flushPlanPricingUpdate = async (value) => {
-    if (!serviceOrder.value?.serviceOrderId) return
-
-    const planPricingId = getPlanPricingId(plans.value, props.plan, value)
-    if (!planPricingId) return
-
+    emit('update:checkoutSessionClientSecret', '')
     try {
-      const response = await updatePlanPricing(planPricingId)
-      // Adapter surfaces the Stripe client secret in two places depending on
-      // where the backend put it: top-level `payment` (explicit field) or on
-      // the SO itself when extracted from `metadata.client_secret`.
-      const nextSecret = response?.payment?.clientSecret || response?.data?.clientSecret
-      if (nextSecret) {
-        emit('update:checkoutSessionClientSecret', nextSecret)
+      const secret = await prepareCheckoutSession({
+        plan: props.plan,
+        preferredCycle: value
+      })
+      if (secret) {
+        emit('update:checkoutSessionClientSecret', secret)
       }
     } catch (err) {
       const detail =

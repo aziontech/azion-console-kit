@@ -59,6 +59,52 @@ export const formatRelativeDays = (value, now = new Date()) => {
 }
 
 /**
+ * Formats a date range as "Jan 25, 2026 - Feb 25, 2026"
+ * @param {string|Date|null} start
+ * @param {string|Date|null} end
+ * @returns {string}
+ */
+export const formatBillingPeriod = (start, end) => {
+  const formattedStart = formatBillingDate(start)
+  const formattedEnd = formatBillingDate(end)
+  if (!formattedStart || !formattedEnd) return ''
+  return `${formattedStart} - ${formattedEnd}`
+}
+
+/**
+ * Formats a timestamp as "Feb 25, 2026, 02:32:22 PM"
+ * @param {string|Date|null} value
+ * @returns {string}
+ */
+export const formatLastUpdate = (value) => {
+  const date = toDate(value)
+  if (!date) return ''
+  const month = MONTHS_SHORT[date.getMonth()]
+  const day = date.getDate()
+  const year = date.getFullYear()
+  let hours = date.getHours()
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  const meridiem = hours >= 12 ? 'PM' : 'AM'
+  hours = hours % 12
+  if (hours === 0) hours = 12
+  const hh = String(hours).padStart(2, '0')
+  return `${month} ${day}, ${year}, ${hh}:${minutes}:${seconds} ${meridiem}`
+}
+
+/**
+ * Formats a date with relative-days suffix as "Feb 25, 2026 (in 4 days)"
+ * @param {string|Date|null} value
+ * @returns {string}
+ */
+export const formatNextChargeDate = (value) => {
+  const absolute = formatBillingDate(value)
+  if (!absolute) return ''
+  const relative = formatRelativeDays(value)
+  return relative ? `${absolute} (${relative})` : absolute
+}
+
+/**
  * Formats absolute price value in the form "$20" or "$19.99".
  * Drops trailing zeros for cents.
  * @param {number|null|undefined} value

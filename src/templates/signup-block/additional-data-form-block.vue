@@ -163,8 +163,7 @@
   const accountStore = useAccountStore()
   const {
     setField: setAdditionalDataField,
-    hydrate: hydrateAdditionalDataForm,
-    clear: clearAdditionalDataForm
+    hydrate: hydrateAdditionalDataForm
   } = useAdditionalDataFormState()
 
   defineOptions({
@@ -550,7 +549,6 @@
       //     fullName: fullName.value
       //   })
       //   .track()
-      clearAdditionalDataForm()
     } catch (err) {
       const errorMessage = err?.message || err
       const errors = typeof errorMessage === 'string' ? { errorMessage } : errorMessage

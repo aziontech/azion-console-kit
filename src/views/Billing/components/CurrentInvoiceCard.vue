@@ -18,7 +18,7 @@
       <div class="flex flex-col">
         <div class="flex flex-col gap-4 px-6 py-4">
           <SubscriptionPlanRow label="Billing Period">
-            <span class="text-color">{{ invoice.billingPeriod || '--' }}</span>
+            <span class="text-color">{{ billingPeriodLabel }}</span>
           </SubscriptionPlanRow>
 
           <SubscriptionPlanRow label="Plan Charge">
@@ -102,6 +102,10 @@
   // Plan price drives "Plan Charge". Sourced from the SO's pricing (resolved
   // by `useCurrentSubscription` against the plans catalog) — the legacy
   // invoice endpoint doesn't carry it.
+  const billingPeriodLabel = computed(
+    () => props.subscription?.billingPeriod || props.invoice?.billingPeriod || '--'
+  )
+
   const planChargeNumeric = computed(() => toNumber(props.subscription?.planChargeValue))
   const planChargeFormatted = computed(() => formatAmount(planChargeNumeric.value))
 

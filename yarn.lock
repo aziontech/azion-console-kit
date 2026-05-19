@@ -85,10 +85,10 @@
   resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-1.13.0.tgz#1fbbc9a5d13091222035cfa3d28263b21d58e9e9"
   integrity sha512-7dQiIizv2fAh/6XZ75RBU3agCf+NTgsE193V7r/R6ddAI39ITgwdZ7J93uOIVS6XMQteQ1l6k5upRFnmCk7DkA==
 
-"@aziontech/webkit@^1.28.1":
-  version "1.28.1"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-1.28.1.tgz#18773afacc98754147840905ee0a68d42b3b5c01"
-  integrity sha512-fvs5kwj4Mni+h9XZpPxDLrZe43xxz+ZSzy3u/0or/KTknQE43EZJ+mKzEk2sco5qEk+GfCKWxVl6eprP1DrhdQ==
+"@aziontech/webkit@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-2.0.2.tgz#c9ceb9d20841dadc1f99bb531c56731fc427279b"
+  integrity sha512-D/Fy0Peos3bPYtnDFkU0F5j09dZ5Ugz720vmcQZTgSHquHk7ppWMbdcIIO8FKutmsn0rESFRQBONzURX9PW85Q==
   dependencies:
     "@vueuse/core" "^10.11.1"
     motion-v "^2.1.0"
