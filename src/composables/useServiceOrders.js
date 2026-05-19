@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+// eslint-disable-next-line azion-architecture/require-vue-query
 import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
 import { SO_MESSAGES, SO_STATUS } from '@/services/v2/service-orders/service-orders-constants'
 import {
