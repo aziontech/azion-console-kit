@@ -5,6 +5,7 @@
   import { useAccountStore } from '@/stores/account'
   import { useThemeStore, DARK_SCHEME_QUERY } from '@/stores/theme'
   import { storeToRefs } from 'pinia'
+  import * as Sentry from '@sentry/vue'
   import { themeApply } from '@/helpers'
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
   import { useAdditionalDataFormState } from '@/composables/useAdditionalDataFormState'
@@ -67,11 +68,9 @@
           : 'paid'
     }
 
-    try {
-      await tracker.group(accountId, traits)
-    } catch {
-      // intentionally swallowed
-    }
+    await Promise.resolve()
+      .then(() => tracker.group(accountId, traits))
+      .catch(Sentry.captureException)
   }
 
   const isLogged = computed(() => {

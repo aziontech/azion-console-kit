@@ -1,19 +1,21 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import * as Sentry from '@sentry/vue'
 // eslint-disable-next-line azion-architecture/require-vue-query
 import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
+import { useAccountStore } from '@/stores/account'
 import { SO_MESSAGES, SO_STATUS } from '@/services/v2/service-orders/service-orders-constants'
 import {
   SUBMIT_ACTIONS,
   resolveSubmitStrategy
 } from '@/services/v2/service-orders/service-orders-strategy'
+import {
+  useServiceOrdersList,
+  ensureServiceOrdersList,
+  getCurrentServiceOrder,
+  getDraftServiceOrder
+} from '@/composables/useServiceOrdersList'
 
-const serviceOrder = ref(null)
-const isLoading = ref(false)
 const isSubmitting = ref(false)
-
-const setServiceOrderFromResponse = (response) => {
-  if (response?.data) serviceOrder.value = response.data
-}
 
 const runSubmission = async (operation) => {
   isSubmitting.value = true
@@ -24,85 +26,38 @@ const runSubmission = async (operation) => {
   }
 }
 
-const listDrafts = (accountId) =>
-  serviceOrdersService.listServiceOrders({ accountId, status: SO_STATUS.DRAFT })
-
 export function useServiceOrders() {
-  const loadAccountServiceOrders = async (accountId) => {
-    if (!accountId) {
-      serviceOrder.value = null
-      return { draft: null, active: null }
-    }
+  const accountStore = useAccountStore()
+  const accountIdRef = computed(() => accountStore.accountData?.id ?? null)
 
-    isLoading.value = true
+  const {
+    activeServiceOrder,
+    draftServiceOrder,
+    currentServiceOrder,
+    isLoading,
+    refetch
+  } = useServiceOrdersList(accountIdRef)
 
-    try {
-      const response = await serviceOrdersService.listServiceOrders({ accountId })
-      const orders = response?.data ?? []
-      const active = orders.find((so) => so.status === SO_STATUS.ACTIVE) ?? null
-      const draft = orders.find((so) => so.status === SO_STATUS.DRAFT) ?? null
-
-      if (active) serviceOrder.value = active
-      if (draft) serviceOrder.value = draft
-      if (!active && !draft) serviceOrder.value = null
-
-      return { draft, active }
-    } catch (err) {
-      serviceOrder.value = null
-      throw err
-    } finally {
-      isLoading.value = false
+  const loadAccountServiceOrders = async (id) => {
+    const targetId = id ?? accountIdRef.value
+    if (!targetId) return { draft: null, active: null }
+    const response = await ensureServiceOrdersList(targetId)
+    const orders = response?.data ?? []
+    return {
+      active: orders.find((so) => so.status === SO_STATUS.ACTIVE) ?? null,
+      draft: orders.find((so) => so.status === SO_STATUS.DRAFT) ?? null
     }
   }
 
   const createServiceOrder = (payload) =>
-    runSubmission(async () => {
-      const response = await serviceOrdersService.createServiceOrder(payload)
-      setServiceOrderFromResponse(response)
-      return response
-    })
+    runSubmission(() => serviceOrdersService.createServiceOrder(payload))
 
   const updateServiceOrder = (id, payload) =>
-    runSubmission(async () => {
-      const response = await serviceOrdersService.updateServiceOrder(id, payload)
-      setServiceOrderFromResponse(response)
-      return response
-    })
-
-  const submitServiceOrder = async ({ accountId, planId, planPricingId }) => {
-    const { action } = resolveSubmitStrategy({
-      currentSO: serviceOrder.value,
-      planId,
-      planPricingId
-    })
-
-    switch (action) {
-      case SUBMIT_ACTIONS.PATCH:
-        return updateServiceOrder(serviceOrder.value.serviceOrderId, {
-          accountId,
-          planId,
-          planPricingId
-        })
-
-      case SUBMIT_ACTIONS.UPGRADE:
-        return upgrade({
-          id: serviceOrder.value.serviceOrderId,
-          accountId,
-          newPlanId: planId,
-          priceId: planPricingId
-        })
-
-      case SUBMIT_ACTIONS.CREATE:
-        return createServiceOrder({ accountId, planId, planPricingId })
-
-      case SUBMIT_ACTIONS.NOOP:
-      default:
-        return { success: true, data: serviceOrder.value, payment: undefined }
-    }
-  }
+    runSubmission(() => serviceOrdersService.updateServiceOrder(id, payload))
 
   const upgrade = async ({ id, accountId, newPlanId, priceId }) => {
-    const serviceOrderId = id || serviceOrder.value?.serviceOrderId
+    const targetAccountId = accountId ?? accountIdRef.value
+    const serviceOrderId = id || getCurrentServiceOrder(targetAccountId)?.serviceOrderId
     if (!serviceOrderId) {
       throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
     }
@@ -110,25 +65,18 @@ export function useServiceOrders() {
     return runSubmission(async () => {
       const response = await serviceOrdersService.upgradeServiceOrder({
         id: serviceOrderId,
-        payload: { accountId, newPlanId, priceId }
+        payload: { accountId: targetAccountId, newPlanId, priceId }
       })
 
-      if (response?.serviceOrder) {
-        serviceOrder.value = response.serviceOrder
-      }
-
-      if (accountId) {
+      if (targetAccountId) {
         try {
-          const listResp = await listDrafts(accountId)
-          const draft = listResp?.data?.[0] ?? null
-          if (draft) {
-            serviceOrder.value = draft
-            if (!response?.payment?.clientSecret && draft.priceId) {
-              response.serviceOrder = draft
-            }
+          await ensureServiceOrdersList(targetAccountId)
+          const draft = getDraftServiceOrder(targetAccountId)
+          if (draft && !response?.payment?.clientSecret && draft.priceId) {
+            response.serviceOrder = draft
           }
-        } catch {
-          /* */
+        } catch (err) {
+          Sentry.captureException(err)
         }
       }
 
@@ -137,35 +85,66 @@ export function useServiceOrders() {
   }
 
   const downgrade = async ({ id, newPlanId }) => {
-    const serviceOrderId = id || serviceOrder.value?.serviceOrderId
+    const serviceOrderId = id || getCurrentServiceOrder(accountIdRef.value)?.serviceOrderId
     if (!serviceOrderId) {
       throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
     }
 
-    return runSubmission(async () => {
-      const response = await serviceOrdersService.downgradeServiceOrder({
+    return runSubmission(() =>
+      serviceOrdersService.downgradeServiceOrder({
         id: serviceOrderId,
         payload: { newPlanId }
       })
-      if (response?.serviceOrder) {
-        serviceOrder.value = response.serviceOrder
-      }
-      return response
+    )
+  }
+
+  const submitServiceOrder = async ({ accountId, planId, planPricingId }) => {
+    const targetAccountId = accountId ?? accountIdRef.value
+    const currentSO = getCurrentServiceOrder(targetAccountId)
+    const { action } = resolveSubmitStrategy({
+      currentSO,
+      planId,
+      planPricingId
     })
+
+    switch (action) {
+      case SUBMIT_ACTIONS.PATCH:
+        return updateServiceOrder(currentSO.serviceOrderId, {
+          accountId: targetAccountId,
+          planId,
+          planPricingId
+        })
+
+      case SUBMIT_ACTIONS.UPGRADE:
+        return upgrade({
+          id: currentSO.serviceOrderId,
+          accountId: targetAccountId,
+          newPlanId: planId,
+          priceId: planPricingId
+        })
+
+      case SUBMIT_ACTIONS.CREATE:
+        return createServiceOrder({ accountId: targetAccountId, planId, planPricingId })
+
+      case SUBMIT_ACTIONS.NOOP:
+      default:
+        return { success: true, data: currentSO, payment: undefined }
+    }
   }
 
   const getServiceOrder = async (id) => {
     if (!id) return null
     const response = await serviceOrdersService.getServiceOrder(id)
-    const so = response?.data ?? null
-    if (so) serviceOrder.value = so
-    return so
+    return response?.data ?? null
   }
 
   return {
-    serviceOrder,
+    serviceOrder: currentServiceOrder,
+    activeServiceOrder,
+    draftServiceOrder,
     isLoading,
     isSubmitting,
+    refetch,
 
     loadAccountServiceOrders,
     getServiceOrder,

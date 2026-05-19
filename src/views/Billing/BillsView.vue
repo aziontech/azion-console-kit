@@ -147,7 +147,9 @@
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
   import { useServiceOrders } from '@/composables/useServiceOrders'
   import { useCheckoutSessionPreparer } from '@/composables/useCheckoutSessionPreparer'
+  import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
   import { useAccountStore } from '@/stores/account'
+  import * as Sentry from '@sentry/vue'
 
   const router = useRouter()
   const emit = defineEmits(['changeTab'])
@@ -156,13 +158,9 @@
   const tracker = inject('tracker')
 
   const trackBilling = (method, payload) => {
-    try {
-      tracker?.billing?.[method]?.(payload)
-        ?.track?.()
-        ?.catch?.(() => {})
-    } catch {
-      // intentionally swallowed
-    }
+    Promise.resolve()
+      .then(() => tracker?.billing?.[method]?.(payload)?.track?.())
+      .catch(Sentry.captureException)
   }
 
   const { showExportBilling, accountIsNotRegular } = storeToRefs(accountStore)
@@ -295,7 +293,8 @@
     upgrade: upgradeServiceOrder,
     updateServiceOrder,
     loadAccountServiceOrders,
-    serviceOrder
+    serviceOrder,
+    activeServiceOrder
   } = useServiceOrders()
   const { prepare: prepareCheckoutSession } = useCheckoutSessionPreparer()
 
@@ -355,7 +354,7 @@
   const currentActiveCycle = computed(() => subscription.billingCycle.value || 'monthly')
 
   const ensureActiveServiceOrder = async () => {
-    if (serviceOrder.value?.status === 'ACTIVE') return serviceOrder.value
+    if (activeServiceOrder.value) return activeServiceOrder.value
     const accountId = accountStore.accountData?.id
     if (!accountId) return null
     try {
@@ -706,6 +705,8 @@
       billingCycle: submittedCycle,
       methodType: 'card'
     })
+
+    markAwaitingActiveServiceOrder()
 
     showPlanInfoDrawer.value = false
     showChangePlanDrawer.value = false

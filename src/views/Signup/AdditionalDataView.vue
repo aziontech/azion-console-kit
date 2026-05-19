@@ -103,19 +103,17 @@
   import { useAccountStore } from '@/stores/account'
   import { useServiceOrders } from '@/composables/useServiceOrders'
   import { useAdditionalDataFormState } from '@/composables/useAdditionalDataFormState'
+  import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
+  import * as Sentry from '@sentry/vue'
   import { loadUserAndAccountInfo } from '@/helpers/account-data'
 
   const router = useRouter()
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const trackSignUp = (method, payload) => {
-    try {
-      tracker?.signUp?.[method]?.(payload)
-        ?.track?.()
-        ?.catch?.(() => {})
-    } catch {
-      // intentionally swallowed
-    }
+    Promise.resolve()
+      .then(() => tracker?.signUp?.[method]?.(payload)?.track?.())
+      .catch(Sentry.captureException)
   }
   const { clear: clearAdditionalDataFormState } = useAdditionalDataFormState()
   const { initialize: initializePlans, billingCycle: storedBillingCycle } = usePlans()
@@ -256,6 +254,7 @@
       amount: checkoutData?.amount,
       currency: checkoutData?.currency || 'USD'
     })
+    markAwaitingActiveServiceOrder()
     currentStep.value = 'success'
   }
 

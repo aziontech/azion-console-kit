@@ -1,19 +1,17 @@
 import { ref } from 'vue'
 import { useAccountStore } from '@/stores/account'
 import { useServiceOrders } from '@/composables/useServiceOrders'
+import {
+  ensureServiceOrdersList,
+  getCurrentServiceOrder
+} from '@/composables/useServiceOrdersList'
 import { ensurePlansList, getPlanPricingId } from '@/composables/usePlansService'
 import { SO_STATUS } from '@/services/v2/service-orders/service-orders-constants'
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
 
 export function useCheckoutSessionPreparer() {
   const accountStore = useAccountStore()
-  const {
-    serviceOrder,
-    createServiceOrder,
-    updateServiceOrder,
-    upgrade,
-    loadAccountServiceOrders
-  } = useServiceOrders()
+  const { createServiceOrder, updateServiceOrder, upgrade } = useServiceOrders()
 
   const isPreparing = ref(false)
 
@@ -28,9 +26,8 @@ export function useCheckoutSessionPreparer() {
   let inFlightKey = ''
 
   const ensureCurrentServiceOrder = async (accountId) => {
-    if (serviceOrder.value) return serviceOrder.value
-    await loadAccountServiceOrders(accountId)
-    return serviceOrder.value
+    await ensureServiceOrdersList(accountId)
+    return getCurrentServiceOrder(accountId)
   }
 
   const runPrepare = async ({ plan, cycle }) => {
@@ -100,11 +97,7 @@ export function useCheckoutSessionPreparer() {
 
     while (inFlightPromise) {
       const prior = inFlightPromise
-      try {
-        await prior
-      } catch {
-        /* */
-      }
+      await Promise.allSettled([prior])
       if (inFlightPromise === prior) break
     }
 

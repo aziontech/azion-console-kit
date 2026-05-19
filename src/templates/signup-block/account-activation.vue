@@ -39,6 +39,7 @@
   import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, inject, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import * as Sentry from '@sentry/vue'
 
   const SUBMIT_TIMER = 60
 
@@ -78,14 +79,9 @@
 
   const resendEmail = async () => {
     disableSubmitByTimer(SUBMIT_TIMER)
-    try {
-      tracker?.signUp
-        ?.emailVerificationClicked?.({ source: 'resend' })
-        ?.track?.()
-        ?.catch?.(() => {})
-    } catch {
-      // intentionally swallowed
-    }
+    Promise.resolve()
+      .then(() => tracker?.signUp?.emailVerificationClicked?.({ source: 'resend' })?.track?.())
+      .catch(Sentry.captureException)
     try {
       const res = await props.resendEmailService({ email: decodedEmail })
       toast.add({ severity: 'success', detail: res, summary: 'Email sent!' })

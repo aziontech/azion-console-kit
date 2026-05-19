@@ -1,88 +1,113 @@
 import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
+import * as Sentry from '@sentry/vue'
 import { useAccountStore } from '@/stores/account'
-import { useServiceOrders } from '@/composables/useServiceOrders'
+import { useServiceOrdersList } from '@/composables/useServiceOrdersList'
 import { usePlansList } from '@/composables/usePlansService'
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
 import {
   findPlanById,
   findPricingById,
   formatPlanStartDate,
-  isActiveServiceOrder,
   resolvePlanSku,
   toFiniteNumber
 } from '@/composables/subscription-helpers'
 import { formatBillingPeriod, formatLastUpdate, formatNextChargeDate } from '@/utils/billing-date'
+import {
+  clearAwaitingActiveServiceOrder,
+  isAwaitingActiveServiceOrder
+} from '@/composables/post-payment-flag'
 
 const isRefetching = ref(false)
+const isPollingForActive = ref(false)
+let postPaymentPollAttempted = false
+const POST_PAYMENT_POLL_INTERVAL = 2000
+const POST_PAYMENT_POLL_MAX_ATTEMPTS = 6
 
 export function useCurrentSubscription() {
   const accountStore = useAccountStore()
   const { accountData } = storeToRefs(accountStore)
 
+  const accountId = computed(() => accountData.value?.id ?? null)
   const hasFinishedOnboarding = computed(() => accountData.value?.has_service_order_plan !== false)
   const hasContractedPlan = hasFinishedOnboarding
 
   const {
-    serviceOrder,
+    activeServiceOrder,
+    draftServiceOrder,
+    currentServiceOrder,
     isLoading: isLoadingServiceOrder,
-    loadAccountServiceOrders
-  } = useServiceOrders()
+    isFetching: isFetchingServiceOrder,
+    refetch: refetchServiceOrders
+  } = useServiceOrdersList(accountId)
   const { data: plansData, isLoading: isLoadingPlans } = usePlansList()
 
-  const activeServiceOrderState = ref(
-    isActiveServiceOrder(serviceOrder.value) ? serviceOrder.value : null
-  )
-
-  watch(serviceOrder, (so) => {
-    if (isActiveServiceOrder(so)) {
-      activeServiceOrderState.value = so
-    } else if (so === null) {
-      activeServiceOrderState.value = null
+  const pollForActiveAfterPayment = async () => {
+    if (isPollingForActive.value) return
+    if (activeServiceOrder.value) {
+      clearAwaitingActiveServiceOrder()
+      return
     }
-  })
+    if (!draftServiceOrder.value?.priceId) {
+      clearAwaitingActiveServiceOrder()
+      return
+    }
 
-  const POST_PAYMENT_POLL_INTERVAL = 2000
-  const POST_PAYMENT_POLL_MAX_ATTEMPTS = 6
-
-  const pollForActiveAfterPayment = async (accountId) => {
-    const singleton = serviceOrder.value
-    const hasPaidDraft = singleton?.status === 'DRAFT' && Boolean(singleton?.priceId)
-    if (activeServiceOrderState.value || !hasPaidDraft) return
-    isRefetching.value = true
+    isPollingForActive.value = true
     try {
       for (let attempt = 0; attempt < POST_PAYMENT_POLL_MAX_ATTEMPTS; attempt += 1) {
         await new Promise((resolve) => setTimeout(resolve, POST_PAYMENT_POLL_INTERVAL))
-        await loadAccountServiceOrders(accountId).catch(() => {})
-        if (activeServiceOrderState.value) return
+        await refetchServiceOrders().catch(Sentry.captureException)
+        if (activeServiceOrder.value) {
+          clearAwaitingActiveServiceOrder()
+          return
+        }
       }
+      clearAwaitingActiveServiceOrder()
     } finally {
-      isRefetching.value = false
+      isPollingForActive.value = false
     }
   }
 
   watch(
-    () => [accountData.value?.id, hasFinishedOnboarding.value],
-    ([accountId, finishedOnboarding]) => {
-      if (!accountId || !finishedOnboarding) return
-      if (activeServiceOrderState.value || isLoadingServiceOrder.value) return
-      loadAccountServiceOrders(accountId)
-        .then(() => pollForActiveAfterPayment(accountId))
-        .catch(() => {})
+    () => [isFetchingServiceOrder.value, accountId.value, hasFinishedOnboarding.value],
+    ([fetching, id, finishedOnboarding]) => {
+      if (postPaymentPollAttempted) return
+      if (fetching) return
+      if (!id || !finishedOnboarding) return
+      if (!isAwaitingActiveServiceOrder()) return
+      postPaymentPollAttempted = true
+      if (activeServiceOrder.value) {
+        clearAwaitingActiveServiceOrder()
+        return
+      }
+      if (!draftServiceOrder.value?.priceId) {
+        clearAwaitingActiveServiceOrder()
+        return
+      }
+      pollForActiveAfterPayment()
     },
     { immediate: true }
   )
 
+  watch(activeServiceOrder, (active) => {
+    if (active) clearAwaitingActiveServiceOrder()
+  })
+
+  watch(accountId, (newId, oldId) => {
+    if (newId !== oldId) postPaymentPollAttempted = false
+  })
+
   const planSku = computed(() => {
     if (isLoadingServiceOrder.value) return null
-    const so = activeServiceOrderState.value
+    const so = activeServiceOrder.value
     if (!so) return 'hobby'
     const plan = findPlanById(plansData.value, so.planId)
     return resolvePlanSku(plan)
   })
 
   const activePricing = computed(() =>
-    findPricingById(plansData.value, activeServiceOrderState.value?.priceId)
+    findPricingById(plansData.value, activeServiceOrder.value?.priceId)
   )
 
   const billingCycle = computed(() => activePricing.value?.periodicity ?? null)
@@ -99,24 +124,24 @@ export function useCurrentSubscription() {
   const planTag = computed(() => (isHobby.value ? 'Free Plan' : null))
 
   const planStartDate = computed(() =>
-    formatPlanStartDate(activeServiceOrderState.value?.currentPeriodStart)
+    formatPlanStartDate(activeServiceOrder.value?.currentPeriodStart)
   )
   const billingPeriod = computed(() =>
     formatBillingPeriod(
-      activeServiceOrderState.value?.currentPeriodStart,
-      activeServiceOrderState.value?.currentPeriodEnd
+      activeServiceOrder.value?.currentPeriodStart,
+      activeServiceOrder.value?.currentPeriodEnd
     )
   )
   const nextChargeDate = computed(() =>
-    formatNextChargeDate(activeServiceOrderState.value?.currentPeriodEnd)
+    formatNextChargeDate(activeServiceOrder.value?.currentPeriodEnd)
   )
   const nextChargeValue = computed(() => planChargeValue.value)
   const lastUpdate = computed(() =>
-    formatLastUpdate(serviceOrder.value?.updatedAt ?? activeServiceOrderState.value?.updatedAt)
+    formatLastUpdate(currentServiceOrder.value?.updatedAt ?? activeServiceOrder.value?.updatedAt)
   )
 
   const scheduledDowngrade = computed(() => {
-    const metadata = activeServiceOrderState.value?.metadata
+    const metadata = activeServiceOrder.value?.metadata
     if (!metadata || typeof metadata !== 'object') return null
     if (metadata.status !== 'downgrade_pending') return null
     return {
@@ -134,16 +159,13 @@ export function useCurrentSubscription() {
     },
     { immediate: true }
   )
-  watch(
-    () => accountData.value?.id,
-    (newId, oldId) => {
-      if (newId !== oldId) hasResolvedOnce.value = false
-    }
-  )
+  watch(accountId, (newId, oldId) => {
+    if (newId !== oldId) hasResolvedOnce.value = false
+  })
 
   const isLoading = computed(() => {
     if (isRefetching.value) return true
-    if (!accountData.value?.id) return true
+    if (!accountId.value) return true
     if (!hasContractedPlan.value) return false
     if (hasResolvedOnce.value) return false
     return isLoadingServiceOrder.value || isLoadingPlans.value || planSku.value === null
@@ -151,9 +173,8 @@ export function useCurrentSubscription() {
 
   const reloadFromBackend = async () => {
     await loadUserAndAccountInfo({ force: true })
-    const accountId = accountData.value?.id
-    if (accountId && hasContractedPlan.value) {
-      await loadAccountServiceOrders(accountId)
+    if (accountId.value && hasContractedPlan.value) {
+      await refetchServiceOrders()
     }
   }
 
@@ -171,7 +192,7 @@ export function useCurrentSubscription() {
     try {
       for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
         await reloadFromBackend()
-        if (predicate(activeServiceOrderState.value)) return true
+        if (predicate(activeServiceOrder.value)) return true
         if (attempt < maxAttempts - 1) {
           await new Promise((resolve) => setTimeout(resolve, interval))
         }
