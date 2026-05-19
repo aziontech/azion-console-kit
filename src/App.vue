@@ -6,6 +6,8 @@
   import { useThemeStore, DARK_SCHEME_QUERY } from '@/stores/theme'
   import { storeToRefs } from 'pinia'
   import { themeApply } from '@/helpers'
+  import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
+  import { useAdditionalDataFormState } from '@/composables/useAdditionalDataFormState'
   import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
@@ -20,34 +22,59 @@
   const { hasActiveUserId, account } = storeToRefs(accountStore)
   const { currentTheme } = storeToRefs(themeStore)
 
+  const subscription = useCurrentSubscription()
+  const { state: additionalDataState } = useAdditionalDataFormState()
+
   const route = useRoute()
 
-  const updateTrackingTraits = () => {
-    const {
-      user_id: userID,
-      id: accountId,
-      client_id: clientId,
-      email,
-      name,
-      kind: accountType,
-      status
-    } = accountStore.account
+  const updateUserTraits = () => {
+    const data = accountStore.account || {}
+    tracker.assignUserTraits({
+      client_id: data.client_id,
+      email: data.email,
+      account_id: data.id,
+      account_name: data.name,
+      account_type: data.kind,
+      client_status: data.status
+    })
+    tracker.identify(data.user_id)
+  }
 
-    const defaultTraits = {
-      client_id: clientId,
-      email,
+  const updateAccountTraits = async () => {
+    const data = accountStore.account || {}
+    const accountId = data.id
+    if (!accountId) return
+
+    const firmographics = additionalDataState.value || {}
+
+    const traits = {
       account_id: accountId,
-      account_name: name,
-      account_type: accountType,
-      client_status: status
+      account_name: data.name,
+      account_type: data.kind,
+      client_status: data.status,
+      plan_sku: subscription.planSku.value,
+      plan_tier: subscription.planSku.value,
+      billing_cycle: subscription.billingCycle.value,
+      company_size: firmographics.companySize,
+      role: firmographics.role,
+      use_case: firmographics.usageIntent,
+      website: firmographics.companyWebsite,
+      signup_method: accountStore.ssoSignUpMethod,
+      lifecycle_stage: subscription.isDowngradePending.value
+        ? 'churn-risk'
+        : subscription.planSku.value === 'hobby'
+          ? 'trial'
+          : 'paid'
     }
 
-    tracker.assignGroupTraits(defaultTraits)
-    tracker.identify(userID)
+    try {
+      await tracker.group(accountId, traits)
+    } catch {
+      // intentionally swallowed
+    }
   }
 
   const isLogged = computed(() => {
-    // evaluating as !route.meta?.hideNavigation will cause navbar to flicker
     return route.meta.hideNavigation !== true && hasActiveUserId.value
   })
 
@@ -60,8 +87,24 @@
   )
 
   watch(account, () => {
-    updateTrackingTraits()
+    updateUserTraits()
+    updateAccountTraits()
   })
+
+  watch(
+    () => [subscription.planSku.value, subscription.billingCycle.value],
+    () => {
+      if (accountStore.account?.id) updateAccountTraits()
+    }
+  )
+
+  watch(
+    () => additionalDataState.value,
+    () => {
+      if (accountStore.account?.id) updateAccountTraits()
+    },
+    { deep: true }
+  )
 
   watch(
     () => route,

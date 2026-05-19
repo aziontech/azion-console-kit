@@ -90,7 +90,9 @@
     :closeOnSelect="false"
     :relativeLabels="true"
     :loadingPlan="preparingPlan"
+    context="billing"
     @select="handlePlanSelect"
+    @billing-cycle-toggled="handleBillingCycleToggled"
   />
 
   <DrawerPlanInfo
@@ -123,7 +125,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, reactive, watch } from 'vue'
+  import { ref, computed, reactive, watch, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import { storeToRefs } from 'pinia'
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
@@ -150,6 +152,18 @@
   const router = useRouter()
   const emit = defineEmits(['changeTab'])
   const accountStore = useAccountStore()
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+
+  const trackBilling = (method, payload) => {
+    try {
+      tracker?.billing?.[method]?.(payload)
+        ?.track?.()
+        ?.catch?.(() => {})
+    } catch {
+      // intentionally swallowed
+    }
+  }
 
   const { showExportBilling, accountIsNotRegular } = storeToRefs(accountStore)
 
@@ -237,7 +251,10 @@
         type: 'action',
         disabled: (item) => item.disabled || item.isFallback,
         commandAction: (item) => {
-          if (item.invoiceUrl) window.open(item.invoiceUrl, '_blank')
+          if (item.invoiceUrl) {
+            trackBilling('invoiceDownloaded', { billId: item.billId, format: 'pdf' })
+            window.open(item.invoiceUrl, '_blank')
+          }
         }
       })
     }
@@ -361,6 +378,11 @@
     const initialCycle = subscription.isPro.value ? 'yearly' : 'monthly'
     setParam('billingCycle', initialCycle)
     await syncToUrl()
+    trackBilling('planChangeInitiated', {
+      fromPlan: subscription.planSku.value,
+      fromCycle: subscription.billingCycle.value,
+      source: 'subscription-card'
+    })
     showChangePlanDrawer.value = true
   }
 
@@ -374,10 +396,21 @@
       selectedPlan.value = plan
       lockedCycle.value = locked
       showPlanInfoDrawer.value = true
+      trackBilling('checkoutStarted', {
+        plan,
+        billingCycle: preferredCycle || storedBillingCycle.value,
+        mode: 'subscribe'
+      })
     } catch (err) {
       const detail =
         (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
         'Unable to initialize payment session.'
+      trackBilling('planChangeFailed', {
+        plan,
+        billingCycle: preferredCycle,
+        errorType: 'checkout-session',
+        errorMessage: detail
+      })
       toast.add({
         severity: 'error',
         summary: 'Error',
@@ -392,6 +425,12 @@
   const openUpgradeToPro = async () => {
     setParam('billingCycle', 'monthly')
     await syncToUrl()
+    trackBilling('upgradeBannerClicked', { location: 'upgrade-card' })
+    trackBilling('planChangeInitiated', {
+      fromPlan: subscription.planSku.value,
+      fromCycle: subscription.billingCycle.value,
+      source: 'upgrade-card'
+    })
     await openDrawerWithCheckoutSession({
       plan: 'pro',
       preferredCycle: 'monthly',
@@ -433,7 +472,24 @@
     showDowngradeDialog.value = true
   }
 
+  const handleBillingCycleToggled = ({ fromCycle, toCycle }) => {
+    trackBilling('billingCycleToggled', { fromCycle, toCycle, context: 'billing' })
+  }
+
   const handlePlanSelect = async ({ plan, billingCycle }) => {
+    const fromPlan = subscription.planSku.value
+    const fromCycle = subscription.billingCycle.value
+    const isCycleOnlyChange = Boolean(
+      plan === fromPlan && billingCycle && fromCycle && billingCycle !== fromCycle
+    )
+    trackBilling('planSelected', {
+      plan,
+      billingCycle,
+      fromPlan,
+      fromCycle,
+      isCycleOnlyChange
+    })
+
     if (plan === 'hobby') {
       await openPlanDowngradeDialog()
       return
@@ -512,6 +568,7 @@
   }
 
   const handleCycleUpgradeSubmit = async ({ plan, billingCycle, done, fail }) => {
+    const fromCycle = subscription.billingCycle.value
     try {
       await upgradeServiceOrderCycle({ plan, billingCycle })
       const targetPriceId = findPriceId(plan, billingCycle)
@@ -525,6 +582,14 @@
       } else {
         await subscription.refetch()
       }
+      trackBilling('planChangeCompleted', {
+        plan,
+        billingCycle,
+        fromPlan: plan,
+        fromCycle,
+        isUpgrade: true,
+        isDowngrade: false
+      })
       toast.add({
         severity: 'success',
         summary: 'Billing cycle updated',
@@ -536,16 +601,30 @@
       const detail =
         (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
         'Unable to update billing cycle.'
+      trackBilling('planChangeFailed', {
+        plan,
+        billingCycle,
+        errorType: 'cycle-upgrade',
+        errorMessage: detail
+      })
       fail?.(detail)
     }
   }
 
   const handleDowngradeConfirm = async ({ toPlan, toCycle, cycleChange, done, fail }) => {
+    const fromPlan = subscription.planSku.value
+    const fromCycle = subscription.billingCycle.value
     try {
       if (cycleChange) {
         await downgradeServiceOrderCycle({
           plan: subscription.planSku.value,
           billingCycle: toCycle
+        })
+        trackBilling('downgradeScheduled', {
+          fromPlan,
+          toPlan: fromPlan,
+          effectiveAt: downgradeEffectiveAt.value,
+          reason: 'cycle-change'
         })
         toast.add({
           severity: 'success',
@@ -571,6 +650,13 @@
         newPlanId: targetPlanId
       })
 
+      trackBilling('downgradeScheduled', {
+        fromPlan,
+        toPlan,
+        effectiveAt: downgradeEffectiveAt.value,
+        reason: 'plan-change'
+      })
+
       toast.add({
         severity: 'success',
         summary: 'Plan changed',
@@ -583,19 +669,43 @@
     } catch (err) {
       const detail =
         (Array.isArray(err?.message) ? err.message[0] : err?.message) || 'Unable to downgrade plan.'
+      trackBilling('planChangeFailed', {
+        plan: toPlan,
+        billingCycle: cycleChange ? toCycle : fromCycle,
+        errorType: 'downgrade',
+        errorMessage: detail
+      })
       fail?.(detail)
     }
   }
 
-  const handleCancelDowngradeConfirm = async ({ fail }) => {
-    fail?.('Cancel scheduled downgrade is not available yet.')
+  const handleCancelDowngradeConfirm = async ({ fail, done } = {}) => {
+    try {
+      fail?.('Cancel scheduled downgrade is not available yet.')
+    } finally {
+      if (done) {
+        trackBilling('downgradeCancelled', {
+          fromPlan: subscription.planSku.value,
+          toPlan: 'hobby'
+        })
+      }
+    }
   }
 
   const planLabel = (sku) => (sku === 'pro' ? 'Pro Plan' : sku === 'hobby' ? 'Hobby Plan' : 'plan')
 
-  const handlePlanInfoSubmit = async () => {
+  const handlePlanInfoSubmit = async (submitPayload = {}) => {
     const targetPlan = selectedPlan.value
     const targetPlanId = targetPlan ? findPlanIdBySku(targetPlan) : null
+    const fromPlan = subscription.planSku.value
+    const fromCycle = subscription.billingCycle.value
+    const submittedCycle = submitPayload?.billingCycle || storedBillingCycle.value
+
+    trackBilling('paymentMethodSubmitted', {
+      plan: targetPlan,
+      billingCycle: submittedCycle,
+      methodType: 'card'
+    })
 
     showPlanInfoDrawer.value = false
     showChangePlanDrawer.value = false
@@ -619,11 +729,29 @@
     } else {
       await subscription.refetch()
     }
+
+    trackBilling('planChangeCompleted', {
+      plan: targetPlan,
+      billingCycle: submittedCycle,
+      fromPlan,
+      fromCycle,
+      isUpgrade: targetPlan === 'pro' && fromPlan === 'hobby',
+      isDowngrade: false
+    })
   }
 
   const goToEnvoiceDetails = (item) => {
     const billId = typeof item === 'object' ? item?.billId : item
     if (!billId) return
+    const invoicePayload =
+      typeof item === 'object'
+        ? {
+            billId,
+            status: item?.status?.content || item?.status,
+            amount: item?.amount
+          }
+        : { billId }
+    trackBilling('invoiceViewed', invoicePayload)
     navigateMethod('billing-invoice-details', { billId })
   }
 

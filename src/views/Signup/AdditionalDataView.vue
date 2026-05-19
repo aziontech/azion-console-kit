@@ -96,7 +96,7 @@
   import ChoosingPlanContainer from '@/templates/signup-block/choosing-plan-container.vue'
   import PlanSuccessBlock from '@/templates/signup-block/plan-success-block.vue'
   import Button from '@aziontech/webkit/button'
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, inject, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { usePlans } from '@/composables/usePlans'
   import { usePlansList, ensurePlansList, getPlanPricingId } from '@/composables/usePlansService'
@@ -106,6 +106,17 @@
   import { loadUserAndAccountInfo } from '@/helpers/account-data'
 
   const router = useRouter()
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+  const trackSignUp = (method, payload) => {
+    try {
+      tracker?.signUp?.[method]?.(payload)
+        ?.track?.()
+        ?.catch?.(() => {})
+    } catch {
+      // intentionally swallowed
+    }
+  }
   const { clear: clearAdditionalDataFormState } = useAdditionalDataFormState()
   const { initialize: initializePlans, billingCycle: storedBillingCycle } = usePlans()
   const accountStore = useAccountStore()
@@ -162,6 +173,8 @@
     await additionalDataRef.value?.submitForm()
 
     if (!plan || !accountId) return
+
+    trackSignUp('planSelected', { plan, billingCycle })
 
     const planId = getPlanIdFromName(plan)
     if (!planId) return
@@ -220,6 +233,10 @@
       return
     }
 
+    trackSignUp('checkoutStarted', {
+      plan: selectedPlan.value,
+      billingCycle: storedBillingCycle.value
+    })
     currentStep.value = 'checkout'
   }
 
@@ -227,11 +244,29 @@
     currentStep.value = 'additional-data'
   }
 
-  const handleCheckoutSuccess = async () => {
+  const handleCheckoutSuccess = async (checkoutData) => {
+    trackSignUp('paymentMethodSubmitted', {
+      plan: selectedPlan.value,
+      billingCycle: storedBillingCycle.value,
+      methodType: checkoutData?.methodType || 'card'
+    })
+    trackSignUp('paymentConfirmed', {
+      plan: selectedPlan.value,
+      billingCycle: storedBillingCycle.value,
+      amount: checkoutData?.amount,
+      currency: checkoutData?.currency || 'USD'
+    })
     currentStep.value = 'success'
   }
 
   const handleCheckoutError = (error) => {
+    const message =
+      (Array.isArray(error?.message) ? error.message[0] : error?.message) || 'Checkout error'
+    trackSignUp('paymentFailed', {
+      errorType: error?.type || 'payment',
+      errorMessage: message,
+      gateway: 'stripe'
+    })
     // eslint-disable-next-line no-console
     console.error('Checkout error:', error)
   }
