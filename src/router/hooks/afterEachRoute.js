@@ -19,6 +19,16 @@ export default function afterEachRoute(to, from, failure) {
     })
     .track()
   tracker.identify(userId)
+  try {
+    tracker
+      .page(typeof to.name === 'string' ? to.name : undefined, {
+        path: to.fullPath,
+        title: typeof document !== 'undefined' ? document.title : undefined
+      })
+      ?.catch?.(() => {})
+  } catch {
+    // intentionally swallowed
+  }
 
   const isOnboardingStep = to.name === 'additional-data'
 
