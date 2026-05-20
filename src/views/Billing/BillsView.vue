@@ -291,6 +291,7 @@
   const {
     downgrade: downgradeServiceOrderPlan,
     upgrade: upgradeServiceOrderPlan,
+    cancelDowngrade: cancelDowngradeServiceOrderPlan,
     loadAccountServiceOrders,
     serviceOrder,
     activeServiceOrder
@@ -325,7 +326,8 @@
     hasContractedPlan: computed(() => subscription.hasContractedPlan.value),
     isHobby: computed(() => subscription.isHobby.value),
     isPro: computed(() => subscription.isPro.value),
-    isLoading: computed(() => subscription.isLoading.value)
+    isLoading: computed(() => subscription.isLoading.value),
+    currentInvoiceAmountCharged: computed(() => subscription.currentInvoiceAmountCharged.value)
   })
 
   const currentInvoice = ref({})
@@ -679,15 +681,42 @@
   }
 
   const handleCancelDowngradeConfirm = async ({ fail, done } = {}) => {
+    const fromPlan = subscription.planSku.value
     try {
-      fail?.('Cancel scheduled downgrade is not available yet.')
-    } finally {
-      if (done) {
-        trackBilling('downgradeCancelled', {
-          fromPlan: subscription.planSku.value,
-          toPlan: 'hobby'
-        })
+      const serviceOrderId = serviceOrder.value?.serviceOrderId
+      if (!serviceOrderId) {
+        throw new Error('Missing service order to cancel.')
       }
+
+      await cancelDowngradeServiceOrderPlan({ id: serviceOrderId })
+
+      await subscription.refetchUntil((so) => so?.metadata?.status !== 'downgrade_pending')
+
+      trackBilling('downgradeCancelled', {
+        fromPlan,
+        toPlan: 'hobby'
+      })
+
+      toast.add({
+        severity: 'success',
+        summary: 'Downgrade cancelled',
+        detail: 'Your scheduled downgrade has been cancelled.',
+        life: 6000,
+        closable: true
+      })
+
+      done?.()
+    } catch (err) {
+      const detail =
+        (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
+        'Unable to cancel scheduled downgrade.'
+      trackBilling('planChangeFailed', {
+        plan: fromPlan,
+        billingCycle: subscription.billingCycle.value,
+        errorType: 'cancel-downgrade',
+        errorMessage: detail
+      })
+      fail?.(detail)
     }
   }
 

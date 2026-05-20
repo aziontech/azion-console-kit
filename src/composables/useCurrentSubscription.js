@@ -29,7 +29,7 @@ export function useCurrentSubscription() {
   const { accountData } = storeToRefs(accountStore)
 
   const accountId = computed(() => accountData.value?.id ?? null)
-  const hasFinishedOnboarding = computed(() => accountData.value?.has_service_order_plan !== false)
+  const hasFinishedOnboarding = computed(() => accountData.value?.hasAccountPlan !== false)
   const hasContractedPlan = hasFinishedOnboarding
 
   const {
@@ -149,6 +149,13 @@ export function useCurrentSubscription() {
     }
   })
 
+  const currentInvoiceAmountCharged = computed(() => {
+    const metadata = activeServiceOrder.value?.metadata
+    if (!metadata || typeof metadata !== 'object') return null
+    const raw = metadata.amountCharged ?? metadata.amount_charged
+    return toFiniteNumber(raw, null)
+  })
+
   const isDowngradePending = computed(() => Boolean(scheduledDowngrade.value))
 
   const hasResolvedOnce = ref(false)
@@ -220,6 +227,7 @@ export function useCurrentSubscription() {
     isLoading,
     isDowngradePending,
     scheduledDowngrade,
+    currentInvoiceAmountCharged,
     refetch,
     refetchUntil
   }

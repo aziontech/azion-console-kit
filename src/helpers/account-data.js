@@ -6,6 +6,7 @@ import {
 } from '@/services/v2/account'
 import { DEFAULT_JOB_ROLE } from '@/services/v2/account/account-settings-adapter'
 import { billingGqlService } from '@/services/v2/billing/billing-gql-service'
+import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { useAccountStore } from '@/stores/account'
@@ -47,8 +48,8 @@ const pickAddressSnapshot = (settings) => {
 /**
  * Refresh the account + user + settings caches. Pass `force: true` to drop
  * the Vue Query entries first so the next fetch hits the network — used
- * after plan changes/downgrades where stale cached values (e.g.
- * `has_service_order_plan`) would mislead the billing UI.
+ * after plan changes/downgrades where stale cached values would mislead the
+ * billing UI.
  *
  * @param {Object} [options]
  * @param {boolean} [options.force=false] - Skip cached payloads.
@@ -58,15 +59,17 @@ export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
 
   if (force) invalidateAccountCaches()
 
-  const [accountInfo, userInfo, accountSettingsInfo] = await Promise.all([
+  const [accountInfo, userInfo, accountSettingsInfo, hasAccountPlan] = await Promise.all([
     accountService.getAccountInfo(),
     userService.getUserInfo(),
-    accountSettingsService.getAccountSettingsInfo().catch(() => null)
+    accountSettingsService.getAccountSettingsInfo().catch(() => null),
+    serviceOrdersService.getAccountPlanStatus()
   ])
 
   Object.assign(accountInfo, pickUserSnapshot(userInfo), pickAddressSnapshot(accountSettingsInfo), {
     jobRole: accountSettingsInfo?.jobRole ?? DEFAULT_JOB_ROLE,
-    isDeveloperSupportPlan: true
+    isDeveloperSupportPlan: true,
+    hasAccountPlan
   })
 
   accountStore.setAccountData(accountInfo)

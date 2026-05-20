@@ -37,6 +37,7 @@
             ref="pricingRef"
             :plan="plan"
             :lockedCycle="lockedCycle"
+            :mode="mode"
             @update:billing-cycle="handleBillingCycleChange"
             @update:checkout-session-client-secret="handleCheckoutSessionClientSecretChange"
           />

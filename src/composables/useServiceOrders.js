@@ -94,6 +94,16 @@ export function useServiceOrders() {
     )
   }
 
+  const cancelDowngrade = async ({ id, accountId } = {}) => {
+    const targetAccountId = accountId ?? accountIdRef.value
+    const serviceOrderId = id || getCurrentServiceOrder(targetAccountId)?.serviceOrderId
+    if (!serviceOrderId) {
+      throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
+    }
+
+    return runSubmission(() => serviceOrdersService.cancelDowngradeServiceOrder(serviceOrderId))
+  }
+
   const submitServiceOrder = async ({ accountId, planId, planPricingId }) => {
     const targetAccountId = accountId ?? accountIdRef.value
     const currentSO = getCurrentServiceOrder(targetAccountId)
@@ -147,6 +157,7 @@ export function useServiceOrders() {
     updateServiceOrder,
     submitServiceOrder,
     upgrade,
-    downgrade
+    downgrade,
+    cancelDowngrade
   }
 }

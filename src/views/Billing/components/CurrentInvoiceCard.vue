@@ -114,11 +114,19 @@
 
   const creditUsedValue = computed(() => formatAmount(props.invoice?.creditUsedForPayment ?? 0))
 
-  // Total is the sum of Plan Charge + Professional Services charges. Replaces
-  // the legacy `invoice.total` field which doesn't reflect the plan price.
-  const totalValue = computed(() =>
-    formatAmount(planChargeNumeric.value + servicePlanChargesNumeric.value)
-  )
+  const amountChargedNumeric = computed(() => {
+    const raw = props.subscription?.currentInvoiceAmountCharged
+    if (raw === null || raw === undefined) return null
+    const parsed = Number(raw)
+    return Number.isFinite(parsed) ? parsed : null
+  })
+
+  const totalValue = computed(() => {
+    if (amountChargedNumeric.value !== null) {
+      return formatAmount(amountChargedNumeric.value)
+    }
+    return formatAmount(planChargeNumeric.value + servicePlanChargesNumeric.value)
+  })
 
   const emitViewDetails = () => {
     // `redirectId` is the "is the details page reachable?" flag the legacy

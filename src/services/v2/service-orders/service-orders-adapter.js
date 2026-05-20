@@ -303,5 +303,19 @@ export const ServiceOrdersAdapter = {
       message: response.message,
       meta: this.transformMeta(response.meta)
     }
+  },
+
+  transformCancelDowngradeResponse(response = {}) {
+    const data = response.data ?? response
+    const serviceOrderData = pick(data?.serviceOrder, data?.service_order)
+    const transition = pick(data?.transition, data?.planTransition)
+
+    return {
+      success: response.success,
+      serviceOrder: serviceOrderData ? this.transformServiceOrder(serviceOrderData) : undefined,
+      transition: this.transformTransition(transition),
+      message: response.message,
+      meta: this.transformMeta(response.meta)
+    }
   }
 }
