@@ -2,9 +2,17 @@ import { ServiceOrdersAdapter } from './service-orders-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
+const normalizeNullableNotFound = (response) => {
+  if (response?.status === 404) return { data: null }
+  if (response?.data?.hasError) throw response.data.error()
+  return response
+}
+
 export class ServiceOrdersService extends BaseService {
   #baseURL = '/edge_api/api/v1/service_orders'
   #plansBaseURL = '/edge_api/api/v1/plans'
+  #accountServiceOrderURL = '/edge_api/api/v1/account/service_order'
+  #accountPlanURL = '/edge_api/api/v1/account/plan'
 
   listPlansService = async () => {
     const { data } = await this.http.request({
@@ -35,12 +43,35 @@ export class ServiceOrdersService extends BaseService {
         ...(params.limit !== undefined && { limit: params.limit }),
         ...(params.offset !== undefined && { offset: params.offset }),
         ...(params.status && { status: params.status }),
-        ...(params.type && { type: params.type }),
-        accountId: params.accountId
+        ...(params.type && { type: params.type })
       }
     })
 
     return ServiceOrdersAdapter.transformListResponse(response.data)
+  }
+
+  getCurrentAccountServiceOrder = async () => {
+    const response = normalizeNullableNotFound(
+      await this.http.request({
+        method: 'GET',
+        url: this.#accountServiceOrderURL,
+        processError: false
+      })
+    )
+
+    return ServiceOrdersAdapter.transformCurrentServiceOrderResponse(response.data)
+  }
+
+  getCurrentAccountPlan = async () => {
+    const response = normalizeNullableNotFound(
+      await this.http.request({
+        method: 'GET',
+        url: this.#accountPlanURL,
+        processError: false
+      })
+    )
+
+    return ServiceOrdersAdapter.transformCurrentPlanResponse(response.data)
   }
 
   getServiceOrder = async (id) => {
@@ -108,6 +139,17 @@ export class ServiceOrdersService extends BaseService {
     this.queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
 
     return ServiceOrdersAdapter.transformDowngradeResponse(response.data)
+  }
+
+  cancelDowngradeServiceOrder = async (id) => {
+    const response = await this.http.request({
+      method: 'DELETE',
+      url: `${this.#baseURL}/${id}/cancel_downgrade`
+    })
+
+    this.queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
+
+    return ServiceOrdersAdapter.transformCancelDowngradeResponse(response.data)
   }
 }
 

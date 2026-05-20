@@ -313,6 +313,12 @@ export const queryKeys = {
   serviceOrders: {
     all: ['service-orders'],
     list: (params) => [...queryKeys.serviceOrders.all, 'list', normalizeParams(params)],
+    current: (params) => [...queryKeys.serviceOrders.all, 'current', normalizeParams(params)],
+    currentPlan: (params) => [
+      ...queryKeys.serviceOrders.all,
+      'current-plan',
+      normalizeParams(params)
+    ],
     detail: (id) => [...queryKeys.serviceOrders.all, 'detail', id]
   },
   edgeService: {

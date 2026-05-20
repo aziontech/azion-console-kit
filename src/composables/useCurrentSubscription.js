@@ -2,11 +2,12 @@ import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import * as Sentry from '@sentry/vue'
 import { useAccountStore } from '@/stores/account'
-import { useServiceOrdersList } from '@/composables/useServiceOrdersList'
-import { usePlansList } from '@/composables/usePlansService'
+import {
+  useCurrentAccountPlan,
+  useCurrentAccountServiceOrder
+} from '@/composables/useServiceOrdersList'
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
 import {
-  findPlanById,
   findPricingById,
   formatPlanStartDate,
   resolvePlanSku,
@@ -30,7 +31,6 @@ export function useCurrentSubscription() {
 
   const accountId = computed(() => accountData.value?.id ?? null)
   const hasFinishedOnboarding = computed(() => accountData.value?.has_service_order_plan !== false)
-  const hasContractedPlan = hasFinishedOnboarding
 
   const {
     activeServiceOrder,
@@ -38,9 +38,16 @@ export function useCurrentSubscription() {
     currentServiceOrder,
     isLoading: isLoadingServiceOrder,
     isFetching: isFetchingServiceOrder,
-    refetch: refetchServiceOrders
-  } = useServiceOrdersList(accountId)
-  const { data: plansData, isLoading: isLoadingPlans } = usePlansList()
+    refetch: refetchServiceOrder
+  } = useCurrentAccountServiceOrder(accountId)
+  const {
+    plan: currentPlan,
+    isLoading: isLoadingCurrentPlan,
+    refetch: refetchCurrentPlan
+  } = useCurrentAccountPlan(accountId)
+  const hasContractedPlan = computed(
+    () => Boolean(currentServiceOrder.value) || hasFinishedOnboarding.value
+  )
 
   const pollForActiveAfterPayment = async () => {
     if (isPollingForActive.value) return
@@ -57,8 +64,9 @@ export function useCurrentSubscription() {
     try {
       for (let attempt = 0; attempt < POST_PAYMENT_POLL_MAX_ATTEMPTS; attempt += 1) {
         await new Promise((resolve) => setTimeout(resolve, POST_PAYMENT_POLL_INTERVAL))
-        await refetchServiceOrders().catch(Sentry.captureException)
+        await refetchServiceOrder().catch(Sentry.captureException)
         if (activeServiceOrder.value) {
+          await refetchCurrentPlan().catch(Sentry.captureException)
           clearAwaitingActiveServiceOrder()
           return
         }
@@ -102,12 +110,12 @@ export function useCurrentSubscription() {
     if (isLoadingServiceOrder.value) return null
     const so = activeServiceOrder.value
     if (!so) return 'hobby'
-    const plan = findPlanById(plansData.value, so.planId)
-    return resolvePlanSku(plan)
+    if (isLoadingCurrentPlan.value || !currentPlan.value) return null
+    return resolvePlanSku(currentPlan.value)
   })
 
   const activePricing = computed(() =>
-    findPricingById(plansData.value, activeServiceOrder.value?.priceId)
+    findPricingById(currentPlan.value ? [currentPlan.value] : [], activeServiceOrder.value?.priceId)
   )
 
   const billingCycle = computed(() => activePricing.value?.periodicity ?? null)
@@ -168,13 +176,16 @@ export function useCurrentSubscription() {
     if (!accountId.value) return true
     if (!hasContractedPlan.value) return false
     if (hasResolvedOnce.value) return false
-    return isLoadingServiceOrder.value || isLoadingPlans.value || planSku.value === null
+    return isLoadingServiceOrder.value || isLoadingCurrentPlan.value || planSku.value === null
   })
 
   const reloadFromBackend = async () => {
     await loadUserAndAccountInfo({ force: true })
-    if (accountId.value && hasContractedPlan.value) {
-      await refetchServiceOrders()
+    if (accountId.value) {
+      await refetchServiceOrder()
+      if (activeServiceOrder.value) {
+        await refetchCurrentPlan()
+      }
     }
   }
 

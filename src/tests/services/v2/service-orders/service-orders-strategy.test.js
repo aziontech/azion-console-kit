@@ -87,13 +87,13 @@ describe('resolveSubmitStrategy', () => {
     expect(action).toBe(SUBMIT_ACTIONS.UPGRADE)
   })
 
-  it('CREATE when SO is ACTIVE, same plan but different pricing (cycle change)', () => {
+  it('UPGRADE when SO is ACTIVE, same plan but different pricing (cycle change)', () => {
     const { action } = resolveSubmitStrategy({
       currentSO: activeSO,
       planId: 'plan-1',
       planPricingId: 'price-yearly'
     })
-    expect(action).toBe(SUBMIT_ACTIONS.CREATE)
+    expect(action).toBe(SUBMIT_ACTIONS.UPGRADE)
   })
 
   it('NOOP when SO is ACTIVE, same plan and same pricing', () => {

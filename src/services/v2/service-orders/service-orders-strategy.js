@@ -25,7 +25,7 @@ export const resolveSubmitStrategy = ({ currentSO, planId, planPricingId }) => {
   if (isPlanChange) return { action: SUBMIT_ACTIONS.UPGRADE }
 
   const isPriceChange = Boolean(planPricingId) && currentSO.priceId !== planPricingId
-  if (isPriceChange) return { action: SUBMIT_ACTIONS.CREATE }
+  if (isPriceChange) return { action: SUBMIT_ACTIONS.UPGRADE }
 
   return { action: SUBMIT_ACTIONS.NOOP }
 }

@@ -9,8 +9,8 @@ import {
   resolveSubmitStrategy
 } from '@/services/v2/service-orders/service-orders-strategy'
 import {
-  useServiceOrdersList,
-  ensureServiceOrdersList,
+  useCurrentAccountServiceOrder,
+  ensureCurrentAccountServiceOrder,
   getCurrentServiceOrder,
   getDraftServiceOrder
 } from '@/composables/useServiceOrdersList'
@@ -31,16 +31,16 @@ export function useServiceOrders() {
   const accountIdRef = computed(() => accountStore.accountData?.id ?? null)
 
   const { activeServiceOrder, draftServiceOrder, currentServiceOrder, isLoading, refetch } =
-    useServiceOrdersList(accountIdRef)
+    useCurrentAccountServiceOrder(accountIdRef)
 
   const loadAccountServiceOrders = async (id) => {
     const targetId = id ?? accountIdRef.value
     if (!targetId) return { draft: null, active: null }
-    const response = await ensureServiceOrdersList(targetId)
-    const orders = response?.data ?? []
+    const response = await ensureCurrentAccountServiceOrder(targetId)
+    const serviceOrder = response?.data ?? null
     return {
-      active: orders.find((so) => so.status === SO_STATUS.ACTIVE) ?? null,
-      draft: orders.find((so) => so.status === SO_STATUS.DRAFT) ?? null
+      active: serviceOrder?.status === SO_STATUS.DRAFT ? null : serviceOrder,
+      draft: serviceOrder?.status === SO_STATUS.DRAFT ? serviceOrder : null
     }
   }
 
@@ -60,12 +60,12 @@ export function useServiceOrders() {
     return runSubmission(async () => {
       const response = await serviceOrdersService.upgradeServiceOrder({
         id: serviceOrderId,
-        payload: { accountId: targetAccountId, newPlanId, priceId }
+        payload: { newPlanId, priceId }
       })
 
       if (targetAccountId) {
         try {
-          await ensureServiceOrdersList(targetAccountId)
+          await ensureCurrentAccountServiceOrder(targetAccountId)
           const draft = getDraftServiceOrder(targetAccountId)
           if (draft && !response?.payment?.clientSecret && draft.priceId) {
             response.serviceOrder = draft
@@ -79,7 +79,7 @@ export function useServiceOrders() {
     })
   }
 
-  const downgrade = async ({ id, newPlanId }) => {
+  const downgrade = async ({ id, newPlanId, priceId, planPricingId }) => {
     const serviceOrderId = id || getCurrentServiceOrder(accountIdRef.value)?.serviceOrderId
     if (!serviceOrderId) {
       throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
@@ -88,9 +88,18 @@ export function useServiceOrders() {
     return runSubmission(() =>
       serviceOrdersService.downgradeServiceOrder({
         id: serviceOrderId,
-        payload: { newPlanId }
+        payload: { newPlanId, priceId: priceId ?? planPricingId }
       })
     )
+  }
+
+  const cancelDowngrade = async ({ id } = {}) => {
+    const serviceOrderId = id || getCurrentServiceOrder(accountIdRef.value)?.serviceOrderId
+    if (!serviceOrderId) {
+      throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
+    }
+
+    return runSubmission(() => serviceOrdersService.cancelDowngradeServiceOrder(serviceOrderId))
   }
 
   const submitServiceOrder = async ({ accountId, planId, planPricingId }) => {
@@ -105,7 +114,6 @@ export function useServiceOrders() {
     switch (action) {
       case SUBMIT_ACTIONS.PATCH:
         return updateServiceOrder(currentSO.serviceOrderId, {
-          accountId: targetAccountId,
           planId,
           planPricingId
         })
@@ -119,7 +127,7 @@ export function useServiceOrders() {
         })
 
       case SUBMIT_ACTIONS.CREATE:
-        return createServiceOrder({ accountId: targetAccountId, planId, planPricingId })
+        return createServiceOrder({ planId, planPricingId })
 
       case SUBMIT_ACTIONS.NOOP:
       default:
@@ -147,6 +155,7 @@ export function useServiceOrders() {
     updateServiceOrder,
     submitServiceOrder,
     upgrade,
-    downgrade
+    downgrade,
+    cancelDowngrade
   }
 }

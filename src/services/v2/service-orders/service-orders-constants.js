@@ -1,6 +1,8 @@
 export const SO_STATUS = Object.freeze({
   DRAFT: 'DRAFT',
-  ACTIVE: 'ACTIVE'
+  ACTIVE: 'ACTIVE',
+  PAST_DUE: 'PAST_DUE',
+  BLOCKED: 'BLOCKED'
 })
 
 export const SO_MESSAGES = Object.freeze({

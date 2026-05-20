@@ -104,7 +104,7 @@ sequenceDiagram
     API-->>F: Success
 
     F->>V: Return plan selection
-    V->>O: submitServiceOrder({accountId, planId, planPricingId})
+    V->>O: submitServiceOrder({planId, planPricingId})
     O->>API: createServiceOrder()
     API-->>O: { serviceOrder, payment.clientSecret }
     O-->>V: Service Order created
@@ -321,10 +321,11 @@ const isSubmitting = ref(false)
 const error = ref(null)
 
 // Actions
-loadServiceOrder(accountId) // Fetch existing service order
-createServiceOrder(payload) // Create new service order
-updateServiceOrder(id, payload) // Update existing service order
+loadServiceOrder(accountId) // Fetch current service order using accountId only as local cache scope
+createServiceOrder(payload) // Create new service order; API account comes from auth
+updateServiceOrder(id, payload) // Update DRAFT service order; API account comes from auth
 submitServiceOrder(params) // Create or update based on existence
+cancelDowngrade(id) // Cancel scheduled downgrade
 updatePlanPricing(planPricingId) // Update just the pricing
 reset() // Clear all state
 ```
@@ -373,6 +374,18 @@ termsAccepted: boolean
 | GET    | `/:id`   | Get single service order           |
 | POST   | `/`      | Create service order               |
 | PATCH  | `/:id`   | Update service order               |
+| PATCH  | `/:id/upgrade` | Upgrade plan or immediate same-plan monthly-to-yearly price change |
+| PATCH  | `/:id/downgrade` | Schedule downgrade or same-plan yearly-to-monthly price change |
+| DELETE | `/:id/cancel_downgrade` | Cancel scheduled downgrade |
+
+### Current Account Service Order API
+
+**Base URL:** `/edge_api/api/v1/account`
+
+| Method | Endpoint | Purpose |
+| ------ | -------- | ------- |
+| GET | `/service_order` | Get current authenticated account service order |
+| GET | `/plan` | Get current authenticated account plan |
 
 ### Plans API
 
@@ -418,17 +431,17 @@ sequenceDiagram
     participant A as service-orders-adapter
     participant API as API Server
 
-    V->>C: submitServiceOrder({accountId, planId, planPricingId})
+    V->>C: submitServiceOrder({planId, planPricingId})
 
     alt Service Order Exists
         C->>S: updateServiceOrder(id, payload)
         S->>A: toUpdatePayload(payload)
-        A-->>S: {accountId, planId, priceId, ...}
+        A-->>S: {planId, priceId}
         S->>API: PATCH /service_orders/:id
     else No Service Order
         C->>S: createServiceOrder(payload)
         S->>A: toCreatePayload(payload)
-        A-->>S: {accountId, planId, priceId}
+        A-->>S: {planId, priceId}
         S->>API: POST /service_orders
     end
 

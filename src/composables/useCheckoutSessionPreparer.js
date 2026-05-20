@@ -1,7 +1,10 @@
 import { ref } from 'vue'
 import { useAccountStore } from '@/stores/account'
 import { useServiceOrders } from '@/composables/useServiceOrders'
-import { ensureServiceOrdersList, getCurrentServiceOrder } from '@/composables/useServiceOrdersList'
+import {
+  ensureCurrentAccountServiceOrder,
+  getCurrentServiceOrder
+} from '@/composables/useServiceOrdersList'
 import { ensurePlansList, getPlanPricingId } from '@/composables/usePlansService'
 import { SO_STATUS } from '@/services/v2/service-orders/service-orders-constants'
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
@@ -23,7 +26,7 @@ export function useCheckoutSessionPreparer() {
   let inFlightKey = ''
 
   const ensureCurrentServiceOrder = async (accountId) => {
-    await ensureServiceOrdersList(accountId)
+    await ensureCurrentAccountServiceOrder(accountId)
     return getCurrentServiceOrder(accountId)
   }
 
@@ -58,7 +61,6 @@ export function useCheckoutSessionPreparer() {
       }
 
       const updateResponse = await updateServiceOrder(currentSO.serviceOrderId, {
-        accountId,
         planId,
         planPricingId
       })
@@ -71,11 +73,10 @@ export function useCheckoutSessionPreparer() {
       currentSO?.status === SO_STATUS.ACTIVE && currentSO.serviceOrderId
         ? await upgrade({
             id: currentSO.serviceOrderId,
-            accountId,
             newPlanId: planId,
             priceId: planPricingId
           })
-        : await createServiceOrder({ accountId, planId, planPricingId })
+        : await createServiceOrder({ planId, planPricingId })
 
     const secret = extractSecret(response)
     if (!secret) {

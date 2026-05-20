@@ -191,6 +191,38 @@ export const ServiceOrdersAdapter = {
     }
   },
 
+  transformCurrentServiceOrderResponse(response = {}) {
+    if (!response || response.hasError || response.data === null) {
+      return {
+        success: false,
+        data: null,
+        meta: this.transformMeta(response?.meta)
+      }
+    }
+
+    return {
+      success: response.success,
+      data: this.transformServiceOrder(response.data ?? response),
+      meta: this.transformMeta(response.meta)
+    }
+  },
+
+  transformCurrentPlanResponse(response = {}) {
+    if (!response || response.hasError || response.data === null) {
+      return {
+        success: false,
+        data: null,
+        meta: this.transformMeta(response?.meta)
+      }
+    }
+
+    return {
+      success: response.success,
+      data: this.transformPlan(response.data ?? response),
+      meta: this.transformMeta(response.meta)
+    }
+  },
+
   transformCreateResponse(response = {}) {
     const serviceOrderData = getServiceOrderData(response)
 
@@ -216,48 +248,34 @@ export const ServiceOrdersAdapter = {
   },
 
   toCreatePayload(payload = {}) {
+    const priceId = pick(payload.priceId, payload.planPricingId)
     return {
-      accountId: payload.accountId,
       planId: payload.planId,
-      priceId: pick(payload.priceId, payload.planPricingId)
+      ...(priceId && { priceId })
     }
   },
 
   toUpdatePayload(payload = {}) {
+    const priceId = pick(payload.priceId, payload.planPricingId)
     return {
-      accountId: payload.accountId,
       planId: payload.planId,
-      priceId: pick(payload.priceId, payload.planPricingId),
-      status: payload.status,
-      type: payload.type,
-      gatewayId: payload.gatewayId,
-      startDate: payload.startDate,
-      endDate: payload.endDate,
-      currentPeriodStart: payload.currentPeriodStart,
-      currentPeriodEnd: payload.currentPeriodEnd,
-      autoRenew: payload.autoRenew,
-      ip: payload.ip,
-      port: payload.port,
-      ipFwd: payload.ipFwd,
-      portFwd: payload.portFwd,
-      timezone: payload.timezone,
-      metadata: payload.metadata,
-      lastEditor: payload.lastEditor
+      ...(priceId && { priceId })
     }
   },
 
   toUpgradePayload(payload = {}) {
     const priceId = pick(payload.priceId, payload.planPricingId)
     return {
-      accountId: payload.accountId,
       newPlanId: payload.newPlanId,
       ...(priceId && { priceId })
     }
   },
 
   toDowngradePayload(payload = {}) {
+    const priceId = pick(payload.priceId, payload.planPricingId)
     return {
-      newPlanId: payload.newPlanId
+      newPlanId: payload.newPlanId,
+      ...(priceId && { priceId })
     }
   },
 
@@ -301,6 +319,20 @@ export const ServiceOrdersAdapter = {
       serviceOrder: serviceOrderData ? this.transformServiceOrder(serviceOrderData) : undefined,
       schedule,
       newPlanId,
+      message: response.message,
+      meta: this.transformMeta(response.meta)
+    }
+  },
+
+  transformCancelDowngradeResponse(response = {}) {
+    const data = response.data ?? response
+    const serviceOrderData = pick(data?.serviceOrder, data?.service_order)
+    const transition = pick(data?.transition, data?.planTransition)
+
+    return {
+      success: response.success,
+      serviceOrder: serviceOrderData ? this.transformServiceOrder(serviceOrderData) : undefined,
+      transition: this.transformTransition(transition),
       message: response.message,
       meta: this.transformMeta(response.meta)
     }

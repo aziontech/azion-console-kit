@@ -291,7 +291,7 @@
   const {
     downgrade: downgradeServiceOrderPlan,
     upgrade: upgradeServiceOrder,
-    updateServiceOrder,
+    cancelDowngrade: cancelServiceOrderDowngrade,
     loadAccountServiceOrders,
     serviceOrder,
     activeServiceOrder
@@ -528,41 +528,39 @@
       throw new Error('Missing active service order.')
     }
 
-    const accountId = accountStore.accountData?.id
     const planId = findPlanIdBySku(plan)
     const planPricingId = findPriceId(plan, billingCycle)
 
-    if (!accountId || !planId || !planPricingId) {
+    if (!planId || !planPricingId) {
       throw new Error('Missing data required to change cycle.')
     }
 
-    return { serviceOrderId: active.serviceOrderId, accountId, planId, planPricingId }
+    return { serviceOrderId: active.serviceOrderId, planId, planPricingId }
   }
 
   const upgradeServiceOrderCycle = async ({ plan, billingCycle }) => {
-    const { serviceOrderId, accountId, planId, planPricingId } = await resolveCycleChangePayload({
+    const { serviceOrderId, planId, planPricingId } = await resolveCycleChangePayload({
       plan,
       billingCycle
     })
 
     await upgradeServiceOrder({
       id: serviceOrderId,
-      accountId,
       newPlanId: planId,
       priceId: planPricingId
     })
   }
 
   const downgradeServiceOrderCycle = async ({ plan, billingCycle }) => {
-    const { serviceOrderId, accountId, planId, planPricingId } = await resolveCycleChangePayload({
+    const { serviceOrderId, planId, planPricingId } = await resolveCycleChangePayload({
       plan,
       billingCycle
     })
 
-    await updateServiceOrder(serviceOrderId, {
-      accountId,
-      planId,
-      planPricingId
+    await downgradeServiceOrderPlan({
+      id: serviceOrderId,
+      newPlanId: planId,
+      priceId: planPricingId
     })
   }
 
@@ -679,15 +677,32 @@
   }
 
   const handleCancelDowngradeConfirm = async ({ fail, done } = {}) => {
+    const serviceOrderId =
+      activeServiceOrder.value?.serviceOrderId ?? serviceOrder.value?.serviceOrderId
+
     try {
-      fail?.('Cancel scheduled downgrade is not available yet.')
-    } finally {
-      if (done) {
-        trackBilling('downgradeCancelled', {
-          fromPlan: subscription.planSku.value,
-          toPlan: 'hobby'
-        })
+      if (!serviceOrderId) {
+        throw new Error('Missing active service order.')
       }
+
+      await cancelServiceOrderDowngrade({ id: serviceOrderId })
+      done?.()
+      await subscription.refetchUntil((so) => so && so?.metadata?.status !== 'downgrade_pending')
+      trackBilling('downgradeCancelled', {
+        fromPlan: subscription.planSku.value,
+        toPlan: subscription.planSku.value
+      })
+      toast.add({
+        severity: 'success',
+        summary: 'Downgrade canceled',
+        detail: 'Your scheduled downgrade has been canceled.',
+        closable: true
+      })
+    } catch (err) {
+      const detail =
+        (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
+        'Unable to cancel scheduled downgrade.'
+      fail?.(detail)
     }
   }
 
