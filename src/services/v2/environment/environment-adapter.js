@@ -39,12 +39,13 @@ const normalizeProtection = (protection) => {
 }
 
 const normalizeBranchTracking = (branchTracking) => {
-  const source = isObject(branchTracking) ? branchTracking : {}
+  if (branchTracking === null) return null
+  if (!isObject(branchTracking)) return null
 
   return {
-    enabled: Boolean(source.enabled),
-    mode: source.mode ?? null,
-    branch_match: source.branch_match ?? null
+    enabled: Boolean(branchTracking.enabled),
+    mode: branchTracking.mode ?? null,
+    branch_match: branchTracking.branch_match ?? null
   }
 }
 
@@ -54,14 +55,17 @@ const normalizeEnvironment = (environment) => {
   return {
     id: source.id ?? null,
     name: source.name ?? '',
-    description: source.description ?? '',
+    description: source.description ?? null,
     deployment_version_policy: source.deployment_version_policy,
-    log_verbosity: toStringArray(source.log_verbosity),
-    robots_policy: toStringArray(source.robots_policy),
+    log_verbosity: typeof source.log_verbosity === 'string' ? source.log_verbosity : 'normal',
+    robots_policy: typeof source.robots_policy === 'string' ? source.robots_policy : 'index',
     protection: normalizeProtection(source.protection),
     branch_tracking: normalizeBranchTracking(source.branch_tracking),
+    state: source.state ?? null,
+    state_detail: source.state_detail ?? null,
+    client_id: source.client_id ?? null,
     created_at: source.created_at ?? null,
-    updated_at: source.updated_at ? formatDateToDayMonthYearHour(source.updated_at) : null,
+    updated_at: source.updated_at ?? null,
     created_by: source.created_by ?? null,
     last_editor: source.last_editor ?? null
   }
@@ -80,7 +84,15 @@ const pickDefined = (payload) => {
 export const EnvironmentAdapter = {
   transformList(data) {
     if (!Array.isArray(data)) return []
-    return data.map((item) => normalizeEnvironment(item))
+    return data.map((item) => {
+      const normalized = normalizeEnvironment(item)
+      return {
+        ...normalized,
+        updated_at: normalized.updated_at
+          ? formatDateToDayMonthYearHour(normalized.updated_at)
+          : '-'
+      }
+    })
   },
 
   transformItem(data) {
@@ -104,6 +116,7 @@ export const EnvironmentAdapter = {
     return pickDefined({
       name: payload.name,
       description: payload.description,
+      deployment_version_policy: payload.deployment_version_policy,
       log_verbosity: payload.log_verbosity,
       robots_policy: payload.robots_policy,
       protection: payload.protection,

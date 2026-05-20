@@ -1,8 +1,4 @@
-import {
-  createEnvironmentService,
-  updateEnvironmentService,
-  getEnvironmentByIdService
-} from '@/services/v2/environment/environment-mock'
+import { environmentService } from '@/services/v2/environment/environment-service'
 
 export const getDeploymentVersionPolicyValue = (deploymentVersionPolicy) => {
   const value = Array.isArray(deploymentVersionPolicy)
@@ -55,7 +51,7 @@ const normalizePayloadToEnvironmentContract = (payload) => {
 }
 
 export const loadEnvironmentByIdAdapter = async ({ id }) => {
-  const response = await getEnvironmentByIdService(id)
+  const response = await environmentService.getEnvironmentByIdService(id)
 
   return {
     name: response.data.name,
@@ -69,13 +65,13 @@ export const loadEnvironmentByIdAdapter = async ({ id }) => {
 
 export const createEnvironmentAdapter = async (payload) => {
   const normalized = normalizePayloadToEnvironmentContract(payload)
-  const response = await createEnvironmentService(normalized)
+  const response = await environmentService.createEnvironmentService(normalized)
   return { feedback: 'Environment created successfully', ...response }
 }
 
 export const updateEnvironmentAdapter = async (id, payload) => {
   const normalized = normalizePayloadToEnvironmentContract(payload)
-  await updateEnvironmentService(id, {
+  await environmentService.updateEnvironmentService(id, {
     name: normalized.name,
     description: normalized.description
   })
