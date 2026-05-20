@@ -125,7 +125,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, reactive, watch, inject } from 'vue'
+  import { ref, computed, reactive, watch, inject, onBeforeUnmount } from 'vue'
   import { useRouter } from 'vue-router'
   import { storeToRefs } from 'pinia'
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
@@ -331,22 +331,55 @@
   })
 
   const currentInvoice = ref({})
+  const INVOICE_RETRY_INTERVAL_MS = 2000
+  const INVOICE_RETRY_MAX_ATTEMPTS = 6
+  let invoiceRetryTimer = null
+  let invoiceRetryAttempt = 0
+
+  const isInvoicePopulated = (invoice) => {
+    if (!invoice) return false
+    const billId = invoice.billId
+    return Boolean(invoice.redirectId) || (Boolean(billId) && billId !== '---')
+  }
+
+  const cancelInvoiceRetry = () => {
+    if (invoiceRetryTimer) {
+      clearTimeout(invoiceRetryTimer)
+      invoiceRetryTimer = null
+    }
+    invoiceRetryAttempt = 0
+  }
 
   const loadCurrentInvoice = async () => {
     try {
-      currentInvoice.value = (await props.loadCurrentInvoiceService()) || {}
+      const result = (await props.loadCurrentInvoiceService()) || {}
+      currentInvoice.value = result
+      if (!isInvoicePopulated(result) && invoiceRetryAttempt < INVOICE_RETRY_MAX_ATTEMPTS) {
+        invoiceRetryAttempt += 1
+        if (invoiceRetryTimer) clearTimeout(invoiceRetryTimer)
+        invoiceRetryTimer = setTimeout(loadCurrentInvoice, INVOICE_RETRY_INTERVAL_MS)
+      } else {
+        cancelInvoiceRetry()
+      }
     } catch {
       currentInvoice.value = {}
+      cancelInvoiceRetry()
     }
   }
 
   watch(
     () => subscriptionState.isPro,
     (isPro, wasPro) => {
-      if (isPro && !wasPro) loadCurrentInvoice()
+      if (isPro && !wasPro) {
+        cancelInvoiceRetry()
+        loadCurrentInvoice()
+      }
+      if (!isPro) cancelInvoiceRetry()
     },
     { immediate: true }
   )
+
+  onBeforeUnmount(cancelInvoiceRetry)
 
   const cardsReady = computed(() => !subscriptionState.isLoading)
 
