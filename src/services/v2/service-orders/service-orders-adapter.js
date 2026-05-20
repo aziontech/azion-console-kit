@@ -46,8 +46,8 @@ const hasServiceOrderData = (data = {}) => {
 
   return Boolean(
     pick(data.serviceOrderId, data.service_order_id) ||
-      pick(data.accountId, data.account_id) ||
-      pick(data.planId, data.plan_id)
+    pick(data.accountId, data.account_id) ||
+    pick(data.planId, data.plan_id)
   )
 }
 
