@@ -18,6 +18,21 @@ const invalidateAccountCaches = () => {
   queryClient.removeQueries({ queryKey: queryKeys.accountSettings.all })
 }
 
+const invalidateBillingDerivedCaches = () => {
+  queryClient.removeQueries({ queryKey: queryKeys.billing.all })
+  queryClient.removeQueries({ queryKey: queryKeys.contract.all })
+}
+
+const clearBillingDerivedFields = (accountStore) => {
+  accountStore.setAccountData({
+    credit: undefined,
+    formatCredit: undefined,
+    days: undefined,
+    yourServicePlan: undefined,
+    isDeveloperSupportPlan: undefined
+  })
+}
+
 const pickUserSnapshot = (userInfo) => {
   const results = userInfo.results || userInfo
   return {
@@ -57,7 +72,11 @@ const pickAddressSnapshot = (settings) => {
 export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
   const accountStore = useAccountStore()
 
-  if (force) invalidateAccountCaches()
+  if (force) {
+    invalidateAccountCaches()
+    invalidateBillingDerivedCaches()
+    clearBillingDerivedFields(accountStore)
+  }
 
   const [accountInfo, userInfo, accountSettingsInfo, hasAccountPlan] = await Promise.all([
     accountService.getAccountInfo(),
@@ -76,12 +95,14 @@ export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
   setFeatureFlags(accountInfo.client_flags)
 }
 
-export const loadBillingData = async () => {
+export const loadBillingData = async ({ force = false } = {}) => {
   const accountStore = useAccountStore()
   const { account, accountIsNotRegular } = accountStore
 
   if (!accountIsNotRegular) return
-  if (account.formatCredit) return
+  if (!force && account.formatCredit) return
+
+  if (force) queryClient.removeQueries({ queryKey: queryKeys.billing.all })
 
   const billingData = await billingGqlService.getCreditAndExpirationDate()
   if (!billingData) return
@@ -90,12 +111,14 @@ export const loadBillingData = async () => {
   accountStore.setAccountData({ credit, formatCredit, days })
 }
 
-export const loadContractData = async () => {
+export const loadContractData = async ({ force = false } = {}) => {
   const accountStore = useAccountStore()
   const { account } = accountStore
 
   if (!account?.client_id) return
-  if (account.yourServicePlan) return
+  if (!force && account.yourServicePlan) return
+
+  if (force) queryClient.removeQueries({ queryKey: queryKeys.contract.all })
 
   const contractData = await contractService.getContractServicePlan(account.client_id)
   if (!contractData) return

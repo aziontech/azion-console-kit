@@ -125,7 +125,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, reactive, watch, inject, onBeforeUnmount } from 'vue'
+  import { ref, computed, reactive, watch, inject, onBeforeUnmount, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { storeToRefs } from 'pinia'
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
@@ -147,7 +147,11 @@
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
   import { useServiceOrders } from '@/composables/useServiceOrders'
   import { useCheckoutSessionPreparer } from '@/composables/useCheckoutSessionPreparer'
-  import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
+  import {
+    markAwaitingActiveServiceOrder,
+    isAwaitingActiveServiceOrder,
+    clearAwaitingActiveServiceOrder
+  } from '@/composables/post-payment-flag'
   import { useAccountStore } from '@/stores/account'
   import * as Sentry from '@sentry/vue'
 
@@ -378,6 +382,18 @@
     },
     { immediate: true }
   )
+
+  onMounted(async () => {
+    if (!isAwaitingActiveServiceOrder()) return
+    try {
+      await subscription.refetchUntil((so) => Boolean(so?.priceId && so?.currentPeriodEnd))
+    } catch (err) {
+      Sentry.captureException(err)
+    } finally {
+      clearAwaitingActiveServiceOrder()
+      loadCurrentInvoice()
+    }
+  })
 
   onBeforeUnmount(cancelInvoiceRetry)
 
