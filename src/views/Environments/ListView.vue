@@ -11,10 +11,6 @@
   defineOptions({ name: 'list-environments' })
 
   const props = defineProps({
-    listEnvironmentsService: {
-      required: true,
-      type: Function
-    },
     documentationService: {
       type: Function,
       required: false
@@ -101,14 +97,6 @@
   const allowedFilters = computed(() => {
     return getColumns.value
   })
-
-  const listServiceAdapter = async (params) => {
-    const result = await props.listEnvironmentsService(params)
-    return {
-      count: result.count,
-      body: result.body
-    }
-  }
 </script>
 
 <template>
@@ -133,7 +121,7 @@
     <template #content>
       <ListTable
         ref="listTableRef"
-        :listService="listServiceAdapter"
+        :listService="environmentService.listEnvironmentsService"
         :columns="getColumns"
         :actions="actions"
         :enableEditClick="true"
