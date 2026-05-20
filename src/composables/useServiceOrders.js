@@ -60,7 +60,7 @@ export function useServiceOrders() {
     return runSubmission(async () => {
       const response = await serviceOrdersService.upgradeServiceOrder({
         id: serviceOrderId,
-        payload: { accountId: targetAccountId, newPlanId, priceId }
+        payload: { newPlanId, priceId }
       })
 
       if (targetAccountId) {
@@ -79,8 +79,9 @@ export function useServiceOrders() {
     })
   }
 
-  const downgrade = async ({ id, newPlanId }) => {
-    const serviceOrderId = id || getCurrentServiceOrder(accountIdRef.value)?.serviceOrderId
+  const downgrade = async ({ id, accountId, newPlanId, priceId }) => {
+    const targetAccountId = accountId ?? accountIdRef.value
+    const serviceOrderId = id || getCurrentServiceOrder(targetAccountId)?.serviceOrderId
     if (!serviceOrderId) {
       throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
     }
@@ -88,9 +89,19 @@ export function useServiceOrders() {
     return runSubmission(() =>
       serviceOrdersService.downgradeServiceOrder({
         id: serviceOrderId,
-        payload: { newPlanId }
+        payload: { newPlanId, priceId }
       })
     )
+  }
+
+  const cancelDowngrade = async ({ id, accountId } = {}) => {
+    const targetAccountId = accountId ?? accountIdRef.value
+    const serviceOrderId = id || getCurrentServiceOrder(targetAccountId)?.serviceOrderId
+    if (!serviceOrderId) {
+      throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
+    }
+
+    return runSubmission(() => serviceOrdersService.cancelDowngradeServiceOrder(serviceOrderId))
   }
 
   const submitServiceOrder = async ({ accountId, planId, planPricingId }) => {
@@ -105,7 +116,6 @@ export function useServiceOrders() {
     switch (action) {
       case SUBMIT_ACTIONS.PATCH:
         return updateServiceOrder(currentSO.serviceOrderId, {
-          accountId: targetAccountId,
           planId,
           planPricingId
         })
@@ -119,7 +129,7 @@ export function useServiceOrders() {
         })
 
       case SUBMIT_ACTIONS.CREATE:
-        return createServiceOrder({ accountId: targetAccountId, planId, planPricingId })
+        return createServiceOrder({ planId, planPricingId })
 
       case SUBMIT_ACTIONS.NOOP:
       default:
@@ -147,6 +157,7 @@ export function useServiceOrders() {
     updateServiceOrder,
     submitServiceOrder,
     upgrade,
-    downgrade
+    downgrade,
+    cancelDowngrade
   }
 }

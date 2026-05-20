@@ -22,14 +22,16 @@ const isRefetching = ref(false)
 const isPollingForActive = ref(false)
 let postPaymentPollAttempted = false
 const POST_PAYMENT_POLL_INTERVAL = 2000
-const POST_PAYMENT_POLL_MAX_ATTEMPTS = 6
+const POST_PAYMENT_POLL_MAX_ATTEMPTS = 10
+
+const isActivePopulated = (so) => Boolean(so?.priceId && so?.currentPeriodEnd)
 
 export function useCurrentSubscription() {
   const accountStore = useAccountStore()
   const { accountData } = storeToRefs(accountStore)
 
   const accountId = computed(() => accountData.value?.id ?? null)
-  const hasFinishedOnboarding = computed(() => accountData.value?.has_service_order_plan !== false)
+  const hasFinishedOnboarding = computed(() => accountData.value?.hasAccountPlan !== false)
   const hasContractedPlan = hasFinishedOnboarding
 
   const {
@@ -44,11 +46,11 @@ export function useCurrentSubscription() {
 
   const pollForActiveAfterPayment = async () => {
     if (isPollingForActive.value) return
-    if (activeServiceOrder.value) {
+    if (isActivePopulated(activeServiceOrder.value)) {
       clearAwaitingActiveServiceOrder()
       return
     }
-    if (!draftServiceOrder.value?.priceId) {
+    if (!activeServiceOrder.value && !draftServiceOrder.value?.priceId) {
       clearAwaitingActiveServiceOrder()
       return
     }
@@ -58,7 +60,7 @@ export function useCurrentSubscription() {
       for (let attempt = 0; attempt < POST_PAYMENT_POLL_MAX_ATTEMPTS; attempt += 1) {
         await new Promise((resolve) => setTimeout(resolve, POST_PAYMENT_POLL_INTERVAL))
         await refetchServiceOrders().catch(Sentry.captureException)
-        if (activeServiceOrder.value) {
+        if (isActivePopulated(activeServiceOrder.value)) {
           clearAwaitingActiveServiceOrder()
           return
         }
@@ -77,11 +79,11 @@ export function useCurrentSubscription() {
       if (!id || !finishedOnboarding) return
       if (!isAwaitingActiveServiceOrder()) return
       postPaymentPollAttempted = true
-      if (activeServiceOrder.value) {
+      if (isActivePopulated(activeServiceOrder.value)) {
         clearAwaitingActiveServiceOrder()
         return
       }
-      if (!draftServiceOrder.value?.priceId) {
+      if (!activeServiceOrder.value && !draftServiceOrder.value?.priceId) {
         clearAwaitingActiveServiceOrder()
         return
       }
@@ -91,7 +93,7 @@ export function useCurrentSubscription() {
   )
 
   watch(activeServiceOrder, (active) => {
-    if (active) clearAwaitingActiveServiceOrder()
+    if (isActivePopulated(active)) clearAwaitingActiveServiceOrder()
   })
 
   watch(accountId, (newId, oldId) => {
@@ -147,6 +149,13 @@ export function useCurrentSubscription() {
     return {
       effectiveAt: metadata.effective_date ?? metadata.effectiveDate ?? null
     }
+  })
+
+  const currentInvoiceAmountCharged = computed(() => {
+    const metadata = activeServiceOrder.value?.metadata
+    if (!metadata || typeof metadata !== 'object') return null
+    const raw = metadata.amountCharged ?? metadata.amount_charged
+    return toFiniteNumber(raw, null)
   })
 
   const isDowngradePending = computed(() => Boolean(scheduledDowngrade.value))
@@ -220,6 +229,7 @@ export function useCurrentSubscription() {
     isLoading,
     isDowngradePending,
     scheduledDowngrade,
+    currentInvoiceAmountCharged,
     refetch,
     refetchUntil
   }

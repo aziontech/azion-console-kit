@@ -125,7 +125,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, reactive, watch, inject } from 'vue'
+  import { ref, computed, reactive, watch, inject, onBeforeUnmount, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { storeToRefs } from 'pinia'
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
@@ -147,7 +147,11 @@
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
   import { useServiceOrders } from '@/composables/useServiceOrders'
   import { useCheckoutSessionPreparer } from '@/composables/useCheckoutSessionPreparer'
-  import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
+  import {
+    markAwaitingActiveServiceOrder,
+    isAwaitingActiveServiceOrder,
+    clearAwaitingActiveServiceOrder
+  } from '@/composables/post-payment-flag'
   import { useAccountStore } from '@/stores/account'
   import * as Sentry from '@sentry/vue'
 
@@ -290,8 +294,8 @@
   const subscription = useCurrentSubscription()
   const {
     downgrade: downgradeServiceOrderPlan,
-    upgrade: upgradeServiceOrder,
-    updateServiceOrder,
+    upgrade: upgradeServiceOrderPlan,
+    cancelDowngrade: cancelDowngradeServiceOrderPlan,
     loadAccountServiceOrders,
     serviceOrder,
     activeServiceOrder
@@ -326,26 +330,72 @@
     hasContractedPlan: computed(() => subscription.hasContractedPlan.value),
     isHobby: computed(() => subscription.isHobby.value),
     isPro: computed(() => subscription.isPro.value),
-    isLoading: computed(() => subscription.isLoading.value)
+    isLoading: computed(() => subscription.isLoading.value),
+    currentInvoiceAmountCharged: computed(() => subscription.currentInvoiceAmountCharged.value)
   })
 
   const currentInvoice = ref({})
+  const INVOICE_RETRY_INTERVAL_MS = 2000
+  const INVOICE_RETRY_MAX_ATTEMPTS = 6
+  let invoiceRetryTimer = null
+  let invoiceRetryAttempt = 0
+
+  const isInvoicePopulated = (invoice) => {
+    if (!invoice) return false
+    const billId = invoice.billId
+    return Boolean(invoice.redirectId) || (Boolean(billId) && billId !== '---')
+  }
+
+  const cancelInvoiceRetry = () => {
+    if (invoiceRetryTimer) {
+      clearTimeout(invoiceRetryTimer)
+      invoiceRetryTimer = null
+    }
+    invoiceRetryAttempt = 0
+  }
 
   const loadCurrentInvoice = async () => {
     try {
-      currentInvoice.value = (await props.loadCurrentInvoiceService()) || {}
+      const result = (await props.loadCurrentInvoiceService()) || {}
+      currentInvoice.value = result
+      if (!isInvoicePopulated(result) && invoiceRetryAttempt < INVOICE_RETRY_MAX_ATTEMPTS) {
+        invoiceRetryAttempt += 1
+        if (invoiceRetryTimer) clearTimeout(invoiceRetryTimer)
+        invoiceRetryTimer = setTimeout(loadCurrentInvoice, INVOICE_RETRY_INTERVAL_MS)
+      } else {
+        cancelInvoiceRetry()
+      }
     } catch {
       currentInvoice.value = {}
+      cancelInvoiceRetry()
     }
   }
 
   watch(
     () => subscriptionState.isPro,
     (isPro, wasPro) => {
-      if (isPro && !wasPro) loadCurrentInvoice()
+      if (isPro && !wasPro) {
+        cancelInvoiceRetry()
+        loadCurrentInvoice()
+      }
+      if (!isPro) cancelInvoiceRetry()
     },
     { immediate: true }
   )
+
+  onMounted(async () => {
+    if (!isAwaitingActiveServiceOrder()) return
+    try {
+      await subscription.refetchUntil((so) => Boolean(so?.priceId && so?.currentPeriodEnd))
+    } catch (err) {
+      Sentry.captureException(err)
+    } finally {
+      clearAwaitingActiveServiceOrder()
+      loadCurrentInvoice()
+    }
+  })
+
+  onBeforeUnmount(cancelInvoiceRetry)
 
   const cardsReady = computed(() => !subscriptionState.isLoading)
 
@@ -545,7 +595,7 @@
       billingCycle
     })
 
-    await upgradeServiceOrder({
+    await upgradeServiceOrderPlan({
       id: serviceOrderId,
       accountId,
       newPlanId: planId,
@@ -559,10 +609,11 @@
       billingCycle
     })
 
-    await updateServiceOrder(serviceOrderId, {
+    await downgradeServiceOrderPlan({
+      id: serviceOrderId,
       accountId,
-      planId,
-      planPricingId
+      newPlanId: planId,
+      priceId: planPricingId
     })
   }
 
@@ -679,15 +730,42 @@
   }
 
   const handleCancelDowngradeConfirm = async ({ fail, done } = {}) => {
+    const fromPlan = subscription.planSku.value
     try {
-      fail?.('Cancel scheduled downgrade is not available yet.')
-    } finally {
-      if (done) {
-        trackBilling('downgradeCancelled', {
-          fromPlan: subscription.planSku.value,
-          toPlan: 'hobby'
-        })
+      const serviceOrderId = serviceOrder.value?.serviceOrderId
+      if (!serviceOrderId) {
+        throw new Error('Missing service order to cancel.')
       }
+
+      await cancelDowngradeServiceOrderPlan({ id: serviceOrderId })
+
+      await subscription.refetchUntil((so) => so?.metadata?.status !== 'downgrade_pending')
+
+      trackBilling('downgradeCancelled', {
+        fromPlan,
+        toPlan: 'hobby'
+      })
+
+      toast.add({
+        severity: 'success',
+        summary: 'Downgrade cancelled',
+        detail: 'Your scheduled downgrade has been cancelled.',
+        life: 6000,
+        closable: true
+      })
+
+      done?.()
+    } catch (err) {
+      const detail =
+        (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
+        'Unable to cancel scheduled downgrade.'
+      trackBilling('planChangeFailed', {
+        plan: fromPlan,
+        billingCycle: subscription.billingCycle.value,
+        errorType: 'cancel-downgrade',
+        errorMessage: detail
+      })
+      fail?.(detail)
     }
   }
 

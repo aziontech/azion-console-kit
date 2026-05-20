@@ -58,7 +58,6 @@ export function useCheckoutSessionPreparer() {
       }
 
       const updateResponse = await updateServiceOrder(currentSO.serviceOrderId, {
-        accountId,
         planId,
         planPricingId
       })
@@ -75,7 +74,7 @@ export function useCheckoutSessionPreparer() {
             newPlanId: planId,
             priceId: planPricingId
           })
-        : await createServiceOrder({ accountId, planId, planPricingId })
+        : await createServiceOrder({ planId, planPricingId })
 
     const secret = extractSecret(response)
     if (!secret) {

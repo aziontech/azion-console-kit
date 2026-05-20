@@ -106,6 +106,8 @@
   import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
   import * as Sentry from '@sentry/vue'
   import { loadUserAndAccountInfo } from '@/helpers/account-data'
+  import { queryClient } from '@/services/v2/base/query/queryClient'
+  import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
   const router = useRouter()
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -178,15 +180,9 @@
     if (!planId) return
 
     if (plan === 'hobby') {
-      // Onboarding only enters when has_service_order_plan === false, so no
-      // ACTIVE SO can exist yet — what may exist is a DRAFT from a previous
-      // attempt. submitServiceOrder already routes: no SO → POST hobby;
-      // DRAFT (any plan) → PATCH to hobby; same plan → no-op.
       try {
         await submitServiceOrder({ accountId, planId })
 
-        // Refresh /info so accountGuard sees has_service_order_plan=true and
-        // doesn't bounce back to additional-data on reload.
         await loadUserAndAccountInfo()
         handleProceedToCheckout()
       } catch (err) {
@@ -255,6 +251,12 @@
       currency: checkoutData?.currency || 'USD'
     })
     markAwaitingActiveServiceOrder()
+    try {
+      queryClient.removeQueries({ queryKey: queryKeys.serviceOrders.all })
+      await loadUserAndAccountInfo({ force: true })
+    } catch (err) {
+      Sentry.captureException(err)
+    }
     currentStep.value = 'success'
   }
 

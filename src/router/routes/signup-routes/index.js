@@ -32,13 +32,9 @@ export const signupRoutes = {
       beforeEnter: (to, from, next) => {
         const accountStore = useAccountStore()
 
-        // Only allow access to additional-data if:
-        // 1. User has active session (hasActiveUserId)
-        // 2. hasServiceOrderPlan === false (needs to complete service order)
-        if (accountStore.hasActiveUserId && accountStore.hasServiceOrderPlan === false) {
+        if (accountStore.hasActiveUserId && accountStore.needsOnboarding) {
           next()
         } else {
-          // If user doesn't need service order, redirect to home
           next({ name: 'home' })
         }
       }
