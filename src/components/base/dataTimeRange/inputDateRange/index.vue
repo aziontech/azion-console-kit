@@ -18,6 +18,7 @@
     getCurrentHourAndMinute,
     getCurrentMonthLabel
   } from '@utils/date.js'
+  import { formatPillDateCompact } from '@/views/RealTimeEvents/helpers/format-timestamp'
 
   defineOptions({ name: 'InputDateRange' })
 
@@ -106,6 +107,20 @@
     return formatDateSimple(model.value.endDate)
   })
 
+  // Compact display: "May 10 @ 04:43:00" — keeps seconds and drops the year.
+  // Delegates to formatPillDateCompact so the regex lives in one place.
+  const formatCompactDate = formatPillDateCompact
+
+  const startDisplayInput = computed(() => {
+    const raw = model.value.labelStart || startDateInput.value
+    return formatCompactDate(raw)
+  })
+
+  const endDisplayInput = computed(() => {
+    const raw = model.value.labelEnd || endDateInput.value
+    return formatCompactDate(raw)
+  })
+
   const isInvalidRange = computed(() => {
     const start = model.value?.startDate
     const end = model.value?.endDate
@@ -126,10 +141,8 @@
   }
 
   const sizeInput = (value) => {
-    if (value.length > 5) {
-      return value.length
-    }
-    return 7
+    if (!value) return 7
+    return value.length
   }
 
   const clampToBounds = (date) => {
@@ -341,7 +354,6 @@
         preset: model.value?.relative?.preset
       }
 
-      const shouldSetDefaultRelativeRange = model.value.label
       if (props.editingField === 'start') {
         model.value.startDate = relativeDirection.value === 'last' ? boundedStart : boundedEnd
         model.value.labelStart = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
@@ -352,11 +364,9 @@
           preset: model.value?.relative?.preset
         }
 
-        if (shouldSetDefaultRelativeRange) {
-          model.value.endDate = now
-          model.value.labelEnd = 'now'
-          model.value.label = ''
-        }
+        model.value.endDate = now
+        model.value.labelEnd = 'now'
+        model.value.label = ''
       } else {
         model.value.endDate = relativeDirection.value === 'last' ? boundedStart : boundedEnd
         model.value.labelEnd = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
@@ -423,6 +433,16 @@
 
   onMounted(() => {
     if (props.mode === 'relative') {
+      const rel =
+        model.value?.relative ||
+        (props.editingField === 'start' ? model.value?.relativeStart : model.value?.relativeEnd)
+
+      if (rel?.value && rel?.unit) {
+        relativeDirection.value = rel.direction || 'last'
+        relativeValue.value = rel.value
+        relativeUnit.value = rel.unit
+      }
+
       updateRelativeRange()
     }
   })
@@ -456,9 +476,9 @@
           isOverlayOpen && editingField === 'start' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
         ]"
         :style="{
-          width: `${sizeInput(model.labelStart || startDateInput)}ch`
+          width: `${sizeInput(startDisplayInput)}ch`
         }"
-        :value="model.labelStart ? model.labelStart : startDateInput"
+        :value="startDisplayInput"
         readonly
         @click="openStart"
       />
@@ -478,9 +498,9 @@
           isOverlayOpen && editingField === 'end' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
         ]"
         :style="{
-          width: `${sizeInput(model.labelEnd || endDateInput)}ch`
+          width: `${sizeInput(endDisplayInput)}ch`
         }"
-        :value="model.labelEnd ? model.labelEnd : endDateInput"
+        :value="endDisplayInput"
         readonly
         @click="openEnd"
       />
@@ -522,7 +542,7 @@
         </div>
       </div>
 
-      <div class="flex gap-3 mt-2 h-[200px]">
+      <div class="flex items-start gap-2 mt-2">
         <Calendar
           v-model="selectedDate"
           :inline="true"
@@ -532,25 +552,24 @@
           :dateFormat="'dd/mm/yy'"
           :minDate="minDate"
           :maxDate="maxDate"
-          class="w-full"
+          class="flex-1 min-w-0"
           @date-select="onDateSelect"
           :pt="{
             header: { class: 'hidden' },
-            table: { class: 'w-full' },
-            weekday: { class: 'font-medium' },
-            daylabel: {
-              style: {
-                padding: '0px !important',
-                margin: '0px !important',
-                fontSize: '0.875rem'
-              }
+            weekDay: {
+              style:
+                'width: 28px !important; height: 28px !important; margin: 2px !important; font-size: 0.75rem !important; font-weight: 500 !important;'
+            },
+            dayLabel: {
+              style:
+                'width: 28px !important; height: 28px !important; margin: 2px !important; font-size: 0.75rem !important;'
             }
           }"
         />
 
         <!-- Time selector -->
         <div class="border surface-border rounded-lg p-1 w-min">
-          <div class="max-h-48 overflow-y-auto overflow-x-hidden space-y-1">
+          <div class="max-h-[240px] overflow-y-auto overflow-x-hidden space-y-1">
             <PrimeButton
               :label="timeSlot"
               v-for="timeSlot in TIME_SLOTS"

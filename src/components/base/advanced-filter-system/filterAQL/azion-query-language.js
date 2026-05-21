@@ -37,7 +37,17 @@ export default class Aql {
 
     const parsedExpressions = expressions
       .map((expr) => {
-        const match = expr.match(expressionRegex)
+        // Strip leading/trailing grouping parentheses that are not part of IN/BETWEEN values
+        let cleanExpr = expr
+        if (cleanExpr.startsWith('(') && !/\bin\b/i.test(cleanExpr) && !/\bbetween\b/i.test(cleanExpr)) {
+          cleanExpr = cleanExpr.replace(/^\(+/, '')
+        }
+        if (cleanExpr.endsWith(')') && !/\bin\b/i.test(cleanExpr) && !/\bbetween\b/i.test(cleanExpr)) {
+          cleanExpr = cleanExpr.replace(/\)+$/, '')
+        }
+        cleanExpr = cleanExpr.trim()
+
+        const match = cleanExpr.match(expressionRegex)
         if (!match) return null
 
         let field = (match[1] || match[2] || match[3]).trim()
@@ -53,7 +63,19 @@ export default class Aql {
         let value = match[5].trim()
 
         const mappedOperator = this.mapOperatorValue(operator)
-        const operatorInfo = this.operatorInfo(suggestion.value.operator, mappedOperator)
+        const operatorInfo = this.operatorInfo(suggestion?.value?.operator, mappedOperator)
+
+        // Drop clauses whose textual operator cannot be resolved against
+        // the selected field's supported operator list. This prevents
+        // emitting a clause with `operator: undefined` (or any non-string
+        // / empty operator), which would otherwise flow into the GraphQL
+        // filter builder and produce a malformed key like
+        // `${valueField}undefined`. The trailing `.filter(item !== null)`
+        // step removes the dropped clause from the parsed output. Guards
+        // both the BETWEEN branch and the regular branch below.
+        if (typeof operatorInfo?.value !== 'string' || operatorInfo.value.length === 0) {
+          return null
+        }
 
         if (operator.toUpperCase() === 'BETWEEN') {
           const [begin, end] = value
@@ -140,15 +162,20 @@ export default class Aql {
 
       let counter = 0
       let endIndex = -1
+      let inQuotes = false
+      let quoteChar = ''
       // eslint-disable-next-line id-length
       for (let i = startIndex; i < query.length; i++) {
-        if (query[i] === '(') {
-          counter++
-        } else if (query[i] === ')') {
-          counter--
-          if (counter === 0) {
-            endIndex = i
-            break
+        const ch = query[i]
+        if ((ch === '"' || ch === "'")) {
+          if (!inQuotes) { inQuotes = true; quoteChar = ch }
+          else if (ch === quoteChar) { inQuotes = false; quoteChar = '' }
+        }
+        if (!inQuotes) {
+          if (ch === '(') counter++
+          else if (ch === ')') {
+            counter--
+            if (counter === 0) { endIndex = i; break }
           }
         }
       }
@@ -162,20 +189,25 @@ export default class Aql {
       const tokens = []
       let token = ''
       let nesting = 0
+      let inQuotes = false
+      let quoteChar = ''
       // eslint-disable-next-line id-length
       for (let i = 0; i < str.length; i++) {
         const char = str[i]
-        if (char === ',' && nesting === 0) {
+        if ((char === '"' || char === "'") && nesting === 0) {
+          if (!inQuotes) { inQuotes = true; quoteChar = char }
+          else if (char === quoteChar) { inQuotes = false; quoteChar = '' }
+          // Don't add quote chars to token
+          continue
+        }
+        if (char === ',' && nesting === 0 && !inQuotes) {
           const cleaned = token.trim()
           if (cleaned.length > 0) tokens.push(cleaned)
           token = ''
         } else {
           token += char
-          if (char === '(') {
-            nesting++
-          } else if (char === ')') {
-            nesting--
-          }
+          if (char === '(' && !inQuotes) nesting++
+          else if (char === ')' && !inQuotes) nesting--
         }
       }
       if (token.trim().length > 0) {
@@ -204,35 +236,81 @@ export default class Aql {
     const value = String(valueToAdd ?? '').trim()
     if (!value) return query
 
-    const startIndex = query.lastIndexOf('(')
-    if (startIndex === -1) {
-      const trimmed = query.trimEnd()
-      return `${trimmed} (${value})`
+    // Find the opening paren of the IN clause (not one inside a quoted value)
+    let startIndex = -1
+    let inQ = false
+    let qc = ''
+    for (let idx = query.length - 1; idx >= 0; idx--) {
+      const ch = query[idx]
+      if ((ch === '"' || ch === "'")) {
+        if (!inQ) { inQ = true; qc = ch } else if (ch === qc) { inQ = false; qc = '' }
+      }
+      if (ch === '(' && !inQ) { startIndex = idx; break }
     }
 
-    const endIndex = query.indexOf(')', startIndex)
+    if (startIndex === -1) {
+      const trimmed = query.trimEnd()
+      const needsQuote = value.includes(',') || value.includes('(') || value.includes(')')
+      const quoted = needsQuote ? '"' + value + '"' : value
+      return trimmed + ' (' + quoted + ')'
+    }
+
+    // Find matching close paren
+    let endIndex = -1
+    let counter = 0
+    inQ = false; qc = ''
+    for (let idx = startIndex; idx < query.length; idx++) {
+      const ch = query[idx]
+      if ((ch === '"' || ch === "'")) {
+        if (!inQ) { inQ = true; qc = ch } else if (ch === qc) { inQ = false; qc = '' }
+      }
+      if (!inQ) {
+        if (ch === '(') counter++
+        else if (ch === ')') { counter--; if (counter === 0) { endIndex = idx; break } }
+      }
+    }
+
     const innerRaw = query.slice(startIndex + 1, endIndex === -1 ? query.length : endIndex)
 
-    const tokens = innerRaw
-      .split(',')
-      .map((token) => token.trim())
-      .filter((token) => token.length > 0)
+    // Split by comma respecting quotes
+    const tokens = []
+    let tok = ''
+    let tInQ = false
+    let tQc = ''
+    for (let idx = 0; idx < innerRaw.length; idx++) {
+      const ch = innerRaw[idx]
+      if ((ch === '"' || ch === "'")) {
+        if (!tInQ) { tInQ = true; tQc = ch } else if (ch === tQc) { tInQ = false; tQc = '' }
+        continue // strip quotes
+      }
+      if (ch === ',' && !tInQ) {
+        const cleaned = tok.trim()
+        if (cleaned.length > 0) tokens.push(cleaned)
+        tok = ''
+      } else {
+        tok += ch
+      }
+    }
+    if (tok.trim().length > 0) tokens.push(tok.trim())
 
     const alreadyExists = tokens.some((token) => token.toLowerCase() === value.toLowerCase())
     if (!alreadyExists) tokens.push(value)
 
-    const rebuiltInner = tokens.join(', ')
+    // Rebuild with quotes for values containing special chars
+    const quoted = tokens.map((token) => {
+      if (token.includes(',') || token.includes('(') || token.includes(')') || token.includes(' ')) return '"' + token + '"'
+      return token
+    })
+    const rebuiltInner = quoted.join(', ')
     const prefix = query.slice(0, startIndex + 1)
 
-    if (endIndex === -1) {
-      return `${prefix}${rebuiltInner})`
-    }
-
+    if (endIndex === -1) return prefix + rebuiltInner + ')'
     const suffix = query.slice(endIndex)
-    return `${prefix}${rebuiltInner}${suffix}`
+    return prefix + rebuiltInner + suffix
   }
 
   operatorInfo(operators, operator) {
+    if (!operators) return undefined
     return operators.find((op) => op.label === operator)?.value
   }
 
@@ -380,9 +458,17 @@ export default class Aql {
       if (operator === 'between') {
         return `${formattedField} ${operator} (${filter.value.begin}, ${filter.value.end})`
       } else if (operator === 'in') {
-        return `${formattedField} ${operator} (${filter.value
-          .map((item) => `${item.label}`)
-          .join(', ')})`
+        const values = filter.value
+          .map((item) => {
+            const label = String(item.label || item.value || item)
+            // Wrap in quotes if the value contains special characters
+            if (label.includes(',') || label.includes('(') || label.includes(')') || label.includes(' ')) {
+              return `"${label}"`
+            }
+            return label
+          })
+          .join(', ')
+        return `${formattedField} ${operator} (${values})`
       }
 
       return `${formattedField} ${operator} ${filter.value}`
@@ -398,13 +484,18 @@ export default class Aql {
     const hasErrorInOperatorIn = this.queryValidationForInOperator(normalizedQuery, suggestions)
     const hasErrorNotSpace = this.queryValidatorNoSpaces(normalizedQuery)
     const hasErrorBetweenOperator = this.queryValidatorBetweenOperators(normalizedQuery)
+    const hasErrorUnsupportedFieldOperator = this.queryValidationForUnsupportedFieldOperator(
+      normalizedQuery,
+      suggestions
+    )
 
     const erros = [
       ...hasErrorInCompoundFields,
       ...hasErrorInFields,
       ...hasErrorInOperatorIn,
       ...hasErrorNotSpace,
-      ...hasErrorBetweenOperator
+      ...hasErrorBetweenOperator,
+      ...hasErrorUnsupportedFieldOperator
     ]
 
     const errorMessages = {
@@ -424,25 +515,102 @@ export default class Aql {
       'between-operator-error-not-parentheses':
         'Please enclose the values for the BETWEEN operator in parentheses. For example: status between (200, 300).',
       'between-operator-error-equal-values':
-        'The two values for the BETWEEN operator must be different. For example: status between (200, 300).'
+        'The two values for the BETWEEN operator must be different. For example: status between (200, 300).',
+      'unsupported-operator-for-field-error': ({ field, operator }) =>
+        `the operator '${operator}' is not supported for the field '${field}'.`
     }
 
-    return erros.map((errorCode) => errorMessages[errorCode]).filter((msg) => !!msg)
+    return erros
+      .map((entry) => {
+        if (typeof entry === 'string') return errorMessages[entry]
+        const template = errorMessages[entry?.code]
+        return typeof template === 'function' ? template(entry) : undefined
+      })
+      .filter((msg) => !!msg)
+  }
+
+  queryValidationForUnsupportedFieldOperator(query, suggestions) {
+    if (!query || !suggestions || !suggestions.length) return []
+
+    const errors = []
+    const expressions = query.split(/\s+and\s+/i)
+    if (!expressions) return errors
+
+    // Match a single AQL clause: optional quoted/compound field, then a
+    // textual operator surrounded by whitespace, then the remainder. The
+    // operator alternation is ordered longest-first to avoid `<` matching
+    // ahead of `<=`/`<>` when the whole pattern is evaluated.
+    const expressionRegex =
+      /^(?:"([^"]+)"|'([^']+)'|([\w\s]+?))\s+(<=|>=|<>|BETWEEN|ILIKE|LIKE|IN|=|<|>)\s+(.+)$/i
+
+    expressions.forEach((expression) => {
+      if (!expression) return
+
+      // Strip leading/trailing grouping parentheses that are not part of
+      // an IN/BETWEEN value list. Mirrors the same pre-processing done by
+      // `parse` so that field+operator extraction lines up.
+      let cleaned = expression.trim()
+      if (
+        cleaned.startsWith('(') &&
+        !/\bin\b/i.test(cleaned) &&
+        !/\bbetween\b/i.test(cleaned)
+      ) {
+        cleaned = cleaned.replace(/^\(+/, '')
+      }
+      if (
+        cleaned.endsWith(')') &&
+        !/\bin\b/i.test(cleaned) &&
+        !/\bbetween\b/i.test(cleaned)
+      ) {
+        cleaned = cleaned.replace(/\)+$/, '')
+      }
+      cleaned = cleaned.trim()
+
+      const match = cleaned.match(expressionRegex)
+      if (!match) return
+
+      const field = (match[1] || match[2] || match[3] || '').trim()
+      const textualOperator = match[4]
+      if (!field || !textualOperator) return
+
+      const suggestion = suggestions.find(
+        (item) => item.label.toLowerCase() === field.toLowerCase()
+      )
+      // When the field is not in the catalog, a dedicated validator branch
+      // (`not-exists-field-error`) handles it. Stay silent here so this
+      // method is purely additive and does not duplicate other branches.
+      if (!suggestion) return
+
+      const mappedOperator = this.mapOperatorValue(textualOperator)
+      const resolved = this.operatorInfo(suggestion?.value?.operator, mappedOperator)
+
+      if (typeof resolved?.value !== 'string' || resolved.value.length === 0) {
+        errors.push({
+          code: 'unsupported-operator-for-field-error',
+          field: suggestion.label,
+          operator: textualOperator.toLowerCase()
+        })
+      }
+    })
+
+    return errors
   }
 
   queryValidationForCompoundFields(queryText) {
     let erros = []
     if (!queryText) return []
 
+    const stripGroupingParens = (str) => str.replace(/^\(+\s*/, '').replace(/\s*\)+$/, '').trim()
     const escapedOperatorsRegex = this.buildOperatorsRegex()
 
     if (queryText.toLowerCase().includes('and')) {
       const expressions = queryText.split(/\s+and\s+/i)
       expressions.forEach((expression) => {
-        let match = expression.toLowerCase().match(escapedOperatorsRegex)
+        const cleaned = stripGroupingParens(expression)
+        let match = cleaned.toLowerCase().match(escapedOperatorsRegex)
         let operatorFound = match ? match[0] : null
         if (operatorFound) {
-          let stringBeforeOperator = expression.split(operatorFound)[0].trim()
+          let stringBeforeOperator = cleaned.split(operatorFound)[0].trim()
           if (stringBeforeOperator.includes(' ')) {
             if (
               !(
@@ -456,11 +624,11 @@ export default class Aql {
             }
           }
         } else {
-          if (expression.includes(' ') && /\s+\S+/.test(expression)) {
+          if (cleaned.includes(' ') && /\s+\S+/.test(cleaned)) {
             if (
               !(
-                (expression.trim().startsWith('"') && expression.trim().endsWith('"')) ||
-                (expression.trim().startsWith("'") && expression.trim().endsWith("'"))
+                (cleaned.startsWith('"') && cleaned.endsWith('"')) ||
+                (cleaned.startsWith("'") && cleaned.endsWith("'"))
               )
             ) {
               if (!erros.includes('quote-error')) {
@@ -471,10 +639,11 @@ export default class Aql {
         }
       })
     } else {
-      let match = queryText.toLowerCase().match(escapedOperatorsRegex)
+      const cleaned = stripGroupingParens(queryText)
+      let match = cleaned.toLowerCase().match(escapedOperatorsRegex)
       let operatorFound = match ? match[0] : null
       if (operatorFound) {
-        let stringBeforeOperator = queryText.split(operatorFound)[0].trim()
+        let stringBeforeOperator = cleaned.split(operatorFound)[0].trim()
         if (stringBeforeOperator.includes(' ')) {
           if (
             !(
@@ -488,11 +657,11 @@ export default class Aql {
           }
         }
       } else {
-        if (queryText.includes(' ') && /\s+\S+/.test(queryText)) {
+        if (cleaned.includes(' ') && /\s+\S+/.test(cleaned)) {
           if (
             !(
-              (queryText.trim().startsWith('"') && queryText.trim().endsWith('"')) ||
-              (queryText.trim().startsWith("'") && queryText.trim().endsWith("'"))
+              (cleaned.startsWith('"') && cleaned.endsWith('"')) ||
+              (cleaned.startsWith("'") && cleaned.endsWith("'"))
             )
           ) {
             if (!erros.includes('quote-error')) {
@@ -516,21 +685,25 @@ export default class Aql {
 
     expressions.forEach((expression) => {
       if (!expression || !expression.endsWith(' ')) return
+      // Strip grouping parentheses before extracting the field name
+      const cleaned = expression.replace(/^\(+\s*/, '').replace(/\s*\)+$/, '').trim()
+      if (!cleaned) return
+
       const operatorFound = this.operators.find((op) =>
-        new RegExp(`(^|\\s)${op}(?=\\s)`, 'i').test(expression)
+        new RegExp(`(^|\\s)${op}(?=\\s)`, 'i').test(cleaned)
       )
 
       let fieldPart
       if (operatorFound) {
         const regex = new RegExp(`^(.*?)\\s+${operatorFound}\\s+`, 'i')
-        const match = expression.match(regex)
+        const match = cleaned.match(regex)
         if (match) {
           fieldPart = match[1].trim()
         } else {
-          fieldPart = expression.trim()
+          fieldPart = cleaned.trim()
         }
       } else {
-        fieldPart = expression.trim()
+        fieldPart = cleaned.trim()
       }
 
       const fieldName = fieldPart.replace(/^["']|["']$/g, '')

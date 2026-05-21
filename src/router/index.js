@@ -21,10 +21,7 @@ import { edgeDnsRoutes } from '@/router/routes/edge-dns-routes'
 import { loginRoutes } from '@routes/login-routes'
 import { marketplaceRoutes } from '@routes/marketplace-routes'
 import { realTimeMetricsRoutes } from '@routes/real-time-metrics-routes'
-import {
-  realTimeEventsRoutes,
-  realTimeEventsV2Routes
-} from '@/router/routes/real-time-events-routes'
+import { realTimeEventsRoutes } from '@/router/routes/real-time-events-routes'
 import { mfaRoutes } from '@routes/mfa-routes'
 import { networkListsRoutes } from '@routes/network-lists-routes'
 import { passwordRoutes } from '@routes/password-routes'
@@ -92,7 +89,6 @@ const router = createRouter({
     wafRulesRoutes,
     realTimeMetricsRoutes,
     realTimeEventsRoutes,
-    realTimeEventsV2Routes,
     githubRoutes,
     billingRoutes,
     importGithubRoutes,

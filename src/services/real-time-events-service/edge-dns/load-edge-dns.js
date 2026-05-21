@@ -22,7 +22,7 @@ export const loadEdgeDNS = async (filter) => {
 
 const adapt = (filter) => {
   const table = {
-    dataset: 'idnsQueriesEvents',
+    dataset: 'edgeDnsQueriesEvents',
     limit: 10000,
     fields: [
       'level',
@@ -72,7 +72,7 @@ const qtypeMap = (value) => {
 
 const adaptResponse = (response) => {
   const { body } = response
-  const [edgeDnsQueriesEvents = {}] = body.data.idnsQueriesEvents
+  const [edgeDnsQueriesEvents = {}] = body.data.edgeDnsQueriesEvents
 
   return {
     ts: edgeDnsQueriesEvents.ts,

@@ -8,7 +8,7 @@
  * (no loader-by-argument) and reuses the same parsing + shaping pipeline.
  */
 
-import { loadFieldsEventsData } from '@/services/real-time-events-service-v2'
+import { loadFieldsEventsData } from '@/services/real-time-events-service'
 import { loadRealTimeMetricsData } from '@/services/real-time-metrics-services'
 
 import {
