@@ -1,13 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { EnvironmentAdapter } from '@/services/v2/environment/environment-adapter'
-import {
-  listEnvironmentsService as listEnvironmentsMock,
-  getEnvironmentByIdService as getEnvironmentByIdMock,
-  createEnvironmentService as createEnvironmentMock,
-  updateEnvironmentService as updateEnvironmentMock,
-  deleteEnvironmentService as deleteEnvironmentMock
-} from '@/services/v2/environment/environment-mock'
 
 const parseListResponse = (data) => {
   if (Array.isArray(data)) {
@@ -38,13 +31,15 @@ const parseItemResponse = (data) => {
 }
 
 export class EnvironmentService extends BaseService {
-  #baseURL = 'v4/environments'
+  // This is a temporary baseURL for the new deployment api, to be ajusted after the migration is complete
+  #baseURL = '/deployment-api/v1/environments'
 
-  // TODO: replace mock call with `this.http.request({ method: 'GET', url: this.#baseURL, params })`
-  // once `v4/environments` is available. The downstream pipeline (parseListResponse +
-  // EnvironmentAdapter.transformList) already matches the V4 list envelope.
   #fetchList = async (params = {}) => {
-    const data = await listEnvironmentsMock(params)
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.#baseURL,
+      params
+    })
 
     const { results, count } = parseListResponse(data)
 
@@ -54,9 +49,13 @@ export class EnvironmentService extends BaseService {
     }
   }
 
-  // TODO: collapse into #fetchList once `v4/environments` is available.
   #fetchDropdown = async (params = {}) => {
-    const data = await listEnvironmentsMock(params)
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.#baseURL,
+      params
+    })
+
     const { results, count } = parseListResponse(data)
 
     const body = results.map((env) => ({
@@ -72,8 +71,13 @@ export class EnvironmentService extends BaseService {
   listEnvironmentsServiceDropdown = this.#fetchDropdown
 
   loadEnvironmentService = async ({ id }) => {
-    const raw = await getEnvironmentByIdMock(id)
+    const { data: raw } = await this.http.request({
+      method: 'GET',
+      url: `${this.#baseURL}/${id}`
+    })
+
     const data = parseItemResponse(raw)
+
     return {
       id: data.id,
       name: data.name,
@@ -109,22 +113,25 @@ export class EnvironmentService extends BaseService {
     })
   }
 
-  // TODO: replace mock call with `this.http.request({ method: 'GET', url: ... })`
-  // once `v4/environments` is available.
   getEnvironmentByIdService = async (id) => {
-    const raw = await getEnvironmentByIdMock(id)
+    const { data: raw } = await this.http.request({
+      method: 'GET',
+      url: `${this.#baseURL}/${id}`
+    })
 
     return {
       data: EnvironmentAdapter.transformItem(parseItemResponse(raw))
     }
   }
 
-  // TODO: replace mock call with `this.http.request({ method: 'POST', ... })`
-  // once `v4/environments` is available.
   createEnvironmentService = async (payload = {}) => {
     const body = EnvironmentAdapter.transformCreatePayload(payload)
 
-    const raw = await createEnvironmentMock(body)
+    const { data: raw } = await this.http.request({
+      method: 'POST',
+      url: this.#baseURL,
+      body
+    })
 
     this.queryClient.removeQueries({ queryKey: queryKeys.environments.all })
 
@@ -133,12 +140,14 @@ export class EnvironmentService extends BaseService {
     }
   }
 
-  // TODO: replace mock call with `this.http.request({ method: 'PATCH', ... })`
-  // once `v4/environments` is available.
   updateEnvironmentService = async (id, payload = {}) => {
     const body = EnvironmentAdapter.transformPatchPayload(payload)
 
-    const raw = await updateEnvironmentMock(id, body)
+    const { data: raw } = await this.http.request({
+      method: 'PATCH',
+      url: `${this.#baseURL}/${id}`,
+      body
+    })
 
     this.queryClient.removeQueries({ queryKey: queryKeys.environments.all })
 
@@ -147,10 +156,11 @@ export class EnvironmentService extends BaseService {
     }
   }
 
-  // TODO: replace mock call with `this.http.request({ method: 'DELETE', ... })`
-  // once `v4/environments` is available.
   deleteEnvironmentService = async (id) => {
-    await deleteEnvironmentMock(id)
+    await this.http.request({
+      method: 'DELETE',
+      url: `${this.#baseURL}/${id}`
+    })
 
     this.queryClient.removeQueries({ queryKey: queryKeys.environments.all })
 

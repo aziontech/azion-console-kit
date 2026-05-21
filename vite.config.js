@@ -14,7 +14,7 @@ const getConfig = () => {
   const IS_PROD = env.VITE_ENVIRONMENT === 'production'
   const URLStartPrefix = IS_PROD ? 'https://' : 'https://stage-'
   const DomainSuffix = IS_PROD ? 'net' : 'com'
-  const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && !IS_PROD
+  const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true'
   const BEHOLDER_URL = env.VITE_BEHOLDER_URL
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
@@ -132,6 +132,11 @@ const getConfig = () => {
         }),
         '/sse': createProxyConfig({
           target: BEHOLDER_URL
+        }),
+        // this is a temporary proxy for new deployment api, to be removed after the migration is complete
+        '/deployment-api': createProxyConfig({
+          target: `https://i29crxkxxva.map.azionedge.net`,
+          rewrite: (path) => path.replace(/^\/deployment-api/, '')
         })
       }
     }
