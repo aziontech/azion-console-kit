@@ -69,7 +69,7 @@
         >
           <p
             :id="log.id"
-            class="w-full text-base font-robotomono"
+            class="w-full text-sm font-robotomono"
             :class="getLogClass(log)"
             v-for="(log, index) in filteredLogs"
             :key="log.id || index"
