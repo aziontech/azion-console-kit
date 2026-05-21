@@ -1,7 +1,7 @@
 <template>
   <i
     v-if="!panelOnly"
-    class="pi pi-calendar inline-flex items-center justify-center border-l border-t border-b surface-border rounded-l-md text-muted-color text-sm w-[2rem] h-[2rem]"
+    class="pi pi-calendar inline-flex items-center justify-center border-l border-t border-b surface-border rounded-l-md text-muted-color text-sm w-[2.125rem] h-[2.125rem]"
     aria-hidden="true"
   ></i>
 
@@ -38,24 +38,23 @@
       />
     </div>
 
-    <div class="mt-3">
-      <div class="text-xs font-medium leading-5 text-color mb-1">Commonly used</div>
+    <div class="mt-4">
+      <div class="text-sm font-medium leading-5 text-color mb-3">Commonly used</div>
       <div class="grid grid-cols-2 grid-rows-6 grid-flow-col">
         <PrimeButton
           v-for="range in commonDateRanges"
           :key="range.value"
           size="small"
           link
-          class="justify-start text-left w-full !py-1"
+          class="justify-start text-left w-full"
           @click="applyCommonRange(range)"
-          :pt="{ label: { class: 'text-xs' } }"
         >
           {{ range.label }}
         </PrimeButton>
       </div>
     </div>
 
-    <div class="mt-3 pt-3 border-t border-[var(--surface-border)]">
+    <div class="mt-4 pt-4 border-t border-[var(--surface-border)]">
       <div class="flex gap-3 justify-between">
         <div class="flex align-center items-center gap-3">
           <InputSwitch
@@ -64,7 +63,7 @@
           />
           <label
             for="autoRefreshEnabled"
-            class="text-xs font-medium leading-5 text-color"
+            class="text-sm font-medium leading-5 text-color"
             >Refresh Every</label
           >
         </div>
@@ -327,23 +326,16 @@
 
     const preservedAutoRefresh = model.value?.autoRefresh
 
-    const relativeLabel = `${quickSelectDirection.value} ${quickSelectValue.value} ${quickSelectUnit.value}`
-
     model.value = {
       startDate: newStartDate,
       endDate: newEndDate,
-      label: relativeLabel,
+      label: '',
       labelStart: '',
       labelEnd: '',
       quick: {
         value: quickSelectValue.value,
         unit: quickSelectUnit.value,
         direction: quickSelectDirection.value
-      },
-      relative: {
-        direction: quickSelectDirection.value,
-        value: quickSelectValue.value,
-        unit: quickSelectUnit.value
       },
       autoRefresh: preservedAutoRefresh
     }

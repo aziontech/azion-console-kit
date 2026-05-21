@@ -29,14 +29,6 @@
     isLoadingFilters: {
       type: Boolean,
       default: false
-    },
-    hideFilterTags: {
-      type: Boolean,
-      default: false
-    },
-    dataset: {
-      type: String,
-      default: ''
     }
   })
 
@@ -150,14 +142,7 @@
     )
     filterData.value.tsRange = {
       tsRangeBegin,
-      tsRangeEnd,
-      label: filterDataRange.value.label || '',
-      labelStart: filterDataRange.value.labelStart || '',
-      labelEnd: filterDataRange.value.labelEnd || ''
-    }
-
-    if (filterDataRange.value?.relative) {
-      filterData.value.tsRange.relative = { ...filterDataRange.value.relative }
+      tsRangeEnd
     }
 
     if (filterDataRange.value?.autoRefresh) {
@@ -173,17 +158,12 @@
       if (Array.isArray(parsed)) {
         filterData.value.fields = parsed
       }
-      // History is persisted after the query succeeds — callers invoke
-      // `commitQueryToHistory()` once they confirm the data loaded.
+      aqlRef.value?.markAsApplied?.()
       hasPendingQueryUpdate.value = false
     }
     updatedTime()
     emitUpdatedFilter()
     hasPendingDateUpdate.value = false
-  }
-
-  const commitQueryToHistory = () => {
-    aqlRef.value?.markAsApplied?.()
   }
 
   const onDateRangeSelect = () => {
@@ -236,7 +216,7 @@
       userUTC
     )
       .toISOString()
-      .replace(/\.\d{3}/, '')
+      .replace(/(\..+)/, '')
 
     const dateEnd = createUtcDateFromUserTimezoneParts(
       {
@@ -251,7 +231,7 @@
       userUTC
     )
       .toISOString()
-      .replace(/\.\d{3}/, '')
+      .replace(/(\..+)/, '')
 
     return {
       tsRangeBegin: dateBegin,
@@ -264,14 +244,8 @@
       startDate: new Date(filterData.value.tsRange.tsRangeBegin),
       endDate: new Date(filterData.value.tsRange.tsRangeEnd),
       label: filterData.value.tsRange.label || '',
-      labelStart: filterData.value.tsRange.labelStart || '',
-      labelEnd: filterData.value.tsRange.labelEnd || '',
       utcOffset: userUTC,
       autoRefresh: filterData.value.tsRange.autoRefresh
-    }
-
-    if (filterData.value.tsRange.relative) {
-      filterDataRange.value.relative = { ...filterData.value.tsRange.relative }
     }
 
     hasPendingDateUpdate.value = false
@@ -291,21 +265,6 @@
     },
     { deep: true }
   )
-
-  const syncDateRangeFromExternal = (startDate, endDate, label = '') => {
-    filterDataRange.value = {
-      ...filterDataRange.value,
-      startDate: startDate instanceof Date ? startDate : new Date(startDate),
-      endDate: endDate instanceof Date ? endDate : new Date(endDate),
-      label,
-      labelStart: '',
-      labelEnd: '',
-      relative: null
-    }
-    hasPendingDateUpdate.value = false
-  }
-
-  defineExpose({ removeFilter, applyFilters, commitQueryToHistory, syncDateRangeFromExternal })
 </script>
 
 <template>
@@ -327,8 +286,8 @@
       class="flex w-full flex-column md:flex-col items-center"
       :class="{ 'gap-6 md:gap-4': filterData.fields.length }"
     >
-      <div class="afs-filter-row">
-        <div class="afs-filter-row__query">
+      <div class="flex w-full gap-2 items-start md:flex-row flex-col">
+        <div class="flex-1 flex gap-2 items-start max-md:w-full">
           <DialogFilter
             v-model:filterAdvanced="filterData.fields"
             :fieldsInFilter="props.fieldsInFilter"
@@ -338,48 +297,43 @@
             :fieldsInFilter="props.fieldsInFilter"
             :searchAdvancedFilter="searchAdvancedFilter"
             :filterAdvanced="filterData.fields"
-            :dataset="props.dataset"
             ref="aqlRef"
             @dirty="onAqlDirtyChange"
             @validation="onAqlValidationChange"
           />
         </div>
-        <div class="afs-filter-row__actions">
-          <DataTimeRange
-            v-model="filterDataRange"
-            :maxDays="props.filterDateRangeMaxDays"
-            :defaultUtcOffset="userUTC"
-            :userTimezone="userTimezone"
-            :listTimezonesService="listTimezonesService"
-            @select="onDateRangeSelect"
-            @autoRefresh="onAutoRefreshTick"
-          />
-          <PrimeButton
-            v-if="!hasPendingDateUpdate && !hasPendingQueryUpdate"
-            icon="pi pi-refresh"
-            outlined
-            size="small"
-            label="Refresh"
-            class="flex-shrink-0"
-            :disabled="isInvalidRange || hasAqlValidationError"
-            @click="applyFilters"
-          />
-          <PrimeButton
-            v-else
-            icon="pi pi-arrow-circle-right"
-            severity="secondary"
-            size="small"
-            label="Update"
-            :disabled="isInvalidRange || hasAqlValidationError"
-            class="flex-shrink-0"
-            @click="applyFilters"
-          />
-        </div>
+        <DataTimeRange
+          class="max-md:w-full"
+          v-model="filterDataRange"
+          :maxDays="props.filterDateRangeMaxDays"
+          :defaultUtcOffset="userUTC"
+          :userTimezone="userTimezone"
+          :listTimezonesService="listTimezonesService"
+          @select="onDateRangeSelect"
+          @autoRefresh="onAutoRefreshTick"
+        />
+        <PrimeButton
+          v-if="!hasPendingDateUpdate && !hasPendingQueryUpdate"
+          icon="pi pi-refresh"
+          outlined
+          size="small"
+          label="Refresh"
+          class="w-[5.875rem]"
+          :disabled="isInvalidRange || hasAqlValidationError"
+          @click="applyFilters"
+        />
+        <PrimeButton
+          v-else
+          icon="pi pi-arrow-circle-right"
+          severity="secondary"
+          size="small"
+          label="Update"
+          :disabled="isInvalidRange || hasAqlValidationError"
+          class="w-[5.875rem]"
+          @click="applyFilters"
+        />
       </div>
-      <div
-        class="flex flex-1 w-full"
-        v-if="!props.hideFilterTags"
-      >
+      <div class="flex flex-1 w-full">
         <FilterTagsDisplay
           :filters="filterData.fields"
           :fieldsInFilter="props.fieldsInFilter"
@@ -389,107 +343,3 @@
     </div>
   </div>
 </template>
-
-<style scoped>
-  .afs-filter-row {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 0.5rem;
-    width: 100%;
-    align-items: center;
-  }
-
-  .afs-filter-row__query {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    flex: 1 1 0%;
-    min-width: 0;
-  }
-
-  .afs-filter-row__actions {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    flex-shrink: 0;
-  }
-
-  /* ── Uniform 2rem height for ALL filterbar elements ── */
-  :deep(.afs-filter-row .p-button),
-  :deep(.afs-filter-row .p-inputtext),
-  :deep(.afs-filter-row .p-dropdown),
-  :deep(.afs-filter-row .p-inputgroup) {
-    height: 2rem !important;
-    min-height: 2rem !important;
-    max-height: 2rem !important;
-    box-sizing: border-box;
-  }
-
-  /* inputgroup children */
-  :deep(.afs-filter-row .p-inputgroup > *) {
-    height: 2rem !important;
-    min-height: 2rem !important;
-    max-height: 2rem !important;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-  }
-
-  /* QuickSelect icon override */
-  :deep(.afs-filter-row .p-inputgroup > i) {
-    height: 2rem !important;
-    width: 2rem !important;
-    min-height: 2rem !important;
-    max-height: 2rem !important;
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-  }
-
-  /* InputDateRange inner container */
-  :deep(.afs-filter-row .p-inputgroup > div) {
-    height: 2rem !important;
-    min-height: 2rem !important;
-    max-height: 2rem !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    display: flex;
-    align-items: center;
-  }
-
-  /* InputText inside inputgroup */
-  :deep(.afs-filter-row .p-inputgroup .p-inputtext) {
-    height: 2rem !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    padding-left: 0.375rem !important;
-    padding-right: 0.375rem !important;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-
-  /* Buttons padding */
-  :deep(.afs-filter-row .p-button) {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  /* Dropdown label vertical centering */
-  :deep(.afs-filter-row .p-dropdown .p-dropdown-label) {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    display: flex;
-    align-items: center;
-  }
-
-  @media (max-width: 640px) {
-    .afs-filter-row__query {
-      flex-basis: 100%;
-    }
-
-    .afs-filter-row__actions {
-      width: 100%;
-    }
-  }
-</style>
