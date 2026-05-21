@@ -83,8 +83,11 @@ const arbLikeOperator = fc.constantFrom('Like', 'Ilike')
 const arbToken = fc.stringMatching(/^[a-z0-9.-]{1,12}$/)
 
 const arbWildcardValue = fc.oneof(
+  // eslint-disable-next-line id-length
   arbToken.map((t) => `${t}%`),
+  // eslint-disable-next-line id-length
   arbToken.map((t) => `%${t}`),
+  // eslint-disable-next-line id-length
   arbToken.map((t) => `%${t}%`)
 )
 
@@ -133,6 +136,7 @@ describe('useEventsData.buildApiFilters Like/Ilike wildcard preservation (Bug 1)
         const emitted = result.and[field + operator]
         // The number of `%` in the emitted value equals the number in the
         // input. Captures "does not add or remove `%`".
+        // eslint-disable-next-line id-length
         const countPct = (s) => (String(s).match(/%/g) || []).length
         expect(countPct(emitted)).toBe(countPct(value))
       }),

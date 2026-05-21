@@ -60,8 +60,8 @@ export function useDocumentSearch(tableData) {
         searchIndex.value = rows.map(buildRowEntry)
       } else if (currentLength > prevLength) {
         // Data grew (loadMore) — only index new rows
-        for (let i = prevLength; i < currentLength; i++) {
-          searchIndex.value.push(buildRowEntry(rows[i]))
+        for (let idx = prevLength; idx < currentLength; idx++) {
+          searchIndex.value.push(buildRowEntry(rows[idx]))
         }
       }
       // If currentLength === prevLength, nothing changed

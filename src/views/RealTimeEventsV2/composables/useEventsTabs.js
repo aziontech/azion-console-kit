@@ -41,12 +41,12 @@ export function isEventsTabId(id) {
  * @returns {string}
  */
 function computeDefaultLabel(currentTabs) {
-  const usedLabels = new Set(currentTabs.map((t) => t.label))
-  let n = 2
-  while (usedLabels.has(`Events (${n})`)) {
-    n++
+  const usedLabels = new Set(currentTabs.map((tab) => tab.label))
+  let num = 2
+  while (usedLabels.has(`Events (${num})`)) {
+    num++
   }
-  return `Events (${n})`
+  return `Events (${num})`
 }
 
 /**
@@ -195,12 +195,12 @@ export function useEventsTabs({ toast, totalTabCount, activeTabId }) {
    * @param {string} tabId
    */
   function closeEventsTab(tabId) {
-    const idx = eventsTabs.value.findIndex((t) => t.id === tabId)
+    const idx = eventsTabs.value.findIndex((tab) => tab.id === tabId)
     if (idx === -1) return
 
     const wasActive = activeTabId.value === tabId
 
-    eventsTabs.value = eventsTabs.value.filter((t) => t.id !== tabId)
+    eventsTabs.value = eventsTabs.value.filter((tab) => tab.id !== tabId)
 
     if (wasActive) {
       if (idx > 0) {
@@ -229,7 +229,7 @@ export function useEventsTabs({ toast, totalTabCount, activeTabId }) {
     const trimmed = typeof label === 'string' ? label.trim() : ''
     if (trimmed === '') return
 
-    const idx = eventsTabs.value.findIndex((t) => t.id === tabId)
+    const idx = eventsTabs.value.findIndex((tab) => tab.id === tabId)
     if (idx === -1) return
 
     const updated = [...eventsTabs.value]

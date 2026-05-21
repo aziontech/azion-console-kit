@@ -43,6 +43,7 @@ describe('useClickToFilter', () => {
       // Filter out empty/whitespace-only strings and the '-' placeholder.
       const arbValidValue = fc
         .string({ minLength: 1 })
+        // eslint-disable-next-line id-length
         .filter((v) => v.trim() !== '' && v.trim() !== '-')
 
       const arbRecord = fc.record({

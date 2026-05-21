@@ -1,3 +1,4 @@
+/* global globalThis */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import fc from 'fast-check'
 import { ref } from 'vue'
@@ -20,6 +21,7 @@ vi.mock('@/views/RealTimeEventsV2/helpers/trigger-download', () => ({
 // ── Generators ──
 
 const arbSummaryItem = fc.record({
+  // eslint-disable-next-line id-length
   key: fc.string({ minLength: 1, maxLength: 20 }).filter((s) => s.trim().length > 0),
   value: fc.oneof(
     fc.string({ minLength: 0, maxLength: 50 }),
@@ -40,7 +42,9 @@ const arbTableRow = fc.record({
       max: new Date('2030-01-01T00:00:00.000Z'),
       noInvalidDate: true
     })
+    // eslint-disable-next-line id-length
     .filter((d) => Number.isFinite(d.getTime()))
+    // eslint-disable-next-line id-length
     .map((d) => d.toISOString()),
   tsFormat: fc.string({ minLength: 5, maxLength: 30 }),
   summary: fc.array(arbSummaryItem, { minLength: 1, maxLength: 8 })

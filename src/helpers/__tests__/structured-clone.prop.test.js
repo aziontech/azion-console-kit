@@ -19,6 +19,7 @@ const arbDate = fc
 
 // Arbitrary: plain objects with string keys and primitive values
 const arbPlainObject = fc.dictionary(
+  // eslint-disable-next-line id-length
   fc.string({ minLength: 1, maxLength: 10 }).filter((s) => /^[a-zA-Z]/.test(s)),
   fc.oneof(fc.string(), fc.integer(), fc.boolean(), fc.constant(null))
 )

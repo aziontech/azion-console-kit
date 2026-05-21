@@ -13,7 +13,6 @@ import { OPERATOR_MAPPING } from '@/components/base/advanced-filter-system-v2/fi
  * @param {Array}                       options.initialFilters    – default filters injected by the panel
  * @param {Function}                    options.loadData          – triggers a full data reload
  * @param {import('vue').Ref<boolean>} options.initialLoadDone   – guards against premature reloads
- * @param {import('vue').Ref<boolean>} options.isLoading         – current loading state
  * @param {Function}                    options.onError           – error callback (replaces toast)
  * @param {Function}                    options.getFiltersFromHash – from useRouteFilterManager
  * @param {Function}                    options.setFilterInHash    – from useRouteFilterManager
@@ -25,7 +24,6 @@ export function useFilterActions({
   initialFilters,
   loadData,
   initialLoadDone,
-  isLoading,
   onError,
   getFiltersFromHash,
   setFilterInHash

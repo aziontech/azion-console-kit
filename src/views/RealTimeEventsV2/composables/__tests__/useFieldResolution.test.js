@@ -3,6 +3,7 @@ import { ref, nextTick } from 'vue'
 import { useFieldResolution } from '../useFieldResolution'
 
 const makeRow = (keys) => ({
+  // eslint-disable-next-line id-length
   summary: keys.map((k) => ({ key: k, value: 'v' }))
 })
 
@@ -36,6 +37,7 @@ describe('useFieldResolution', () => {
       tableData: [makeRow(['remoteAddr'])]
     })
 
+    // eslint-disable-next-line id-length
     const labels = availableFieldOptions.value.map((o) => o.label)
     expect(labels).toContain('host')
     expect(labels).toContain('status')
@@ -49,6 +51,7 @@ describe('useFieldResolution', () => {
       tableData: [makeRow(['sessionid'])]
     })
 
+    // eslint-disable-next-line id-length
     const labels = availableFieldOptions.value.map((o) => o.label)
     // Row-discovered name wins
     expect(labels).toContain('sessionid')
@@ -61,6 +64,7 @@ describe('useFieldResolution', () => {
       liveDatasetFields: ['count', 'sum', 'host', 'avg']
     })
 
+    // eslint-disable-next-line id-length
     const labels = availableFieldOptions.value.map((o) => o.label)
     expect(labels).toEqual(['host'])
   })
@@ -70,6 +74,7 @@ describe('useFieldResolution', () => {
       liveDatasetFields: ['zeta', 'alpha', 'mid']
     })
 
+    // eslint-disable-next-line id-length
     const labels = availableFieldOptions.value.map((o) => o.label)
     expect(labels).toEqual(['alpha', 'mid', 'zeta'])
   })
@@ -88,12 +93,14 @@ describe('useFieldResolution', () => {
         tableData: [makeRow(['host'])]
       })
 
+      // eslint-disable-next-line id-length
       expect(availableFieldOptions.value.map((o) => o.label)).toEqual(['host'])
 
       // Append new rows
       tableData.value = [...tableData.value, makeRow(['status'])]
       await nextTick()
 
+      // eslint-disable-next-line id-length
       const labels = availableFieldOptions.value.map((o) => o.label)
       expect(labels).toContain('host')
       expect(labels).toContain('status')
@@ -104,13 +111,16 @@ describe('useFieldResolution', () => {
         tableData: [makeRow(['host']), makeRow(['status'])]
       })
 
+      // eslint-disable-next-line id-length
       expect(availableFieldOptions.value.map((o) => o.label)).toContain('host')
+      // eslint-disable-next-line id-length
       expect(availableFieldOptions.value.map((o) => o.label)).toContain('status')
 
       // Reset to new data (simulates new query)
       tableData.value = [makeRow(['newField'])]
       await nextTick()
 
+      // eslint-disable-next-line id-length
       const labels = availableFieldOptions.value.map((o) => o.label)
       expect(labels).toEqual(['newField'])
     })
@@ -119,6 +129,7 @@ describe('useFieldResolution', () => {
       const row = { data: [{ key: 'myField', value: 'v' }] }
       const { availableFieldOptions } = setup({ tableData: [row] })
 
+      // eslint-disable-next-line id-length
       expect(availableFieldOptions.value.map((o) => o.label)).toContain('myField')
     })
   })
@@ -128,6 +139,7 @@ describe('useFieldResolution', () => {
       filterFields: [{ value: 'host' }, { value: 'status' }]
     })
 
+    // eslint-disable-next-line id-length
     const labels = availableFieldOptions.value.map((o) => o.label)
     expect(labels).toContain('host')
     expect(labels).toContain('status')
@@ -139,6 +151,7 @@ describe('useFieldResolution', () => {
       liveDatasetFields: [null, 'status']
     })
 
+    // eslint-disable-next-line id-length
     const labels = availableFieldOptions.value.map((o) => o.label)
     expect(labels).toEqual(['host', 'status'])
   })

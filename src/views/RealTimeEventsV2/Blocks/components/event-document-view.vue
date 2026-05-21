@@ -60,16 +60,16 @@
   })
 
   const filteredEntries = computed(() => {
-    const q = fieldSearch.value.trim().toLowerCase()
-    if (!q) return summaryEntries.value
+    const qry = fieldSearch.value.trim().toLowerCase()
+    if (!qry) return summaryEntries.value
     return summaryEntries.value.filter(
-      (e) =>
-        String(e.key ?? '')
+      (entry) =>
+        String(entry.key ?? '')
           .toLowerCase()
-          .includes(q) ||
-        String(e.value ?? '')
+          .includes(qry) ||
+        String(entry.value ?? '')
           .toLowerCase()
-          .includes(q)
+          .includes(qry)
     )
   })
 

@@ -69,9 +69,11 @@ describe('pivotGroupedData', () => {
     ]
     const result = pivotGroupedData(rows, 'category', 'count')
     expect(result).toHaveLength(2)
+    // eslint-disable-next-line id-length
     const row0 = result.find((r) => r.ts === '2024-01-01T00:00:00Z')
     expect(row0.A).toBe(10)
     expect(row0.B).toBe(20)
+    // eslint-disable-next-line id-length
     const row1 = result.find((r) => r.ts === '2024-01-01T00:01:00Z')
     expect(row1.A).toBe(5)
     expect(row1.B).toBe(0) // backfilled
@@ -294,6 +296,7 @@ describe('loadFromEventsApi', () => {
         ]
       },
       eventsApiPostProcess: (rows) =>
+        // eslint-disable-next-line id-length
         rows.map((r) => ({ ts: r.ts, rate: r._total > 0 ? (r._saved / r._total) * 100 : 0 }))
     }
     const result = await loadFromEventsApi(config, 'begin', 'end')

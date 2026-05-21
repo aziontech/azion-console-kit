@@ -4,6 +4,8 @@ import fc from 'fast-check'
 import { useEventsTabs } from '../useEventsTabs.js'
 import { useTabLimit, MAX_TOTAL_TABS } from '../useTabLimit.js'
 
+/* global globalThis */
+
 /**
  * Feature: real-time-events-enhancements
  *
@@ -54,6 +56,7 @@ describe('Property 1: Tab-structure invariants (fc.commands)', () => {
    * Assert all structural invariants against the current composable state.
    * Called after every command execution.
    */
+  // eslint-disable-next-line no-unused-vars
   function assertInvariants(tabs, activeTabId, openTabs) {
     const evTabs = tabs.eventsTabs.value
 
@@ -61,6 +64,7 @@ describe('Property 1: Tab-structure invariants (fc.commands)', () => {
     expect(evTabs.length).toBeLessThanOrEqual(MAX_TOTAL_TABS - 1)
 
     // (b) Labels among additional Events tabs are unique
+    // eslint-disable-next-line id-length
     const labels = evTabs.map((t) => t.label)
     const uniqueLabels = new Set(labels)
     expect(uniqueLabels.size).toBe(labels.length)
@@ -68,11 +72,13 @@ describe('Property 1: Tab-structure invariants (fc.commands)', () => {
     // (c) activeTabId is either null (pinned) or present in eventsTabs
     const active = activeTabId.value
     if (active !== null) {
+      // eslint-disable-next-line id-length
       const ids = evTabs.map((t) => t.id)
       expect(ids).toContain(active)
     }
 
     // (d) All tab ids start with 'events:'
+    // eslint-disable-next-line id-length
     for (const t of evTabs) {
       expect(t.id).toMatch(/^events:/)
     }
@@ -101,6 +107,7 @@ describe('Property 1: Tab-structure invariants (fc.commands)', () => {
 
       // (e) Additional tabs are closable — verify by checking closeEventsTab removes them
       // We verify this lazily: every tab in eventsTabs can be found and removed.
+      // eslint-disable-next-line id-length
       for (const t of tabs.eventsTabs.value) {
         expect(tabs.isEventsTabId(t.id)).toBe(true)
       }
@@ -209,6 +216,7 @@ describe('Property 1: Tab-structure invariants (fc.commands)', () => {
 
   const arbLabel = fc.oneof(
     fc.constant(null),
+    // eslint-disable-next-line id-length
     fc.string({ minLength: 1, maxLength: 40 }).filter((s) => s.trim() !== '' && s.trim() !== '-')
   )
 
@@ -226,6 +234,7 @@ describe('Property 1: Tab-structure invariants (fc.commands)', () => {
 
   const arbRenameCmd = fc
     .string({ minLength: 1, maxLength: 40 })
+    // eslint-disable-next-line id-length
     .filter((s) => s.trim() !== '' && s.trim() !== '-')
     .map((label) => new RenameCommand(label))
 
@@ -294,8 +303,11 @@ describe('Property 2: Events-tab persistence round-trip', () => {
     fc.record({
       id: fc
         .string({ minLength: 8, maxLength: 20 })
+        // eslint-disable-next-line id-length
         .filter((s) => s.trim() !== '')
+        // eslint-disable-next-line id-length
         .map((s) => `events:${s}`),
+      // eslint-disable-next-line id-length
       label: fc.string({ minLength: 1, maxLength: 40 }).filter((s) => s.trim() !== ''),
       dataset: fc.constantFrom(...DATASETS)
     }),
@@ -342,8 +354,11 @@ describe('Property 2: Events-tab persistence round-trip', () => {
           fc.record({
             id: fc
               .string({ minLength: 8, maxLength: 20 })
+              // eslint-disable-next-line id-length
               .filter((s) => s.trim() !== '')
+              // eslint-disable-next-line id-length
               .map((s) => `events:${s}`),
+            // eslint-disable-next-line id-length
             label: fc.string({ minLength: 1, maxLength: 40 }).filter((s) => s.trim() !== ''),
             dataset: fc.constantFrom(...DATASETS)
           }),
@@ -364,6 +379,7 @@ describe('Property 2: Events-tab persistence round-trip', () => {
           const expected = generatedList.slice(0, MAX_TOTAL_TABS - 1)
 
           // Order must be preserved
+          // eslint-disable-next-line id-length
           for (let i = 0; i < restored.length; i++) {
             expect(restored[i].id).toBe(expected[i].id)
             expect(restored[i].label).toBe(expected[i].label)

@@ -21,6 +21,7 @@ describe('Multi-tab memory-footprint benchmark', () => {
     const NUM_TABS = 6
 
     const instances = []
+    // eslint-disable-next-line id-length
     for (let i = 0; i < NUM_TABS; i++) {
       const filterData = ref({
         tsRange: {
@@ -50,7 +51,9 @@ describe('Multi-tab memory-footprint benchmark', () => {
     expect(instances).toHaveLength(NUM_TABS)
 
     // Each instance has its own independent reactive state
+    // eslint-disable-next-line id-length
     for (let i = 0; i < NUM_TABS; i++) {
+      // eslint-disable-next-line id-length
       for (let j = i + 1; j < NUM_TABS; j++) {
         expect(instances[i].instance.kpis).not.toBe(instances[j].instance.kpis)
         expect(instances[i].instance.chartData).not.toBe(instances[j].instance.chartData)
@@ -61,6 +64,7 @@ describe('Multi-tab memory-footprint benchmark', () => {
 
     // Mutating one instance does not affect others (linear-per-tab envelope)
     instances[0].instance.kpis.value = { total: 42 }
+    // eslint-disable-next-line id-length
     for (let i = 1; i < NUM_TABS; i++) {
       expect(instances[i].instance.kpis.value).toBeNull()
     }

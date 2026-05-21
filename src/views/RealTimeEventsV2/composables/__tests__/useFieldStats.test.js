@@ -106,7 +106,7 @@ describe('useFieldStats', () => {
 
     it('skips rows without summary array', async () => {
       const data = ref([{ id: '1' }, makeRow({ status: '200' })])
-      const { fieldStats } = setup()
+      setup()
       // Replace data in the setup
       const result = useFieldStats({
         data,
@@ -121,6 +121,7 @@ describe('useFieldStats', () => {
 
     it('limits topValues to 5 entries', async () => {
       const rows = []
+      // eslint-disable-next-line id-length
       for (let i = 0; i < 10; i++) {
         rows.push(makeRow({ code: `val_${i}` }))
       }

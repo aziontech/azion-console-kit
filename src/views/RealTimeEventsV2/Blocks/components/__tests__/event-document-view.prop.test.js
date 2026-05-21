@@ -47,6 +47,7 @@ describe('EventDocumentView — Property 11: Long-value row width bound', () => 
   it('Property 11: .doc-list__value has overflow-wrap and no white-space:nowrap for any string value', () => {
     fc.assert(
       fc.property(
+        // eslint-disable-next-line id-length
         fc.string({ maxLength: 1000 }).filter((s) => s.length > 0),
         (value) => {
           const wrapper = mountComponent(value)

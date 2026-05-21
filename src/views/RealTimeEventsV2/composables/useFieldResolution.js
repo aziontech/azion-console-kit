@@ -43,15 +43,15 @@ export function useFieldResolution({ filterFields, liveDatasetFields, selectedFi
       if (len <= scannedLength.value) return
 
       let added = false
-      for (let i = scannedLength.value; i < len; i++) {
-        const row = data[i]
+      for (let idx = scannedLength.value; idx < len; idx++) {
+        const row = data[idx]
         const summary = Array.isArray(row?.summary)
           ? row.summary
           : Array.isArray(row?.data)
             ? row.data
             : []
-        for (let j = 0; j < summary.length; j++) {
-          const key = summary[j]?.key
+        for (let jdx = 0; jdx < summary.length; jdx++) {
+          const key = summary[jdx]?.key
           if (!key) continue
           const display = String(key)
           if (AGGREGATION_OPERATORS.has(display)) continue
@@ -104,7 +104,7 @@ export function useFieldResolution({ filterFields, liveDatasetFields, selectedFi
     // Source 4: row-discovered keys (from incremental scan)
     // Row-discovered names win because they reflect what the backend actually
     // emits, including any casing drift vs the curated docs list.
-    for (const [lower, display] of knownRowKeys) {
+    for (const display of knownRowKeys.values()) {
       add(display, /* preferred */ true)
     }
 

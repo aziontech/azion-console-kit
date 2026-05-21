@@ -43,6 +43,7 @@ describe('EventDocumentView', () => {
     // Find copy buttons via the stubbed PrimeButton — the stub renders icon as a prop
     const copyBtns = wrapper
       .findAllComponents({ name: 'PrimeButton' })
+      // eslint-disable-next-line id-length
       .filter((c) => c.props('icon') === 'pi pi-copy')
 
     // In default (non-compact) mode, copy buttons are rendered per entry

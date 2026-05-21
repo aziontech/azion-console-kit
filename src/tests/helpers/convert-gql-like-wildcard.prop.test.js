@@ -45,14 +45,15 @@ const NUM_RUNS = 100
 
 const arbField = fc.constantFrom('host', 'status', 'requestUri')
 const arbLikeOperator = fc.constantFrom('Like', 'Ilike')
-const arbNonLikeOperator = fc.constantFrom('Eq', 'Ne', 'In', 'Range', 'Lt', 'Lte', 'Gt', 'Gte')
 
 const arbValueWithPercent = fc
   .string({ minLength: 1, maxLength: 16 })
+  // eslint-disable-next-line id-length
   .filter((s) => s.includes('%'))
 
 const arbValueWithoutPercent = fc
   .string({ minLength: 1, maxLength: 16 })
+  // eslint-disable-next-line id-length
   .filter((s) => !s.includes('%') && s.trim().length > 0)
 
 const variableKey = (field, operator) => `and_${field}${operator}`
@@ -217,6 +218,7 @@ describe('convertGQL non-Like operators forward value byte-for-byte (PBT 1.C) â€
               {
                 valueField: field,
                 operator: 'In',
+                // eslint-disable-next-line id-length
                 value: values.map((v) => ({ value: v, label: v }))
               }
             ]

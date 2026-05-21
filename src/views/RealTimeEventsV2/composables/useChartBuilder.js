@@ -11,7 +11,6 @@ import {
 } from './useChartBucketing'
 import { getChartConfig } from '../Blocks/constants/chart-configs'
 import { CHART_KINDS, resolveChartKind, isStackedKind, isMultiSeriesKind } from './chart-kinds'
-import { computeTooltipPosition } from './tooltip-position.js'
 
 function formatBytes(bytes) {
   if (bytes === 0) return '0 B'
@@ -91,8 +90,6 @@ export function useChartBuilder(props) {
 
     const stackKey =
       kind === CHART_KINDS.STACKED_HISTOGRAM ? String(props.stackBy || 'default') : 'default'
-
-    const isStackedChart = false // spline charts always render at absolute Y values
 
     // Metrics API charts (MULTI_SERIES_TIMESERIES) return data already
     // aggregated at the correct granularity — plot points directly without
@@ -313,18 +310,18 @@ function buildDirectSeries(rawData, seriesFields, duration, tz) {
   }
 
   // Sort by ts ascending
-  const sorted = [...rawData].sort((a, b) => new Date(a.ts) - new Date(b.ts))
+  const sorted = [...rawData].sort((aa, bb) => new Date(aa.ts) - new Date(bb.ts))
 
   // Detect interval from consecutive timestamps for tooltip range
   let interval = 60 * 1000 // default 1 min
   if (sorted.length >= 2) {
     const gaps = []
-    for (let i = 1; i < Math.min(sorted.length, 10); i++) {
-      const gap = new Date(sorted[i].ts) - new Date(sorted[i - 1].ts)
+    for (let idx = 1; idx < Math.min(sorted.length, 10); idx++) {
+      const gap = new Date(sorted[idx].ts) - new Date(sorted[idx - 1].ts)
       if (gap > 0) gaps.push(gap)
     }
     if (gaps.length) {
-      gaps.sort((a, b) => a - b)
+      gaps.sort((aa, bb) => aa - bb)
       interval = gaps[Math.floor(gaps.length / 2)]
     }
   }
@@ -435,7 +432,6 @@ export function buildC3Config({
   chartData,
   chartConfig,
   chartKind = CHART_KINDS.SINGLE_SERIES_HISTOGRAM,
-  onLegendClick,
   chartContainer = null,
   getPointerPos = null
 }) {
@@ -588,7 +584,7 @@ export function buildC3Config({
       // hovered bar/line. Cursor is never inside the tooltip bounds.
       ...(chartContainer
         ? {
-            position: (data, tooltipWidth, tooltipHeight, element) => {
+            position: (data, tooltipWidth, tooltipHeight) => {
               const containerRect = chartContainer.getBoundingClientRect()
               const pointer = typeof getPointerPos === 'function' ? getPointerPos() : null
               const padding = 8
@@ -644,6 +640,7 @@ export function buildC3Config({
     // Show points only on hover for cleaner look
     point: {
       show: false,
+      // eslint-disable-next-line id-length
       focus: { expand: { enabled: true, r: 4 } }
     },
     transition: { duration: (columns[0]?.length || 0) > 150 ? 0 : 200 },

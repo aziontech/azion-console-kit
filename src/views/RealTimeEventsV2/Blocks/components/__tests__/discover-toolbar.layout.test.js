@@ -15,6 +15,7 @@
  * JSDOM does not compute scoped CSS, and the scoped `<style>` block carries
  * the layout rules we need to validate.
  */
+/* global __dirname */
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { readFileSync } from 'node:fs'

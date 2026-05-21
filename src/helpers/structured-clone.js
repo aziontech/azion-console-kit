@@ -1,3 +1,4 @@
+/* global globalThis */
 /**
  * Deep-clone an object using the native structuredClone API when available,
  * falling back to JSON round-trip for older browsers.

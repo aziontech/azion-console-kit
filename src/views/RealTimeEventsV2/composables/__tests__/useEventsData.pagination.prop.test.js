@@ -25,6 +25,7 @@ const arbNumLoadMoreCalls = fc.integer({ min: 0, max: 4 })
  */
 function buildDescendingRows(totalRows, baseTime) {
   const rows = []
+  // eslint-disable-next-line id-length
   for (let i = 0; i < totalRows; i++) {
     const ts = new Date(baseTime - i * 1000).toISOString()
     rows.push({
@@ -69,9 +70,6 @@ function createEventsDataForPagination(allRows, pageSize) {
   const mockListService = createMockListService(allRows)
   const totalRowCount = allRows.length
 
-  // We'll capture setRecordsFound to call it after load
-  let setRecordsFoundFn = null
-
   const instance = useEventsData({
     filterData: ref({
       tsRange: { tsRangeBegin: begin, tsRangeEnd: end },
@@ -112,6 +110,7 @@ describe('Feature: real-time-events-refactor, Property 11: loadMore pagination a
         instance.hasMoreData.value = true
 
         // Perform N loadMore calls
+        // eslint-disable-next-line id-length
         for (let i = 0; i < numLoadMore; i++) {
           if (!instance.hasMoreData.value) break
           await instance.loadMore()
@@ -124,6 +123,7 @@ describe('Feature: real-time-events-refactor, Property 11: loadMore pagination a
         expect(rows.length).toBe(expectedLength)
 
         // ── Property: descending timestamp order ──
+        // eslint-disable-next-line id-length
         for (let i = 1; i < rows.length; i++) {
           const prevTs = new Date(rows[i - 1].ts).getTime()
           const currTs = new Date(rows[i].ts).getTime()
@@ -131,11 +131,13 @@ describe('Feature: real-time-events-refactor, Property 11: loadMore pagination a
         }
 
         // ── Property: no duplicate rows ──
+        // eslint-disable-next-line id-length
         const ids = rows.map((r) => r.id)
         const uniqueIds = new Set(ids)
         expect(uniqueIds.size).toBe(rows.length)
 
         // ── Property: no gaps (consecutive rows from the dataset) ──
+        // eslint-disable-next-line id-length
         for (let i = 0; i < rows.length; i++) {
           expect(rows[i].id).toBe(`row-${i}`)
         }
@@ -161,8 +163,7 @@ describe('Feature: real-time-events-refactor, Property 11: loadMore pagination a
         instance.setRecordsFound(totalRowCount)
         instance.hasMoreData.value = true
 
-        const callsAfterLoad = mockListService.mock.calls.length
-
+        // eslint-disable-next-line id-length
         for (let i = 0; i < numLoadMore; i++) {
           if (!instance.hasMoreData.value) break
           await instance.loadMore()
@@ -176,6 +177,7 @@ describe('Feature: real-time-events-refactor, Property 11: loadMore pagination a
         expect(offsets[0]).toBe(0)
 
         // Subsequent calls should have strictly increasing offsets
+        // eslint-disable-next-line id-length
         for (let i = 1; i < offsets.length; i++) {
           expect(offsets[i]).toBeGreaterThan(offsets[i - 1])
         }
@@ -224,12 +226,14 @@ describe('Feature: real-time-events-refactor, Property 11: loadMore pagination a
         instance.setRecordsFound(totalAvailableRows)
         instance.hasMoreData.value = true
 
+        // eslint-disable-next-line id-length
         for (let i = 0; i < numLoadMore; i++) {
           if (!instance.hasMoreData.value) break
           await instance.loadMore()
         }
 
         // tableData.length should equal the sum of all page sizes returned
+        // eslint-disable-next-line id-length
         const sumOfPages = pageSizesReturned.reduce((sum, s) => sum + s, 0)
         expect(instance.tableData.value.length).toBe(sumOfPages)
       }),

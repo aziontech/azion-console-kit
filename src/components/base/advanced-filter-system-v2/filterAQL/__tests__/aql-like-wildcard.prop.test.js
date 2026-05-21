@@ -61,8 +61,11 @@ const arbToken = fc.stringMatching(/^[a-z0-9.-]{1,12}$/)
 // both-sides wildcard `%value%`. The captured `raw` is the exact text that
 // must round-trip through the parser byte-for-byte.
 const arbWildcardValue = fc.oneof(
+  // eslint-disable-next-line id-length
   arbToken.map((t) => `${t}%`),
+  // eslint-disable-next-line id-length
   arbToken.map((t) => `%${t}`),
+  // eslint-disable-next-line id-length
   arbToken.map((t) => `%${t}%`)
 )
 

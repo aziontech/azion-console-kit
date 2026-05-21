@@ -1,3 +1,4 @@
+/* global globalThis */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 /**
@@ -156,6 +157,7 @@ describe('useSessionManager — tab-limit path', () => {
       openTab('panel-b')
 
       // Tab should now be open
+      // eslint-disable-next-line id-length
       expect(openTabs.value.some((t) => t.id === 'panel-b')).toBe(true)
       // Active tab should be set
       expect(activeTabId.value).toBe('panel-b')
@@ -172,6 +174,7 @@ describe('useSessionManager — tab-limit path', () => {
   describe('when canOpenNewTab is NOT injected (null)', () => {
     it('falls back to the old MAX_OPEN_TABS = 5 limit', () => {
       // Create 6 panels so we can try to open more than 5
+      // eslint-disable-next-line id-length
       const panels = Array.from({ length: 6 }, (_, i) => makePanel(`panel-${i}`))
 
       // No canOpenNewTab injected — uses legacy path
@@ -179,11 +182,13 @@ describe('useSessionManager — tab-limit path', () => {
       const { openTab, openTabs } = manager
 
       // Open 5 tabs (the old limit)
+      // eslint-disable-next-line id-length
       for (let i = 0; i < 5; i++) {
         openTab(`panel-${i}`)
       }
 
       // At this point we have 5 extra tabs + 1 pinned = 6 total
+      // eslint-disable-next-line id-length
       const extraCount = openTabs.value.filter((t) => t.id !== null).length
       expect(extraCount).toBe(5)
 
@@ -192,6 +197,7 @@ describe('useSessionManager — tab-limit path', () => {
       openTab('panel-5')
 
       // Tab should NOT have been added
+      // eslint-disable-next-line id-length
       const extraCountAfter = openTabs.value.filter((t) => t.id !== null).length
       expect(extraCountAfter).toBe(5)
 
