@@ -57,7 +57,6 @@ src/views/Playground/PlaygroundView.vue
 specs.json
 
 docs/ARCHITECTURE.md
-hooks/
 
 storybook/yarn.lock
 
