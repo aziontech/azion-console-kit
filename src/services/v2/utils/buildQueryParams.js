@@ -53,7 +53,7 @@ export const buildQueryParams = (paramsObject = {}) => {
     }
 
     if (paramValue !== null && paramValue !== undefined && paramValue !== '') {
-      params.set(paramKey.toLowerCase(), paramValue)
+      params.set(paramKey, paramValue)
     }
   })
 

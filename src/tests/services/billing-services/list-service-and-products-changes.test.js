@@ -165,12 +165,6 @@ const fixtures = {
                 quantity: '776,472',
                 price: formatCurrencyString('BRL', 4.97),
                 slug: 'requests'
-              },
-              {
-                country: 'Canada',
-                quantity: '0',
-                price: formatCurrencyString('BRL', 0.0),
-                slug: 'requests'
               }
             ]
           },
@@ -185,48 +179,6 @@ const fixtures = {
                 quantity: '1.539 GB',
                 price: formatCurrencyString('BRL', 1.46),
                 slug: 'data_transferred'
-              },
-              {
-                country: 'Canada',
-                quantity: '0 GB',
-                price: formatCurrencyString('BRL', 0.0),
-                slug: 'data_transferred'
-              }
-            ]
-          }
-        ]
-      },
-      {
-        service: 'Data Stream',
-        value: formatCurrencyString('BRL', 0),
-        slug: 'data_stream',
-        currency: 'BRL',
-        descriptions: [
-          {
-            service: 'Data Streamed',
-            slug: 'data_stream_data_streamed',
-            quantity: '0 GB',
-            price: formatCurrencyString('BRL', 0),
-            data: [
-              {
-                country: 'Brazil',
-                quantity: '0 GB',
-                price: formatCurrencyString('BRL', 0),
-                slug: 'data_stream_data_streamed'
-              }
-            ]
-          },
-          {
-            service: 'Data Stream Requests',
-            slug: 'data_stream_requests',
-            quantity: '0',
-            price: formatCurrencyString('BRL', 0),
-            data: [
-              {
-                country: 'Brazil',
-                quantity: '0',
-                price: formatCurrencyString('BRL', 0),
-                slug: 'data_stream_requests'
               }
             ]
           }
@@ -256,7 +208,7 @@ describe('BillingServices', () => {
     const result = await sut()
 
     expect(result).toEqual(fixtures.formattedResponse.data)
-    expect(result.some((item) => item.slug === 'data_stream')).toBe(true)
+    expect(result.some((item) => item.slug === 'data_stream')).toBe(false)
   })
 
   it('should return an error if the request fails', async () => {

@@ -10,12 +10,21 @@ export default {
   content: [
     './index.html',
     './src/**/*.{vue,js,ts,jsx,tsx}',
-    './node_modules/@aziontech/webkit/**/*.{vue,js,ts,jsx,tsx}' 
+    './node_modules/@aziontech/webkit/**/*.{vue,js,ts,jsx,tsx}'
   ],
   darkMode: ['class', '.dark', '.azion.azion-dark'],
   theme: {
     fontFamily: {
-      sans: ['Sora', 'ui-sans-serif', 'system-ui', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji']
+      sans: [
+        'Sora',
+        'ui-sans-serif',
+        'system-ui',
+        'sans-serif',
+        'Apple Color Emoji',
+        'Segoe UI Emoji',
+        'Segoe UI Symbol',
+        'Noto Color Emoji'
+      ]
     },
     listStyleType: {
       none: 'none',
@@ -62,19 +71,30 @@ export default {
         robotomono: ['Roboto Mono'],
         sora: ['Sora'],
         protomono: ['Proto Mono'],
-        mono: ['Proto Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'Courier New', 'monospace']
+        'proto-mono': ['Proto Mono'],
+        mono: [
+          'Proto Mono',
+          'ui-monospace',
+          'SFMono-Regular',
+          'Menlo',
+          'Monaco',
+          'Cascadia Code',
+          'Roboto Mono',
+          'Courier New',
+          'monospace'
+        ]
       },
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',
         fadeOut: 'fadeOut 220ms ease-in-out',
         slideDown: 'slideDown 220ms ease-in-out',
         blink: 'blink 1.4s infinite both',
-        'highlight-fade': 'highlight ease-in forwards',
+        'highlight-fade': 'highlight ease-in forwards'
       },
       keyframes: {
         highlight: {
-          '0%': { backgroundColor: 'var(--surface-hover)', fontWeight: '500'},
-          '100%': { backgroundColor: 'var(--surface-hover)',  fontWeight: '500'}
+          '0%': { backgroundColor: 'var(--surface-hover)', fontWeight: '500' },
+          '100%': { backgroundColor: 'var(--surface-hover)', fontWeight: '500' }
         },
         fadeIn: {
           '0%': { opacity: '0' },

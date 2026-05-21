@@ -106,7 +106,9 @@ const router = createRouter({
     edgeSQLRoutes,
     edgeStorageRoutes,
     credentialsRoutes
-  ].concat(errorRoutes)
+  ]
+    .filter(Boolean)
+    .concat(errorRoutes)
 })
 
 router.beforeEach(async (to, from, next) => {

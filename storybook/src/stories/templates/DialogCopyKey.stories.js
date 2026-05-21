@@ -1,5 +1,5 @@
-import DialogCopyKey from '@/templates/dialog-copy-key/index.vue';
-import { ref, provide } from 'vue';
+import DialogCopyKey from '@/templates/dialog-copy-key/index.vue'
+import { ref, provide } from 'vue'
 
 export default {
   title: 'Templates/DialogCopyKey',
@@ -8,24 +8,34 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: 'A dialog component that displays a personal token value with copy functionality and a warning message. Uses PrimeDialog with a password input (with toggle mask and readonly) and receives the token via dialogRef injection. Designed to be used with PrimeVue dynamic dialog systems. The token is displayed once with a warning to copy it before closing.'
+        component: 'A dialog component that displays a token/key value with copy functionality and a warning message. Uses Dialog with either InputPassword (with toggle mask) or InputText based on the mask parameter. Receives the token via dialogRef injection. Designed to be used with PrimeVue dynamic dialog systems. Supports both Personal Tokens and Origin Keys with configurable masking behavior. The token is displayed once with a warning to copy it before closing.'
       }
     }
   }
-};
+}
 
 // Helper component to provide dialogRef injection
 const DialogWrapper = {
   components: { DialogCopyKey },
   props: {
-    personalToken: {
+    token: {
       type: String,
-      default: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+      default: 'ec7dfefb-c7c4-429e-b4ab-bc952f6176b3'
+    },
+    title: {
+      type: String,
+      default: 'Origin Key'
+    },
+    mask: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props) {
     const dialogData = ref({
-      personalToken: props.personalToken
+      token: props.token,
+      title: props.title,
+      mask: props.mask
     });
 
     const dialogRef = ref({
@@ -43,11 +53,18 @@ const DialogWrapper = {
   template: `
     <DialogCopyKey />
   `
-};
+}
 
 export const Default = {
   render: () => ({
     components: { DialogWrapper },
-    template: '<DialogWrapper personalToken="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" />'
+    template: '<DialogWrapper token="ec7dfefb-c7c4-429e-b4ab-bc952f6176b3" title="Origin Key" :mask="false" />'
   })
-};
+}
+
+export const PersonalToken = {
+  render: () => ({
+    components: { DialogWrapper },
+    template: '<DialogWrapper token="azion34c675c8ee426a6830807bbfff0dddb0f42" title="Personal Token" :mask="true" />'
+  })
+}

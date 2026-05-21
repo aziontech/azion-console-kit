@@ -206,14 +206,17 @@ const METRIC_SLUGS = {
   waf_requests: { title: 'WAF - Requests' },
   waf_rule_sets: { title: 'WAF - Rule Sets' },
   workload_data_transfer: { title: 'Workload - Data Transfer', unit: 'GB' },
-  workload_workloads: { title: 'Workload - Workloads ', unit: 'Unit' }
+  workload_workloads: { title: 'Workload - Workloads ' },
+  workload_requests: { title: 'Workload - Requests' },
+  application_requets: { title: 'Application Requests' }
 }
 
 const mapRegionMetrics = (metric, regionMetricsGrouped, currency, unit) => {
   return regionMetricsGrouped.reduce((list, regionMetric) => {
     if (
       regionMetric.productSlug === metric.productSlug &&
-      regionMetric.metricSlug === metric.metricSlug
+      regionMetric.metricSlug === metric.metricSlug &&
+      (regionMetric.value > 0 || regionMetric.accounted > 0)
     ) {
       list.push({
         country: regionMetric.regionName,
@@ -228,7 +231,7 @@ const mapRegionMetrics = (metric, regionMetricsGrouped, currency, unit) => {
 
 const mapDescriptions = (product, metricsGrouped, regionMetricsGrouped) => {
   return metricsGrouped.reduce((list, metric) => {
-    if (metric.productSlug === product.productSlug) {
+    if (metric.productSlug === product.productSlug && (metric.value > 0 || metric.accounted > 0)) {
       const unit = METRIC_SLUGS[metric.metricSlug]?.unit
       list.push({
         service: METRIC_SLUGS[metric.metricSlug]?.title,
@@ -286,9 +289,11 @@ const adapt = ({ body, statusCode }) => {
     ? productMetricsRegionAccounted
     : filterOutConnectorMetrics(productMetricsRegionAccounted)
 
-  const filteredProducts = productsFilteredByFlag.filter(
-    (item) => ![BOT_MANAGER_SLUG].includes(item.productSlug)
-  )
+  const filteredProducts = productsFilteredByFlag.filter((item) => {
+    const hasValue = item.value > 0
+    const isNotBotManager = ![BOT_MANAGER_SLUG].includes(item.productSlug)
+    return hasValue && isNotBotManager
+  })
 
   if (!filteredProducts.length) {
     return { body: filteredProducts, statusCode }

@@ -39,7 +39,11 @@ const SERVICE_EXCEPTIONS = [
   /\/helpers?\//,
   /\/errors?(\/|$)/,
   /\/constants?\//,
-  /\/base\/query\//
+  /\/base\/query\//,
+  // Pure-utility files colocated with a service (no HTTP, no side effects).
+  // Match the file-name suffix so e.g. `service-orders-constants` is treated
+  // as a utility rather than a service entry point.
+  /-(constants|errors|strategy|helpers|types|contracts|adapter)(\.[jt]sx?)?$/
 ]
 
 /**

@@ -21,7 +21,8 @@
       default: 'No registers found.'
     },
     scrollHeight: {
-      type: String
+      type: String,
+      default: ''
     }
   })
 </script>
@@ -36,6 +37,7 @@
       :data="data"
       :paginator="false"
       :columns="columns"
+      :scrollable="!!scrollHeight"
       :scrollHeight="scrollHeight"
       :emptyListMessage="emptyListMessage"
       :rowHover="false"

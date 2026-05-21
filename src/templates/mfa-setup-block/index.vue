@@ -33,11 +33,11 @@
         <!-- QR Code -->
         <div class="flex flex-wrap justify-center items-center">
           <Skeleton
-            v-show="!qrCode.url"
+            v-if="!qrCode.url"
             class="w-[10rem] h-[10rem] sm:w-[12.5rem] sm:h-[12.5rem]"
           />
           <QrcodeVue
-            v-show="qrCode.url"
+            v-else-if="qrCode.url"
             :value="qrCode?.url"
             level="H"
             :size="250"

@@ -18,13 +18,19 @@
         @loaded-service-object="isFormLoading = false"
       >
         <template #form="{ loading }">
-          <FormSkeleton v-if="loading || isFormLoading" />
-          <FormFieldsYourSettings
-            v-show="!loading && !isFormLoading"
-            :timezoneOptions="optionsTimezone"
-            :listCountriesPhoneService="listCountriesPhoneService"
-            @password-strength="onPasswordStrengthChange"
-          />
+          <div class="relative flex flex-col gap-8 max-md:gap-6">
+            <FormFieldsYourSettings
+              :timezoneOptions="optionsTimezone"
+              :listCountriesPhoneService="listCountriesPhoneService"
+              @password-strength="onPasswordStrengthChange"
+            />
+            <div
+              v-if="loading || isFormLoading"
+              class="absolute inset-0 z-10 bg-[var(--surface-ground)]"
+            >
+              <FormSkeleton />
+            </div>
+          </div>
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading, values }">
           <ActionBarBlockWithTeleport
