@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { accountGuard } from '@/router/hooks/guards/accountGuard'
 
 vi.mock('@/helpers/account-data', () => ({
-  loadUserAndAccountInfo: vi.fn()
+  loadAccountHydration: vi.fn()
 }))
 
 vi.mock('@/helpers', () => ({
@@ -18,7 +18,7 @@ vi.mock('@/services/v2/base/auth', () => ({
 
 describe('accountGuard hasSession check', () => {
   it('should redirect to login without calling API when hasSession=false', async () => {
-    const { loadUserAndAccountInfo } = await import('@/helpers/account-data')
+    const { loadAccountHydration } = await import('@/helpers/account-data')
 
     const result = await accountGuard({
       to: { meta: { isPublic: false }, fullPath: '/products' },
@@ -26,27 +26,31 @@ describe('accountGuard hasSession check', () => {
       tracker: { reset: vi.fn() }
     })
 
-    expect(loadUserAndAccountInfo).not.toHaveBeenCalled()
+    expect(loadAccountHydration).not.toHaveBeenCalled()
     expect(result).toBe('/login')
   })
 
   it('should attempt session restore when hasSession=true', async () => {
-    const { loadUserAndAccountInfo } = await import('@/helpers/account-data')
-    loadUserAndAccountInfo.mockResolvedValue(undefined)
+    const { loadAccountHydration } = await import('@/helpers/account-data')
+    loadAccountHydration.mockResolvedValue(undefined)
 
     const result = await accountGuard({
       to: { meta: { isPublic: false }, fullPath: '/products' },
-      accountStore: { hasActiveUserId: false, hasSession: true },
+      accountStore: {
+        hasActiveUserId: false,
+        hasSession: true,
+        needsOnboarding: false
+      },
       tracker: { reset: vi.fn() }
     })
 
-    expect(loadUserAndAccountInfo).toHaveBeenCalled()
+    expect(loadAccountHydration).toHaveBeenCalled()
     expect(result).toBeUndefined()
   })
 
   it('should not interfere when user is already logged in', async () => {
-    const { loadUserAndAccountInfo } = await import('@/helpers/account-data')
-    loadUserAndAccountInfo.mockClear()
+    const { loadAccountHydration } = await import('@/helpers/account-data')
+    loadAccountHydration.mockClear()
 
     const result = await accountGuard({
       to: { meta: { isPublic: false }, fullPath: '/products' },
@@ -54,13 +58,13 @@ describe('accountGuard hasSession check', () => {
       tracker: { reset: vi.fn() }
     })
 
-    expect(loadUserAndAccountInfo).not.toHaveBeenCalled()
+    expect(loadAccountHydration).not.toHaveBeenCalled()
     expect(result).toBeUndefined()
   })
 
   it('should not interfere on public routes', async () => {
-    const { loadUserAndAccountInfo } = await import('@/helpers/account-data')
-    loadUserAndAccountInfo.mockClear()
+    const { loadAccountHydration } = await import('@/helpers/account-data')
+    loadAccountHydration.mockClear()
 
     const result = await accountGuard({
       to: { meta: { isPublic: true }, fullPath: '/login' },
@@ -68,7 +72,7 @@ describe('accountGuard hasSession check', () => {
       tracker: { reset: vi.fn() }
     })
 
-    expect(loadUserAndAccountInfo).not.toHaveBeenCalled()
+    expect(loadAccountHydration).not.toHaveBeenCalled()
     expect(result).toBeUndefined()
   })
 })

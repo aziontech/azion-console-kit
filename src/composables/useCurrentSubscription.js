@@ -46,7 +46,9 @@ export function useCurrentSubscription() {
   const plansQueryEnabled = computed(
     () => Boolean(accountId.value) && hasContractedPlan.value && Boolean(activeServiceOrder.value)
   )
-  const { data: plansData, isLoading: isLoadingPlans } = usePlansList({ enabled: plansQueryEnabled })
+  const { data: plansData, isLoading: isLoadingPlans } = usePlansList({
+    enabled: plansQueryEnabled
+  })
 
   const planSku = computed(() => {
     if (isLoadingServiceOrder.value) return null
