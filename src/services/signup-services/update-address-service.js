@@ -1,14 +1,18 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import * as Errors from '@/services/axios/errors'
 
-const makeAccountSettingsBaseUrl = () => {
-  const version = 'v4'
-  return `${version}/iam/account`
+const ENDPOINT = 'v4/iam/account'
+
+const ERROR_BY_STATUS = {
+  400: Errors.InvalidApiRequestError,
+  403: Errors.PermissionError,
+  404: Errors.NotFoundError,
+  500: Errors.InternalServerError
 }
 
 export const updateAddressService = async (payload) => {
   const httpResponse = await AxiosHttpClientAdapter.request({
-    url: makeAccountSettingsBaseUrl(),
+    url: ENDPOINT,
     method: 'PATCH',
     body: {
       postal_code: payload.postalCode,
@@ -19,22 +23,9 @@ export const updateAddressService = async (payload) => {
       complement: payload.complement
     }
   })
-  return parseHttpResponse(httpResponse)
-}
 
-const parseHttpResponse = (httpResponse) => {
-  switch (httpResponse.statusCode) {
-    case 200:
-      return 'Address updated successfully'
-    case 400:
-      throw new Error(new Errors.InvalidApiRequestError().message)
-    case 403:
-      throw new Error(new Errors.PermissionError().message)
-    case 404:
-      throw new Error(new Errors.NotFoundError().message)
-    case 500:
-      throw new Error(new Errors.InternalServerError().message)
-    default:
-      throw new Error(new Errors.UnexpectedError().message)
-  }
+  if (httpResponse.statusCode === 200) return
+
+  const ErrorClass = ERROR_BY_STATUS[httpResponse.statusCode] ?? Errors.UnexpectedError
+  throw new Error(new ErrorClass().message)
 }
