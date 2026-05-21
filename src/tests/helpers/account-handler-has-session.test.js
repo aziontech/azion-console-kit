@@ -8,7 +8,8 @@ vi.mock('@/stores/account', () => ({
 
 vi.mock('@/services/v2/base/auth/sessionManager', () => ({
   sessionManager: {
-    switchAccount: vi.fn().mockResolvedValue(undefined)
+    switchAccount: vi.fn().mockResolvedValue(undefined),
+    notifySwitchAccountComplete: vi.fn()
   }
 }))
 
@@ -17,7 +18,7 @@ describe('AccountHandler hasSession flag', () => {
     const setHasSession = vi.fn()
     useAccountStore.mockReturnValue({ setHasSession })
 
-    const switchAccountService = vi.fn().mockResolvedValue({ firstLogin: false })
+    const switchAccountService = vi.fn().mockResolvedValue({})
     const listTypeAccountService = vi.fn()
     const handler = new AccountHandler(switchAccountService, listTypeAccountService)
 
@@ -30,7 +31,7 @@ describe('AccountHandler hasSession flag', () => {
     const setHasSession = vi.fn()
     useAccountStore.mockReturnValue({ setHasSession })
 
-    const switchAccountService = vi.fn().mockResolvedValue({ firstLogin: false })
+    const switchAccountService = vi.fn().mockResolvedValue({})
     const listTypeAccountService = vi.fn()
     const handler = new AccountHandler(switchAccountService, listTypeAccountService)
 
@@ -40,5 +41,18 @@ describe('AccountHandler hasSession flag', () => {
     await handler.switchAccountAndRedirect('456')
 
     expect(setHasSession).toHaveBeenCalledWith(true)
+  })
+
+  it('should return home route from switchAndReturnAccountPage', async () => {
+    const setHasSession = vi.fn()
+    useAccountStore.mockReturnValue({ setHasSession })
+
+    const switchAccountService = vi.fn().mockResolvedValue({})
+    const listTypeAccountService = vi.fn().mockResolvedValue({ results: [] })
+    const handler = new AccountHandler(switchAccountService, listTypeAccountService)
+
+    const result = await handler.switchAndReturnAccountPage('123')
+
+    expect(result).toEqual({ name: 'home' })
   })
 })
