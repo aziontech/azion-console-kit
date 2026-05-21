@@ -233,7 +233,7 @@
               v-if="item?.tag"
               :value="item.tag.value"
               :icon="item.tag.icon"
-              severity="info"
+              severity="secondary"
               class="mt-3"
             />
           </template>

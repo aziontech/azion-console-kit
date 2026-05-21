@@ -56,7 +56,7 @@
           <span v-bind="props.label">{{ label }}</span>
           <PrimeTag
             v-if="item.tag"
-            :severity="item.tag === 'New' ? 'primary' : 'info'"
+            :severity="item.tag === 'New' ? 'primary' : 'secondary'"
             :value="item.tag"
             class="ml-2"
           />

@@ -60,7 +60,7 @@ describe('Switch-account-services', () => {
           type: {
             content: 'Brand',
             icon: 'pi pi-globe',
-            severity: 'info'
+            severity: 'secondary'
           }
         }
       ],

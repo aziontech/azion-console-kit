@@ -47,7 +47,7 @@ const parseName = (edgeFunctionData) => {
       icon: 'pi pi-cart-plus',
       value: 'Integration',
       outlined: true,
-      severity: 'info'
+      severity: 'secondary'
     }
   }
 

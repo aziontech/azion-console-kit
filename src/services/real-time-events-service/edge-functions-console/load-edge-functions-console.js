@@ -66,17 +66,17 @@ const levelMap = {
   },
   INFO: {
     content: 'Info',
-    severity: 'info',
+    severity: 'secondary',
     icon: 'pi pi-info-circle'
   },
   LOG: {
     content: 'Log',
-    severity: 'info',
+    severity: 'secondary',
     icon: 'pi pi-code'
   },
   MDN: {
     content: 'MDN',
-    severity: 'info',
+    severity: 'secondary',
     icon: 'pi pi-code'
   }
 }

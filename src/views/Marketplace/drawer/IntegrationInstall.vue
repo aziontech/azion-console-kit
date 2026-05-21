@@ -258,7 +258,7 @@
                         <Tag
                           v-if="slotProps.option.upgradeable"
                           value="Update Available"
-                          severity="info"
+                          severity="secondary"
                         />
                       </div>
                     </template>

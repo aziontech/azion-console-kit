@@ -18,7 +18,7 @@ export const RulesEngineAdapter = {
         phase: {
           content: capitalizeFirstLetter(phase),
           outlined: true,
-          severity: 'info'
+          severity: 'secondary'
         },
         behaviors: rule.behaviors,
         criteria: rule.criteria,
