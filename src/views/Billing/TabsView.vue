@@ -3,7 +3,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import TabView from 'primevue/tabview'
-  import Tag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/prime-tag'
   import PaymentListView from './PaymentListView.vue'
   import BillsView from '@/views/Billing/BillsView.vue'
   import SkeletonBlock from '@/templates/skeleton-block'
