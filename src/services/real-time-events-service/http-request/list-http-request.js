@@ -2,6 +2,7 @@ import { convertGQL } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
+import { useGraphQLStore } from '@/stores/graphql-query'
 import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 import { getCurrentTimezone } from '@/helpers'
@@ -9,192 +10,58 @@ import { getCurrentTimezone } from '@/helpers'
 const shouldShowTsColumn = false
 const shouldLimitRequestUri = true
 
-const DATASET = 'workloadEvents'
-
-// All 58 workloadEvents fields split into two chunks (≤30 each + join keys).
-// `requestId` + `ts` in both for reliable merge.
-const FIELDS_CHUNK_A = [
-  'requestId',
-  'ts',
-  'bytesSent',
-  'configurationId',
-  'debugLog',
-  'geolocAsn',
-  'geolocCountryName',
-  'geolocRegionName',
-  'host',
-  'httpReferer',
-  'httpUserAgent',
-  'proxyStatus',
-  'requestLength',
-  'requestMethod',
-  'requestTime',
-  'requestUri',
-  'remoteAddress',
-  'remotePort',
-  'scheme',
-  'serverProtocol',
-  'sentHttpContentType',
-  'sentHttpXOriginalImageSize',
-  'sessionid',
-  'serverAddr',
-  'serverPort',
-  'solutionId',
-  'sslCipher',
-  'sslProtocol',
-  'sslServerName',
-  'sslSessionReused'
-]
-
-const FIELDS_CHUNK_B = [
-  'requestId',
-  'ts',
-  'stacktrace',
-  'status',
-  'streamname',
-  'tcpinfoRtt',
-  'upstreamAddr',
-  'upstreamAddrStr',
-  'upstreamBytesReceived',
-  'upstreamBytesReceivedStr',
-  'upstreamBytesSent',
-  'upstreamBytesSentStr',
-  'upstreamCacheStatus',
-  'upstreamConnectTime',
-  'upstreamConnectTimeStr',
-  'upstreamHeaderTime',
-  'upstreamHeaderTimeStr',
-  'upstreamResponseTime',
-  'upstreamResponseTimeStr',
-  'upstreamStatus',
-  'upstreamStatusStr',
-  'virtualhostId',
-  'wafAttackFamily',
-  'wafBlock',
-  'wafEvheaders',
-  'wafLearning',
-  'wafMatch',
-  'wafScore',
-  'wafTotalBlocked',
-  'wafTotalProcessed'
-]
-
-// ── DEV MOCK ────────────────────────────────────────────────────────────
-const USE_MOCK =
-  import.meta.env.MODE === 'development' && import.meta.env.VITE_ENVIRONMENT !== 'production'
-
-const spreadTimestamps = (events) => {
-  const now = Date.now()
-  const fiveMinutesAgo = now - 5 * 60 * 1000
-  return events.map((event, index) => {
-    const fraction = index / (events.length - 1 || 1)
-    const ts = new Date(fiveMinutesAgo + fraction * (now - fiveMinutesAgo)).toISOString()
-    return { ...event, ts }
-  })
-}
-
-const loadMockData = async () => {
-  const mod = await import('./__mocks__/events.json')
-  const raw = mod.default || mod
-  const events = spreadTimestamps(raw.data.httpEvents)
-  return { data: { httpEvents: events } }
-}
-
-const adaptMockResponse = (httpResponse) => {
-  let counter = 0
-  const data = httpResponse.data.httpEvents?.map((httpEventItem) => ({
-    id: `mock_${Date.now()}_${counter++}`,
-    requestId: httpEventItem.requestId,
-    summary: buildSummary(httpEventItem, shouldLimitRequestUri, shouldShowTsColumn),
-    ts: httpEventItem.ts,
-    tsFormat: getCurrentTimezone(httpEventItem.ts)
-  }))
-  return { data }
-}
-// ── END DEV MOCK ────────────────────────────────────────────────────────
-
-export const listHttpRequest = async (filter, { onQuery } = {}) => {
-  if (USE_MOCK) {
-    const body = await loadMockData()
-    return adaptMockResponse(body)
-  }
+export const listHttpRequest = async (filter) => {
+  const payload = adapt(filter)
+  const graphqlStore = useGraphQLStore()
+  graphqlStore.setQuery(payload)
 
   const decorator = new AxiosHttpClientSignalDecorator()
-  const makeRequest = (fields) => {
-    const payload = adapt(filter, fields)
-    if (typeof onQuery === 'function') {
-      onQuery(payload)
-    }
-    return decorator.request({
-      baseURL: '/',
-      url: makeRealTimeEventsBaseUrl(),
-      method: 'POST',
-      body: payload
-    })
-  }
 
-  const [responseA, responseB] = await Promise.all([
-    makeRequest(FIELDS_CHUNK_A),
-    makeRequest(FIELDS_CHUNK_B)
-  ])
+  const httpResponse = await decorator.request({
+    baseURL: '/',
+    url: makeRealTimeEventsBaseUrl(),
+    method: 'POST',
+    body: payload
+  })
 
-  // Both must succeed
-  if (responseA.statusCode !== 200) return parseHttpResponse(responseA)
-  if (responseB.statusCode !== 200) return parseHttpResponse(responseB)
-
-  const rowsA = responseA.body.data?.[DATASET] || []
-  const rowsB = responseB.body.data?.[DATASET] || []
-
-  // Merge by requestId — both queries use the same filter + ordering so
-  // rows arrive in the same order. Build a Map from chunk B for O(1) lookup.
-  // Only index rows that have a non-null requestId to avoid false matches.
-  const chunkBByRequestId = new Map(
-    rowsB
-      .filter((row) => row.requestId != null && row.requestId !== '')
-      .map((row) => [row.requestId, row])
-  )
-
-  // In-place merge: assign chunk B fields directly onto chunk A row objects
-  // to avoid spread-copying every row.
-  for (let i = 0; i < rowsA.length; i++) {
-    const rowA = rowsA[i]
-    // Primary: match by requestId. Fallback: match by position (same index).
-    // Position fallback handles cases where requestId is null/empty for all rows.
-    let rowB = null
-    if (rowA.requestId != null && rowA.requestId !== '') {
-      rowB = rowsB[i]?.requestId === rowA.requestId
-        ? rowsB[i]
-        : chunkBByRequestId.get(rowA.requestId) || null
-    }
-    // Positional fallback: if no requestId match, use same index
-    if (!rowB && rowsB[i]) {
-      rowB = rowsB[i]
-    }
-    if (rowB) {
-      for (const key in rowB) {
-        if (key !== 'requestId' && key !== 'ts') {
-          rowA[key] = rowB[key]
-        }
-      }
-    }
-  }
-
-  return adaptResponse({ data: { [DATASET]: rowsA } })
+  return parseHttpResponse(httpResponse)
 }
 
-const adapt = (filter, fields) => {
+const adapt = (filter) => {
   const table = {
-    dataset: DATASET,
-    limit: filter?.pageSize || 1000,
-    ...(filter?.offset && { offset: filter.offset }),
-    fields,
+    dataset: 'workloadEvents',
+    limit: 1000,
+    fields: [
+      'configurationId',
+      'host',
+      'requestId',
+      'httpUserAgent',
+      'requestMethod',
+      'status',
+      'ts',
+      'upstreamBytesSent',
+      'sslProtocol',
+      'wafLearning',
+      'requestUri',
+      'requestTime',
+      'serverProtocol',
+      'upstreamCacheStatus',
+      'httpReferer',
+      'remoteAddress',
+      'wafMatch',
+      'serverPort',
+      'sslCipher',
+      'wafEvheaders',
+      'serverAddr',
+      'scheme'
+    ],
     orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
 
 const adaptResponse = (httpResponse) => {
-  const data = httpResponse.data[DATASET]?.map((workloadEventItem) => ({
+  const data = httpResponse.data.workloadEvents?.map((workloadEventItem) => ({
     id: generateCurrentTimestamp(),
     requestId: workloadEventItem.requestId,
     summary: buildSummary(workloadEventItem, shouldLimitRequestUri, shouldShowTsColumn),
@@ -202,7 +69,9 @@ const adaptResponse = (httpResponse) => {
     tsFormat: getCurrentTimezone(workloadEventItem.ts)
   }))
 
-  return { data }
+  return {
+    data
+  }
 }
 
 const parseHttpResponse = (response) => {

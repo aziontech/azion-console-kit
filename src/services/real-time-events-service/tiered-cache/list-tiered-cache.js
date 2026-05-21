@@ -6,45 +6,71 @@ import { useGraphQLStore } from '@/stores/graphql-query'
 import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 import { getCurrentTimezone } from '@/helpers'
-import { CURATED_DATASET_FIELDS } from '../_shared/dataset-fields'
 
 const shouldShowTsColumn = false
 const shouldLimitRequestUri = true
 
-const DATASET = 'tieredCacheEvents'
-
 export const listTieredCache = async (filter) => {
-  const fields = [...CURATED_DATASET_FIELDS[DATASET]]
+  const payload = adapt(filter)
 
-  const payload = adapt(filter, fields)
   const graphqlStore = useGraphQLStore()
   graphqlStore.setQuery(payload)
 
   const decorator = new AxiosHttpClientSignalDecorator()
 
-  const httpResponse = await decorator.request({
+  const response = await decorator.request({
     baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
 
-  return parseHttpResponse(httpResponse)
+  return parseHttpResponse(response)
 }
 
-const adapt = (filter, fields) => {
+const adapt = (filter) => {
   const table = {
-    dataset: DATASET,
-    limit: filter?.pageSize || 500,
-    ...(filter?.offset && { offset: filter.offset }),
-    fields,
+    dataset: 'l2CacheEvents',
+    limit: 10000,
+    fields: [
+      'bytesSent',
+      'cacheKey',
+      'cacheTtl',
+      'configurationId',
+      'host',
+      'proxyHost',
+      'proxyStatus',
+      'proxyUpstream',
+      'referenceError',
+      'remoteAddr',
+      'remotePort',
+      'requestLength',
+      'requestMethod',
+      'requestTime',
+      'requestUri',
+      'scheme',
+      'sentHttpContentType',
+      'serverProtocol',
+      'solution',
+      'status',
+      'tcpinfoRtt',
+      'ts',
+      'upstreamBytesReceived',
+      'upstreamBytesReceivedStr',
+      'upstreamCacheStatus',
+      'upstreamConnectTime',
+      'upstreamHeaderTime',
+      'upstreamResponseTime',
+      'upstreamStatus',
+      'clientId'
+    ],
     orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
 
 const adaptResponse = (response) => {
-  const data = response.data[DATASET]?.map((tieredCacheEvents) => ({
+  const data = response.data.l2CacheEvents?.map((tieredCacheEvents) => ({
     configurationId: tieredCacheEvents.configurationId,
     host: tieredCacheEvents.host,
     proxyHost: tieredCacheEvents.proxyHost,

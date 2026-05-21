@@ -6,45 +6,50 @@ import { useGraphQLStore } from '@/stores/graphql-query'
 import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 import { getCurrentTimezone } from '@/helpers'
-import { CURATED_DATASET_FIELDS } from '../_shared/dataset-fields'
 
 const shouldShowTsColumn = false
 const shouldLimitRequestUri = true
 
-const DATASET = 'edgeDnsQueriesEvents'
-
 export const listEdgeDNS = async (filter) => {
-  const fields = [...CURATED_DATASET_FIELDS[DATASET]]
+  const payload = adapt(filter)
 
-  const payload = adapt(filter, fields)
   const graphqlStore = useGraphQLStore()
   graphqlStore.setQuery(payload)
 
   const decorator = new AxiosHttpClientSignalDecorator()
 
-  const httpResponse = await decorator.request({
+  const response = await decorator.request({
     baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
 
-  return parseHttpResponse(httpResponse)
+  return parseHttpResponse(response)
 }
 
-const adapt = (filter, fields) => {
+const adapt = (filter) => {
   const table = {
-    dataset: DATASET,
-    limit: filter?.pageSize || 500,
-    ...(filter?.offset && { offset: filter.offset }),
-    fields,
+    dataset: 'idnsQueriesEvents',
+    limit: 10000,
+    fields: [
+      'level',
+      'zoneId',
+      'qtype',
+      'resolutionType',
+      'solutionId',
+      'ts',
+      'uuid',
+      'statusCode',
+      'version'
+    ],
     orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
 
 const adaptResponse = (response) => {
-  const data = response.data[DATASET]?.map((edgeDnsQueriesEvents) => ({
+  const data = response.data.idnsQueriesEvents?.map((edgeDnsQueriesEvents) => ({
     id: generateCurrentTimestamp(),
     summary: buildSummary(edgeDnsQueriesEvents, shouldLimitRequestUri, shouldShowTsColumn),
     ts: edgeDnsQueriesEvents.ts,

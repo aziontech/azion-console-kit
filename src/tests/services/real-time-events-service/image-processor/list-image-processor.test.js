@@ -3,22 +3,6 @@ import { listImageProcessor } from '@/services/real-time-events-service/image-pr
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
 
-vi.mock('@/modules/filter-loaders/dataset-fields-loader', () => ({
-  loadDatasetFields: vi.fn().mockResolvedValue([]),
-  getDatasetFields: vi
-    .fn()
-    .mockReturnValue([
-      'configurationId',
-      'host',
-      'requestUri',
-      'status',
-      'bytesSent',
-      'httpReferer',
-      'ts',
-      'httpUserAgent'
-    ])
-}))
-
 const fixtures = {
   filter: {
     tsRange: {
@@ -55,21 +39,47 @@ describe('ImageProcessorServices', () => {
       body: { data: { httpRequest: [] } }
     })
     const { sut } = makeSut()
+    const datasetName = 'imagesProcessedEvents'
     await sut(fixtures.filter)
 
-    expect(requestSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        url: 'v4/events/graphql',
-        method: 'POST',
-        baseURL: '/',
-        body: expect.objectContaining({
-          variables: {
-            tsRange_begin: '2024-02-23T18:07:25',
-            tsRange_end: '2024-02-23T19:07:25'
-          }
-        })
-      })
-    )
+    const query = [
+      `query (`,
+      `\t$tsRange_begin: DateTime!`,
+      `\t$tsRange_end: DateTime!`,
+      `) {`,
+      `\t${datasetName} (`,
+      `\t\tlimit: 10000`,
+      `\t\torderBy: [ts_DESC]`,
+      `\t\tfilter: {`,
+      `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
+      `\t\t}`,
+      `\t) {`,
+      `\t\tconfigurationId`,
+      `\t\thost`,
+      `\t\trequestUri`,
+      `\t\tstatus`,
+      `\t\tbytesSent`,
+      `\t\thttpReferer`,
+      `\t\tts`,
+      `\t\thttpUserAgent`,
+      `\t}`,
+      `}`
+    ].join('\n')
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      url: 'v4/events/graphql',
+      method: 'POST',
+      signal: undefined,
+      baseURL: '/',
+      body: {
+        query,
+        variables: {
+          tsRange_begin: '2024-02-23T18:07:25',
+          tsRange_end: '2024-02-23T19:07:25'
+        }
+      },
+      headers: undefined
+    })
   })
 
   it('should parsed correctly each event', async () => {
@@ -92,13 +102,13 @@ describe('ImageProcessorServices', () => {
           httpReferer: fixtures.imageProcessor.httpReferer,
           httpUserAgent: fixtures.imageProcessor.httpUserAgent,
           summary: [
+            { key: 'bytesSent', value: fixtures.imageProcessor.bytesSent },
             { key: 'configurationId', value: fixtures.imageProcessor.configurationId },
             { key: 'host', value: fixtures.imageProcessor.host },
             { key: 'httpReferer', value: fixtures.imageProcessor.httpReferer },
             { key: 'httpUserAgent', value: fixtures.imageProcessor.httpUserAgent },
             { key: 'requestUri', value: fixtures.imageProcessor.requestUri },
-            { key: 'status', value: fixtures.imageProcessor.status },
-            { key: 'bytesSent', value: fixtures.imageProcessor.bytesSent }
+            { key: 'status', value: fixtures.imageProcessor.status }
           ],
           ts: fixtures.imageProcessor.ts,
           tsFormat: 'February 23, 2024 at 06:07:25 PM'
