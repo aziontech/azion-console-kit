@@ -57,14 +57,14 @@
         icon: 'pi pi-exclamation-triangle'
       },
       'no-variation': {
-        severity: 'info'
+        severity: 'secondary'
       },
       'positive-neutral': {
-        severity: 'info',
+        severity: 'secondary',
         icon: 'pi pi-arrow-up-right'
       },
       'negative-neutral': {
-        severity: 'info',
+        severity: 'secondary',
         icon: 'pi pi-arrow-down-left'
       }
     }

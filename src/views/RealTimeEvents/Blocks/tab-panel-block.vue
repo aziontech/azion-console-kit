@@ -229,7 +229,7 @@
       <div class="flex gap-2 justify-end">
         <PrimeTag
           :value="totalRecordsFound"
-          severity="info"
+          severity="secondary"
         />
         <PrimeButton
           outlined

@@ -40,7 +40,7 @@ const OWNER_AS_TAG = {
   },
   false: {
     content: 'No',
-    severity: 'info'
+    severity: 'secondary'
   }
 }
 

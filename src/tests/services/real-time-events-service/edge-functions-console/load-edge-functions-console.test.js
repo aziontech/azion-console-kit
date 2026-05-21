@@ -74,7 +74,7 @@ describe('EdgeFunctionsConsoleServices', () => {
       level: {
         content: 'Info',
         icon: 'pi pi-info-circle',
-        severity: 'info'
+        severity: 'secondary'
       },
       data: [
         { key: 'configurationId', value: fixtures.edgeFunctionConsole.configurationId },

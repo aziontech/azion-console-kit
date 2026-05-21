@@ -156,7 +156,7 @@ describe('UsersServices', () => {
         },
         owner: {
           content: 'No',
-          severity: 'info'
+          severity: 'secondary'
         },
         isAccountOwner: false,
         twoFactorEnabled: false,

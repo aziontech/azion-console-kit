@@ -47,7 +47,7 @@
         <i class="pi pi-search" />
         <i class="!top-[35%]">
           <Tag
-            severity="info"
+            severity="secondary"
             @click="closeSearch"
             class="not-italic border surface-border text-color-secondary surface-100 cursor-pointer"
             value="ESC"

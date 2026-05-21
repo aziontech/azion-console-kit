@@ -6,7 +6,7 @@
     />
     {{ props.cardNumber || '-' }}
     <PrimeTag
-      severity="info"
+      severity="secondary"
       :value="props.status"
       v-if="props.status"
     />

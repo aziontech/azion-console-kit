@@ -12,8 +12,8 @@
   const severityMap = {
     created: 'success',
     deleted: 'danger',
-    changed: 'info',
-    edited: 'info'
+    changed: 'secondary',
+    edited: 'secondary'
   }
 
   const severity = computed(() => {
