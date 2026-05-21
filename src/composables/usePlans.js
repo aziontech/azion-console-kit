@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue'
+import { computed, onScopeDispose, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const STORAGE_KEY = 'signup_plan_params'
@@ -7,198 +7,104 @@ const DEFAULT_EXPIRATION_DAYS = 15
 const VALID_PLANS = ['hobby', 'pro']
 const VALID_BILLING_CYCLES = ['monthly', 'yearly']
 
-// Shared state (singleton-style)
+const isValidPlan = (value) => VALID_PLANS.includes(value)
+const isValidBillingCycle = (value) => VALID_BILLING_CYCLES.includes(value)
+
+const getExpirationTimestamp = (days = DEFAULT_EXPIRATION_DAYS) =>
+  Date.now() + days * 24 * 60 * 60 * 1000
+
+const isExpired = (data) => !data?.expiresAt || Date.now() > data.expiresAt
+
+// Signup-scoped state. The user is in a single onboarding flow at a time, so
+// sharing the plan/cycle choice across the components in that flow is
+// intentional. Component-level router context is resolved per-call below.
 const _plan = ref(null)
 const _billingCycle = ref(null)
 
-// Active router context (refreshed on each usePlans call)
-const activeRoute = ref(null)
-const activeRouter = ref(null)
+const clearStorage = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+  } catch {
+    /* storage unavailable */
+  }
+}
 
-// Ensure sync watcher is registered only once
-let hasSyncWatcher = false
+const saveToStorage = () => {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        plan: _plan.value,
+        billingCycle: _billingCycle.value,
+        expiresAt: getExpirationTimestamp()
+      })
+    )
+  } catch {
+    /* storage unavailable */
+  }
+}
 
-/**
- * @typedef {Object} PlanParams
- * @property {string|null} plan - The selected plan (hobby, pro)
- * @property {string|null} billingCycle - The billing cycle (monthly, yearly)
- */
+const loadFromStorage = () => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    const data = JSON.parse(raw)
+    if (isExpired(data)) {
+      clearStorage()
+      return null
+    }
+    return {
+      plan: data.plan && isValidPlan(data.plan) ? data.plan : null,
+      billingCycle: data.billingCycle || null
+    }
+  } catch {
+    clearStorage()
+    return null
+  }
+}
 
-/**
- * Composable for managing signup plan parameters with localStorage persistence
- * and automatic URL synchronization.
- *
- * @returns {Object} Plan params state and methods
- */
 export function usePlans() {
   const route = useRoute()
   const router = useRouter()
 
-  activeRoute.value = route
-  activeRouter.value = router
-
-  /**
-   * Validates if a plan value is valid
-   * @param {string} value
-   * @returns {boolean}
-   */
-  const isValidPlan = (value) => VALID_PLANS.includes(value)
-
-  /**
-   * Validates if a billing cycle value is valid
-   * @param {string} value
-   * @returns {boolean}
-   */
-  const isValidBillingCycle = (value) => VALID_BILLING_CYCLES.includes(value)
-
-  /**
-   * Get current timestamp
-   * @returns {number}
-   */
-  const getCurrentTimestamp = () => Date.now()
-
-  /**
-   * Calculate expiration timestamp
-   * @param {number} days
-   * @returns {number}
-   */
-  const getExpirationTimestamp = (days = DEFAULT_EXPIRATION_DAYS) => {
-    return getCurrentTimestamp() + days * 24 * 60 * 60 * 1000
-  }
-
-  /**
-   * Check if stored data is expired
-   * @param {Object} data
-   * @returns {boolean}
-   */
-  const isExpired = (data) => {
-    if (!data?.expiresAt) return true
-    return getCurrentTimestamp() > data.expiresAt
-  }
-
-  /**
-   * Save params to localStorage
-   */
-  const saveToStorage = () => {
-    const data = {
-      plan: _plan.value,
-      billingCycle: _billingCycle.value,
-      expiresAt: getExpirationTimestamp()
-    }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-  }
-
-  /**
-   * Load params from localStorage
-   * @returns {PlanParams|null}
-   */
-  const loadFromStorage = () => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (!stored) return null
-
-      const data = JSON.parse(stored)
-      if (isExpired(data)) {
-        clearStorage()
-        return null
-      }
-
-      return {
-        plan: data.plan && isValidPlan(data.plan) ? data.plan : null,
-        billingCycle: data.billingCycle || null
-      }
-    } catch {
-      clearStorage()
-      return null
-    }
-  }
-
-  /**
-   * Clear localStorage data
-   */
-  const clearStorage = () => {
-    localStorage.removeItem(STORAGE_KEY)
-  }
-
-  /**
-   * Read params from URL query string
-   * URL has priority over localStorage
-   * @returns {PlanParams|null}
-   */
   const readFromUrl = () => {
-    const currentRoute = activeRoute.value
-    if (!currentRoute) return null
+    if (!route) return null
+    const { query } = route
+    const params = {}
 
-    const query = currentRoute.query
-    const urlParams = {}
+    if (query.plan && isValidPlan(query.plan)) params.plan = query.plan
 
-    if (query.plan && isValidPlan(query.plan)) {
-      urlParams.plan = query.plan
+    const rawCycle = query['billing-cycle'] ?? query.billingCycle
+    const cycle = Array.isArray(rawCycle) ? rawCycle[0] : rawCycle
+    if (typeof cycle === 'string' && isValidBillingCycle(cycle)) {
+      params.billingCycle = cycle
     }
 
-    const billingCycleQuery = query['billing-cycle'] ?? query.billingCycle
-    const normalizedBillingCycle = Array.isArray(billingCycleQuery)
-      ? billingCycleQuery[0]
-      : billingCycleQuery
-
-    if (typeof normalizedBillingCycle === 'string' && isValidBillingCycle(normalizedBillingCycle)) {
-      urlParams.billingCycle = normalizedBillingCycle
-    }
-
-    return Object.keys(urlParams).length > 0 ? urlParams : null
+    return Object.keys(params).length ? params : null
   }
 
-  /**
-   * Sync params to URL query string
-   */
   const syncToUrl = async () => {
-    const currentRoute = activeRoute.value
-    const currentRouter = activeRouter.value
+    if (!route || !router) return
 
-    if (!currentRoute || !currentRouter) return
+    const currentQuery = { ...route.query }
+    const nextQuery = { ...currentQuery }
 
-    const currentQuery = { ...currentRoute.query }
-    const newQuery = { ...currentQuery }
+    if (_plan.value) nextQuery.plan = _plan.value
+    else delete nextQuery.plan
 
-    // Update or remove plan
-    if (_plan.value) {
-      newQuery.plan = _plan.value
-    } else if (currentQuery.plan) {
-      delete newQuery.plan
-    }
-
-    // Update or remove billingCycle (canonical URL param: billing-cycle)
     if (_billingCycle.value) {
-      newQuery['billing-cycle'] = _billingCycle.value
-      if (currentQuery.billingCycle) {
-        delete newQuery.billingCycle
-      }
+      nextQuery['billing-cycle'] = _billingCycle.value
+      delete nextQuery.billingCycle
     } else {
-      if (currentQuery['billing-cycle']) {
-        delete newQuery['billing-cycle']
-      }
-      if (currentQuery.billingCycle) {
-        delete newQuery.billingCycle
-      }
+      delete nextQuery['billing-cycle']
+      delete nextQuery.billingCycle
     }
 
-    // Only navigate if query actually changed
-    const queryChanged = JSON.stringify(currentQuery) !== JSON.stringify(newQuery)
-
-    if (queryChanged) {
-      await currentRouter.replace({
-        path: currentRoute.path,
-        query: newQuery
-      })
-    }
+    if (JSON.stringify(currentQuery) === JSON.stringify(nextQuery)) return
+    await router.replace({ path: route.path, query: nextQuery })
   }
 
-  /**
-   * Initialize params from URL (priority) or localStorage
-   * Should be called once when entering signup flow
-   */
   const initialize = () => {
-    // URL has priority
     const urlParams = readFromUrl()
     if (urlParams) {
       _plan.value = urlParams.plan || null
@@ -207,62 +113,38 @@ export function usePlans() {
       return
     }
 
-    // Fall back to localStorage
-    const storedParams = loadFromStorage()
-    if (storedParams?.plan) {
-      _plan.value = storedParams.plan
-      _billingCycle.value = storedParams.billingCycle
+    const stored = loadFromStorage()
+    if (stored?.plan) {
+      _plan.value = stored.plan
+      _billingCycle.value = stored.billingCycle
       return
     }
 
-    // Default fallback for signup flow when no plan is provided
     _plan.value = 'pro'
     _billingCycle.value = 'monthly'
     saveToStorage()
   }
 
-  /**
-   * Set a single parameter
-   * @param {string} key - Parameter name (plan, billingCycle)
-   * @param {string|null} value - Parameter value
-   */
   const setParam = (key, value) => {
-    switch (key) {
-      case 'plan':
-        if (value === null || isValidPlan(value)) {
-          _plan.value = value
-        }
-        break
-      case 'billingCycle':
-        if (value === null || isValidBillingCycle(value)) {
-          _billingCycle.value = value
-        }
-        break
-    }
+    if (key === 'plan' && (value === null || isValidPlan(value))) _plan.value = value
+    else if (key === 'billingCycle' && (value === null || isValidBillingCycle(value)))
+      _billingCycle.value = value
     saveToStorage()
   }
 
-  /**
-   * Set all params at once
-   * @param {PlanParams} params
-   */
   const setParams = (params) => {
-    if (params.plan !== undefined) {
-      if (params.plan === null || isValidPlan(params.plan)) {
-        _plan.value = params.plan
-      }
+    if (params.plan !== undefined && (params.plan === null || isValidPlan(params.plan))) {
+      _plan.value = params.plan
     }
-    if (params.billingCycle !== undefined) {
-      if (params.billingCycle === null || isValidBillingCycle(params.billingCycle)) {
-        _billingCycle.value = params.billingCycle
-      }
+    if (
+      params.billingCycle !== undefined &&
+      (params.billingCycle === null || isValidBillingCycle(params.billingCycle))
+    ) {
+      _billingCycle.value = params.billingCycle
     }
     saveToStorage()
   }
 
-  /**
-   * Clear all params from memory, storage and URL
-   */
   const clear = async () => {
     _plan.value = null
     _billingCycle.value = null
@@ -270,56 +152,29 @@ export function usePlans() {
     await syncToUrl()
   }
 
-  /**
-   * Check if any params are set
-   * @returns {boolean}
-   */
-  const hasParams = computed(() => {
-    return _plan.value !== null || _billingCycle.value !== null
+  // Bind URL sync to the calling component's lifecycle so multiple instances
+  // don't share a single stale router reference.
+  const stopWatch = watch([_plan, _billingCycle], () => {
+    syncToUrl()
   })
-
-  /**
-   * Get all params as object
-   * @returns {PlanParams}
-   */
-  const params = computed(() => ({
-    plan: _plan.value,
-    billingCycle: _billingCycle.value
-  }))
-
-  // Watch for changes and sync to URL automatically
-  if (!hasSyncWatcher) {
-    watch(
-      [_plan, _billingCycle],
-      () => {
-        syncToUrl()
-      },
-      { deep: true }
-    )
-
-    hasSyncWatcher = true
-  }
+  onScopeDispose(stopWatch)
 
   return {
-    // State (reactive)
     plan: computed(() => _plan.value),
     billingCycle: computed(() => _billingCycle.value),
-    params,
-    hasParams,
+    params: computed(() => ({ plan: _plan.value, billingCycle: _billingCycle.value })),
+    hasParams: computed(() => _plan.value !== null || _billingCycle.value !== null),
 
-    // Validation helpers
     isValidPlan,
     isValidBillingCycle,
     VALID_PLANS,
     VALID_BILLING_CYCLES,
 
-    // Actions
     initialize,
     setParam,
     setParams,
     clear,
 
-    // Low-level utilities
     syncToUrl,
     saveToStorage,
     loadFromStorage
