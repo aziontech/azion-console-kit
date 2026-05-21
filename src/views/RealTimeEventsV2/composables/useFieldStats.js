@@ -72,8 +72,8 @@ export function useFieldStats({
 
       if (currentLength > prevLength) {
         // Process only new rows
-        for (let i = prevLength; i < currentLength; i++) {
-          const row = rows[i]
+        for (let idx = prevLength; idx < currentLength; idx++) {
+          const row = rows[idx]
           if (!row?.summary || !Array.isArray(row.summary)) continue
           row.summary.forEach(({ key, value }) => {
             if (!runningCounts[key]) runningCounts[key] = {}

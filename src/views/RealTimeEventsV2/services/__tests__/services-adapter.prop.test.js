@@ -39,7 +39,7 @@ vi.mock('@stores/account', () => ({
 }))
 
 vi.mock('../../helpers/format-timestamp', () => ({
-  formatTimestampCompact: (time, _tz) => `formatted:${time}`
+  formatTimestampCompact: (time) => `formatted:${time}`
 }))
 
 // Arbitrary: ISO 8601 timestamp strings (use integer-based generation to avoid invalid dates)
@@ -78,6 +78,7 @@ describe('Feature: real-time-events-refactor, Property 8: In-place row mutation 
         const result = await listHttpRequest()
 
         // Every returned row must be the exact same object reference
+        // eslint-disable-next-line id-length
         for (let i = 0; i < originalRefs.length; i++) {
           expect(Object.is(originalRefs[i], result.data[i])).toBe(true)
         }

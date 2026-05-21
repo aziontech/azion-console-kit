@@ -148,6 +148,7 @@
   // Track the latest pointer position (viewport coords) so the C3 tooltip
   // position callback can place the tooltip near the cursor on the opposite
   // Y side, never covering the hovered bar/line.
+  // eslint-disable-next-line id-length
   const pointerPos = ref({ x: 0, y: 0, present: false })
 
   const { chartConfig, chartData, totalEvents, formattedTotal, chartKind } = useChartBuilder(props)
@@ -246,6 +247,7 @@
   const handleMouseMove = (event) => {
     // Always record the latest pointer position for the tooltip positioner,
     // independent of the brush-selection drag state.
+    // eslint-disable-next-line id-length
     pointerPos.value = { x: event.clientX, y: event.clientY, present: true }
     if (!isDragging.value || !chartRef.value) return
     const rect = chartRef.value.getBoundingClientRect()
@@ -254,6 +256,7 @@
   }
 
   const handleMouseLeave = () => {
+    // eslint-disable-next-line id-length
     pointerPos.value = { x: 0, y: 0, present: false }
     handleMouseUp()
   }

@@ -44,10 +44,12 @@ export function useClickToFilter({ onAdd, onExclude, isValid }) {
     // the browser's native text-selection drag. We do NOT call
     // preventDefault() ourselves so the browser can start a selection.
     event.stopImmediatePropagation()
+    /* eslint-disable id-length */
     event.currentTarget.__clickStart = {
       x: event.clientX,
       y: event.clientY
     }
+    /* eslint-enable id-length */
   }
 
   /**

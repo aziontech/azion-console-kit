@@ -16,6 +16,7 @@ import { useDocumentSearch } from '../useDocumentSearch'
 
 const makeRow = (fields) => {
   const obj = {}
+  // eslint-disable-next-line id-length
   for (const [k, v] of Object.entries(fields)) {
     obj[k] = v
   }
@@ -124,7 +125,7 @@ describe('useDocumentSearch', () => {
   it('highlight wraps first occurrence in mark tag', () => {
     vi.useFakeTimers()
     const tableData = ref([makeRow({ name: 'Alice' })])
-    const { query, highlight, debouncedQuery } = useDocumentSearch(tableData)
+    const { highlight, debouncedQuery } = useDocumentSearch(tableData)
 
     // Directly set debouncedQuery for synchronous highlight testing
     debouncedQuery.value = 'ali'

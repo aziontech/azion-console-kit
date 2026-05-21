@@ -1,3 +1,4 @@
+/* global globalThis */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import EventsSummaryBar from '../events-summary-bar.vue'
@@ -61,6 +62,7 @@ describe('EventsSummaryBar — HTTP dataset (supportsStatusBreakdown + supportsR
   it('renders a numeric value for CLIENT ERRORS (4XX)', () => {
     const wrapper = mountBar(httpKpis)
     const cards = wrapper.findAll('.events-summary-bar__card')
+    // eslint-disable-next-line id-length
     const clientErrorCard = cards.find((c) => c.text().includes('CLIENT ERRORS'))
     expect(clientErrorCard).toBeTruthy()
     // Should show the formatted number, not the "—" muted placeholder
@@ -71,6 +73,7 @@ describe('EventsSummaryBar — HTTP dataset (supportsStatusBreakdown + supportsR
   it('renders a numeric value for SERVER ERRORS (5XX)', () => {
     const wrapper = mountBar(httpKpis)
     const cards = wrapper.findAll('.events-summary-bar__card')
+    // eslint-disable-next-line id-length
     const serverErrorCard = cards.find((c) => c.text().includes('SERVER ERRORS'))
     expect(serverErrorCard).toBeTruthy()
     expect(serverErrorCard.find('.events-summary-bar__value').text()).not.toBe('—')
@@ -80,6 +83,7 @@ describe('EventsSummaryBar — HTTP dataset (supportsStatusBreakdown + supportsR
   it('renders a numeric value for AVG REQUEST TIME', () => {
     const wrapper = mountBar(httpKpis)
     const cards = wrapper.findAll('.events-summary-bar__card')
+    // eslint-disable-next-line id-length
     const avgCard = cards.find((c) => c.text().includes('AVG REQUEST TIME'))
     expect(avgCard).toBeTruthy()
     // Should show a formatted seconds value like "0.123s"
@@ -94,6 +98,7 @@ describe('EventsSummaryBar — HTTP dataset (supportsStatusBreakdown + supportsR
   it('renders a percentage sub-label for client errors', () => {
     const wrapper = mountBar(httpKpis)
     const cards = wrapper.findAll('.events-summary-bar__card')
+    // eslint-disable-next-line id-length
     const clientErrorCard = cards.find((c) => c.text().includes('CLIENT ERRORS'))
     expect(clientErrorCard.find('.events-summary-bar__sub').text()).toMatch(/% of total/)
   })
@@ -119,6 +124,7 @@ describe('EventsSummaryBar — non-HTTP dataset (supportsStatusBreakdown=false, 
   it('renders "Not available for this dataset" for CLIENT ERRORS (4XX)', () => {
     const wrapper = mountBar(nonHttpKpis)
     const cards = wrapper.findAll('.events-summary-bar__card')
+    // eslint-disable-next-line id-length
     const clientErrorCard = cards.find((c) => c.text().includes('CLIENT ERRORS'))
     expect(clientErrorCard).toBeTruthy()
     expect(clientErrorCard.text()).toContain('Not available for this dataset')
@@ -127,6 +133,7 @@ describe('EventsSummaryBar — non-HTTP dataset (supportsStatusBreakdown=false, 
   it('renders "Not available for this dataset" for SERVER ERRORS (5XX)', () => {
     const wrapper = mountBar(nonHttpKpis)
     const cards = wrapper.findAll('.events-summary-bar__card')
+    // eslint-disable-next-line id-length
     const serverErrorCard = cards.find((c) => c.text().includes('SERVER ERRORS'))
     expect(serverErrorCard).toBeTruthy()
     expect(serverErrorCard.text()).toContain('Not available for this dataset')
@@ -135,6 +142,7 @@ describe('EventsSummaryBar — non-HTTP dataset (supportsStatusBreakdown=false, 
   it('renders "Not available for this dataset" for AVG REQUEST TIME', () => {
     const wrapper = mountBar(nonHttpKpis)
     const cards = wrapper.findAll('.events-summary-bar__card')
+    // eslint-disable-next-line id-length
     const avgCard = cards.find((c) => c.text().includes('AVG REQUEST TIME'))
     expect(avgCard).toBeTruthy()
     expect(avgCard.text()).toContain('Not available for this dataset')

@@ -64,6 +64,7 @@ function createEventsData(locale) {
 describe('Feature: real-time-events-refactor, Property 3: Locale-aware number formatting', () => {
   it('setRecordsFound output matches Intl.NumberFormat(locale).format(n) for any locale and positive integer', () => {
     fc.assert(
+      // eslint-disable-next-line id-length
       fc.property(arbLocale, arbPositiveInt, (locale, n) => {
         const { setRecordsFound, recordsFound } = createEventsData(locale)
 
@@ -78,6 +79,7 @@ describe('Feature: real-time-events-refactor, Property 3: Locale-aware number fo
 
   it('returns the placeholder "—" for zero or negative totals', () => {
     fc.assert(
+      // eslint-disable-next-line id-length
       fc.property(arbLocale, fc.integer({ min: -1000, max: 0 }), (locale, n) => {
         const { setRecordsFound, recordsFound } = createEventsData(locale)
         setRecordsFound(n)
@@ -90,7 +92,9 @@ describe('Feature: real-time-events-refactor, Property 3: Locale-aware number fo
   it('formatting uses the provided locale, not a hardcoded one', () => {
     fc.assert(
       fc.property(
+        // eslint-disable-next-line id-length
         arbPositiveInt.filter((n) => n >= 1000),
+        // eslint-disable-next-line id-length
         (n) => {
           const { setRecordsFound: setUS, recordsFound: foundUS } = createEventsData('en-US')
           const { setRecordsFound: setDE, recordsFound: foundDE } = createEventsData('de-DE')
@@ -109,6 +113,7 @@ describe('Feature: real-time-events-refactor, Property 3: Locale-aware number fo
 
   it('formatting produces a non-empty string that matches Intl output for every locale', () => {
     fc.assert(
+      // eslint-disable-next-line id-length
       fc.property(arbLocale, arbPositiveInt, (locale, n) => {
         const { setRecordsFound, recordsFound } = createEventsData(locale)
 

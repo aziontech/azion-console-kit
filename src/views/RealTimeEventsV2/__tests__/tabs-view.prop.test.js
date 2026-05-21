@@ -22,6 +22,7 @@ describe('Property 3: isEventsTabId predicate', () => {
   it('returns true for any events:* id', () => {
     fc.assert(
       fc.property(
+        // eslint-disable-next-line id-length
         fc.string({ minLength: 1, maxLength: 50 }).filter((s) => s.trim() !== ''),
         (suffix) => {
           const id = `events:${suffix}`
@@ -43,6 +44,7 @@ describe('Property 3: isEventsTabId predicate', () => {
   it('returns false for any non-events string', () => {
     fc.assert(
       fc.property(
+        // eslint-disable-next-line id-length
         fc.string({ minLength: 0, maxLength: 50 }).filter((s) => !s.startsWith('events:')),
         (id) => {
           expect(isEventsTabId(id)).toBe(false)
@@ -92,12 +94,14 @@ describe('Property 4: combinedOpenTabs always includes pinned tab at index 0', (
 
     return computed(() => [
       { id: null, label: 'Events', icon: 'pi pi-list', closable: false },
+      // eslint-disable-next-line id-length
       ...eventsTabs.value.map((t) => ({
         id: t.id,
         label: t.label,
         icon: 'pi pi-list',
         closable: true
       })),
+      // eslint-disable-next-line id-length
       ...openTabs.value.filter((t) => t.id !== null)
     ])
   }
@@ -105,8 +109,11 @@ describe('Property 4: combinedOpenTabs always includes pinned tab at index 0', (
   const arbEventsTab = fc.record({
     id: fc
       .string({ minLength: 4, maxLength: 20 })
+      // eslint-disable-next-line id-length
       .filter((s) => s.trim() !== '')
+      // eslint-disable-next-line id-length
       .map((s) => `events:${s}`),
+    // eslint-disable-next-line id-length
     label: fc.string({ minLength: 1, maxLength: 40 }).filter((s) => s.trim() !== ''),
     dataset: fc.constantFrom(
       'httpRequests',
@@ -122,6 +129,7 @@ describe('Property 4: combinedOpenTabs always includes pinned tab at index 0', (
 
   const arbDashboardTab = fc.record({
     id: fc.uuid(),
+    // eslint-disable-next-line id-length
     label: fc.string({ minLength: 1, maxLength: 40 }).filter((s) => s.trim() !== ''),
     icon: fc.constant('pi pi-chart-bar'),
     closable: fc.constant(true)
@@ -160,6 +168,7 @@ describe('Property 4: combinedOpenTabs always includes pinned tab at index 0', (
           expect(tabs[0].id).toBeNull()
 
           // Events tabs follow (indices 1..eventsTabsArr.length)
+          // eslint-disable-next-line id-length
           for (let i = 0; i < eventsTabsArr.length; i++) {
             expect(tabs[1 + i].id).toBe(eventsTabsArr[i].id)
             expect(isEventsTabId(tabs[1 + i].id)).toBe(true)
@@ -167,6 +176,7 @@ describe('Property 4: combinedOpenTabs always includes pinned tab at index 0', (
 
           // Dashboard tabs follow events tabs
           const dashboardStart = 1 + eventsTabsArr.length
+          // eslint-disable-next-line id-length
           for (let i = 0; i < dashboardTabsArr.length; i++) {
             expect(tabs[dashboardStart + i].id).toBe(dashboardTabsArr[i].id)
             expect(isEventsTabId(tabs[dashboardStart + i].id)).toBe(false)

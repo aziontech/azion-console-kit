@@ -11,10 +11,12 @@
  * **Validates: Requirements 1.1, 1.2, 1.4, 1.7, 2.6, 4.3**
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed } from 'vue'
 import { useEventsTabs, isEventsTabId } from '../composables/useEventsTabs.js'
 import { useTabLimit, MAX_TOTAL_TABS } from '../composables/useTabLimit.js'
 import TABS_EVENTS from '../Blocks/constants/tabs-events.js'
+
+/* global globalThis */
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -36,6 +38,7 @@ function createTabsSetup() {
   } = useEventsTabs({
     toast,
     totalTabCount: () => {
+      // eslint-disable-next-line id-length
       return 1 + eventsTabs.value.length + openTabs.value.filter((t) => t.id !== null).length
     },
     activeTabId
@@ -45,6 +48,7 @@ function createTabsSetup() {
     openTabs: computed(() => [
       { id: null },
       ...eventsTabs.value,
+      // eslint-disable-next-line id-length
       ...openTabs.value.filter((t) => t.id !== null)
     ])
   })
@@ -61,6 +65,7 @@ function createTabsSetup() {
       closeEventsTab(tabId)
     } else {
       // Dashboard tab close — just remove from openTabs
+      // eslint-disable-next-line id-length
       openTabs.value = openTabs.value.filter((t) => t.id !== tabId)
     }
   }
@@ -76,6 +81,7 @@ function createTabsSetup() {
     }
 
     if (activeTabId.value && isEventsId(activeTabId.value)) {
+      // eslint-disable-next-line id-length
       const tab = eventsTabs.value.find((t) => t.id === activeTabId.value)
       if (tab) {
         eventsTab = { id: tab.id, label: tab.label, dataset: tab.dataset }
@@ -147,6 +153,7 @@ describe('openNewEventsTab', () => {
     const { openNewEventsTab, eventsTabs, toast } = createTabsSetup()
 
     // Open MAX_TOTAL_TABS - 1 additional tabs (pinned + these = MAX_TOTAL_TABS)
+    // eslint-disable-next-line id-length
     for (let i = 0; i < MAX_TOTAL_TABS - 1; i++) {
       openNewEventsTab()
     }
@@ -169,6 +176,7 @@ describe('openNewEventsTab', () => {
     const { openNewEventsTab, toast } = createTabsSetup()
 
     // Fill up to the limit
+    // eslint-disable-next-line id-length
     for (let i = 0; i < MAX_TOTAL_TABS - 1; i++) {
       openNewEventsTab()
     }
@@ -227,6 +235,7 @@ describe('handleCloseTab routing', () => {
 
     handleCloseTab(dashboardTabId)
 
+    // eslint-disable-next-line id-length
     expect(openTabs.value.some((t) => t.id === dashboardTabId)).toBe(false)
   })
 
@@ -436,6 +445,7 @@ describe('Share_State import with tab limit reached', () => {
     const { openNewEventsTab, toast, canOpenNewTab, eventsTabs } = createTabsSetup()
 
     // Fill up to the limit
+    // eslint-disable-next-line id-length
     for (let i = 0; i < MAX_TOTAL_TABS - 1; i++) {
       openNewEventsTab()
     }
@@ -444,11 +454,6 @@ describe('Share_State import with tab limit reached', () => {
     expect(eventsTabs.value).toHaveLength(MAX_TOTAL_TABS - 1)
 
     // Simulate what TabsView does when pendingEventsTabState arrives but limit is reached
-    const pendingState = {
-      label: 'Shared Tab',
-      dataset: 'httpRequests',
-      viewState: { filters: { fields: [] } }
-    }
 
     // canOpenNewTab is false, so we should show the toast
     if (!canOpenNewTab()) {
@@ -471,6 +476,7 @@ describe('Share_State import with tab limit reached', () => {
   it('canOpenNewTab returns false when MAX_TOTAL_TABS tabs are open', () => {
     const { openNewEventsTab, canOpenNewTab } = createTabsSetup()
 
+    // eslint-disable-next-line id-length
     for (let i = 0; i < MAX_TOTAL_TABS - 1; i++) {
       openNewEventsTab()
     }

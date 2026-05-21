@@ -200,6 +200,7 @@ describe('useEventsData.buildApiFilters preservation (Property 2)', () => {
         fc.constantFrom(...NON_IN_OPERATORS),
         arbAlpha,
         arbAlpha,
+        // eslint-disable-next-line id-length
         (vf, op, a, b) => {
           const fields = [
             { valueField: vf, operator: op, value: a, type: 'String' },

@@ -8,9 +8,8 @@
 // inactive tabs (because the view switch goes through `useViewSync` which calls the
 // guarded wrapper, and the guard prevents the URL write for inactive tabs).
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import fc from 'fast-check'
-import { computed, ref, nextTick } from 'vue'
 
 // ── Pure isActiveTab logic (extracted for property testing) ──────────────────
 // This mirrors the computed in tab-panel-block.vue exactly so we can test it
@@ -25,13 +24,13 @@ function computeIsActiveTab(tabId, activeTabId) {
 // Generate a random events tab id (e.g. 'events:abc123')
 const arbEventsTabId = fc
   .string({ minLength: 1, maxLength: 20 })
+  // eslint-disable-next-line id-length
   .filter((s) => s.trim().length > 0)
+  // eslint-disable-next-line id-length
   .map((s) => `events:${s}`)
 
-// Generate a tab id that is either null (pinned) or an events tab id
-const arbTabId = fc.oneof(fc.constant(null), arbEventsTabId)
-
 // Generate a pair of distinct events tab ids
+// eslint-disable-next-line id-length
 const arbDistinctEventsTabIds = fc.tuple(arbEventsTabId, arbEventsTabId).filter(([a, b]) => a !== b)
 
 describe('Feature: real-time-events-enhancements, Property 12: isActiveTab computed logic', () => {
@@ -143,9 +142,9 @@ describe('Feature: real-time-events-enhancements, Property 12: isActiveTab compu
           }
 
           // Simulate each view change triggering reloadListTableWithHash
-          for (const _view of viewSequence) {
+          viewSequence.forEach(() => {
             guardedReload()
-          }
+          })
 
           // For an inactive tab, setFilterInHash must never be called
           expect(setFilterInHashCalls).toHaveLength(0)
@@ -187,9 +186,9 @@ describe('Feature: real-time-events-enhancements, Property 12: isActiveTab compu
             }
           }
 
-          for (const _view of viewSequence) {
+          viewSequence.forEach(() => {
             guardedReload()
-          }
+          })
 
           // For the active tab, setFilterInHash is called for each view change
           expect(setFilterInHashCalls).toHaveLength(viewSequence.length)

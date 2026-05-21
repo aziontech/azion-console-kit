@@ -20,7 +20,7 @@ import { useFieldStats } from '../composables/useFieldStats'
 import { useLegendFilter } from '../composables/useLegendFilter'
 import { useViewSync } from '../composables/useViewSync'
 import { resolveChartKind, CHART_KINDS } from '../composables/chart-kinds'
-import { useEventsTabs, isEventsTabId } from '../composables/useEventsTabs'
+import { useEventsTabs } from '../composables/useEventsTabs'
 import { useEventsData } from '../composables/useEventsData'
 
 // ── Constants ──
@@ -154,6 +154,7 @@ describe('Requirement 13.1: Dataset switching with correct field loading', () =>
     expect(values).toContain('requestMethod')
     expect(values).toContain('newField')
     // Case-insensitive dedup: 'host' appears once
+    // eslint-disable-next-line id-length
     const hostCount = values.filter((v) => v.toLowerCase() === 'host').length
     expect(hostCount).toBe(1)
   })
@@ -167,6 +168,7 @@ describe('Requirement 13.1: Dataset switching with correct field loading', () =>
       tableData
     })
 
+    // eslint-disable-next-line id-length
     const before = availableFieldOptions.value.map((o) => o.value)
     expect(before).toContain('fieldA')
     expect(before).not.toContain('fieldB')
@@ -176,6 +178,7 @@ describe('Requirement 13.1: Dataset switching with correct field loading', () =>
     triggerRef(tableData)
     await nextTick()
 
+    // eslint-disable-next-line id-length
     const after = availableFieldOptions.value.map((o) => o.value)
     expect(after).toContain('fieldA')
     expect(after).toContain('fieldB')
@@ -224,6 +227,7 @@ describe('Requirement 13.2: Filter add/exclude/remove with URL hash persistence'
       value: 'example.com'
     })
     // reloadListTableWithHash is fire-and-forget async — flush all microtasks
+    // eslint-disable-next-line id-length
     await new Promise((r) => setTimeout(r, 0))
     expect(setFilterInHash).toHaveBeenCalled()
     expect(loadData).toHaveBeenCalled()
@@ -276,6 +280,7 @@ describe('Requirement 13.2: Filter add/exclude/remove with URL hash persistence'
   it('handleAddRangeFilter adds Gte and Lt filters', () => {
     ctx.handleAddRangeFilter('status', 200, 300)
     expect(filterData.value.fields).toHaveLength(2)
+    // eslint-disable-next-line id-length
     const ops = filterData.value.fields.map((f) => f.operator)
     expect(ops).toContain('Gte')
     expect(ops).toContain('Lt')
@@ -431,7 +436,6 @@ describe('Requirement 13.6: Session save/edit/delete/share/import', () => {
   // Saved searches are scoped per `client_id:user_id` (see useSavedSearches).
   // The vi.mock at the top of this file pins both ids so storage lands at the
   // fully qualified key below.
-  const SAVED_SEARCHES_KEY = 'rte-saved-searches:test-client-regression:test-user-regression'
   let storage
 
   beforeEach(() => {
@@ -486,6 +490,7 @@ describe('Requirement 13.6: Session save/edit/delete/share/import', () => {
 
   it('useSavedSearches enforces max 50 saved searches', () => {
     const { savedSearches, saveSearch } = useSavedSearches()
+    // eslint-disable-next-line id-length
     for (let i = 0; i < 55; i++) {
       saveSearch({ name: `Search ${i}`, filterData: null, selectedColumns: [], dataset: '' })
     }
@@ -793,10 +798,12 @@ describe('Requirement 13.8: Keyboard navigation, detail view, search, field stat
         selectedFields: ref([])
       })
 
+      // eslint-disable-next-line id-length
       const pinnedValues = pinnedFields.value.map((f) => f.value)
       expect(pinnedValues).toContain('host')
       expect(pinnedValues).not.toContain('customField')
 
+      // eslint-disable-next-line id-length
       const nonPinnedValues = availableFieldsNonPinned.value.map((f) => f.value)
       expect(nonPinnedValues).toContain('customField')
     })
@@ -887,6 +894,7 @@ describe('Requirement 13.9: KeepAlive state preservation', () => {
       tableData
     })
 
+    // eslint-disable-next-line id-length
     const fields = availableFieldOptions.value.map((o) => o.value)
     expect(fields).toContain('fieldA')
     expect(fields).toContain('fieldB')
@@ -928,12 +936,14 @@ describe('Requirement 13.5: loadMore pagination maintains correct offset', () =>
       tableData
     })
 
+    // eslint-disable-next-line id-length
     expect(availableFieldOptions.value.map((o) => o.value)).toContain('fieldA')
 
     // Simulate new query — data reset (full replacement)
     tableData.value = [makeRow(3, 'ts3', { fieldC: '3' })]
     await nextTick()
 
+    // eslint-disable-next-line id-length
     const after = availableFieldOptions.value.map((o) => o.value)
     expect(after).toContain('fieldC')
     // fieldA should be gone after reset
@@ -976,6 +986,7 @@ describe('Requirement 13.5: loadMore pagination maintains correct offset', () =>
       tableData
     })
 
+    // eslint-disable-next-line id-length
     expect(availableFieldOptions.value.map((o) => o.value)).toContain('fieldA')
 
     // Simulate loadMore — push + triggerRef
@@ -987,6 +998,7 @@ describe('Requirement 13.5: loadMore pagination maintains correct offset', () =>
     triggerRef(tableData)
     await nextTick()
 
+    // eslint-disable-next-line id-length
     const fields = availableFieldOptions.value.map((o) => o.value)
     expect(fields).toContain('fieldA')
     expect(fields).toContain('fieldB')
@@ -1086,6 +1098,7 @@ describe('Multi-tab coexistence regression', () => {
       expect(eventsTabs.value).toHaveLength(2)
 
       closeEventsTab(id1)
+      // eslint-disable-next-line id-length
       openTabs.value = openTabs.value.filter((t) => t.id !== id1)
 
       expect(eventsTabs.value).toHaveLength(1)
@@ -1242,6 +1255,7 @@ describe('Multi-tab coexistence regression', () => {
       closeEventsTab(newId)
 
       expect(eventsTabs.value).toHaveLength(0)
+      // eslint-disable-next-line id-length
       expect(eventsTabs.value.find((t) => t.id === newId)).toBeUndefined()
     })
 

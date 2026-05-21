@@ -129,6 +129,7 @@ describe('Feature: real-time-events-refactor, Property 6: Temporal windowing cor
 
         // Verify windows are sequential from newest to oldest:
         // Each window's end should equal the previous window's begin
+        // eslint-disable-next-line id-length
         for (let i = 1; i < calls.length; i++) {
           const prevBegin = new Date(calls[i - 1].tsRangeBegin).getTime()
           const currEnd = new Date(calls[i].tsRangeEnd).getTime()
@@ -182,6 +183,7 @@ describe('Feature: real-time-events-refactor, Property 6: Temporal windowing cor
         expect(lastBegin).toBe(range.beginMs)
 
         // Verify contiguity: no gaps between windows
+        // eslint-disable-next-line id-length
         for (let i = 1; i < calls.length; i++) {
           const prevBegin = new Date(calls[i - 1].tsRangeBegin).getTime()
           const currEnd = new Date(calls[i].tsRangeEnd).getTime()

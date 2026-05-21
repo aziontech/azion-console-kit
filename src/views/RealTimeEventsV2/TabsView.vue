@@ -237,7 +237,7 @@
     toast,
     totalTabCount: () => {
       // Count: 1 (pinned) + additional Events tabs + Dashboard tabs
-      return 1 + eventsTabs.value.length + openTabs.value.filter((t) => t.id !== null).length
+      return 1 + eventsTabs.value.length + openTabs.value.filter((tab) => tab.id !== null).length
     },
     activeTabId
   })
@@ -247,20 +247,20 @@
     openTabs: computed(() => [
       { id: null },
       ...eventsTabs.value,
-      ...openTabs.value.filter((t) => t.id !== null)
+      ...openTabs.value.filter((tab) => tab.id !== null)
     ])
   })
 
   // ── Combined tab list for the tab bar ──
   const combinedOpenTabs = computed(() => [
     { id: null, label: 'Events', icon: 'pi pi-list', closable: false },
-    ...eventsTabs.value.map((t) => ({
-      id: t.id,
-      label: t.label,
+    ...eventsTabs.value.map((tab) => ({
+      id: tab.id,
+      label: tab.label,
       icon: 'pi pi-list',
       closable: true
     })),
-    ...openTabs.value.filter((t) => t.id !== null)
+    ...openTabs.value.filter((tab) => tab.id !== null)
   ])
 
   // ── Tab UI helpers ──
@@ -312,7 +312,7 @@
     }
 
     if (activeTabId.value && isEventsTabId(activeTabId.value)) {
-      const tab = eventsTabs.value.find((t) => t.id === activeTabId.value)
+      const tab = eventsTabs.value.find((entry) => entry.id === activeTabId.value)
       if (tab) {
         eventsTab = { id: tab.id, label: tab.label, dataset: tab.dataset }
       }
@@ -348,7 +348,7 @@
   const selectedTab = computed(() => {
     // When an additional Events tab is active, use its dataset
     if (activeTabId.value && isEventsTabId(activeTabId.value)) {
-      const evTab = eventsTabs.value.find((t) => t.id === activeTabId.value)
+      const evTab = eventsTabs.value.find((entry) => entry.id === activeTabId.value)
       if (evTab) {
         return allDatasets.find((tab) => tab.panel === evTab.dataset) || allDatasets[0]
       }
@@ -419,9 +419,9 @@
     if (!newId || !isEventsTabId(newId)) return
     // When switching to an additional Events tab, reload filter fields
     // for the tab's dataset
-    const tab = eventsTabs.value.find((t) => t.id === newId)
+    const tab = eventsTabs.value.find((entry) => entry.id === newId)
     if (tab) {
-      const tabConfig = Object.values(TABS_EVENTS).find((t) => t.panel === tab.dataset)
+      const tabConfig = Object.values(TABS_EVENTS).find((entry) => entry.panel === tab.dataset)
       if (tabConfig) {
         await reloadFilterFields(tabConfig)
       }

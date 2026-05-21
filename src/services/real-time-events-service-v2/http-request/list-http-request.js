@@ -156,20 +156,20 @@ export const listHttpRequest = async (filter, { onQuery } = {}) => {
 
   // In-place merge: assign chunk B fields directly onto chunk A row objects
   // to avoid spread-copying every row.
-  for (let i = 0; i < rowsA.length; i++) {
-    const rowA = rowsA[i]
+  for (let idx = 0; idx < rowsA.length; idx++) {
+    const rowA = rowsA[idx]
     // Primary: match by requestId. Fallback: match by position (same index).
     // Position fallback handles cases where requestId is null/empty for all rows.
     let rowB = null
     if (rowA.requestId != null && rowA.requestId !== '') {
       rowB =
-        rowsB[i]?.requestId === rowA.requestId
-          ? rowsB[i]
+        rowsB[idx]?.requestId === rowA.requestId
+          ? rowsB[idx]
           : chunkBByRequestId.get(rowA.requestId) || null
     }
     // Positional fallback: if no requestId match, use same index
-    if (!rowB && rowsB[i]) {
-      rowB = rowsB[i]
+    if (!rowB && rowsB[idx]) {
+      rowB = rowsB[idx]
     }
     if (rowB) {
       for (const key in rowB) {

@@ -37,6 +37,7 @@ const arbViewState = fc.record({
 
 describe('Property 5: Share_State round-trip with eventsTab', () => {
   const arbEventsTab = fc.record({
+    // eslint-disable-next-line id-length
     label: fc.string({ minLength: 1, maxLength: 40 }).filter((s) => s.trim() !== ''),
     dataset: fc.constantFrom(...DATASETS)
   })

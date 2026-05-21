@@ -23,6 +23,7 @@ const ALL_CHART_KINDS = [
 const arbChartKind = fc.constantFrom(...ALL_CHART_KINDS)
 
 // Arbitrary: a time-label string (simulates formatted bucket labels)
+// eslint-disable-next-line id-length
 const arbTimeLabel = fc.integer({ min: 0, max: 23 }).map((h) => `${String(h).padStart(2, '0')}:00`)
 
 // Arbitrary: a series name (alphanumeric, non-empty)
@@ -59,6 +60,7 @@ const arbChartData = fc
     const usedSeries = uniqueNames.slice(0, seriesValues.length)
 
     const xColumn = ['x', ...timeLabels]
+    // eslint-disable-next-line id-length
     const dataColumns = usedSeries.map((name, i) => [name, ...seriesValues[i]])
     const columns = [xColumn, ...dataColumns]
 
@@ -74,6 +76,7 @@ const arbChartData = fc
     }
   })
   // Ensure at least 1 data column exists (after dedup)
+  // eslint-disable-next-line id-length
   .filter((d) => d.seriesNames.length >= 1)
 
 // Arbitrary: minimal chart config object

@@ -33,6 +33,7 @@ const DATASETS = [
   'dataStreamedEvents'
 ]
 
+// eslint-disable-next-line id-length
 const arbFieldName = fc.string({ minLength: 1, maxLength: 30 }).filter((s) => s.trim().length > 0)
 
 const arbIdentifier = fc.stringMatching(/^[a-zA-Z_]{1,20}$/)
@@ -132,6 +133,7 @@ describe('Feature: real-time-events-refactor, Property 12: Filter state URL hash
 
         // Fields must be in the same order
         expect(decoded.fields).toHaveLength(filterData.fields.length)
+        // eslint-disable-next-line id-length
         decoded.fields.forEach((field, i) => {
           expect(field.field).toBe(filterData.fields[i].field)
           expect(field.valueField).toBe(filterData.fields[i].valueField)
