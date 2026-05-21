@@ -9,12 +9,15 @@ vi.mock('@/services/v2/hubspot', () => ({
 
 vi.mock('@/utils/cookies', () => ({
   getHubSpotUtk: vi.fn(),
-  getHubSpotContext: vi.fn()
+  getHubSpotContext: vi.fn(),
+  getHubSpotFormContext: vi.fn(),
+  getUtmParams: vi.fn()
 }))
 
-const makeSut = () => {
+const makeSut = ({ anonymousId } = {}) => {
   const trackerAdapterSpy = {
-    addEvent: vi.fn().mockReturnThis()
+    addEvent: vi.fn().mockReturnThis(),
+    getAnonymousId: vi.fn().mockReturnValue(anonymousId)
   }
   const sut = new SignInTracker(trackerAdapterSpy)
 
@@ -28,14 +31,21 @@ describe('SignInTracker', () => {
   let hubspotService
   let getHubSpotUtk
   let getHubSpotContext
+  let getHubSpotFormContext
+  let getUtmParams
 
   beforeEach(async () => {
     vi.clearAllMocks()
     hubspotService = (await import('@/services/v2/hubspot')).hubspotService
-    getHubSpotUtk = (await import('@/utils/cookies')).getHubSpotUtk
-    getHubSpotContext = (await import('@/utils/cookies')).getHubSpotContext
+    const cookies = await import('@/utils/cookies')
+    getHubSpotUtk = cookies.getHubSpotUtk
+    getHubSpotContext = cookies.getHubSpotContext
+    getHubSpotFormContext = cookies.getHubSpotFormContext
+    getUtmParams = cookies.getUtmParams
     getHubSpotUtk.mockReturnValue(undefined)
     getHubSpotContext.mockReturnValue({})
+    getHubSpotFormContext.mockReturnValue({})
+    getUtmParams.mockReturnValue({})
   })
 
   describe('userSignedIn', () => {
@@ -75,13 +85,17 @@ describe('SignInTracker', () => {
         email: 'test@example.com',
         form_action: 'login_email',
         user_id__rtm_: 'user-123',
+        rtm_account_id: undefined,
+        segment__annonymousid: undefined,
         firstname: undefined,
         lastname: undefined,
         mobilephone: undefined,
         company: undefined,
         github_handle: undefined,
         utk: undefined,
-        context: {}
+        context: {},
+        formContext: {},
+        utmParams: {}
       })
     })
 
@@ -110,13 +124,14 @@ describe('SignInTracker', () => {
     })
 
     it('should pass all optional fields to HubSpot when provided', async () => {
-      const { sut } = makeSut()
+      const { sut } = makeSut({ anonymousId: 'anon-xyz' })
 
       sut.userSignedIn({
         method: 'github',
         signupTypeFlags: { login_sso_github: true },
         email: 'test@example.com',
         userId: 'user-789',
+        accountId: 'account-456',
         firstname: 'John',
         lastname: 'Doe',
         phone: '+1234567890',
@@ -128,13 +143,17 @@ describe('SignInTracker', () => {
         email: 'test@example.com',
         form_action: 'login_sso_github',
         user_id__rtm_: 'user-789',
+        rtm_account_id: 'account-456',
+        segment__annonymousid: 'anon-xyz',
         firstname: 'John',
         lastname: 'Doe',
         mobilephone: '+1234567890',
         company: 'Acme Inc',
         github_handle: 'johndoe',
         utk: undefined,
-        context: {}
+        context: {},
+        formContext: {},
+        utmParams: {}
       })
     })
 

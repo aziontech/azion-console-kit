@@ -30,6 +30,7 @@ export async function trackSignInSafely({ tracker, method, email, loadUserData =
       signupTypeFlags,
       email: accountData?.email || email,
       userId: consoleUserId,
+      accountId: accountData?.id,
       firstname: isClientAccount
         ? accountData?.first_name || accountData?.name?.split(' ')[0]
         : undefined,
@@ -78,6 +79,7 @@ export function trackSignUpSafely({ tracker, method, signupTypeFlags, firstSessi
         signupTypeFlags,
         email: userEmail,
         userId: consoleUserId,
+        accountId: accountData?.id,
         firstname,
         lastname,
         company: companyName,

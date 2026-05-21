@@ -1,4 +1,9 @@
-import { getHubSpotUtk, getHubSpotContext } from '@/utils/cookies'
+import {
+  getHubSpotUtk,
+  getHubSpotContext,
+  getHubSpotFormContext,
+  getUtmParams
+} from '@/utils/cookies'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 
 describe('getHubSpotUtk', () => {
@@ -118,5 +123,81 @@ describe('getHubSpotContext', () => {
 
     expect(context.hs_utm_source).toBeUndefined()
     expect(context.hs_utm_medium).toBeUndefined()
+  })
+})
+
+describe('getHubSpotFormContext', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('should return hutk, pageUri and pageName', () => {
+    vi.stubGlobal('window', {
+      location: { href: 'https://console.azion.com/signup', search: '' }
+    })
+    vi.stubGlobal('document', {
+      title: 'Sign Up - Azion',
+      cookie: 'hubspotutk=abc123'
+    })
+
+    expect(getHubSpotFormContext()).toEqual({
+      hutk: 'abc123',
+      pageUri: 'https://console.azion.com/signup',
+      pageName: 'Sign Up - Azion'
+    })
+  })
+
+  it('should return undefined hutk when cookie is missing', () => {
+    vi.stubGlobal('window', {
+      location: { href: 'https://console.azion.com/signup', search: '' }
+    })
+    vi.stubGlobal('document', {
+      title: 'Sign Up - Azion',
+      cookie: ''
+    })
+
+    const context = getHubSpotFormContext()
+
+    expect(context.hutk).toBeUndefined()
+    expect(context.pageUri).toBe('https://console.azion.com/signup')
+    expect(context.pageName).toBe('Sign Up - Azion')
+  })
+})
+
+describe('getUtmParams', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('should return raw utm_* params present in the URL', () => {
+    vi.stubGlobal('window', {
+      location: {
+        search:
+          '?utm_source=docs&utm_medium=web&utm_campaign=launch&utm_content=hero&utm_term=edge&utm_id=42'
+      }
+    })
+
+    expect(getUtmParams()).toEqual({
+      utm_source: 'docs',
+      utm_medium: 'web',
+      utm_campaign: 'launch',
+      utm_content: 'hero',
+      utm_term: 'edge',
+      utm_id: '42'
+    })
+  })
+
+  it('should omit utm keys without a value', () => {
+    vi.stubGlobal('window', {
+      location: { search: '?utm_source=docs' }
+    })
+
+    expect(getUtmParams()).toEqual({ utm_source: 'docs' })
+  })
+
+  it('should return an empty object when no utm params are present', () => {
+    vi.stubGlobal('window', { location: { search: '' } })
+
+    expect(getUtmParams()).toEqual({})
   })
 })

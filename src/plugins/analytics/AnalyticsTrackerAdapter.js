@@ -95,6 +95,20 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
+   * Returns the Segment anonymousId associated with the current visitor, or undefined
+   * if no analytics client is configured / the id is not yet available.
+   * @return {string|undefined}
+   */
+  getAnonymousId() {
+    if (!this.#hasAnalytics()) return undefined
+    try {
+      return this.#analyticsClient.user('anonymousId') || undefined
+    } catch {
+      return undefined
+    }
+  }
+
+  /**
    * Resets the internal state of the tracker, including any queued events and traits.
    */
   reset() {

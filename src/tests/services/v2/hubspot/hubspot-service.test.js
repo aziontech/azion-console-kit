@@ -32,6 +32,14 @@ describe('HubspotService', () => {
           properties: {
             user_id__rtm_: 'user-123',
             form_action: 'signup_email'
+          },
+          form: {
+            fields: {
+              form_action: 'signup',
+              email: 'test@example.com',
+              segment__userid: 'user-123',
+              rtm_id: 'user-123'
+            }
           }
         },
         headers: {
@@ -50,12 +58,20 @@ describe('HubspotService', () => {
         email: 'test@example.com',
         form_action: 'signup_sso_google',
         user_id__rtm_: 'user-456',
+        rtm_account_id: 'account-789',
+        segment__annonymousid: 'anon-xyz',
         firstname: 'John',
         lastname: 'Doe',
         mobilephone: '+1234567890',
         company: 'Acme Inc',
         github_handle: 'johndoe',
-        utk: 'hubspot-token-123'
+        utk: 'hubspot-token-123',
+        formContext: {
+          hutk: 'hubspot-token-123',
+          pageUri: 'https://console.azion.com/signup',
+          pageName: 'Sign up'
+        },
+        utmParams: { utm_source: 'docs', utm_medium: 'web' }
       })
 
       expect(requestSpy).toHaveBeenCalledWith({
@@ -73,6 +89,27 @@ describe('HubspotService', () => {
             mobilephone: '+1234567890',
             company: 'Acme Inc',
             github_handle: 'johndoe'
+          },
+          form: {
+            fields: {
+              form_action: 'signup',
+              email: 'test@example.com',
+              firstname: 'John',
+              lastname: 'Doe',
+              mobilephone: '+1234567890',
+              company: 'Acme Inc',
+              segment__userid: 'user-456',
+              segment__annonymousid: 'anon-xyz',
+              rtm_id: 'user-456',
+              rtm_account_id: 'account-789',
+              utm_source: 'docs',
+              utm_medium: 'web'
+            },
+            context: {
+              hutk: 'hubspot-token-123',
+              pageUri: 'https://console.azion.com/signup',
+              pageName: 'Sign up'
+            }
           }
         },
         headers: {

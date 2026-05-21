@@ -1,5 +1,10 @@
 import { hubspotService } from '@/services/v2/hubspot'
-import { getHubSpotUtk, getHubSpotContext } from '@/utils/cookies'
+import {
+  getHubSpotUtk,
+  getHubSpotContext,
+  getHubSpotFormContext,
+  getUtmParams
+} from '@/utils/cookies'
 
 const FORM_ACTION_PRIORITY = [
   'signup_sso_google',
@@ -72,13 +77,17 @@ export class SignUpTracker {
         email: payload.email,
         form_action: signupType,
         user_id__rtm_: payload.userId,
+        rtm_account_id: payload.accountId,
+        segment__annonymousid: this.#trackerAdapter.getAnonymousId?.(),
         firstname: payload.firstname,
         lastname: payload.lastname,
         mobilephone: payload.phone,
         company: payload.company,
         github_handle: payload.githubHandle,
         utk: payload.utk ?? getHubSpotUtk(),
-        context: getHubSpotContext()
+        context: getHubSpotContext(),
+        formContext: getHubSpotFormContext(),
+        utmParams: getUtmParams()
       })
     }
 

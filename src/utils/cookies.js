@@ -71,3 +71,32 @@ export function getHubSpotContext() {
     ...(queryParams.utm_term && { hs_utm_term: queryParams.utm_term })
   }
 }
+
+/**
+ * Gets HubSpot Forms API context (hutk, pageUri, pageName).
+ * Used by the api-tracker `form.context` payload that drives form attribution.
+ * @returns {{hutk: string|undefined, pageUri: string, pageName: string}}
+ */
+export function getHubSpotFormContext() {
+  return {
+    hutk: getHubSpotUtk(),
+    pageUri: window.location.href,
+    pageName: document.title
+  }
+}
+
+const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id']
+
+/**
+ * Extracts raw utm_* parameters from the current URL for HubSpot form fields.
+ * Only includes keys that have a non-empty value.
+ * @returns {Object} Object containing raw utm_* parameters
+ */
+export function getUtmParams() {
+  const queryParams = getQueryParams()
+  const params = {}
+  for (const key of UTM_KEYS) {
+    if (queryParams[key]) params[key] = queryParams[key]
+  }
+  return params
+}
