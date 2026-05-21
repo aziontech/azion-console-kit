@@ -126,12 +126,13 @@
     buildCheckoutAppearance,
     checkoutFonts
   } from '@/templates/checkout-block/helpers/stripe-appearance.js'
+  import { isStaleCheckoutSessionError } from '@/templates/checkout-block/helpers/stripe-error-mapper.js'
 
   defineOptions({
     name: 'payment-method-block'
   })
 
-  const emit = defineEmits(['readiness-change'])
+  const emit = defineEmits(['readiness-change', 'stale-session'])
 
   const props = defineProps({
     stripeClientService: {
@@ -271,8 +272,20 @@
       })
 
       paymentElement.value.mount('#payment-element')
-    } catch {
+    } catch (error) {
       if (currentInitializationVersion !== initializationVersion.value) {
+        return
+      }
+
+      // If Stripe rejected the secret because the underlying session is gone
+      // (expired / already consumed / wrong env), ask the parent to recover
+      // by invalidating the cached SO and re-issuing a fresh session. We
+      // suppress the inline error in this case so the user sees a loading
+      // state rather than a scary "Unable to initialize" while recovery
+      // runs.
+      if (isStaleCheckoutSessionError(error)) {
+        emit('stale-session', { reason: 'no_such_checkout_session' })
+        emitReadinessChange()
         return
       }
 

@@ -51,6 +51,7 @@
               :stripeClientService="getStripeClientService"
               :checkoutSessionClientSecret="checkoutSessionClientSecret"
               @readiness-change="handlePaymentReadinessChange"
+              @stale-session="$emit('stale-session', { plan, billingCycle })"
             />
 
             <AddressInformationBlock
@@ -107,7 +108,7 @@
     getStripeClientService: { type: Function, required: false, default: null }
   })
 
-  const emit = defineEmits(['update:visible', 'submit', 'submitCycleChange'])
+  const emit = defineEmits(['update:visible', 'submit', 'submitCycleChange', 'stale-session'])
 
   const toast = useToast()
   const { setParam } = usePlans()

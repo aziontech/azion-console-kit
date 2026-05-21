@@ -4,8 +4,11 @@ import { useAccountStore } from '@/stores/account'
 import { useServiceOrders } from '@/composables/useServiceOrders'
 import { ensureServiceOrdersList, getCurrentServiceOrder } from '@/composables/useServiceOrdersList'
 import { ensurePlansList, getPlanPricingId } from '@/composables/usePlansService'
+import { invalidateCurrentAccountSubscription } from '@/composables/useCurrentAccountSubscriptionService'
 import { SO_STATUS } from '@/services/v2/service-orders/service-orders-constants'
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 const extractSecret = (response) =>
   response?.payment?.clientSecret ||
@@ -15,11 +18,15 @@ const extractSecret = (response) =>
   ''
 
 /**
- * Prepares a Stripe checkout session for the requested plan/cycle. Uses
- * the existing draft service order when it matches; otherwise issues the
- * appropriate create/update/upgrade mutation. Concurrent invocations with
- * the same arguments dedupe through Vue Query's mutation cache — no manual
- * in-flight tracking required.
+ * Prepares a Stripe checkout session for the requested plan/cycle. When a
+ * DRAFT service order already exists for the same plan, this issues a PATCH
+ * to refresh the Stripe session instead of trusting the cached client
+ * secret — Stripe Checkout Sessions expire (~24h) and may have been
+ * consumed since the last time the cache was warmed. The PATCH is cheap
+ * compared to the bug surface of mounting Stripe.js with a dead secret.
+ *
+ * Concurrent invocations dedupe through Vue Query's mutation cache; no
+ * manual in-flight tracking required.
  */
 export function useCheckoutSessionPreparer() {
   const accountStore = useAccountStore()
@@ -49,12 +56,6 @@ export function useCheckoutSessionPreparer() {
       const currentSO = getCurrentServiceOrder(accountId)
 
       if (currentSO?.status === SO_STATUS.DRAFT && currentSO.serviceOrderId) {
-        const draftMatchesTarget =
-          currentSO.planId === planId &&
-          currentSO.priceId === planPricingId &&
-          currentSO.clientSecret
-        if (draftMatchesTarget) return currentSO.clientSecret
-
         const updateResponse = await updateServiceOrder(currentSO.serviceOrderId, {
           planId,
           planPricingId
@@ -85,8 +86,21 @@ export function useCheckoutSessionPreparer() {
   const prepare = ({ plan, preferredCycle = null }) =>
     prepareMutation.mutateAsync({ plan, cycle: preferredCycle || 'monthly' })
 
+  /**
+   * Recovery path for when Stripe rejects the secret returned by `prepare`
+   * (`No such checkout.session`, `resource_missing`, etc). Drops the cached
+   * SO snapshots so the next `prepare` reads server-truth, then re-prepares
+   * — yielding a brand-new Stripe Checkout Session.
+   */
+  const recoverFromStaleSession = ({ plan, preferredCycle = null }) => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
+    invalidateCurrentAccountSubscription()
+    return prepare({ plan, preferredCycle })
+  }
+
   return {
     isPreparing: computed(() => prepareMutation.isPending.value),
-    prepare
+    prepare,
+    recoverFromStaleSession
   }
 }

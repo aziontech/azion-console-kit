@@ -105,6 +105,7 @@
     :getStripeClientService="props.getStripeClientService"
     @submit="handlePlanInfoSubmit"
     @submitCycleChange="handleCycleUpgradeSubmit"
+    @stale-session="handleStaleCheckoutSession"
   />
 
   <DialogDowngradePlan
@@ -303,7 +304,8 @@
     serviceOrder,
     activeServiceOrder
   } = useServiceOrders()
-  const { prepare: prepareCheckoutSession } = useCheckoutSessionPreparer()
+  const { prepare: prepareCheckoutSession, recoverFromStaleSession } =
+    useCheckoutSessionPreparer()
 
   const downgradeEffectiveAt = ref(null)
 
@@ -441,6 +443,33 @@
       })
     } finally {
       preparingPlan.value = null
+    }
+  }
+
+  // Stripe rejected the previously issued client secret (session expired or
+  // already consumed). Re-prepare with a fresh PATCH so the payment element
+  // re-mounts against a live session — without forcing the user to close the
+  // drawer.
+  const handleStaleCheckoutSession = async ({ plan, billingCycle: cycle } = {}) => {
+    const targetPlan = plan || selectedPlan.value
+    if (!targetPlan) return
+    checkoutSessionClientSecret.value = ''
+    try {
+      const fresh = await recoverFromStaleSession({
+        plan: targetPlan,
+        preferredCycle: cycle || storedBillingCycle.value || null
+      })
+      checkoutSessionClientSecret.value = fresh
+    } catch (err) {
+      Sentry.captureException(err)
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail:
+          (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
+          'Unable to refresh the checkout session.',
+        closable: true
+      })
     }
   }
 
