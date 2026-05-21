@@ -45,7 +45,7 @@
     return origin === 'Azion'
       ? {
           value: 'Azion',
-          severity: 'secondary'
+          severity: 'info'
         }
       : {}
   }

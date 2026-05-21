@@ -3,7 +3,7 @@
     <PrimeTag
       icon="pi pi-calculator"
       :value="aggregationTypeLabel"
-      severity="secondary"
+      severity="info"
     />
     <PrimeTag
       v-if="displayTag"
@@ -70,7 +70,7 @@
         icon: 'pi pi-exclamation-triangle'
       },
       'no-variation': {
-        severity: 'secondary'
+        severity: 'info'
       }
     }
     return variations[variation]

@@ -48,7 +48,7 @@
         <PrimeTag
           v-for="(tags, i) in props.tags"
           :key="i"
-          :severity="tags?.severity ?? 'secondary'"
+          :severity="tags?.severity ?? 'info'"
           class="cursor-pointer"
           :icon="tags?.icon"
           :value="tags.text"

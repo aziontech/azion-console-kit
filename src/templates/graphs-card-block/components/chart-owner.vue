@@ -1,13 +1,13 @@
 <template>
   <PrimeTag
     icon="pi pi-user"
-    severity="secondary"
+    severity="info"
     :pt="{ icon: { class: 'mr-0' } }"
     v-if="chartOwner === 'user'"
   />
   <PrimeTag
     icon="pi pi-users"
-    severity="secondary"
+    severity="info"
     :pt="{ icon: { class: 'mr-0' } }"
     v-if="chartOwner === 'account'"
   />

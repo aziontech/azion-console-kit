@@ -22,7 +22,7 @@ const STATUS_AS_TAG = {
   },
   NotCharged: {
     content: 'Not charged',
-    severity: 'secondary'
+    severity: 'info'
   }
 }
 

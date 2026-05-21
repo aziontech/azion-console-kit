@@ -615,7 +615,7 @@
               <PrimeTag
                 value="Automatically enabled in all accounts."
                 icon="pi pi-lock"
-                severity="secondary"
+                severity="info"
                 class="mt-3"
               />
             </template>

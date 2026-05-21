@@ -4,7 +4,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import InputText from '@aziontech/webkit/inputtext'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
@@ -228,7 +228,7 @@
               v-if="item?.tag"
               :value="item.tag.value"
               :icon="item.tag.icon"
-              severity="secondary"
+              severity="info"
               class="mt-3"
             />
           </template>

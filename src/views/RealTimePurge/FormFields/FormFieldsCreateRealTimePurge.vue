@@ -113,7 +113,7 @@
             v-if="item?.tag && isLayerTieredCache"
             :value="item.tag.value"
             :icon="item.tag.icon"
-            severity="secondary"
+            severity="info"
             class="mt-3"
           />
         </template>

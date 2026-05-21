@@ -236,7 +236,7 @@
   const displayPositionExceededToast = () => {
     toast.add({
       closable: true,
-      severity: 'secondary',
+      severity: 'info',
       summary: 'Invalid Position',
       detail:
         'The entered position exceeds the list limit. The rule has been moved to the last position in the list.'
