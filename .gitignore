@@ -59,7 +59,6 @@ specs.json
 .opencode/
 CLAUDE.md
 docs/ARCHITECTURE.md
-hooks/
 
 storybook/yarn.lock
 
