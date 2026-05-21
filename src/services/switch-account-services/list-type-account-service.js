@@ -30,7 +30,7 @@ const adapt = (httpResponse, type) => {
     type: {
       content: getAccountTypeName(type),
       icon: getAccountTypeIcon(type),
-      severity: 'secondary'
+      severity: 'info'
     },
     clientID: account.client_id || '-',
     id: account.id.toString(),

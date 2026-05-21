@@ -541,7 +541,7 @@
         <PrimeTag
           class="no-wrap whitespace-nowrap ml-auto"
           :value="recordsFoundLabel"
-          severity="secondary"
+          severity="info"
         />
       </div>
     </div>
