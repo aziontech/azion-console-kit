@@ -125,21 +125,17 @@
 </template>
 
 <script setup>
-  import { ref, computed, reactive, watch, inject, onBeforeUnmount, onMounted } from 'vue'
+  import { ref, computed, reactive, watch, inject, onMounted, defineAsyncComponent } from 'vue'
   import { useRouter } from 'vue-router'
   import { storeToRefs } from 'pinia'
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import PrimeButton from '@aziontech/webkit/button'
-  import PlanSelectionDrawer from '@/templates/signup-block/plan-selection-drawer.vue'
-  import DrawerPlanInfo from './Drawer/DrawerPlanInfo.vue'
   import SubscriptionPlanCard from './components/SubscriptionPlanCard.vue'
   import UpgradeToProCard from './components/UpgradeToProCard.vue'
   import CurrentInvoiceCard from './components/CurrentInvoiceCard.vue'
   import BillingCardSkeleton from './components/BillingCardSkeleton.vue'
-  import DialogDowngradePlan from './Dialog/DialogDowngradePlan.vue'
-  import DialogCancelDowngrade from './Dialog/DialogCancelDowngrade.vue'
   import DowngradePendingBanner from './components/DowngradePendingBanner.vue'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { usePlans } from '@/composables/usePlans'
@@ -147,13 +143,20 @@
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
   import { useServiceOrders } from '@/composables/useServiceOrders'
   import { useCheckoutSessionPreparer } from '@/composables/useCheckoutSessionPreparer'
-  import {
-    markAwaitingActiveServiceOrder,
-    isAwaitingActiveServiceOrder,
-    clearAwaitingActiveServiceOrder
-  } from '@/composables/post-payment-flag'
+  import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
   import { useAccountStore } from '@/stores/account'
   import * as Sentry from '@sentry/vue'
+
+  // Modals/drawers are heavy (Stripe element, plan grid) and only render on
+  // user action — defer the chunks so the initial Billing render stays light.
+  const PlanSelectionDrawer = defineAsyncComponent(
+    () => import('@/templates/signup-block/plan-selection-drawer.vue')
+  )
+  const DrawerPlanInfo = defineAsyncComponent(() => import('./Drawer/DrawerPlanInfo.vue'))
+  const DialogDowngradePlan = defineAsyncComponent(() => import('./Dialog/DialogDowngradePlan.vue'))
+  const DialogCancelDowngrade = defineAsyncComponent(
+    () => import('./Dialog/DialogCancelDowngrade.vue')
+  )
 
   const router = useRouter()
   const emit = defineEmits(['changeTab'])
@@ -335,67 +338,37 @@
   })
 
   const currentInvoice = ref({})
-  const INVOICE_RETRY_INTERVAL_MS = 2000
-  const INVOICE_RETRY_MAX_ATTEMPTS = 6
-  let invoiceRetryTimer = null
-  let invoiceRetryAttempt = 0
-
-  const isInvoicePopulated = (invoice) => {
-    if (!invoice) return false
-    const billId = invoice.billId
-    return Boolean(invoice.redirectId) || (Boolean(billId) && billId !== '---')
-  }
-
-  const cancelInvoiceRetry = () => {
-    if (invoiceRetryTimer) {
-      clearTimeout(invoiceRetryTimer)
-      invoiceRetryTimer = null
-    }
-    invoiceRetryAttempt = 0
-  }
 
   const loadCurrentInvoice = async () => {
     try {
-      const result = (await props.loadCurrentInvoiceService()) || {}
-      currentInvoice.value = result
-      if (!isInvoicePopulated(result) && invoiceRetryAttempt < INVOICE_RETRY_MAX_ATTEMPTS) {
-        invoiceRetryAttempt += 1
-        if (invoiceRetryTimer) clearTimeout(invoiceRetryTimer)
-        invoiceRetryTimer = setTimeout(loadCurrentInvoice, INVOICE_RETRY_INTERVAL_MS)
-      } else {
-        cancelInvoiceRetry()
-      }
+      currentInvoice.value = (await props.loadCurrentInvoiceService()) || {}
     } catch {
       currentInvoice.value = {}
-      cancelInvoiceRetry()
     }
   }
 
+  // Re-fetch the legacy invoice service whenever the subscription transitions
+  // into Pro (initial mount included). No timer/retry loop here — the
+  // post-checkout invoice freshness used to be papered over by 6×2s polling;
+  // now it relies on the SO mutation `onSuccess` invalidating subscription
+  // state and `loadCurrentInvoice` running again on this watch.
   watch(
     () => subscriptionState.isPro,
-    (isPro, wasPro) => {
-      if (isPro && !wasPro) {
-        cancelInvoiceRetry()
-        loadCurrentInvoice()
-      }
-      if (!isPro) cancelInvoiceRetry()
+    (isPro) => {
+      if (isPro) loadCurrentInvoice()
     },
     { immediate: true }
   )
 
   onMounted(async () => {
-    if (!isAwaitingActiveServiceOrder()) return
+    // Post-checkout entry refreshes once so the cards reflect the just-paid
+    // SO without depending on stale persisted cache.
     try {
-      await subscription.refetchUntil((so) => Boolean(so?.priceId && so?.currentPeriodEnd))
+      await subscription.refetch()
     } catch (err) {
       Sentry.captureException(err)
-    } finally {
-      clearAwaitingActiveServiceOrder()
-      loadCurrentInvoice()
     }
   })
-
-  onBeforeUnmount(cancelInvoiceRetry)
 
   const cardsReady = computed(() => !subscriptionState.isLoading)
 

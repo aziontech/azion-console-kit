@@ -4,7 +4,7 @@
     modal
     :closable="!isSubmitting"
     :draggable="false"
-    :style="{ width: '576px', maxWidth: 'calc(100vw - 32px)' }"
+    :style="{ width: 'min(90vw, 576px)' }"
     :pt="{
       root: { class: 'overflow-hidden rounded-md border border-default' },
       header: {
@@ -35,14 +35,14 @@
         <Button
           outlined
           label="Cancel"
-          class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
+          class="h-10 md:h-8 px-4 font-protomono text-sm md:text-xs flex items-center justify-center"
           :disabled="isSubmitting"
           @click="close"
         />
         <Button
           :label="error ? 'Retry' : 'Keep current plan'"
           :loading="isSubmitting"
-          class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
+          class="h-10 md:h-8 px-4 font-protomono text-sm md:text-xs flex items-center justify-center"
           :disabled="isSubmitting"
           @click="confirm"
         />

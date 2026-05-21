@@ -3,14 +3,14 @@
     class="flex shrink-0 justify-end gap-3 border-t border-default bg-[var(--surface-50)] px-4 py-3 md:px-8"
   >
     <Button
-      class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
+      class="h-10 md:h-8 px-4 font-protomono text-sm md:text-xs flex items-center justify-center"
       outlined
       label="Cancel"
       :disabled="isSubmitting"
       @click="$emit('cancel')"
     />
     <Button
-      class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
+      class="h-10 md:h-8 px-4 font-protomono text-sm md:text-xs flex items-center justify-center"
       :label="submitLabel"
       :loading="isSubmitting"
       :disabled="isConfirmDisabled"
