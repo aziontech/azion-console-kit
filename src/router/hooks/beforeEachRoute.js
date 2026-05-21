@@ -5,8 +5,7 @@ import {
   billingGuard,
   redirectGuard,
   flagGuard,
-  cliGuard,
-  realTimeEventsVersionGuard
+  cliGuard
 } from '@/router/hooks/guards'
 import { useRouter } from 'vue-router'
 
@@ -21,8 +20,7 @@ export default async function beforeEachRoute(guardDependency) {
     cliGuard,
     billingGuard,
     redirectGuard,
-    flagGuard,
-    realTimeEventsVersionGuard
+    flagGuard
   ]
 
   for (const executeGuard of guards) {

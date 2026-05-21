@@ -1,4 +1,4 @@
-import { PREDEFINED_PANELS } from '@/views/RealTimeEventsV2/Blocks/constants/predefined-panels'
+import { PREDEFINED_PANELS } from '@/views/RealTimeEvents/Blocks/constants/predefined-panels'
 import REPORTS from '@/modules/real-time-metrics/constants/reports'
 import {
   getItem,

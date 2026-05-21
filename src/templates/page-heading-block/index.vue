@@ -2,7 +2,6 @@
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import Breadcrumb from '@aziontech/webkit/breadcrumb'
   import Skeleton from '@aziontech/webkit/skeleton'
-  import PrimeTag from '@aziontech/webkit/tag'
   import { computed, useSlots } from 'vue'
   import { useRouter } from 'vue-router'
 
@@ -52,55 +51,43 @@
 <template>
   <div class="w-full md:min-h-16 flex md:flex-row flex-col gap-4 md:justify-between items-center">
     <div class="w-full md:w-auto flex flex-col">
-      <div class="flex items-center gap-2 flex-wrap">
-        <Breadcrumb
-          :model="breadcrumbs.items"
-          class="overflow-auto p-0"
-          :pt="{
-            label: { class: 'whitespace-nowrap text-[18px]' },
-            menuItem: ({ props }) => ({
-              'data-testid': `page-heading-block__breadcrumb__${props.item.label}`
-            })
-          }"
-        >
-          <template #item="{ item, props }">
-            <Skeleton
-              v-if="item.isLoading"
-              width="8rem"
-              height="1.125rem"
-              class="bg-surface-200 dark:bg-surface-700"
-            />
-            <router-link
-              v-else-if="item.to"
-              :to="item.to"
-              v-bind="props.action"
-              :class="{
-                'text-color-secondary': breadcrumbs.items.indexOf(item) === -1,
-                'text-[var(--text-color-secondary)]':
-                  breadcrumbs.items.length > 1 && breadcrumbs.items.indexOf(item) === 0
-              }"
-            >
-              {{ item.label }}
-            </router-link>
-            <span
-              v-else
-              class="text-[18px]"
-            >
-              {{ item.label }}
-            </span>
-          </template>
-        </Breadcrumb>
-        <PrimeTag
-          v-if="props.tag"
-          :value="props.tag.value"
-          :severity="props.tag.severity"
-          :icon="props.tag.icon"
-          v-tooltip.bottom="
-            props.tag.tooltip ? { value: props.tag.tooltip, showDelay: 300 } : undefined
-          "
-          data-testid="page-heading-block__tag"
-        />
-      </div>
+      <Breadcrumb
+        :model="breadcrumbs.items"
+        class="overflow-auto w-full p-0"
+        :pt="{
+          label: { class: 'whitespace-nowrap text-[18px]' },
+          menuItem: ({ props }) => ({
+            'data-testid': `page-heading-block__breadcrumb__${props.item.label}`
+          })
+        }"
+      >
+        <template #item="{ item, props }">
+          <Skeleton
+            v-if="item.isLoading"
+            width="8rem"
+            height="1.125rem"
+            class="bg-surface-200 dark:bg-surface-700"
+          />
+          <router-link
+            v-else-if="item.to"
+            :to="item.to"
+            v-bind="props.action"
+            :class="{
+              'text-color-secondary': breadcrumbs.items.indexOf(item) === -1,
+              'text-[var(--text-color-secondary)]':
+                breadcrumbs.items.length > 1 && breadcrumbs.items.indexOf(item) === 0
+            }"
+          >
+            {{ item.label }}
+          </router-link>
+          <span
+            v-else
+            class="text-[18px]"
+          >
+            {{ item.label }}
+          </span>
+        </template>
+      </Breadcrumb>
       <span
         class="text-[var(--text-color-secondary)] text-sm font-normal leading-5 px-0.5"
         v-if="props.description"

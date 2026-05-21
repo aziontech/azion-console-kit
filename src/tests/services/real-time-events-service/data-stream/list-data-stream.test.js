@@ -50,7 +50,7 @@ describe('DataStreamingServices', () => {
       `\t$tsRange_end: DateTime!`,
       `) {`,
       `\t${datasetName} (`,
-      `\t\tlimit: 10000`,
+      `\t\tlimit: 500`,
       `\t\torderBy: [ts_DESC]`,
       `\t\tfilter: {`,
       `\t\t\ttsRange: { begin: $tsRange_begin, end: $tsRange_end }`,
