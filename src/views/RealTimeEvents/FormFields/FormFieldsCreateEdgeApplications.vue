@@ -8,7 +8,7 @@
   import InputSwitch from '@aziontech/webkit/inputswitch'
   import InputText from '@aziontech/webkit/inputtext'
   import RadioButton from '@aziontech/webkit/radiobutton'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
 
