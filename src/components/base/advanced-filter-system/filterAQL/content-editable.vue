@@ -4,7 +4,7 @@
     ref="editable"
     contenteditable
     placeholder="Filter using Azion Query Language syntax..."
-    class="contenteditable p-inputtext font-normal text-sm w-full h-auto font-mono"
+    class="contenteditable p-inputtext font-normal text-sm w-full h-auto"
     @input="handleInput"
     @keyup="updateCursorOffset"
     @mouseup="updateCursorOffset"
@@ -34,6 +34,7 @@
 
   const editable = ref(null)
   const cursorOffset = ref(null)
+  const isInternalUpdate = ref(false)
 
   const updateCursorOffset = () => {
     cursorOffset.value = AzionQueryLanguage.saveCursorPosition(editable.value)
@@ -44,6 +45,7 @@
 
     const newValue = event.target.innerText
     editable.value.innerHTML = AzionQueryLanguage.highlightQuerySyntax(newValue)
+    isInternalUpdate.value = true
     emit('update:modelValue', newValue)
     props.handleQuery()
     restoreCursorPosition()
@@ -64,6 +66,12 @@
   watch(
     () => props.modelValue,
     (newVal) => {
+      // Skip when the change came from our own handleInput — innerHTML is already set
+      // and cursor position is being restored. Re-setting innerHTML would destroy the cursor.
+      if (isInternalUpdate.value) {
+        isInternalUpdate.value = false
+        return
+      }
       if (editable.value) {
         editable.value.innerHTML = AzionQueryLanguage.highlightQuerySyntax(newVal)
       }
@@ -79,11 +87,20 @@
 <style>
   .contenteditable {
     white-space: pre-wrap;
+    font-family:
+      ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+    min-height: 2.25rem;
+    max-height: 6rem;
+    overflow-y: auto;
   }
 
   .contenteditable:empty:before {
     content: attr(placeholder);
     color: var(--input-placeholder-text-color);
     pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
   }
 </style>

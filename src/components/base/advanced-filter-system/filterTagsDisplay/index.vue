@@ -54,28 +54,53 @@
   const labelOperator = ({ operator }) => {
     return OPERATOR_MAPPING_ADVANCED_FILTER[operator]?.label.toLowerCase()
   }
+
+  const filterTooltip = (filter) => {
+    const field = filter.field
+    const op = labelOperator(filter)
+    let value = ''
+    if (filter.operator === 'Range') {
+      value = `(${filter.value.begin}, ${filter.value.end})`
+    } else if (filter.operator === 'In') {
+      value = `(${filter.value.map((item) => item.label).join(', ')})`
+    } else {
+      value = String(filter.value)
+    }
+    return `${field} ${op}: ${value}`
+  }
 </script>
 
 <template>
-  <div class="flex gap-2 items-center flex-wrap flex-1">
+  <div class="flex gap-2 items-center flex-nowrap flex-1 overflow-hidden">
     <div
       v-for="(filter, index) in processedFilters"
       :key="index"
-      class="inline-flex items-center gap-1 py-1.5 px-2.5 rounded-md border text-sm surface-border transition-colors"
+      class="inline-flex items-center gap-1 py-1.5 px-2.5 rounded-md border text-sm surface-border transition-colors max-w-xs flex-shrink-0"
+      v-tooltip.bottom="{ value: filterTooltip(filter), showDelay: 300 }"
       @click="handleClickFilter(filter)"
     >
-      <span class="text-color font-normal">{{ filter.field }}</span>
-      <span class="text-color font-medium">{{ labelOperator(filter) }}:</span>
-      <span v-if="filter.operator === 'Range'">
+      <span class="text-color font-normal whitespace-nowrap">{{ filter.field }}</span>
+      <span class="text-color font-medium whitespace-nowrap">{{ labelOperator(filter) }}:</span>
+      <span
+        class="truncate max-w-[12rem]"
+        v-if="filter.operator === 'Range'"
+      >
         ({{ filter.value.begin }},{{ filter.value.end }})
       </span>
-      <span v-else-if="filter.operator === 'In'">
+      <span
+        class="truncate max-w-[12rem]"
+        v-else-if="filter.operator === 'In'"
+      >
         ({{ filter.value.map((item) => item.label).join(', ') }})
       </span>
-      <span v-else>{{ filter.value }}</span>
+      <span
+        class="truncate max-w-[12rem]"
+        v-else
+        >{{ filter.value }}</span
+      >
       <i
-        class="pl-1 pi pi-times-circle cursor-pointer text-sm"
-        @click="removeFilter(index)"
+        class="pl-1 pi pi-times-circle cursor-pointer text-sm flex-shrink-0"
+        @click.stop="removeFilter(index)"
       />
     </div>
   </div>

@@ -6,49 +6,45 @@ import { useGraphQLStore } from '@/stores/graphql-query'
 import { buildSummary } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 import { getCurrentTimezone } from '@/helpers'
+import { CURATED_DATASET_FIELDS } from '../_shared/dataset-fields'
 
 const shouldShowTsColumn = false
 const shouldLimitRequestUri = true
 
-export const listImageProcessor = async (filter) => {
-  const payload = adapt(filter)
+const DATASET = 'imagesProcessedEvents'
 
+export const listImageProcessor = async (filter) => {
+  const fields = [...CURATED_DATASET_FIELDS[DATASET]]
+
+  const payload = adapt(filter, fields)
   const graphqlStore = useGraphQLStore()
   graphqlStore.setQuery(payload)
 
   const decorator = new AxiosHttpClientSignalDecorator()
 
-  const response = await decorator.request({
+  const httpResponse = await decorator.request({
     baseURL: '/',
     url: makeRealTimeEventsBaseUrl(),
     method: 'POST',
     body: payload
   })
 
-  return parseHttpResponse(response)
+  return parseHttpResponse(httpResponse)
 }
 
-const adapt = (filter) => {
+const adapt = (filter, fields) => {
   const table = {
-    dataset: 'imagesProcessedEvents',
-    limit: 10000,
-    fields: [
-      'configurationId',
-      'host',
-      'requestUri',
-      'status',
-      'bytesSent',
-      'httpReferer',
-      'ts',
-      'httpUserAgent'
-    ],
+    dataset: DATASET,
+    limit: filter?.pageSize || 500,
+    ...(filter?.offset && { offset: filter.offset }),
+    fields,
     orderBy: 'ts_DESC'
   }
   return convertGQL(filter, table)
 }
 
 const adaptResponse = (response) => {
-  const data = response.data.imagesProcessedEvents?.map((imagesProcessedEvents) => ({
+  const data = response.data[DATASET]?.map((imagesProcessedEvents) => ({
     id: generateCurrentTimestamp(),
     configurationId: imagesProcessedEvents.configurationId,
     httpUserAgent: imagesProcessedEvents.httpUserAgent,
