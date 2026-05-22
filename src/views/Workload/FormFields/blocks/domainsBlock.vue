@@ -37,7 +37,6 @@
   const { value: useCustomDomain } = useField('useCustomDomain')
   // eslint-disable-next-line no-unused-vars
   const { value: customDomain, errorMessage: customDomainErrorMessage } = useField('customDomain')
-  const { value: infrastructure } = useField('infrastructure')
   const { value: tls } = useField('tls')
 
   const { setValue: setCommonName } = useField('letEncrypt.commonName')

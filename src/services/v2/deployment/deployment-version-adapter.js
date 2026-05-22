@@ -99,7 +99,7 @@ const normalizeVersion = (version) => {
     audit: normalizeAudit(source.audit),
     state: source.state ?? null,
     state_detail: source.state_detail ?? null,
-    account_id: source.account_id ?? null,
+    client_id: source.client_id ?? null,
     last_modified_by: normalizeAuditActor(source.last_modified_by),
     created_at: source.created_at ?? null
   }
@@ -130,6 +130,14 @@ export const DeploymentVersionAdapter = {
   },
 
   transformCreatePayload(payload = {}) {
+    return pickDefined({
+      resources: normalizeResources(payload.resources),
+      strategy: payload.strategy,
+      origin: payload.origin
+    })
+  },
+
+  transformEditDraftPayload(payload = {}) {
     return pickDefined({
       resources: normalizeResources(payload.resources),
       strategy: payload.strategy,

@@ -10,7 +10,15 @@
   import LabelBlock from '@aziontech/webkit/label'
   import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
-  import { listResourceVersionsService } from '@/services/v2/deployment/deployment-mock'
+  // Stub local: o endpoint "list versions of a resource" ainda não existe na deployment-api.
+  const listResourceVersionsService = async () => ({
+    data: [
+      { value: 'latest', label: 'latest' },
+      { value: 'v2.4.0', label: 'v2.4.0' },
+      { value: 'v2.3.9', label: 'v2.3.9' },
+      { value: 'v2.3.8', label: 'v2.3.8' }
+    ]
+  })
   import {
     resourceRegistry,
     hasResourceListing

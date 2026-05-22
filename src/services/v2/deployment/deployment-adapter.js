@@ -1,3 +1,5 @@
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+
 const isObject = (value) => {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
@@ -12,6 +14,42 @@ const pickDefined = (payload) => {
     if (value !== undefined) {
       acc[key] = value
     }
+    return acc
+  }, {})
+}
+
+const STATE_TO_STATUS = {
+  ready: { content: 'Ready', severity: 'success' },
+  queued: { content: 'Queued', severity: 'info' },
+  building: { content: 'Building', severity: 'info' },
+  error: { content: 'Error', severity: 'danger' },
+  canceled: { content: 'Canceled', severity: 'warning' },
+  archiving: { content: 'Archiving', severity: 'secondary' },
+  archived: { content: 'Archived', severity: 'secondary' },
+  draft: { content: 'Draft', severity: 'info' }
+}
+
+export const mapStateToStatus = (state) => {
+  if (!state) return { content: 'Unknown', severity: 'secondary' }
+  const key = String(state).trim().toLowerCase()
+  return STATE_TO_STATUS[key] || { content: String(state), severity: 'secondary' }
+}
+
+const snakeToCamel = (segment) => segment.replace(/_([a-z])/g, (_, char) => char.toUpperCase())
+
+const apiResourceTypeToUiKey = (apiType) => {
+  if (!apiType) return ''
+  const lower = String(apiType).toLowerCase()
+  const stripped = lower.startsWith('edge_') ? lower.slice(5) : lower
+  return snakeToCamel(stripped)
+}
+
+const buildResourcePack = (allowedResourceTypes) => {
+  if (!Array.isArray(allowedResourceTypes)) return {}
+  return allowedResourceTypes.reduce((acc, type) => {
+    const key = apiResourceTypeToUiKey(type)
+    if (!key) return acc
+    acc[key] = { name: type, hash: '' }
     return acc
   }, {})
 }
@@ -58,9 +96,12 @@ const normalizeDeployment = (deployment) => {
     description: source.description ?? null,
     active: Boolean(source.active),
     binding_policy: source.binding_policy ?? null,
+    deployment_version_policy: source.deployment_version_policy ?? null,
     allowed_resource_types: toStringArray(source.allowed_resource_types),
     strategy_defaults: normalizeStrategyDefaults(source.strategy_defaults),
-    account_id: source.account_id ?? null,
+    state: source.state ?? null,
+    state_detail: source.state_detail ?? null,
+    client_id: source.client_id ?? null,
     created_at: source.created_at ?? null,
     updated_at: source.updated_at ?? null,
     created_by: normalizeAuditActor(source.created_by),
@@ -71,7 +112,21 @@ const normalizeDeployment = (deployment) => {
 export const DeploymentAdapter = {
   transformList(data) {
     if (!Array.isArray(data)) return []
-    return data.map((item) => normalizeDeployment(item))
+    return data.map((item) => {
+      const normalized = normalizeDeployment(item)
+      return {
+        ...normalized,
+        status: mapStateToStatus(normalized.state),
+        resourcePack: buildResourcePack(normalized.allowed_resource_types),
+        lastEditor: normalized.last_modified_by?.user_id ?? '',
+        lastModified: normalized.updated_at
+          ? formatDateToDayMonthYearHour(normalized.updated_at)
+          : '-',
+        hash: '',
+        environment: '',
+        isCurrent: false
+      }
+    })
   },
 
   transformItem(data) {
@@ -81,11 +136,10 @@ export const DeploymentAdapter = {
 
   transformCreatePayload(payload = {}) {
     return pickDefined({
-      environment_id: payload.environment_id,
       name: payload.name,
       description: payload.description,
-      active: payload.active,
       binding_policy: payload.binding_policy,
+      deployment_version_policy: payload.deployment_version_policy,
       allowed_resource_types: payload.allowed_resource_types,
       strategy_defaults: payload.strategy_defaults
     })
@@ -95,8 +149,8 @@ export const DeploymentAdapter = {
     return pickDefined({
       name: payload.name,
       description: payload.description,
-      active: payload.active,
       binding_policy: payload.binding_policy,
+      deployment_version_policy: payload.deployment_version_policy,
       allowed_resource_types: payload.allowed_resource_types,
       strategy_defaults: payload.strategy_defaults
     })

@@ -15,22 +15,11 @@
     getDeploymentStatus,
     getResourcePackRows,
     getResourcePackDisplay,
-    resourcePackTypeMeta,
     normalizeText
   } from '@/views/Deployments/helpers/deployment-status'
+  import { deploymentService } from '@/services/v2/deployment/deployment-service'
 
   defineOptions({ name: 'list-deployments' })
-
-  const props = defineProps({
-    listDeploymentsService: {
-      required: true,
-      type: Function
-    },
-    documentationService: {
-      type: Function,
-      required: false
-    }
-  })
 
   const toast = useToast()
 
@@ -103,8 +92,6 @@
       field: 'lastModified'
     }
   ]
-
-  const textKeys = ['text', 'content', 'value', 'label', 'name', 'email']
 
   const drawerRef = ref(null)
 
@@ -222,121 +209,10 @@
     })
   })
 
-  const resolveResourcePackEntry = (value) => {
-    if (value == null) return null
-
-    if (typeof value === 'string' || typeof value === 'number') {
-      return {
-        name: String(value),
-        hash: ''
-      }
-    }
-
-    if (typeof value !== 'object') return null
-
-    const name =
-      resolvePrimitiveText(value?.name) ||
-      resolvePrimitiveText(value?.label) ||
-      resolvePrimitiveText(value?.resourceName)
-
-    const hash =
-      resolvePrimitiveText(value?.hash) ||
-      resolvePrimitiveText(value?.versionHash) ||
-      resolvePrimitiveText(value?.version) ||
-      resolvePrimitiveText(value?.sourceHash)
-
-    if (!name && !hash) return null
-
-    return {
-      name,
-      hash
-    }
-  }
-
-  const normalizeLegacyResourceType = (resource) => {
-    const value = normalizeText(resource)
-    if (value === 'application') return 'application'
-    if (value === 'firewall' || value === 'waf') return 'firewall'
-    if (value === 'workload') return 'workload'
-    return ''
-  }
-
-  const normalizeResourcePack = (resourcePack, item) => {
-    const normalized = Object.fromEntries(resourcePackTypeMeta.map((meta) => [meta.key, null]))
-
-    if (resourcePack && typeof resourcePack === 'object') {
-      for (const meta of resourcePackTypeMeta) {
-        normalized[meta.key] = resolveResourcePackEntry(resourcePack?.[meta.key])
-      }
-    }
-
-    const hasAnyEntry = resourcePackTypeMeta.some((meta) => normalized[meta.key])
-    if (!hasAnyEntry) {
-      const legacyType = normalizeLegacyResourceType(item?.resource)
-      if (legacyType) {
-        normalized[legacyType] = {
-          name: resolvePrimitiveText(item?.resource),
-          hash: resolvePrimitiveText(item?.sourceHash)
-        }
-      }
-    }
-
-    return normalized
-  }
-
   const getResourcePackSearchText = (deployment) => {
     return getResourcePackRows(deployment)
       .map((entry) => `${entry.label} ${entry.name} ${entry.hash}`)
       .join(' ')
-  }
-
-  const resolvePrimitiveText = (value) => {
-    if (value == null) return ''
-    if (typeof value === 'string' || typeof value === 'number') return String(value)
-
-    for (const key of textKeys) {
-      const candidate = value?.[key]
-      if (typeof candidate === 'string' || typeof candidate === 'number') {
-        return String(candidate)
-      }
-    }
-
-    return ''
-  }
-
-  const normalizeStatus = (statusValue) => {
-    if (typeof statusValue === 'string') {
-      return {
-        content: statusValue,
-        severity: 'secondary'
-      }
-    }
-
-    if (statusValue && typeof statusValue === 'object') {
-      return {
-        content: resolvePrimitiveText(statusValue) || 'Unknown',
-        severity: statusValue.severity || 'secondary'
-      }
-    }
-
-    return {
-      content: 'Unknown',
-      severity: 'secondary'
-    }
-  }
-
-  const normalizeDeployments = (list) => {
-    return list.map((item, index) => ({
-      id: resolvePrimitiveText(item?.id) || `deployment-${index}`,
-      name: resolvePrimitiveText(item?.name),
-      hash: resolvePrimitiveText(item?.hash),
-      environment: resolvePrimitiveText(item?.environment),
-      isCurrent: Boolean(item?.isCurrent),
-      status: normalizeStatus(item?.status),
-      resourcePack: normalizeResourcePack(item?.resourcePack, item),
-      lastEditor: resolvePrimitiveText(item?.lastEditor),
-      lastModified: resolvePrimitiveText(item?.lastModified)
-    }))
   }
 
   const formatEnvironment = (environment) => {
@@ -348,16 +224,8 @@
     loading.value = true
 
     try {
-      const result = await props.listDeploymentsService()
-      const list = Array.isArray(result)
-        ? result
-        : Array.isArray(result?.data)
-          ? result.data
-          : Array.isArray(result?.body)
-            ? result.body
-            : []
-
-      deployments.value = normalizeDeployments(list)
+      const result = await deploymentService.listDeploymentsService()
+      deployments.value = Array.isArray(result?.body) ? result.body : []
 
       if (paginatorFirst.value >= deployments.value.length && deployments.value.length > 0) {
         paginatorFirst.value = 0
@@ -374,68 +242,9 @@
     }
   }
 
-  const handleCancelDeployment = async (deployment) => {
-    try {
-      const { cancelDeploymentService } = await import('@/services/v2/deployment/deployment-mock')
-      await cancelDeploymentService(deployment.id)
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Deployment canceled successfully'
-      })
-      await loadDeployments()
-    } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Failed to cancel deployment'
-      })
-    }
-  }
-
-  const handleCloneToDraftDeployment = async (deployment) => {
-    try {
-      const { cloneDeploymentToDraftService } =
-        await import('@/services/v2/deployment/deployment-mock')
-      await cloneDeploymentToDraftService(deployment.id)
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Deployment cloned to draft successfully'
-      })
-      await loadDeployments()
-    } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Failed to clone deployment to draft'
-      })
-    }
-  }
-
-  const handleBuildDeployment = async (deployment) => {
-    try {
-      const { buildDeploymentService } = await import('@/services/v2/deployment/deployment-mock')
-      await buildDeploymentService(deployment.id)
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Deployment build started successfully'
-      })
-      await loadDeployments()
-    } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Failed to start deployment build'
-      })
-    }
-  }
-
   const handleDeleteDeployment = async (deployment) => {
     try {
-      const { deleteDeploymentService } = await import('@/services/v2/deployment/deployment-mock')
-      await deleteDeploymentService(deployment.id)
+      await deploymentService.deleteDeploymentService(deployment.id)
       toast.add({
         severity: 'success',
         summary: 'Success',
@@ -451,123 +260,15 @@
     }
   }
 
-  const handleReopenDeployment = async (deployment) => {
-    try {
-      const { reopenDeploymentService } = await import('@/services/v2/deployment/deployment-mock')
-      await reopenDeploymentService(deployment.id)
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Deployment reopened as draft successfully'
-      })
-      await loadDeployments()
-    } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Failed to reopen deployment'
-      })
-    }
-  }
-
-  const handleRollbackDeployment = async (deployment) => {
-    try {
-      const { rollbackDeploymentService } = await import('@/services/v2/deployment/deployment-mock')
-      await rollbackDeploymentService(deployment.id)
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Deployment rolled back successfully'
-      })
-      await loadDeployments()
-    } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Failed to rollback deployment'
-      })
-    }
-  }
-
-  const handlePromoteDeployment = async (deployment) => {
-    try {
-      const { promoteDeploymentService } = await import('@/services/v2/deployment/deployment-mock')
-      await promoteDeploymentService(deployment.id)
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Deployment promoted successfully'
-      })
-      await loadDeployments()
-    } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Failed to promote deployment'
-      })
-    }
-  }
-
   const getActions = (deployment) => {
     const status = getDeploymentStatus(deployment)
-
-    if (status === 'ready') {
-      const actions = [
-        {
-          label: 'Clone to draft',
-          icon: 'pi pi-copy',
-          commandAction: () => handleCloneToDraftDeployment(deployment)
-        }
-      ]
-
-      actions.push(
-        deployment.isCurrent
-          ? {
-              label: 'Rollback',
-              icon: 'pi pi-undo',
-              commandAction: () => handleRollbackDeployment(deployment)
-            }
-          : {
-              label: 'Promote',
-              icon: 'pi pi-arrow-up',
-              commandAction: () => handlePromoteDeployment(deployment)
-            }
-      )
-
-      return actions
-    }
 
     if (status === 'draft') {
       return [
         {
-          label: 'Build',
-          icon: 'pi pi-play',
-          commandAction: () => handleBuildDeployment(deployment)
-        },
-        {
           label: 'Delete',
           icon: 'pi pi-trash',
           commandAction: () => handleDeleteDeployment(deployment)
-        }
-      ]
-    }
-
-    if (status === 'error' || status === 'canceled') {
-      return [
-        {
-          label: 'Reopen in draft',
-          icon: 'pi pi-refresh',
-          commandAction: () => handleReopenDeployment(deployment)
-        }
-      ]
-    }
-
-    if (status === 'building') {
-      return [
-        {
-          label: 'Cancel',
-          icon: 'pi pi-times',
-          commandAction: () => handleCancelDeployment(deployment)
         }
       ]
     }
@@ -609,7 +310,7 @@
   <ContentBlock data-testid="deployments-content-block">
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Deployments"
+        pageTitle="Deployments Versions"
         description="View and manage your deployment history."
         data-testid="deployments-heading"
       >
@@ -638,7 +339,7 @@
         refreshAriaLabel="Refresh deployments"
         exportAriaLabel="Export deployments"
         selectColumnsAriaLabel="Select deployment columns"
-        emptyTitle="No Deployments yet"
+        emptyTitle="No Deployments Versions yet"
         emptyDescription="Deployments will appear here once you deploy your resources."
         filteredEmptyTitle="No deployments found"
         filteredEmptyDescription="Try changing your search or filters."
