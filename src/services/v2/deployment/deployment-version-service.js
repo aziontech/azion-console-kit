@@ -31,9 +31,7 @@ const parseItemResponse = (data) => {
 }
 
 export class DeploymentVersionService extends BaseService {
-  #getUrl(deploymentId, suffix = '') {
-    return `v4/deployments/${deploymentId}/versions${suffix}`
-  }
+  #baseURL = '/deployment-api/v1/deployments'
 
   #invalidateVersions = (deploymentId) => {
     this.queryClient.invalidateQueries({
@@ -50,9 +48,8 @@ export class DeploymentVersionService extends BaseService {
   #fetchList = async (deploymentId, params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: this.#getUrl(deploymentId),
-      params,
-      config: { baseURL: '/api' }
+      url: `${this.#baseURL}/${deploymentId}/versions`,
+      params
     })
 
     const { results, count } = parseListResponse(data)
@@ -79,8 +76,7 @@ export class DeploymentVersionService extends BaseService {
   getVersionByIdService = async (deploymentId, versionId) => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: this.#getUrl(deploymentId, `/${versionId}`),
-      config: { baseURL: '/api' }
+      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}`
     })
 
     return {
@@ -93,9 +89,8 @@ export class DeploymentVersionService extends BaseService {
 
     const { data } = await this.http.request({
       method: 'POST',
-      url: this.#getUrl(deploymentId),
-      body,
-      config: { baseURL: '/api' }
+      url: `${this.#baseURL}/${deploymentId}/versions`,
+      body
     })
 
     this.#invalidateVersions(deploymentId)
@@ -111,9 +106,8 @@ export class DeploymentVersionService extends BaseService {
 
     const { data } = await this.http.request({
       method: 'POST',
-      url: this.#getUrl(deploymentId, `/${versionId}/cancel`),
-      body,
-      config: { baseURL: '/api' }
+      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/cancel`,
+      body
     })
 
     this.#invalidateVersions(deploymentId)
@@ -128,9 +122,8 @@ export class DeploymentVersionService extends BaseService {
 
     const { data } = await this.http.request({
       method: 'POST',
-      url: this.#getUrl(deploymentId, `/${versionId}/archive`),
-      body,
-      config: { baseURL: '/api' }
+      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/archive`,
+      body
     })
 
     this.#invalidateVersions(deploymentId)
@@ -143,8 +136,7 @@ export class DeploymentVersionService extends BaseService {
   deleteVersionService = async (deploymentId, versionId) => {
     await this.http.request({
       method: 'DELETE',
-      url: this.#getUrl(deploymentId, `/${versionId}`),
-      config: { baseURL: '/api' }
+      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}`
     })
 
     this.#invalidateVersions(deploymentId)
@@ -157,9 +149,8 @@ export class DeploymentVersionService extends BaseService {
 
     const { data } = await this.http.request({
       method: 'POST',
-      url: this.#getUrl(deploymentId, `/${versionId}/activate`),
-      body,
-      config: { baseURL: '/api' }
+      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/activate`,
+      body
     })
 
     this.#invalidateVersions(deploymentId)
@@ -175,9 +166,8 @@ export class DeploymentVersionService extends BaseService {
 
     const { data } = await this.http.request({
       method: 'POST',
-      url: this.#getUrl(deploymentId, `/${versionId}/rollback`),
-      body,
-      config: { baseURL: '/api' }
+      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/rollback`,
+      body
     })
 
     this.#invalidateVersions(deploymentId)
@@ -193,9 +183,8 @@ export class DeploymentVersionService extends BaseService {
 
     const { data } = await this.http.request({
       method: 'POST',
-      url: this.#getUrl(deploymentId, `/${versionId}/promote`),
-      body,
-      config: { baseURL: '/api' }
+      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/promote`,
+      body
     })
 
     if (body.target_deployment_id) {
@@ -212,15 +201,44 @@ export class DeploymentVersionService extends BaseService {
 
     const { data } = await this.http.request({
       method: 'PATCH',
-      url: this.#getUrl(deploymentId, `/${versionId}/strategy`),
-      body,
-      config: { baseURL: '/api' }
+      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/strategy`,
+      body
     })
 
     this.queryClient.invalidateQueries({
       queryKey: queryKeys.deployments.versions.detail(deploymentId, versionId)
     })
     this.#invalidateVersions(deploymentId)
+
+    return {
+      data: parseItemResponse(data)
+    }
+  }
+
+  editDraftVersionService = async (deploymentId, versionId, payload = {}) => {
+    const body = DeploymentVersionAdapter.transformEditDraftPayload(payload)
+
+    const { data } = await this.http.request({
+      method: 'PATCH',
+      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}`,
+      body
+    })
+
+    this.#invalidateVersions(deploymentId)
+
+    return {
+      data: DeploymentVersionAdapter.transformItem(parseItemResponse(data))
+    }
+  }
+
+  deployDraftVersionService = async (deploymentId, versionId) => {
+    const { data } = await this.http.request({
+      method: 'POST',
+      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/deploy`
+    })
+
+    this.#invalidateVersions(deploymentId)
+    this.#invalidateDeploymentDetail(deploymentId)
 
     return {
       data: parseItemResponse(data)

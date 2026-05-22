@@ -31,14 +31,13 @@ const parseItemResponse = (data) => {
 }
 
 export class DeploymentService extends BaseService {
-  #baseURL = 'v4/deployments'
+  #baseURL = '/deployment-api/v1/deployments'
 
   #fetchList = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.#baseURL,
-      params,
-      config: { baseURL: '/api' }
+      params
     })
 
     const { results, count } = parseListResponse(data)
@@ -79,8 +78,7 @@ export class DeploymentService extends BaseService {
   getDeploymentByIdService = async (id) => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: `${this.#baseURL}/${id}`,
-      config: { baseURL: '/api' }
+      url: `${this.#baseURL}/${id}`
     })
 
     return {
@@ -94,8 +92,7 @@ export class DeploymentService extends BaseService {
     const { data } = await this.http.request({
       method: 'POST',
       url: this.#baseURL,
-      body,
-      config: { baseURL: '/api' }
+      body
     })
 
     this.queryClient.removeQueries({ queryKey: queryKeys.deployments.all })
@@ -111,8 +108,7 @@ export class DeploymentService extends BaseService {
     const { data } = await this.http.request({
       method: 'PATCH',
       url: `${this.#baseURL}/${id}`,
-      body,
-      config: { baseURL: '/api' }
+      body
     })
 
     this.queryClient.removeQueries({ queryKey: queryKeys.deployments.all })
@@ -125,8 +121,7 @@ export class DeploymentService extends BaseService {
   deleteDeploymentService = async (id) => {
     await this.http.request({
       method: 'DELETE',
-      url: `${this.#baseURL}/${id}`,
-      config: { baseURL: '/api' }
+      url: `${this.#baseURL}/${id}`
     })
 
     this.queryClient.removeQueries({ queryKey: queryKeys.deployments.all })

@@ -18,9 +18,8 @@ export class DeploymentResourceService extends BaseService {
 
     const { data } = await this.http.request({
       method: 'POST',
-      url: `v4/resources/${resourceVersionId}/redeploy`,
-      body,
-      config: { baseURL: '/api' }
+      url: `/deployment-api/v1/resources/${resourceVersionId}/redeploy`,
+      body
     })
 
     this.queryClient.invalidateQueries({ queryKey: queryKeys.deployments.all })
