@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import Toolbar from '@aziontech/webkit/toolbar'
   import Welcome from '../components/chat-welcome.vue'
   import ChatInput from '../components/chat-input.vue'

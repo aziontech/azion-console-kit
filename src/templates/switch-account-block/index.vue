@@ -11,7 +11,7 @@
   import InputText from '@aziontech/webkit/inputtext'
   import Skeleton from '@aziontech/webkit/skeleton'
   import Menu from '@aziontech/webkit/menu'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import { computed, onMounted, ref, watch } from 'vue'
 
   defineOptions({ name: 'SwitchAccountBlock' })

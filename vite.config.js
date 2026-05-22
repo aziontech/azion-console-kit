@@ -130,8 +130,14 @@ const getConfig = () => {
           target: 'https://api.appcues.com',
           rewrite: (path) => path.replace(/^\/appcues/, '')
         }),
-        '/sse': createProxyConfig({
-          target: BEHOLDER_URL
+        ...(BEHOLDER_URL && {
+          '/sse': createProxyConfig({
+            target: BEHOLDER_URL
+          })
+        }),
+        '/edge_api': createProxyConfig({
+          target: 'https://urvlgkvpxla.map.azionedge.net',
+          rewrite: (path) => path.replace(/^\/edge_api/, '')
         })
       }
     }

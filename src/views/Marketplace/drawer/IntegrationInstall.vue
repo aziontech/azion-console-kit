@@ -8,7 +8,7 @@
   import Dropdown from '@aziontech/webkit/dropdown'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import Sidebar from '@aziontech/webkit/sidebar'
-  import Tag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/prime-tag'
   import { useField, useForm } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
