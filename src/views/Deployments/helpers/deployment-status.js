@@ -52,6 +52,8 @@ export const normalizeText = (value) =>
     .trim()
     .toLowerCase()
 
+export { mapStateToStatus } from '@/services/v2/deployment/deployment-adapter'
+
 export const getDeploymentStatus = (deployment) => normalizeText(deployment?.status?.content)
 
 export const getResourcePackRows = (deployment) => {

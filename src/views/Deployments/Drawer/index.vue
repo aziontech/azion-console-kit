@@ -7,16 +7,43 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import FormFieldsDeploymentVersion from '@/views/Deployments/FormFields/FormFieldsDeploymentVersion.vue'
+  import { deploymentService } from '@/services/v2/deployment/deployment-service'
   import {
-    createDeploymentService,
-    updateDeploymentService,
-    getDeploymentByIdService,
-    buildDeploymentService,
-    cancelDeploymentService,
-    cloneDeploymentToDraftService,
-    reopenDeploymentService
-  } from '@/services/v2/deployment/deployment-mock'
-  import { normalizeText, isReadonlyStatus } from '@/views/Deployments/helpers/deployment-status'
+    normalizeText,
+    isReadonlyStatus,
+    mapStateToStatus
+  } from '@/views/Deployments/helpers/deployment-status'
+
+  const mapFormToCreatePayload = (form) => {
+    const kinds = Array.from(
+      new Set((form?.resourcePackEntries || []).map((entry) => entry?.kind).filter(Boolean))
+    )
+
+    return {
+      name: form?.name,
+      description: form?.description || null,
+      binding_policy: 'STRICT',
+      deployment_version_policy: 'single_version',
+      allowed_resource_types: kinds,
+      strategy_defaults: {
+        canary: {
+          enabled: Boolean(form?.gradualDeploymentEnabled),
+          default_percentage: Number(form?.trafficPercentage ?? 0)
+        },
+        skew_protection: {
+          enabled: Boolean(form?.skewProtectionEnabled),
+          default_ttl_seconds: 3600
+        }
+      }
+    }
+  }
+
+  const mapFormToPatchPayload = (form) => {
+    const payload = mapFormToCreatePayload(form)
+    // deployment_version_policy é imutável — API retorna 409 se mudar.
+    delete payload.deployment_version_policy
+    return payload
+  }
 
   defineOptions({ name: 'deployments-drawer' })
 
@@ -27,7 +54,6 @@
   const showEditDrawer = ref(false)
   const selectedDeploymentId = ref('')
   const selectedDeployment = ref(null)
-  const buildOnCreate = ref(false)
 
   const DEBOUNCE_TIME_IN_MS = 300
   const loadCreateDrawer = refDebounced(showCreateDrawer, DEBOUNCE_TIME_IN_MS)
@@ -84,51 +110,28 @@
     resourcePackEntries: []
   }
 
-  const resourcePackToEntries = (resourcePack) => {
-    if (!resourcePack || typeof resourcePack !== 'object') return []
-    return Object.entries(resourcePack)
-      .filter(([, value]) => value && (value.name || value.hash))
-      .map(([kind, value]) => ({
-        kind,
-        name: value?.name || '',
-        hash: value?.hash || ''
-      }))
-  }
-
-  const entriesToResourcePack = (entries) => {
-    if (!Array.isArray(entries)) return {}
-    return entries.reduce((acc, entry) => {
-      if (!entry?.kind) return acc
-      acc[entry.kind] = {
-        name: entry.name || '',
-        hash: entry.hash || ''
-      }
-      return acc
-    }, {})
-  }
-
-  const editStatus = computed(
-    () => selectedDeployment.value?.status || { content: 'Draft', severity: 'info' }
-  )
-  const editStatusText = computed(() => normalizeText(editStatus.value?.content))
+  const editStatus = computed(() => {
+    const state = selectedDeployment.value?.state
+    if (!state) return { content: 'Draft', severity: 'info' }
+    return mapStateToStatus(state)
+  })
   const editIsReadonly = computed(() => isReadonlyStatus(editStatus.value?.content))
   const editAudit = computed(() => {
     const dep = selectedDeployment.value
     if (!dep) return null
 
     return {
-      buildTriggerType: dep.buildTriggerType || 'Console',
-      triggeredByUser: dep.lastEditor,
-      createdAt: dep.lastModified,
-      versionId: dep.hash ? `ver_${dep.hash}` : dep.id,
-      auditMetadata: dep.auditMetadata
+      buildTriggerType: dep.last_modified_by?.trigger || 'Console',
+      triggeredByUser: dep.last_modified_by?.user_id,
+      createdAt: dep.updated_at,
+      versionId: dep.id,
+      auditMetadata: null
     }
   })
 
   const openCreateDrawer = () => {
     selectedDeployment.value = null
     selectedDeploymentId.value = ''
-    buildOnCreate.value = false
     showCreateDrawer.value = true
   }
 
@@ -139,7 +142,7 @@
     selectedDeploymentId.value = String(id)
 
     try {
-      const response = await getDeploymentByIdService(id)
+      const response = await deploymentService.getDeploymentByIdService(id)
       selectedDeployment.value = response.data
       showEditDrawer.value = true
     } catch (error) {
@@ -152,90 +155,45 @@
   }
 
   const loadDeploymentService = async ({ id }) => {
-    const response = await getDeploymentByIdService(id)
+    const response = await deploymentService.getDeploymentByIdService(id)
     const dep = response.data
     selectedDeployment.value = dep
 
+    // Campos legados sem equivalente na API nova ficam com defaults — serão
+    // descartados pelos mappers no envio. UX redesign vai eliminá-los.
     return {
       name: dep.name || '',
       description: dep.description || '',
-      environment: dep.environment || 'development',
-      publishDomain: dep.publishDomain || '',
-      deploymentPolicy: dep.deploymentPolicy || 'manual-approve',
-      deploymentStrategy: dep.deploymentStrategy || 'all-at-once',
-      gradualDeploymentEnabled: Boolean(dep.gradualDeploymentEnabled),
-      gradualVersion: dep.gradualVersion || '',
-      trafficPercentage: Number(dep.trafficPercentage ?? 10),
-      skewProtectionEnabled: Boolean(dep.skewProtectionEnabled),
-      resourcePackEntries: resourcePackToEntries(dep.resourcePack)
-    }
-  }
-
-  const buildServicePayload = (payload) => {
-    const { resourcePackEntries, ...rest } = payload || {}
-    return {
-      ...rest,
-      resourcePack: entriesToResourcePack(resourcePackEntries)
+      environment: 'development',
+      publishDomain: '',
+      deploymentPolicy: 'manual-approve',
+      deploymentStrategy: 'all-at-once',
+      gradualDeploymentEnabled: Boolean(dep.strategy_defaults?.canary?.enabled),
+      gradualVersion: '',
+      trafficPercentage: Number(dep.strategy_defaults?.canary?.default_percentage ?? 10),
+      skewProtectionEnabled: Boolean(dep.strategy_defaults?.skew_protection?.enabled),
+      resourcePackEntries: (dep.allowed_resource_types || []).map((kind) => ({
+        kind,
+        name: '',
+        hash: ''
+      }))
     }
   }
 
   const createDeploymentServiceAdapter = async (payload) => {
-    return await createDeploymentService({
-      ...buildServicePayload(payload),
-      buildOnCreate: buildOnCreate.value
-    })
+    return await deploymentService.createDeploymentService(mapFormToCreatePayload(payload))
   }
 
   const editDeploymentServiceAdapter = async (payload) => {
-    return await updateDeploymentService(selectedDeploymentId.value, buildServicePayload(payload))
+    return await deploymentService.updateDeploymentService(
+      selectedDeploymentId.value,
+      mapFormToPatchPayload(payload)
+    )
   }
 
   const handleSuccess = () => {
     emit('onSuccess')
   }
-
-  const runRowAction = async (action, { successMessage, closeAfter = true }) => {
-    if (!selectedDeploymentId.value) return
-
-    try {
-      await action(selectedDeploymentId.value)
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: successMessage
-      })
-      emit('onSuccess')
-      if (closeAfter) {
-        showEditDrawer.value = false
-      }
-    } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Action failed'
-      })
-    }
-  }
-
-  const handleDuplicateAsDraft = () =>
-    runRowAction(cloneDeploymentToDraftService, {
-      successMessage: 'Deployment cloned to draft successfully'
-    })
-
-  const handleCancelBuild = () =>
-    runRowAction(cancelDeploymentService, {
-      successMessage: 'Deployment build canceled'
-    })
-
-  const handleReopenAsDraft = () =>
-    runRowAction(reopenDeploymentService, {
-      successMessage: 'Deployment reopened as draft'
-    })
-
-  const handleBuildDraft = () =>
-    runRowAction(buildDeploymentService, {
-      successMessage: 'Deployment build started'
-    })
 
   defineExpose({
     openCreateDrawer,
@@ -280,29 +238,10 @@
           label="Save as Draft"
           severity="secondary"
           size="small"
-          :loading="isSubmitting && !buildOnCreate"
+          :loading="isSubmitting"
           :disabled="isSubmitting"
-          @click="
-            () => {
-              buildOnCreate = false
-              onSubmit()
-            }
-          "
+          @click="onSubmit"
           data-testid="deployment-version-drawer__save-draft"
-        />
-        <PrimeButton
-          label="Build version"
-          icon="pi pi-play"
-          size="small"
-          :loading="isSubmitting && buildOnCreate"
-          :disabled="isSubmitting"
-          @click="
-            () => {
-              buildOnCreate = true
-              onSubmit()
-            }
-          "
-          data-testid="deployment-version-drawer__build-version"
         />
       </div>
     </template>
@@ -330,75 +269,28 @@
 
     <template #action-bar="{ onSubmit, onCancel, loading }">
       <div
-        class="flex w-full items-center justify-between gap-2 border-t border-[var(--surface-border)] bg-[var(--surface-section)] px-6 py-3"
+        class="flex w-full items-center justify-end gap-2 border-t border-[var(--surface-border)] bg-[var(--surface-section)] px-6 py-3"
         data-testid="deployment-version-drawer__edit-actions"
       >
-        <div class="flex items-center gap-2">
-          <PrimeButton
-            v-if="editStatusText === 'ready'"
-            label="Duplicate as Draft"
-            icon="pi pi-clone"
-            severity="secondary"
-            outlined
-            size="small"
-            :loading="loading"
-            @click="handleDuplicateAsDraft"
-            data-testid="deployment-version-drawer__duplicate-draft"
-          />
-          <PrimeButton
-            v-else-if="editStatusText === 'error' || editStatusText === 'canceled'"
-            label="Reopen as Draft"
-            icon="pi pi-refresh"
-            severity="secondary"
-            outlined
-            size="small"
-            :loading="loading"
-            @click="handleReopenAsDraft"
-            data-testid="deployment-version-drawer__reopen-draft"
-          />
-        </div>
+        <PrimeButton
+          :label="editIsReadonly ? 'Close' : 'Cancel'"
+          severity="secondary"
+          outlined
+          size="small"
+          :disabled="loading"
+          @click="onCancel"
+          data-testid="deployment-version-drawer__close-edit"
+        />
 
-        <div class="flex items-center gap-2">
-          <PrimeButton
-            :label="editIsReadonly ? 'Close' : 'Cancel'"
-            severity="secondary"
-            outlined
-            size="small"
-            :disabled="loading"
-            @click="onCancel"
-            data-testid="deployment-version-drawer__close-edit"
-          />
-
-          <template v-if="editStatusText === 'draft'">
-            <PrimeButton
-              label="Save changes"
-              severity="secondary"
-              size="small"
-              :loading="loading"
-              @click="onSubmit"
-              data-testid="deployment-version-drawer__save-changes"
-            />
-            <PrimeButton
-              label="Build version"
-              icon="pi pi-play"
-              size="small"
-              :loading="loading"
-              @click="handleBuildDraft"
-              data-testid="deployment-version-drawer__build-draft"
-            />
-          </template>
-
-          <PrimeButton
-            v-else-if="editStatusText === 'building'"
-            label="Cancel build"
-            icon="pi pi-times"
-            severity="danger"
-            size="small"
-            :loading="loading"
-            @click="handleCancelBuild"
-            data-testid="deployment-version-drawer__cancel-build"
-          />
-        </div>
+        <PrimeButton
+          v-if="!editIsReadonly"
+          label="Save changes"
+          severity="secondary"
+          size="small"
+          :loading="loading"
+          @click="onSubmit"
+          data-testid="deployment-version-drawer__save-changes"
+        />
       </div>
     </template>
   </EditDrawerBlock>

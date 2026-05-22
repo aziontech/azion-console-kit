@@ -31,14 +31,13 @@ const parseItemResponse = (data) => {
 }
 
 export class DeploymentHistoryService extends BaseService {
-  #baseURL = 'v4/deployments'
+  #baseURL = '/deployment-api/v1/deployments'
 
   #fetchGlobal = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.#baseURL}/history`,
-      params,
-      config: { baseURL: '/api' }
+      params
     })
 
     const { results, count } = parseListResponse(data)
@@ -53,8 +52,7 @@ export class DeploymentHistoryService extends BaseService {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.#baseURL}/${deploymentId}/history`,
-      params,
-      config: { baseURL: '/api' }
+      params
     })
 
     const { results, count } = parseListResponse(data)
@@ -95,8 +93,7 @@ export class DeploymentHistoryService extends BaseService {
     const { data } = await this.http.request({
       method: 'GET',
       url: `${this.#baseURL}/${deploymentId}/versions/diff`,
-      params: { from, to },
-      config: { baseURL: '/api' }
+      params: { from, to }
     })
 
     return {

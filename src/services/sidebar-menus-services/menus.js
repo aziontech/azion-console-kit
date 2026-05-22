@@ -21,10 +21,10 @@ function createMarketplaceItem() {
 
 function createDeploymentsItem() {
   return {
-    label: 'Deployments',
+    label: 'Deployments Versions',
     icon: 'ai ai-deploy-pillar',
-    to: '/deployments',
-    id: 'deployments'
+    to: '/deployments-versions',
+    id: 'deployments-versions'
   }
 }
 
