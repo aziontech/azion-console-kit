@@ -1,6 +1,11 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { DeploymentAdapter } from '@/services/v2/deployment/deployment-adapter'
+import { deploymentListMockResponse } from '@/services/v2/deployment/deployment-list-mock'
+
+// MOCK: temporary toggle. Set to false once the API exposes the full contract
+// (environment, is_current, duration_seconds) used by the Deployments view.
+const USE_LIST_MOCK = true
 
 const parseListResponse = (data) => {
   if (Array.isArray(data)) {
@@ -34,6 +39,14 @@ export class DeploymentService extends BaseService {
   #baseURL = '/deployment-api/v1/deployments'
 
   #fetchList = async (params = {}) => {
+    if (USE_LIST_MOCK) {
+      const { results, count } = parseListResponse(deploymentListMockResponse)
+      return {
+        body: DeploymentAdapter.transformList(results),
+        count
+      }
+    }
+
     const { data } = await this.http.request({
       method: 'GET',
       url: this.#baseURL,

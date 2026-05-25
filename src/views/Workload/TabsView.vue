@@ -10,7 +10,6 @@
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import EditView from './EditView.vue'
   import OverviewTab from './Tabs/OverviewTab.vue'
-  import WorkloadVersionTab from './Tabs/WorkloadVersionTab.vue'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
@@ -21,7 +20,7 @@
     updatedRedirect: { type: String, required: true }
   })
 
-  const TAB_ORDER = ['overview', 'main-settings', 'workload-version']
+  const TAB_ORDER = ['overview', 'main-settings']
   const TAB_TO_INDEX = TAB_ORDER.reduce((acc, name, index) => {
     acc[name] = index
     return acc
@@ -152,16 +151,6 @@
             :updatedRedirect="props.updatedRedirect"
             :embeddedInTabs="true"
             @loaded-service-object="setWorkloadName"
-          />
-        </TabPanel>
-        <TabPanel
-          header="Workload Version"
-          :pt="{ root: { 'data-testid': 'workload-tabs__tab__workload-version' } }"
-        >
-          <WorkloadVersionTab
-            v-if="activeTab === TAB_TO_INDEX['workload-version']"
-            :workloadId="workloadId"
-            :workload="workload"
           />
         </TabPanel>
       </TabView>
