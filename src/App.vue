@@ -6,12 +6,16 @@
   import { useThemeStore, DARK_SCHEME_QUERY } from '@/stores/theme'
   import { storeToRefs } from 'pinia'
   import { themeApply } from '@/helpers'
+  import { captureFirstSessionUrl } from '@/helpers/first-session-url'
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
   import { useAdditionalDataFormState } from '@/composables/useAdditionalDataFormState'
   import { safeTrackerCall } from '@/plugins/analytics/safe-call'
   import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
+
+  // Capture the first session URL as early as possible
+  captureFirstSessionUrl()
 
   const DEFAULT_TITLE = 'Azion Console'
 
