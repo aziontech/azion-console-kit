@@ -169,10 +169,10 @@
   const isPaymentFormReady = () => {
     return Boolean(
       props.checkoutSessionClientSecret &&
-      paymentElement.value &&
-      paymentElementReady.value &&
-      paymentElementComplete.value &&
-      !displayError.value.paymentElement
+        paymentElement.value &&
+        paymentElementReady.value &&
+        paymentElementComplete.value &&
+        !displayError.value.paymentElement
     )
   }
 

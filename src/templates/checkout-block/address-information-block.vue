@@ -155,10 +155,10 @@
   const isAddressFormReady = () => {
     return Boolean(
       String(postalCode.value || '').trim() &&
-      String(country.value || '').trim() &&
-      String(region.value || '').trim() &&
-      String(city.value || '').trim() &&
-      String(address.value || '').trim()
+        String(country.value || '').trim() &&
+        String(region.value || '').trim() &&
+        String(city.value || '').trim() &&
+        String(address.value || '').trim()
     )
   }
 
