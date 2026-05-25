@@ -3,7 +3,7 @@
   import { useRouter } from 'vue-router'
   import { watchDebounced } from '@vueuse/core'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import Tag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/prime-tag'
   import Menu from '@aziontech/webkit/menu'
   import { CellExpand } from '@aziontech/webkit/list-data-table/cells'
 

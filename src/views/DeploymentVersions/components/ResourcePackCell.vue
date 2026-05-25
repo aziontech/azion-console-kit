@@ -1,7 +1,7 @@
 <script setup>
   import { ref } from 'vue'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'
-  import Tag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/prime-tag'
 
   defineOptions({ name: 'resource-pack-cell' })
 

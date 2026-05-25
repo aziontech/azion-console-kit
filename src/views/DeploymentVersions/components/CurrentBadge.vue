@@ -1,5 +1,5 @@
 <script setup>
-  import Tag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/prime-tag'
 
   defineOptions({ name: 'deployment-current-badge' })
 
