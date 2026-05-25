@@ -5,7 +5,7 @@
     @cancel="showCancelDowngradeDialog = true"
   />
 
-  <div class="w-full flex flex-col sm:flex-row gap-6 mt-4 items-stretch billing-cards">
+  <div class="w-full flex flex-col min-[1100px]:flex-row gap-6 mt-4 items-stretch billing-cards">
     <template v-if="cardsReady">
       <SubscriptionPlanCard
         :subscription="subscriptionState"
@@ -304,8 +304,7 @@
     serviceOrder,
     activeServiceOrder
   } = useServiceOrders()
-  const { prepare: prepareCheckoutSession, recoverFromStaleSession } =
-    useCheckoutSessionPreparer()
+  const { prepare: prepareCheckoutSession, recoverFromStaleSession } = useCheckoutSessionPreparer()
 
   const downgradeEffectiveAt = ref(null)
 
@@ -822,6 +821,15 @@
   }
 
   const goToEnvoiceDetails = (item) => {
+    const detailsUrl = typeof item === 'object' ? item?.detailsUrl : null
+    if (detailsUrl) {
+      trackBilling('invoiceViewed', {
+        status: item?.status?.content || item?.status,
+        amount: item?.amount
+      })
+      window.open(detailsUrl, '_blank')
+      return
+    }
     const billId = typeof item === 'object' ? item?.billId : item
     if (!billId) return
     const invoicePayload =

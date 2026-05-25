@@ -3,10 +3,7 @@
     v-model:visible="visibleDrawer"
     position="right"
     :pt="{
-      root: {
-        class:
-          'w-full sm:w-[480px] md:w-[720px] lg:w-[860px] max-w-[calc(100vw-16px)] border-l surface-border'
-      },
+      root: { class: 'w-fit border-l surface-border' },
       header: { class: 'h-14 px-4 md:px-8 py-[14px] border-b surface-border' },
       content: {
         class:
@@ -30,7 +27,7 @@
       <div
         :class="[
           'flex flex-col gap-3 flex-1 bg-surface-raised',
-          isHorizontalPricingCard ? '' : 'lg:flex-row lg:h-[200px]'
+          isHorizontalPricingCard ? '' : 'md:flex-row md:h-[200px]'
         ]"
       >
         <div

@@ -1,7 +1,7 @@
 <template>
   <CardBox
     title="Current Invoice"
-    class="w-full sm:w-1/2 current-invoice-card"
+    class="w-full min-[1100px]:w-1/2 current-invoice-card"
   >
     <template #header-action>
       <PrimeButton

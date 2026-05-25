@@ -1,7 +1,7 @@
 <template>
   <CardBox
     title="Subscription Plan"
-    class="w-full sm:w-1/2"
+    class="w-full min-[1100px]:w-1/2"
   >
     <template #header-action>
       <PrimeButton

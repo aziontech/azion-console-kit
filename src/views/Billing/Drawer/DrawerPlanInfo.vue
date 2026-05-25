@@ -4,15 +4,14 @@
     position="right"
     :pt="{
       root: {
-        class:
-          'w-full sm:w-[480px] md:w-[640px] lg:w-[960px] max-w-[calc(100vw-16px)] border-l surface-border'
+        class: 'w-full md:w-[960px] md:max-w-[calc(100vw-160px)] border-l surface-border'
       },
       header: { class: 'hidden' },
       content: { class: 'p-0 overflow-hidden' }
     }"
   >
     <div class="flex h-full">
-      <div class="hidden lg:block w-[300px] shrink-0 border-r border-default bg-surface">
+      <div class="hidden md:block w-[300px] shrink-0 border-r border-default bg-surface">
         <CheckoutFeaturesBlock :plan="plan" />
       </div>
 

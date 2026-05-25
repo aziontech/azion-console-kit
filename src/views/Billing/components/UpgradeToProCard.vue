@@ -1,7 +1,7 @@
 <template>
   <CardBox
     title="Upgrade to Pro"
-    class="w-full sm:w-1/2"
+    class="w-full min-[1100px]:w-1/2"
   >
     <template #content>
       <div class="px-6 py-4 flex flex-col gap-4">
