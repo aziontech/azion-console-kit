@@ -21,10 +21,19 @@ function createMarketplaceItem() {
 
 function createDeploymentsItem() {
   return {
+    label: 'Deployments',
+    icon: 'ai ai-deploy-pillar',
+    to: '/deployments',
+    id: 'deployments'
+  }
+}
+
+function createDeploymentVersionsItem() {
+  return {
     label: 'Deployments Versions',
     icon: 'ai ai-deploy-pillar',
-    to: '/deployments-versions',
-    id: 'deployments-versions'
+    to: '/deployment-versions',
+    id: 'deployment-versions'
   }
 }
 
@@ -224,6 +233,7 @@ export function getMenuItens(showMarketplaceProductsItens) {
     createHomeItem(),
     createMarketplaceItem(),
     createDeploymentsItem(),
+    createDeploymentVersionsItem(),
     {
       label: 'Build',
       items: createBuildItems()

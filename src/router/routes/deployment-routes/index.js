@@ -2,7 +2,7 @@
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const deploymentRoutes = {
-  path: '/deployments-versions',
+  path: '/deployments',
   name: 'deployments',
   children: [
     {
@@ -13,8 +13,8 @@ export const deploymentRoutes = {
         title: 'Deployments',
         breadCrumbs: [
           {
-            label: 'Deployments Versions',
-            to: '/deployments-versions'
+            label: 'Deployments',
+            to: '/deployments'
           }
         ]
       }

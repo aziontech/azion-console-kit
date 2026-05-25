@@ -145,30 +145,33 @@
           :placeholder="filter.placeholder"
           @update:modelValue="updateFilterValue(filter.key, $event)"
         />
+        <slot name="toolbar-extras" />
       </div>
 
       <div class="flex w-full items-center justify-end gap-2 sm:w-auto">
-        <PrimeButton
-          icon="pi pi-refresh"
-          outlined
-          size="small"
-          :aria-label="refreshAriaLabel"
-          @click="emit('refresh')"
-        />
-        <PrimeButton
-          icon="pi pi-download"
-          outlined
-          size="small"
-          disabled
-          :aria-label="exportAriaLabel"
-        />
-        <PrimeButton
-          icon="ai ai-column"
-          outlined
-          size="small"
-          disabled
-          :aria-label="selectColumnsAriaLabel"
-        />
+        <slot name="toolbar-actions">
+          <PrimeButton
+            icon="pi pi-refresh"
+            outlined
+            size="small"
+            :aria-label="refreshAriaLabel"
+            @click="emit('refresh')"
+          />
+          <PrimeButton
+            icon="pi pi-download"
+            outlined
+            size="small"
+            disabled
+            :aria-label="exportAriaLabel"
+          />
+          <PrimeButton
+            icon="ai ai-column"
+            outlined
+            size="small"
+            disabled
+            :aria-label="selectColumnsAriaLabel"
+          />
+        </slot>
       </div>
     </div>
 

@@ -3,16 +3,16 @@
   import Menu from '@aziontech/webkit/menu'
   import { useToast } from '@aziontech/webkit/use-toast'
   import Tag from '@aziontech/webkit/tag'
-  import GenericDataView from '@/views/Deployments/components/GenericDataView.vue'
-  import ResourcePackCell from '@/views/Deployments/components/ResourcePackCell.vue'
-  import StatusTag from '@/views/Deployments/components/StatusTag.vue'
-  import EnvironmentTag from '@/views/Deployments/components/EnvironmentTag.vue'
-  import CurrentBadge from '@/views/Deployments/components/CurrentBadge.vue'
+  import GenericDataView from '@/views/DeploymentVersions/components/GenericDataView.vue'
+  import ResourcePackCell from '@/views/DeploymentVersions/components/ResourcePackCell.vue'
+  import StatusTag from '@/views/DeploymentVersions/components/StatusTag.vue'
+  import EnvironmentTag from '@/views/DeploymentVersions/components/EnvironmentTag.vue'
+  import CurrentBadge from '@/views/DeploymentVersions/components/CurrentBadge.vue'
   import {
     getDeploymentStatus,
     getResourcePackDisplay,
     normalizeText
-  } from '@/views/Deployments/helpers/deployment-status'
+  } from '@/views/DeploymentVersions/helpers/deployment-status'
   import { listWorkloadVersionsService } from '@/services/v2/workload/workload-versions-mock'
 
   defineOptions({ name: 'workload-version-history-section' })

@@ -3,21 +3,15 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import Menu from '@aziontech/webkit/menu'
-  import GenericDataView from '@/views/Deployments/components/GenericDataView.vue'
-  import ResourcePackCell from '@/views/Deployments/components/ResourcePackCell.vue'
-  import StatusTag from '@/views/Deployments/components/StatusTag.vue'
-  import EnvironmentTag from '@/views/Deployments/components/EnvironmentTag.vue'
-  import CurrentBadge from '@/views/Deployments/components/CurrentBadge.vue'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import Calendar from '@aziontech/webkit/calendar'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import { DataTableActionsButtons } from '@/components/list-table'
-  import DeploymentsDrawer from '@/views/Deployments/Drawer'
-  import {
-    getDeploymentStatus,
-    getResourcePackRows,
-    getResourcePackDisplay,
-    normalizeText
-  } from '@/views/Deployments/helpers/deployment-status'
+  import GenericDataView from '@/views/DeploymentVersions/components/GenericDataView.vue'
+  import { normalizeText } from '@/views/DeploymentVersions/helpers/deployment-status'
   import { deploymentService } from '@/services/v2/deployment/deployment-service'
+  import DeploymentRowCell from '@/views/Deployments/components/DeploymentRowCell.vue'
+  import StatusDurationCell from '@/views/Deployments/components/StatusDurationCell.vue'
 
   defineOptions({ name: 'list-deployments' })
 
@@ -31,18 +25,21 @@
   const searchTerm = ref('')
   const filterValues = ref({
     status: 'all',
-    environment: 'all',
-    current: 'all'
+    environment: 'all'
   })
+  const dateRange = ref(null)
+  const sortBy = ref('lastModified')
 
   const rowMenuRef = ref(null)
   const rowMenuItems = ref([])
+  const actionsMenuRef = ref(null)
 
   const statusAllOption = { label: 'All Status', value: 'all' }
   const environmentAllOption = { label: 'All Environments', value: 'all' }
-  const currentOptions = [
-    { label: 'All Versions', value: 'all' },
-    { label: 'Only Current', value: 'current' }
+  const sortOptions = [
+    { label: 'Last modification', value: 'lastModified' },
+    { label: 'Status', value: 'status' },
+    { label: 'ID', value: 'id' }
   ]
 
   const columns = [
@@ -54,34 +51,11 @@
         'min-w-[280px] flex-[2.5_1_280px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
     },
     {
-      key: 'environment',
-      label: 'Environment',
-      headerClass: 'min-w-[130px] flex-[1.1_1_130px]',
-      cellClass:
-        'min-w-[130px] flex-[1.1_1_130px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1',
-      field: 'environment'
-    },
-    {
       key: 'status',
       label: 'Status',
-      headerClass: 'min-w-[120px] flex-[1.25_1_120px]',
+      headerClass: 'min-w-[160px] flex-[1.25_1_160px]',
       cellClass:
-        'min-w-[120px] flex-[1.25_1_120px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
-    },
-    {
-      key: 'resource-pack',
-      label: 'Resource Pack',
-      headerClass: 'min-w-[320px] flex-[2.5_1_320px]',
-      cellClass:
-        'min-w-[320px] flex-[2.5_1_320px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
-    },
-    {
-      key: 'lastEditor',
-      label: 'Last Editor',
-      headerClass: 'min-w-[180px] flex-[1.4_1_180px]',
-      cellClass:
-        'min-w-[180px] flex-[1.4_1_180px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1',
-      field: 'lastEditor'
+        'min-w-[160px] flex-[1.25_1_160px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
     },
     {
       key: 'lastModified',
@@ -90,18 +64,16 @@
       cellClass:
         'min-w-[170px] flex-[1.4_1_170px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1',
       field: 'lastModified'
+    },
+    {
+      key: 'lastEditor',
+      label: 'Last Editor',
+      headerClass: 'min-w-[180px] flex-[1.4_1_180px]',
+      cellClass:
+        'min-w-[180px] flex-[1.4_1_180px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1',
+      field: 'lastEditor'
     }
   ]
-
-  const drawerRef = ref(null)
-
-  const handleOpenCreateDrawer = () => {
-    drawerRef.value?.openCreateDrawer()
-  }
-
-  const handleOpenEditDrawer = (deployment) => {
-    drawerRef.value?.openEditDrawer(deployment)
-  }
 
   const statusOptions = computed(() => {
     const statuses = Array.from(
@@ -133,31 +105,20 @@
 
   const filters = computed(() => [
     {
-      key: 'status',
-      field: 'status.content',
-      placeholder: 'Status',
-      options: statusOptions.value,
+      key: 'environment',
+      field: 'environment',
+      placeholder: 'All Environments',
+      options: environmentOptions.value,
       optionLabel: 'label',
       optionValue: 'value',
       defaultValue: 'all',
       allValue: 'all'
     },
     {
-      key: 'current',
-      field: 'isCurrent',
-      placeholder: 'Current',
-      options: currentOptions,
-      optionLabel: 'label',
-      optionValue: 'value',
-      defaultValue: 'all',
-      allValue: 'all',
-      matcher: (itemValue, selectedValue) => selectedValue !== 'current' || itemValue
-    },
-    {
-      key: 'environment',
-      field: 'environment',
-      placeholder: 'Environment',
-      options: environmentOptions.value,
+      key: 'status',
+      field: 'status.content',
+      placeholder: 'All Status',
+      options: statusOptions.value,
       optionLabel: 'label',
       optionValue: 'value',
       defaultValue: 'all',
@@ -178,25 +139,45 @@
       if (selectedValue === filter.allValue) return true
 
       const itemValue = getValueByPath(deployment, filter.field)
-
-      if (typeof filter.matcher === 'function') {
-        return filter.matcher(itemValue, selectedValue, deployment)
-      }
-
       return normalizeText(itemValue) === normalizeText(selectedValue)
     })
   }
 
+  const matchesDateRange = (deployment) => {
+    const [from, to] = Array.isArray(dateRange.value) ? dateRange.value : []
+    if (!from && !to) return true
+
+    const reference = deployment.updated_at ? new Date(deployment.updated_at) : null
+    if (!reference || Number.isNaN(reference.getTime())) return false
+
+    if (from && reference < new Date(new Date(from).setHours(0, 0, 0, 0))) return false
+    if (to && reference > new Date(new Date(to).setHours(23, 59, 59, 999))) return false
+    return true
+  }
+
+  const compareDeployments = (a, b) => {
+    switch (sortBy.value) {
+      case 'status':
+        return normalizeText(a.status?.content).localeCompare(normalizeText(b.status?.content))
+      case 'id':
+        return normalizeText(a.id).localeCompare(normalizeText(b.id))
+      case 'lastModified':
+      default: {
+        const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0
+        const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0
+        return dateB - dateA
+      }
+    }
+  }
+
   const filteredDeployments = computed(() => {
     const normalizedSearch = normalizeText(searchTerm.value)
-    return deployments.value.filter((deployment) => {
+    const list = deployments.value.filter((deployment) => {
       const searchableValues = [
         deployment.id,
         deployment.name,
-        deployment.hash,
         deployment.environment,
         deployment.status?.content,
-        getResourcePackSearchText(deployment),
         deployment.lastEditor,
         deployment.lastModified
       ]
@@ -205,15 +186,13 @@
         !normalizedSearch ||
         searchableValues.some((value) => normalizeText(value).includes(normalizedSearch))
 
-      return matchesSearch && matchesDropdownFilters(deployment)
+      return (
+        matchesSearch && matchesDropdownFilters(deployment) && matchesDateRange(deployment)
+      )
     })
-  })
 
-  const getResourcePackSearchText = (deployment) => {
-    return getResourcePackRows(deployment)
-      .map((entry) => `${entry.label} ${entry.name} ${entry.hash}`)
-      .join(' ')
-  }
+    return [...list].sort(compareDeployments)
+  })
 
   const formatEnvironment = (environment) => {
     if (!environment) return 'Environment'
@@ -242,53 +221,34 @@
     }
   }
 
-  const handleDeleteDeployment = async (deployment) => {
-    try {
-      await deploymentService.deleteDeploymentService(deployment.id)
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Deployment deleted successfully'
-      })
-      await loadDeployments()
-    } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.message || 'Failed to delete deployment'
-      })
-    }
-  }
-
-  const getActions = (deployment) => {
-    const status = getDeploymentStatus(deployment)
-
-    if (status === 'draft') {
-      return [
-        {
-          label: 'Delete',
-          icon: 'pi pi-trash',
-          commandAction: () => handleDeleteDeployment(deployment)
-        }
-      ]
-    }
-
-    return []
-  }
-
-  const openRowMenu = (event, deployment) => {
-    const actions = getActions(deployment)
-
-    rowMenuItems.value = actions.length
-      ? actions.map((action) => ({
-          label: action.label,
-          icon: action.icon,
-          command: action.commandAction
-        }))
-      : [{ label: 'No actions available', icon: 'pi pi-info-circle', disabled: true }]
-
+  const openRowMenu = (event) => {
+    rowMenuItems.value = [
+      { label: 'View details', icon: 'pi pi-eye', disabled: true }
+    ]
     rowMenuRef.value?.toggle(event)
   }
+
+  const openActionsMenu = (event) => {
+    actionsMenuRef.value?.toggle(event)
+  }
+
+  const actionsMenuItems = computed(() => [
+    {
+      label: 'Refresh',
+      icon: 'pi pi-refresh',
+      command: () => loadDeployments()
+    },
+    {
+      label: 'Export',
+      icon: 'pi pi-download',
+      disabled: true
+    },
+    {
+      label: 'Select Columns',
+      icon: 'ai ai-column',
+      disabled: true
+    }
+  ])
 
   const onPage = (event) => {
     paginatorFirst.value = event.first
@@ -296,7 +256,7 @@
   }
 
   watch(
-    [searchTerm, filterValues],
+    [searchTerm, filterValues, dateRange, sortBy],
     () => {
       paginatorFirst.value = 0
     },
@@ -310,19 +270,10 @@
   <ContentBlock data-testid="deployments-content-block">
     <template #heading>
       <PageHeadingBlock
-        pageTitle="Deployments Versions"
+        pageTitle="Deployments"
         description="View and manage your deployment history."
         data-testid="deployments-heading"
-      >
-        <template #default>
-          <DataTableActionsButtons
-            size="small"
-            label="Deployment Version"
-            @click="handleOpenCreateDrawer"
-            data-testid="create_deployment_version_button"
-          />
-        </template>
-      </PageHeadingBlock>
+      />
     </template>
     <template #content>
       <GenericDataView
@@ -335,51 +286,58 @@
         :filters="filters"
         :paginatorFirst="paginatorFirst"
         :paginatorRows="paginatorRows"
-        searchPlaceholder="Search deployments"
+        searchPlaceholder="Search Deployments"
         refreshAriaLabel="Refresh deployments"
         exportAriaLabel="Export deployments"
         selectColumnsAriaLabel="Select deployment columns"
-        emptyTitle="No Deployments Versions yet"
-        emptyDescription="Deployments will appear here once you deploy your resources."
+        emptyTitle="No Deployments yet"
+        emptyDescription="Deployments will appear here once you trigger a deploy."
         filteredEmptyTitle="No deployments found"
         filteredEmptyDescription="Try changing your search or filters."
         rowActionsAriaLabel="Deployment actions"
         @refresh="loadDeployments"
         @page="onPage"
-        @open-row-menu="({ event, deployment }) => openRowMenu(event, deployment)"
+        @open-row-menu="({ event }) => openRowMenu(event)"
       >
-        <template #cell-deployment="{ item: deployment }">
-          <div class="min-w-0 flex flex-col gap-1">
-            <div class="flex min-w-0 items-center gap-2">
-              <button
-                type="button"
-                class="deployment-name-button m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-medium leading-6 text-[var(--text-color)] hover:text-[var(--primary-color)] focus-visible:text-[var(--primary-color)] focus-visible:outline-none"
-                :data-testid="`deployment-row-open__${deployment.id}`"
-                @click="handleOpenEditDrawer(deployment)"
-              >
-                {{ deployment.name || '--' }}
-              </button>
-              <CurrentBadge v-if="deployment.isCurrent" />
-            </div>
-          </div>
+        <template #toolbar-extras>
+          <Calendar
+            v-model="dateRange"
+            selectionMode="range"
+            placeholder="Select Date Range"
+            showIcon
+            :manualInput="false"
+            class="dataview-control w-full sm:w-auto sm:min-w-[12rem]"
+          />
+          <Dropdown
+            v-model="sortBy"
+            :options="sortOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Last modification"
+            class="dataview-control dataview-dropdown min-w-0 w-full sm:w-auto sm:min-w-[9.5rem]"
+          />
         </template>
 
-        <template #cell-environment="{ item: deployment }">
-          <EnvironmentTag :environment="deployment.environment" />
+        <template #toolbar-actions>
+          <PrimeButton
+            icon="pi pi-ellipsis-h"
+            outlined
+            size="small"
+            aria-label="More options"
+            data-testid="deployments-more-actions"
+            @click="openActionsMenu"
+          />
+        </template>
+
+        <template #cell-deployment="{ item: deployment }">
+          <DeploymentRowCell :deployment="deployment" />
         </template>
 
         <template #cell-status="{ item: deployment }">
-          <StatusTag :status="deployment.status" />
-        </template>
-
-        <template #cell-resource-pack="{ item: deployment }">
-          <ResourcePackCell :display="getResourcePackDisplay(deployment)" />
-        </template>
-
-        <template #cell-lastEditor="{ item: deployment }">
-          <span class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
-            {{ deployment.lastEditor || '--' }}
-          </span>
+          <StatusDurationCell
+            :status="deployment.status"
+            :duration="deployment.duration"
+          />
         </template>
 
         <template #cell-lastModified="{ item: deployment }">
@@ -387,7 +345,19 @@
             {{ deployment.lastModified || '--' }}
           </span>
         </template>
+
+        <template #cell-lastEditor="{ item: deployment }">
+          <span class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+            {{ deployment.lastEditor || '--' }}
+          </span>
+        </template>
       </GenericDataView>
+
+      <Menu
+        ref="actionsMenuRef"
+        :popup="true"
+        :model="actionsMenuItems"
+      />
 
       <Menu
         ref="rowMenuRef"
@@ -396,19 +366,4 @@
       />
     </template>
   </ContentBlock>
-
-  <DeploymentsDrawer
-    ref="drawerRef"
-    @onSuccess="loadDeployments"
-  />
 </template>
-
-<style scoped>
-  .deployment-name-button {
-    background: transparent;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-    font: inherit;
-  }
-</style>
