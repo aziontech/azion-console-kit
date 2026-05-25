@@ -130,7 +130,10 @@
   }
 
   const handleEditRedirect = (item) => {
-    if (item.id === 'azion-default-sso') return
+    if (item.id === 'azion-default-sso') {
+      toastBuilder('info', 'The Internal Identity Source cannot be edited.')
+      return
+    }
     router.push({ path: `identity-providers/edit/${item.protocol}/${item.id}` })
   }
 
