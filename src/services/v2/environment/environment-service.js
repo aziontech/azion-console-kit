@@ -34,11 +34,10 @@ export class EnvironmentService extends BaseService {
   // This is a temporary baseURL for the new deployment api, to be ajusted after the migration is complete
   #baseURL = '/deployment-api/v1/environments'
 
-  #fetchList = async (params = {}) => {
+  #fetchList = async () => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: this.#baseURL,
-      params
+      url: this.#baseURL
     })
 
     const { results, count } = parseListResponse(data)
@@ -49,11 +48,10 @@ export class EnvironmentService extends BaseService {
     }
   }
 
-  #fetchDropdown = async (params = {}) => {
+  #fetchDropdown = async () => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: this.#baseURL,
-      params
+      url: this.#baseURL
     })
 
     const { results, count } = parseListResponse(data)
@@ -86,21 +84,17 @@ export class EnvironmentService extends BaseService {
     }
   }
 
-  prefetchList = (params = {}) => {
-    return this.usePrefetchQuery(queryKeys.environments.list(params), () => this.#fetchList(params))
+  prefetchList = () => {
+    return this.usePrefetchQuery(queryKeys.environments.list(), () => this.#fetchList())
   }
 
   listEnvironmentsService = async (params = {}) => {
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
-    return await this.useEnsureQueryData(
-      queryKeys.environments.list(params),
-      () => this.#fetchList(params),
-      {
-        persist: !skipCache,
-        skipCache
-      }
-    )
+    return await this.useEnsureQueryData(queryKeys.environments.list(), () => this.#fetchList(), {
+      persist: !skipCache,
+      skipCache
+    })
   }
 
   getEnvironmentFromCache = (id) => {
