@@ -1,10 +1,12 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import DataView from 'primevue/dataview'
   import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InputText from '@aziontech/webkit/inputtext'
   import Skeleton from '@aziontech/webkit/skeleton'
+  import Menu from '@aziontech/webkit/menu'
+  import DataTable from '@aziontech/webkit/list-data-table'
 
   defineOptions({ name: 'generic-data-view' })
 
@@ -84,6 +86,39 @@
     rowActionsAriaLabel: {
       type: String,
       default: 'Row actions'
+    },
+    toolbarMode: {
+      type: String,
+      default: 'inline',
+      validator: (value) => ['inline', 'compact'].includes(value)
+    },
+    allowedFilters: {
+      type: Array,
+      default: () => []
+    },
+    appliedFilters: {
+      type: Array,
+      default: () => []
+    },
+    primaryColumnKey: {
+      type: String,
+      default: ''
+    },
+    lazy: {
+      type: Boolean,
+      default: false
+    },
+    totalRecords: {
+      type: Number,
+      default: 0
+    },
+    filterButtonAriaLabel: {
+      type: String,
+      default: 'Open filter panel'
+    },
+    overflowMenuAriaLabel: {
+      type: String,
+      default: 'More actions'
     }
   })
 
@@ -92,7 +127,11 @@
     'update:filterValues',
     'refresh',
     'page',
-    'open-row-menu'
+    'open-row-menu',
+    'apply-filter',
+    'remove-filter',
+    'edit-filter',
+    'row-primary-click'
   ])
 
   const searchValue = computed({
@@ -119,11 +158,72 @@
     if (value == null || value === '') return '--'
     return value
   }
+
+  const isCompactMode = computed(() => props.toolbarMode === 'compact')
+  const hasAllowedFilters = computed(() => props.allowedFilters?.length > 0)
+  const hasAppliedFilters = computed(() => props.appliedFilters?.length > 0)
+
+  const filterPanel = ref(null)
+  const overflowMenuRef = ref(null)
+
+  const toggleFilterPanel = (event) => {
+    filterPanel.value?.toggle?.(event)
+  }
+
+  const handleApplyFilter = (applied) => {
+    emit('apply-filter', applied)
+  }
+
+  const handleRemoveFilter = (filter) => {
+    emit('remove-filter', filter)
+  }
+
+  const handleEditFilter = ({ filter, event }) => {
+    filterPanel.value?.openForFilter?.(filter, event)
+    emit('edit-filter', { filter, event })
+  }
+
+  const overflowMenuItems = computed(() => [
+    {
+      label: 'Refresh',
+      icon: 'pi pi-refresh',
+      command: () => emit('refresh')
+    },
+    {
+      label: 'Export',
+      icon: 'pi pi-download',
+      disabled: true
+    },
+    {
+      label: 'Select columns',
+      icon: 'ai ai-column',
+      disabled: true
+    }
+  ])
+
+  const openOverflowMenu = (event) => {
+    overflowMenuRef.value?.toggle?.(event)
+  }
+
+  const isPrimaryColumn = (column) =>
+    !!props.primaryColumnKey && column?.key === props.primaryColumnKey
+
+  const triggerPrimaryClick = (item) => emit('row-primary-click', item)
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 text-[var(--text-color)]">
-    <div class="flex flex-wrap items-center justify-between gap-2">
+  <div
+    :class="[
+      'flex flex-col text-[var(--text-color)]',
+      isCompactMode
+        ? 'rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] overflow-hidden'
+        : 'gap-4'
+    ]"
+  >
+    <div
+      v-if="!isCompactMode"
+      class="flex flex-wrap items-center justify-between gap-2"
+    >
       <div class="dataview-toolbar flex w-full flex-wrap items-center gap-2 md:w-auto">
         <span class="dataview-search p-input-icon-left w-full sm:min-w-80 sm:w-auto">
           <i class="pi pi-search text-[var(--text-color-secondary)]" />
@@ -176,8 +276,51 @@
     </div>
 
     <div
+      v-else
+      class="compact-toolbar flex flex-wrap items-center gap-3 px-3 py-2 border-b border-[var(--surface-border)]"
+    >
+      <PrimeButton
+        v-if="hasAllowedFilters"
+        icon="pi pi-filter"
+        outlined
+        size="small"
+        :aria-label="filterButtonAriaLabel"
+        @click="toggleFilterPanel"
+      />
+      <span class="dataview-search p-input-icon-left flex-1 min-w-[12rem]">
+        <i class="pi pi-search text-[var(--text-color-secondary)]" />
+        <InputText
+          v-model="searchValue"
+          :placeholder="searchPlaceholder"
+          class="dataview-control w-full"
+        />
+      </span>
+      <slot name="toolbar-extras" />
+      <PrimeButton
+        icon="pi pi-ellipsis-h"
+        outlined
+        size="small"
+        :aria-label="overflowMenuAriaLabel"
+        @click="openOverflowMenu"
+      />
+      <Menu
+        ref="overflowMenuRef"
+        :popup="true"
+        :model="overflowMenuItems"
+      />
+    </div>
+
+    <DataTable.AppliedFilters
+      v-if="hasAllowedFilters && hasAppliedFilters"
+      :applied-filters="appliedFilters"
+      :class="isCompactMode ? 'border-b border-[var(--surface-border)] px-3 py-2' : ''"
+      @remove="handleRemoveFilter"
+      @edit="handleEditFilter"
+    />
+
+    <div
       v-if="loading"
-      class="flex flex-col gap-2"
+      :class="['flex flex-col gap-2', isCompactMode ? 'p-3' : '']"
     >
       <div
         v-for="item in 5"
@@ -189,7 +332,10 @@
 
     <div
       v-else-if="!hasDeployments"
-      class="empty-state rounded-md border border-[var(--surface-border)] px-6 py-6 text-center text-[var(--text-color-secondary)]"
+      :class="[
+        'empty-state px-6 py-6 text-center text-[var(--text-color-secondary)]',
+        isCompactMode ? '' : 'rounded-md border border-[var(--surface-border)]'
+      ]"
     >
       <h3 class="m-0 text-base font-semibold leading-6 text-[var(--text-color)]">
         {{ emptyTitle }}
@@ -201,7 +347,10 @@
 
     <div
       v-else-if="!items.length"
-      class="empty-state rounded-md border border-[var(--surface-border)] px-6 py-6 text-center text-[var(--text-color-secondary)]"
+      :class="[
+        'empty-state px-6 py-6 text-center text-[var(--text-color-secondary)]',
+        isCompactMode ? '' : 'rounded-md border border-[var(--surface-border)]'
+      ]"
     >
       <h3 class="m-0 text-base font-semibold leading-6 text-[var(--text-color)]">
         {{ filteredEmptyTitle }}
@@ -211,7 +360,10 @@
 
     <div
       v-else
-      class="table-surface overflow-hidden rounded-md border border-[var(--surface-border)]"
+      :class="[
+        'table-surface',
+        isCompactMode ? '' : 'overflow-hidden rounded-md border border-[var(--surface-border)]'
+      ]"
     >
       <div
         class="deployment-header hidden items-center gap-3 border-b border-[var(--surface-border)] px-4 py-3 text-[14px] font-normal leading-6 tracking-[0.0625rem] text-[var(--text-color-secondary)] lg:flex"
@@ -232,7 +384,9 @@
       <DataView
         :value="items"
         dataKey="id"
-        paginator
+        :paginator="true"
+        :lazy="lazy"
+        :totalRecords="lazy ? totalRecords : undefined"
         :rows="paginatorRows"
         :first="paginatorFirst"
         :rowsPerPageOptions="[10, 20, 50]"
@@ -257,10 +411,16 @@
                 :name="`cell-${column.key}`"
                 :item="deployment"
                 :column="column"
+                :isPrimary="isPrimaryColumn(column)"
+                :onPrimaryClick="() => triggerPrimaryClick(deployment)"
               >
-                <span class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{{
-                  resolveDisplayValue(deployment, column)
-                }}</span>
+                <span
+                  class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+                  :class="{ 'cursor-pointer hover:underline': isPrimaryColumn(column) }"
+                  @click="isPrimaryColumn(column) ? triggerPrimaryClick(deployment) : null"
+                >
+                  {{ resolveDisplayValue(deployment, column) }}
+                </span>
               </slot>
             </div>
 
@@ -283,6 +443,13 @@
         </template>
       </DataView>
     </div>
+
+    <DataTable.Filter
+      v-if="hasAllowedFilters"
+      ref="filterPanel"
+      :filters="allowedFilters"
+      @apply="handleApplyFilter"
+    />
   </div>
 </template>
 
