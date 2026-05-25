@@ -35,7 +35,7 @@ export const mapStateToStatus = (state) => {
   return STATE_TO_STATUS[key] || { content: String(state), severity: 'secondary' }
 }
 
-const snakeToCamel = (segment) => segment.replace(/_([a-z])/g, (_, char) => char.toUpperCase())
+const snakeToCamel = (segment) => segment.replace(/_([a-z])/g, (match, char) => char.toUpperCase())
 
 const apiResourceTypeToUiKey = (apiType) => {
   if (!apiType) return ''

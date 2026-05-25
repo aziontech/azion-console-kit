@@ -9,7 +9,6 @@
   import FormFieldsDeploymentVersion from '@/views/DeploymentVersions/FormFields/FormFieldsDeploymentVersion.vue'
   import { deploymentService } from '@/services/v2/deployment/deployment-service'
   import {
-    normalizeText,
     isReadonlyStatus,
     mapStateToStatus
   } from '@/views/DeploymentVersions/helpers/deployment-status'
