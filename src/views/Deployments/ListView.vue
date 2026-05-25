@@ -155,16 +155,18 @@
     return true
   }
 
-  const compareDeployments = (a, b) => {
+  const compareDeployments = (deploymentA, deploymentB) => {
     switch (sortBy.value) {
       case 'status':
-        return normalizeText(a.status?.content).localeCompare(normalizeText(b.status?.content))
+        return normalizeText(deploymentA.status?.content).localeCompare(
+          normalizeText(deploymentB.status?.content)
+        )
       case 'id':
-        return normalizeText(a.id).localeCompare(normalizeText(b.id))
+        return normalizeText(deploymentA.id).localeCompare(normalizeText(deploymentB.id))
       case 'lastModified':
       default: {
-        const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0
-        const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0
+        const dateA = deploymentA.updated_at ? new Date(deploymentA.updated_at).getTime() : 0
+        const dateB = deploymentB.updated_at ? new Date(deploymentB.updated_at).getTime() : 0
         return dateB - dateA
       }
     }
@@ -186,9 +188,7 @@
         !normalizedSearch ||
         searchableValues.some((value) => normalizeText(value).includes(normalizedSearch))
 
-      return (
-        matchesSearch && matchesDropdownFilters(deployment) && matchesDateRange(deployment)
-      )
+      return matchesSearch && matchesDropdownFilters(deployment) && matchesDateRange(deployment)
     })
 
     return [...list].sort(compareDeployments)
@@ -222,9 +222,7 @@
   }
 
   const openRowMenu = (event) => {
-    rowMenuItems.value = [
-      { label: 'View details', icon: 'pi pi-eye', disabled: true }
-    ]
+    rowMenuItems.value = [{ label: 'View details', icon: 'pi pi-eye', disabled: true }]
     rowMenuRef.value?.toggle(event)
   }
 

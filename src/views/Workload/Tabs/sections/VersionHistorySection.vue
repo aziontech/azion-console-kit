@@ -2,7 +2,7 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import Menu from '@aziontech/webkit/menu'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import Tag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/prime-tag'
   import GenericDataView from '@/views/DeploymentVersions/components/GenericDataView.vue'
   import ResourcePackCell from '@/views/DeploymentVersions/components/ResourcePackCell.vue'
   import StatusTag from '@/views/DeploymentVersions/components/StatusTag.vue'

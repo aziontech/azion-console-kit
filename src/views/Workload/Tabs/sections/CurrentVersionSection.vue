@@ -3,7 +3,7 @@
   import Dropdown from '@aziontech/webkit/dropdown'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import Tag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/prime-tag'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'
   import {
     resourcePackTypeMeta,
