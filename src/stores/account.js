@@ -17,7 +17,6 @@ export const useAccountStore = defineStore({
       signup_sso_github: false,
       signup_email: false
     },
-    currentPlanSku: null,
     accountStatuses: {
       BLOCKED: 'BLOCKED',
       DEFAULTING: 'DEFAULTING',
@@ -86,13 +85,6 @@ export const useAccountStore = defineStore({
     isFirstLogin(state) {
       return state.account?.first_login
     },
-    hasServiceOrderPlan(state) {
-      // false = needs to purchase (redirects to additional-data)
-      // true = has contract a plan
-      // null = is old account
-      const value = state.account?.has_service_order_plan
-      return value === false ? false : true
-    },
     accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'
     },
@@ -149,12 +141,6 @@ export const useAccountStore = defineStore({
     },
     isClientAccount(state) {
       return state.account?.kind === 'client'
-    },
-    isHobbyPlan(state) {
-      return state.currentPlanSku === 'hobby'
-    },
-    isProPlan(state) {
-      return state.currentPlanSku === 'pro'
     }
   },
   actions: {
@@ -163,9 +149,6 @@ export const useAccountStore = defineStore({
     },
     setHasSession(value) {
       this.hasSession = !!value
-    },
-    setCurrentPlan(sku) {
-      this.currentPlanSku = sku ?? null
     },
     resetAccount() {
       this.account = {}
@@ -179,7 +162,6 @@ export const useAccountStore = defineStore({
         signup_sso_github: false,
         signup_email: false
       }
-      this.currentPlanSku = null
     },
     setSsoSignUpMethod(method) {
       this.identifySignUpProvider = method
