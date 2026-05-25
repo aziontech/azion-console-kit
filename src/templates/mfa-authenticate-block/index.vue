@@ -73,9 +73,13 @@
   import InputText from '@aziontech/webkit/inputtext'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
 
-  import { ref } from 'vue'
+  import { ref, inject } from 'vue'
   import { useRouter } from 'vue-router'
   import { UserIsNotClientError, ProccessRequestError } from '@/services/axios/errors'
+  import { trackSignInSafely } from '@/helpers/track-auth-event'
+
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
 
   const props = defineProps({
     validateMfaCodeService: {
@@ -182,6 +186,8 @@
       await props.validateMfaCodeService(mfaToken)
 
       const { user_tracking_info: userInfo } = await verifyUserData()
+      // Load user data and track before switchAccount (which cancels pending requests)
+      await trackSignInSafely({ tracker, method: 'email', loadUserData: true })
       await switchClientAccount(userInfo.props.account_id)
     } catch (error) {
       hasRequestErrorMessage.value = error
