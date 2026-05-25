@@ -28,56 +28,32 @@ describe('account store session state', () => {
   })
 })
 
-describe('account store hasAccountPlan getter', () => {
+describe('account store hasServiceOrderPlan getter', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
   })
 
-  it('should return true when hasAccountPlan is true', () => {
+  it('should return true when has_service_order_plan is true', () => {
     const store = useAccountStore()
-    store.setAccountData({ hasAccountPlan: true })
-    expect(store.hasAccountPlan).toBe(true)
+    store.setAccountData({ has_service_order_plan: true })
+    expect(store.hasServiceOrderPlan).toBe(true)
   })
 
-  it('should return true when hasAccountPlan is undefined', () => {
+  it('should return true when has_service_order_plan is null', () => {
     const store = useAccountStore()
-    store.setAccountData({ id: 1 })
-    expect(store.hasAccountPlan).toBe(true)
+    store.setAccountData({ has_service_order_plan: null })
+    expect(store.hasServiceOrderPlan).toBe(true)
   })
 
-  it('should return false when hasAccountPlan is false', () => {
+  it('should return true when has_service_order_plan is undefined', () => {
     const store = useAccountStore()
-    store.setAccountData({ hasAccountPlan: false })
-    expect(store.hasAccountPlan).toBe(false)
-  })
-})
-
-describe('account store needsOnboarding getter', () => {
-  beforeEach(() => {
-    setActivePinia(createPinia())
+    store.setAccountData({ id: 1 }) // has_service_order_plan is undefined
+    expect(store.hasServiceOrderPlan).toBe(true)
   })
 
-  it('should return true when first_login=true and hasAccountPlan=false', () => {
+  it('should return false when has_service_order_plan is false', () => {
     const store = useAccountStore()
-    store.setAccountData({ first_login: true, hasAccountPlan: false })
-    expect(store.needsOnboarding).toBe(true)
-  })
-
-  it('should return false when first_login=true but hasAccountPlan=true', () => {
-    const store = useAccountStore()
-    store.setAccountData({ first_login: true, hasAccountPlan: true })
-    expect(store.needsOnboarding).toBe(false)
-  })
-
-  it('should return false when first_login=false and hasAccountPlan=false', () => {
-    const store = useAccountStore()
-    store.setAccountData({ first_login: false, hasAccountPlan: false })
-    expect(store.needsOnboarding).toBe(false)
-  })
-
-  it('should return false when first_login is undefined', () => {
-    const store = useAccountStore()
-    store.setAccountData({ hasAccountPlan: false })
-    expect(store.needsOnboarding).toBe(false)
+    store.setAccountData({ has_service_order_plan: false })
+    expect(store.hasServiceOrderPlan).toBe(false)
   })
 })

@@ -25,18 +25,6 @@
       </div>
     </Transition>
 
-    <Transition name="annual-discount-slide">
-      <div
-        v-if="currentPlanCredit > 0"
-        class="flex justify-between text-sm"
-      >
-        <span class="text-muted">Current Plan Credit</span>
-        <div class="text-right">
-          <span class="text-success">-${{ formattedCurrentPlanCredit }}</span>
-        </div>
-      </div>
-    </Transition>
-
     <div class="flex justify-between text-base font-semibold">
       <span class="text-default">Total</span>
       <span class="text-default">
@@ -56,7 +44,6 @@
   const props = defineProps({
     subtotal: { type: Number, required: true },
     yearlyDiscount: { type: Number, default: 0 },
-    currentPlanCredit: { type: Number, default: 0 },
     total: { type: Number, required: true },
     billingCycleLabel: { type: String, required: true }
   })
@@ -65,7 +52,6 @@
 
   const formattedSubtotal = computed(() => formatPrice(props.subtotal))
   const formattedYearlyDiscount = computed(() => formatPrice(props.yearlyDiscount))
-  const formattedCurrentPlanCredit = computed(() => formatPrice(props.currentPlanCredit))
   const formattedTotal = computed(() => formatPrice(props.total))
 </script>
 

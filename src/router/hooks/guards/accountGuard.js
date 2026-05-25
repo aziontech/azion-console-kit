@@ -17,14 +17,17 @@ export async function accountGuard({ to, accountStore, tracker }) {
       await loadUserAndAccountInfo()
       sessionManager.afterLogin()
 
-      const needsOnboarding = accountStore.needsOnboarding
+      // Check if needs service order plan
+      const needsServiceOrder = accountStore.hasServiceOrderPlan === false
       const isAdditionalDataRoute = to.name === 'additional-data'
 
-      if (needsOnboarding && !isAdditionalDataRoute) {
+      // If needs service order and not on additional-data route, redirect
+      if (needsServiceOrder && !isAdditionalDataRoute) {
         return { name: 'additional-data' }
       }
 
-      if (!needsOnboarding && isAdditionalDataRoute) {
+      // If doesn't need service order and trying to access additional-data, go to home
+      if (!needsServiceOrder && isAdditionalDataRoute) {
         return { name: 'home' }
       }
 

@@ -12,7 +12,6 @@
     <PricingSummary
       :subtotal="subtotal"
       :yearlyDiscount="yearlyDiscount"
-      :currentPlanCredit="currentPlanCredit"
       :total="total"
       :billingCycleLabel="billingCycleLabel"
     />
@@ -50,11 +49,6 @@
       type: String,
       default: null,
       validator: (value) => value === null || ['monthly', 'yearly'].includes(value)
-    },
-    mode: {
-      type: String,
-      default: 'subscribe',
-      validator: (value) => ['subscribe', 'edit', 'change-cycle'].includes(value)
     }
   })
 
@@ -91,15 +85,9 @@
       : planPricing.value?.monthly || 0
   })
 
-  const currentPlanCredit = computed(() => {
-    if (props.mode !== 'change-cycle') return 0
-    if (billingCycle.value !== 'yearly') return 0
-    return planPricing.value?.monthly || 0
-  })
+  const discount = computed(() => yearlyDiscount.value)
 
-  const discount = computed(() => yearlyDiscount.value + currentPlanCredit.value)
-
-  const total = computed(() => Math.max(basePlanPrice.value - currentPlanCredit.value, 0))
+  const total = computed(() => basePlanPrice.value)
 
   const billingCycleLabel = computed(() => (billingCycle.value === 'monthly' ? 'month' : 'year'))
 
@@ -157,12 +145,11 @@
   })
 
   watch(
-    [subtotal, discount, currentPlanCredit, total, billingCycleLabel],
+    [subtotal, discount, total, billingCycleLabel],
     () => {
       emit('pricingChange', {
         subtotal: subtotal.value,
         discount: discount.value,
-        currentPlanCredit: currentPlanCredit.value,
         total: total.value,
         billingCycle: billingCycle.value,
         billingCycleLabel: billingCycleLabel.value
@@ -175,7 +162,6 @@
     billingCycle,
     subtotal,
     discount,
-    currentPlanCredit,
     total
   })
 </script>

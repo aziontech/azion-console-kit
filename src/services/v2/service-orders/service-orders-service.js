@@ -3,30 +3,16 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 export class ServiceOrdersService extends BaseService {
-  #baseURL = '/edge_api/api/v1'
-  #serviceOrdersURL = `${this.#baseURL}/service_orders`
-  #plansURL = `${this.#baseURL}/plans`
-  #accountPlanURL = `${this.#baseURL}/account/plan`
+  #baseURL = '/edge_api/api/v1/service_orders'
+  #plansBaseURL = '/edge_api/api/v1/plans'
 
   listPlansService = async () => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: this.#plansURL
+      url: this.#plansBaseURL
     })
 
     return ServiceOrdersAdapter.transformPlansList(data?.data ?? data)
-  }
-
-  getAccountPlanStatus = async () => {
-    try {
-      await this.http.request({
-        method: 'GET',
-        url: this.#accountPlanURL
-      })
-      return true
-    } catch {
-      return false
-    }
   }
 
   // Plan catalogue is effectively static — cache aggressively to avoid the
@@ -44,7 +30,7 @@ export class ServiceOrdersService extends BaseService {
   listServiceOrders = async (params = {}) => {
     const response = await this.http.request({
       method: 'GET',
-      url: this.#serviceOrdersURL,
+      url: this.#baseURL,
       params: {
         ...(params.limit !== undefined && { limit: params.limit }),
         ...(params.offset !== undefined && { offset: params.offset }),
@@ -60,7 +46,7 @@ export class ServiceOrdersService extends BaseService {
   getServiceOrder = async (id) => {
     const response = await this.http.request({
       method: 'GET',
-      url: `${this.#serviceOrdersURL}/${id}`
+      url: `${this.#baseURL}/${id}`
     })
 
     const body = response?.data ?? {}
@@ -79,7 +65,7 @@ export class ServiceOrdersService extends BaseService {
   createServiceOrder = async (payload) => {
     const response = await this.http.request({
       method: 'POST',
-      url: this.#serviceOrdersURL,
+      url: this.#baseURL,
       body: ServiceOrdersAdapter.toCreatePayload(payload)
     })
 
@@ -91,7 +77,7 @@ export class ServiceOrdersService extends BaseService {
   updateServiceOrder = async (id, payload) => {
     const response = await this.http.request({
       method: 'PATCH',
-      url: `${this.#serviceOrdersURL}/${id}`,
+      url: `${this.#baseURL}/${id}`,
       body: ServiceOrdersAdapter.toUpdatePayload(payload)
     })
 
@@ -103,7 +89,7 @@ export class ServiceOrdersService extends BaseService {
   upgradeServiceOrder = async ({ id, payload }) => {
     const response = await this.http.request({
       method: 'PATCH',
-      url: `${this.#serviceOrdersURL}/${id}/upgrade`,
+      url: `${this.#baseURL}/${id}/upgrade`,
       body: ServiceOrdersAdapter.toUpgradePayload(payload)
     })
 
@@ -115,24 +101,13 @@ export class ServiceOrdersService extends BaseService {
   downgradeServiceOrder = async ({ id, payload }) => {
     const response = await this.http.request({
       method: 'PATCH',
-      url: `${this.#serviceOrdersURL}/${id}/downgrade`,
+      url: `${this.#baseURL}/${id}/downgrade`,
       body: ServiceOrdersAdapter.toDowngradePayload(payload)
     })
 
     this.queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
 
     return ServiceOrdersAdapter.transformDowngradeResponse(response.data)
-  }
-
-  cancelDowngradeServiceOrder = async (id) => {
-    const response = await this.http.request({
-      method: 'DELETE',
-      url: `${this.#serviceOrdersURL}/${id}/cancel_downgrade`
-    })
-
-    this.queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
-
-    return ServiceOrdersAdapter.transformCancelDowngradeResponse(response.data)
   }
 }
 

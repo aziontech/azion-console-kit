@@ -157,7 +157,7 @@
               @click="handleRefresh"
             >
               <Tag
-                severity="secondary"
+                severity="info"
                 :icon="isRefreshing ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'"
                 :value="invoiceLastUpdated"
               />
