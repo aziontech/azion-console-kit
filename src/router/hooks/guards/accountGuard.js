@@ -21,17 +21,6 @@ export async function accountGuard({ to, accountStore, tracker }) {
       await loadAccountHydration()
       sessionManager.afterLogin()
 
-      const needsOnboarding = accountStore.needsOnboarding
-      const isAdditionalDataRoute = to.name === 'additional-data'
-
-      if (needsOnboarding && !isAdditionalDataRoute) {
-        return { name: 'additional-data' }
-      }
-
-      if (!needsOnboarding && isAdditionalDataRoute) {
-        return { name: 'home' }
-      }
-
       if (to.meta.isPublic) {
         return '/'
       }

@@ -124,6 +124,7 @@ const METRIC_SLUGS = {
     unit: 'GB'
   },
   application_requests: { title: 'Applications Requests' },
+  application_rules: { title: 'Application Rules' },
   bot_manager_invocations: { title: 'Bot Manager Requests' },
   cache_purges: { title: 'Cache Purges' },
   compute_time: { title: 'Edge Functions Compute Time', unit: 'ms' },
