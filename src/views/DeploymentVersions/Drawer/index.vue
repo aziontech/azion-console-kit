@@ -6,13 +6,13 @@
   import { useToast } from '@aziontech/webkit/use-toast'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
-  import FormFieldsDeploymentVersion from '@/views/Deployments/FormFields/FormFieldsDeploymentVersion.vue'
+  import FormFieldsDeploymentVersion from '@/views/DeploymentVersions/FormFields/FormFieldsDeploymentVersion.vue'
   import { deploymentService } from '@/services/v2/deployment/deployment-service'
   import {
     normalizeText,
     isReadonlyStatus,
     mapStateToStatus
-  } from '@/views/Deployments/helpers/deployment-status'
+  } from '@/views/DeploymentVersions/helpers/deployment-status'
 
   const mapFormToCreatePayload = (form) => {
     const kinds = Array.from(
@@ -45,7 +45,7 @@
     return payload
   }
 
-  defineOptions({ name: 'deployments-drawer' })
+  defineOptions({ name: 'deployment-versions-drawer' })
 
   const emit = defineEmits(['onSuccess'])
 

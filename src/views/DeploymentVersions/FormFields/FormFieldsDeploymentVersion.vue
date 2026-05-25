@@ -22,12 +22,12 @@
   import {
     resourceRegistry,
     hasResourceListing
-  } from '@/views/Deployments/helpers/deployment-resource-registry'
+  } from '@/views/DeploymentVersions/helpers/deployment-resource-registry'
   import {
     resourcePackTypeMeta,
     normalizeText
-  } from '@/views/Deployments/helpers/deployment-status'
-  import StatusTag from '@/views/Deployments/components/StatusTag.vue'
+  } from '@/views/DeploymentVersions/helpers/deployment-status'
+  import StatusTag from '@/views/DeploymentVersions/components/StatusTag.vue'
 
   defineOptions({ name: 'form-fields-deployment-version' })
 

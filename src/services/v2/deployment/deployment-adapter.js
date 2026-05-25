@@ -92,9 +92,12 @@ const normalizeDeployment = (deployment) => {
   return {
     id: source.id ?? null,
     environment_id: source.environment_id ?? null,
+    environment: source.environment ?? '',
     name: source.name ?? '',
     description: source.description ?? null,
     active: Boolean(source.active),
+    is_current: Boolean(source.is_current),
+    duration_seconds: source.duration_seconds ?? null,
     binding_policy: source.binding_policy ?? null,
     deployment_version_policy: source.deployment_version_policy ?? null,
     allowed_resource_types: toStringArray(source.allowed_resource_types),
@@ -107,6 +110,16 @@ const normalizeDeployment = (deployment) => {
     created_by: normalizeAuditActor(source.created_by),
     last_modified_by: normalizeAuditActor(source.last_modified_by)
   }
+}
+
+const formatDuration = (durationSeconds) => {
+  if (durationSeconds == null) return ''
+  const total = Number(durationSeconds)
+  if (!Number.isFinite(total) || total < 0) return ''
+  if (total < 60) return `${Math.round(total)}s`
+  const minutes = Math.floor(total / 60)
+  const seconds = Math.round(total % 60)
+  return seconds ? `${minutes}m ${seconds}s` : `${minutes}m`
 }
 
 export const DeploymentAdapter = {
@@ -122,9 +135,10 @@ export const DeploymentAdapter = {
         lastModified: normalized.updated_at
           ? formatDateToDayMonthYearHour(normalized.updated_at)
           : '-',
+        duration: formatDuration(normalized.duration_seconds),
         hash: '',
-        environment: '',
-        isCurrent: false
+        environment: normalized.environment ?? '',
+        isCurrent: Boolean(normalized.is_current)
       }
     })
   },
