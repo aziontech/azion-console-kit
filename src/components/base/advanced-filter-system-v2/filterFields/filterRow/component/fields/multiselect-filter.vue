@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref, onMounted } from 'vue'
+  import { computed, ref, onMounted, watch } from 'vue'
   import MultiSelect from '@aziontech/webkit/multiselect'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
@@ -38,6 +38,8 @@
     }
   })
 
+  const emit = defineEmits(['update:value'])
+
   const valueOptions = ref([])
   const loading = ref(false)
   const toast = useToast()
@@ -49,6 +51,8 @@
       initialValue: props.value
     }
   )
+
+  watch(selectedValue, (newValue) => emit('update:value', newValue))
 
   const loadValue = computed({
     get: () => {
@@ -93,12 +97,14 @@
       filter
       :disabled="props.disabled"
       :loading="loading"
+      :maxSelectedLabels="2"
+      :selectedItemsLabel="`{0} items selected`"
       v-model="loadValue"
       :options="valueOptions"
       :selectionLimit="props.selectionLimit"
       :optionLabel="payload.label"
       :optionValue="payload.value"
-      class="w-full"
+      class="w-full min-w-0 rte-multiselect-filter"
       :placeholder="props.placeholder"
       :pt="{
         panel: { class: 'w-full max-w-lg' },
@@ -112,3 +118,12 @@
     >
   </div>
 </template>
+
+<style>
+  /* Trigger label: keep chips from making the row grow vertically. */
+  .rte-multiselect-filter .p-multiselect-label {
+    max-height: 2rem;
+    overflow-y: auto;
+    flex-wrap: wrap;
+  }
+</style>

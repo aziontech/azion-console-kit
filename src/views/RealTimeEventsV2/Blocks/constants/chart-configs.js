@@ -125,9 +125,8 @@ const CHART_CONFIGS = {
     groupBy: ['ts'],
     limit: 10000,
     orderBy: 'ts_ASC',
-    chartType: 'area-spline',
+    chartType: 'spline',
     splineInterpolation: 'monotone',
-    areaOpacity: 0.15,
     dataUnit: 'count',
     xAxis: 'ts',
     seriesOrder: ['wafRequestsAllowed', 'wafRequestsThreat', 'wafRequestsBlocked'],
@@ -308,9 +307,8 @@ const CHART_CONFIGS = {
   },
 
   bandwidthSavedMissed: {
-    chartType: 'area-spline',
+    chartType: 'spline',
     splineInterpolation: 'monotone',
-    areaOpacity: 0.15,
     dataUnit: 'bytes',
     xAxis: 'ts',
     seriesOrder: ['bandwidthSavedData', 'bandwidthMissedData'],

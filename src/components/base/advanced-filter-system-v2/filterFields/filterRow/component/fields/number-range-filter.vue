@@ -2,6 +2,7 @@
   import InputNumber from '@aziontech/webkit/inputnumber'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
+  import { watch } from 'vue'
 
   defineOptions({ name: 'numberangerFilter' })
 
@@ -57,12 +58,18 @@
     }
   )
 
+  const emit = defineEmits(['update:value'])
+
   const setBegin = ({ value }) => {
     handleChangeBegin(value)
   }
   const setEnd = ({ value }) => {
     handleChangeEnd(value)
   }
+
+  watch([begin, end], ([newBegin, newEnd]) =>
+    emit('update:value', { begin: newBegin, end: newEnd })
+  )
 </script>
 <template>
   <div class="flex flex-col sm:flex-row gap-6 w-full">

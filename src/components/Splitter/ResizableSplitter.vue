@@ -272,4 +272,17 @@
   .handle {
     background: var(--handle-bg);
   }
+  /* Tablet (640-1023px): enlarge the splitter handle's touchable area
+     for finger ergonomics. Visual bar inside (`barOuterClass`) stays narrow;
+     only the clickable/touchable wrapper grows. Mouse-driven desktop (>=1024px)
+     and mobile (<640px, where the handle is hidden by the parent) are
+     unaffected. */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .handle.cursor-row-resize {
+      height: 2rem;
+    }
+    .handle.cursor-col-resize {
+      width: 2rem;
+    }
+  }
 </style>

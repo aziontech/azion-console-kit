@@ -36,7 +36,31 @@ const BUCKET_TABLE = [
   [Infinity, 30 * DAY]
 ]
 
-export function getBucketInterval(durationMs) {
+/**
+ * Pick the smallest bucket interval that (a) covers the duration and
+ * (b) produces no more than `targetMaxBuckets` slots. Without the cap,
+ * narrow viewports (~490px) end up with 60+ bars at ~7px each — too dense
+ * to be readable. The cap is a soft target: if no interval in the table
+ * satisfies both conditions, the coarsest matching interval is returned
+ * (i.e. we prefer fewer-but-wider bars over time-coverage drift).
+ *
+ * @param {number} durationMs - Range duration in ms.
+ * @param {number} [targetMaxBuckets=Infinity] - Soft cap on output bucket count.
+ * @returns {number} Bucket interval in ms.
+ */
+export function getBucketInterval(durationMs, targetMaxBuckets = Infinity) {
+  const minInterval =
+    Number.isFinite(targetMaxBuckets) && targetMaxBuckets > 0
+      ? durationMs / targetMaxBuckets
+      : 0
+
+  // Walk the table in ascending-interval order; first row that fits the
+  // duration AND yields ≤ targetMaxBuckets wins.
+  for (const [maxRange, interval] of BUCKET_TABLE) {
+    if (durationMs <= maxRange && interval >= minInterval) return interval
+  }
+  // No row satisfied both — fall back to the coarsest interval that still
+  // covers the duration so we don't over-decimate badly.
   for (const [maxRange, interval] of BUCKET_TABLE) {
     if (durationMs <= maxRange) return interval
   }
@@ -73,15 +97,22 @@ export function detectNativeInterval(rawData) {
  * when the server returns coarser resolution than the auto interval.
  * Returns { sortedKeys, bucketMap, bucketMs }
  */
-export function aggregateIntoBuckets(rawData, rangeStart, rangeEnd) {
+export function aggregateIntoBuckets(rawData, rangeStart, rangeEnd, targetMaxBuckets) {
   const duration = rangeEnd - rangeStart
-  const bucketMs = getBucketInterval(duration)
+  const bucketMs = getBucketInterval(duration, targetMaxBuckets)
   const alignedStart = Math.floor(rangeStart / bucketMs) * bucketMs
   const bucketMap = new Map()
 
-  // Pre-fill slots — stop BEFORE rangeEnd to avoid an incomplete trailing
-  // bucket that would show a visual drop to near-zero.
-  for (let ts = alignedStart; ts < rangeEnd; ts += bucketMs) {
+  // Only include buckets that fall ENTIRELY inside [rangeStart, rangeEnd].
+  // Partial buckets at either edge would show a misleading low/dip:
+  //   - First bucket aligned to `alignedStart < rangeStart` includes time
+  //     before the range, with no data to fill it.
+  //   - Last bucket whose end is past `rangeEnd` includes future time (or
+  //     time after "now" for live data), also under-filled.
+  // Skipping these eliminates the "starts low / ends low" visual artifact.
+  const firstBucketTs =
+    alignedStart < rangeStart ? alignedStart + bucketMs : alignedStart
+  for (let ts = firstBucketTs; ts + bucketMs <= rangeEnd; ts += bucketMs) {
     bucketMap.set(ts, 0)
   }
 

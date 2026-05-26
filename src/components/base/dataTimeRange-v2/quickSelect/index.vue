@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-  import { ref, defineModel, onMounted, onUnmounted, watch } from 'vue'
+  import { ref, defineModel, onMounted, onUnmounted, onActivated, onDeactivated, watch } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InputNumber from '@aziontech/webkit/inputnumber'
@@ -285,7 +285,16 @@
     scheduleAutoRefresh()
   })
 
+  onActivated(() => {
+    if (props.panelOnly) return
+    scheduleAutoRefresh()
+  })
+
   onUnmounted(() => {
+    clearAutoRefreshTimer()
+  })
+
+  onDeactivated(() => {
     clearAutoRefreshTimer()
   })
 

@@ -49,7 +49,8 @@
         icon="pi pi-save"
         text
         size="small"
-        class="!w-7 !h-7 flex-shrink-0"
+        class="ss-save-btn !w-7 !h-7 flex-shrink-0"
+        aria-label="Save current search"
         :disabled="!saveSearchName.trim()"
         @click="handleSave"
       />
@@ -75,7 +76,8 @@
           icon="pi pi-times"
           text
           size="small"
-          class="!w-5 !h-5 !p-0 flex-shrink-0"
+          class="ss-delete-btn !w-5 !h-5 !p-0 flex-shrink-0"
+          aria-label="Delete saved search"
           @click.stop="emit('delete', entry.id)"
         />
       </li>
@@ -93,6 +95,18 @@
   :deep(.ss-overlay) {
     width: 360px;
     max-width: calc(100vw - 2rem);
+  }
+  @media (max-width: 639px) {
+    :deep(.ss-overlay) {
+      width: calc(100vw - 1rem);
+    }
+  }
+  @media (max-width: 1023px) {
+    :deep(.ss-overlay .ss-save-btn),
+    :deep(.ss-overlay .ss-delete-btn) {
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+    }
   }
   .ss-header {
     display: flex;

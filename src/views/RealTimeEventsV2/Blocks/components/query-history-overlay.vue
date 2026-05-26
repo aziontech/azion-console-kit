@@ -35,7 +35,8 @@
         text
         severity="danger"
         size="small"
-        class="!w-6 !h-6"
+        class="qh-clear-btn !w-6 !h-6"
+        aria-label="Clear query history"
         @click="emit('clear')"
       />
     </div>
@@ -75,7 +76,8 @@
           icon="pi pi-times"
           text
           size="small"
-          class="!w-5 !h-5 !p-0 flex-shrink-0"
+          class="qh-remove-btn !w-5 !h-5 !p-0 flex-shrink-0"
+          aria-label="Remove query from history"
           @click.stop="emit('remove', idx)"
         />
       </li>
@@ -90,9 +92,16 @@
 </template>
 
 <style scoped>
-  .query-history-overlay {
-    width: 400px;
-    max-width: calc(100vw - 2rem);
+  :deep(.query-history-overlay) {
+    width: min(400px, calc(100vw - 1rem));
+    max-width: calc(100vw - 1rem);
+  }
+  @media (max-width: 1023px) {
+    :deep(.query-history-overlay .qh-clear-btn),
+    :deep(.query-history-overlay .qh-remove-btn) {
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+    }
   }
   .qh-header {
     display: flex;

@@ -1,4 +1,3 @@
-import { h } from 'vue'
 import multiselectFilter from './fields/multiselect-filter'
 import selectFilter from './fields/select-filter'
 import textFilter from './fields/text-filter'
@@ -9,18 +8,23 @@ import floatRangeFilter from './fields/float-range-filter'
 import numberRangeFilter from './fields/number-range-filter'
 import MultiSelectLazyLoaderFilter from './fields/multiselect-lazy-loader-filter.vue'
 
+// Component definitions (NOT pre-built VNodes via h()): using h(component) here
+// produces a static VNode that <component :is> just mounts as-is, dropping the
+// v-model:value / props / events declared on the <component> tag. Passing the
+// component directly lets <component :is> create a fresh instance with the
+// parent's bindings applied — which is what makes v-model:value flow.
 export const FIELDS_MAPPING = {
-  Int: h(numberFilter),
-  Float: h(floatFilter),
-  String: h(textFilter),
-  IntRange: h(numberRangeFilter),
-  FloatRange: h(floatRangeFilter),
-  ArrayObject: h(multiselectFilter),
-  ArrayObjectDomain: h(MultiSelectLazyLoaderFilter),
-  Boolean: h(selectFilter),
-  StringObject: h(selectFilter),
-  ArrayString: h(chipsFilter),
-  GenericScalar: h(textFilter)
+  Int: numberFilter,
+  Float: floatFilter,
+  String: textFilter,
+  IntRange: numberRangeFilter,
+  FloatRange: floatRangeFilter,
+  ArrayObject: multiselectFilter,
+  ArrayObjectDomain: MultiSelectLazyLoaderFilter,
+  Boolean: selectFilter,
+  StringObject: selectFilter,
+  ArrayString: chipsFilter,
+  GenericScalar: textFilter
 }
 
 export const OPERATOR_MAPPING = {

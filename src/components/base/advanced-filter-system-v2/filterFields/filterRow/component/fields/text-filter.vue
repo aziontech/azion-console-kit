@@ -2,6 +2,7 @@
   import InputText from '@aziontech/webkit/inputtext'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
+  import { watch } from 'vue'
   defineOptions({ name: 'textFilter' })
 
   const props = defineProps({
@@ -16,6 +17,8 @@
     }
   })
 
+  const emit = defineEmits(['update:value'])
+
   const {
     value: selectedValue,
     errorMessage,
@@ -24,6 +27,8 @@
   } = useField('selectedValue', yup.string().default(''), {
     initialValue: props.value || ''
   })
+
+  watch(selectedValue, (newValue) => emit('update:value', newValue))
 </script>
 <template>
   <div class="w-full">
