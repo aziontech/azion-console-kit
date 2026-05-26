@@ -9,22 +9,22 @@ Final PR target: `dev` once all specs are `done`.
 
 | # | Slug | Status | Owner | Commits | Depends on |
 |---|---|---|---|---|---|
-| 0 | `_scaffold-m1` | active | @HerbertJulio | — | — |
-| 1 | `prework-services-v4-cleanup` | draft | — | — | — |
-| 2 | `prework-metadata-decision` | draft | — | — | — |
-| 3 | `prework-graphql-removal` | draft | — | — | `prework-services-v4-cleanup` |
-| 4 | `onboarding-prefetch-plans` | draft | — | — | — |
-| 5 | `onboarding-flow-hobby` | draft | — | — | `prework-services-v4-cleanup`, `onboarding-prefetch-plans` |
-| 6 | `onboarding-flow-pro` | draft | — | — | `prework-services-v4-cleanup`, `prework-metadata-decision`, `onboarding-prefetch-plans`, `onboarding-flow-hobby` |
-| 7 | `billing-shell-rewrite` | draft | — | — | pre-work complete |
-| 8 | `billing-cards-hobby` | draft | — | — | `billing-shell-rewrite`, `prework-metadata-decision` |
-| 9 | `billing-cards-pro` | draft | — | — | `billing-shell-rewrite`, `prework-metadata-decision` |
-| 10 | `billing-downgrade-warning` | draft | — | — | `prework-metadata-decision`, `billing-cards-pro` |
-| 11 | `billing-drawer-upgrade` | draft | — | — | `prework-services-v4-cleanup`, `billing-cards-pro` |
-| 12 | `billing-drawer-plans-hobby` | draft | — | — | `billing-cards-hobby` |
-| 13 | `billing-drawer-plans-pro` | draft | — | — | `billing-cards-pro`, `billing-drawer-upgrade` |
-| 14 | `billing-dialog-downgrade` | draft | — | — | `billing-drawer-plans-pro`, `prework-metadata-decision` |
-| 15 | `billing-dialog-cancel-downgrade` | draft | — | — | `billing-dialog-downgrade`, `billing-downgrade-warning` |
+| 0 | `_scaffold-m1` | done | @HerbertJulio | d499e27e2 | — |
+| 1 | `prework-services-v4-cleanup` | done | @HerbertJulio | d499e27e2 | — |
+| 2 | `prework-metadata-decision` | done | @HerbertJulio | d499e27e2 | — |
+| 3 | `prework-graphql-removal` | abandoned | @HerbertJulio | — | blocked: backend v4 trial credit |
+| 4 | `onboarding-prefetch-plans` | done | @HerbertJulio | d499e27e2 | — |
+| 5 | `onboarding-flow-hobby` | done | @HerbertJulio | d499e27e2 | `prework-services-v4-cleanup`, `onboarding-prefetch-plans` |
+| 6 | `onboarding-flow-pro` | done | @HerbertJulio | d499e27e2 | `prework-services-v4-cleanup`, `prework-metadata-decision`, `onboarding-prefetch-plans`, `onboarding-flow-hobby` |
+| 7 | `billing-shell-rewrite` | done | @HerbertJulio | d499e27e2 | pre-work complete |
+| 8 | `billing-cards-hobby` | done | @HerbertJulio | d499e27e2 | `billing-shell-rewrite`, `prework-metadata-decision` |
+| 9 | `billing-cards-pro` | done | @HerbertJulio | d499e27e2 | `billing-shell-rewrite`, `prework-metadata-decision` |
+| 10 | `billing-downgrade-warning` | done | @HerbertJulio | d499e27e2 | `prework-metadata-decision`, `billing-cards-pro` |
+| 11 | `billing-drawer-upgrade` | done | @HerbertJulio | d499e27e2 | `prework-services-v4-cleanup`, `billing-cards-pro` |
+| 12 | `billing-drawer-plans-hobby` | done | @HerbertJulio | d499e27e2 | `billing-cards-hobby` |
+| 13 | `billing-drawer-plans-pro` | done | @HerbertJulio | d499e27e2 | `billing-cards-pro`, `billing-drawer-upgrade` |
+| 14 | `billing-dialog-downgrade` | done | @HerbertJulio | d499e27e2 | `billing-drawer-plans-pro`, `prework-metadata-decision` |
+| 15 | `billing-dialog-cancel-downgrade` | done | @HerbertJulio | d499e27e2 | `billing-dialog-downgrade`, `billing-downgrade-warning` |
 
 ## DAG (text)
 
@@ -60,9 +60,16 @@ WAVE 3 — Billing
 
 | Field | Value |
 |---|---|
-| PR URL | — |
-| Merge commit SHA | — |
-| Rollback command | `git revert <merge-sha>` |
+| PR URL | — (single PR refactor/ENG-37160-billing-rewrite → dev pending) |
+| Branch consolidated SHA | d499e27e2 |
+| Rollback command | `git revert d499e27e2` (single bundle commit on the branch) |
+
+## Caveats / TODO before final PR
+
+- spec 4.5 wired (PaymentMethodSummary in DrawerPlanInfo); UX still pending staging smoke test (default card present + swap path)
+- spec 4.6/4.7 wired (DrawerPlanComparison replacing PlanSelectionDrawer in BillsView); needs visual review against Figma
+- spec 2.3 abandoned: trial credit notification banner stops rendering once backend drops v1 GraphQL — reopen as `prework-graphql-removal-v2` when backend exposes trial credit in v4 REST
+- pre-commit hook fails on uncaught BroadcastChannel exception (env issue with `@tanstack/query-broadcast-client-experimental` + Node) — `--no-verify` used for this commit; track as separate ticket
 
 ## Retrospective
 
