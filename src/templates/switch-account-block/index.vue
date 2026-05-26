@@ -12,7 +12,9 @@
   import Skeleton from '@aziontech/webkit/skeleton'
   import Menu from '@aziontech/webkit/menu'
   import PrimeTag from '@aziontech/webkit/prime-tag'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, inject, onMounted, ref, watch } from 'vue'
+  import { useAccountStore } from '@/stores/account'
+  import { trackSignInSafely } from '@/helpers/track-auth-event'
 
   defineOptions({ name: 'SwitchAccountBlock' })
   const emit = defineEmits(['update:showSwitchAccount'])
@@ -91,6 +93,17 @@
   ])
   const menu = ref()
 
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+  const accountStore = useAccountStore()
+
+  const getSignInMethod = () => {
+    const flags = accountStore.getSignupTypeFlags()
+    if (flags.login_sso_google || flags.signup_sso_google) return 'google'
+    if (flags.login_sso_github || flags.signup_sso_github) return 'github'
+    return 'email'
+  }
+
   // Lazy loading state (previously managed by with-lazy-and-dropdown-filter.vue)
   const isLoading = ref(false)
   const first = ref(1)
@@ -157,6 +170,8 @@
   }
   const onSelectedAccount = async (rowSelected) => {
     visible.value = false
+
+    await trackSignInSafely({ tracker, method: getSignInMethod() })
     await props.accountHandler.switchAccountAndRedirect(rowSelected.accountId)
   }
 </script>
