@@ -1,6 +1,9 @@
 import * as SignupService from '@/services/signup-services'
+import { inject } from 'vue'
 import { useAccountStore } from '@/stores/account'
 import SignupView from '@/views/Signup/SignupView.vue'
+import { getFirstSessionUrl } from '@/helpers/first-session-url'
+import { trackSignUpSafely } from '@/helpers/track-auth-event'
 
 /** @type {import('vue-router').RouteRecordRaw} */
 export const signupRoutes = {
@@ -33,6 +36,22 @@ export const signupRoutes = {
         const accountStore = useAccountStore()
 
         if (accountStore.hasActiveUserId && accountStore.needsOnboarding) {
+          const signupTypeFlags = accountStore.getSignupTypeFlags()
+          const ssoMethod = accountStore.ssoSignUpMethod
+          const isEmailSignup = signupTypeFlags.signup_email
+
+          if (ssoMethod || isEmailSignup) {
+            /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+            const tracker = inject('tracker')
+
+            trackSignUpSafely({
+              tracker,
+              method: ssoMethod || 'email',
+              signupTypeFlags,
+              firstSessionUrl: getFirstSessionUrl()
+            })
+          }
+
           next()
         } else {
           next({ name: 'home' })
