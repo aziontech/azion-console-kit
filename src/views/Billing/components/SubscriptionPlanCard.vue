@@ -72,7 +72,11 @@
         </SubscriptionPlanRow>
 
         <SubscriptionPlanRow label="Payment Method">
-          <span class="text-color">
+          <span class="inline-flex items-center gap-2 text-color">
+            <CardFlagBlock
+              v-if="paymentMethodBrand"
+              :cardFlag="paymentMethodBrand"
+            />
             {{ paymentMethodLabel }}
           </span>
         </SubscriptionPlanRow>
@@ -99,12 +103,29 @@
   import CardBox from '@aziontech/webkit/content/card-box'
   import SkeletonBlock from '@/templates/skeleton-block'
   import SubscriptionPlanRow from './SubscriptionPlanRow.vue'
+  import CardFlagBlock from '@/templates/card-flag-block'
 
   defineOptions({ name: 'subscription-plan-card' })
 
+  const SUPPORTED_FLAGS = ['visa', 'mastercard', 'amex', 'discover', 'diners', 'jcb']
+  const BRAND_ALIASES = {
+    american_express: 'amex',
+    americanexpress: 'amex',
+    diners_club: 'diners',
+    dinersclub: 'diners'
+  }
+
   const props = defineProps({
     subscription: { type: Object, required: true },
-    paymentMethodLabel: { type: String, default: '--' }
+    paymentMethodLabel: { type: String, default: '--' },
+    paymentMethodBrandRaw: { type: String, default: '' }
+  })
+
+  const paymentMethodBrand = computed(() => {
+    const raw = (props.paymentMethodBrandRaw || '').toLowerCase()
+    if (!raw) return null
+    const normalized = BRAND_ALIASES[raw] ?? raw
+    return SUPPORTED_FLAGS.includes(normalized) ? normalized : null
   })
 
   const emit = defineEmits(['change-plan', 'go-to-payment'])

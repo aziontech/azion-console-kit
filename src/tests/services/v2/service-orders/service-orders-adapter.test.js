@@ -67,17 +67,54 @@ describe('transformServiceOrder', () => {
   })
 
   describe('downgradePending derivation', () => {
-    it('returns null when neither downgrade_pending nor metadata are present', () => {
+    it('returns null when neither pending_transition nor metadata are present', () => {
       const result = ServiceOrdersAdapter.transformServiceOrder(v4ServiceOrder)
       expect(result.downgradePending).toBeNull()
     })
 
-    it('reads from future-shape downgrade_pending field when present', () => {
+    it('reads from pending_transition (PR #96) when present', () => {
+      const data = {
+        ...v4ServiceOrder,
+        pending_transition: {
+          type: 'downgrade',
+          to_plan_id: 'plan-free',
+          to_plan_pricing_id: null,
+          effective_date: '2026-06-30T23:59:59.000Z'
+        }
+      }
+      expect(ServiceOrdersAdapter.transformServiceOrder(data).downgradePending).toEqual({
+        type: 'downgrade',
+        toPlanId: 'plan-free',
+        toPriceId: null,
+        effectiveAt: '2026-06-30T23:59:59.000Z',
+        mode: null
+      })
+    })
+
+    it('maps pending_transition with paid downgrade target', () => {
+      const data = {
+        ...v4ServiceOrder,
+        pending_transition: {
+          type: 'downgrade',
+          to_plan_id: 'plan-pro-monthly',
+          to_plan_pricing_id: 'price_xxx',
+          effective_date: '2026-06-01T00:00:00Z'
+        }
+      }
+      const result = ServiceOrdersAdapter.transformServiceOrder(data).downgradePending
+      expect(result.toPriceId).toBe('price_xxx')
+      expect(result.effectiveAt).toBe('2026-06-01T00:00:00Z')
+    })
+
+    it('falls back to legacy downgrade_pending field when present', () => {
       const data = {
         ...v4ServiceOrder,
         downgrade_pending: { effective_at: '2026-06-01T00:00:00Z', mode: 'cancel_at_period_end' }
       }
       expect(ServiceOrdersAdapter.transformServiceOrder(data).downgradePending).toEqual({
+        type: 'downgrade',
+        toPlanId: null,
+        toPriceId: null,
         effectiveAt: '2026-06-01T00:00:00Z',
         mode: 'cancel_at_period_end'
       })
@@ -89,6 +126,9 @@ describe('transformServiceOrder', () => {
         metadata: { status: 'downgrade_pending', effective_date: '2026-06-15T00:00:00Z' }
       }
       expect(ServiceOrdersAdapter.transformServiceOrder(data).downgradePending).toEqual({
+        type: 'downgrade',
+        toPlanId: null,
+        toPriceId: null,
         effectiveAt: '2026-06-15T00:00:00Z',
         mode: null
       })
@@ -348,6 +388,112 @@ describe('transformCancelDowngradeResponse', () => {
     expect(result.transition.status).toBe('canceled')
     expect(result).not.toHaveProperty('mode')
     expect(result).not.toHaveProperty('cancelAtPeriodEnd')
+  })
+})
+
+describe('transformBillingPaymentMethodsResponse', () => {
+  const v4Envelope = {
+    state: 'executed',
+    data: {
+      object: 'list',
+      payment_methods: [
+        {
+          id: 'pm_xxx',
+          type: 'card',
+          brand: 'visa',
+          last4: '4242',
+          exp_month: 12,
+          exp_year: 2030,
+          funding: 'credit',
+          country: 'US',
+          is_default: true
+        },
+        {
+          id: 'pm_yyy',
+          type: 'card',
+          brand: 'mastercard',
+          last4: '5151',
+          exp_month: 6,
+          exp_year: 2028,
+          funding: 'debit',
+          country: 'BR',
+          is_default: false
+        }
+      ],
+      billing_address: {
+        line1: '123 Main St',
+        line2: null,
+        city: 'San Francisco',
+        state: 'CA',
+        postal_code: '94107',
+        country: 'US'
+      },
+      customer_email: 'user@example.com',
+      customer_name: 'Test User',
+      stale: false
+    }
+  }
+
+  it('maps payment methods list with default flag', () => {
+    const result = ServiceOrdersAdapter.transformBillingPaymentMethodsResponse(v4Envelope)
+    expect(result.paymentMethods).toHaveLength(2)
+    expect(result.paymentMethods[0]).toEqual({
+      id: 'pm_xxx',
+      type: 'card',
+      brand: 'visa',
+      last4: '4242',
+      expMonth: 12,
+      expYear: 2030,
+      funding: 'credit',
+      country: 'US',
+      isDefault: true
+    })
+    expect(result.paymentMethods[1].isDefault).toBe(false)
+  })
+
+  it('identifies defaultPaymentMethod from is_default flag', () => {
+    const result = ServiceOrdersAdapter.transformBillingPaymentMethodsResponse(v4Envelope)
+    expect(result.defaultPaymentMethod?.id).toBe('pm_xxx')
+    expect(result.defaultPaymentMethod?.last4).toBe('4242')
+  })
+
+  it('returns null defaultPaymentMethod when none flagged', () => {
+    const envelope = {
+      state: 'executed',
+      data: {
+        object: 'list',
+        payment_methods: [{ id: 'pm_a', type: 'card', brand: 'visa', last4: '0001' }]
+      }
+    }
+    const result = ServiceOrdersAdapter.transformBillingPaymentMethodsResponse(envelope)
+    expect(result.defaultPaymentMethod).toBeNull()
+    expect(result.paymentMethods[0].isDefault).toBe(false)
+  })
+
+  it('maps billing_address to camelCase', () => {
+    const result = ServiceOrdersAdapter.transformBillingPaymentMethodsResponse(v4Envelope)
+    expect(result.billingAddress).toEqual({
+      line1: '123 Main St',
+      line2: null,
+      city: 'San Francisco',
+      state: 'CA',
+      postalCode: '94107',
+      country: 'US'
+    })
+  })
+
+  it('returns empty list when payment_methods absent', () => {
+    const result = ServiceOrdersAdapter.transformBillingPaymentMethodsResponse({
+      state: 'executed',
+      data: {}
+    })
+    expect(result.paymentMethods).toEqual([])
+    expect(result.defaultPaymentMethod).toBeNull()
+  })
+
+  it('preserves stale flag from snapshot fallback', () => {
+    const envelope = { state: 'executed', data: { payment_methods: [], stale: true } }
+    expect(ServiceOrdersAdapter.transformBillingPaymentMethodsResponse(envelope).stale).toBe(true)
   })
 })
 

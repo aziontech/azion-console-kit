@@ -313,7 +313,8 @@ export const queryKeys = {
   serviceOrders: {
     all: ['service-orders'],
     list: (params) => [...queryKeys.serviceOrders.all, 'list', normalizeParams(params)],
-    detail: (id) => [...queryKeys.serviceOrders.all, 'detail', id]
+    detail: (id) => [...queryKeys.serviceOrders.all, 'detail', id],
+    billingPaymentMethods: () => [...queryKeys.serviceOrders.all, 'billing', 'payment-methods']
   },
   edgeService: {
     all: ['edge-services'],

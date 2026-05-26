@@ -70,8 +70,21 @@ const toFiniteNumberOrNull = (value) => {
 }
 
 const deriveDowngradePending = (data) => {
+  const pending = data?.pending_transition
+  if (pending && typeof pending === 'object') {
+    return {
+      type: pending.type ?? null,
+      toPlanId: pending.to_plan_id ?? null,
+      toPriceId: pending.to_plan_pricing_id ?? null,
+      effectiveAt: pending.effective_date ?? null,
+      mode: null
+    }
+  }
   if (data?.downgrade_pending && typeof data.downgrade_pending === 'object') {
     return {
+      type: data.downgrade_pending.type ?? 'downgrade',
+      toPlanId: data.downgrade_pending.to_plan_id ?? null,
+      toPriceId: data.downgrade_pending.to_plan_pricing_id ?? null,
       effectiveAt: data.downgrade_pending.effective_at ?? null,
       mode: data.downgrade_pending.mode ?? null
     }
@@ -79,6 +92,9 @@ const deriveDowngradePending = (data) => {
   const meta = data?.metadata
   if (meta && typeof meta === 'object' && meta.status === 'downgrade_pending') {
     return {
+      type: 'downgrade',
+      toPlanId: null,
+      toPriceId: null,
       effectiveAt: meta.effective_date ?? meta.effectiveDate ?? null,
       mode: meta.mode ?? null
     }
@@ -226,6 +242,46 @@ const transformCancelDowngradeResponse = (envelope = {}) => {
   }
 }
 
+const transformBillingPaymentMethod = (method = {}) => ({
+  id: method.id ?? null,
+  type: method.type ?? null,
+  brand: method.brand ?? null,
+  last4: method.last4 ?? null,
+  expMonth: method.exp_month ?? null,
+  expYear: method.exp_year ?? null,
+  funding: method.funding ?? null,
+  country: method.country ?? null,
+  isDefault: Boolean(method.is_default)
+})
+
+const transformBillingAddress = (address) => {
+  if (!address || typeof address !== 'object') return null
+  return {
+    line1: address.line1 ?? null,
+    line2: address.line2 ?? null,
+    city: address.city ?? null,
+    state: address.state ?? null,
+    postalCode: address.postal_code ?? null,
+    country: address.country ?? null
+  }
+}
+
+const transformBillingPaymentMethodsResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
+  const methods = Array.isArray(data.payment_methods)
+    ? data.payment_methods.map(transformBillingPaymentMethod)
+    : []
+  return {
+    state: envelope?.state ?? null,
+    paymentMethods: methods,
+    defaultPaymentMethod: methods.find((method) => method.isDefault) ?? null,
+    billingAddress: transformBillingAddress(data.billing_address),
+    customerEmail: data.customer_email ?? null,
+    customerName: data.customer_name ?? null,
+    stale: Boolean(data.stale)
+  }
+}
+
 const toCreatePayload = (payload = {}) => ({
   plan_id: payload.planId,
   ...(payload.planPricingId !== undefined && { plan_pricing_id: payload.planPricingId })
@@ -257,6 +313,8 @@ export const ServiceOrdersAdapter = {
   transformDowngradeResponse,
   transformCancelResponse,
   transformCancelDowngradeResponse,
+  transformBillingPaymentMethod,
+  transformBillingPaymentMethodsResponse,
   toCreatePayload,
   toUpdatePayload,
   toPlanChangePayload,

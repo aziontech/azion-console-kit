@@ -6,6 +6,7 @@ export class ServiceOrdersService extends BaseService {
   #baseURL = '/edge_api/v4/service_orders'
   #plansURL = `${this.#baseURL}/plans`
   #currentPlanURL = `${this.#baseURL}/plans/current`
+  #billingPaymentMethodsURL = `${this.#baseURL}/billing/payment_methods`
 
   listPlansService = async () => {
     const response = await this.http.request({
@@ -127,6 +128,14 @@ export class ServiceOrdersService extends BaseService {
       body: {}
     })
     return ServiceOrdersAdapter.transformCancelDowngradeResponse(response.data)
+  }
+
+  getBillingPaymentMethods = async () => {
+    const response = await this.http.request({
+      method: 'GET',
+      url: this.#billingPaymentMethodsURL
+    })
+    return ServiceOrdersAdapter.transformBillingPaymentMethodsResponse(response.data)
   }
 }
 

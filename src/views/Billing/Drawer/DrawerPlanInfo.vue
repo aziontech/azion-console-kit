@@ -2,13 +2,7 @@
   <Sidebar
     v-model:visible="visibleDrawer"
     position="right"
-    :pt="{
-      root: {
-        class: 'w-full md:w-[960px] md:max-w-[calc(100vw-160px)] border-l surface-border'
-      },
-      header: { class: 'hidden' },
-      content: { class: 'p-0 overflow-hidden' }
-    }"
+    :pt="sidebarPt"
   >
     <div class="flex h-full">
       <div class="hidden md:block w-[300px] shrink-0 border-r border-default bg-surface">
@@ -113,7 +107,22 @@
       validator: (value) => value === null || ['monthly', 'yearly'].includes(value)
     },
     initialClientSecret: { type: String, default: '' },
-    getStripeClientService: { type: Function, required: false, default: null }
+    getStripeClientService: { type: Function, required: false, default: null },
+    indented: { type: Boolean, default: false }
+  })
+
+  const sidebarPt = computed(() => {
+    const rootBase = 'w-full md:w-[960px] md:max-w-[calc(100vw-160px)] border-l surface-border'
+    return {
+      root: {
+        class: props.indented
+          ? `${rootBase} shadow-[-12px_0_32px_-8px_rgba(0,0,0,0.45)]`
+          : rootBase
+      },
+      mask: props.indented ? { style: { backgroundColor: 'transparent' } } : undefined,
+      header: { class: 'hidden' },
+      content: { class: 'p-0 overflow-hidden' }
+    }
   })
 
   const emit = defineEmits(['update:visible', 'submit', 'submitCycleChange', 'stale-session'])

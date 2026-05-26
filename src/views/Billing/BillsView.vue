@@ -9,6 +9,8 @@
     <template v-if="cardsReady">
       <SubscriptionPlanCard
         :subscription="subscriptionState"
+        :paymentMethodLabel="paymentMethodLabel"
+        :paymentMethodBrandRaw="paymentMethodBrandRaw"
         @change-plan="showOtherPlans"
         @go-to-payment="goToPayment"
       />
@@ -101,6 +103,7 @@
     :lockedCycle="lockedCycle"
     :initialClientSecret="checkoutSessionClientSecret"
     :getStripeClientService="props.getStripeClientService"
+    :indented="showChangePlanDrawer"
     @submit="handlePlanInfoSubmit"
     @submitCycleChange="handleCycleUpgradeSubmit"
     @stale-session="handleStaleCheckoutSession"
@@ -140,6 +143,7 @@
   import { usePlans } from '@/composables/usePlans'
   import { usePlansList } from '@/composables/usePlansService'
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
+  import { useBillingPaymentMethods } from '@/composables/useBillingPaymentMethods'
   import { useServiceOrders } from '@/composables/useServiceOrders'
   import { useCheckoutSessionPreparer } from '@/composables/useCheckoutSessionPreparer'
   import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
@@ -320,6 +324,22 @@
     loaded: props.cardDefault?.loader,
     hasData: !!props.cardDefault?.cardData
   }))
+
+  const { defaultPaymentMethod } = useBillingPaymentMethods()
+
+  const formatBrandName = (brand) => {
+    if (!brand) return ''
+    return brand.charAt(0).toUpperCase() + brand.slice(1)
+  }
+
+  const paymentMethodLabel = computed(() => {
+    const method = defaultPaymentMethod.value
+    if (!method?.last4) return '--'
+    const brand = formatBrandName(method.brand)
+    return [brand, method.last4].filter(Boolean).join(' •••• ') || '--'
+  })
+
+  const paymentMethodBrandRaw = computed(() => defaultPaymentMethod.value?.brand ?? '')
 
   const subscriptionState = reactive({
     planTitle: computed(() => subscription.planTitle.value),
