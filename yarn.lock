@@ -80,15 +80,15 @@
   resolved "https://registry.yarnpkg.com/@aziontech/icons/-/icons-1.4.0.tgz#10b90da5545ee61a3d0f4688e25e6ea3cc936921"
   integrity sha512-V2AQJoY4iV6ZlrcKiCW9pyZeMJXou8cg2sqmsTn3KTH7G/cLiHD0QZG/y8md8rfSSSEvsBzR/82JM45+taaRIQ==
 
-"@aziontech/theme@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-2.0.2.tgz#339f59e4b3f46c11dcfc32b478ccc60e6f2800dc"
-  integrity sha512-3RkkIe0XxDjF3gs9RqK+cr+LIDAirNEoKKOnHJ7IZFmyeL36BXE2bEBmB4vMoE9pTUwnNgHpLXBYhaatVLUDSQ==
+"@aziontech/theme@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-2.0.3.tgz#6b8703b4eb042f597725396fbd1a0e93d0b6beee"
+  integrity sha512-fMwTtU5+VMO1PlqvCJGjzJ+QxWW/YabOgcQX1nuQYDb0SToXGOzs68yFpeDL/mTqqJhV3yQfNf/KhqbP+ez3qw==
 
-"@aziontech/webkit@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-3.0.1.tgz#9c8439c2ecce9089a5a4a383aa9e3797a96b05a5"
-  integrity sha512-7seXQtWGDgsd67H972dkCoLJ7ycLp8zsWdfEVAcslI3zjxm7r5BDadS6ro/gdJSDOwTqkkCL0HGe8SWUUjfsZg==
+"@aziontech/webkit@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-3.0.2.tgz#07f6e0dbce3ee1251d62d7beb98192384eaec747"
+  integrity sha512-qxWhBX1PzgBEgJ/dLFcBKg3iCZHWsproR6j2/iLz9tVAo1jlGXeVpdJQ2o6Bb02GyuwD8L5V8w475VdK/A7qxQ==
   dependencies:
     "@vueuse/core" "^10.11.1"
     clsx "^2.1.1"
