@@ -10,6 +10,7 @@
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import EditView from './EditView.vue'
   import OverviewTab from './Tabs/OverviewTab.vue'
+  import DeploymentsListSection from './Tabs/sections/DeploymentsListSection.vue'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
@@ -20,7 +21,7 @@
     updatedRedirect: { type: String, required: true }
   })
 
-  const TAB_ORDER = ['overview', 'main-settings']
+  const TAB_ORDER = ['overview', 'deployment', 'settings']
   const TAB_TO_INDEX = TAB_ORDER.reduce((acc, name, index) => {
     acc[name] = index
     return acc
@@ -143,11 +144,20 @@
           />
         </TabPanel>
         <TabPanel
-          header="Main Settings"
-          :pt="{ root: { 'data-testid': 'workload-tabs__tab__main-settings' } }"
+          header="Deployment"
+          :pt="{ root: { 'data-testid': 'workload-tabs__tab__deployment' } }"
+        >
+          <DeploymentsListSection
+            v-if="activeTab === TAB_TO_INDEX['deployment']"
+            :workloadId="workloadId"
+          />
+        </TabPanel>
+        <TabPanel
+          header="Settings"
+          :pt="{ root: { 'data-testid': 'workload-tabs__tab__settings' } }"
         >
           <EditView
-            v-if="activeTab === TAB_TO_INDEX['main-settings']"
+            v-if="activeTab === TAB_TO_INDEX['settings']"
             :updatedRedirect="props.updatedRedirect"
             :embeddedInTabs="true"
             @loaded-service-object="setWorkloadName"
