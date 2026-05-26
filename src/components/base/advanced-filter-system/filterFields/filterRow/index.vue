@@ -1,7 +1,10 @@
 <template>
   <div class="flex flex-col gap-3">
-    <!-- Filter Row Content -->
-    <div class="flex items-center gap-3 w-full">
+    <!-- Filter Row Content
+         Mobile (<640px): stacks vertically — each dropdown/input gets its
+         own row, action buttons wrap to a final row.
+         Tablet+: horizontal layout as designed. -->
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
       <Dropdown
         ref="fieldDropdownRef"
         id="filter-field"
@@ -25,9 +28,10 @@
         v-model="selectedOperator"
         :disabled="listOperatorsDisabled"
         :options="listOperators"
-        optionLabel="value"
+        optionLabel="label"
         optionValue="type"
         placeholder="Select an operator"
+        class="w-full sm:w-auto"
       />
 
       <component
@@ -39,8 +43,8 @@
         :disabled="!selectedField"
       />
 
-      <!-- Action Buttons -->
-      <div class="flex gap-1">
+      <!-- Action Buttons — wrap so they reflow on tight viewports -->
+      <div class="flex flex-wrap gap-1 sm:flex-shrink-0">
         <!-- Add OR Button -->
         <PrimeButton
           outlined
@@ -80,7 +84,7 @@
       <Dropdown
         v-model="selectedOperator"
         :options="listOperators"
-        optionLabel="value"
+        optionLabel="label"
         optionValue="type"
         placeholder="Select an operator"
         @change="showOperatorDropdown = false"
@@ -94,7 +98,7 @@
   import { computed, defineModel, ref, watch } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
-  import { FIELDS_MAPPING } from '@/components/base/filterFields/filterRow/component'
+  import { FIELDS_MAPPING, OPERATOR_MAPPING } from './component'
 
   defineOptions({ name: 'FilterRow' })
 
@@ -144,7 +148,11 @@
   })
 
   const listOperators = computed(() => {
-    return props.fields.find((field) => field.value === selectedField.value)?.operator || []
+    const raw = props.fields.find((field) => field.value === selectedField.value)?.operator || []
+    return raw.map((op) => ({
+      ...op,
+      label: OPERATOR_MAPPING[op.value]?.label || op.value
+    }))
   })
 
   const listOperatorsDisabled = computed(() => {

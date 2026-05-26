@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col w-full sm:w-full gap-2">
+  <div class="flex flex-col w-full min-w-0 gap-2">
     <MultiSelect
       v-model="selectedValue"
       :options="items"
@@ -8,7 +8,9 @@
       :loading="loading"
       :placeholder="placeholder"
       :disabled="disabled"
-      class="w-full md:w-14rem"
+      :maxSelectedLabels="2"
+      :selectedItemsLabel="`{0} items selected`"
+      class="rte-multiselect-lazy w-full min-w-0"
       display="chip"
     >
       <template #header>
@@ -35,7 +37,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, watch } from 'vue'
   import { watchDebounced } from '@vueuse/core'
   import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services'
   import * as yup from 'yup'
@@ -71,6 +73,8 @@
     }
   })
 
+  const emit = defineEmits(['update:value'])
+
   const PAGE_INCREMENT = 1
   const PAGE_SIZE = 100
   const INITIAL_PAGE = 1
@@ -86,6 +90,8 @@
   const { value: selectedValue, errorMessage } = useField('selectedValue', yup.array().min(1), {
     initialValue: props.value
   })
+
+  watch(selectedValue, (newValue) => emit('update:value', newValue))
 
   onMounted(async () => {
     await loadDomains()
@@ -170,3 +176,22 @@
     { debounce: SEARCH_DEBOUNCE, maxWait: SEARCH_MAX_WAIT }
   )
 </script>
+
+<style>
+  /* Trigger: prevent chips from forcing the row to grow. The label container
+     gets a max-height so the trigger stays single-row-tall; overflow scrolls
+     vertically when chips exceed the visible area (rare, since
+     maxSelectedLabels=2 collapses to "{N} items selected" first). */
+  .rte-multiselect-lazy .p-multiselect-label {
+    max-height: 2rem;
+    overflow-y: auto;
+    flex-wrap: wrap;
+  }
+
+  /* Teleported panel: PrimeVue sizes it to the trigger width by default.
+     With multiple chips that becomes huge and spills outside the modal.
+     Cap the panel so it never exceeds the viewport (minus 1rem on each side). */
+  .p-multiselect-panel {
+    max-width: calc(100vw - 2rem);
+  }
+</style>

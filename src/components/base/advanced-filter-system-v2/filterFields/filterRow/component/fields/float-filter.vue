@@ -2,6 +2,7 @@
   import InputNumber from '@aziontech/webkit/inputnumber'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
+  import { watch } from 'vue'
   defineOptions({ name: 'floatFilter' })
 
   const props = defineProps({
@@ -16,6 +17,8 @@
     }
   })
 
+  const emit = defineEmits(['update:value'])
+
   const {
     value: selectedValue,
     errorMessage,
@@ -27,6 +30,8 @@
   const handleChange = ({ value }) => {
     handleChangeNumber(value)
   }
+
+  watch(selectedValue, (newValue) => emit('update:value', newValue))
 </script>
 <template>
   <div class="w-full sm:w-1/2 sm:pr-6">

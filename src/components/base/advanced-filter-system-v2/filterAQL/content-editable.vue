@@ -86,11 +86,17 @@
 
 <style>
   .contenteditable {
-    white-space: pre-wrap;
+    /* `nowrap` keeps the query on a single line.
+       `overflow-x: hidden` clips long text that would otherwise visibly
+       extend past the input boundary and cover the gap/divider/actions
+       group on the right (default overflow-x is `visible`, which lets
+       overflowing inline content paint outside its own box). */
+    white-space: nowrap;
     font-family:
       ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
     min-height: 2.25rem;
     max-height: 6rem;
+    overflow-x: hidden;
     overflow-y: auto;
   }
 

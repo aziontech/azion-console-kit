@@ -1,21 +1,28 @@
 <template>
   <div>
     <PrimeButton
-      icon="pi pi-plus"
+      icon="pi pi-filter"
       outlined
       size="small"
       @click="toggleOverPanel"
     />
 
-    <!-- OverPanel -->
+    <!-- OverPanel — sized proportionally to the viewport so the modal
+         adapts to any resolution without hardcoded pixel breakpoints.
+         - max-h: 80vh (caps at 80% of viewport height — never overflows)
+         - h: auto (sizes to content — no forced fixed height)
+         - max-w: min(90vw, 56rem) (90% of viewport, capped at ~896px for
+           ergonomics on very wide screens) -->
     <OverlayPanel
       ref="overPanelRef"
       appendTo="body"
       aria-haspopup="true"
       aria-controls="overlay_panel"
-      class="max-h-[600px] h-[280px] max-w-[900px] overflow-y-auto"
+      class="overflow-y-auto"
       :pt="{
-        root: { class: 'p-0 max-sm:w-full max-w-[900px] ' },
+        root: {
+          class: 'p-0 w-[min(90vw,56rem)] max-h-[80vh]'
+        },
         content: { class: 'p-0' }
       }"
     >
@@ -60,6 +67,11 @@
   // Methods
   const toggleOverPanel = (event) => {
     overPanelRef.value.toggle(event)
+    // Drop focus from the trigger after click so the focus ring doesn't
+    // linger while the panel is open. Keyboard users navigating via Tab
+    // still get the focus ring via :focus-visible — this only suppresses
+    // the visual side-effect of mouse clicks.
+    event.currentTarget?.blur?.()
   }
 
   const onApplyFilter = (filterData) => {

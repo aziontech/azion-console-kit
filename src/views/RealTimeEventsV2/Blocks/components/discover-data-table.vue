@@ -77,7 +77,6 @@
     >
       <Column
         :style="{ width: '2.5rem', minWidth: '2.5rem', maxWidth: '2.5rem' }"
-        frozen
       >
         <template #body="{ data: rowData }">
           <i
@@ -95,7 +94,6 @@
         sortable
         sortField="ts"
         :style="{ width: '185px', minWidth: '185px', maxWidth: '185px' }"
-        frozen
       >
         <template #body="{ data: rowData }">
           <span
@@ -301,23 +299,6 @@
   :deep(.discover-data-table .p-button.p-button-text.p-button-icon-only),
   :deep(.discover-data-table .p-button.p-button-text) {
     border-radius: 4px !important;
-  }
-  /* Frozen columns: keep background consistent */
-  :deep(.discover-data-table .p-datatable-tbody > tr:nth-child(even) > td.p-frozen-column) {
-    background: var(--table-body-row-even-bg);
-  }
-  :deep(.discover-data-table .p-datatable-tbody > tr:nth-child(odd) > td.p-frozen-column) {
-    background: var(--surface-card);
-  }
-  :deep(.discover-data-table .p-datatable-tbody > tr:hover > td.p-frozen-column) {
-    background: var(--table-body-row-hover-bg) !important;
-  }
-  :deep(.discover-data-table .p-datatable-tbody > tr.row--active > td.p-frozen-column) {
-    background: color-mix(in srgb, var(--primary-color) 6%, transparent) !important;
-  }
-  :deep(.discover-data-table .p-datatable-thead > tr > th.p-frozen-column) {
-    background: var(--surface-ground);
-    z-index: 2;
   }
   /* Timestamp: no truncation */
   .timestamp-cell {

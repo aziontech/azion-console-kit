@@ -451,7 +451,7 @@
     v-if="isTabSelected"
     class="flex flex-col flex-1 min-h-0 gap-3"
     :class="{
-      'fixed inset-0 z-[100] bg-[var(--surface-ground)] p-2 overflow-auto': isFullscreen
+      'fixed inset-0 z-[100] bg-[var(--surface-ground)] p-2 overflow-auto tab-panel-root--fullscreen': isFullscreen
     }"
   >
     <!-- Filter bar -->
@@ -642,6 +642,18 @@
     border: none;
     border-radius: 0;
   }
+  /* Fullscreen root: respect iOS safe-area insets, fill the visible viewport,
+     and enable momentum scrolling on iOS Safari. */
+  .tab-panel-root--fullscreen {
+    /* Fallback for browsers without `dvh` support (pre-2022 iOS Safari). */
+    height: 100vh;
+    height: 100dvh;
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    padding-right: max(0.5rem, env(safe-area-inset-right));
+    -webkit-overflow-scrolling: touch;
+  }
   :deep(.discover-layout .panel-a) {
     background: var(--surface-ground);
   }
@@ -660,10 +672,11 @@
     border-radius: 0;
     margin-bottom: 0;
   }
-  @media (max-width: 768px) {
-    :deep(.resizable-splitter > .panel-a) {
-      display: none !important;
-    }
+  /* On narrow viewports the splitter HANDLE (drag bar) is hidden — touch users
+     can toggle the field sidebar via the "Fields" button in `discover-toolbar`
+     instead. The sidebar itself stays controllable by the JS `sidebarVisible`
+     state, so the user can opt-in to seeing fields on mobile if they want. */
+  @media (max-width: 639px) {
     :deep(.resizable-splitter > .handle) {
       display: none !important;
     }

@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref, onMounted } from 'vue'
+  import { computed, ref, onMounted, watch } from 'vue'
   import Select from '@aziontech/webkit/dropdown'
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
@@ -38,6 +38,8 @@
     }
   })
 
+  const emit = defineEmits(['update:value'])
+
   const valueOptions = ref([])
   const loading = ref(false)
   const toast = useToast()
@@ -48,6 +50,8 @@
       initialValue: props.value
     }
   )
+
+  watch(selectedValue, (newValue) => emit('update:value', newValue))
 
   const loadValue = computed({
     get: () => {

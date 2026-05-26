@@ -10,6 +10,9 @@
   import { createUtcDateFromUserTimezoneParts } from '@/helpers/convert-date'
   import { createRelativeRange } from '@utils/date.js'
   import { listTimezonesService } from '@/services/users-services'
+  import { useVisibility } from '@/views/RealTimeEventsV2/composables/useVisibility'
+  import { useBreakpoint } from '@/views/RealTimeEventsV2/composables/useBreakpoint'
+  import { convertUnitToMilliseconds } from '@/helpers'
 
   defineOptions({ name: 'advanced-filter-system' })
   const accountStore = useAccountStore()
@@ -47,6 +50,31 @@
   const hasPendingQueryUpdate = ref(false)
   const hasAqlValidationError = ref(false)
   const aqlRef = ref(null)
+
+  const { isHidden, onVisible } = useVisibility()
+  const bp = useBreakpoint()
+  const isMobileViewport = computed(() => bp.is('mobile-s').value || bp.is('mobile').value)
+  const refreshLabel = computed(() => (isMobileViewport.value ? null : 'Refresh'))
+  const updateLabel = computed(() => (isMobileViewport.value ? null : 'Update'))
+  const dataTimeRangeRef = ref(null)
+
+  let lastTickAt = 0
+
+  const getAutoRefreshIntervalMs = () => {
+    const cfg = filterDataRange.value?.autoRefresh
+    if (!cfg?.enabled) return null
+    const every = Number(cfg.every)
+    if (!Number.isFinite(every) || every < 1) return null
+    const unit = String(cfg.unit || '').toLowerCase().trim()
+    return convertUnitToMilliseconds(unit, every)
+  }
+
+  const isAqlInputFocused = () => {
+    if (typeof document === 'undefined') return false
+    const active = document.activeElement
+    if (!active || typeof active.closest !== 'function') return false
+    return Boolean(active.closest('[data-testid="azion-query-language-input"]'))
+  }
 
   const isInvalidRange = computed(() => {
     const start = filterDataRange.value?.startDate
@@ -191,10 +219,31 @@
   }
 
   const onAutoRefreshTick = () => {
+    // Pause auto-refresh while the tab is hidden — the catch-up fires
+    // from `onVisible` registered below.
+    if (isHidden.value) return
+    // Focus guard: don't blow away the user's input while they type AQL.
+    if (isAqlInputFocused()) return
     if (hasPendingDateUpdate.value) return
     updatedTime()
     emitUpdatedFilter()
+    lastTickAt = Date.now()
   }
+
+  onVisible(() => {
+    const intervalMs = getAutoRefreshIntervalMs()
+    if (!intervalMs) return
+    if (Date.now() - lastTickAt > intervalMs) {
+      onAutoRefreshTick()
+    }
+  })
+
+  watch(
+    () => bp.current.value,
+    () => {
+      dataTimeRangeRef.value?.closeOverlay?.()
+    }
+  )
 
   const onAqlDirtyChange = (isDirty) => {
     hasPendingQueryUpdate.value = Boolean(isDirty)
@@ -346,6 +395,7 @@
         </div>
         <div class="afs-filter-row__actions">
           <DataTimeRange
+            ref="dataTimeRangeRef"
             v-model="filterDataRange"
             :maxDays="props.filterDateRangeMaxDays"
             :defaultUtcOffset="userUTC"
@@ -359,8 +409,10 @@
             icon="pi pi-refresh"
             outlined
             size="small"
-            label="Refresh"
+            :label="refreshLabel"
             class="flex-shrink-0"
+            aria-label="Refresh events"
+            data-testid="rte-refresh-button"
             :disabled="isInvalidRange || hasAqlValidationError"
             @click="applyFilters"
           />
@@ -369,7 +421,8 @@
             icon="pi pi-arrow-circle-right"
             severity="secondary"
             size="small"
-            label="Update"
+            :label="updateLabel"
+            aria-label="Update events"
             :disabled="isInvalidRange || hasAqlValidationError"
             class="flex-shrink-0"
             @click="applyFilters"
@@ -394,7 +447,7 @@
   .afs-filter-row {
     display: flex;
     flex-wrap: nowrap;
-    gap: 0.5rem;
+    gap: 1.25rem;
     width: 100%;
     align-items: center;
   }
@@ -407,11 +460,66 @@
     min-width: 0;
   }
 
+  /* Actions group (DataTimeRange + Refresh) is clearly detached from the
+     AQL input via a wider gap (1.25rem) + a vertical separator to its
+     left. Without these, the dark backgrounds of the input and the
+     time-range control merge into one continuous strip and the user
+     can't tell where filtering ends and time/refresh controls begin. */
   .afs-filter-row__actions {
     display: flex;
     gap: 0.5rem;
     align-items: center;
     flex-shrink: 0;
+    padding-left: 1rem;
+    border-left: 1px solid var(--surface-border);
+    margin-left: 0.25rem;
+  }
+
+  /* Tablet + mobile (< 1024px): the actions group (time range + refresh)
+     drops to row 2 of the AdvancedFilterSystem so the AQL input gets full
+     width on row 1. Date + Refresh stay LEFT-aligned across both
+     breakpoints (per UX request — easier scan + thumb reach). */
+  @media (max-width: 1023px) {
+    .afs-filter-row {
+      flex-wrap: wrap;
+    }
+    .afs-filter-row__query {
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+    .afs-filter-row__actions {
+      flex: 0 0 auto;
+      width: 100%;
+      justify-content: flex-start;
+      align-items: center;
+      max-width: 100%;
+      overflow: hidden;
+      /* Keep border-left + padding-left at all viewports: when the actions
+         row stays on the same line as the query (no actual wrap), the
+         divider is the only visual separation between them. Suppressing it
+         here was making the AQL input visually merge with the date picker
+         whenever the actions did NOT wrap to row 2. */
+    }
+    .afs-filter-row__actions > * {
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    /* Height baseline unified at 2rem across DataTimeRange + Refresh so the
+     wrapped row reads as a single visual band. */
+    :deep(.afs-filter-row__actions .p-inputgroup),
+    :deep(.afs-filter-row__actions .p-inputgroup > *),
+    :deep(.afs-filter-row__actions .p-inputgroup .p-inputtext) {
+      height: 2rem !important;
+      min-height: 2rem !important;
+      max-height: 2rem !important;
+      box-sizing: border-box;
+    }
+    :deep(.afs-filter-row__actions .p-button) {
+      height: 2rem !important;
+      min-height: 2rem !important;
+      max-height: 2rem !important;
+    }
   }
 
   /* ── Uniform 2rem height for ALL filterbar elements ── */
@@ -490,6 +598,26 @@
 
     .afs-filter-row__actions {
       width: 100%;
+    }
+  }
+</style>
+
+<!--
+  Global (unscoped) constraints for the time-range OverlayPanel on
+  mobile. PrimeVue teleports the panel to <body>, so scoped styles
+  cannot reach it. The constraints keep the panel within the viewport
+  and ensure its contents scroll instead of overflowing.
+-->
+<style>
+  @media (max-width: 640px) {
+    .p-overlaypanel {
+      max-width: calc(100vw - 1rem) !important;
+      max-height: calc(100dvh - 4rem) !important;
+      overflow: auto;
+    }
+    .p-overlaypanel .p-overlaypanel-content {
+      max-height: calc(100dvh - 5rem);
+      overflow: auto;
     }
   }
 </style>

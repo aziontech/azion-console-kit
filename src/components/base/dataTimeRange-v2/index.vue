@@ -365,4 +365,6 @@
     hasInitializedUtcOffset.value = true
     await fetchTimezones()
   })
+
+  defineExpose({ closeOverlay })
 </script>

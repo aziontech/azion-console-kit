@@ -901,9 +901,14 @@ export default class Aql {
         return `<span style="color: var(--series-six-color);">${part.trim()}</span>`
       } else {
         return part.replace(
-          /((?:"[^"]+"|\S+))(\s*)(<=|>=|<>|=|<|>|like|ilike|between|\bin\b)/gi,
-          (match, field, space, operator) => {
-            return `<span style="color: var(--series-three-color);">${field}</span> <span style="color: var(--series-two-color);">${operator}</span>`
+          /((?:"[^"]+"|\S+))\s*(<=|>=|<>|=|<|>|like|ilike|between|\bin\b)\s*/gi,
+          (match, field, operator) => {
+            // Use non-breaking spaces around the operator: the browser
+            // collapses regular whitespace at the inline boundary of two
+            // adjacent spans (rendering "domain in (..." as "domainin(...")
+            // and `white-space: nowrap` does not change that behavior.
+            // `&nbsp;` is preserved literally and is visually identical.
+            return `<span style="color: var(--series-three-color);">${field}</span>&nbsp;<span style="color: var(--series-two-color);">${operator}</span>&nbsp;`
           }
         )
       }
