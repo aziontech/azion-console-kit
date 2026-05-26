@@ -13,7 +13,6 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
-  import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
 
   const route = useRoute()
   const router = useRouter()
@@ -21,14 +20,6 @@
   const emit = defineEmits(['loadCard', 'openDrawerAddCredit', 'openDrawerAddPaymentMethod'])
 
   const { accountIsNotRegular } = storeToRefs(accountStore)
-
-  const subscription = useCurrentSubscription()
-  const isRefreshing = ref(false)
-  const loadingLastUpdated = computed(() => subscription.isLoading.value || isRefreshing.value)
-  const invoiceLastUpdated = computed(() => {
-    const value = subscription.lastUpdate.value
-    return value ? `Last Update: ${value}` : 'Last Update: --'
-  })
 
   const activeTab = ref(0)
 
@@ -50,6 +41,9 @@
     loadInvoiceLastUpdatedService: { type: Function, required: true },
     cardDefault: { type: Object, required: true }
   })
+
+  const invoiceLastUpdated = ref('')
+  const loadingLastUpdated = ref(false)
 
   const TABS_MAP = {
     bills: 0,
@@ -92,22 +86,23 @@
     changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
   }
 
+  const loadInvoiceLastUpdated = async () => {
+    try {
+      loadingLastUpdated.value = true
+      invoiceLastUpdated.value = accountIsNotRegular.value
+        ? await props.loadInvoiceLastUpdatedService()
+        : ''
+    } finally {
+      loadingLastUpdated.value = false
+    }
+  }
+
   const callBackDrawer = async () => {
     if (paymentListViewRef.value) {
       await paymentListViewRef.value.reloadList()
     }
     if (viewBillsRef.value) {
       await viewBillsRef.value.reloadList()
-    }
-  }
-
-  const handleRefresh = async () => {
-    if (isRefreshing.value) return
-    isRefreshing.value = true
-    try {
-      await Promise.allSettled([subscription.refetch(), callBackDrawer()])
-    } finally {
-      isRefreshing.value = false
     }
   }
 
@@ -134,6 +129,7 @@
 
   onMounted(() => {
     renderTabCurrentRouter()
+    loadInvoiceLastUpdated()
   })
 </script>
 <template>
@@ -148,20 +144,13 @@
           <SkeletonBlock
             width="10rem"
             :isLoaded="!loadingLastUpdated"
+            v-if="invoiceLastUpdated"
           >
-            <button
-              type="button"
-              :disabled="isRefreshing"
-              class="bg-transparent border-0 p-0 cursor-pointer"
-              :class="{ 'opacity-60 cursor-not-allowed': isRefreshing }"
-              @click="handleRefresh"
-            >
-              <Tag
-                severity="secondary"
-                :icon="isRefreshing ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'"
-                :value="invoiceLastUpdated"
-              />
-            </button>
+            <Tag
+              severity="info"
+              icon="pi pi-refresh"
+              :value="invoiceLastUpdated"
+            />
           </SkeletonBlock>
         </template>
       </PageHeadingBlock>

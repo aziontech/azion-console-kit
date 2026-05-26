@@ -29,10 +29,15 @@ export const signupRoutes = {
       path: 'additional-data',
       name: 'additional-data',
       component: () => import('@views/Signup/AdditionalDataView.vue'),
+      props: {
+        postAdditionalDataService: SignupService.postAdditionalDataService,
+        patchFullnameService: SignupService.patchFullnameService,
+        updateAccountInfoService: SignupService.updateAccountInfoService
+      },
       meta: {
         hideNavigation: true
       },
-      beforeEnter: (to, from, next) => {
+      beforeEnter: (__, ___, next) => {
         const accountStore = useAccountStore()
 
         if (accountStore.hasActiveUserId && accountStore.needsOnboarding) {
