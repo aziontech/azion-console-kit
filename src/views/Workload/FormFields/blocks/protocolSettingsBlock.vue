@@ -43,6 +43,27 @@
 
   const { errorMessage: quicPortError, value: quicPortValue } = useField('protocols.http.quicPorts')
 
+  const mergePortOptions = (baseOptions, currentValue) => {
+    const merged = [...baseOptions]
+    const values = Array.isArray(currentValue) ? currentValue : []
+    values.forEach((item) => {
+      if (item && !merged.some((option) => option.value === item.value)) {
+        merged.push(item)
+      }
+    })
+    return merged
+  }
+
+  const httpPortOptions = computed(() =>
+    mergePortOptions(HTTP_PORT_LIST_OPTIONS, httpPortValue.value)
+  )
+  const httpsPortOptions = computed(() =>
+    mergePortOptions(HTTPS_PORT_LIST_OPTIONS, httpsPortValue.value)
+  )
+  const http3PortOptions = computed(() =>
+    mergePortOptions(HTTP3_PORT_LIST_OPTIONS, quicPortValue.value)
+  )
+
   const openDigitalCertificateDrawer = (type = 'edge_certificate') => {
     digitalCertificateDrawerRef.value.changeCertificateType(type)
     digitalCertificateDrawerRef.value.openCreateDrawer()
@@ -161,7 +182,7 @@
           />
           <span class="p-input-icon-right">
             <MultiSelect
-              :options="HTTP_PORT_LIST_OPTIONS"
+              :options="httpPortOptions"
               v-model="httpPortValue"
               name="protocols.http.httpPorts"
               filter
@@ -254,7 +275,7 @@
               data-testid="form-horizontal-delivery-settings-https-ports-lock-icon"
             />
             <MultiSelect
-              :options="HTTPS_PORT_LIST_OPTIONS"
+              :options="httpsPortOptions"
               v-model="httpsPortValue"
               name="protocols.http.httpsPorts"
               filter
@@ -341,7 +362,7 @@
               data-testid="form-horizontal-delivery-settings-https-ports-lock-icon"
             />
             <MultiSelect
-              :options="HTTP3_PORT_LIST_OPTIONS"
+              :options="http3PortOptions"
               v-model="quicPortValue"
               name="protocols.http.quicPorts"
               filter
