@@ -9,20 +9,57 @@
     </template>
 
     <div class="flex flex-col gap-8 px-8 pb-8">
-      <div class="flex justify-center">
+      <div
+        v-if="showCycleToggle"
+        class="flex justify-center"
+      >
         <SegmentedButton
-          v-model:value="cycle"
-          :items="cycleOptions"
+          v-model="cycle"
+          :options="cycleOptions"
         />
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <PlanComparisonCard
+        <CardPricing
           v-for="card in planCards"
           :key="card.key"
-          v-bind="card.props"
-          @action="card.onAction"
-        />
+          :planTitle="card.planTitle"
+          :description="card.description"
+          :pricingDetails="card.pricingDetails"
+          :showTag="card.showTag"
+          :tagLabel="card.tagLabel"
+          :value="card.value"
+          :prefix="card.prefix"
+          :suffix="card.suffix"
+          :showPrefix="card.showPrefix"
+          :showSuffix="card.showSuffix"
+          slotPosition="bottom"
+        >
+          <template #actions>
+            <ActionButton
+              :label="card.buttonLabel"
+              :kind="card.buttonKind"
+              size="large"
+              :disabled="card.buttonDisabled"
+              class="w-full"
+              @click="card.onAction"
+            />
+          </template>
+
+          <ul class="flex flex-col gap-2">
+            <li
+              v-for="feature in card.features"
+              :key="feature.title"
+              class="flex items-center gap-2 text-sm text-color"
+            >
+              <i
+                v-if="feature.icon"
+                :class="[feature.icon, 'text-color-secondary text-sm']"
+              />
+              <span>{{ feature.title }}</span>
+            </li>
+          </ul>
+        </CardPricing>
       </div>
     </div>
   </Sidebar>
@@ -32,7 +69,8 @@
   import { computed, ref, watch } from 'vue'
   import Sidebar from '@aziontech/webkit/sidebar'
   import SegmentedButton from '@aziontech/webkit/segmented-button'
-  import PlanComparisonCard from './blocks/PlanComparisonCard.vue'
+  import CardPricing from '@aziontech/webkit/content/card-pricing'
+  import ActionButton from '@aziontech/webkit/actions/button'
   import { getComparisonInfo } from '@/views/Billing/plan-comparison-features'
   import { getPlanPricing } from '@/composables/usePlansService'
 
@@ -53,14 +91,24 @@
     'select-cycle-change'
   ])
 
-  const cycle = ref(props.currentCycle === 'yearly' ? 'yearly' : 'monthly')
+  const isCurrentPro = computed(() => props.currentPlan === 'pro')
+  const isCurrentHobby = computed(() => props.currentPlan === 'hobby')
+
+  const resolveInitialCycle = () => {
+    if (isCurrentPro.value) return 'yearly'
+    return props.currentCycle === 'yearly' ? 'yearly' : 'monthly'
+  }
+
+  const cycle = ref(resolveInitialCycle())
 
   watch(
-    () => props.currentCycle,
-    (next) => {
-      cycle.value = next === 'yearly' ? 'yearly' : 'monthly'
+    () => [props.currentCycle, props.currentPlan],
+    () => {
+      cycle.value = resolveInitialCycle()
     }
   )
+
+  const showCycleToggle = computed(() => !isCurrentPro.value)
 
   const cycleOptions = [
     { label: 'Monthly', value: 'monthly' },
@@ -74,13 +122,32 @@
 
   const proPricing = computed(() => getPlanPricing(props.plans, 'pro'))
 
-  const proPrice = computed(() => {
-    const value = cycle.value === 'yearly' ? proPricing.value.yearly : proPricing.value.monthly
-    return value ? `$ ${Number(value).toFixed(0)}` : '$ 0'
+  const proMonthlyPrice = computed(() => proPricing.value.monthly || 0)
+  const proYearlyMonthlyEquivalent = computed(() =>
+    proPricing.value.yearly ? proPricing.value.yearly / 12 : 0
+  )
+
+  const proYearlyDiscountPct = computed(() => {
+    if (!proMonthlyPrice.value || !proYearlyMonthlyEquivalent.value) return 0
+    const pct = Math.round(
+      ((proMonthlyPrice.value - proYearlyMonthlyEquivalent.value) / proMonthlyPrice.value) * 100
+    )
+    return pct > 0 ? pct : 0
   })
 
-  const isCurrentHobby = computed(() => props.currentPlan === 'hobby')
-  const isCurrentPro = computed(() => props.currentPlan === 'pro')
+  const proPriceValue = computed(() => {
+    const value =
+      cycle.value === 'yearly' ? proYearlyMonthlyEquivalent.value : proMonthlyPrice.value
+    return value ? String(Math.round(value)) : '0'
+  })
+
+  const proPricingDetails = computed(() => {
+    if (cycle.value === 'yearly' && proYearlyDiscountPct.value > 0) {
+      return `Billed annually (save ${proYearlyDiscountPct.value}%)`
+    }
+    if (cycle.value === 'yearly') return 'Billed annually'
+    return 'Billed monthly'
+  })
 
   const proCycleSwapLabel = computed(() => {
     if (!isCurrentPro.value) return 'Upgrade'
@@ -95,35 +162,38 @@
     return [
       {
         key: 'hobby',
-        props: {
-          name: hobby.label,
-          tagline: hobby.tagline,
-          price: 'Free',
-          priceUnit: '',
-          billingLine: hobby.description,
-          sectionTitle: hobby.sectionTitle,
-          features: hobby.features,
-          buttonLabel: isCurrentHobby.value ? 'Actual plan' : 'Downgrade',
-          buttonOutlined: true,
-          buttonDisabled: isCurrentHobby.value
-        },
+        planTitle: hobby.label,
+        description: hobby.tagline,
+        pricingDetails: hobby.description,
+        showTag: false,
+        tagLabel: '',
+        value: '0',
+        prefix: '$',
+        suffix: 'forever',
+        showPrefix: false,
+        showSuffix: true,
+        features: hobby.features,
+        buttonLabel: isCurrentHobby.value ? 'Actual plan' : 'Downgrade',
+        buttonKind: 'outlined',
+        buttonDisabled: isCurrentHobby.value,
         onAction: () => emit('select-downgrade-hobby')
       },
       {
         key: 'pro',
-        props: {
-          name: pro.label,
-          chipLabel: isCurrentPro.value ? 'Current plan' : 'Recommended',
-          chipVariant: isCurrentPro.value ? 'current' : 'recommended',
-          tagline: pro.tagline,
-          price: proPrice.value,
-          priceUnit: 'per month',
-          billingLine: pro.description,
-          sectionTitle: pro.sectionTitle,
-          features: pro.features,
-          buttonLabel: isCurrentPro.value ? proCycleSwapLabel.value : 'Upgrade',
-          highlighted: !isCurrentPro.value
-        },
+        planTitle: pro.label,
+        description: pro.tagline,
+        pricingDetails: proPricingDetails.value,
+        showTag: true,
+        tagLabel: isCurrentPro.value ? 'Current plan' : 'Recommended',
+        value: proPriceValue.value,
+        prefix: '$',
+        suffix: 'per month',
+        showPrefix: true,
+        showSuffix: true,
+        features: pro.features,
+        buttonLabel: isCurrentPro.value ? proCycleSwapLabel.value : 'Upgrade',
+        buttonKind: 'primary',
+        buttonDisabled: false,
         onAction: () => {
           if (isCurrentPro.value) {
             emit('select-cycle-change', cycle.value === 'monthly' ? 'yearly' : 'monthly')
@@ -134,16 +204,20 @@
       },
       {
         key: 'enterprise',
-        props: {
-          name: enterprise.label,
-          tagline: enterprise.tagline,
-          price: 'Custom',
-          billingLine: enterprise.description,
-          sectionTitle: enterprise.sectionTitle,
-          features: enterprise.features,
-          buttonLabel: 'Contact Sales',
-          buttonOutlined: true
-        },
+        planTitle: enterprise.label,
+        description: enterprise.tagline,
+        pricingDetails: enterprise.description,
+        showTag: false,
+        tagLabel: '',
+        value: 'Custom',
+        prefix: '',
+        suffix: '',
+        showPrefix: false,
+        showSuffix: false,
+        features: enterprise.features,
+        buttonLabel: 'Contact Sales',
+        buttonKind: 'outlined',
+        buttonDisabled: false,
         onAction: () => {
           window.open(props.contactSalesUrl, '_blank')
         }

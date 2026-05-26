@@ -72,17 +72,6 @@
           @input="address = $event"
         />
       </div>
-
-      <div class="flex w-full min-w-0 flex-col gap-2">
-        <FieldInput
-          name="complement"
-          label="Apartment, floor, etc."
-          :value="complement"
-          placeholder="1st floor"
-          class="w-full"
-          @input="complement = $event"
-        />
-      </div>
     </div>
   </div>
 </template>
@@ -123,8 +112,7 @@
     country: yup.string().required().label('Country'),
     region: yup.string().required().label('State/Region'),
     city: yup.string().required().label('City'),
-    address: yup.string().required().label('Address'),
-    complement: yup.string()
+    address: yup.string().required().label('Address')
   })
 
   const { validate, resetForm } = useForm({
@@ -134,8 +122,7 @@
       country: '',
       region: '',
       city: '',
-      address: '',
-      complement: ''
+      address: ''
     }
   })
 
@@ -144,7 +131,6 @@
   const { value: region } = useField('region')
   const { value: city } = useField('city')
   const { value: address } = useField('address')
-  const { value: complement } = useField('complement')
 
   const countriesOptions = ref({ options: [], done: true })
   const regionsOptions = ref({ options: [], done: true })
@@ -189,8 +175,7 @@
       country: initialAddress.country || '',
       region: initialAddress.region || '',
       city: initialAddress.city || '',
-      address: initialAddress.address || '',
-      complement: initialAddress.complement || ''
+      address: initialAddress.address || ''
     }
 
     const hasAddressInfo = Object.values(rawValues).some((value) => !!value)
@@ -364,8 +349,7 @@
             country: '',
             region: '',
             city: '',
-            address: '',
-            complement: ''
+            address: ''
           }
         })
         regionsOptions.value.options = []
@@ -386,8 +370,7 @@
       country: country.value,
       region: region.value,
       city: city.value,
-      address: address.value,
-      complement: complement.value
+      address: address.value
     }
 
     await updateAddressService(payload)

@@ -424,7 +424,6 @@
     }
 
     hydrateAdditionalDataForm({
-      usageIntent,
       role,
       companySize,
       companyWebsite,
@@ -435,13 +434,10 @@
     await nextTick()
     skipInitialExpandAnimation.value = false
 
-    // Pre-fill role from accountStore
-    const jobRole = accountStore.account?.jobRole
-    if (jobRole && !role.value) {
-      const roleTitle = jobRoleKebabToTitle(jobRole)
-      if (roleTitle) {
-        role.value = roleTitle
-      }
+    if (!role.value || role.value === 'Other') {
+      const jobRole = accountStore.account?.jobRole
+      const roleTitle = jobRole ? jobRoleKebabToTitle(jobRole) : null
+      role.value = roleTitle && roleTitle !== 'Other' ? roleTitle : 'Software Developer'
     }
   })
 
@@ -469,14 +465,25 @@
     setAdditionalDataField('termsAccepted', value)
   })
 
+  const capitalizeName = (name) =>
+    String(name || '')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
+
   watch(
     () => [
       accountStore.accountData?.first_name ?? accountStore.accountData?.firstName,
       accountStore.accountData?.last_name ?? accountStore.accountData?.lastName
     ],
     ([firstName, lastName]) => {
-      if (!fullName.value && (firstName || lastName)) {
-        fullName.value = `${firstName || ''} ${lastName || ''}`.trim()
+      if (fullName.value) return
+      const first = capitalizeName(firstName)
+      const last = capitalizeName(lastName)
+      if (first && last) {
+        fullName.value = `${first} ${last}`
       }
     },
     { immediate: true }

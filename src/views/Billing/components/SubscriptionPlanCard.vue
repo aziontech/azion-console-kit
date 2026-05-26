@@ -4,10 +4,10 @@
     class="w-full min-[1100px]:w-1/2"
   >
     <template #header-action>
-      <PrimeButton
-        outlined
+      <ActionButton
         label="Change Plan"
-        class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
+        kind="secondary"
+        size="small"
         @click="emit('change-plan')"
       />
     </template>
@@ -95,8 +95,8 @@
 
 <script setup>
   import { computed } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
-  import CardBox from '@aziontech/webkit/card-box'
+  import ActionButton from '@aziontech/webkit/actions/button'
+  import CardBox from '@aziontech/webkit/content/card-box'
   import SkeletonBlock from '@/templates/skeleton-block'
   import SubscriptionPlanRow from './SubscriptionPlanRow.vue'
 

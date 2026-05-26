@@ -90,7 +90,7 @@ export const useAccountStore = defineStore({
       return state.account?.hasAccountPlan !== false
     },
     needsOnboarding(state) {
-      return state.account?.first_login === true && state.account?.hasAccountPlan === false
+      return state.account?.hasAccountPlan === false
     },
     accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'

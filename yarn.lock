@@ -80,19 +80,20 @@
   resolved "https://registry.yarnpkg.com/@aziontech/icons/-/icons-1.4.0.tgz#10b90da5545ee61a3d0f4688e25e6ea3cc936921"
   integrity sha512-V2AQJoY4iV6ZlrcKiCW9pyZeMJXou8cg2sqmsTn3KTH7G/cLiHD0QZG/y8md8rfSSSEvsBzR/82JM45+taaRIQ==
 
-"@aziontech/theme@^1.12.0":
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-1.13.0.tgz#1fbbc9a5d13091222035cfa3d28263b21d58e9e9"
-  integrity sha512-7dQiIizv2fAh/6XZ75RBU3agCf+NTgsE193V7r/R6ddAI39ITgwdZ7J93uOIVS6XMQteQ1l6k5upRFnmCk7DkA==
+"@aziontech/theme@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@aziontech/theme/-/theme-2.0.2.tgz#339f59e4b3f46c11dcfc32b478ccc60e6f2800dc"
+  integrity sha512-3RkkIe0XxDjF3gs9RqK+cr+LIDAirNEoKKOnHJ7IZFmyeL36BXE2bEBmB4vMoE9pTUwnNgHpLXBYhaatVLUDSQ==
 
-"@aziontech/webkit@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-3.0.0.tgz#26ce84226a0f1c0477b8daeee4a16bb7f02f5106"
-  integrity sha512-5gkz62w6eAMWL81XH0D7mDbqevW/OhjrEueqtgnOTXaJ/2EltN0/Emz6kS16Ee2MMVQmKy9U9oHiV/Na3C4dBQ==
+"@aziontech/webkit@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-3.0.1.tgz#9c8439c2ecce9089a5a4a383aa9e3797a96b05a5"
+  integrity sha512-7seXQtWGDgsd67H972dkCoLJ7ycLp8zsWdfEVAcslI3zjxm7r5BDadS6ro/gdJSDOwTqkkCL0HGe8SWUUjfsZg==
   dependencies:
     "@vueuse/core" "^10.11.1"
-    motion-v "^2.1.0"
+    clsx "^2.1.1"
     primevue "3.35.0"
+    tailwind-merge "^3.6.0"
     vee-validate "^4.15.1"
     vue-tsc "^3.2.5"
 
@@ -3759,6 +3760,11 @@ cliui@^8.0.1:
     strip-ansi "^6.0.1"
     wrap-ansi "^7.0.0"
 
+clsx@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/clsx/-/clsx-2.1.1.tgz#eed397c9fd8bd882bfb18deab7102049a2f32999"
+  integrity sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==
+
 color-convert@2.0.1, color-convert@^1.9.3, color-convert@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-2.0.1.tgz#72d3a68d598c9bdb3af2ad1e84f21d896abd4de3"
@@ -5249,7 +5255,7 @@ fraction.js@^5.2.1, fraction.js@^5.3.4:
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-5.3.4.tgz#8c0fcc6a9908262df4ed197427bdeef563e0699a"
   integrity sha512-1X1NTtiJphryn/uLQz3whtY6jK3fTqoE3ohKs0tT+Ujr1W59oopxmoEh7Lu5p6vBaPbgoM0bzveAW4Qi5RyWDQ==
 
-framer-motion@^12.25.0, framer-motion@^12.38.0:
+framer-motion@^12.25.0:
   version "12.38.0"
   resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-12.38.0.tgz#cf28e072a95942881ca4e33fd33be41192fd146b"
   integrity sha512-rFYkY/pigbcswl1XQSb7q424kSTQ8q6eAC+YUsSKooHQYuLdzdHjrt6uxUC+PRAO++q5IS7+TamgIw1AphxR+g==
@@ -6809,16 +6815,6 @@ motion-v@^1.10.2:
     framer-motion "^12.25.0"
     hey-listen "^1.0.8"
     motion-dom "^12.23.23"
-
-motion-v@^2.1.0:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/motion-v/-/motion-v-2.2.1.tgz#62a61eec3c924625f48a6b2de6eb10f081be03cf"
-  integrity sha512-BYbABe1Ep/u33dHOrK+8SoVU2MuiQqT94JOYsgrge8QbrwkKf2lS6rHW2QyzP6t89wcyBvzZeLQQwfrx76dj9A==
-  dependencies:
-    framer-motion "^12.38.0"
-    hey-listen "^1.0.8"
-    motion-dom "^12.38.0"
-    motion-utils "^12.36.0"
 
 mrmime@^2.0.0:
   version "2.0.1"
@@ -8592,6 +8588,11 @@ synckit@^0.11.12:
   integrity sha512-Bh7QjT8/SuKUIfObSXNHNSK6WHo6J1tHCqJsuaFDP7gP0fkzSfTxI8y85JrppZ0h8l0maIgc2tfuZQ6/t3GtnQ==
   dependencies:
     "@pkgr/core" "^0.2.9"
+
+tailwind-merge@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/tailwind-merge/-/tailwind-merge-3.6.0.tgz#88d83242d1dd7bc847223f73dcf210dd1f2ee11c"
+  integrity sha512-uxL7qAVQriqRQPAyK3pj66VqskWqoZ37PW94jwOTwNfq/z9oyu1V+eqrZqtR2+fCiXdYOZe/Modt8GtvqNzu+w==
 
 tailwindcss@^3.3.3:
   version "3.4.19"

@@ -1,6 +1,8 @@
 <template>
   <div class="border border-[var(--surface-border)] rounded-md">
-    <div class="flex items-center justify-between px-6 py-3 border-b border-[var(--surface-border)]">
+    <div
+      class="flex items-center justify-between px-6 py-3 border-b border-[var(--surface-border)]"
+    >
       <span class="text-lg font-semibold text-color">Payment Method</span>
     </div>
     <div class="flex flex-col gap-3 px-6 py-4">
@@ -19,10 +21,10 @@
             >
           </div>
         </div>
-        <PrimeButton
-          link
+        <ActionButton
+          kind="text"
+          size="small"
           label="Use another payment method"
-          class="text-xs font-protomono p-0"
           @click="$emit('swap')"
         />
       </div>
@@ -32,7 +34,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
   import CardFlagBlock from '@/templates/card-flag-block'
 
   defineOptions({ name: 'payment-method-summary' })

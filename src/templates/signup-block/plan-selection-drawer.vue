@@ -35,35 +35,51 @@
           :key="planOption.value"
           class="flex flex-col gap-3 h-fit w-full"
         >
-          <PricingCard
-            :title="planOption.label"
-            :subtitle="planOption.description"
-            :features="planOption.features"
-            :monthlyPrice="getMonthlyPrice(planOption.value)"
-            :annualPrice="getAnnualPrice(planOption.value)"
-            :currentPeriod="localBillingCycle === 'yearly' ? 'annual' : 'monthly'"
-            :priceLabel="getPriceLabel(planOption.value)"
-            :popular="Boolean(planOption.tagLabel)"
-            :popularText="planOption.tagLabel || 'Popular'"
-            :customPrice="getCustomPrice(planOption.value)"
+          <CardPricing
+            :planTitle="planOption.label"
+            :description="planOption.description"
+            :pricingDetails="getPricingDetails(planOption.value)"
+            :showTag="Boolean(planOption.tagLabel)"
+            :tagLabel="planOption.tagLabel || 'Popular'"
+            :value="getCardValue(planOption.value)"
+            :prefix="getCardPrefix(planOption.value)"
+            :suffix="getCardSuffix(planOption.value)"
+            :showPrefix="planOption.value !== 'enterprise'"
+            :showSuffix="planOption.value !== 'enterprise'"
+            slotPosition="bottom"
           >
-            <template #button>
-              <Button
-                severity="secondary"
-                class="h-[42px] font-proto-mono text-sm tracking-[-0.14px]"
+            <template #actions>
+              <ActionButton
                 :label="planOption.buttonLabel"
+                :kind="
+                  isCurrentPlanSelection(planOption.value) ||
+                  planOption.value.toLowerCase() === 'enterprise'
+                    ? 'outlined'
+                    : 'secondary'
+                "
+                size="large"
                 icon="pi pi-chevron-right"
                 :loading="isLoadingPlan(planOption.value)"
                 :disabled="isCurrentPlanSelection(planOption.value) || Boolean(props.loadingPlan)"
-                iconPos="left"
-                :outlined="
-                  isCurrentPlanSelection(planOption.value) ||
-                  planOption.value.toLowerCase() === 'enterprise'
-                "
+                class="w-full"
                 @click="handleChoosePlan(planOption.value)"
               />
             </template>
-          </PricingCard>
+
+            <ul class="flex flex-col gap-2">
+              <li
+                v-for="feature in planOption.features"
+                :key="feature.label"
+                class="flex items-center gap-2 text-sm text-color"
+              >
+                <i
+                  v-if="feature.icon"
+                  :class="[feature.icon, 'text-color-secondary text-sm']"
+                />
+                <span>{{ feature.label }}</span>
+              </li>
+            </ul>
+          </CardPricing>
         </div>
       </div>
     </div>
@@ -73,8 +89,8 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
   import Sidebar from '@aziontech/webkit/sidebar'
-  import PricingCard from '@aziontech/webkit/pricing-card'
-  import Button from '@aziontech/webkit/button'
+  import CardPricing from '@aziontech/webkit/content/card-pricing'
+  import ActionButton from '@aziontech/webkit/actions/button'
   import SegmentedButton from '@aziontech/webkit/segmented-button'
   import { useResize } from '@/composables/useResize'
   import { usePlans } from '@/composables/usePlans'
@@ -193,33 +209,37 @@
     return props.plans?.find((plan) => plan.sku?.toLowerCase() === planValue.toLowerCase())
   }
 
-  const formatMonthlyValue = (value) => {
+  const formatNumeric = (value) => {
     const number = Number(value ?? 0)
-    const formatted = Number.isInteger(number) ? String(number) : number.toFixed(2)
-    return `$${formatted}`
+    return Number.isInteger(number) ? String(number) : number.toFixed(2)
   }
 
-  const getMonthlyPrice = (planValue) => {
-    if (planValue === 'enterprise') return ''
+  const getMonthlyPriceNumeric = (planValue) => {
     const pricing = getPlanData(planValue)?.pricings?.find((item) => item.periodicity === 'monthly')
-    return formatMonthlyValue(pricing?.priceValue)
+    return Number(pricing?.priceValue ?? 0)
   }
 
-  const getAnnualPrice = (planValue) => {
-    if (planValue === 'enterprise') return ''
+  const getAnnualMonthlyEquivalent = (planValue) => {
     const pricing = getPlanData(planValue)?.pricings?.find((item) => item.periodicity === 'yearly')
-    const monthlyEquivalent = Number(pricing?.priceValue ?? 0) / 12
-    return formatMonthlyValue(monthlyEquivalent)
+    return Number(pricing?.priceValue ?? 0) / 12
   }
 
-  const getCustomPrice = (planValue) => {
+  const getCardValue = (planValue) => {
     if (planValue === 'enterprise') return 'Custom'
-    return ''
+    const numeric =
+      localBillingCycle.value === 'yearly'
+        ? getAnnualMonthlyEquivalent(planValue)
+        : getMonthlyPriceNumeric(planValue)
+    return formatNumeric(numeric)
   }
 
-  const getPriceLabel = (planValue) => {
+  const getCardPrefix = (planValue) => (planValue === 'enterprise' ? '' : '$')
+
+  const getCardSuffix = (planValue) => (planValue === 'enterprise' ? '' : 'per month')
+
+  const getPricingDetails = (planValue) => {
     if (planValue === 'enterprise') return ''
-    return 'started at'
+    return localBillingCycle.value === 'yearly' ? 'Billed annually' : 'Billed monthly'
   }
 
   const isLoadingPlan = (planValue) =>

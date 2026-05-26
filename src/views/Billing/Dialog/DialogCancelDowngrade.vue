@@ -32,17 +32,18 @@
 
     <template #footer>
       <div class="flex h-14 items-center justify-end gap-2">
-        <Button
-          outlined
+        <ActionButton
+          kind="outlined"
+          size="medium"
           label="Cancel"
-          class="h-10 md:h-8 px-4 font-protomono text-sm md:text-xs flex items-center justify-center"
           :disabled="isSubmitting"
           @click="close"
         />
-        <Button
+        <ActionButton
+          kind="primary"
+          size="medium"
           :label="error ? 'Retry' : 'Keep current plan'"
           :loading="isSubmitting"
-          class="h-10 md:h-8 px-4 font-protomono text-sm md:text-xs flex items-center justify-center"
           :disabled="isSubmitting"
           @click="confirm"
         />
@@ -54,7 +55,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import Dialog from '@aziontech/webkit/dialog'
-  import Button from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
 
   defineOptions({ name: 'dialog-cancel-downgrade' })

@@ -43,17 +43,18 @@
 
     <template #footer>
       <div class="flex h-14 items-center justify-end gap-2">
-        <Button
-          outlined
+        <ActionButton
+          kind="outlined"
+          size="medium"
           :label="confirmLabel"
           :loading="isSubmitting"
-          class="h-10 md:h-8 px-4 font-protomono text-sm md:text-xs flex items-center justify-center"
           :disabled="isSubmitting"
           @click="confirm"
         />
-        <Button
+        <ActionButton
+          kind="primary"
+          size="medium"
           :label="keepLabel"
-          class="h-10 md:h-8 px-4 font-protomono text-sm md:text-xs flex items-center justify-center"
           :disabled="isSubmitting"
           @click="close"
         />
@@ -65,7 +66,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import Dialog from '@aziontech/webkit/dialog'
-  import Button from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PlanFeatureComparison from '@/views/Billing/Dialog/PlanFeatureComparison.vue'
   import { getPlanLabel } from '@/templates/checkout-block/helpers/plan-features'

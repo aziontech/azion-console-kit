@@ -36,9 +36,10 @@
             >Pricing and Plans</a
           >.
         </p>
-        <PrimeButton
+        <ActionButton
           label="Upgrade to Pro"
-          class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
+          kind="primary"
+          size="small"
           :loading="props.loading"
           :disabled="props.loading"
           @click="handleUpgradeClick"
@@ -49,8 +50,8 @@
 </template>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
-  import CardBox from '@aziontech/webkit/card-box'
+  import ActionButton from '@aziontech/webkit/actions/button'
+  import CardBox from '@aziontech/webkit/content/card-box'
   import { getPlanFeatures } from '@/templates/checkout-block/helpers/plan-features'
 
   defineOptions({ name: 'upgrade-to-pro-card' })

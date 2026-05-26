@@ -1,8 +1,9 @@
 <template>
-  <router-view v-slot="{ Component }">
+  <router-view v-slot="routeSlot">
     <component
+      v-if="routeSlot?.Component"
       ref="componentRef"
-      :is="Component"
+      :is="routeSlot.Component"
       v-bind="props"
       :cardDefault="cardDefault"
       @loadCard="loadCardDefault"
@@ -23,7 +24,7 @@
 <script setup>
   import { ref, onMounted } from 'vue'
   import NotificationPayment from '@/views/Billing/components/notification-payment'
-  import { loadBillingData, loadContractData } from '@/helpers/account-data'
+  import { loadContractData } from '@/helpers/account-data'
 
   const props = defineProps({
     loadPaymentMethodDefaultService: { type: Function, required: true },
@@ -85,7 +86,6 @@
   }
 
   onMounted(() => {
-    loadBillingData()
     loadContractData()
     loadCardDefault()
   })

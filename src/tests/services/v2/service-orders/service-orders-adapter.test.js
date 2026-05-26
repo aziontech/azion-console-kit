@@ -112,7 +112,9 @@ describe('transformServiceOrder', () => {
 
   describe('invoiceAmountCharged derivation', () => {
     it('returns null when no source is present', () => {
-      expect(ServiceOrdersAdapter.transformServiceOrder(v4ServiceOrder).invoiceAmountCharged).toBeNull()
+      expect(
+        ServiceOrdersAdapter.transformServiceOrder(v4ServiceOrder).invoiceAmountCharged
+      ).toBeNull()
     })
 
     it('reads from future-shape current_invoice_amount_charged', () => {

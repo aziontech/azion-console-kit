@@ -25,10 +25,11 @@
       </p>
     </div>
 
-    <Button
-      severity="secondary"
-      class="h-8 px-4 font-protomono text-xs flex items-center justify-center shrink-0"
+    <ActionButton
+      kind="secondary"
+      size="small"
       label="Keep current plan"
+      class="shrink-0"
       @click="$emit('cancel')"
     />
   </div>
@@ -36,7 +37,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import Button from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
   import { formatBillingDate } from '@/utils/billing-date'
 
   defineOptions({ name: 'downgrade-pending-banner' })

@@ -151,11 +151,7 @@
     return formLoading || serviceOrderLoading
   })
 
-  const submitButtonLabel = computed(() => {
-    const plan = additionalDataRef.value?.plan
-    if (plan === 'hobby') return 'Start Deploying'
-    return 'Continue'
-  })
+  const submitButtonLabel = computed(() => 'Continue')
   const getPlanIdFromName = (planName) => {
     if (!plansData.value?.length) return null
     const foundPlan = plansData.value.find(

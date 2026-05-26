@@ -5,7 +5,6 @@ import {
   contractService
 } from '@/services/v2/account'
 import { DEFAULT_JOB_ROLE } from '@/services/v2/account/job-role-validator'
-import { billingGqlService } from '@/services/v2/billing/billing-gql-service'
 import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
@@ -95,22 +94,6 @@ export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
   setFeatureFlags(accountInfo.client_flags)
 }
 
-export const loadBillingData = async ({ force = false } = {}) => {
-  const accountStore = useAccountStore()
-  const { account, accountIsNotRegular } = accountStore
-
-  if (!accountIsNotRegular) return
-  if (!force && account.formatCredit) return
-
-  if (force) queryClient.removeQueries({ queryKey: queryKeys.billing.all })
-
-  const billingData = await billingGqlService.getCreditAndExpirationDate()
-  if (!billingData) return
-
-  const { credit, formatCredit, days } = billingData
-  accountStore.setAccountData({ credit, formatCredit, days })
-}
-
 export const loadContractData = async ({ force = false } = {}) => {
   const accountStore = useAccountStore()
   const { account } = accountStore
@@ -139,5 +122,5 @@ export const loadContractData = async ({ force = false } = {}) => {
  */
 export const loadAccountHydration = async ({ force = false } = {}) => {
   await loadUserAndAccountInfo({ force })
-  await Promise.allSettled([loadContractData({ force }), loadBillingData({ force })])
+  await loadContractData({ force })
 }

@@ -16,10 +16,10 @@
         <p class="text-xs leading-4 text-color-secondary">{{ description }}</p>
       </div>
 
-      <Button
-        severity="secondary"
-        outlined
-        class="h-8 px-3 font-protomono text-xs flex items-center justify-center shrink-0"
+      <ActionButton
+        kind="outlined"
+        size="small"
+        class="shrink-0"
         @click="emit('change')"
         label="Change"
       />
@@ -29,7 +29,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import Button from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
 
   defineOptions({
     name: 'plan-selector-card'

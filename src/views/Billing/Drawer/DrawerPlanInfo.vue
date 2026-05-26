@@ -261,8 +261,7 @@
           countryId: address.country,
           region: address.region,
           city: address.city,
-          address: address.address,
-          complement: address.complement
+          address: address.address
         }
       })
     } catch (err) {

@@ -2,40 +2,40 @@ export const PLAN_COMPARISON_FEATURES = {
   hobby: {
     label: 'Hobby',
     tagline: 'The perfect starting place',
-    description: 'Billed annually or $25/mo billed monthly.',
-    sectionTitle: 'Todas as funcionalidades disponíveis',
+    description: 'Start free for personal projects and learning.',
+    sectionTitle: 'All features available',
     features: [
-      { title: 'Infraestrutura global', icon: 'pi pi-globe' },
-      { title: 'Funções serverless', icon: 'pi pi-code' },
+      { title: 'Global infrastructure', icon: 'pi pi-globe' },
+      { title: 'Serverless functions', icon: 'pi pi-code' },
       { title: 'Image optimization', icon: 'pi pi-image' },
-      { title: 'Armazenamento e banco de dados', icon: 'pi pi-database' },
-      { title: 'Mitigação de DDoS e firewall', icon: 'pi pi-shield' }
+      { title: 'Storage & SQL database', icon: 'pi pi-database' },
+      { title: 'Firewall', icon: 'pi pi-shield' }
     ]
   },
   pro: {
     label: 'Pro',
     tagline: 'Billed annually or $25/mo billed monthly.',
     description: 'Billed annually or $25/mo billed monthly.',
-    sectionTitle: 'Escale além dos limites incluídos',
+    sectionTitle: 'All Free features, plus',
     features: [
-      { title: 'Workloads adicionais', icon: 'pi pi-box' },
-      { title: 'Limites maiores para aplicações', icon: 'pi pi-arrows-h' },
-      { title: 'Mais capacidade de Storage', icon: 'pi pi-database' },
-      { title: 'Maior cobertura de segurança', icon: 'pi pi-shield' },
-      { title: 'Limite de gasto configurável', icon: 'pi pi-dollar' }
+      { title: 'Additional workloads', icon: 'pi pi-box' },
+      { title: 'Higher application limits', icon: 'pi pi-check-circle' },
+      { title: 'Real-time event observability', icon: 'pi pi-eye' },
+      { title: 'Enhanced security features', icon: 'pi pi-shield' },
+      { title: 'Technical Support', icon: 'pi pi-question-circle' }
     ]
   },
   enterprise: {
     label: 'Enterprise',
-    tagline: 'Suporte avançado e serviços contínuos.',
+    tagline: 'Advanced support and ongoing services.',
     description: 'Billed annually or $250/mo billed monthly.',
-    sectionTitle: 'Todas as funcionalidades disponíveis',
+    sectionTitle: 'Choose your pricing model',
     features: [
-      { title: 'Preços on-demand', icon: 'pi pi-chart-line' },
-      { title: 'Economize com compromissos', icon: 'pi pi-dollar' },
-      { title: 'Reserva de Capacidade disponível', icon: 'pi pi-th-large' },
-      { title: 'Savings Plans disponíveis', icon: 'pi pi-tag' },
-      { title: 'Suporte avançado disponível', icon: 'pi pi-wrench' }
+      { title: 'On-demand pricing', icon: 'pi pi-check-circle' },
+      { title: 'Lower costs with commitments', icon: 'pi pi-check-circle' },
+      { title: 'Reserved Capacity available', icon: 'pi pi-check-circle' },
+      { title: 'Savings Plans available', icon: 'pi pi-check-circle' },
+      { title: 'Service Plans available', icon: 'pi pi-check-circle' }
     ]
   }
 }

@@ -2,7 +2,7 @@
   import { ref, computed } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import Tag from '@aziontech/webkit/prime-tag'
+  import IconButton from '@aziontech/webkit/actions/icon-button'
   import SkeletonBlock from '@/templates/skeleton-block'
   import BillsView from '@/views/Billing/BillsView.vue'
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
@@ -70,24 +70,22 @@
         :isRightAlignment="true"
       >
         <template #default>
-          <SkeletonBlock
-            width="10rem"
-            :isLoaded="!loadingLastUpdated"
-          >
-            <button
-              type="button"
-              :disabled="isRefreshing"
-              class="bg-transparent border-0 p-0 cursor-pointer"
-              :class="{ 'opacity-60 cursor-not-allowed': isRefreshing }"
-              @click="handleRefresh"
+          <div class="flex items-center gap-3">
+            <SkeletonBlock
+              width="12rem"
+              :isLoaded="!loadingLastUpdated"
             >
-              <Tag
-                severity="secondary"
-                :icon="isRefreshing ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'"
-                :value="invoiceLastUpdated"
-              />
-            </button>
-          </SkeletonBlock>
+              <span class="text-xs text-color">{{ invoiceLastUpdated }}</span>
+            </SkeletonBlock>
+            <IconButton
+              kind="outlined"
+              size="small"
+              :icon="isRefreshing ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'"
+              :disabled="isRefreshing"
+              ariaLabel="Refresh billing"
+              @click="handleRefresh"
+            />
+          </div>
         </template>
       </PageHeadingBlock>
     </template>

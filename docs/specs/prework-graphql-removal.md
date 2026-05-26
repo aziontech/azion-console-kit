@@ -1,7 +1,8 @@
 # prework-graphql-removal — Delete billing GraphQL, redirect to REST v4
 
-> status: abandoned
+> status: done
 > owner: @HerbertJulio
+> completed-at: 2026-05-26
 > branch: refactor/ENG-37160-billing-rewrite
 > commits: []
 > figma: []
@@ -10,13 +11,26 @@
 
 ## 1. Why
 
-`billing-gql-service.js` + `billing-gql-adapter.js` exist solely to fetch `fetchLastBill` and `fetchLastCredit` via GraphQL. v4 REST exposes equivalent data via `/v4/service_orders/current` and `/v4/service_orders/billing/invoices`.
+`billing-gql-service.js` + `billing-gql-adapter.js` exist solely to fetch `fetchLastBill` and `fetchLastCredit` via GraphQL. v4 REST exposes equivalent data for invoices via `/v4/service_orders/billing/invoices`. Trial credit has no v4 REST equivalent (yet).
 
 ## Amendment 2026-05-26 — abandoned, blocked on backend
 
 Investigation in PR #92 (`/tmp/so-pr92/src/index.ts`) confirmed there is NO v4 REST endpoint exposing trial credit (`fetchLastCredit` / `balanceFinancialEntry`). Currently the GraphQL `getCreditAndExpirationDate()` is the ONLY source of `credit/formatCredit/days` consumed by `notification-payment.vue` for the trial credit banner.
 
-Decision: spec abandoned for now. GraphQL stays operational until backend exposes trial credit in v4 REST. Reopen as a new spec (`prework-graphql-removal-v2`) when that endpoint is available. Downstream specs do NOT depend on this — proceed with onboarding + billing waves without it.
+Initial decision: keep GraphQL until backend exposes trial credit in v4 REST.
+
+## Amendment 2026-05-26 (2) — reverted to delete now
+
+User decided to delete GraphQL anyway. The trial credit banner stops rendering until backend exposes the data in v4 — acceptable trade-off.
+
+Changes applied:
+- DELETED `src/services/v2/billing/billing-gql-service.js`
+- DELETED `src/services/v2/billing/billing-gql-adapter.js`
+- `src/helpers/account-data.js` — removed `loadBillingData()` function, removed `billingGqlService` import, removed `loadBillingData` from `loadAccountHydration()` parallel chain
+- `src/views/Billing/BillingLayout.vue` — removed `loadBillingData` import + call in `onMounted`
+- `src/views/Billing/components/notification-payment.vue` — removed `TRIAL` notification config + trial branch in `loadText`; only `BLOCKED`/`DEFAULTING` notifications remain
+
+`prework-graphql-removal-v2` stub is no longer needed and was deleted.
 
 ## 2. Out of scope
 

@@ -12,7 +12,7 @@ Final PR target: `dev` once all specs are `done`.
 | 0 | `_scaffold-m1` | done | @HerbertJulio | d499e27e2 | — |
 | 1 | `prework-services-v4-cleanup` | done | @HerbertJulio | d499e27e2 | — |
 | 2 | `prework-metadata-decision` | done | @HerbertJulio | d499e27e2 | — |
-| 3 | `prework-graphql-removal` | abandoned | @HerbertJulio | — | blocked: backend v4 trial credit |
+| 3 | `prework-graphql-removal` | done | @HerbertJulio | pending | `prework-services-v4-cleanup` |
 | 4 | `onboarding-prefetch-plans` | done | @HerbertJulio | d499e27e2 | — |
 | 5 | `onboarding-flow-hobby` | done | @HerbertJulio | d499e27e2 | `prework-services-v4-cleanup`, `onboarding-prefetch-plans` |
 | 6 | `onboarding-flow-pro` | done | @HerbertJulio | d499e27e2 | `prework-services-v4-cleanup`, `prework-metadata-decision`, `onboarding-prefetch-plans`, `onboarding-flow-hobby` |
@@ -68,9 +68,18 @@ WAVE 3 — Billing
 
 - spec 4.5 wired (PaymentMethodSummary in DrawerPlanInfo); UX still pending staging smoke test (default card present + swap path)
 - spec 4.6/4.7 wired (DrawerPlanComparison replacing PlanSelectionDrawer in BillsView); needs visual review against Figma
-- spec 2.3 abandoned: trial credit notification banner stops rendering once backend drops v1 GraphQL — reopen as `prework-graphql-removal-v2` when backend exposes trial credit in v4 REST
-- pre-commit hook fails on uncaught BroadcastChannel exception (env issue with `@tanstack/query-broadcast-client-experimental` + Node) — `--no-verify` used for this commit; track as separate ticket
+- spec 2.3 done: GraphQL files deleted; trial credit banner removed from `notification-payment.vue` (will not render until backend exposes trial credit in v4 REST — accepted trade-off)
+- ~~pre-commit hook fails on uncaught BroadcastChannel exception~~ — FIXED in `src/tests/setup-tests.js` (disabler now runs at module top-level before any test file imports the queryClient). `--no-verify` no longer needed.
+
+## SDD tooling available (M2 — implemented in this session)
+
+- `/spec-new <slug>` — scaffold new spec from template + register in this index
+- `/spec-task <slug>` — flip `draft → active`, brief on contracts, run RPI cycle
+- `/spec-close <slug>` — verify DoD, flip `active → done`, record commits
+- `/spec-amend <slug>` — append-only `## Amendment YYYY-MM-DD` block
+
+Skills live in `.claude/skills/spec-{new,task,close,amend}/SKILL.md`.
 
 ## Retrospective
 
-After spec 15 closes, create `docs/specs/_retro-pilot.md` with outcomes for M2/M3 decisions.
+See [_retro-pilot.md](specs/_retro-pilot.md) — outcome of this wave + M2 status + recommendations for M3 (3 CI sync-guards).

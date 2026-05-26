@@ -4,11 +4,11 @@
     class="w-full min-[1100px]:w-1/2 current-invoice-card"
   >
     <template #header-action>
-      <PrimeButton
-        outlined
-        icon="pi pi-file"
+      <ActionButton
         label="Details"
-        class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
+        kind="secondary"
+        size="small"
+        icon="pi pi-file"
         :disabled="!invoice.redirectId"
         @click="emitViewDetails"
       />
@@ -75,8 +75,8 @@
 
 <script setup>
   import { computed } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
-  import CardBox from '@aziontech/webkit/card-box'
+  import ActionButton from '@aziontech/webkit/actions/button'
+  import CardBox from '@aziontech/webkit/content/card-box'
   import SubscriptionPlanRow from './SubscriptionPlanRow.vue'
 
   defineOptions({ name: 'current-invoice-card' })
@@ -122,20 +122,25 @@
   const extraProductChargesNumeric = computed(() => toNumber(props.invoice?.extraProductCharges))
   const extraProductCharges = computed(() => formatAmount(extraProductChargesNumeric.value))
 
-  const creditUsedValue = computed(() => formatAmount(props.invoice?.creditUsedForPayment ?? 0))
+  const creditUsedNumeric = computed(() => toNumber(props.invoice?.creditUsedForPayment))
+  const creditUsedValue = computed(() => formatAmount(creditUsedNumeric.value))
 
   const amountChargedNumeric = computed(() => {
     const raw = props.subscription?.currentInvoiceAmountCharged
     if (raw === null || raw === undefined) return null
     const parsed = Number(raw)
-    return Number.isFinite(parsed) ? parsed : null
+    if (!Number.isFinite(parsed) || parsed <= 0) return null
+    return parsed
   })
 
   const totalValue = computed(() => {
     if (amountChargedNumeric.value !== null) {
       return formatAmount(amountChargedNumeric.value)
     }
-    return formatAmount(planChargeNumeric.value + servicePlanChargesNumeric.value)
+    const subtotal =
+      planChargeNumeric.value + extraProductChargesNumeric.value + servicePlanChargesNumeric.value
+    const total = Math.max(subtotal - creditUsedNumeric.value, 0)
+    return formatAmount(total)
   })
 
   const emitViewDetails = () => {

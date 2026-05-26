@@ -1,13 +1,14 @@
 <template>
   <div class="flex flex-col gap-6 border-l surface-border bg-surface p-6 max-w-[300px] flex-1">
     <p class="text-[13px] leading-[21px] text-color-secondary">
-      <span class="font-semibold">Choose {{ planName }}</span>
-      <span> to scale applications securely as an independent professional. </span>
+      <span>Upgrade to </span>
+      <span class="font-semibold">{{ planName }}</span>
+      <span> to power your businesses with advanced security and compliance.</span>
     </p>
 
     <div class="flex flex-col gap-6">
       <FeaturesList
-        title="Included Features"
+        title="Upgrade features"
         :features="planFeatures"
       />
 

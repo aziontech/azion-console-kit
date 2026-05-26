@@ -20,11 +20,11 @@
   >
     <template #description>
       {{ notificationPayment.description }}
-      <PrimeButton
+      <ActionButton
         v-if="!props.linkText.hidden"
         :label="labelLink"
-        link
-        class="p-0 text-sm"
+        kind="text"
+        size="small"
         :disabled="props.linkText.disabled"
         @click="redirectPayment"
       />
@@ -37,7 +37,7 @@
   import { paymentService } from '@/services/v2/payment/payment-service'
   import MessageNotification from '@/templates/message-notification'
   import { useAccountStore } from '@/stores/account'
-  import PrimeButton from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
   import { computed, ref, onMounted } from 'vue'
   import { formatUnitValue } from '@/helpers'
   import SkeletonBlock from '@/templates/skeleton-block'
@@ -125,12 +125,6 @@
   }
 
   const NOTIFICATION_CONFIGS = {
-    TRIAL: {
-      title: 'Your free trial credit balance is running',
-      type: 'info',
-      getDescription: (credit, days) =>
-        `You have $${credit} to use in ${days} days. To use Azion with no service interruptions at the end of your trial, add a`
-    },
     BLOCKED: {
       title: 'Your account is blocked',
       type: 'error',
@@ -160,26 +154,19 @@
         return
       }
 
-      if (status === 'TRIAL' || status === 'ONLINE') {
-        const { credit, days, formatCredit } = accountData
-        if (!(credit > 0 && days > 0)) {
-          loadingNotification.value = false
-          showNotification.value = false
-          return
-        }
-        notificationPayment.value = {
-          ...NOTIFICATION_CONFIGS.TRIAL,
-          description: NOTIFICATION_CONFIGS.TRIAL.getDescription(formatCredit, days)
-        }
-      } else if (status === 'BLOCKED' || status === 'DEFAULTING') {
+      if (status === 'BLOCKED' || status === 'DEFAULTING') {
         const total = await totalPending()
         notificationPayment.value = {
           ...NOTIFICATION_CONFIGS[status],
           description: NOTIFICATION_CONFIGS[status].getDescription(total)
         }
+        loadingNotification.value = false
+        showNotification.value = true
+        return
       }
+
       loadingNotification.value = false
-      showNotification.value = true
+      showNotification.value = false
     } catch {
       showNotification.value = false
       loadingNotification.value = false

@@ -32,7 +32,7 @@
     </template>
   </div>
 
-  <h2 class="text-lg font-medium line-height-1 my-8">Payment History</h2>
+  <h2 class="text-lg font-medium line-height-1 mt-6 mb-2">Payment History</h2>
 
   <div
     v-if="hasContentToList"
@@ -63,18 +63,19 @@
     :documentationService="props.documentPaymentHistoryService"
   >
     <template #default>
-      <PrimeButton
+      <ActionButton
         class="max-md:w-full w-fit"
+        kind="outlined"
+        size="medium"
         label="Credit"
         icon="pi pi-plus"
         :disabled="!defaultCardStatus.hasData"
         @click="goToPayment"
-        outlined
-      >
-      </PrimeButton>
-      <PrimeButton
+      />
+      <ActionButton
         class="max-md:w-full w-fit"
-        severity="secondary"
+        kind="secondary"
+        size="medium"
         icon="pi pi-plus"
         label="Payment Method"
         @click="goToPayment"
@@ -129,7 +130,7 @@
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
   import SubscriptionPlanCard from './components/SubscriptionPlanCard.vue'
   import UpgradeToProCard from './components/UpgradeToProCard.vue'
   import CurrentInvoiceCard from './components/CurrentInvoiceCard.vue'
@@ -520,7 +521,6 @@
   }
 
   const handleSelectProUpgrade = async (cycle) => {
-    showChangePlanDrawer.value = false
     setParam('billingCycle', cycle)
     await syncToUrl()
     trackBilling('planSelected', {
@@ -538,7 +538,6 @@
   }
 
   const handleSelectDowngradeHobby = async () => {
-    showChangePlanDrawer.value = false
     trackBilling('planSelected', {
       plan: 'hobby',
       billingCycle: subscription.billingCycle.value,
@@ -550,7 +549,6 @@
   }
 
   const handleSelectCycleChange = async (targetCycle) => {
-    showChangePlanDrawer.value = false
     const plan = subscription.planSku.value
     const fromCycle = subscription.billingCycle.value
     trackBilling('billingCycleToggled', { fromCycle, toCycle: targetCycle, context: 'billing' })
