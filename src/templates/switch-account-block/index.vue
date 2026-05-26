@@ -170,11 +170,8 @@
   }
   const onSelectedAccount = async (rowSelected) => {
     visible.value = false
-    try {
-      await trackSignInSafely({ tracker, method: getSignInMethod() })
-    } catch {
-      // Ignore tracking errors and proceed with the switch.
-    }
+   
+    await trackSignInSafely({ tracker, method: getSignInMethod() })
     await props.accountHandler.switchAccountAndRedirect(rowSelected.accountId)
   }
 </script>
