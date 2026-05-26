@@ -92,21 +92,11 @@ export function useCurrentSubscription() {
     formatLastUpdate(currentServiceOrder.value?.updatedAt ?? activeServiceOrder.value?.updatedAt)
   )
 
-  const scheduledDowngrade = computed(() => {
-    const metadata = activeServiceOrder.value?.metadata
-    if (!metadata || typeof metadata !== 'object') return null
-    if (metadata.status !== 'downgrade_pending') return null
-    return {
-      effectiveAt: metadata.effective_date ?? metadata.effectiveDate ?? null
-    }
-  })
+  const scheduledDowngrade = computed(() => activeServiceOrder.value?.downgradePending ?? null)
 
-  const currentInvoiceAmountCharged = computed(() => {
-    const metadata = activeServiceOrder.value?.metadata
-    if (!metadata || typeof metadata !== 'object') return null
-    const raw = metadata.amountCharged ?? metadata.amount_charged
-    return toFiniteNumber(raw, null)
-  })
+  const currentInvoiceAmountCharged = computed(() =>
+    toFiniteNumber(activeServiceOrder.value?.invoiceAmountCharged, null)
+  )
 
   const isDowngradePending = computed(() => Boolean(scheduledDowngrade.value))
 

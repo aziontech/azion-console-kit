@@ -24,7 +24,7 @@ const buildPlanQuery = () => ({
 
 /**
  * Reactive read of the authenticated account's current service order.
- * Source: GET /api/v1/account/service_order. A 404 is normalized to `null`
+ * Source: GET /v4/service_orders/current. A 404 is normalized to `null`
  * by the service layer; other errors surface via Vue Query's `error`.
  */
 export function useCurrentAccountServiceOrder(options = {}) {
@@ -39,7 +39,7 @@ export function useCurrentAccountServiceOrder(options = {}) {
 
 /**
  * Reactive read of the authenticated account's currently entitled plan.
- * Source: GET /api/v1/account/plan. A 404 is normalized to `null`.
+ * Source: GET /v4/service_orders/plans/current. A 404 is normalized to `null`.
  */
 export function useCurrentAccountPlan(options = {}) {
   const { enabled = true } = options

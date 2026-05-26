@@ -37,7 +37,6 @@
           >.
         </p>
         <PrimeButton
-          severity="secondary"
           label="Upgrade to Pro"
           class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
           :loading="props.loading"

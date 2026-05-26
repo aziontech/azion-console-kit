@@ -28,6 +28,13 @@
             </span>
           </SubscriptionPlanRow>
 
+          <SubscriptionPlanRow label="Extra Product Charges">
+            <span class="text-color">
+              <span class="text-color-secondary">$</span>
+              {{ extraProductCharges }}
+            </span>
+          </SubscriptionPlanRow>
+
           <SubscriptionPlanRow label="Professional Services Plan Charges">
             <span class="text-color">
               <span class="text-color-secondary">$</span>
@@ -111,6 +118,9 @@
 
   const servicePlanChargesNumeric = computed(() => toNumber(props.invoice?.servicePlan))
   const servicePlanCharges = computed(() => formatAmount(servicePlanChargesNumeric.value))
+
+  const extraProductChargesNumeric = computed(() => toNumber(props.invoice?.extraProductCharges))
+  const extraProductCharges = computed(() => formatAmount(extraProductChargesNumeric.value))
 
   const creditUsedValue = computed(() => formatAmount(props.invoice?.creditUsedForPayment ?? 0))
 

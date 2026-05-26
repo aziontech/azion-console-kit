@@ -17,9 +17,20 @@
     :header="title"
   >
     <div class="flex flex-col gap-3.5 px-8 py-5">
-      <p class="whitespace-pre-line text-[13px] leading-5 text-default">
-        {{ bodyText }}
-      </p>
+      <div
+        class="flex gap-3 rounded-md border border-red-500/30 bg-red-500/10 px-4 py-3 text-[13px] leading-5 text-default"
+      >
+        <i class="pi pi-info-circle text-red-500 mt-0.5" />
+        <p class="whitespace-pre-line">
+          {{ bodyText }}
+        </p>
+      </div>
+
+      <PlanFeatureComparison
+        v-if="!cycleChange"
+        :fromPlanLabel="getPlanLabel(fromPlan)"
+        :toPlanLabel="getPlanLabel(toPlan)"
+      />
 
       <InlineMessage
         v-if="error"
@@ -34,17 +45,17 @@
       <div class="flex h-14 items-center justify-end gap-2">
         <Button
           outlined
-          label="Cancel"
-          class="h-10 md:h-8 px-4 font-protomono text-sm md:text-xs flex items-center justify-center"
-          :disabled="isSubmitting"
-          @click="close"
-        />
-        <Button
           :label="confirmLabel"
           :loading="isSubmitting"
           class="h-10 md:h-8 px-4 font-protomono text-sm md:text-xs flex items-center justify-center"
           :disabled="isSubmitting"
           @click="confirm"
+        />
+        <Button
+          :label="keepLabel"
+          class="h-10 md:h-8 px-4 font-protomono text-sm md:text-xs flex items-center justify-center"
+          :disabled="isSubmitting"
+          @click="close"
         />
       </div>
     </template>
@@ -56,6 +67,7 @@
   import Dialog from '@aziontech/webkit/dialog'
   import Button from '@aziontech/webkit/button'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import PlanFeatureComparison from '@/views/Billing/Dialog/PlanFeatureComparison.vue'
   import { getPlanLabel } from '@/templates/checkout-block/helpers/plan-features'
   import { formatBillingDate } from '@/utils/billing-date'
 
@@ -104,8 +116,10 @@
 
   const confirmLabel = computed(() => {
     if (error.value) return 'Retry'
-    return 'Schedule downgrade'
+    return 'Downgrade plan'
   })
+
+  const keepLabel = computed(() => `Keep ${getPlanLabel(props.fromPlan)}`)
 
   const effectiveDate = computed(() => formatBillingDate(props.effectiveAt))
 

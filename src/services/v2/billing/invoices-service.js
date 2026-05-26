@@ -1,27 +1,40 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { InvoicesAdapter } from './invoices-adapter'
 
-export class InvoicesService extends BaseService {
-  #baseURL = '/edge_api/api/v1/account/invoices'
+const MAX_LIMIT = 100
 
-  listAccountInvoices = async () => {
+export class InvoicesService extends BaseService {
+  #baseURL = '/edge_api/v4/service_orders/billing/invoices'
+
+  listAccountInvoices = async ({ limit = MAX_LIMIT, startingAfter } = {}) => {
     const response = await this.http.request({
       method: 'GET',
-      url: this.#baseURL
+      url: this.#baseURL,
+      params: {
+        limit,
+        ...(startingAfter && { starting_after: startingAfter })
+      }
     })
 
-    const data = response?.data ?? {}
+    const body = response?.data ?? {}
     return {
-      invoices: Array.isArray(data.invoices) ? data.invoices : [],
-      hasMore: Boolean(data.has_more)
+      invoices: Array.isArray(body.data) ? body.data : [],
+      hasMore: Boolean(body.has_more),
+      nextStartingAfter: body.next_starting_after ?? null,
+      stale: Boolean(body.stale)
     }
   }
 
-  listAccountInvoicesAsRows = async ({ statusMap } = {}) => {
-    const { invoices, hasMore } = await this.listAccountInvoices()
+  listAccountInvoicesAsRows = async ({ statusMap, limit, startingAfter } = {}) => {
+    const { invoices, hasMore, nextStartingAfter, stale } = await this.listAccountInvoices({
+      limit,
+      startingAfter
+    })
     return {
       rows: InvoicesAdapter.transformInvoicesList(invoices, statusMap),
-      hasMore
+      hasMore,
+      nextStartingAfter,
+      stale
     }
   }
 }

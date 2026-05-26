@@ -24,6 +24,10 @@ export const billingRoutes = {
   },
   children: [
     {
+      path: 'payment',
+      redirect: { name: 'billing-tabs' }
+    },
+    {
       path: ':tab?',
       name: 'billing-tabs',
       component: () => import('@views/Billing/TabsView.vue'),

@@ -16,9 +16,14 @@
       />
     </div>
 
-    <p class="flex-1 text-xs leading-5 text-default">
-      {{ message }}
-    </p>
+    <div class="flex-1 flex flex-col gap-0.5">
+      <p class="text-xs leading-5 text-color">
+        {{ mainMessage }}
+      </p>
+      <p class="text-xs leading-5 text-color-secondary">
+        Your usage limits will be reduced after this date.
+      </p>
+    </div>
 
     <Button
       severity="secondary"
@@ -45,9 +50,9 @@
 
   const formattedDate = computed(() => formatBillingDate(props.effectiveAt))
 
-  const message = computed(() => {
+  const mainMessage = computed(() => {
     const date = formattedDate.value || '--'
     const target = props.targetPlanLabel ? ` to ${props.targetPlanLabel}` : ''
-    return `You scheduled a downgrade${target} on ${date}. Your usage limits will be reduced after this date.`
+    return `You scheduled a downgrade${target} on ${date}.`
   })
 </script>

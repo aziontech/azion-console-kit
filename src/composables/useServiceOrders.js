@@ -55,13 +55,19 @@ export function useServiceOrders() {
     ...mutationOptions
   })
 
+  const cancelMutation = useMutation({
+    mutationFn: (id) => serviceOrdersService.cancelServiceOrder(id),
+    ...mutationOptions
+  })
+
   const isSubmitting = computed(
     () =>
       createMutation.isPending.value ||
       updateMutation.isPending.value ||
       upgradeMutation.isPending.value ||
       downgradeMutation.isPending.value ||
-      cancelDowngradeMutation.isPending.value
+      cancelDowngradeMutation.isPending.value ||
+      cancelMutation.isPending.value
   )
 
   const loadAccountServiceOrders = async (id) => {
@@ -107,6 +113,12 @@ export function useServiceOrders() {
     const serviceOrderId = resolveServiceOrderId(id, accountId)
     if (!serviceOrderId) throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
     return cancelDowngradeMutation.mutateAsync(serviceOrderId)
+  }
+
+  const cancelServiceOrder = async ({ id, accountId } = {}) => {
+    const serviceOrderId = resolveServiceOrderId(id, accountId)
+    if (!serviceOrderId) throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
+    return cancelMutation.mutateAsync(serviceOrderId)
   }
 
   const submitServiceOrder = async ({ accountId, planId, planPricingId }) => {
@@ -156,6 +168,7 @@ export function useServiceOrders() {
     submitServiceOrder,
     upgrade,
     downgrade,
-    cancelDowngrade
+    cancelDowngrade,
+    cancelServiceOrder
   }
 }

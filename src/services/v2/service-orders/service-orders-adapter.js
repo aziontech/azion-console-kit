@@ -3,27 +3,8 @@ import {
   resolveServiceOrderPaymentMeta
 } from './stripe-payment-resolver'
 
-const pick = (value, fallback) => (value !== undefined ? value : fallback)
-
-const hasServiceOrderData = (data) => {
-  if (!data || typeof data !== 'object') return false
-  return Boolean(
-    pick(data.serviceOrderId, data.service_order_id) ||
-    pick(data.accountId, data.account_id) ||
-    pick(data.planId, data.plan_id)
-  )
-}
-
-const extractServiceOrderData = (response) => {
-  if (!response) return null
-  const data = response.data ?? response.results
-  if (hasServiceOrderData(data)) return data
-  if (hasServiceOrderData(response)) return response
-  return null
-}
-
 const transformPricing = (pricing = {}) => ({
-  id: pricing.plan_pricing_id,
+  id: pricing.id ?? pricing.plan_pricing_id,
   currencyCode: pricing.currency_code,
   priceValue: pricing.price_value,
   periodicity: pricing.periodicity,
@@ -32,7 +13,7 @@ const transformPricing = (pricing = {}) => ({
 })
 
 const transformPlan = (item = {}) => ({
-  id: item.plan_id,
+  id: item.id ?? item.plan_id,
   fallbackPlanId: item.fallback_plan_id,
   name: item.name,
   slug: item.slug,
@@ -40,6 +21,8 @@ const transformPlan = (item = {}) => ({
   description: item.description,
   type: item.type,
   status: item.status,
+  active: item.active,
+  sortOrder: item.sort_order,
   eolDate: item.eol_date,
   revision: item.revision,
   publishedRevision: item.published_revision,
@@ -51,8 +34,6 @@ const transformPlan = (item = {}) => ({
   supportsReservedCapacity: item.supports_reserved_capacity,
   supportsSavingsPlan: item.supports_savings_plan,
   isInternal: item.is_internal,
-  sortOrder: item.sort_order,
-  active: item.active,
   deletedAt: item.deleted_at,
   deletedBy: item.deleted_by,
   isPublicCatalog: item.is_public_catalog,
@@ -60,10 +41,11 @@ const transformPlan = (item = {}) => ({
   requiresManualApproval: item.requires_manual_approval,
   whitelistOnly: item.whitelist_only,
   externalProductId: item.external_product_id,
+  productVersion: item.product_version,
   audit: {
-    lastEditor: item.audit?.last_editor,
-    lastModified: item.audit?.last_modified,
-    createdAt: item.audit?.created_at
+    lastEditor: item.last_editor ?? item.audit?.last_editor,
+    lastModified: item.last_modified ?? item.audit?.last_modified,
+    createdAt: item.created_at ?? item.audit?.created_at
   },
   pricings: Array.isArray(item.pricings) ? item.pricings.map(transformPricing) : []
 })
@@ -73,164 +55,189 @@ const transformPlansList = (data) => {
   return Array.isArray(plans) ? plans.map(transformPlan) : []
 }
 
+const transformPlanDetailResponse = (envelope = {}) => {
+  const data = envelope?.data ?? null
+  return {
+    state: envelope?.state ?? null,
+    data: data ? transformPlan(data) : null
+  }
+}
+
+const toFiniteNumberOrNull = (value) => {
+  if (value === null || value === undefined) return null
+  const num = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(num) ? num : null
+}
+
+const deriveDowngradePending = (data) => {
+  if (data?.downgrade_pending && typeof data.downgrade_pending === 'object') {
+    return {
+      effectiveAt: data.downgrade_pending.effective_at ?? null,
+      mode: data.downgrade_pending.mode ?? null
+    }
+  }
+  const meta = data?.metadata
+  if (meta && typeof meta === 'object' && meta.status === 'downgrade_pending') {
+    return {
+      effectiveAt: meta.effective_date ?? meta.effectiveDate ?? null,
+      mode: meta.mode ?? null
+    }
+  }
+  return null
+}
+
+const deriveInvoiceAmountCharged = (data) => {
+  if (data?.current_invoice_amount_charged !== undefined) {
+    return toFiniteNumberOrNull(data.current_invoice_amount_charged)
+  }
+  const meta = data?.metadata
+  if (meta && typeof meta === 'object') {
+    return toFiniteNumberOrNull(meta.amountCharged ?? meta.amount_charged)
+  }
+  return null
+}
+
 const transformServiceOrder = (data = {}) => {
   const { clientSecret, checkoutSessionId } = resolveServiceOrderPaymentMeta(data)
 
   return {
-    serviceOrderId: pick(data.serviceOrderId, data.service_order_id),
-    accountId: pick(data.accountId, data.account_id),
-    planId: pick(data.planId, data.plan_id),
-    priceId: pick(
-      data.priceId,
-      pick(data.price_id, pick(data.planPricingId, data.plan_pricing_id))
-    ),
+    serviceOrderId: data.id,
     type: data.type,
     status: data.status,
-    gatewayId: pick(data.gatewayId, data.gateway_id),
-    startDate: pick(data.startDate, data.start_date),
-    endDate: pick(data.endDate, data.end_date),
-    currentPeriodStart: pick(data.currentPeriodStart, data.current_period_start),
-    currentPeriodEnd: pick(data.currentPeriodEnd, data.current_period_end),
-    autoRenew: pick(data.autoRenew, data.auto_renew),
-    ip: data.ip,
-    port: data.port,
-    ipFwd: pick(data.ipFwd, data.ip_fwd),
-    portFwd: pick(data.portFwd, data.port_fwd),
-    timezone: data.timezone,
-    metadata: data.metadata ?? {},
+    planId: data.plan_id,
+    priceId: data.plan_pricing_id,
+    startDate: data.start_date,
+    endDate: data.end_date,
+    currentPeriodStart: data.current_period_start,
+    currentPeriodEnd: data.current_period_end,
+    autoRenew: data.auto_renew,
+    createdAt: data.created_at,
+    updatedAt: data.last_modified,
+    lastEditor: data.last_editor,
+    productVersion: data.product_version,
+    downgradePending: deriveDowngradePending(data),
+    invoiceAmountCharged: deriveInvoiceAmountCharged(data),
     clientSecret,
-    checkoutSessionId,
-    lastEditor: pick(data.lastEditor, data.last_editor),
-    createdAt: pick(data.createdAt, data.created_at),
-    updatedAt: pick(data.updatedAt, data.updated_at)
+    checkoutSessionId
   }
 }
-
-const transformMeta = (meta = {}) => ({
-  count: meta.count,
-  total: meta.total,
-  limit: meta.limit,
-  offset: meta.offset,
-  requestId: pick(meta.requestId, meta.request_id)
-})
 
 const transformTransition = (transition) => {
   if (!transition || typeof transition !== 'object') return null
   return {
-    from: pick(transition.from, transition.fromPlan),
-    to: pick(transition.to, transition.toPlan),
-    effectiveAt: pick(transition.effectiveAt, transition.effective_at),
-    type: transition.type
+    id: transition.id,
+    type: transition.type,
+    status: transition.status,
+    fromPlanId: transition.from_plan_id,
+    toPlanId: transition.to_plan_id,
+    fromPriceId: transition.from_plan_pricing_id,
+    toPriceId: transition.to_plan_pricing_id,
+    effectiveImmediately: transition.effective_immediately,
+    prorated: transition.prorated,
+    scheduledAt: transition.scheduled_at,
+    completedAt: transition.completed_at,
+    createdAt: transition.created_at,
+    updatedAt: transition.last_modified,
+    lastEditor: transition.last_editor
   }
 }
 
-const baseResponseEnvelope = (response) => ({
-  success: response?.success ?? true,
-  message: response?.message ?? null,
-  meta: transformMeta(response?.meta),
-  payment: resolvePaymentFromResponse(response)
+const transformListMeta = (envelope = {}) => ({
+  count: envelope.count,
+  totalPages: envelope.total_pages,
+  page: envelope.page,
+  pageSize: envelope.page_size,
+  next: envelope.next,
+  previous: envelope.previous
 })
 
-const transformListResponse = (response = {}) => ({
-  ...baseResponseEnvelope(response),
-  data: Array.isArray(response.results) ? response.results.map(transformServiceOrder) : []
+const transformListResponse = (envelope = {}) => ({
+  data: Array.isArray(envelope.results) ? envelope.results.map(transformServiceOrder) : [],
+  meta: transformListMeta(envelope)
 })
 
-const transformSingleResponse = (response = {}) => {
-  const so = extractServiceOrderData(response)
+const extractEnvelopeData = (envelope = {}) => envelope?.data ?? null
+
+const transformDetailResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope)
   return {
-    ...baseResponseEnvelope(response),
-    data: so ? transformServiceOrder(so) : null
+    state: envelope?.state ?? null,
+    data: data ? transformServiceOrder(data) : null
   }
 }
 
-const transformDetailResponse = (response = {}) => {
-  const body = response ?? {}
-  const so =
-    (body.data && typeof body.data === 'object' ? body.data : null) ??
-    (Array.isArray(body.results) ? body.results[0] : body.results) ??
-    (hasServiceOrderData(body) ? body : null)
+const transformSingleResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope)
+  const serviceOrder = data ? transformServiceOrder(data) : null
   return {
-    success: body.success ?? true,
-    data: so ? transformServiceOrder(so) : null,
-    meta: transformMeta(body.meta)
+    state: envelope?.state ?? null,
+    data: serviceOrder,
+    payment: resolvePaymentFromResponse(envelope)
   }
 }
 
-const transformUpgradeResponse = (response = {}) => {
-  const data = response.data ?? response
-  const currentOrder = pick(data?.currentOrder, data?.current_order)
-  const newPlan = pick(data?.newPlan, data?.new_plan)
-  const transition = pick(data?.transition, data?.planTransition)
-  const immediate = pick(data?.immediateUpdate, pick(data?.immediate_update, data?.immediate))
-
+const transformUpgradeResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
   return {
-    ...baseResponseEnvelope(response),
-    serviceOrder: currentOrder ? transformServiceOrder(currentOrder) : null,
-    newPlan: newPlan ? transformPlan(newPlan) : null,
-    transition: transformTransition(transition),
-    immediate: immediate ?? true
+    state: envelope?.state ?? null,
+    serviceOrder: data.service_order ? transformServiceOrder(data.service_order) : null,
+    transition: transformTransition(data.transition),
+    plan: data.plan ? transformPlan(data.plan) : null,
+    immediate: data.immediate_update ?? false,
+    proration: data.proration
+      ? {
+          amountDue: data.proration.amount_due,
+          currency: data.proration.currency
+        }
+      : null,
+    payment: resolvePaymentFromResponse({ data: data.service_order })
   }
 }
 
-const transformDowngradeResponse = (response = {}) => {
-  const data = response.data ?? response
-  const so = pick(data?.serviceOrder, data?.service_order)
-  const schedule = pick(data?.schedule, data?.subscriptionSchedule)
-  const newPlanId = pick(data?.newPlanId, data?.new_plan_id)
-
+const transformDowngradeResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
   return {
-    ...baseResponseEnvelope(response),
-    serviceOrder: so ? transformServiceOrder(so) : null,
-    schedule: schedule ?? null,
-    newPlanId: newPlanId ?? null
+    state: envelope?.state ?? null,
+    serviceOrder: data.service_order ? transformServiceOrder(data.service_order) : null,
+    transition: transformTransition(data.transition),
+    mode: data.mode ?? null,
+    cancelAtPeriodEnd: data.cancel_at_period_end ?? null,
+    effectiveDate: data.effective_date ?? null,
+    subscriptionScheduleId: data.subscription_schedule_id ?? null
   }
 }
 
-const transformCancelDowngradeResponse = (response = {}) => {
-  const data = response.data ?? response
-  const so = pick(data?.serviceOrder, data?.service_order)
-  const transition = pick(data?.transition, data?.planTransition)
-
+const transformCancelResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
   return {
-    ...baseResponseEnvelope(response),
-    serviceOrder: so ? transformServiceOrder(so) : null,
-    transition: transformTransition(transition)
+    state: envelope?.state ?? null,
+    serviceOrder: data.service_order ? transformServiceOrder(data.service_order) : null,
+    transition: transformTransition(data.transition),
+    cancelAtPeriodEnd: data.cancel_at_period_end ?? null
+  }
+}
+
+const transformCancelDowngradeResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
+  return {
+    state: envelope?.state ?? null,
+    serviceOrder: data.service_order ? transformServiceOrder(data.service_order) : null,
+    transition: transformTransition(data.transition)
   }
 }
 
 const toCreatePayload = (payload = {}) => ({
-  planId: payload.planId,
-  priceId: pick(payload.priceId, payload.planPricingId)
+  plan_id: payload.planId,
+  ...(payload.planPricingId !== undefined && { plan_pricing_id: payload.planPricingId })
 })
 
-const toUpdatePayload = (payload = {}) => ({
-  planId: payload.planId,
-  priceId: pick(payload.priceId, payload.planPricingId),
-  status: payload.status,
-  type: payload.type,
-  gatewayId: payload.gatewayId,
-  startDate: payload.startDate,
-  endDate: payload.endDate,
-  currentPeriodStart: payload.currentPeriodStart,
-  currentPeriodEnd: payload.currentPeriodEnd,
-  autoRenew: payload.autoRenew,
-  ip: payload.ip,
-  port: payload.port,
-  ipFwd: payload.ipFwd,
-  portFwd: payload.portFwd,
-  timezone: payload.timezone,
-  metadata: payload.metadata,
-  lastEditor: payload.lastEditor
-})
+const toUpdatePayload = toCreatePayload
 
-// Upgrade and downgrade share the same wire shape — the action is decided by
-// which endpoint receives the payload, not by the body.
 const toPlanChangePayload = (payload = {}) => {
-  const priceId = pick(payload.priceId, payload.planPricingId)
+  const planPricingId = payload.planPricingId ?? payload.priceId
   return {
-    newPlanId: payload.newPlanId,
-    ...(priceId && { priceId })
+    plan_id: payload.newPlanId ?? payload.planId,
+    ...(planPricingId !== undefined && planPricingId !== null && { plan_pricing_id: planPricingId })
   }
 }
 
@@ -238,18 +245,21 @@ export const ServiceOrdersAdapter = {
   transformPricing,
   transformPlan,
   transformPlansList,
+  transformPlanDetailResponse,
   transformServiceOrder,
-  transformMeta,
   transformTransition,
+  transformListMeta,
   transformListResponse,
   transformDetailResponse,
   transformCreateResponse: transformSingleResponse,
   transformUpdateResponse: transformSingleResponse,
   transformUpgradeResponse,
   transformDowngradeResponse,
+  transformCancelResponse,
   transformCancelDowngradeResponse,
   toCreatePayload,
   toUpdatePayload,
+  toPlanChangePayload,
   toUpgradePayload: toPlanChangePayload,
   toDowngradePayload: toPlanChangePayload
 }

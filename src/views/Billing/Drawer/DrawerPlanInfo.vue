@@ -45,7 +45,13 @@
           />
 
           <template v-if="!isChangeCycleMode">
+            <PaymentMethodSummary
+              v-if="showDefaultPaymentSummary"
+              :card="defaultPaymentCard"
+              @swap="handleSwapPaymentMethod"
+            />
             <PaymentMethodBlock
+              v-else
               ref="paymentRef"
               :stripeClientService="getStripeClientService"
               :checkoutSessionClientSecret="checkoutSessionClientSecret"
@@ -54,6 +60,7 @@
             />
 
             <AddressInformationBlock
+              v-if="!showDefaultPaymentSummary"
               ref="addressRef"
               :showUseOwnerInfo="true"
               @readiness-change="handleAddressReadinessChange"
@@ -79,9 +86,11 @@
   import CheckoutFeaturesBlock from '@/templates/checkout-block/checkout-features-block.vue'
   import PricingCalculationBlock from '@/templates/checkout-block/pricing-calculation-block.vue'
   import PaymentMethodBlock from '@/templates/checkout-block/payment-method-block.vue'
+  import PaymentMethodSummary from '@/views/Billing/Drawer/blocks/PaymentMethodSummary.vue'
   import AddressInformationBlock from '@/templates/checkout-block/address-information-block.vue'
   import CheckoutSubmissionFooter from '@/views/Billing/Drawer/CheckoutSubmissionFooter.vue'
   import { usePlans } from '@/composables/usePlans'
+  import { usePaymentMethods } from '@/composables/usePaymentMethods'
   import { useToast } from '@aziontech/webkit/use-toast'
 
   defineOptions({ name: 'drawer-plan-info' })
@@ -120,8 +129,19 @@
   const isAddressFormReady = ref(false)
   const billingCycle = ref('yearly')
   const checkoutSessionClientSecret = ref(props.initialClientSecret)
+  const useDefaultPaymentMethod = ref(true)
+
+  const { defaultCard: defaultPaymentCard } = usePaymentMethods()
 
   const isChangeCycleMode = computed(() => props.mode === 'change-cycle')
+
+  const showDefaultPaymentSummary = computed(
+    () => useDefaultPaymentMethod.value && Boolean(defaultPaymentCard.value)
+  )
+
+  const handleSwapPaymentMethod = () => {
+    useDefaultPaymentMethod.value = false
+  }
 
   const visibleDrawer = computed({
     get: () => props.visible,
@@ -145,6 +165,7 @@
   const isConfirmDisabled = computed(() => {
     if (isSubmitting.value) return true
     if (isChangeCycleMode.value) return false
+    if (showDefaultPaymentSummary.value) return !checkoutSessionClientSecret.value
     return (
       !checkoutSessionClientSecret.value || !isPaymentFormReady.value || !isAddressFormReady.value
     )
@@ -204,6 +225,16 @@
             fail: (err) =>
               reject(typeof err === 'string' ? new Error(err) : err || new Error('Failed'))
           })
+        })
+        return
+      }
+
+      if (showDefaultPaymentSummary.value) {
+        emit('submit', {
+          plan: props.plan,
+          billingCycle: billingCycle.value,
+          useDefaultPaymentMethod: true,
+          paymentMethodId: defaultPaymentCard.value?.id ?? null
         })
         return
       }

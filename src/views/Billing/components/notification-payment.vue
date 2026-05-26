@@ -6,11 +6,6 @@
     :createService="paymentService.addCredit"
     @onSuccess="successCredit"
   />
-  <DrawerPaymentMethod
-    ref="drawerPaymentMethodRef"
-    :getStripeClientService="props.getStripeClientService"
-    @onSuccess="successPaymentMethod"
-  />
 
   <SkeletonBlock
     v-if="!showNotification && loadingNotification"
@@ -39,7 +34,6 @@
 </template>
 <script setup>
   import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit.vue'
-  import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod.vue'
   import { paymentService } from '@/services/v2/payment/payment-service'
   import MessageNotification from '@/templates/message-notification'
   import { useAccountStore } from '@/stores/account'
@@ -52,19 +46,12 @@
 
   defineOptions({ name: 'notification-payment' })
 
-  const emit = defineEmits([
-    'clickAddCredit',
-    'clickAddPaymentMethod',
-    'clickLink',
-    'onSuccessCredit',
-    'onSuccessPaymentMethod'
-  ])
+  const emit = defineEmits(['clickAddCredit', 'clickLink', 'onSuccessCredit'])
 
   const toast = useToast()
   const showNotification = ref(false)
   const loadingNotification = ref(false)
   const drawerAddCreditRef = ref(null)
-  const drawerPaymentMethodRef = ref(null)
   const labelLink = ref('payment methods.')
 
   const props = defineProps({
@@ -85,12 +72,6 @@
       })
     },
     linkText: {
-      type: Object,
-      default: () => ({
-        disabled: false
-      })
-    },
-    buttonPaymentMethod: {
       type: Object,
       default: () => ({
         disabled: false
@@ -133,16 +114,6 @@
       hidden: !props.cardDefault.cardData,
       outlined: true,
       ...props.buttonCredit
-    },
-    {
-      label: 'Payment Method',
-      icon: 'pi pi-plus',
-      onClick: () => {
-        openDrawerPaymentMethod()
-        emit('clickAddPaymentMethod')
-      },
-      severity: 'secondary',
-      ...props.buttonPaymentMethod
     }
   ])
 
@@ -235,11 +206,6 @@
     }
   }
 
-  const successPaymentMethod = () => {
-    reload()
-    emit('onSuccessPaymentMethod')
-  }
-
   const successCredit = () => {
     reload()
     emit('onSuccessCredit')
@@ -249,10 +215,6 @@
     drawerAddCreditRef.value?.openDrawer()
   }
 
-  const openDrawerPaymentMethod = async () => {
-    drawerPaymentMethodRef.value?.openDrawer()
-  }
-
   onMounted(() => {
     const account = useAccountStore()
     loadText(account)
@@ -260,7 +222,6 @@
 
   defineExpose({
     reload,
-    openDrawerCredit,
-    openDrawerPaymentMethod
+    openDrawerCredit
   })
 </script>

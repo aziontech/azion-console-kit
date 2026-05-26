@@ -41,48 +41,41 @@
           </SkeletonBlock>
         </SubscriptionPlanRow>
 
-        <template v-if="subscription.isPro">
-          <SubscriptionPlanRow label="Next Charge Date">
-            <SkeletonBlock
-              :isLoaded="!subscription.isLoading"
-              class="text-color"
-              elementType="span"
-            >
-              {{ subscription.nextChargeDate || '--' }}
-            </SkeletonBlock>
-          </SubscriptionPlanRow>
+        <SubscriptionPlanRow label="Next Charge Date">
+          <SkeletonBlock
+            :isLoaded="!subscription.isLoading"
+            class="text-color"
+            elementType="span"
+          >
+            {{ subscription.isPro ? subscription.nextChargeDate || '--' : '--' }}
+          </SkeletonBlock>
+        </SubscriptionPlanRow>
 
-          <SubscriptionPlanRow label="Next Charge Value">
-            <SkeletonBlock
-              :isLoaded="!subscription.isLoading"
-              class="text-color"
-              elementType="span"
-            >
+        <SubscriptionPlanRow label="Next Charge Value">
+          <SkeletonBlock
+            :isLoaded="!subscription.isLoading"
+            class="text-color"
+            elementType="span"
+          >
+            <template v-if="subscription.isPro">
               <span class="text-color">
                 <span class="text-color-secondary">$</span>
                 {{ nextChargeFormatted }}
               </span>
-            </SkeletonBlock>
-          </SubscriptionPlanRow>
+            </template>
+            <span
+              v-else
+              class="text-color"
+              >--</span
+            >
+          </SkeletonBlock>
+        </SubscriptionPlanRow>
 
-          <SubscriptionPlanRow label="Payment Method">
-            <span class="text-color">--</span>
-          </SubscriptionPlanRow>
-        </template>
-
-        <template v-if="subscription.isHobby">
-          <SubscriptionPlanRow label="Payment Method">
-            <span class="text-color">--</span>
-          </SubscriptionPlanRow>
-
-          <SubscriptionPlanRow label="Payment Currency">
-            <span class="text-color">--</span>
-          </SubscriptionPlanRow>
-
-          <SubscriptionPlanRow label="Credit Balance">
-            <span class="text-color"><span class="text-color-secondary">$</span>0</span>
-          </SubscriptionPlanRow>
-        </template>
+        <SubscriptionPlanRow label="Payment Method">
+          <span class="text-color">
+            {{ paymentMethodLabel }}
+          </span>
+        </SubscriptionPlanRow>
       </div>
     </template>
 
@@ -110,7 +103,8 @@
   defineOptions({ name: 'subscription-plan-card' })
 
   const props = defineProps({
-    subscription: { type: Object, required: true }
+    subscription: { type: Object, required: true },
+    paymentMethodLabel: { type: String, default: '--' }
   })
 
   const emit = defineEmits(['change-plan', 'go-to-payment'])

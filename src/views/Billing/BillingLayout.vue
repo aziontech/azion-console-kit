@@ -7,7 +7,6 @@
       :cardDefault="cardDefault"
       @loadCard="loadCardDefault"
       @openDrawerAddCredit="openDrawerCredit"
-      @openDrawerAddPaymentMethod="openDrawerPaymentMethod"
     >
       <template #notification="slotProp">
         <NotificationPayment
@@ -15,7 +14,6 @@
           v-bind="propsNotification(slotProp)"
           @clickLink="slotProp.redirectLink"
           @onSuccessCredit="successDrawer"
-          @onSuccessPaymentMethod="successDrawer"
         />
       </template>
     </component>
@@ -60,7 +58,8 @@
       ...linkText
     },
     buttonPaymentMethod: {
-      ...buttonPaymentMethod
+      ...buttonPaymentMethod,
+      hidden: true
     }
   })
 
@@ -83,10 +82,6 @@
 
   const openDrawerCredit = async () => {
     notificationPaymentRef.value?.openDrawerCredit()
-  }
-
-  const openDrawerPaymentMethod = () => {
-    notificationPaymentRef.value?.openDrawerPaymentMethod()
   }
 
   onMounted(() => {
