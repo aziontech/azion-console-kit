@@ -203,4 +203,34 @@ export class SignUpTracker {
     })
     return this.#trackerAdapter
   }
+
+  /**
+   * @param {Object} payload
+   * @param {string} payload.plan
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  successScreenViewed(payload = {}) {
+    this.#trackerAdapter.addEvent({
+      eventName: 'Plan Success Screen Viewed',
+      props: {
+        plan: payload.plan
+      }
+    })
+    return this.#trackerAdapter
+  }
+
+  /**
+   * @param {Object} payload
+   * @param {string} payload.plan
+   * @returns {AnalyticsTrackerAdapter}
+   */
+  startDeployingClicked(payload = {}) {
+    this.#trackerAdapter.addEvent({
+      eventName: 'Start Deploying Clicked',
+      props: {
+        plan: payload.plan
+      }
+    })
+    return this.#trackerAdapter
+  }
 }

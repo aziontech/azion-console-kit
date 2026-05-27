@@ -51,6 +51,8 @@ function disableBroadcastChannelForTests() {
   Function('return this')().BroadcastChannel = undefined
 }
 
+disableBroadcastChannelForTests()
+
 export function setupGlobalPinia() {
   const pinia = createPinia()
   setActivePinia(pinia)
