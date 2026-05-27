@@ -372,6 +372,10 @@
     }
   }
 
+  const refreshInvoiceAndHistory = async () => {
+    await Promise.allSettled([loadCurrentInvoice(), listTableRef.value?.reload?.()])
+  }
+
   // Re-fetch the legacy invoice service whenever the subscription transitions
   // into Pro (initial mount included). No timer/retry loop here — the
   // post-checkout invoice freshness used to be papered over by 6×2s polling;
@@ -659,6 +663,7 @@
         } else {
           await subscription.refetch()
         }
+        await refreshInvoiceAndHistory()
       } finally {
         isPostPaymentReloading.value = false
       }
@@ -855,6 +860,7 @@
       } else {
         await subscription.refetch()
       }
+      await refreshInvoiceAndHistory()
     } finally {
       isPostPaymentReloading.value = false
     }
