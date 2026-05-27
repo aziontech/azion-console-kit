@@ -10,7 +10,6 @@
         @submit.prevent
         class="space-y-6"
       >
-
         <div
           class="flex flex-col gap-2 w-full"
           :class="{ 'stripe-input-invalid': displayError.paymentElement }"

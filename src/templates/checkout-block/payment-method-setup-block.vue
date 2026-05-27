@@ -120,7 +120,10 @@
   const initVersion = ref(0)
 
   const emitReadiness = () => {
-    emit('readiness-change', paymentElementReady.value && paymentElementComplete.value && !error.value)
+    emit(
+      'readiness-change',
+      paymentElementReady.value && paymentElementComplete.value && !error.value
+    )
   }
 
   const unmount = () => {

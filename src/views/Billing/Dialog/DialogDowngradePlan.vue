@@ -12,7 +12,9 @@
       },
       title: { class: 'text-base font-semibold leading-[21px] text-default' },
       content: { class: 'bg-[var(--surface-100)] p-0' },
-      footer: { class: 'h-14 border-t border-[var(--border-default)] bg-[var(--surface-50)] px-8 m-0' }
+      footer: {
+        class: 'h-14 border-t border-[var(--border-default)] bg-[var(--surface-50)] px-8 m-0'
+      }
     }"
     :header="title"
   >

@@ -25,8 +25,7 @@ export function useLatestInvoice(options = {}) {
   const latestInvoiceTotal = computed(() => {
     const invoice = latestInvoice.value
     if (!invoice) return null
-    const cents =
-      typeof invoice.amount_paid === 'number' ? invoice.amount_paid : invoice.total
+    const cents = typeof invoice.amount_paid === 'number' ? invoice.amount_paid : invoice.total
     if (typeof cents !== 'number' || !Number.isFinite(cents)) return null
     return cents / 100
   })

@@ -7,7 +7,6 @@ import '@aziontech/theme'
 import '@aziontech/icons'
 import '@aziontech/webkit/styles/country-flags'
 
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'

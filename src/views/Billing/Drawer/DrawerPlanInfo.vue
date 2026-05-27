@@ -5,7 +5,9 @@
     :pt="sidebarPt"
   >
     <div class="flex h-full">
-      <div class="hidden md:block w-[300px] shrink-0 border-r border-[var(--border-default)] bg-surface">
+      <div
+        class="hidden md:block w-[300px] shrink-0 border-r border-[var(--border-default)] bg-surface"
+      >
         <CheckoutFeaturesBlock :plan="plan" />
       </div>
 
@@ -126,9 +128,7 @@
     const rootBase = 'w-full md:w-[960px] md:max-w-[calc(100vw-160px)] border-l surface-border'
     return {
       root: {
-        class: props.indented
-          ? `${rootBase} shadow-[-12px_0_32px_-8px_rgba(0,0,0,0.45)]`
-          : rootBase
+        class: props.indented ? `${rootBase} shadow-[-12px_0_32px_-8px_rgba(0,0,0,0.45)]` : rootBase
       },
       header: { class: 'hidden' },
       content: { class: 'p-0 overflow-hidden' }
@@ -153,8 +153,7 @@
   const useDefaultPaymentMethod = ref(true)
 
   const { defaultPaymentMethod: defaultPaymentCard } = useBillingPaymentMethods()
-  const { createSetupIntent, setDefault: setDefaultPaymentMethod } =
-    useUpdateDefaultPaymentMethod()
+  const { createSetupIntent, setDefault: setDefaultPaymentMethod } = useUpdateDefaultPaymentMethod()
 
   const isChangeCycleMode = computed(() => props.mode === 'change-cycle')
 
