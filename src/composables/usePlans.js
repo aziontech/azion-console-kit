@@ -1,67 +1,18 @@
 import { computed, onScopeDispose, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-const STORAGE_KEY = 'signup_plan_params'
-const DEFAULT_EXPIRATION_DAYS = 15
-
 const VALID_PLANS = ['hobby', 'pro']
 const VALID_BILLING_CYCLES = ['monthly', 'yearly']
 
 const isValidPlan = (value) => VALID_PLANS.includes(value)
 const isValidBillingCycle = (value) => VALID_BILLING_CYCLES.includes(value)
 
-const getExpirationTimestamp = (days = DEFAULT_EXPIRATION_DAYS) =>
-  Date.now() + days * 24 * 60 * 60 * 1000
-
-const isExpired = (data) => !data?.expiresAt || Date.now() > data.expiresAt
-
 // Signup-scoped state. The user is in a single onboarding flow at a time, so
 // sharing the plan/cycle choice across the components in that flow is
-// intentional. Component-level router context is resolved per-call below.
+// intentional. Module-level refs survive in-session navigation; URL params
+// (?plan, ?billing-cycle) are the source of truth across reloads/deep links.
 const _plan = ref(null)
 const _billingCycle = ref(null)
-
-const clearStorage = () => {
-  try {
-    localStorage.removeItem(STORAGE_KEY)
-  } catch {
-    /* storage unavailable */
-  }
-}
-
-const saveToStorage = () => {
-  try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        plan: _plan.value,
-        billingCycle: _billingCycle.value,
-        expiresAt: getExpirationTimestamp()
-      })
-    )
-  } catch {
-    /* storage unavailable */
-  }
-}
-
-const loadFromStorage = () => {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
-    const data = JSON.parse(raw)
-    if (isExpired(data)) {
-      clearStorage()
-      return null
-    }
-    return {
-      plan: data.plan && isValidPlan(data.plan) ? data.plan : null,
-      billingCycle: data.billingCycle || null
-    }
-  } catch {
-    clearStorage()
-    return null
-  }
-}
 
 export function usePlans() {
   const route = useRoute()
@@ -109,27 +60,19 @@ export function usePlans() {
     if (urlParams) {
       _plan.value = urlParams.plan || null
       _billingCycle.value = urlParams.billingCycle || null
-      saveToStorage()
       return
     }
 
-    const stored = loadFromStorage()
-    if (stored?.plan) {
-      _plan.value = stored.plan
-      _billingCycle.value = stored.billingCycle
-      return
-    }
+    if (_plan.value || _billingCycle.value) return
 
     _plan.value = 'pro'
     _billingCycle.value = 'monthly'
-    saveToStorage()
   }
 
   const setParam = (key, value) => {
     if (key === 'plan' && (value === null || isValidPlan(value))) _plan.value = value
     else if (key === 'billingCycle' && (value === null || isValidBillingCycle(value)))
       _billingCycle.value = value
-    saveToStorage()
   }
 
   const setParams = (params) => {
@@ -142,13 +85,11 @@ export function usePlans() {
     ) {
       _billingCycle.value = params.billingCycle
     }
-    saveToStorage()
   }
 
   const clear = async () => {
     _plan.value = null
     _billingCycle.value = null
-    clearStorage()
     await syncToUrl()
   }
 
@@ -175,8 +116,6 @@ export function usePlans() {
     setParams,
     clear,
 
-    syncToUrl,
-    saveToStorage,
-    loadFromStorage
+    syncToUrl
   }
 }
