@@ -17,7 +17,10 @@
     </template>
 
     <div class="flex flex-col gap-6 p-6">
-      <div class="flex justify-center">
+      <div
+        v-if="showCycleToggle"
+        class="flex justify-center"
+      >
         <SegmentedButton
           v-model="localBillingCycle"
           :options="CYCLE_OPTIONS"
@@ -83,7 +86,7 @@
   import Sidebar from '@aziontech/webkit/sidebar'
   import CardPricing from '@aziontech/webkit/content/card-pricing'
   import ActionButton from '@aziontech/webkit/actions/button'
-  import SegmentedButton from '@aziontech/webkit/segmented-button'
+  import SegmentedButton from '@aziontech/webkit/actions/segmented-button'
   import { usePlans } from '@/composables/usePlans'
   import { getComparisonInfo } from '@/views/Billing/plan-comparison-features'
 
@@ -146,7 +149,24 @@
     { label: 'Yearly', value: 'yearly' }
   ]
 
-  const localBillingCycle = ref(props.billingCycle)
+  // In billing context, Pro users only have a meaningful single direction:
+  // - Pro/monthly → upgrade cycle to yearly
+  // - Pro/yearly  → downgrade cycle to monthly (or downgrade plan to Hobby)
+  // Hide the toggle and force the opposite cycle so the Pro card shows the
+  // single available cycle-change target. Signup context always shows the
+  // full picker (user is choosing fresh, no current-plan constraint).
+  const isProUserInBillingContext = computed(
+    () => props.context === 'billing' && props.currentPlan?.toLowerCase() === 'pro'
+  )
+
+  const showCycleToggle = computed(() => !isProUserInBillingContext.value)
+
+  const initialCycle = () => {
+    if (!isProUserInBillingContext.value) return props.billingCycle
+    return props.billingCycle === 'monthly' ? 'yearly' : 'monthly'
+  }
+
+  const localBillingCycle = ref(initialCycle())
 
   watch(localBillingCycle, (cycle, previousCycle) => {
     setParam('billingCycle', cycle)
@@ -164,7 +184,7 @@
     () => props.visible,
     (newVisible) => {
       if (newVisible) {
-        localBillingCycle.value = props.billingCycle
+        localBillingCycle.value = initialCycle()
       }
     }
   )
@@ -278,6 +298,24 @@
     return props.billingCycle === localBillingCycle.value
   }
 
+  const resolveIntent = (planValue) => {
+    const target = planValue.toLowerCase()
+    if (target === 'enterprise') return 'contact-sales'
+
+    const current = props.currentPlan?.toLowerCase()
+    if (!current || props.context === 'signup') return 'subscribe'
+
+    if (target === current) {
+      if (target === 'hobby') return 'subscribe'
+      if (props.billingCycle === localBillingCycle.value) return 'subscribe'
+      return localBillingCycle.value === 'yearly' ? 'cycle-change' : 'cycle-change'
+    }
+
+    const targetRank = PLAN_RANK[target] ?? 0
+    const currentRank = PLAN_RANK[current] ?? 0
+    return targetRank > currentRank ? 'upgrade' : 'downgrade'
+  }
+
   const handleChoosePlan = (planValue) => {
     if (planValue?.toLowerCase() === 'enterprise') {
       window.open('https://www.azion.com/en/contact/', '_blank', 'noopener,noreferrer')
@@ -291,7 +329,10 @@
 
     emit('select', {
       plan: planValue,
-      billingCycle: localBillingCycle.value
+      billingCycle: localBillingCycle.value,
+      intent: resolveIntent(planValue),
+      fromPlan: props.currentPlan,
+      fromCycle: props.billingCycle
     })
     if (props.closeOnSelect) {
       emit('update:visible', false)

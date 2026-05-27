@@ -65,6 +65,15 @@ const _companyWebsite = ref(initialState.companyWebsite)
 const _fullName = ref(initialState.fullName)
 const _termsAccepted = ref(initialState.termsAccepted)
 
+const state = computed(() => ({
+  usageIntent: _usageIntent.value,
+  role: _role.value,
+  companySize: _companySize.value,
+  companyWebsite: _companyWebsite.value,
+  fullName: _fullName.value,
+  termsAccepted: _termsAccepted.value
+}))
+
 const setField = (key, value) => {
   switch (key) {
     case 'usageIntent':
@@ -108,15 +117,6 @@ const clear = () => {
   _termsAccepted.value = undefined
   removePersistedState()
 }
-
-const state = computed(() => ({
-  usageIntent: _usageIntent.value,
-  role: _role.value,
-  companySize: _companySize.value,
-  companyWebsite: _companyWebsite.value,
-  fullName: _fullName.value,
-  termsAccepted: _termsAccepted.value
-}))
 
 export function useAdditionalDataFormState() {
   return {

@@ -85,15 +85,16 @@
     </template>
   </EmptyResultsBlock>
 
-  <DrawerPlanComparison
+  <PlanSelectionDrawer
     v-model:visible="showChangePlanDrawer"
+    context="billing"
+    :relativeLabels="true"
+    :closeOnSelect="false"
     :currentPlan="currentPlanSlug"
-    :currentCycle="currentActiveCycle"
+    :billingCycle="currentActiveCycle"
     :plans="plansData || []"
-    :preparingPlan="preparingPlan"
-    @select-pro-upgrade="handleSelectProUpgrade"
-    @select-downgrade-hobby="handleSelectDowngradeHobby"
-    @select-cycle-change="handleSelectCycleChange"
+    :loadingPlan="preparingPlan"
+    @select="handleSelectPlan"
   />
 
   <DrawerPlanInfo
@@ -153,8 +154,8 @@
 
   // Modals/drawers are heavy (Stripe element, plan grid) and only render on
   // user action — defer the chunks so the initial Billing render stays light.
-  const DrawerPlanComparison = defineAsyncComponent(
-    () => import('./Drawer/DrawerPlanComparison.vue')
+  const PlanSelectionDrawer = defineAsyncComponent(
+    () => import('@/templates/signup-block/plan-selection-drawer.vue')
   )
   const DrawerPlanInfo = defineAsyncComponent(() => import('./Drawer/DrawerPlanInfo.vue'))
   const DialogDowngradePlan = defineAsyncComponent(() => import('./Dialog/DialogDowngradePlan.vue'))
@@ -438,14 +439,15 @@
 
   const openDrawerWithCheckoutSession = async ({ plan, preferredCycle, lockedCycle: locked }) => {
     if (preparingPlan.value) return
+    checkoutSessionClientSecret.value = ''
+    drawerMode.value = 'subscribe'
+    selectedPlan.value = plan
+    lockedCycle.value = locked
+    showPlanInfoDrawer.value = true
     preparingPlan.value = plan
     try {
       const secret = await prepareCheckoutSession({ plan, preferredCycle })
       checkoutSessionClientSecret.value = secret
-      drawerMode.value = 'subscribe'
-      selectedPlan.value = plan
-      lockedCycle.value = locked
-      showPlanInfoDrawer.value = true
       trackBilling('checkoutStarted', {
         plan,
         billingCycle: preferredCycle || storedBillingCycle.value,
@@ -467,6 +469,7 @@
         detail,
         closable: true
       })
+      showPlanInfoDrawer.value = false
     } finally {
       preparingPlan.value = null
     }
@@ -549,42 +552,48 @@
     showDowngradeDialog.value = true
   }
 
-  const handleSelectProUpgrade = async (cycle) => {
-    setParam('billingCycle', cycle)
-    await syncToUrl()
-    trackBilling('planSelected', {
-      plan: 'pro',
-      billingCycle: cycle,
-      fromPlan: subscription.planSku.value,
-      fromCycle: subscription.billingCycle.value,
-      isCycleOnlyChange: false
-    })
-    await openDrawerWithCheckoutSession({
-      plan: 'pro',
-      preferredCycle: cycle,
-      lockedCycle: null
-    })
-  }
+  const handleSelectPlan = async ({ plan, billingCycle, intent, fromPlan, fromCycle }) => {
+    if (intent === 'upgrade' || intent === 'subscribe') {
+      setParam('billingCycle', billingCycle)
+      await syncToUrl()
+      trackBilling('planSelected', {
+        plan,
+        billingCycle,
+        fromPlan,
+        fromCycle,
+        isCycleOnlyChange: false
+      })
+      await openDrawerWithCheckoutSession({
+        plan,
+        preferredCycle: billingCycle,
+        lockedCycle: null
+      })
+      return
+    }
 
-  const handleSelectDowngradeHobby = async () => {
-    trackBilling('planSelected', {
-      plan: 'hobby',
-      billingCycle: subscription.billingCycle.value,
-      fromPlan: subscription.planSku.value,
-      fromCycle: subscription.billingCycle.value,
-      isCycleOnlyChange: false
-    })
-    await openPlanDowngradeDialog()
-  }
+    if (intent === 'downgrade') {
+      trackBilling('planSelected', {
+        plan,
+        billingCycle,
+        fromPlan,
+        fromCycle,
+        isCycleOnlyChange: false
+      })
+      await openPlanDowngradeDialog()
+      return
+    }
 
-  const handleSelectCycleChange = async (targetCycle) => {
-    const plan = subscription.planSku.value
-    const fromCycle = subscription.billingCycle.value
-    trackBilling('billingCycleToggled', { fromCycle, toCycle: targetCycle, context: 'billing' })
-    if (targetCycle === 'yearly') {
-      openCycleReviewDrawer({ plan, targetCycle })
-    } else {
-      await openCycleDowngradeDialog({ fromCycle, toCycle: targetCycle })
+    if (intent === 'cycle-change') {
+      trackBilling('billingCycleToggled', {
+        fromCycle,
+        toCycle: billingCycle,
+        context: 'billing'
+      })
+      if (billingCycle === 'yearly') {
+        openCycleReviewDrawer({ plan, targetCycle: billingCycle })
+      } else {
+        await openCycleDowngradeDialog({ fromCycle, toCycle: billingCycle })
+      }
     }
   }
 

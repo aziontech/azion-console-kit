@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-6 mt-4">
     <FormHorizontal
       title="General"
-      description="Set up your new SQL database with basic configuration."
+      description="Set up your new SQL Database with basic configuration."
       data-testid="create-database-form-general"
     >
       <template #inputs>

@@ -6,8 +6,8 @@
 
     <div class="flex w-full max-w-full flex-col p-6">
       <div
-        v-if="showUseOwnerInfo"
-        class="flex items-start gap-3"
+        v-if="canUseOwnerInfo"
+        class="flex items-start gap-3 mb-6"
       >
         <Checkbox
           v-model="useOwnerInfo"
@@ -25,7 +25,7 @@
       <Transition name="address-fields-collapse">
         <div
           v-if="showAddressFields"
-          class="address-fields flex w-full flex-col gap-6"
+          class="flex w-full flex-col gap-6"
         >
           <div class="flex w-full flex-col gap-6 md:flex-row">
             <CountrySelector
@@ -66,7 +66,7 @@
             />
           </div>
 
-          <div class="flex w-full min-w-0 flex-col gap-2">
+          <div class="address-full-width flex w-full min-w-0 flex-col gap-2">
             <FieldInput
               name="address"
               label="Address"
@@ -143,10 +143,20 @@
   const regionsOptions = ref({ options: [], done: true })
   const citiesOptions = ref({ options: [], done: true })
   const isApplyingInitialValues = ref(false)
-  const useOwnerInfo = ref(props.showUseOwnerInfo)
+
+  const hasOwnerAddress = computed(() => {
+    const data = accountStore.accountData
+    if (!data) return false
+    const street = String(data.address || '').trim()
+    const postal = String(data.postalCode || data.postal_code || '').trim()
+    return Boolean(street && postal)
+  })
+
+  const canUseOwnerInfo = computed(() => props.showUseOwnerInfo && hasOwnerAddress.value)
+  const useOwnerInfo = ref(canUseOwnerInfo.value)
 
   const showAddressFields = computed(() => {
-    if (!props.showUseOwnerInfo) return true
+    if (!canUseOwnerInfo.value) return true
     return !useOwnerInfo.value
   })
 
@@ -404,8 +414,8 @@
     font-size: 12px !important;
   }
 
-  .address-fields {
-    margin-top: 24px;
+  .address-full-width :deep([class*='max-w-lg']) {
+    max-width: none !important;
   }
 
   .address-fields-collapse-enter-active,
@@ -413,8 +423,7 @@
     transition:
       opacity 220ms ease,
       transform 220ms ease,
-      max-height 260ms ease,
-      margin-top 220ms ease;
+      max-height 260ms ease;
     overflow: hidden;
     max-height: 800px;
   }
@@ -424,7 +433,6 @@
     opacity: 0;
     transform: translateY(-8px);
     max-height: 0;
-    margin-top: 0;
   }
 
   .address-fields-collapse-enter-to,
@@ -432,6 +440,5 @@
     opacity: 1;
     transform: translateY(0);
     max-height: 800px;
-    margin-top: 24px;
   }
 </style>

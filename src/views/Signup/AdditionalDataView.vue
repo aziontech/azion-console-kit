@@ -16,26 +16,15 @@
           </template>
 
           <template #footer>
-            <Button
-              severity="primary"
-              class="w-full font-protomono flex items-center justify-center"
+            <ActionButton
+              kind="primary"
+              size="large"
+              class="w-full"
+              :label="submitButtonLabel"
+              :loading="isSubmitLoading"
               :disabled="isDisabledSubmit"
               @click="onSubmit"
-            >
-              <span class="inline-flex items-center gap-2">
-                <Transition
-                  name="label-fade"
-                  mode="out-in"
-                >
-                  <span :key="submitButtonLabel">{{ submitButtonLabel }}</span>
-                </Transition>
-                <i
-                  v-if="isSubmitLoading"
-                  class="pi pi-spinner pi-spin text-xs animate-spin"
-                  aria-hidden="true"
-                />
-              </span>
-            </Button>
+            />
           </template>
         </CardBox>
         <div
@@ -91,11 +80,11 @@
 </template>
 
 <script setup>
-  import CardBox from '@aziontech/webkit/card-box'
+  import CardBox from '@aziontech/webkit/content/card-box'
   import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block.vue'
   import ChoosingPlanContainer from '@/templates/signup-block/choosing-plan-container.vue'
   import PlanSuccessBlock from '@/templates/signup-block/plan-success-block.vue'
-  import Button from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
   import { computed, inject, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { usePlans } from '@/composables/usePlans'
@@ -198,26 +187,30 @@
     const planPricingId = getPlanPricingId(plansData.value, plan, billingCycle)
     if (!planPricingId) return
 
+    checkoutSessionClientSecret.value = ''
+    selectedPlan.value = plan
+    trackSignUp('checkoutStarted', { plan, billingCycle })
+    currentStep.value = 'checkout'
+
     try {
       const serviceOrderResponse = await submitServiceOrder({ accountId, planId, planPricingId })
-      // Adapter surfaces the Stripe client secret in two places depending on
-      // where the backend put it: top-level `payment` (explicit field) or on
-      // the SO itself when extracted from `metadata.client_secret`.
-      checkoutSessionClientSecret.value =
+      const secret =
         serviceOrderResponse?.payment?.clientSecret ||
         serviceOrderResponse?.data?.clientSecret ||
         ''
 
-      if (!checkoutSessionClientSecret.value) {
+      if (!secret) {
         // eslint-disable-next-line no-console
         console.error('Unable to initialize payment. Please try again.')
+        currentStep.value = 'additional-data'
         return
       }
 
-      handleProceedToCheckout()
+      checkoutSessionClientSecret.value = secret
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Failed to submit service order:', err)
+      currentStep.value = 'additional-data'
     }
   }
 

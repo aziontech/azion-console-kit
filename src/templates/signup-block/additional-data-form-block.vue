@@ -128,6 +128,7 @@
     <!-- Plan Selection Drawer -->
     <PlanSelectionDrawer
       v-model:visible="showPlanDrawer"
+      context="signup"
       :plans="plansData"
       :currentPlan="plan"
       :billingCycle="billingCycle"
@@ -150,7 +151,7 @@
     updateAccountInfoService
   } from '@/services/signup-services'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import BoxGridSelection from '@aziontech/webkit/box-grid-selection'
+  import BoxGridSelection from '@aziontech/webkit/inputs/box-grid-selection'
   import FieldText from '@aziontech/webkit/field-text'
   import Skeleton from '@aziontech/webkit/skeleton'
   import Checkbox from '@aziontech/webkit/checkbox'
@@ -161,7 +162,7 @@
   const tracker = inject('tracker')
   const toast = useToast()
   const accountStore = useAccountStore()
-  const { setField: setAdditionalDataField, hydrate: hydrateAdditionalDataForm } =
+  const { state: additionalDataFormState, setField: setAdditionalDataField } =
     useAdditionalDataFormState()
 
   defineOptions({
@@ -199,8 +200,14 @@
       .required('Your Full Name is required')
   })
 
+  const buildInitialValues = () =>
+    Object.fromEntries(
+      Object.entries(additionalDataFormState.value).filter(([, value]) => value !== undefined)
+    )
+
   const { meta } = useForm({
-    validationSchema
+    validationSchema,
+    initialValues: buildInitialValues()
   })
 
   const { value: plan } = useField('plan')
@@ -422,14 +429,6 @@
     if (storedBillingCycle.value) {
       billingCycle.value = storedBillingCycle.value
     }
-
-    hydrateAdditionalDataForm({
-      role,
-      companySize,
-      companyWebsite,
-      fullName,
-      termsAccepted
-    })
 
     await nextTick()
     skipInitialExpandAnimation.value = false

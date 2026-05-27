@@ -8,7 +8,7 @@ export const PLAN_COMPARISON_FEATURES = {
       { title: 'Global infrastructure', icon: 'pi pi-globe' },
       { title: 'Serverless functions', icon: 'pi pi-code' },
       { title: 'Image optimization', icon: 'pi pi-image' },
-      { title: 'Storage & SQL database', icon: 'pi pi-database' },
+      { title: 'Storage & SQL Database', icon: 'pi pi-database' },
       { title: 'Firewall', icon: 'pi pi-shield' }
     ]
   },
