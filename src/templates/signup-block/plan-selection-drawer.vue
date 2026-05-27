@@ -2,12 +2,11 @@
   <Sidebar
     v-model:visible="visibleDrawer"
     position="right"
+    class="!w-full md:!w-[1158px]"
     :pt="{
-      root: { class: 'w-fit border-l surface-border' },
-      header: { class: 'h-14 px-4 md:px-8 py-[14px] border-b surface-border' },
+      header: { class: 'h-14 px-6 py-[14px] border-b border-[var(--border-muted)]' },
       content: {
-        class:
-          'px-4 md:px-8 py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'
+        class: 'p-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'
       }
     }"
   >
@@ -17,70 +16,63 @@
       </div>
     </template>
 
-    <div class="flex flex-col gap-6 min-h-full">
-      <SegmentedButton
-        v-model="localBillingCycle"
-        :options="CYCLE_OPTIONS"
-        class="self-center"
-      />
+    <div class="flex flex-col gap-6 p-6">
+      <div class="flex justify-center">
+        <SegmentedButton
+          v-model="localBillingCycle"
+          :options="CYCLE_OPTIONS"
+        />
+      </div>
 
-      <div
-        :class="[
-          'flex flex-col gap-3 flex-1 bg-surface-raised',
-          isHorizontalPricingCard ? '' : 'md:flex-row md:h-[200px]'
-        ]"
-      >
-        <div
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        <CardPricing
           v-for="planOption in planOptions"
           :key="planOption.value"
-          class="flex flex-col gap-3 h-fit w-full"
+          :planTitle="planOption.label"
+          :description="planOption.description"
+          :pricingDetails="getPricingDetails(planOption.value)"
+          :showTag="Boolean(planOption.tagLabel)"
+          :tagLabel="planOption.tagLabel || 'Popular'"
+          :value="getCardValue(planOption.value)"
+          :prefix="getCardPrefix(planOption.value)"
+          :suffix="getCardSuffix(planOption.value)"
+          :showPrefix="isPricedPlan(planOption.value)"
+          :showSuffix="isPricedPlan(planOption.value)"
+          slotPosition="middle"
         >
-          <CardPricing
-            :planTitle="planOption.label"
-            :description="planOption.description"
-            :pricingDetails="getPricingDetails(planOption.value)"
-            :showTag="Boolean(planOption.tagLabel)"
-            :tagLabel="planOption.tagLabel || 'Popular'"
-            :value="getCardValue(planOption.value)"
-            :prefix="getCardPrefix(planOption.value)"
-            :suffix="getCardSuffix(planOption.value)"
-            :showPrefix="planOption.value !== 'enterprise'"
-            :showSuffix="planOption.value !== 'enterprise'"
-            slotPosition="bottom"
-          >
-            <template #actions>
-              <ActionButton
-                :label="planOption.buttonLabel"
-                :kind="
-                  isCurrentPlanSelection(planOption.value) ||
-                  planOption.value.toLowerCase() === 'enterprise'
-                    ? 'outlined'
-                    : 'secondary'
-                "
-                size="large"
-                icon="pi pi-chevron-right"
-                :loading="isLoadingPlan(planOption.value)"
-                :disabled="isCurrentPlanSelection(planOption.value) || Boolean(props.loadingPlan)"
-                class="w-full"
-                @click="handleChoosePlan(planOption.value)"
-              />
-            </template>
+          <template #actions>
+            <ActionButton
+              :label="planOption.buttonLabel"
+              :kind="resolveButtonKind(planOption.value)"
+              size="large"
+              :loading="isLoadingPlan(planOption.value)"
+              :disabled="isCurrentPlanSelection(planOption.value) || Boolean(props.loadingPlan)"
+              class="w-full"
+              @click="handleChoosePlan(planOption.value)"
+            />
+          </template>
 
+          <div class="flex flex-col gap-2">
+            <p
+              v-if="getSectionTitle(planOption)"
+              class="text-xs leading-none text-color-secondary"
+            >
+              {{ getSectionTitle(planOption) }}
+            </p>
             <ul class="flex flex-col gap-2">
               <li
-                v-for="feature in planOption.features"
-                :key="feature.label"
-                class="flex items-center gap-2 text-sm text-color"
+                v-for="feature in getIconFeatures(planOption)"
+                :key="feature.title"
+                class="flex items-center gap-2.5 text-xs leading-none text-color"
               >
-                <i
-                  v-if="feature.icon"
-                  :class="[feature.icon, 'text-color-secondary text-sm']"
-                />
-                <span>{{ feature.label }}</span>
+                <span class="inline-flex items-center justify-center size-5 shrink-0">
+                  <i :class="[feature.icon, 'text-base text-color']" />
+                </span>
+                <span>{{ feature.title }}</span>
               </li>
             </ul>
-          </CardPricing>
-        </div>
+          </div>
+        </CardPricing>
       </div>
     </div>
   </Sidebar>
@@ -92,9 +84,8 @@
   import CardPricing from '@aziontech/webkit/content/card-pricing'
   import ActionButton from '@aziontech/webkit/actions/button'
   import SegmentedButton from '@aziontech/webkit/segmented-button'
-  import { useResize } from '@/composables/useResize'
   import { usePlans } from '@/composables/usePlans'
-  import { PLAN_OPTIONS } from '@/templates/signup-block/plan-options'
+  import { getComparisonInfo } from '@/views/Billing/plan-comparison-features'
 
   defineOptions({
     name: 'plan-selection-drawer'
@@ -148,8 +139,6 @@
   })
 
   const emit = defineEmits(['update:visible', 'select', 'billing-cycle-toggled'])
-  const { windowWidth } = useResize()
-  const isHorizontalPricingCard = computed(() => windowWidth.value <= 1000)
   const { setParam } = usePlans()
 
   const CYCLE_OPTIONS = [
@@ -197,9 +186,24 @@
     return 'Downgrade'
   }
 
+  const BASE_PLAN_OPTIONS = computed(() => {
+    return ['hobby', 'pro', 'enterprise'].map((value) => {
+      const info = getComparisonInfo(value) || {}
+      return {
+        value,
+        label: info.label,
+        description: info.tagline,
+        sectionTitle: info.sectionTitle,
+        features: info.features ?? [],
+        tagLabel: value === 'pro' ? 'Popular' : undefined,
+        buttonLabel: value === 'enterprise' ? 'Contact Sales' : 'Choose Plan'
+      }
+    })
+  })
+
   const planOptions = computed(() => {
-    if (!props.relativeLabels) return PLAN_OPTIONS
-    return PLAN_OPTIONS.map((option) => ({
+    if (!props.relativeLabels) return BASE_PLAN_OPTIONS.value
+    return BASE_PLAN_OPTIONS.value.map((option) => ({
       ...option,
       buttonLabel: getRelativeLabel(option.value)
     }))
@@ -225,6 +229,7 @@
   }
 
   const getCardValue = (planValue) => {
+    if (planValue === 'hobby') return 'Free'
     if (planValue === 'enterprise') return 'Custom'
     const numeric =
       localBillingCycle.value === 'yearly'
@@ -233,17 +238,35 @@
     return formatNumeric(numeric)
   }
 
-  const getCardPrefix = (planValue) => (planValue === 'enterprise' ? '' : '$')
+  const isPricedPlan = (planValue) => planValue === 'pro'
 
-  const getCardSuffix = (planValue) => (planValue === 'enterprise' ? '' : 'per month')
+  const getCardPrefix = (planValue) => (isPricedPlan(planValue) ? '$' : '')
+
+  const getCardSuffix = (planValue) => (isPricedPlan(planValue) ? 'per month' : '')
 
   const getPricingDetails = (planValue) => {
-    if (planValue === 'enterprise') return ''
-    return localBillingCycle.value === 'yearly' ? 'Billed annually' : 'Billed monthly'
+    if (isPricedPlan(planValue)) {
+      return localBillingCycle.value === 'yearly' ? 'Billed annually' : 'Billed monthly'
+    }
+    return getComparisonInfo(planValue)?.description ?? ''
   }
 
   const isLoadingPlan = (planValue) =>
     Boolean(props.loadingPlan) && props.loadingPlan.toLowerCase() === planValue.toLowerCase()
+
+  const getSectionTitle = (planOption) => planOption?.sectionTitle ?? ''
+
+  const getIconFeatures = (planOption) => {
+    return (planOption?.features ?? []).filter((feature) => Boolean(feature?.icon))
+  }
+
+  const resolveButtonKind = (planValue) => {
+    const target = planValue.toLowerCase()
+    if (target === 'enterprise') return 'outlined'
+    if (isCurrentPlanSelection(planValue)) return 'outlined'
+    if (target === 'pro') return 'primary'
+    return 'outlined'
+  }
 
   const isCurrentPlanSelection = (planValue) => {
     const target = planValue.toLowerCase()

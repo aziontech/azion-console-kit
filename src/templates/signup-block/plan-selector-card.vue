@@ -1,11 +1,13 @@
 <template>
-  <div class="plan-selector-card border border-solid rounded-md surface-border bg-surface">
+  <div
+    class="plan-selector-card border border-solid border-[var(--border-muted)] rounded-md bg-surface"
+  >
     <div class="flex items-center gap-3 pl-4 pr-3 py-3">
       <div class="flex flex-col gap-[2px] flex-1 min-w-0">
         <div class="flex items-center gap-2 flex-wrap">
           <span class="font-semibold text-default">{{ planLabel }}</span>
           <div
-            class="flex items-center h-[26px] rounded-[6px] border px-2 surface-section surface-border w-fit"
+            class="flex items-center h-[26px] rounded-[6px] border border-[var(--border-muted)] px-2 surface-section w-fit"
           >
             <span class="font-protomono text-xs leading-4 text-color">
               {{ priceTagLabel }}

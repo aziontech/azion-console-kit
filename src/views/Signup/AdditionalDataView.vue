@@ -61,7 +61,7 @@
       <!-- Enterprise Link (only in step 1) -->
       <template v-if="isAdditionalDataStep">
         <div
-          class="bg-[var(--surface-100)] border border-[var(--surface-border)] border-solid rounded-md px-3 py-3 w-full max-w-xl text-center"
+          class="bg-surface border border-[var(--border-muted)] border-solid rounded-md px-3 py-3 w-full max-w-xl text-center"
         >
           <span class="text-xs text-[var(--text-color-secondary)]"
             >Have enterprise requirements?
@@ -160,6 +160,12 @@
     return foundPlan?.id || null
   }
 
+  const invalidateBillingCaches = () => {
+    queryClient.removeQueries({ queryKey: queryKeys.serviceOrders.all })
+    queryClient.removeQueries({ queryKey: queryKeys.billing.all })
+    queryClient.removeQueries({ queryKey: queryKeys.plans.all })
+  }
+
   // Handlers
   const onSubmit = async () => {
     const plan = additionalDataRef.value?.plan
@@ -179,7 +185,8 @@
       try {
         await submitServiceOrder({ accountId, planId })
 
-        await loadUserAndAccountInfo()
+        invalidateBillingCaches()
+        await loadUserAndAccountInfo({ force: true })
         handleProceedToCheckout()
       } catch (err) {
         // eslint-disable-next-line no-console
@@ -248,7 +255,7 @@
     })
     markAwaitingActiveServiceOrder()
     try {
-      queryClient.removeQueries({ queryKey: queryKeys.serviceOrders.all })
+      invalidateBillingCaches()
       await loadUserAndAccountInfo({ force: true })
     } catch (err) {
       Sentry.captureException(err)
@@ -270,6 +277,7 @@
 
   const handleStartFromSuccess = () => {
     clearAdditionalDataFormState()
+    invalidateBillingCaches()
     router.push({ name: 'home' })
   }
 

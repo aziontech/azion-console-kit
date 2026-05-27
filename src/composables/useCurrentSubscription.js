@@ -73,7 +73,7 @@ export function useCurrentSubscription() {
   const isHobby = computed(() => planSku.value === 'hobby')
 
   const planTitle = computed(() => (isPro.value ? 'Pro Plan' : 'Hobby'))
-  const planTag = computed(() => (isHobby.value ? 'Free Plan' : null))
+  const planTag = computed(() => (hasContractedPlan.value ? 'Actual Plan' : null))
 
   const planStartDate = computed(() =>
     formatPlanStartDate(activeServiceOrder.value?.currentPeriodStart)
@@ -98,7 +98,7 @@ export function useCurrentSubscription() {
     toFiniteNumber(activeServiceOrder.value?.invoiceAmountCharged, null)
   )
 
-  const isDowngradePending = computed(() => Boolean(scheduledDowngrade.value))
+  const isDowngradePending = computed(() => Boolean(scheduledDowngrade.value?.effectiveAt))
 
   const isLoading = computed(() => {
     if (!accountId.value) return true

@@ -192,7 +192,8 @@ export const queryKeys = {
   },
   billing: {
     all: ['billing'],
-    lastBill: () => [...queryKeys.billing.all, 'last-bill']
+    lastBill: () => [...queryKeys.billing.all, 'last-bill'],
+    invoicesList: () => [...queryKeys.billing.all, 'invoices', 'list']
   },
   variables: {
     all: ['variables'],

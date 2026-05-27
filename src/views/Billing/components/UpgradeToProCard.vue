@@ -4,23 +4,21 @@
     class="w-full min-[1100px]:w-1/2"
   >
     <template #content>
-      <div class="px-6 py-4 flex flex-col gap-4">
-        <p class="text-xs leading-5 text-color-secondary">
-          Upgrade to unlock higher limits and keep your applications running at scale. Explore
-          additional capabilities available with the Pro plan:
-        </p>
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-4 sm:grid-flow-col gap-x-3 gap-y-2.5"
-        >
+      <div class="p-6 flex flex-col gap-6 justify-between h-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-3">
           <div
             v-for="feature in features"
             :key="feature.title"
-            class="flex items-center gap-2.5 text-xs leading-none tracking-[-0.24px] text-default"
+            class="flex items-center gap-2.5 h-5 text-xs leading-none text-default"
           >
             <i class="pi pi-check text-base shrink-0 text-success-check" />
             <span>{{ feature.title }}</span>
           </div>
         </div>
+        <p class="text-sm leading-[1.25] text-color-secondary">
+          Upgrade to unlock higher limits and keep your applications running at scale. Explore
+          additional capabilities available with the Pro plan:
+        </p>
       </div>
     </template>
 
@@ -39,7 +37,7 @@
         <ActionButton
           label="Upgrade to Pro"
           kind="primary"
-          size="small"
+          size="medium"
           :loading="props.loading"
           :disabled="props.loading"
           @click="handleUpgradeClick"
@@ -52,7 +50,7 @@
 <script setup>
   import ActionButton from '@aziontech/webkit/actions/button'
   import CardBox from '@aziontech/webkit/content/card-box'
-  import { getPlanFeatures } from '@/templates/checkout-block/helpers/plan-features'
+  import { PRO_UPGRADE_HIGHLIGHTS } from '@/templates/checkout-block/helpers/plan-features'
 
   defineOptions({ name: 'upgrade-to-pro-card' })
 
@@ -65,7 +63,7 @@
 
   const emit = defineEmits(['upgrade'])
 
-  const features = getPlanFeatures('pro')
+  const features = PRO_UPGRADE_HIGHLIGHTS
 
   const pricingAndPlansUrl = 'https://www.azion.com/en/pricing/'
 

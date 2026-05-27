@@ -6,8 +6,8 @@
     <template #header-action>
       <ActionButton
         label="Change Plan"
-        kind="secondary"
-        size="small"
+        kind="outlined"
+        size="medium"
         @click="emit('change-plan')"
       />
     </template>
@@ -57,12 +57,13 @@
             class="text-color"
             elementType="span"
           >
-            <template v-if="subscription.isPro">
-              <span class="text-color">
-                <span class="text-color-secondary">$</span>
-                {{ nextChargeFormatted }}
-              </span>
-            </template>
+            <Currency
+              v-if="subscription.isPro"
+              size="small"
+              prefix="$"
+              :value="nextChargeFormatted"
+              :showSuffix="false"
+            />
             <span
               v-else
               class="text-color"
@@ -101,6 +102,7 @@
   import { computed } from 'vue'
   import ActionButton from '@aziontech/webkit/actions/button'
   import CardBox from '@aziontech/webkit/content/card-box'
+  import Currency from '@aziontech/webkit/content/currency'
   import SkeletonBlock from '@/templates/skeleton-block'
   import SubscriptionPlanRow from './SubscriptionPlanRow.vue'
   import CardFlagBlock from '@/templates/card-flag-block'

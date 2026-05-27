@@ -1,6 +1,6 @@
 <template>
-  <div class="border border-default border-solid rounded-md bg-surface">
-    <div class="flex items-center justify-between px-6 py-3 border-b border-default">
+  <div class="border border-[var(--border-muted)] border-solid rounded-md bg-surface">
+    <div class="flex items-center justify-between px-6 py-3 border-b border-[var(--border-muted)]">
       <span class="text-lg font-semibold text-default">Payment Method</span>
     </div>
 
@@ -10,26 +10,6 @@
         @submit.prevent
         class="space-y-6"
       >
-        <!-- <div class="flex flex-col gap-2 w-full">
-          <LabelBlock
-            label="Card Holder Name"
-            :isRequired="true"
-          />
-          <InputText
-            data-testid="payment-method-form__card-holder-name__input"
-            name="cardholderName"
-            v-model="cardHolderName"
-            @blur="validateCardholderName"
-            :class="{ 'p-invalid': displayError.cardHolderName }"
-            placeholder="John Doe"
-          />
-          <small
-            v-if="displayError.cardHolderName"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ displayError.cardHolderName }}
-          </small>
-        </div> -->
 
         <div
           class="flex flex-col gap-2 w-full"

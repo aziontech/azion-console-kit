@@ -1,10 +1,10 @@
 <template>
-  <div class="border border-default border-solid rounded-md bg-surface">
-    <div class="flex items-center justify-between px-6 py-3 border-b border-default">
+  <div class="border border-[var(--border-muted)] border-solid rounded-md bg-surface">
+    <div class="flex items-center justify-between px-6 py-3 border-b border-[var(--border-muted)]">
       <span class="text-lg font-semibold text-default">Address Information</span>
     </div>
 
-    <div class="flex w-full max-w-full flex-col gap-8 p-6">
+    <div class="flex w-full max-w-full flex-col p-6">
       <div
         v-if="showUseOwnerInfo"
         class="flex items-start gap-3"
@@ -16,68 +16,75 @@
         />
         <label
           for="address-use-owner-info"
-          class="text-[13px] leading-5 font-medium text-color-secondary"
+          class="text-[13px] leading-5 font-medium text-color-secondary cursor-pointer"
         >
           Use the same information of the account owner
         </label>
       </div>
 
-      <div class="flex w-full flex-col gap-6 md:flex-row">
-        <CountrySelector
-          :value="country"
-          :options="countriesOptions.options"
-          :loading="!countriesOptions.done"
-          @change="handleCountryChange"
-        />
+      <Transition name="address-fields-collapse">
+        <div
+          v-if="showAddressFields"
+          class="address-fields flex w-full flex-col gap-6"
+        >
+          <div class="flex w-full flex-col gap-6 md:flex-row">
+            <CountrySelector
+              :value="country"
+              :options="countriesOptions.options"
+              :loading="!countriesOptions.done"
+              @change="handleCountryChange"
+            />
 
-        <div class="flex w-full min-w-0 flex-1 flex-col gap-2">
-          <FieldInput
-            name="postalCode"
-            label="Postal Code"
-            required
-            :value="postalCode"
-            placeholder="00.000.000-00"
-            class="w-full"
-            @input="postalCode = $event"
-          />
+            <div class="flex w-full min-w-0 flex-1 flex-col gap-2">
+              <FieldInput
+                name="postalCode"
+                label="Postal Code"
+                required
+                :value="postalCode"
+                placeholder="00.000.000-00"
+                class="w-full"
+                @input="postalCode = $event"
+              />
+            </div>
+          </div>
+
+          <div class="flex w-full flex-col gap-6 md:flex-row">
+            <RegionSelector
+              :value="region"
+              :options="regionsOptions.options"
+              :loading="!regionsOptions.done"
+              :disabled="!country"
+              @change="handleRegionChange"
+            />
+
+            <CitySelector
+              :value="city"
+              :options="citiesOptions.options"
+              :loading="!citiesOptions.done"
+              :disabled="!region"
+              @change="city = $event.value"
+            />
+          </div>
+
+          <div class="flex w-full min-w-0 flex-col gap-2">
+            <FieldInput
+              name="address"
+              label="Address"
+              required
+              :value="address"
+              placeholder="123 Example Ave."
+              class="w-full"
+              @input="address = $event"
+            />
+          </div>
         </div>
-      </div>
-
-      <div class="flex w-full flex-col gap-6 md:flex-row">
-        <RegionSelector
-          :value="region"
-          :options="regionsOptions.options"
-          :loading="!regionsOptions.done"
-          :disabled="!country"
-          @change="handleRegionChange"
-        />
-
-        <CitySelector
-          :value="city"
-          :options="citiesOptions.options"
-          :loading="!citiesOptions.done"
-          :disabled="!region"
-          @change="city = $event.value"
-        />
-      </div>
-
-      <div class="flex w-full min-w-0 flex-col gap-2">
-        <FieldInput
-          name="address"
-          label="Address"
-          required
-          :value="address"
-          placeholder="123 Example Ave."
-          class="w-full"
-          @input="address = $event"
-        />
-      </div>
+      </Transition>
     </div>
   </div>
 </template>
 
 <script setup>
-  import { nextTick, onMounted, ref, watch } from 'vue'
+  import { computed, nextTick, onMounted, ref, watch } from 'vue'
   import { useForm, useField } from 'vee-validate'
   import * as yup from 'yup'
   import { useToast } from '@aziontech/webkit/use-toast'
@@ -137,6 +144,11 @@
   const citiesOptions = ref({ options: [], done: true })
   const isApplyingInitialValues = ref(false)
   const useOwnerInfo = ref(props.showUseOwnerInfo)
+
+  const showAddressFields = computed(() => {
+    if (!props.showUseOwnerInfo) return true
+    return !useOwnerInfo.value
+  })
 
   const isAddressFormReady = () => {
     return Boolean(
@@ -390,5 +402,36 @@
 <style scoped>
   :deep(.text-base) {
     font-size: 12px !important;
+  }
+
+  .address-fields {
+    margin-top: 24px;
+  }
+
+  .address-fields-collapse-enter-active,
+  .address-fields-collapse-leave-active {
+    transition:
+      opacity 220ms ease,
+      transform 220ms ease,
+      max-height 260ms ease,
+      margin-top 220ms ease;
+    overflow: hidden;
+    max-height: 800px;
+  }
+
+  .address-fields-collapse-enter-from,
+  .address-fields-collapse-leave-to {
+    opacity: 0;
+    transform: translateY(-8px);
+    max-height: 0;
+    margin-top: 0;
+  }
+
+  .address-fields-collapse-enter-to,
+  .address-fields-collapse-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 800px;
+    margin-top: 24px;
   }
 </style>

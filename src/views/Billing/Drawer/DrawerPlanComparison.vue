@@ -5,10 +5,10 @@
     class="!w-full md:!w-[1158px]"
   >
     <template #header>
-      <h2 class="text-2xl font-semibold text-color">Change Plan</h2>
+      <h2 class="text-[17.5px] font-semibold leading-[21px] text-default">Change Plan</h2>
     </template>
 
-    <div class="flex flex-col gap-8 px-8 pb-8">
+    <div class="flex flex-col gap-6 p-6">
       <div
         v-if="showCycleToggle"
         class="flex justify-center"
@@ -19,7 +19,7 @@
         />
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
         <CardPricing
           v-for="card in planCards"
           :key="card.key"
@@ -33,32 +33,43 @@
           :suffix="card.suffix"
           :showPrefix="card.showPrefix"
           :showSuffix="card.showSuffix"
-          slotPosition="bottom"
+          slotPosition="middle"
         >
           <template #actions>
             <ActionButton
               :label="card.buttonLabel"
               :kind="card.buttonKind"
               size="large"
-              :disabled="card.buttonDisabled"
+              :loading="card.buttonLoading"
+              :disabled="card.buttonDisabled || isAnyPreparing"
               class="w-full"
               @click="card.onAction"
             />
           </template>
 
-          <ul class="flex flex-col gap-2">
-            <li
-              v-for="feature in card.features"
-              :key="feature.title"
-              class="flex items-center gap-2 text-sm text-color"
+          <div class="flex flex-col gap-2">
+            <p
+              v-if="card.sectionTitle"
+              class="text-xs leading-none text-color-secondary"
             >
-              <i
-                v-if="feature.icon"
-                :class="[feature.icon, 'text-color-secondary text-sm']"
-              />
-              <span>{{ feature.title }}</span>
-            </li>
-          </ul>
+              {{ card.sectionTitle }}
+            </p>
+            <ul class="flex flex-col gap-2">
+              <li
+                v-for="feature in card.features"
+                :key="feature.title"
+                class="flex items-center gap-2.5 text-xs leading-none text-color"
+              >
+                <span
+                  v-if="feature.icon"
+                  class="inline-flex items-center justify-center size-5 shrink-0"
+                >
+                  <i :class="[feature.icon, 'text-base text-color']" />
+                </span>
+                <span>{{ feature.title }}</span>
+              </li>
+            </ul>
+          </div>
         </CardPricing>
       </div>
     </div>
@@ -81,7 +92,8 @@
     currentPlan: { type: String, default: 'hobby' },
     currentCycle: { type: String, default: 'monthly' },
     plans: { type: Array, default: () => [] },
-    contactSalesUrl: { type: String, default: 'mailto:sales@azion.com' }
+    contactSalesUrl: { type: String, default: 'mailto:sales@azion.com' },
+    preparingPlan: { type: String, default: null }
   })
 
   const emit = defineEmits([
@@ -154,6 +166,8 @@
     return props.currentCycle === 'monthly' ? 'Upgrade to Yearly' : 'Change to Monthly'
   })
 
+  const isAnyPreparing = computed(() => Boolean(props.preparingPlan))
+
   const planCards = computed(() => {
     const hobby = getComparisonInfo('hobby')
     const pro = getComparisonInfo('pro')
@@ -167,15 +181,17 @@
         pricingDetails: hobby.description,
         showTag: false,
         tagLabel: '',
-        value: '0',
-        prefix: '$',
-        suffix: 'forever',
+        value: 'Free',
+        prefix: '',
+        suffix: '',
         showPrefix: false,
-        showSuffix: true,
+        showSuffix: false,
+        sectionTitle: hobby.sectionTitle,
         features: hobby.features,
         buttonLabel: isCurrentHobby.value ? 'Actual plan' : 'Downgrade',
         buttonKind: 'outlined',
         buttonDisabled: isCurrentHobby.value,
+        buttonLoading: props.preparingPlan === 'hobby',
         onAction: () => emit('select-downgrade-hobby')
       },
       {
@@ -190,13 +206,15 @@
         suffix: 'per month',
         showPrefix: true,
         showSuffix: true,
+        sectionTitle: pro.sectionTitle,
         features: pro.features,
         buttonLabel: isCurrentPro.value ? proCycleSwapLabel.value : 'Upgrade',
         buttonKind: 'primary',
         buttonDisabled: false,
+        buttonLoading: props.preparingPlan === 'pro',
         onAction: () => {
           if (isCurrentPro.value) {
-            emit('select-cycle-change', cycle.value === 'monthly' ? 'yearly' : 'monthly')
+            emit('select-cycle-change', props.currentCycle === 'monthly' ? 'yearly' : 'monthly')
           } else {
             emit('select-pro-upgrade', cycle.value)
           }
@@ -214,10 +232,12 @@
         suffix: '',
         showPrefix: false,
         showSuffix: false,
+        sectionTitle: enterprise.sectionTitle,
         features: enterprise.features,
         buttonLabel: 'Contact Sales',
         buttonKind: 'outlined',
         buttonDisabled: false,
+        buttonLoading: false,
         onAction: () => {
           window.open(props.contactSalesUrl, '_blank')
         }

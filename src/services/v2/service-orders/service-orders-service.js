@@ -137,6 +137,24 @@ export class ServiceOrdersService extends BaseService {
     })
     return ServiceOrdersAdapter.transformBillingPaymentMethodsResponse(response.data)
   }
+
+  createPaymentMethodSetupIntent = async () => {
+    const response = await this.http.request({
+      method: 'POST',
+      url: `${this.#billingPaymentMethodsURL}/setup_intents`,
+      body: {}
+    })
+    return ServiceOrdersAdapter.transformSetupIntentResponse(response.data)
+  }
+
+  setDefaultPaymentMethod = async (paymentMethodId) => {
+    const response = await this.http.request({
+      method: 'POST',
+      url: `${this.#billingPaymentMethodsURL}/${paymentMethodId}/set_default`,
+      body: {}
+    })
+    return ServiceOrdersAdapter.transformSetDefaultPaymentMethodResponse(response.data)
+  }
 }
 
 export const serviceOrdersService = new ServiceOrdersService()

@@ -99,6 +99,7 @@
       <BillsView
         ref="viewBillsRef"
         v-bind="props"
+        :isReloading="isRefreshing"
         @loadCard="emit('loadCard')"
         @openDrawerAddCredit="emit('openDrawerAddCredit')"
       />

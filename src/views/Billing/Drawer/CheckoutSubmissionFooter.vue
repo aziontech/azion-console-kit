@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex shrink-0 justify-end gap-3 border-t border-default bg-[var(--surface-50)] px-4 py-3 md:px-8"
+    class="flex shrink-0 justify-end gap-3 border-t border-[var(--border-default)] bg-[var(--surface-50)] px-4 py-3 md:px-8"
   >
     <ActionButton
       kind="outlined"

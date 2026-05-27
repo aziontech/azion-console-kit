@@ -5,13 +5,13 @@
     :pt="sidebarPt"
   >
     <div class="flex h-full">
-      <div class="hidden md:block w-[300px] shrink-0 border-r border-default bg-surface">
+      <div class="hidden md:block w-[300px] shrink-0 border-r border-[var(--border-default)] bg-surface">
         <CheckoutFeaturesBlock :plan="plan" />
       </div>
 
       <div class="flex flex-1 flex-col min-w-0 bg-surface">
         <div
-          class="flex h-14 shrink-0 items-center justify-between border-b border-default px-4 md:px-8"
+          class="flex h-14 shrink-0 items-center justify-between border-b border-[var(--border-default)] px-4 md:px-8"
         >
           <h2 class="text-[17.5px] font-semibold leading-[21px] text-default">
             {{ headerLabel }}
@@ -38,14 +38,24 @@
             @update:checkout-session-client-secret="handleCheckoutSessionClientSecretChange"
           />
 
-          <template v-if="!isChangeCycleMode">
-            <PaymentMethodSummary
-              v-if="showDefaultPaymentSummary"
-              :card="defaultPaymentCard"
-              @swap="handleSwapPaymentMethod"
+          <PaymentMethodSummary
+            v-if="showDefaultPaymentSummary"
+            :card="defaultPaymentCard"
+            @swap="handleSwapPaymentMethod"
+          />
+
+          <template v-else-if="isChangeCycleMode">
+            <PaymentMethodSetupBlock
+              ref="paymentSetupRef"
+              :stripeClientService="getStripeClientService"
+              :clientSecret="setupIntentClientSecret"
+              @readiness-change="handlePaymentReadinessChange"
+              @cancel="handleCancelPaymentSwap"
             />
+          </template>
+
+          <template v-else>
             <PaymentMethodBlock
-              v-else
               ref="paymentRef"
               :stripeClientService="getStripeClientService"
               :checkoutSessionClientSecret="checkoutSessionClientSecret"
@@ -54,7 +64,6 @@
             />
 
             <AddressInformationBlock
-              v-if="!showDefaultPaymentSummary"
               ref="addressRef"
               :showUseOwnerInfo="true"
               @readiness-change="handleAddressReadinessChange"
@@ -80,11 +89,13 @@
   import CheckoutFeaturesBlock from '@/templates/checkout-block/checkout-features-block.vue'
   import PricingCalculationBlock from '@/templates/checkout-block/pricing-calculation-block.vue'
   import PaymentMethodBlock from '@/templates/checkout-block/payment-method-block.vue'
+  import PaymentMethodSetupBlock from '@/templates/checkout-block/payment-method-setup-block.vue'
   import PaymentMethodSummary from '@/views/Billing/Drawer/blocks/PaymentMethodSummary.vue'
   import AddressInformationBlock from '@/templates/checkout-block/address-information-block.vue'
   import CheckoutSubmissionFooter from '@/views/Billing/Drawer/CheckoutSubmissionFooter.vue'
   import { usePlans } from '@/composables/usePlans'
-  import { usePaymentMethods } from '@/composables/usePaymentMethods'
+  import { useBillingPaymentMethods } from '@/composables/useBillingPaymentMethods'
+  import { useUpdateDefaultPaymentMethod } from '@/composables/useUpdateDefaultPaymentMethod'
   import { useToast } from '@aziontech/webkit/use-toast'
 
   defineOptions({ name: 'drawer-plan-info' })
@@ -119,7 +130,6 @@
           ? `${rootBase} shadow-[-12px_0_32px_-8px_rgba(0,0,0,0.45)]`
           : rootBase
       },
-      mask: props.indented ? { style: { backgroundColor: 'transparent' } } : undefined,
       header: { class: 'hidden' },
       content: { class: 'p-0 overflow-hidden' }
     }
@@ -132,15 +142,19 @@
 
   const pricingRef = ref(null)
   const paymentRef = ref(null)
+  const paymentSetupRef = ref(null)
   const addressRef = ref(null)
   const isSubmitting = ref(false)
   const isPaymentFormReady = ref(false)
   const isAddressFormReady = ref(false)
   const billingCycle = ref('yearly')
   const checkoutSessionClientSecret = ref(props.initialClientSecret)
+  const setupIntentClientSecret = ref('')
   const useDefaultPaymentMethod = ref(true)
 
-  const { defaultCard: defaultPaymentCard } = usePaymentMethods()
+  const { defaultPaymentMethod: defaultPaymentCard } = useBillingPaymentMethods()
+  const { createSetupIntent, setDefault: setDefaultPaymentMethod } =
+    useUpdateDefaultPaymentMethod()
 
   const isChangeCycleMode = computed(() => props.mode === 'change-cycle')
 
@@ -148,8 +162,26 @@
     () => useDefaultPaymentMethod.value && Boolean(defaultPaymentCard.value)
   )
 
-  const handleSwapPaymentMethod = () => {
+  const handleSwapPaymentMethod = async () => {
     useDefaultPaymentMethod.value = false
+    if (!isChangeCycleMode.value) return
+    isPaymentFormReady.value = false
+    try {
+      const { clientSecret } = await createSetupIntent()
+      if (!clientSecret) {
+        throw new Error('Setup intent client secret missing in response.')
+      }
+      setupIntentClientSecret.value = clientSecret
+    } catch (err) {
+      useDefaultPaymentMethod.value = true
+      showError(err?.message || 'Unable to initialize payment method update.')
+    }
+  }
+
+  const handleCancelPaymentSwap = () => {
+    setupIntentClientSecret.value = ''
+    isPaymentFormReady.value = false
+    useDefaultPaymentMethod.value = true
   }
 
   const visibleDrawer = computed({
@@ -173,7 +205,10 @@
 
   const isConfirmDisabled = computed(() => {
     if (isSubmitting.value) return true
-    if (isChangeCycleMode.value) return false
+    if (isChangeCycleMode.value) {
+      if (showDefaultPaymentSummary.value) return false
+      return !setupIntentClientSecret.value || !isPaymentFormReady.value
+    }
     if (showDefaultPaymentSummary.value) return !checkoutSessionClientSecret.value
     return (
       !checkoutSessionClientSecret.value || !isPaymentFormReady.value || !isAddressFormReady.value
@@ -226,6 +261,15 @@
     isSubmitting.value = true
     try {
       if (isChangeCycleMode.value) {
+        if (!showDefaultPaymentSummary.value) {
+          const newPaymentMethodId = await paymentSetupRef.value?.confirmSetup?.()
+          if (!newPaymentMethodId) {
+            throw new Error('Unable to confirm new payment method.')
+          }
+          await setDefaultPaymentMethod(newPaymentMethodId)
+          setupIntentClientSecret.value = ''
+          useDefaultPaymentMethod.value = true
+        }
         await new Promise((resolve, reject) => {
           emit('submitCycleChange', {
             plan: props.plan,

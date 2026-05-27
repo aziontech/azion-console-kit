@@ -90,6 +90,7 @@
     :currentPlan="currentPlanSlug"
     :currentCycle="currentActiveCycle"
     :plans="plansData || []"
+    :preparingPlan="preparingPlan"
     @select-pro-upgrade="handleSelectProUpgrade"
     @select-downgrade-hobby="handleSelectDowngradeHobby"
     @select-cycle-change="handleSelectCycleChange"
@@ -220,6 +221,10 @@
     },
     loadInvoiceLastUpdatedService: {
       type: Function
+    },
+    isReloading: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -389,7 +394,11 @@
     }
   })
 
-  const cardsReady = computed(() => !subscriptionState.isLoading)
+  const isPostPaymentReloading = ref(false)
+
+  const cardsReady = computed(
+    () => !subscriptionState.isLoading && !props.isReloading && !isPostPaymentReloading.value
+  )
 
   const currentPlanSlug = computed(() => subscription.planSku.value || 'hobby')
 
@@ -634,10 +643,15 @@
       showChangePlanDrawer.value = false
       selectedPlan.value = null
       lockedCycle.value = null
-      if (targetPriceId) {
-        await subscription.refetchUntil((so) => so?.priceId === targetPriceId)
-      } else {
-        await subscription.refetch()
+      isPostPaymentReloading.value = true
+      try {
+        if (targetPriceId) {
+          await subscription.refetchUntil((so) => so?.priceId === targetPriceId)
+        } else {
+          await subscription.refetch()
+        }
+      } finally {
+        isPostPaymentReloading.value = false
       }
       trackBilling('planChangeCompleted', {
         plan,
@@ -691,7 +705,12 @@
         })
         done?.()
         showChangePlanDrawer.value = false
-        await subscription.refetch()
+        isPostPaymentReloading.value = true
+        try {
+          await subscription.refetch()
+        } finally {
+          isPostPaymentReloading.value = false
+        }
         return
       }
 
@@ -722,7 +741,12 @@
       })
       done?.()
       showChangePlanDrawer.value = false
-      await subscription.refetchUntil((so) => so?.downgradePending != null)
+      isPostPaymentReloading.value = true
+      try {
+        await subscription.refetchUntil((so) => so?.downgradePending != null)
+      } finally {
+        isPostPaymentReloading.value = false
+      }
     } catch (err) {
       const detail =
         (Array.isArray(err?.message) ? err.message[0] : err?.message) || 'Unable to downgrade plan.'
@@ -746,7 +770,12 @@
 
       await cancelDowngradeServiceOrderPlan({ id: serviceOrderId })
 
-      await subscription.refetchUntil((so) => so?.downgradePending == null)
+      isPostPaymentReloading.value = true
+      try {
+        await subscription.refetchUntil((so) => so?.downgradePending == null)
+      } finally {
+        isPostPaymentReloading.value = false
+      }
 
       trackBilling('downgradeCancelled', {
         fromPlan,
@@ -810,10 +839,15 @@
       })
     }
 
-    if (targetPlanId) {
-      await subscription.refetchUntil((so) => so?.planId === targetPlanId)
-    } else {
-      await subscription.refetch()
+    isPostPaymentReloading.value = true
+    try {
+      if (targetPlanId) {
+        await subscription.refetchUntil((so) => so?.planId === targetPlanId)
+      } else {
+        await subscription.refetch()
+      }
+    } finally {
+      isPostPaymentReloading.value = false
     }
 
     trackBilling('planChangeCompleted', {

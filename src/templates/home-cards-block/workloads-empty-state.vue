@@ -25,8 +25,8 @@
       action: () => createModalStore.open('templates')
     },
     {
-      title: 'Start from a Scratch',
-      description: `Start from a blank ${handleTextDomainWorkload.singularTitle}.`,
+      title: 'Start from Scratch',
+      description: `Start from blank ${handleTextDomainWorkload.singularTitle}.`,
       buttonLabel: 'Create',
       action: handleCreateFromScratch
     }

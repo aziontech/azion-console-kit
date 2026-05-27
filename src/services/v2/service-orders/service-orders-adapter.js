@@ -282,6 +282,22 @@ const transformBillingPaymentMethodsResponse = (envelope = {}) => {
   }
 }
 
+const transformSetupIntentResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
+  return {
+    state: envelope?.state ?? null,
+    clientSecret: data.client_secret ?? null
+  }
+}
+
+const transformSetDefaultPaymentMethodResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
+  return {
+    state: envelope?.state ?? null,
+    paymentMethodId: data.payment_method_id ?? data.id ?? null
+  }
+}
+
 const toCreatePayload = (payload = {}) => ({
   plan_id: payload.planId,
   ...(payload.planPricingId !== undefined && { plan_pricing_id: payload.planPricingId })
@@ -315,6 +331,8 @@ export const ServiceOrdersAdapter = {
   transformCancelDowngradeResponse,
   transformBillingPaymentMethod,
   transformBillingPaymentMethodsResponse,
+  transformSetupIntentResponse,
+  transformSetDefaultPaymentMethodResponse,
   toCreatePayload,
   toUpdatePayload,
   toPlanChangePayload,

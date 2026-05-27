@@ -125,7 +125,7 @@
 <template>
   <div class="flex flex-col gap-3 w-full">
     <div class="flex gap-3 items-center h-7">
-      <span class="text-base font-semibold">Last Activities</span>
+      <span class="text-base font-semibold">Recent Activity</span>
     </div>
     <ListTableSimple
       :data="displayData"
