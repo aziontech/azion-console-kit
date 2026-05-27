@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, nextTick, onMounted, ref, watch } from 'vue'
   import { useField } from 'vee-validate'
   import { RouterLink } from 'vue-router'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -54,9 +54,16 @@
   const environmentVariablesJsonError = ref('')
   const environmentVariablesFormError = ref('')
   const customVariablesFieldErrors = ref({})
-  const isSyncingEnvironmentVariables = ref(false)
+  const lastSyncSource = ref(null)
   const keyRegex = /^[A-Z0-9_]+$/
   let customVariableEntryId = 0
+
+  const markSyncSource = (source) => {
+    lastSyncSource.value = source
+    nextTick(() => {
+      lastSyncSource.value = null
+    })
+  }
 
   const createCustomVariableEntry = (key = '', value = '') => ({
     id: `custom-variable-entry-${customVariableEntryId++}`,
@@ -119,10 +126,22 @@
     return leftKeys.every((key) => right[key] === left[key])
   }
 
-  const mapEnvironmentVariablesToEntries = (variables) => {
-    return Object.entries(variables).map(([key, value]) => ({
-      ...createCustomVariableEntry(key, value)
-    }))
+  const mapEnvironmentVariablesToEntries = (variables, currentEntries = []) => {
+    const idByKey = new Map()
+    currentEntries.forEach((entry) => {
+      const entryKey = typeof entry?.key === 'string' ? entry.key.trim() : ''
+      if (entryKey && !idByKey.has(entryKey)) {
+        idByKey.set(entryKey, entry.id)
+      }
+    })
+
+    return Object.entries(variables).map(([key, value]) => {
+      const existingId = idByKey.get(key)
+      if (existingId) {
+        return { id: existingId, key, value }
+      }
+      return createCustomVariableEntry(key, value)
+    })
   }
 
   const getInvalidEnvironmentVariableKeys = (variablesObject) => {
@@ -228,7 +247,7 @@
   const syncEnvironmentVariablesViews = (source = 'external') => {
     const normalized = normalizeEnvironmentVariablesObject(environmentVariables.value)
 
-    isSyncingEnvironmentVariables.value = true
+    markSyncSource(source)
 
     if (!areEnvironmentVariablesEqual(normalized, environmentVariables.value || {})) {
       environmentVariables.value = normalized
@@ -239,15 +258,16 @@
     }
 
     if (source !== 'form') {
-      customVariablesEntries.value = mapEnvironmentVariablesToEntries(normalized)
+      customVariablesEntries.value = mapEnvironmentVariablesToEntries(
+        normalized,
+        customVariablesEntries.value
+      )
       ensureCustomVariableEntry()
     }
-
-    isSyncingEnvironmentVariables.value = false
   }
 
   const handleCustomVariablesJsonUpdate = (value) => {
-    if (isSyncingEnvironmentVariables.value) return
+    if (lastSyncSource.value !== null) return
 
     environmentVariablesJsonText.value = value
 
@@ -287,7 +307,7 @@
   }
 
   const handleEnvironmentVariablesFormChange = () => {
-    if (isSyncingEnvironmentVariables.value) return
+    if (lastSyncSource.value !== null) return
 
     const {
       nextVariables,
@@ -307,36 +327,33 @@
       duplicatedKeys
     })
 
-    if (emptyKeyIndices.size > 0) {
-      environmentVariablesFormError.value = 'Key is required.'
+    const invalidateEnvironmentVariables = (errorMessage) => {
+      environmentVariablesFormError.value = errorMessage
       if (environmentVariables.value !== null) {
+        markSyncSource('form')
         environmentVariables.value = null
       }
+    }
+
+    if (emptyKeyIndices.size > 0) {
+      invalidateEnvironmentVariables('Key is required.')
       return
     }
 
     if (emptyValueIndices.size > 0) {
-      environmentVariablesFormError.value = 'Value is required.'
-      if (environmentVariables.value !== null) {
-        environmentVariables.value = null
-      }
+      invalidateEnvironmentVariables('Value is required.')
       return
     }
 
     if (invalidKeyFormatIndices.size > 0) {
-      environmentVariablesFormError.value =
+      invalidateEnvironmentVariables(
         'Invalid key format. Use only uppercase letters, numbers, and underscore (_).'
-      if (environmentVariables.value !== null) {
-        environmentVariables.value = null
-      }
+      )
       return
     }
 
     if (duplicatedKeys.length > 0) {
-      environmentVariablesFormError.value = `Duplicated key: ${duplicatedKeys.join(', ')}`
-      if (environmentVariables.value !== null) {
-        environmentVariables.value = null
-      }
+      invalidateEnvironmentVariables(`Duplicated key: ${duplicatedKeys.join(', ')}`)
       return
     }
 
@@ -348,6 +365,7 @@
       return
     }
 
+    markSyncSource('form')
     environmentVariables.value = nextVariables
     syncEnvironmentVariablesViews('form')
   }
@@ -488,7 +506,7 @@
   watch(
     environmentVariables,
     () => {
-      if (isSyncingEnvironmentVariables.value) return
+      if (lastSyncSource.value !== null) return
       if (environmentVariablesJsonError.value || environmentVariablesFormError.value) return
       syncEnvironmentVariablesViews()
     },
