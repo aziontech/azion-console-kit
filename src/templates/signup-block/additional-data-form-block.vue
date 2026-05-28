@@ -246,9 +246,9 @@
   const usageIntentOptions = [
     { value: 'learn', description: 'Learn', ariaLabel: 'Learn usage intent' },
     {
-      value: 'personal-project',
-      description: 'Personal Project',
-      ariaLabel: 'Personal project usage intent'
+      value: 'personal-projects',
+      description: 'Personal Projects',
+      ariaLabel: 'Personal projects usage intent'
     },
     { value: 'work', description: 'Work', ariaLabel: 'Work usage intent' }
   ]
@@ -375,7 +375,7 @@
 
   const usageIntentToApiValue = {
     learn: 'Study',
-    'personal-project': 'Personal',
+    'personal-projects': 'Personal',
     work: 'Work'
   }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen var(--bg-color)">
+  <div class="flex flex-col flex-1 var(--bg-color)">
     <!-- Main Content -->
     <div class="flex-1 flex flex-col items-center py-8 px-4 gap-6">
       <!-- Card Container (only for step 1) -->
