@@ -355,7 +355,6 @@
     nextChargeDate: computed(() => subscription.nextChargeDate.value),
     nextChargeValue: computed(() => subscription.nextChargeValue.value),
     planChargeValue: computed(() => subscription.planChargeValue.value),
-    hasContractedPlan: computed(() => subscription.hasContractedPlan.value),
     isHobby: computed(() => subscription.isHobby.value),
     isPro: computed(() => subscription.isPro.value),
     isLoading: computed(() => subscription.isLoading.value),
