@@ -1,9 +1,9 @@
 <template>
   <div
-    class="flex shrink-0 justify-end gap-3 border-t border-[var(--border-default)] bg-surface px-6 lg:px-8 py-4"
+    class="flex shrink-0 gap-3 border-t border-[var(--border-default)] bg-surface px-4 lg:px-8 py-4 lg:justify-end"
   >
     <Button
-      class="font-protomono flex items-center justify-center text-xs"
+      class="font-protomono flex items-center justify-center text-xs flex-1 lg:flex-none"
       :disabled="submitting"
       outlined
       label="Back"
@@ -11,7 +11,7 @@
     />
     <Button
       severity="secondary"
-      class="font-protomono flex items-center justify-center text-xs"
+      class="font-protomono flex items-center justify-center text-xs flex-1 lg:flex-none"
       :loading="loading"
       :disabled="disabled"
       label="Subscribe"
