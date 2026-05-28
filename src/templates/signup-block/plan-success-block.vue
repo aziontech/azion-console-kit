@@ -79,20 +79,20 @@
 
     <!-- CTA Button -->
     <div class="mt-5">
-      <Button
-        severity="primary"
-        class="w-full font-protomono flex items-center justify-center"
+      <ActionButton
+        kind="primary"
+        size="large"
+        label="Start deploying"
+        class="w-full"
         @click="handleStartClick"
-      >
-        Start deploying
-      </Button>
+      />
     </div>
   </div>
 </template>
 
 <script setup>
   import { computed, onMounted, inject } from 'vue'
-  import Button from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

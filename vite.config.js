@@ -136,7 +136,9 @@ const getConfig = () => {
           })
         }),
         '/edge_api': createProxyConfig({
-          target: 'https://urvlgkvpxla.map.azionedge.net',
+          target: IS_PROD
+            ? 'https://jkjuyhi0gza.map.azionedge.net'
+            : 'https://urvlgkvpxla.map.azionedge.net',
           rewrite: (path) => path.replace(/^\/edge_api/, '')
         })
       }

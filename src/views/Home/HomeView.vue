@@ -86,7 +86,7 @@
           :class="homeStyle.firstColumn"
         >
           <div class="flex w-full justify-between items-center">
-            <h1 class="text-[22px] font-semibold">Welcome {{ user.name }}</h1>
+            <h1 class="text-[22px] font-semibold">Welcome, {{ user.name }}</h1>
             <PrimeButton
               icon="pi pi-user-plus"
               severity="secondary"

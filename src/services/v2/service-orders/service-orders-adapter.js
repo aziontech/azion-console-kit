@@ -1,321 +1,341 @@
-const pick = (value, fallback) => (value !== undefined ? value : fallback)
+import {
+  resolvePaymentFromResponse,
+  resolveServiceOrderPaymentMeta
+} from './stripe-payment-resolver'
 
-const firstDefinedKey = (obj, keys) => {
-  if (!obj || typeof obj !== 'object') return null
-  for (const key of keys) {
-    if (obj[key] !== undefined) return obj[key]
+const transformPricing = (pricing = {}) => ({
+  id: pricing.id ?? pricing.plan_pricing_id,
+  currencyCode: pricing.currency_code,
+  priceValue: pricing.price_value,
+  periodicity: pricing.periodicity,
+  active: pricing.active,
+  validFrom: pricing.valid_from
+})
+
+const transformPlan = (item = {}) => ({
+  id: item.id ?? item.plan_id,
+  fallbackPlanId: item.fallback_plan_id,
+  name: item.name,
+  slug: item.slug,
+  sku: item.sku,
+  description: item.description,
+  type: item.type,
+  status: item.status,
+  active: item.active,
+  sortOrder: item.sort_order,
+  eolDate: item.eol_date,
+  revision: item.revision,
+  publishedRevision: item.published_revision,
+  publishedPublicationId: item.published_publication_id,
+  reqContract: item.req_contract,
+  trialCreditValue: item.trial_credit_value,
+  trialCreditDurationDays: item.trial_credit_duration_days,
+  trialCreditCurrency: item.trial_credit_currency,
+  supportsReservedCapacity: item.supports_reserved_capacity,
+  supportsSavingsPlan: item.supports_savings_plan,
+  isInternal: item.is_internal,
+  deletedAt: item.deleted_at,
+  deletedBy: item.deleted_by,
+  isPublicCatalog: item.is_public_catalog,
+  allowSelfService: item.allow_self_service,
+  requiresManualApproval: item.requires_manual_approval,
+  whitelistOnly: item.whitelist_only,
+  externalProductId: item.external_product_id,
+  productVersion: item.product_version,
+  audit: {
+    lastEditor: item.last_editor ?? item.audit?.last_editor,
+    lastModified: item.last_modified ?? item.audit?.last_modified,
+    createdAt: item.created_at ?? item.audit?.created_at
+  },
+  pricings: Array.isArray(item.pricings) ? item.pricings.map(transformPricing) : []
+})
+
+const transformPlansList = (data) => {
+  const plans = Array.isArray(data) ? data : data?.results
+  return Array.isArray(plans) ? plans.map(transformPlan) : []
+}
+
+const transformPlanDetailResponse = (envelope = {}) => {
+  const data = envelope?.data ?? null
+  return {
+    state: envelope?.state ?? null,
+    data: data ? transformPlan(data) : null
+  }
+}
+
+const toFiniteNumberOrNull = (value) => {
+  if (value === null || value === undefined) return null
+  const num = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(num) ? num : null
+}
+
+const deriveDowngradePending = (data) => {
+  const pending = data?.pending_transition
+  if (pending && typeof pending === 'object') {
+    return {
+      type: pending.type ?? null,
+      toPlanId: pending.to_plan_id ?? null,
+      toPriceId: pending.to_plan_pricing_id ?? null,
+      effectiveAt: pending.effective_date ?? null,
+      mode: null
+    }
+  }
+  if (data?.downgrade_pending && typeof data.downgrade_pending === 'object') {
+    return {
+      type: data.downgrade_pending.type ?? 'downgrade',
+      toPlanId: data.downgrade_pending.to_plan_id ?? null,
+      toPriceId: data.downgrade_pending.to_plan_pricing_id ?? null,
+      effectiveAt: data.downgrade_pending.effective_at ?? null,
+      mode: data.downgrade_pending.mode ?? null
+    }
+  }
+  const meta = data?.metadata
+  if (meta && typeof meta === 'object' && meta.status === 'downgrade_pending') {
+    return {
+      type: 'downgrade',
+      toPlanId: null,
+      toPriceId: null,
+      effectiveAt: meta.effective_date ?? meta.effectiveDate ?? null,
+      mode: meta.mode ?? null
+    }
   }
   return null
 }
 
-const firstDefinedAcrossPaths = (paths, keys) => {
-  for (const obj of paths) {
-    const value = firstDefinedKey(obj, keys)
-    if (value != null) return value
+const deriveInvoiceAmountCharged = (data) => {
+  if (data?.current_invoice_amount_charged !== undefined) {
+    return toFiniteNumberOrNull(data.current_invoice_amount_charged)
+  }
+  const meta = data?.metadata
+  if (meta && typeof meta === 'object') {
+    return toFiniteNumberOrNull(meta.amountCharged ?? meta.amount_charged)
   }
   return null
 }
 
-const SO_CLIENT_SECRET_KEYS = [
-  'checkoutSessionClientSecret',
-  'checkout_session_client_secret',
-  'clientSecret',
-  'client_secret'
-]
+const transformServiceOrder = (data = {}) => {
+  const { clientSecret, checkoutSessionId } = resolveServiceOrderPaymentMeta(data)
 
-const PAYMENT_CLIENT_SECRET_KEYS = [
-  'clientSecret',
-  'client_secret',
-  'checkoutSessionClientSecret',
-  'checkout_session_client_secret'
-]
-
-const CHECKOUT_SESSION_ID_KEYS = ['checkoutSessionId', 'checkout_session_id']
-
-const PAYMENT_CONTAINER_PATHS = (data, metadata) => [
-  metadata,
-  data,
-  data.payment,
-  data.session,
-  data.checkout,
-  data.stripe
-]
-
-const hasServiceOrderData = (data = {}) => {
-  if (!data || typeof data !== 'object') return false
-
-  return Boolean(
-    pick(data.serviceOrderId, data.service_order_id) ||
-      pick(data.accountId, data.account_id) ||
-      pick(data.planId, data.plan_id)
-  )
+  return {
+    serviceOrderId: data.id,
+    type: data.type,
+    status: data.status,
+    planId: data.plan_id,
+    priceId: data.plan_pricing_id,
+    startDate: data.start_date,
+    endDate: data.end_date,
+    currentPeriodStart: data.current_period_start,
+    currentPeriodEnd: data.current_period_end,
+    autoRenew: data.auto_renew,
+    createdAt: data.created_at,
+    updatedAt: data.last_modified,
+    lastEditor: data.last_editor,
+    productVersion: data.product_version,
+    downgradePending: deriveDowngradePending(data),
+    invoiceAmountCharged: deriveInvoiceAmountCharged(data),
+    clientSecret,
+    checkoutSessionId
+  }
 }
 
-const getServiceOrderData = (response = {}) => {
-  const data = response.data ?? response.results
-  if (hasServiceOrderData(data)) return data
-  if (hasServiceOrderData(response)) return response
+const transformTransition = (transition) => {
+  if (!transition || typeof transition !== 'object') return null
+  return {
+    id: transition.id,
+    type: transition.type,
+    status: transition.status,
+    fromPlanId: transition.from_plan_id,
+    toPlanId: transition.to_plan_id,
+    fromPriceId: transition.from_plan_pricing_id,
+    toPriceId: transition.to_plan_pricing_id,
+    effectiveImmediately: transition.effective_immediately,
+    prorated: transition.prorated,
+    scheduledAt: transition.scheduled_at,
+    completedAt: transition.completed_at,
+    createdAt: transition.created_at,
+    updatedAt: transition.last_modified,
+    lastEditor: transition.last_editor
+  }
+}
+
+const transformListMeta = (envelope = {}) => ({
+  count: envelope.count,
+  totalPages: envelope.total_pages,
+  page: envelope.page,
+  pageSize: envelope.page_size,
+  next: envelope.next,
+  previous: envelope.previous
+})
+
+const transformListResponse = (envelope = {}) => ({
+  data: Array.isArray(envelope.results) ? envelope.results.map(transformServiceOrder) : [],
+  meta: transformListMeta(envelope)
+})
+
+const extractEnvelopeData = (envelope = {}) => envelope?.data ?? null
+
+const transformDetailResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope)
+  return {
+    state: envelope?.state ?? null,
+    data: data ? transformServiceOrder(data) : null
+  }
+}
+
+const transformSingleResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope)
+  const serviceOrder = data ? transformServiceOrder(data) : null
+  return {
+    state: envelope?.state ?? null,
+    data: serviceOrder,
+    payment: resolvePaymentFromResponse(envelope)
+  }
+}
+
+const transformUpgradeResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
+  return {
+    state: envelope?.state ?? null,
+    serviceOrder: data.service_order ? transformServiceOrder(data.service_order) : null,
+    transition: transformTransition(data.transition),
+    plan: data.plan ? transformPlan(data.plan) : null,
+    immediate: data.immediate_update ?? false,
+    proration: data.proration
+      ? {
+          amountDue: data.proration.amount_due,
+          currency: data.proration.currency
+        }
+      : null,
+    payment: resolvePaymentFromResponse({ data: data.service_order })
+  }
+}
+
+const transformDowngradeResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
+  return {
+    state: envelope?.state ?? null,
+    serviceOrder: data.service_order ? transformServiceOrder(data.service_order) : null,
+    transition: transformTransition(data.transition),
+    mode: data.mode ?? null,
+    cancelAtPeriodEnd: data.cancel_at_period_end ?? null,
+    effectiveDate: data.effective_date ?? null,
+    subscriptionScheduleId: data.subscription_schedule_id ?? null
+  }
+}
+
+const transformCancelResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
+  return {
+    state: envelope?.state ?? null,
+    serviceOrder: data.service_order ? transformServiceOrder(data.service_order) : null,
+    transition: transformTransition(data.transition),
+    cancelAtPeriodEnd: data.cancel_at_period_end ?? null
+  }
+}
+
+const transformCancelDowngradeResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
+  return {
+    state: envelope?.state ?? null,
+    serviceOrder: data.service_order ? transformServiceOrder(data.service_order) : null,
+    transition: transformTransition(data.transition)
+  }
+}
+
+const transformBillingPaymentMethod = (method = {}) => ({
+  id: method.id ?? null,
+  type: method.type ?? null,
+  brand: method.brand ?? null,
+  last4: method.last4 ?? null,
+  expMonth: method.exp_month ?? null,
+  expYear: method.exp_year ?? null,
+  funding: method.funding ?? null,
+  country: method.country ?? null,
+  isDefault: Boolean(method.is_default)
+})
+
+const transformBillingAddress = (address) => {
+  if (!address || typeof address !== 'object') return null
+  return {
+    line1: address.line1 ?? null,
+    line2: address.line2 ?? null,
+    city: address.city ?? null,
+    state: address.state ?? null,
+    postalCode: address.postal_code ?? null,
+    country: address.country ?? null
+  }
+}
+
+const transformBillingPaymentMethodsResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
+  const methods = Array.isArray(data.payment_methods)
+    ? data.payment_methods.map(transformBillingPaymentMethod)
+    : []
+  return {
+    state: envelope?.state ?? null,
+    paymentMethods: methods,
+    defaultPaymentMethod: methods.find((method) => method.isDefault) ?? null,
+    billingAddress: transformBillingAddress(data.billing_address),
+    customerEmail: data.customer_email ?? null,
+    customerName: data.customer_name ?? null,
+    stale: Boolean(data.stale)
+  }
+}
+
+const transformSetupIntentResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
+  return {
+    state: envelope?.state ?? null,
+    clientSecret: data.client_secret ?? null
+  }
+}
+
+const transformSetDefaultPaymentMethodResponse = (envelope = {}) => {
+  const data = extractEnvelopeData(envelope) ?? {}
+  return {
+    state: envelope?.state ?? null,
+    paymentMethodId: data.payment_method_id ?? data.id ?? null
+  }
+}
+
+const toCreatePayload = (payload = {}) => ({
+  plan_id: payload.planId,
+  ...(payload.planPricingId !== undefined && { plan_pricing_id: payload.planPricingId })
+})
+
+const toUpdatePayload = toCreatePayload
+
+const toPlanChangePayload = (payload = {}) => {
+  const planPricingId = payload.planPricingId ?? payload.priceId
+  return {
+    plan_id: payload.newPlanId ?? payload.planId,
+    ...(planPricingId !== undefined && planPricingId !== null && { plan_pricing_id: planPricingId })
+  }
 }
 
 export const ServiceOrdersAdapter = {
-  transformPricing(pricing = {}) {
-    return {
-      id: pricing.plan_pricing_id,
-      currencyCode: pricing.currency_code,
-      priceValue: pricing.price_value,
-      periodicity: pricing.periodicity,
-      active: pricing.active,
-      validFrom: pricing.valid_from
-    }
-  },
-
-  transformPlan(item = {}) {
-    return {
-      id: item.plan_id,
-      fallbackPlanId: item.fallback_plan_id,
-      name: item.name,
-      slug: item.slug,
-      sku: item.sku,
-      description: item.description,
-      type: item.type,
-      status: item.status,
-      eolDate: item.eol_date,
-      revision: item.revision,
-      publishedRevision: item.published_revision,
-      publishedPublicationId: item.published_publication_id,
-      reqContract: item.req_contract,
-      trialCreditValue: item.trial_credit_value,
-      trialCreditDurationDays: item.trial_credit_duration_days,
-      trialCreditCurrency: item.trial_credit_currency,
-      supportsReservedCapacity: item.supports_reserved_capacity,
-      supportsSavingsPlan: item.supports_savings_plan,
-      isInternal: item.is_internal,
-      sortOrder: item.sort_order,
-      active: item.active,
-      deletedAt: item.deleted_at,
-      deletedBy: item.deleted_by,
-      isPublicCatalog: item.is_public_catalog,
-      allowSelfService: item.allow_self_service,
-      requiresManualApproval: item.requires_manual_approval,
-      whitelistOnly: item.whitelist_only,
-      externalProductId: item.external_product_id,
-      audit: {
-        lastEditor: item.audit?.last_editor,
-        lastModified: item.audit?.last_modified,
-        createdAt: item.audit?.created_at
-      },
-      pricings: Array.isArray(item.pricings)
-        ? item.pricings.map((pricing) => this.transformPricing(pricing))
-        : []
-    }
-  },
-
-  transformPlansList(data) {
-    const plans = Array.isArray(data) ? data : data?.results
-    if (!Array.isArray(plans)) return []
-
-    return plans.map((item) => this.transformPlan(item))
-  },
-
-  transformServiceOrder(data = {}) {
-    const metadata = data.metadata ?? {}
-    // Backend stores the live Stripe checkout session under the SO so the
-    // drawer can resume an unconfirmed payment instead of issuing a new
-    // PATCH. Search metadata, root, and payment/session/checkout/stripe
-    // nesting — the backend has emitted all of these shapes.
-    const paymentPaths = PAYMENT_CONTAINER_PATHS(data, metadata)
-    const clientSecret = firstDefinedAcrossPaths(paymentPaths, SO_CLIENT_SECRET_KEYS)
-    const checkoutSessionId = firstDefinedAcrossPaths(paymentPaths, CHECKOUT_SESSION_ID_KEYS)
-
-    return {
-      serviceOrderId: pick(data.serviceOrderId, data.service_order_id),
-      accountId: pick(data.accountId, data.account_id),
-      planId: pick(data.planId, data.plan_id),
-      priceId: pick(
-        data.priceId,
-        pick(data.price_id, pick(data.planPricingId, data.plan_pricing_id))
-      ),
-      type: data.type,
-      status: data.status,
-      gatewayId: pick(data.gatewayId, data.gateway_id),
-      startDate: pick(data.startDate, data.start_date),
-      endDate: pick(data.endDate, data.end_date),
-      currentPeriodStart: pick(data.currentPeriodStart, data.current_period_start),
-      currentPeriodEnd: pick(data.currentPeriodEnd, data.current_period_end),
-      autoRenew: pick(data.autoRenew, data.auto_renew),
-      ip: data.ip,
-      port: data.port,
-      ipFwd: pick(data.ipFwd, data.ip_fwd),
-      portFwd: pick(data.portFwd, data.port_fwd),
-      timezone: data.timezone,
-      metadata,
-      clientSecret: clientSecret ?? null,
-      checkoutSessionId: checkoutSessionId ?? null,
-      lastEditor: pick(data.lastEditor, data.last_editor),
-      createdAt: pick(data.createdAt, data.created_at),
-      updatedAt: pick(data.updatedAt, data.updated_at)
-    }
-  },
-
-  transformMeta(meta = {}) {
-    return {
-      count: meta.count,
-      total: meta.total,
-      limit: meta.limit,
-      offset: meta.offset,
-      requestId: pick(meta.requestId, meta.request_id)
-    }
-  },
-
-  transformPayment(response = {}) {
-    const payment =
-      response?.payment ??
-      response?.data?.payment ??
-      response?.results?.payment ??
-      response?.session ??
-      response?.checkout ??
-      null
-    if (!payment) return undefined
-    const clientSecret = firstDefinedKey(payment, PAYMENT_CLIENT_SECRET_KEYS)
-    if (!clientSecret) return undefined
-    return { clientSecret }
-  },
-
-  transformListResponse(response = {}) {
-    return {
-      success: response.success,
-      data: Array.isArray(response.results)
-        ? response.results.map((item) => this.transformServiceOrder(item))
-        : [],
-      meta: this.transformMeta(response.meta)
-    }
-  },
-
-  transformCreateResponse(response = {}) {
-    const serviceOrderData = getServiceOrderData(response)
-
-    return {
-      success: response.success,
-      data: serviceOrderData ? this.transformServiceOrder(serviceOrderData) : undefined,
-      message: response.message,
-      meta: this.transformMeta(response.meta),
-      payment: this.transformPayment(response)
-    }
-  },
-
-  transformUpdateResponse(response = {}) {
-    const serviceOrderData = getServiceOrderData(response)
-
-    return {
-      success: response.success,
-      data: serviceOrderData ? this.transformServiceOrder(serviceOrderData) : undefined,
-      message: response.message,
-      meta: this.transformMeta(response.meta),
-      payment: this.transformPayment(response)
-    }
-  },
-
-  toCreatePayload(payload = {}) {
-    return {
-      planId: payload.planId,
-      priceId: pick(payload.priceId, payload.planPricingId)
-    }
-  },
-
-  toUpdatePayload(payload = {}) {
-    return {
-      planId: payload.planId,
-      priceId: pick(payload.priceId, payload.planPricingId),
-      status: payload.status,
-      type: payload.type,
-      gatewayId: payload.gatewayId,
-      startDate: payload.startDate,
-      endDate: payload.endDate,
-      currentPeriodStart: payload.currentPeriodStart,
-      currentPeriodEnd: payload.currentPeriodEnd,
-      autoRenew: payload.autoRenew,
-      ip: payload.ip,
-      port: payload.port,
-      ipFwd: payload.ipFwd,
-      portFwd: payload.portFwd,
-      timezone: payload.timezone,
-      metadata: payload.metadata,
-      lastEditor: payload.lastEditor
-    }
-  },
-
-  toUpgradePayload(payload = {}) {
-    const priceId = pick(payload.priceId, payload.planPricingId)
-    return {
-      newPlanId: payload.newPlanId,
-      ...(priceId && { priceId })
-    }
-  },
-
-  toDowngradePayload(payload = {}) {
-    const priceId = pick(payload.priceId, payload.planPricingId)
-    return {
-      newPlanId: payload.newPlanId,
-      ...(priceId && { priceId })
-    }
-  },
-
-  transformTransition(transition = {}) {
-    if (!transition || typeof transition !== 'object') return undefined
-    return {
-      from: pick(transition.from, transition.fromPlan),
-      to: pick(transition.to, transition.toPlan),
-      effectiveAt: pick(transition.effectiveAt, transition.effective_at),
-      type: transition.type
-    }
-  },
-
-  transformUpgradeResponse(response = {}) {
-    const data = response.data ?? response
-    const currentOrder = pick(data?.currentOrder, data?.current_order)
-    const newPlan = pick(data?.newPlan, data?.new_plan)
-    const transition = pick(data?.transition, data?.planTransition)
-    const immediate = pick(data?.immediateUpdate, pick(data?.immediate_update, data?.immediate))
-
-    return {
-      success: response.success,
-      serviceOrder: currentOrder ? this.transformServiceOrder(currentOrder) : undefined,
-      newPlan: newPlan ? this.transformPlan(newPlan) : undefined,
-      transition: this.transformTransition(transition),
-      immediate: immediate ?? true,
-      payment: this.transformPayment(response),
-      message: response.message,
-      meta: this.transformMeta(response.meta)
-    }
-  },
-
-  transformDowngradeResponse(response = {}) {
-    const data = response.data ?? response
-    const serviceOrderData = pick(data?.serviceOrder, data?.service_order)
-    const schedule = pick(data?.schedule, data?.subscriptionSchedule)
-    const newPlanId = pick(data?.newPlanId, data?.new_plan_id)
-
-    return {
-      success: response.success,
-      serviceOrder: serviceOrderData ? this.transformServiceOrder(serviceOrderData) : undefined,
-      schedule,
-      newPlanId,
-      message: response.message,
-      meta: this.transformMeta(response.meta)
-    }
-  },
-
-  transformCancelDowngradeResponse(response = {}) {
-    const data = response.data ?? response
-    const serviceOrderData = pick(data?.serviceOrder, data?.service_order)
-    const transition = pick(data?.transition, data?.planTransition)
-
-    return {
-      success: response.success,
-      serviceOrder: serviceOrderData ? this.transformServiceOrder(serviceOrderData) : undefined,
-      transition: this.transformTransition(transition),
-      message: response.message,
-      meta: this.transformMeta(response.meta)
-    }
-  }
+  transformPricing,
+  transformPlan,
+  transformPlansList,
+  transformPlanDetailResponse,
+  transformServiceOrder,
+  transformTransition,
+  transformListMeta,
+  transformListResponse,
+  transformDetailResponse,
+  transformCreateResponse: transformSingleResponse,
+  transformUpdateResponse: transformSingleResponse,
+  transformUpgradeResponse,
+  transformDowngradeResponse,
+  transformCancelResponse,
+  transformCancelDowngradeResponse,
+  transformBillingPaymentMethod,
+  transformBillingPaymentMethodsResponse,
+  transformSetupIntentResponse,
+  transformSetDefaultPaymentMethodResponse,
+  toCreatePayload,
+  toUpdatePayload,
+  toPlanChangePayload,
+  toUpgradePayload: toPlanChangePayload,
+  toDowngradePayload: toPlanChangePayload
 }

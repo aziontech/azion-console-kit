@@ -232,32 +232,13 @@
   function handleRowClick(event) {
     if (props.disabledList) return
     if (!props.enableEditClick) return
+    if (props.frozenColumns?.length) return null
 
-    const rowData = event.data
-    const originalEvent = event.originalEvent
-
-    // Don't navigate when clicking inside a component column (e.g., CopyBlock, Tag, etc.)
-    const clickedCell = originalEvent.target.closest('td')
-    if (clickedCell) {
-      const columnIndex = Array.from(clickedCell.parentElement.children).indexOf(clickedCell)
-      const adjustedIndex =
-        columnIndex - (props.reorderableRows ? 1 : 0) - (props.showSelectionMode ? 1 : 0)
-      const col = selectedColumns.value[adjustedIndex]
-      if (col?.type === 'component') return null
-    }
-
-    if (!props.frozenColumns.length) {
-      return editItemSelected(originalEvent, rowData)
-    }
-    return null
+    return editItemSelected(event.originalEvent, event.data)
   }
 
   function handleColumnClick(event, col, rowData) {
     if (isFrozenColumn(col.field)) {
-      return editItemSelected(event, rowData)
-    }
-    if (col?.type === 'component') return null
-    if (!props.frozenColumns.length && props.enableEditClick) {
       return editItemSelected(event, rowData)
     }
     return null
@@ -438,7 +419,8 @@
         :header="col.header"
         :sortField="col?.sortField"
         :class="{
-          'hover:cursor-pointer': !disabledList && (enableEditClick || isFrozenColumn(col.field))
+          'hover:cursor-pointer':
+            !disabledList && (frozenColumns?.length ? isFrozenColumn(col.field) : enableEditClick)
         }"
         data-testid="data-table-column"
         :style="col.style"

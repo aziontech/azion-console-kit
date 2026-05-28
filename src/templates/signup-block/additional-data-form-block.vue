@@ -128,6 +128,7 @@
     <!-- Plan Selection Drawer -->
     <PlanSelectionDrawer
       v-model:visible="showPlanDrawer"
+      context="signup"
       :plans="plansData"
       :currentPlan="plan"
       :billingCycle="billingCycle"
@@ -150,7 +151,7 @@
     updateAccountInfoService
   } from '@/services/signup-services'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import BoxGridSelection from '@aziontech/webkit/box-grid-selection'
+  import BoxGridSelection from '@aziontech/webkit/inputs/box-grid-selection'
   import FieldText from '@aziontech/webkit/field-text'
   import Skeleton from '@aziontech/webkit/skeleton'
   import Checkbox from '@aziontech/webkit/checkbox'
@@ -161,7 +162,7 @@
   const tracker = inject('tracker')
   const toast = useToast()
   const accountStore = useAccountStore()
-  const { setField: setAdditionalDataField, hydrate: hydrateAdditionalDataForm } =
+  const { state: additionalDataFormState, setField: setAdditionalDataField } =
     useAdditionalDataFormState()
 
   defineOptions({
@@ -199,8 +200,14 @@
       .required('Your Full Name is required')
   })
 
+  const buildInitialValues = () =>
+    Object.fromEntries(
+      Object.entries(additionalDataFormState.value).filter(([, value]) => value !== undefined)
+    )
+
   const { meta } = useForm({
-    validationSchema
+    validationSchema,
+    initialValues: buildInitialValues()
   })
 
   const { value: plan } = useField('plan')
@@ -239,9 +246,9 @@
   const usageIntentOptions = [
     { value: 'learn', description: 'Learn', ariaLabel: 'Learn usage intent' },
     {
-      value: 'personal-project',
-      description: 'Personal Project',
-      ariaLabel: 'Personal project usage intent'
+      value: 'personal-projects',
+      description: 'Personal Projects',
+      ariaLabel: 'Personal projects usage intent'
     },
     { value: 'work', description: 'Work', ariaLabel: 'Work usage intent' }
   ]
@@ -368,7 +375,7 @@
 
   const usageIntentToApiValue = {
     learn: 'Study',
-    'personal-project': 'Personal',
+    'personal-projects': 'Personal',
     work: 'Work'
   }
 
@@ -423,25 +430,13 @@
       billingCycle.value = storedBillingCycle.value
     }
 
-    hydrateAdditionalDataForm({
-      usageIntent,
-      role,
-      companySize,
-      companyWebsite,
-      fullName,
-      termsAccepted
-    })
-
     await nextTick()
     skipInitialExpandAnimation.value = false
 
-    // Pre-fill role from accountStore
-    const jobRole = accountStore.account?.jobRole
-    if (jobRole && !role.value) {
-      const roleTitle = jobRoleKebabToTitle(jobRole)
-      if (roleTitle) {
-        role.value = roleTitle
-      }
+    if (!role.value || role.value === 'Other') {
+      const jobRole = accountStore.account?.jobRole
+      const roleTitle = jobRole ? jobRoleKebabToTitle(jobRole) : null
+      role.value = roleTitle && roleTitle !== 'Other' ? roleTitle : 'Software Developer'
     }
   })
 
@@ -469,14 +464,25 @@
     setAdditionalDataField('termsAccepted', value)
   })
 
+  const capitalizeName = (name) =>
+    String(name || '')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
+
   watch(
     () => [
       accountStore.accountData?.first_name ?? accountStore.accountData?.firstName,
       accountStore.accountData?.last_name ?? accountStore.accountData?.lastName
     ],
     ([firstName, lastName]) => {
-      if (!fullName.value && (firstName || lastName)) {
-        fullName.value = `${firstName || ''} ${lastName || ''}`.trim()
+      if (fullName.value) return
+      const first = capitalizeName(firstName)
+      const last = capitalizeName(lastName)
+      if (first && last) {
+        fullName.value = `${first} ${last}`
       }
     },
     { immediate: true }

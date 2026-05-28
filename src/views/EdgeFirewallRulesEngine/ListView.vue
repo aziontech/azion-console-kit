@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref, inject, onMounted } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import InputNumber from '@aziontech/webkit/inputnumber'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useToast } from '@aziontech/webkit/use-toast'

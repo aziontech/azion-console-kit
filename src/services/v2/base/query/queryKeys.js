@@ -192,7 +192,8 @@ export const queryKeys = {
   },
   billing: {
     all: ['billing'],
-    lastBill: () => [...queryKeys.billing.all, 'last-bill']
+    lastBill: () => [...queryKeys.billing.all, 'last-bill'],
+    invoicesList: () => [...queryKeys.billing.all, 'invoices', 'list']
   },
   variables: {
     all: ['variables'],
@@ -313,7 +314,8 @@ export const queryKeys = {
   serviceOrders: {
     all: ['service-orders'],
     list: (params) => [...queryKeys.serviceOrders.all, 'list', normalizeParams(params)],
-    detail: (id) => [...queryKeys.serviceOrders.all, 'detail', id]
+    detail: (id) => [...queryKeys.serviceOrders.all, 'detail', id],
+    billingPaymentMethods: () => [...queryKeys.serviceOrders.all, 'billing', 'payment-methods']
   },
   edgeService: {
     all: ['edge-services'],

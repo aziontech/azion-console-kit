@@ -1,3 +1,4 @@
+import '@aziontech/theme/globals.css'
 import 'primeflex/primeflex.css'
 import '@assets/main.css'
 import '@assets/c3.scss'
@@ -5,10 +6,6 @@ import '@mdi/font/css/materialdesignicons.css'
 import '@aziontech/theme'
 import '@aziontech/icons'
 import '@aziontech/webkit/styles/country-flags'
-
-// Inject CSS variables for semantic tokens
-import { injectCssVars } from '@aziontech/theme/tokens'
-injectCssVars()
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

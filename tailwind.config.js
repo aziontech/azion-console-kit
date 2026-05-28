@@ -1,8 +1,4 @@
 import typography from '@tailwindcss/typography'
-import { theme } from '@aziontech/theme/tailwind/tailwind-theme'
-import semanticColors from '@aziontech/theme/tailwind/semantic-colors-plugin'
-import semanticTexts from '@aziontech/theme/tailwind/semantic-texts-plugin'
-import semanticSpacing from '@aziontech/theme/tailwind/semantic-spacing-plugin'
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -34,9 +30,7 @@ export default {
       roman: 'upper-roman'
     },
     extend: {
-      ...theme.extend,
       colors: {
-        ...theme.extend.colors,
         header: '#111111',
         'header-button-enabled': '#ffffff32',
         'header-button-hover': '#f5f5f516',
@@ -115,5 +109,5 @@ export default {
       }
     }
   },
-  plugins: [typography, semanticColors(), semanticTexts(), semanticSpacing()]
+  plugins: [typography]
 }

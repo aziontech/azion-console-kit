@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen var(--bg-color)">
+  <div class="flex flex-col flex-1 var(--bg-color)">
     <!-- Main Content -->
     <div class="flex-1 flex flex-col items-center py-8 px-4 gap-6">
       <!-- Card Container (only for step 1) -->
@@ -16,26 +16,15 @@
           </template>
 
           <template #footer>
-            <Button
-              severity="primary"
-              class="w-full font-protomono flex items-center justify-center"
+            <ActionButton
+              kind="primary"
+              size="large"
+              class="w-full"
+              :label="submitButtonLabel"
+              :loading="isSubmitLoading"
               :disabled="isDisabledSubmit"
               @click="onSubmit"
-            >
-              <span class="inline-flex items-center gap-2">
-                <Transition
-                  name="label-fade"
-                  mode="out-in"
-                >
-                  <span :key="submitButtonLabel">{{ submitButtonLabel }}</span>
-                </Transition>
-                <i
-                  v-if="isSubmitLoading"
-                  class="pi pi-spinner pi-spin text-xs animate-spin"
-                  aria-hidden="true"
-                />
-              </span>
-            </Button>
+            />
           </template>
         </CardBox>
         <div
@@ -61,7 +50,7 @@
       <!-- Enterprise Link (only in step 1) -->
       <template v-if="isAdditionalDataStep">
         <div
-          class="bg-[var(--surface-100)] border border-[var(--surface-border)] border-solid rounded-md px-3 py-3 w-full max-w-xl text-center"
+          class="bg-surface border border-[var(--border-muted)] border-solid rounded-md px-3 py-3 w-full max-w-xl text-center"
         >
           <span class="text-xs text-[var(--text-color-secondary)]"
             >Have enterprise requirements?
@@ -91,12 +80,12 @@
 </template>
 
 <script setup>
-  import CardBox from '@aziontech/webkit/card-box'
+  import CardBox from '@aziontech/webkit/content/card-box'
   import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block.vue'
   import ChoosingPlanContainer from '@/templates/signup-block/choosing-plan-container.vue'
   import PlanSuccessBlock from '@/templates/signup-block/plan-success-block.vue'
-  import Button from '@aziontech/webkit/button'
-  import { computed, inject, onMounted, ref } from 'vue'
+  import ActionButton from '@aziontech/webkit/actions/button'
+  import { computed, inject, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { usePlans } from '@/composables/usePlans'
   import { usePlansList, ensurePlansList, getPlanPricingId } from '@/composables/usePlansService'
@@ -118,7 +107,11 @@
       .catch(Sentry.captureException)
   }
   const { clear: clearAdditionalDataFormState } = useAdditionalDataFormState()
-  const { initialize: initializePlans, billingCycle: storedBillingCycle } = usePlans()
+  const {
+    initialize: initializePlans,
+    billingCycle: storedBillingCycle,
+    clear: clearPlans
+  } = usePlans()
   const accountStore = useAccountStore()
   // Auto-fetch on mount when the cache entry is stale/missing (staleTime
   // 1h). The view reads `plansData.value` reactively in helpers like
@@ -151,17 +144,19 @@
     return formLoading || serviceOrderLoading
   })
 
-  const submitButtonLabel = computed(() => {
-    const plan = additionalDataRef.value?.plan
-    if (plan === 'hobby') return 'Start Deploying'
-    return 'Continue'
-  })
+  const submitButtonLabel = computed(() => 'Continue')
   const getPlanIdFromName = (planName) => {
     if (!plansData.value?.length) return null
     const foundPlan = plansData.value.find(
       (planItem) => planItem.sku?.toLowerCase() === planName?.toLowerCase()
     )
     return foundPlan?.id || null
+  }
+
+  const invalidateBillingCaches = () => {
+    queryClient.removeQueries({ queryKey: queryKeys.serviceOrders.all })
+    queryClient.removeQueries({ queryKey: queryKeys.billing.all })
+    queryClient.removeQueries({ queryKey: queryKeys.plans.all })
   }
 
   // Handlers
@@ -183,7 +178,8 @@
       try {
         await submitServiceOrder({ accountId, planId })
 
-        await loadUserAndAccountInfo()
+        invalidateBillingCaches()
+        await loadUserAndAccountInfo({ force: true })
         handleProceedToCheckout()
       } catch (err) {
         // eslint-disable-next-line no-console
@@ -195,26 +191,30 @@
     const planPricingId = getPlanPricingId(plansData.value, plan, billingCycle)
     if (!planPricingId) return
 
+    checkoutSessionClientSecret.value = ''
+    selectedPlan.value = plan
+    trackSignUp('checkoutStarted', { plan, billingCycle })
+    currentStep.value = 'checkout'
+
     try {
       const serviceOrderResponse = await submitServiceOrder({ accountId, planId, planPricingId })
-      // Adapter surfaces the Stripe client secret in two places depending on
-      // where the backend put it: top-level `payment` (explicit field) or on
-      // the SO itself when extracted from `metadata.client_secret`.
-      checkoutSessionClientSecret.value =
+      const secret =
         serviceOrderResponse?.payment?.clientSecret ||
         serviceOrderResponse?.data?.clientSecret ||
         ''
 
-      if (!checkoutSessionClientSecret.value) {
+      if (!secret) {
         // eslint-disable-next-line no-console
         console.error('Unable to initialize payment. Please try again.')
+        currentStep.value = 'additional-data'
         return
       }
 
-      handleProceedToCheckout()
+      checkoutSessionClientSecret.value = secret
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Failed to submit service order:', err)
+      currentStep.value = 'additional-data'
     }
   }
 
@@ -252,7 +252,7 @@
     })
     markAwaitingActiveServiceOrder()
     try {
-      queryClient.removeQueries({ queryKey: queryKeys.serviceOrders.all })
+      invalidateBillingCaches()
       await loadUserAndAccountInfo({ force: true })
     } catch (err) {
       Sentry.captureException(err)
@@ -273,9 +273,15 @@
   }
 
   const handleStartFromSuccess = () => {
-    clearAdditionalDataFormState()
+    invalidateBillingCaches()
     router.push({ name: 'home' })
   }
+
+  watch(isSuccessStep, (reachedSuccess) => {
+    if (!reachedSuccess) return
+    clearAdditionalDataFormState()
+    clearPlans()
+  })
 
   onMounted(async () => {
     initializePlans()
