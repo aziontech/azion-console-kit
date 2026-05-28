@@ -3,10 +3,8 @@ export const PRO_UPGRADE_HIGHLIGHTS = [
   { title: '20 GB Object Storage' },
   { title: '20M Application requests' },
   { title: '20M Firewall requests' },
-  { title: '10 hours Function compute time' },
-  { title: '2 GB Real-Time Events Storage' },
-  { title: 'DDoS Protection included' },
-  { title: 'SOC 2 Type 2 / SOC 3' }
+  { title: '10 hours Functions compute time' },
+  { title: '2 GB Real-Time Events Storage' }
 ]
 
 export const PLAN_INFO = {
