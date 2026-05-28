@@ -85,7 +85,7 @@
   import ChoosingPlanContainer from '@/templates/signup-block/choosing-plan-container.vue'
   import PlanSuccessBlock from '@/templates/signup-block/plan-success-block.vue'
   import ActionButton from '@aziontech/webkit/actions/button'
-  import { computed, inject, onMounted, ref } from 'vue'
+  import { computed, inject, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { usePlans } from '@/composables/usePlans'
   import { usePlansList, ensurePlansList, getPlanPricingId } from '@/composables/usePlansService'
@@ -107,7 +107,11 @@
       .catch(Sentry.captureException)
   }
   const { clear: clearAdditionalDataFormState } = useAdditionalDataFormState()
-  const { initialize: initializePlans, billingCycle: storedBillingCycle } = usePlans()
+  const {
+    initialize: initializePlans,
+    billingCycle: storedBillingCycle,
+    clear: clearPlans
+  } = usePlans()
   const accountStore = useAccountStore()
   // Auto-fetch on mount when the cache entry is stale/missing (staleTime
   // 1h). The view reads `plansData.value` reactively in helpers like
@@ -269,10 +273,15 @@
   }
 
   const handleStartFromSuccess = () => {
-    clearAdditionalDataFormState()
     invalidateBillingCaches()
     router.push({ name: 'home' })
   }
+
+  watch(isSuccessStep, (reachedSuccess) => {
+    if (!reachedSuccess) return
+    clearAdditionalDataFormState()
+    clearPlans()
+  })
 
   onMounted(async () => {
     initializePlans()
