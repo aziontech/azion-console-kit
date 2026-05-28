@@ -5,7 +5,7 @@
       <!-- Card Container (only for step 1) -->
       <div class="w-full">
         <CardBox
-          v-if="isAdditionalDataStep"
+          v-show="isAdditionalDataStep"
           title="How are you planning to use Azion?"
           class="mx-auto max-w-xl"
         >
@@ -28,7 +28,7 @@
           </template>
         </CardBox>
         <div
-          v-else-if="isCheckoutStep"
+          v-if="isCheckoutStep"
           class="w-full"
         >
           <!-- Checkout Component -->
@@ -42,7 +42,7 @@
           />
         </div>
         <PlanSuccessBlock
-          v-else-if="isSuccessStep"
+          v-if="isSuccessStep"
           :plan="selectedPlan"
           @onStart="handleStartFromSuccess"
         />
@@ -165,8 +165,6 @@
     const accountId = accountStore.accountData?.id
     const billingCycle = storedBillingCycle.value || 'yearly'
 
-    await additionalDataRef.value?.submitForm()
-
     if (!plan || !accountId) return
 
     trackSignUp('planSelected', { plan, billingCycle })
@@ -176,6 +174,7 @@
 
     if (plan === 'hobby') {
       try {
+        await additionalDataRef.value?.submitForm()
         await submitServiceOrder({ accountId, planId })
 
         invalidateBillingCaches()
@@ -252,6 +251,7 @@
     })
     markAwaitingActiveServiceOrder()
     try {
+      await additionalDataRef.value?.submitForm()
       invalidateBillingCaches()
       await loadUserAndAccountInfo({ force: true })
     } catch (err) {
