@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex shrink-0 justify-end gap-3 border-t border-[var(--border-default)] bg-surface px-8 py-4"
+    class="flex shrink-0 justify-end gap-3 border-t border-[var(--border-default)] bg-surface px-6 lg:px-8 py-4"
   >
     <Button
       class="font-protomono flex items-center justify-center text-xs"

@@ -2,7 +2,7 @@
   <div
     class="w-full max-w-5xl mx-auto bg-surface rounded border surface-border min-h-[600px] lg:h-[800px]"
   >
-    <div class="flex h-full min-h-0 overflow-hidden flex-col lg:flex-row">
+    <div class="flex lg:h-full lg:min-h-0 lg:overflow-hidden flex-col lg:flex-row">
       <CheckoutPlanBlock
         ref="planBlockRef"
         :plan="plan"

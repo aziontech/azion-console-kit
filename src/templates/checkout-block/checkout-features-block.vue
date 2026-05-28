@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col gap-6 border-l surface-border bg-surface p-6 max-w-[300px] flex-1">
+  <div
+    class="flex flex-col gap-6 border-t lg:border-t-0 lg:border-l surface-border bg-surface p-6 w-full lg:max-w-[300px] flex-1"
+  >
     <p class="text-[13px] leading-[21px] text-color-secondary">
       <span>Upgrade to </span>
       <span class="font-semibold">{{ planName }}</span>
