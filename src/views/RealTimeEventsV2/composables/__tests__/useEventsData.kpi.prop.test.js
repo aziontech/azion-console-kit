@@ -368,8 +368,9 @@ describe('useEventsData KPI fallback — abort and error-swallow paths', () => {
     expect(instance.kpis.value).toBeNull()
 
     // The chart error toast IS shown (this is the chart failure path, not KPI fallback)
+    // Wording is the user-facing message from Task 11.1.
     expect(onError).toHaveBeenCalledWith(
-      expect.objectContaining({ severity: 'warn', summary: 'Chart failed' })
+      expect.objectContaining({ severity: 'error', summary: 'Error loading events' })
     )
   })
 })

@@ -5,10 +5,22 @@ import { FILTERS_RULES } from '@/helpers'
  *
  * @param {string} name - The name of the field.
  * @param {string} typeName - The type of the field.
+ * @param {string} operator - The operator (Eq, In, etc).
  * @return {String} The field type.
  */
-const getTypeField = (name, typeName) => {
-  return FILTERS_RULES().FILTER_LIKE_TYPE[name] || typeName || 'String'
+const getTypeField = (name, typeName, operator) => {
+  // Check curated overrides first
+  if (FILTERS_RULES().FILTER_LIKE_TYPE[name]) {
+    return FILTERS_RULES().FILTER_LIKE_TYPE[name]
+  }
+
+  // Convert ArrayObject to StringObject for Eq operators (single-value filters)
+  // ArrayObject is for multi-select (In), but Eq should be single-select
+  if (typeName === 'ArrayObject' && operator === 'Eq') {
+    return 'StringObject'
+  }
+
+  return typeName || 'String'
 }
 
 /**
@@ -54,7 +66,7 @@ export const getOperatorLabelFromFieldName = (fieldName) => {
 export default function ParserObjectField({ name, type: { name: typeName } }) {
   const { label, group, value } = formatFieldName(name)
   const operator = getOperatorLabelFromFieldName(name)
-  const fieldType = getTypeField(name, typeName)
+  const fieldType = getTypeField(name, typeName, operator)
 
   return {
     label,

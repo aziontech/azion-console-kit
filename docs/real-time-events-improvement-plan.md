@@ -330,3 +330,59 @@ src/views/RealTimeEvents/
 - [x] **Fix**: `fillGaps` em `event-chart.vue` — normaliza timestamps para bucket boundaries
 - [x] **Cleanup**: Removidos `console.log` de debug em `tab-panel-block.vue`
 - [x] **Confirmação**: WebSocket observado é Vite HMR, não transporte de dados
+
+---
+
+## 9. Real-Time Events V2 — Guia rápido do usuário
+
+Esta seção resume as quatro melhorias entregues no V2. Para o detalhe
+técnico de implementação ver
+[`specs/real-time-events-v2-improvements/FEATURE.md`](../specs/real-time-events-v2-improvements/FEATURE.md).
+
+### 9.1 Compartilhar uma query
+
+1. Aplique os filtros desejados (ex.: `status = 500`, `host = api.x`).
+2. Escolha o dataset, page size e colunas que quer compartilhar.
+3. Clique em **Share** no cabeçalho. A URL é copiada para a área de
+   transferência e um toast confirma o sucesso.
+4. Cole a URL no Slack, e-mail, ou outro navegador. Quem abrir verá
+   exatamente a mesma visão (mesmos filtros, dataset, page size e
+   colunas).
+
+Limitação: o intervalo de tempo (`tsRange`) é capturado no momento do
+clique — destinatários veem a mesma janela absoluta, não "últimos 15
+minutos" relativos.
+
+Browsers sem Clipboard API (Safari sem HTTPS, contextos restritos)
+abrem um diálogo de fallback com a URL em um input e um botão **Copy**.
+
+### 9.2 Salvar uma pesquisa
+
+1. Aplique os filtros e ajustes de coluna desejados.
+2. Clique em **Save**, dê um nome (ex.: `5xx no domínio principal`).
+3. A pesquisa aparece no dropdown de Saved Searches.
+4. Recarregue a página ou volte mais tarde: clique no item salvo para
+   re-aplicar tudo (filtros, dataset, page size, colunas).
+
+Limitação: pesquisas salvas vivem **apenas no navegador atual**
+(`localStorage`), por conta+tenant. Não sincronizam entre dispositivos.
+Se o `localStorage` estiver cheio, o V2 mostra um toast de aviso e
+mantém a sessão atual em memória, mas não persiste.
+
+### 9.3 Correções de GraphQL em cinco datasets
+
+Cinco abas que crashavam no V1 com erro de `groupBy` agora carregam
+limpas: Function Events, Function Console Events, Data Stream Events,
+Edge DNS Queries e Activity History.
+
+Se uma aba mostrar um toast de erro de carregamento, o log estruturado
+`[real-time-events] GraphQL query failed` no console traz `dataset` e
+`groupByField` para o suporte abrir um chamado.
+
+### 9.4 Modal Add Filter estável
+
+O modal **Add Filter** mantém a largura constante quando você troca o
+campo ou o operador — sem mais "saltos" de layout. Em mobile, o modal
+ocupa a viewport menos uma margem de 1 rem; em desktop, fica em 35 rem
+(560 px). Todos os botões e chips têm pelo menos 44×44 px, atendendo
+WCAG 2.5.5.

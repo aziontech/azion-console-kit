@@ -75,9 +75,7 @@
       class="discover-data-table"
       @row-click="emit('row-click', $event)"
     >
-      <Column
-        :style="{ width: '2.5rem', minWidth: '2.5rem', maxWidth: '2.5rem' }"
-      >
+      <Column :style="{ width: '2.5rem', minWidth: '2.5rem', maxWidth: '2.5rem' }">
         <template #body="{ data: rowData }">
           <i
             :class="[

@@ -84,6 +84,10 @@ module.exports = {
   rules: {
     'no-case-declarations': 0,
     'no-console': 'error',
-    'id-length': ['error', { min: 2 }]
+    'id-length': ['error', { min: 2 }],
+    // Reliability — applies repo-wide, not gated by tier.
+    // navigator.clipboard.writeText() returns a Promise; ignoring it hides
+    // permission rejections and lost-focus failures that silently break copy UX.
+    'azion-architecture/no-unawaited-clipboard': 'error'
   }
 }

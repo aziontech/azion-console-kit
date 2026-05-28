@@ -4,7 +4,7 @@
          Mobile (<640px): stacks vertically — each dropdown/input gets its
          own row, action buttons wrap to a final row.
          Tablet+: horizontal layout as designed. -->
-    <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full min-w-0">
       <Dropdown
         ref="fieldDropdownRef"
         id="filter-field"
@@ -16,34 +16,34 @@
         autoFilterFocus
         optionLabel="label"
         optionValue="value"
-        class="w-full"
+        class="flex-1 min-w-0"
         placeholder="Select a field"
         filterIcon="pi pi-search"
         @show="onDropdownShow"
       />
 
       <Dropdown
-        appendTo="self"
+        appendTo="body"
         id="filter-operator"
         v-model="selectedOperator"
         :disabled="listOperatorsDisabled"
         :options="listOperators"
         optionLabel="label"
         placeholder="Select an operator"
-        class="w-full sm:w-auto"
+        class="flex-1 min-w-0 sm:flex-0"
       />
 
       <component
         :is="componentRender"
         v-model:value="filterValue"
         v-bind="selectedOperator?.props"
-        class="w-full"
+        class="flex-1 min-w-0"
         :placeholder="selectedField ? 'Enter value...' : 'Please select a field first...'"
         :disabled="!selectedField"
       />
 
       <!-- Action Buttons — wrap so they reflow on tight viewports -->
-      <div class="flex flex-wrap gap-1 sm:flex-shrink-0">
+      <div class="flex flex-wrap gap-1 sm:flex-shrink-0 sm:ml-auto">
         <!-- Add OR Button -->
         <PrimeButton
           outlined

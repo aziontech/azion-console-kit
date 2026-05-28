@@ -21,6 +21,9 @@ module.exports = {
     // Architecture — disabled
     'azion-architecture/module-isolation': 'off',
     'azion-architecture/naming-convention': 'off',
-    'azion-architecture/type-separation': 'off'
+    'azion-architecture/type-separation': 'off',
+
+    // Reliability — clipboard Promise must be observed
+    'azion-architecture/no-unawaited-clipboard': 'error'
   }
 }

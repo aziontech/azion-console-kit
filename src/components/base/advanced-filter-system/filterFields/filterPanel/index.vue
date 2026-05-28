@@ -45,7 +45,6 @@
       </div>
     </div>
 
-
     <!-- Custom Label Section -->
     <div class="px-4 sm:px-6 md:px-8 py-5 flex gap-3.5 flex-col">
       <label class="text-sm font-medium text-color">Custom label (optional)</label>

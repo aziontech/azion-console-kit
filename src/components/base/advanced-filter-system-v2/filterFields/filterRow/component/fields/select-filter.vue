@@ -32,9 +32,6 @@
     },
     disabled: {
       type: Boolean
-    },
-    selectionLimit: {
-      type: Number
     }
   })
 
@@ -61,6 +58,11 @@
       selectedValue.value = value
     }
   })
+
+  const shouldFilterOptions = computed(() => {
+    return valueOptions.value.length > 8
+  })
+
   const serviceIn = async () => {
     try {
       loading.value = true
@@ -87,21 +89,20 @@
   })
 </script>
 <template>
-  <div class="flex flex-col w-full sm:w-full gap-2">
+  <div class="flex flex-col w-full min-w-0 sm:w-full gap-2">
     <Select
       id="in_field"
-      display="chip"
       resetFilterOnHide
       autoFilterFocus
-      filter
+      :filter="shouldFilterOptions"
+      scrollHeight="240px"
       :disabled="props.disabled"
       :loading="loading"
       v-model="loadValue"
       :options="valueOptions"
-      :selectionLimit="props.selectionLimit"
       :optionLabel="payload.label"
       :optionValue="payload.value"
-      class="w-full"
+      class="w-full min-w-0"
       :placeholder="props.placeholder"
       :pt="{
         panel: { class: 'w-full max-w-lg' },

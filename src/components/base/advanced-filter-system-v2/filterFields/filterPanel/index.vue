@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="border-b px-4 sm:px-6 md:px-8 py-2.5 justify-between surface-border flex">
+  <div class="filter-panel">
+    <div class="border-b px-3 sm:px-4 md:px-6 py-2.5 justify-between surface-border flex">
       <h3 class="text-sm font-semibold text-color">Add filter</h3>
       <PrimeButton
         icon="pi pi-times"
@@ -12,7 +12,7 @@
     </div>
 
     <!-- Filter Rows -->
-    <div class="px-4 sm:px-6 md:px-8 py-6 flex gap-2 flex-col">
+    <div class="px-3 sm:px-4 md:px-6 py-6 flex gap-2 flex-col">
       <div
         v-for="(filterRow, rowIndex) in filterRows"
         :key="rowIndex"
@@ -45,10 +45,9 @@
       </div>
     </div>
 
-
     <!-- Footer Buttons -->
     <div
-      class="px-4 sm:px-6 md:px-8 py-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
+      class="px-3 sm:px-4 md:px-6 py-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
     >
       <PrimeButton
         type="button"
@@ -194,3 +193,22 @@
     })
   }
 </script>
+
+<style scoped>
+  /* Responsive width pinning: ensures child content stays within bounds
+     even as dropdowns expand/collapse. Uses CSS custom properties from
+     filterFields index.vue for media-query-driven width constraints. */
+  .filter-panel {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  /* All child divs use border-box sizing and clip overflow to prevent
+     horizontal scrollbars when dropdowns/inputs expand. */
+  .filter-panel > div {
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+</style>

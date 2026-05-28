@@ -121,6 +121,13 @@
         :availableReports="availableReports"
         @save="handleSessionSave"
       />
+
+      <!-- Fallback Copy Dialog — surfaced by `shareCurrentView()` when the
+           Clipboard API is unavailable (insecure context, denied permission,
+           private mode in some browsers). Stays mounted at the page root so
+           the imperative `show(url)` from the composable works regardless of
+           which tab is active. -->
+      <FallbackCopyDialog ref="fallbackCopyDialogRef" />
     </template>
   </ContentBlock>
 </template>
@@ -140,6 +147,7 @@
   import SessionCreator from '@/views/RealTimeEventsV2/Blocks/components/session-creator.vue'
   import DashboardPanel from '@/views/RealTimeEventsV2/Blocks/components/dashboard-panel.vue'
   import SessionTabHeader from '@/views/RealTimeEventsV2/Blocks/components/session-tab-header.vue'
+  import FallbackCopyDialog from '@/views/RealTimeEventsV2/components/FallbackCopyDialog.vue'
   import TABS_EVENTS from '@/views/RealTimeEventsV2/Blocks/constants/tabs-events'
   import { loadEventsFilterFields } from '@/modules/filter-loaders'
   import { useSessionManager } from '@/views/RealTimeEventsV2/composables/useSessionManager'
@@ -198,6 +206,11 @@
   const tabPanelBlockRef = ref(null)
   const generatedFilterFields = ref([])
   const selectedDatasetKey = ref(null)
+  // Ref to `<FallbackCopyDialog>` — wired into `useSessionManager` so the
+  // composable can imperatively `show(url)` when the Clipboard API is
+  // unavailable. Declared *before* the composable call so the ref is the
+  // same identity Vue will populate after mount.
+  const fallbackCopyDialogRef = ref(null)
 
   // ── Session management (composable) ──
   const {
@@ -219,7 +232,7 @@
     deleteSession,
     shareCurrentView,
     initializePanels
-  } = useSessionManager({ route, router, toast })
+  } = useSessionManager({ route, router, toast, fallbackCopyDialogRef })
 
   // Backwards-compat alias for watchers below
   const activePanel = activeTabId
@@ -303,7 +316,12 @@
   }
 
   // ── Share ──
-  const handleShare = () => {
+  // `shareCurrentView` is now async (Task 4.1 — awaits clipboard write so
+  // the success toast only fires after the OS clipboard accepted the URL).
+  // We await it here so any error surfaced by the composable's catch block
+  // settles before the click handler returns — and so future enhancements
+  // (analytics, focus restoration) can chain off the resolved promise.
+  const handleShare = async () => {
     let viewState = {}
     let eventsTab = null
 
@@ -318,7 +336,7 @@
       }
     }
 
-    shareCurrentView({ viewState, eventsTab })
+    await shareCurrentView({ viewState, eventsTab })
   }
 
   // ── Watch pendingEventsTabState from useSessionManager (Share_State import) ──
