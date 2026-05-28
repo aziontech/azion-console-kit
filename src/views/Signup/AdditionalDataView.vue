@@ -1,7 +1,12 @@
 <template>
   <div class="flex flex-col flex-1 var(--bg-color)">
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col items-center py-8 px-4 gap-6">
+    <div
+      :class="[
+        'flex-1 flex flex-col items-center py-8 px-4 gap-6',
+        { 'justify-center': isSuccessStep }
+      ]"
+    >
       <!-- Card Container (only for step 1) -->
       <div class="w-full">
         <CardBox
