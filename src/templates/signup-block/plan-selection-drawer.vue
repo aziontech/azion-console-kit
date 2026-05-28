@@ -222,10 +222,15 @@
   })
 
   const planOptions = computed(() => {
-    if (!props.relativeLabels) return BASE_PLAN_OPTIONS.value
+    if (props.relativeLabels) {
+      return BASE_PLAN_OPTIONS.value.map((option) => ({
+        ...option,
+        buttonLabel: getRelativeLabel(option.value)
+      }))
+    }
     return BASE_PLAN_OPTIONS.value.map((option) => ({
       ...option,
-      buttonLabel: getRelativeLabel(option.value)
+      buttonLabel: isCurrentPlanSelection(option.value) ? 'Selected Plan' : option.buttonLabel
     }))
   })
 

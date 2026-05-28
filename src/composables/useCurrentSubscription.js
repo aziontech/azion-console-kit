@@ -73,7 +73,7 @@ export function useCurrentSubscription() {
   const isHobby = computed(() => planSku.value === 'hobby')
 
   const planTitle = computed(() => (isPro.value ? 'Pro Plan' : 'Hobby'))
-  const planTag = computed(() => (hasContractedPlan.value ? 'Actual Plan' : null))
+  const planTag = computed(() => (hasContractedPlan.value ? 'Current Plan' : null))
 
   const planStartDate = computed(() =>
     formatPlanStartDate(activeServiceOrder.value?.currentPeriodStart)

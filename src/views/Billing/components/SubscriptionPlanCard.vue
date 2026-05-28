@@ -51,7 +51,7 @@
           </SkeletonBlock>
         </SubscriptionPlanRow>
 
-        <SubscriptionPlanRow label="Next Charge Value">
+        <SubscriptionPlanRow label="Next Charge Amount">
           <SkeletonBlock
             :isLoaded="!subscription.isLoading"
             class="text-color"
@@ -86,7 +86,7 @@
 
     <template #footer>
       <p class="w-full text-xs leading-5 text-color-secondary">
-        This invoice includes all consumption up to the last day of the month. Change
+        This invoice includes all usage up to the last day of the month. Change
         <span
           class="text-[var(--text-color-link)] cursor-pointer"
           @click="emit('go-to-payment')"

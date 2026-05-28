@@ -9,7 +9,7 @@
     >
       <!-- Plan Selector Card -->
       <div class="flex flex-col gap-2">
-        <label class="text-xs leading-4 text-color-secondary">Plan Selected</label>
+        <label class="text-xs leading-4 text-color-secondary">Selected Plan</label>
         <PlanSelectorCard
           :plan="plan"
           :planData="selectedPlanData"
