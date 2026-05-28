@@ -691,6 +691,61 @@ function pivotGroupedRows(rows, groupByField, tsRange) {
 }
 
 const HTTP_LIKE_DATASETS = new Set(['workloadEvents'])
+
+/**
+ * Whitelist of groupBy fields each Events dataset can be safely grouped by.
+ *
+ * Mirrors `CURATED_DATASET_FIELDS` (`_shared/dataset-fields.js`) — the single
+ * source of truth for which fields each dataset exposes. Only fields used as
+ * `groupByField` in the UI stack-by selector are listed; non-stackable
+ * datasets get an empty Set so any incoming groupByField is dropped before
+ * reaching GraphQL.
+ *
+ * Rationale: GraphQL responds with "Cannot query field X" when a dataset is
+ * grouped by a field it doesn't support, which fails the entire chart query.
+ * The guard below downgrades the request to a time-series query instead.
+ */
+const DATASET_SUPPORTS_GROUPBY = Object.freeze({
+  workloadEvents: new Set(['status', 'requestMethod', 'upstreamCacheStatus']),
+  tieredCacheEvents: new Set(['upstreamCacheStatus']),
+  functionEvents: new Set(),
+  functionConsoleEvents: new Set(),
+  imagesProcessedEvents: new Set(),
+  edgeDnsQueriesEvents: new Set(),
+  dataStreamedEvents: new Set(),
+  activityHistoryEvents: new Set()
+})
+
+/**
+ * Validate and (if needed) downgrade a groupByField against the dataset's
+ * whitelist. Logs a structured warning when an unsupported field is dropped
+ * so the issue is observable in production.
+ *
+ * @param {string} dataset
+ * @param {string|null|undefined} groupByField
+ * @param {string} site - call-site tag for diagnostics ('client' | 'service')
+ * @returns {string|null} the original field if supported, otherwise null
+ */
+function sanitizeGroupByField(dataset, groupByField, site) {
+  if (!groupByField) return null
+  const supported = DATASET_SUPPORTS_GROUPBY[dataset]
+  // Unknown dataset: pass-through (let the API surface the error).
+  if (!supported) return groupByField
+  if (supported.has(groupByField)) return groupByField
+  // eslint-disable-next-line no-console
+  console.warn(
+    `[real-time-events] Dataset ${dataset} does not support groupBy:${groupByField}; falling back to ts-only`,
+    {
+      event: 'unsupported_groupby',
+      site,
+      dataset,
+      field: groupByField,
+      fallback: 'ts-only'
+    }
+  )
+  return null
+}
+
 const STATUS_CHART_ALIASES = Object.freeze([
   { alias: 'chart2xx', bucket: '2xx', filter: 'statusGte: 200, statusLt: 300' },
   { alias: 'chart3xx', bucket: '3xx', filter: 'statusGte: 300, statusLt: 400' },
@@ -747,6 +802,11 @@ function buildKpiAliases({ dataset, filterBlock }) {
 }
 
 async function loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupByField = null }) {
+  // Task 10.2 — client-side guard: drop unsupported groupByField up-front so
+  // we never build a query GraphQL is guaranteed to reject. Downgrades to a
+  // ts-only time-series instead of failing the whole chart.
+  let effectiveGroupByField = sanitizeGroupByField(dataset, groupByField, 'client')
+
   const normalizedTsRange = {
     tsRangeBegin:
       tsRange.tsRangeBegin instanceof Date
@@ -762,8 +822,15 @@ async function loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupBy
     Object.keys(filters?.and || {}).some((key) => key.startsWith('status')) ||
     Object.keys(filters?.in || {}).some((key) => key.startsWith('status'))
   )
-  const isBucketedStatusStack = groupByField === 'status' && isHttpLike && !hasExplicitStatusFilter
-  const chartGroupBy = groupByField && !isBucketedStatusStack ? ['ts', groupByField] : ['ts']
+  // Task 10.3 — defense-in-depth: re-check at query-build time. If anything
+  // between the entry guard and this point reassigned `effectiveGroupByField`
+  // (refactor risk), we still drop the unsupported field before assembling
+  // the query.
+  effectiveGroupByField = sanitizeGroupByField(dataset, effectiveGroupByField, 'service')
+  const isBucketedStatusStack =
+    effectiveGroupByField === 'status' && isHttpLike && !hasExplicitStatusFilter
+  const chartGroupBy =
+    effectiveGroupByField && !isBucketedStatusStack ? ['ts', effectiveGroupByField] : ['ts']
   const variables = { tsBegin: normalizedTsRange.tsRangeBegin, tsEnd: normalizedTsRange.tsRangeEnd }
   const extraFilterLines = []
   if (filters?.and) {
@@ -811,14 +878,39 @@ async function loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupBy
     variables
   }
   const decorator = new AxiosHttpClientSignalDecorator()
-  const httpResponse = await decorator.request({
-    baseURL: '/',
-    url: makeRealTimeEventsBaseUrl(),
-    method: 'POST',
-    body: JSON.stringify(query)
-  })
-  if (httpResponse.statusCode !== 200)
+  let httpResponse
+  try {
+    httpResponse = await decorator.request({
+      baseURL: '/',
+      url: makeRealTimeEventsBaseUrl(),
+      method: 'POST',
+      body: JSON.stringify(query)
+    })
+  } catch (err) {
+    // Task 11.1 — log raw error with structured context; rethrow so the
+    // caller (useEventsData.loadChart) surfaces the user-facing toast.
+    // eslint-disable-next-line no-console
+    console.error('[real-time-events] GraphQL query failed', {
+      event: 'graphql_error',
+      dataset,
+      groupByField: effectiveGroupByField,
+      error: err?.message || String(err),
+      timestamp: new Date().toISOString()
+    })
+    throw err
+  }
+  if (httpResponse.statusCode !== 200) {
+    // eslint-disable-next-line no-console
+    console.error('[real-time-events] GraphQL non-200 response', {
+      event: 'graphql_error',
+      dataset,
+      groupByField: effectiveGroupByField,
+      statusCode: httpResponse.statusCode,
+      detail: httpResponse.body?.detail,
+      timestamp: new Date().toISOString()
+    })
     throw new Error(httpResponse.body?.detail || 'Aggregation API error')
+  }
   const data = httpResponse.body?.data || {}
   let chartData = []
   if (isBucketedStatusStack) {
@@ -834,8 +926,8 @@ async function loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupBy
       })
       return normalized
     })
-    chartData = groupByField
-      ? pivotGroupedRows(chartRows, groupByField, normalizedTsRange)
+    chartData = effectiveGroupByField
+      ? pivotGroupedRows(chartRows, effectiveGroupByField, normalizedTsRange)
       : chartRows
   }
   let kpis = {

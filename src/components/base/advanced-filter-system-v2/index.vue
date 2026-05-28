@@ -65,7 +65,9 @@
     if (!cfg?.enabled) return null
     const every = Number(cfg.every)
     if (!Number.isFinite(every) || every < 1) return null
-    const unit = String(cfg.unit || '').toLowerCase().trim()
+    const unit = String(cfg.unit || '')
+      .toLowerCase()
+      .trim()
     return convertUnitToMilliseconds(unit, every)
   }
 

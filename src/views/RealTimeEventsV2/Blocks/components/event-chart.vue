@@ -62,9 +62,7 @@
   // cramped and easy to mis-tap. Tablet+ keeps the popover (existing UX).
   const isBottomSheetMobileS = isBreakpoint('mobile-s')
   const isBottomSheetMobile = isBreakpoint('mobile')
-  const isBottomSheetMode = computed(
-    () => isBottomSheetMobileS.value || isBottomSheetMobile.value
-  )
+  const isBottomSheetMode = computed(() => isBottomSheetMobileS.value || isBottomSheetMobile.value)
   // Touch policy follows pointer capability, not viewport size: an iPad with a
   // Magic Keyboard exposes both fine and coarse pointers, and we want the
   // tap-to-tooltip path active whenever the primary input is touch.
@@ -118,9 +116,7 @@
     if (event.key !== 'Tab') return
     const root = viewPanelRef.value
     if (!root) return
-    const focusables = root.querySelectorAll(
-      'button, [tabindex]:not([tabindex="-1"])'
-    )
+    const focusables = root.querySelectorAll('button, [tabindex]:not([tabindex="-1"])')
     if (!focusables.length) return
     const first = focusables[0]
     const last = focusables[focusables.length - 1]
@@ -777,10 +773,11 @@
         <span class="chart-header__label">events</span>
       </span>
       <div
-        v-if="showView && !collapsed"
+        v-if="!collapsed"
         class="chart-header__controls"
       >
         <div
+          v-if="showView"
           class="chart-header__view-control"
           data-testid="event-chart-view"
         >
@@ -1177,13 +1174,13 @@
    * on loading/empty states prevents layout jump between them.
    */
   .chart-loading {
-    height: clamp(140px, 32dvh, 320px);
+    height: clamp(140px, 22dvh, 240px);
     padding: 0.75rem;
   }
 
   .chart-container {
     position: relative;
-    height: clamp(140px, 32dvh, 320px);
+    height: clamp(140px, 22dvh, 240px);
     padding: 0.25rem;
     /* Default cursor; crosshair only when a fine pointer is in use. */
     cursor: default;
@@ -1228,7 +1225,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    height: clamp(140px, 32dvh, 320px);
+    height: clamp(140px, 22dvh, 240px);
     color: var(--text-color-secondary);
   }
 

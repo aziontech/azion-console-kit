@@ -291,11 +291,14 @@ export function useEventsData({
       isChartLoading.value = false
       chartData.value = []
       kpis.value = null
+      // Task 11.1 — user-facing toast for GraphQL chart failures. The
+      // service already logs structured details (event: graphql_error);
+      // here we surface a friendly message so the user knows what to do.
       onError({
         closable: true,
-        severity: 'warn',
-        summary: 'Chart failed',
-        detail: String(err).slice(0, 100),
+        severity: 'error',
+        summary: 'Error loading events',
+        detail: 'Please try again or contact support',
         life: 5000
       })
     }

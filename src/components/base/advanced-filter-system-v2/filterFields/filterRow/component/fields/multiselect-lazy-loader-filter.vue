@@ -12,22 +12,13 @@
       :selectedItemsLabel="`{0} items selected`"
       class="rte-multiselect-lazy w-full min-w-0"
       display="chip"
-    >
-      <template #header>
-        <div class="flex">
-          <InputText
-            placeholder="Search"
-            v-model="search"
-            :pt="{ root: { class: 'rounded-none w-full' } }"
-          />
-          <PrimeButton
-            icon="pi pi-search"
-            @click="loadDomains()"
-            :pt="{ root: { class: 'rounded-none cursor-pointer' } }"
-          />
-        </div>
-      </template>
-    </MultiSelect>
+      filter
+      autoFilterFocus
+      resetFilterOnHide
+      :showToggleAll="false"
+      filterPlaceholder="Search"
+      @filter="onFilter"
+    />
     <small
       v-if="errorMessage"
       class="p-error text-xs font-normal leading-tight"
@@ -43,8 +34,6 @@
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
   import MultiSelect from '@aziontech/webkit/multiselect'
-  import PrimeButton from '@aziontech/webkit/button'
-  import InputText from '@aziontech/webkit/inputtext'
 
   defineOptions({ name: 'multiSelectLazyLoaderFilter' })
 
@@ -165,6 +154,10 @@
     itemSize: 38,
     showLoader: true,
     loading
+  }
+
+  const onFilter = (event) => {
+    search.value = event.value || ''
   }
 
   watchDebounced(

@@ -71,7 +71,18 @@
     removeQuery: removeQueryFromHistory,
     clearHistory: clearQueryHistory
   } = useQueryHistory()
-  const { savedSearches, saveSearch, deleteSearch } = useSavedSearches()
+  const { savedSearches, saveSearch, deleteSearch, localStorageAvailable } = useSavedSearches({
+    // Fires at most once per composable instance — see useSavedSearches.
+    onQuotaExceeded: () => {
+      toast.add({
+        closable: true,
+        severity: 'warn',
+        summary: 'Saved searches unavailable in this session',
+        detail: 'Storage quota exceeded or unavailable in this browser.',
+        life: 4000
+      })
+    }
+  })
   const { pageSize, setPageSize } = usePageSize()
 
   const filterData = ref(null)
@@ -262,14 +273,24 @@
   const savedSearchOverlayRef = ref(null)
   const reloadListTable = () => loadData()
 
-  const handleSaveSearch = (name) => {
-    saveSearch({
+  const handleSaveSearch = (payload) => {
+    // Overlay may emit either a plain string (legacy) or `{ name, description }`.
+    const { name, description } =
+      typeof payload === 'string' ? { name: payload, description: '' } : payload || {}
+    const entry = saveSearch({
       name,
       filterData: filterData.value,
       selectedColumns: selectedFields.value,
-      dataset: props.tabSelected?.dataset
+      selectedFields: selectedFields.value,
+      dataset: props.tabSelected?.dataset,
+      pageSize: pageSize.value,
+      description
     })
-    toast.add({ closable: true, severity: 'success', summary: 'Search saved', life: 2000 })
+    // saveSearch returns undefined when the name is empty or account context
+    // is missing — only confirm when something was actually persisted.
+    if (entry) {
+      toast.add({ closable: true, severity: 'success', summary: 'Search saved', life: 2000 })
+    }
   }
 
   const handleLoadQueryHistory = (entry) => {
@@ -285,8 +306,23 @@
   }
 
   const handleLoadSearch = (entry) => {
+    if (!entry) return
     if (entry.filterData) filterData.value = safeStructuredClone(entry.filterData)
-    if (entry.selectedColumns?.length) selectedFields.value = [...entry.selectedColumns]
+    // Prefer `selectedFields` (V2 spec field) when present and non-empty,
+    // otherwise fall back to the legacy `selectedColumns` slot. Either may
+    // exist on older persisted entries.
+    const fieldsToRestore =
+      (Array.isArray(entry.selectedFields) &&
+        entry.selectedFields.length &&
+        entry.selectedFields) ||
+      (Array.isArray(entry.selectedColumns) &&
+        entry.selectedColumns.length &&
+        entry.selectedColumns)
+    if (fieldsToRestore) selectedFields.value = [...fieldsToRestore]
+    if (Number.isFinite(entry.pageSize) && entry.pageSize > 0) {
+      pageSize.value = entry.pageSize
+      setPageSize(entry.pageSize)
+    }
     reloadListTableWithHash()
     savedSearchOverlayRef.value?.hide()
   }
@@ -379,6 +415,31 @@
     handleKeyDown(event)
   }
 
+  /**
+   * Hydrate this tab from a Share_State payload on mount.
+   *
+   * Two entry points feed this:
+   *   1. **Additional Events tabs** — `useEventsTabs.getPendingViewState`
+   *      returns the full decoded view state (filters + meta) for the
+   *      tab being opened from `?shareState=...`. Passed via the
+   *      `pendingViewState` prop.
+   *   2. **Pinned Events tab** — `useSessionManager` exposes the decoded
+   *      filters/pageSize/selectedFields directly via `initialFilterState`,
+   *      `initialPageSize`, `initialSelectedFields` (split because the
+   *      pinned tab can also receive these from non-share flows).
+   *
+   * Called from `onBeforeMount` *before* `refreshFilterData()` so the
+   * shared filters land in `filterData.value` first and the initial load
+   * uses them — otherwise the request would fire with stale defaults
+   * and we'd flash the wrong dataset.
+   *
+   * Also exposed via `defineExpose` so the parent can re-apply share
+   * state when a Share_State arrives after this component already
+   * mounted (TabsView watches `pendingEventsTabState` and calls this as
+   * a fallback when the tab-limit is reached, see TabsView.vue:325-342).
+   *
+   * @requires Requirements 1.5, N.2
+   */
   const applyInitialShareState = () => {
     // pendingViewState takes priority (from useEventsTabs.getPendingViewState — Share_State import
     // into a new Events tab). Falls back to initialFilterState (direct prop injection).
@@ -387,7 +448,7 @@
       try {
         filterData.value = safeStructuredClone(stateToApply)
       } catch {
-        /* ignore */
+        /* ignore — falls back to whatever refreshFilterData() seeds */
       }
     }
     if (Array.isArray(props.initialSelectedFields))
@@ -451,7 +512,8 @@
     v-if="isTabSelected"
     class="flex flex-col flex-1 min-h-0 gap-3"
     :class="{
-      'fixed inset-0 z-[100] bg-[var(--surface-ground)] p-2 overflow-auto tab-panel-root--fullscreen': isFullscreen
+      'fixed inset-0 z-[100] bg-[var(--surface-ground)] p-2 overflow-auto tab-panel-root--fullscreen':
+        isFullscreen
     }"
   >
     <!-- Filter bar -->
@@ -483,6 +545,7 @@
     <SavedSearchesOverlay
       ref="savedSearchOverlayRef"
       :searches="savedSearches"
+      :storageAvailable="localStorageAvailable"
       @load="handleLoadSearch"
       @delete="deleteSearch"
       @save="handleSaveSearch"
@@ -531,7 +594,7 @@
                   :stackBy="stackByField"
                   :view="selectedView"
                   :viewOptions="viewOptions"
-                  :showView="hasMultipleViewOptions"
+                  :showView="hasMultipleViewOptions && tabSupportsStacking"
                   :showSummary="showChartSummary"
                   :collapsed="isChartCollapsed"
                   @update:view="selectedView = $event"

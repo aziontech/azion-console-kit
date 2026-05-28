@@ -7,23 +7,25 @@
       @click="toggleOverPanel"
     />
 
-    <!-- OverPanel — sized proportionally to the viewport so the modal
-         adapts to any resolution without hardcoded pixel breakpoints.
-         - max-h: 80vh (caps at 80% of viewport height — never overflows)
-         - h: auto (sizes to content — no forced fixed height)
-         - max-w: min(90vw, 56rem) (90% of viewport, capped at ~896px for
-           ergonomics on very wide screens) -->
+    <!-- OverPanel — fixed responsive width so the modal stays stable
+         across field/operator changes (no resize jank as inner content
+         reflows). Width is driven by CSS media queries on `.filter-overlay`:
+         - desktop (>=1024px): 35rem (560px) fixed
+         - tablet  (640-1023px): min(35rem, 90vw)
+         - mobile  (<640px): calc(100vw - 1rem) (near full-bleed)
+         max-h: 80vh caps height; content reflows inside fixed width. -->
     <OverlayPanel
       ref="overPanelRef"
       appendTo="body"
       aria-haspopup="true"
       aria-controls="overlay_panel"
       class="overflow-y-auto"
+      :style="{ width: 'var(--filter-overlay-width, 35rem)' }"
       :pt="{
         root: {
-          class: 'p-0 w-[min(90vw,56rem)] max-h-[80vh]'
+          class: 'filter-overlay p-0 max-h-[80vh] overflow-hidden'
         },
-        content: { class: 'p-0' }
+        content: { class: 'p-0 overflow-hidden' }
       }"
     >
       <FilterPanel
@@ -83,3 +85,33 @@
     overPanelRef.value.hide()
   }
 </script>
+
+<style>
+  /* Responsive OverlayPanel width. The panel is teleported to <body>
+     (appendTo="body"), so this rule must be UNSCOPED to reach the
+     teleported root. Width is fixed per breakpoint to keep the modal
+     stable as the user changes field/operator inside it.
+     Desktop: 700px (43.75rem) — comfortable for 1920x+ without waste
+     Tablet: 90vw capped at 700px
+     Mobile: full bleed minus 1rem */
+  :root {
+    --filter-overlay-width: 43.75rem;
+  }
+
+  @media (max-width: 1023px) {
+    :root {
+      --filter-overlay-width: min(43.75rem, 90vw);
+    }
+  }
+
+  @media (max-width: 639px) {
+    :root {
+      --filter-overlay-width: calc(100vw - 1rem);
+    }
+  }
+
+  .filter-overlay {
+    width: var(--filter-overlay-width, 43.75rem) !important;
+    overflow: hidden !important;
+  }
+</style>

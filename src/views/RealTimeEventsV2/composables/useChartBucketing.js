@@ -50,9 +50,7 @@ const BUCKET_TABLE = [
  */
 export function getBucketInterval(durationMs, targetMaxBuckets = Infinity) {
   const minInterval =
-    Number.isFinite(targetMaxBuckets) && targetMaxBuckets > 0
-      ? durationMs / targetMaxBuckets
-      : 0
+    Number.isFinite(targetMaxBuckets) && targetMaxBuckets > 0 ? durationMs / targetMaxBuckets : 0
 
   // Walk the table in ascending-interval order; first row that fits the
   // duration AND yields ≤ targetMaxBuckets wins.
@@ -110,8 +108,7 @@ export function aggregateIntoBuckets(rawData, rangeStart, rangeEnd, targetMaxBuc
   //   - Last bucket whose end is past `rangeEnd` includes future time (or
   //     time after "now" for live data), also under-filled.
   // Skipping these eliminates the "starts low / ends low" visual artifact.
-  const firstBucketTs =
-    alignedStart < rangeStart ? alignedStart + bucketMs : alignedStart
+  const firstBucketTs = alignedStart < rangeStart ? alignedStart + bucketMs : alignedStart
   for (let ts = firstBucketTs; ts + bucketMs <= rangeEnd; ts += bucketMs) {
     bucketMap.set(ts, 0)
   }

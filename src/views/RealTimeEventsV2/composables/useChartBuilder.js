@@ -282,8 +282,7 @@ function buildMultiSeries(
   //   - Last slot: cap so `slotStart + interval <= rangeEnd` (no trailing
   //     partial slot extending past "now" / range end).
   // Eliminates the misleading low values at both edges of the chart.
-  const firstSlotTs =
-    alignedStart < rangeStart ? alignedStart + interval : alignedStart
+  const firstSlotTs = alignedStart < rangeStart ? alignedStart + interval : alignedStart
   const rawSlotCount = Math.max(0, Math.floor((rangeEnd - firstSlotTs) / interval))
   // Ensure at least 1 slot so the chart can still render (rare edge case
   // when range is shorter than one bucket interval).
@@ -727,10 +726,7 @@ function computeTickPatch({ naturalTicks, containerWidth, breakpoint, axisProbe,
   //     never make us pick a narrower slot.
   //  3. Apply LABEL_WIDTH_SAFETY (≥1) on top to absorb HTML-span vs
   //     SVG-text render gap that bit us in production with HH:mm:ss buckets.
-  const longestChars = naturalTicks.reduce(
-    (max, label) => Math.max(max, String(label).length),
-    0
-  )
+  const longestChars = naturalTicks.reduce((max, label) => Math.max(max, String(label).length), 0)
   const charEstimate = Math.ceil(longestChars * AXIS_FONT_SIZE_PX * CHAR_WIDTH_EM + 4)
   const measuredWidth = getCachedLongestLabelWidth(
     naturalTicks,
@@ -750,9 +746,8 @@ function computeTickPatch({ naturalTicks, containerWidth, breakpoint, axisProbe,
   // Below capacity → no decimation needed; keep all natural ticks. Don't set
   // `tick.values` (and don't flip `fit`) so chart-kind defaults remain intact.
   if (naturalTicks.length <= maxTicks) {
-    const rotate = isRotatableBreakpoint && containerWidth / naturalTicks.length < slotWidth
-      ? -45
-      : 0
+    const rotate =
+      isRotatableBreakpoint && containerWidth / naturalTicks.length < slotWidth ? -45 : 0
     return { rotate }
   }
 
@@ -769,8 +764,7 @@ function computeTickPatch({ naturalTicks, containerWidth, breakpoint, axisProbe,
 
   // Rotation only when overlap is still likely after decimation. Wide screens
   // (`desktop`/`xl`) always keep labels horizontal.
-  const rotate =
-    isRotatableBreakpoint && containerWidth / values.length < slotWidth ? -45 : 0
+  const rotate = isRotatableBreakpoint && containerWidth / values.length < slotWidth ? -45 : 0
 
   return { values, fit: false, rotate }
 }
@@ -888,8 +882,7 @@ export function buildC3Config({
   // the longest formatted label and dividing the container width by that
   // slot. Falls back to legacy culling.max when width or measurement is
   // unavailable (SSR, pre-render, JSDOM).
-  const naturalTicks =
-    Array.isArray(columns[0]) && columns[0].length > 1 ? columns[0].slice(1) : []
+  const naturalTicks = Array.isArray(columns[0]) && columns[0].length > 1 ? columns[0].slice(1) : []
   let containerWidth = 0
   if (chartContainer && typeof chartContainer.getBoundingClientRect === 'function') {
     try {

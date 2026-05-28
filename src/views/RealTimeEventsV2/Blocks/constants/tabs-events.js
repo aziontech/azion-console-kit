@@ -89,13 +89,9 @@ const TABS_EVENTS = {
     tabRouter: 'tiered-cache',
     availableFields: DATASET_FIELDS.tieredCacheEvents,
     defaultSelectedFields: ['host', 'status', 'upstreamCacheStatus'],
-    // Chart options
-    showStackBy: true,
-    showSummary: false,
-    stackByOptions: [
-      { label: 'Default', value: 'none' },
-      { label: 'Cache Status', value: 'upstreamCacheStatus' }
-    ]
+    // Chart options - volume over time, no stack-by or summary
+    showStackBy: false,
+    showSummary: false
   },
   edgeDNS: {
     panel: 'edgeDNS',

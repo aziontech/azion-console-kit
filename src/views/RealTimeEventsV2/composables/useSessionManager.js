@@ -62,8 +62,15 @@ export const EVENTS_TAB = Object.freeze({
  * @param {import('vue-router').Router}                  options.router        – router instance
  * @param {Object}                                        options.toast         – PrimeVue toast service
  * @param {(() => boolean)|null}                          [options.canOpenNewTab=null] – injected from useTabLimit; when provided, replaces the per-type MAX_OPEN_TABS check
+ * @param {import('vue').Ref|null}                         [options.fallbackCopyDialogRef=null] – ref to a `<FallbackCopyDialog>` instance. When clipboard write fails or the Clipboard API is unavailable, the dialog is opened with the share URL so the user can copy it manually. Optional: when omitted (or unwired), a plain error toast is shown instead.
  */
-export function useSessionManager({ route, router, toast, canOpenNewTab = null }) {
+export function useSessionManager({
+  route,
+  router,
+  toast,
+  canOpenNewTab = null,
+  fallbackCopyDialogRef = null
+}) {
   const openTabs = ref([EVENTS_TAB])
   const activeTabId = ref(null)
   const panels = ref([])
@@ -310,11 +317,35 @@ export function useSessionManager({ route, router, toast, canOpenNewTab = null }
 
   /**
    * Share the current view (active tab + its filter/dataset state).
-   * @param {object} [options]
-   * @param {object} [options.viewState] - { filters, tsRange, dataset, pageSize, documentQuery }
-   * @param {object|null} [options.eventsTab] - { label, dataset } for additional Events tabs; null for pinned/Dashboard tabs
+   *
+   * Async by design: the clipboard write is **awaited** so the success
+   * toast only fires after the OS clipboard actually holds the URL. The
+   * previous fire-and-forget implementation was a race against the
+   * promise — users could see the success toast while the write was
+   * still pending (or had silently failed in some browsers).
+   *
+   * Failure path:
+   *   1. If the Clipboard API is unavailable or the page is not in a
+   *      secure context, we **throw before attempting** the write — that
+   *      keeps the error path deterministic instead of relying on
+   *      browser-specific rejection messages.
+   *   2. In the catch block, if a `fallbackCopyDialogRef` was wired, we
+   *      open the dialog with the URL so the user can copy it by hand
+   *      (PrimeVue `InputText[readonly]` + execCommand legacy path).
+   *   3. Only when no fallback is wired do we surface a destructive
+   *      error toast — otherwise the user already has a working path.
+   *
+   * @param {object}      [options]
+   * @param {object}      [options.viewState]  - { filters, tsRange, dataset, pageSize, selectedFields, documentQuery, selectedView }
+   * @param {object|null} [options.eventsTab]  - { id, label, dataset } for additional Events tabs; null for pinned/Dashboard tabs
+   * @returns {Promise<void>}
+   * @requires Requirements 1.1, 1.3, 1.4, N.1, N.8, N.9
    */
-  const shareCurrentView = ({ viewState = {}, eventsTab = null } = {}) => {
+  const shareCurrentView = async ({ viewState = {}, eventsTab = null } = {}) => {
+    // `url` is declared in the outer scope so the catch block can pass
+    // it to the fallback dialog even when the failure happens after the
+    // URL has been built.
+    let url = null
     try {
       const state = {
         tab: activeTabId.value,
@@ -334,11 +365,38 @@ export function useSessionManager({ route, router, toast, canOpenNewTab = null }
         }
       }
       const encoded = encodeShareState(state)
-      const url = new URL(window.location.href)
+      url = new URL(window.location.href)
       url.searchParams.delete('panel')
       url.searchParams.delete('panelConfig')
       url.searchParams.set('shareState', encoded)
-      navigator.clipboard.writeText(url.toString())
+
+      // Feature-detect clipboard availability before attempting the write.
+      // Both checks are required: `navigator.clipboard` exists in some
+      // non-secure contexts but throws on write; `isSecureContext` is
+      // false on http:// origins (except localhost) and inside some
+      // sandboxed iframes.
+      if (!navigator.clipboard || !window.isSecureContext) {
+        throw new Error('Clipboard API unavailable')
+      }
+
+      // AWAIT — the toast must only fire once the OS clipboard has
+      // accepted the write. Browsers may reject the promise (denied
+      // permission, transient failure) and we want the catch to handle
+      // it consistently.
+      await navigator.clipboard.writeText(url.toString())
+
+      const urlString = url.toString()
+      // Structured log for observability (N.9). Kept at info level so
+      // it lands in browser console / forwarded sinks without alerting
+      // on the failure path.
+      // eslint-disable-next-line no-console
+      console.info({
+        event: 'share_url_copied',
+        success: true,
+        timestamp: Date.now(),
+        url_length: urlString.length
+      })
+
       toast.add({
         closable: true,
         severity: 'success',
@@ -346,6 +404,33 @@ export function useSessionManager({ route, router, toast, canOpenNewTab = null }
         life: 3000
       })
     } catch (err) {
+      // Fallback dialog path: when the parent wired a `FallbackCopyDialog`,
+      // surface it so the user can still complete the share manually
+      // (Ctrl/Cmd+C or the dialog's own legacy execCommand button).
+      const dialog = fallbackCopyDialogRef?.value
+      const urlString = url ? url.toString() : ''
+      if (dialog && typeof dialog.show === 'function' && urlString) {
+        try {
+          dialog.show(urlString)
+          toast.add({
+            closable: true,
+            severity: 'info',
+            summary: 'URL opened for manual copy',
+            life: 4000
+          })
+          return
+        } catch {
+          // Fall through to error toast below if the dialog itself
+          // failed to open (shouldn't happen, but defensive).
+        }
+      }
+
+      // eslint-disable-next-line no-console
+      console.error({
+        event: 'share_url_copy_failed',
+        error: String(err),
+        timestamp: Date.now()
+      })
       toast.add({
         closable: true,
         severity: 'error',
