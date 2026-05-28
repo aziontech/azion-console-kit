@@ -87,10 +87,7 @@ export const persistOnboardingData = async ({ plan } = {}) => {
   const lastName = lastNameParts.join(' ')
   const userId = accountStore.userId
 
-  const requests = [
-    updateAccountInfoService(role),
-    patchFullnameService(usersPayload)
-  ]
+  const requests = [updateAccountInfoService(role), patchFullnameService(usersPayload)]
 
   if (!accountStore.accountData?.jobRole) {
     requests.push(
