@@ -57,10 +57,10 @@
 
           <div class="flex flex-col gap-2">
             <p
-              v-if="getSectionTitle(planOption)"
-              class="text-xs leading-none text-color-secondary"
+              v-if="planOption?.sectionTitle"
+              class="text-xs leading-none text-[var(--text-muted)]"
             >
-              {{ getSectionTitle(planOption) }}
+              {{ planOption?.sectionTitle }}
             </p>
             <ul class="flex flex-col gap-2">
               <li
@@ -278,8 +278,6 @@
 
   const isLoadingPlan = (planValue) =>
     Boolean(props.loadingPlan) && props.loadingPlan.toLowerCase() === planValue.toLowerCase()
-
-  const getSectionTitle = (planOption) => planOption?.sectionTitle ?? ''
 
   const getIconFeatures = (planOption) => {
     return (planOption?.features ?? []).filter((feature) => Boolean(feature?.icon))

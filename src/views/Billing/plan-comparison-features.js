@@ -2,7 +2,7 @@ export const PLAN_COMPARISON_FEATURES = {
   hobby: {
     label: 'Hobby',
     tagline: 'Start free for personal projects and learning.',
-    description: 'Start free for personal projects and learning.',
+    description: 'All products and features available.',
     sectionTitle: 'All features available',
     features: [
       { title: 'Global infrastructure', icon: 'pi pi-globe text-[var(--primary)]' },
