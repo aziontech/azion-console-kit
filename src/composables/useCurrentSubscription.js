@@ -30,7 +30,7 @@ export function useCurrentSubscription() {
   const { accountData } = storeToRefs(accountStore)
 
   const accountId = computed(() => accountData.value?.id ?? null)
-  const hasFinishedOnboarding = computed(() => accountData.value?.hasAccountPlan !== false)
+  const hasFinishedOnboarding = computed(() => accountData.value?.first_login !== true)
   const hasContractedPlan = hasFinishedOnboarding
 
   const {
