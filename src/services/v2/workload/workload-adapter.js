@@ -19,19 +19,20 @@ function extractAzionAppSubdomain(fullDomains, zones = []) {
   fullDomains.forEach((entry) => {
     const name = typeof entry === 'string' ? entry : entry?.name
     const environment = typeof entry === 'string' ? null : (entry?.environment ?? null)
+    const certificate = typeof entry === 'string' ? null : (entry?.certificate ?? null)
     const { domain, subdomain } = getPrimaryDomain(name, zones)
 
     if (domain === 'azion.app') {
       azionAppSubdomains = subdomain
     } else {
-      cleanDomains.push({ subdomain: subdomain ?? '', domain, environment })
+      cleanDomains.push({ subdomain: subdomain ?? '', domain, environment, certificate })
     }
   })
 
   return {
     cleanDomains: cleanDomains.length
       ? cleanDomains
-      : [{ subdomain: '', domain: '', environment: null }],
+      : [{ subdomain: '', domain: '', environment: null, certificate: 0 }],
     azionAppSubdomains
   }
 }
@@ -59,8 +60,7 @@ const handleTls = (payload) => {
   if (payload.protocols.http.useHttps) {
     return {
       minimum_version: payload.tls.minimumVersion || null,
-      ciphers: payload.tls.ciphers || null,
-      certificate: payload.tls.certificate || null
+      ciphers: payload.tls.ciphers || null
     }
   }
 
@@ -71,15 +71,17 @@ export const WorkloadAdapter = {
   transformCreateWorkload(payload) {
     let domains = payload.domains
       .filter(({ subdomain, domain }) => subdomain || domain)
-      .map(({ subdomain, domain, environment }) => ({
+      .map(({ subdomain, domain, environment, certificate }) => ({
         name: subdomain ? `${subdomain}.${domain}` : domain,
-        environment: environment ?? null
+        environment: environment ?? null,
+        certificate: certificate ?? null
       }))
 
     if (payload.useCustomDomain) {
       domains.unshift({
         name: `${payload.customDomain}.azion.app`,
-        environment: payload.domains?.[0]?.environment ?? null
+        environment: payload.domains?.[0]?.environment ?? null,
+        certificate: payload.domains?.[0]?.certificate ?? null
       })
     }
 
@@ -161,8 +163,7 @@ export const WorkloadAdapter = {
       tls: item.tls
         ? {
             minimumVersion: item.tls.minimum_version,
-            ciphers: item.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value,
-            certificate: item.tls.certificate || 0
+            ciphers: item.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value
           }
         : undefined,
       protocols: item.protocols?.http
@@ -194,6 +195,14 @@ export const WorkloadAdapter = {
   },
   transformLoadWorkload({ data: workload }, workloadDeployment, zones = []) {
     const { azionAppSubdomains, cleanDomains } = extractAzionAppSubdomain(workload.domains, zones)
+    const legacyCertificate = workload.tls?.certificate ?? null
+    if (legacyCertificate !== null) {
+      cleanDomains.forEach((d) => {
+        if (d.certificate === null || d.certificate === undefined) {
+          d.certificate = legacyCertificate
+        }
+      })
+    }
     return {
       id: workload.id,
       name: workload.name,
@@ -211,8 +220,7 @@ export const WorkloadAdapter = {
       workloadHostnameAllowAccess: workload.workload_domain_allow_access,
       tls: {
         minimumVersion: workload.tls.minimum_version,
-        ciphers: workload.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value,
-        certificate: workload.tls.certificate || 0
+        ciphers: workload.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value
       },
       protocols: {
         http: {

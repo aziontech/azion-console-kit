@@ -1,5 +1,64 @@
 import * as yup from 'yup'
 
+const subdomainSchema = yup
+  .string()
+  .test('valid-subdomain', 'Invalid Subdomain format', function (value) {
+    if (!value) return true
+
+    if (value === '*') return true
+
+    if (value.endsWith('.')) return false
+
+    const dotCount = (value.match(/\./g) || []).length
+    if (dotCount > 10) return false
+    const segments = value.split('.')
+    return segments.every((segment) =>
+      /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
+    )
+  })
+  .label('Subdomain')
+
+const domainSchema = yup
+  .string()
+  .test('valid-domain', 'Invalid Domain format ', function (value) {
+    if (!value) {
+      return true
+    }
+
+    if (value.endsWith('.')) {
+      return false
+    }
+
+    const segments = value.split('.')
+    const dotCount = segments.length - 1
+    if (dotCount < 1 || dotCount > 10) {
+      return false
+    }
+
+    return segments.every((segment) =>
+      /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
+    )
+  })
+  .label('Domain')
+
+const environmentSchema = yup
+  .string()
+  .nullable()
+  .when(['subdomain', 'domain'], {
+    is: (subdomain, domain) => !!(subdomain || domain),
+    then: (schema) => schema.required('Environment is required for this domain.'),
+    otherwise: (schema) => schema.nullable()
+  })
+  .label('Environment')
+
+export const domainItemSchema = yup.object({
+  id: yup.number(),
+  subdomain: subdomainSchema,
+  domain: domainSchema,
+  environment: environmentSchema,
+  certificate: yup.mixed().nullable().notRequired().label('Digital Certificate')
+})
+
 export const validationSchema = yup.object({
   name: yup
     .string()
@@ -13,13 +72,15 @@ export const validationSchema = yup.object({
         return nameRegex.test(value)
       }
     ),
-  application: yup.number().required().label('Application'),
+  // application/firewall/customPage are legacy flat fields kept for adapter compatibility.
+  // The new per-environment configuration lives in `environmentDeployments` below.
+  application: yup.number().nullable().notRequired().label('Application'),
+  environmentDeployments: yup.object().default({}),
   active: yup.boolean(),
   networkMap: yup.string(),
   firewall: yup.number().label('Firewall').nullable(),
   tls: yup.object({
     isEnabled: yup.boolean(),
-    certificate: yup.string(),
     ciphers: yup.string(),
     minimumVersion: yup.string()
   }),
@@ -60,59 +121,7 @@ export const validationSchema = yup.object({
   }),
   domains: yup
     .array()
-    .of(
-      yup.object({
-        id: yup.number(),
-        subdomain: yup
-          .string()
-          .test('valid-subdomain', 'Invalid Subdomain format', function (value) {
-            if (!value) return true
-
-            if (value === '*') return true
-
-            if (value.endsWith('.')) return false
-
-            const dotCount = (value.match(/\./g) || []).length
-            if (dotCount > 10) return false
-            const segments = value.split('.')
-            return segments.every((segment) =>
-              /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
-            )
-          })
-          .label('Subdomain'),
-        domain: yup
-          .string()
-          .test('valid-domain', 'Invalid Domain format ', function (value) {
-            if (!value) {
-              return true
-            }
-
-            if (value.endsWith('.')) {
-              return false
-            }
-
-            const segments = value.split('.')
-            const dotCount = segments.length - 1
-            if (dotCount < 1 || dotCount > 10) {
-              return false
-            }
-
-            return segments.every((segment) =>
-              /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
-            )
-          })
-          .label('Domain'),
-        environment: yup
-          .string()
-          .nullable()
-          .when(['subdomain', 'domain'], {
-            is: (subdomain, domain) => !!(subdomain || domain),
-            then: (schema) => schema.required('Environment is required for this domain.'),
-            otherwise: (schema) => schema.nullable()
-          })
-          .label('Environment')
-      })
-    )
+    .of(domainItemSchema)
     .when('workloadHostnameAllowAccess', {
       is: false,
       then: (schema) =>
@@ -122,22 +131,21 @@ export const validationSchema = yup.object({
           (value) => value?.some((domain) => domain.subdomain || domain.domain)
         )
     })
-    .when('tls', {
-      is: (value) => {
-        return value.certificate === '1' || value.certificate === '2'
-      },
+    .when('protocols.http.useHttps', {
+      is: true,
       then: (schema) =>
         schema.test(
-          'has-filled-domain',
-          "Domain is required when using a Let's Encrypt certificate.",
-          (value) => value?.some((domain) => domain.domain)
+          'cert-when-https',
+          'Each domain needs a certificate when HTTPS is enabled.',
+          (rows) =>
+            (rows || []).every(
+              (d) => d?.certificate !== undefined && d?.certificate !== null && d.certificate !== 0
+            )
         )
     }),
   workloadHostnameAllowAccess: yup.boolean(),
   letEncrypt: yup.object({
     commonName: yup.string(),
     alternativeNames: yup.array()
-  }),
-  authorityCertificate: yup.string().nullable(),
-  subjectNameCertificate: yup.array().nullable()
+  })
 })

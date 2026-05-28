@@ -3,13 +3,10 @@
   import LabelBlock from '@aziontech/webkit/label'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
-  import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer/'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
-  import PrimeButton from '@aziontech/webkit/button'
   import MultiSelect from '@aziontech/webkit/multiselect'
   import { useField } from 'vee-validate'
-  import { ref, computed, watch, onMounted } from 'vue'
-  import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
+  import { computed, watch } from 'vue'
 
   import {
     HTTP_PORT_LIST_OPTIONS,
@@ -19,17 +16,9 @@
     SUPPORTED_CIPHERS_LIST_OPTIONS
   } from '@/helpers'
 
-  const digitalCertificateDrawerRef = ref('')
-  const statusDigitalCertificate = ref('')
-  const certificateOptions = ref([])
-  const certificateLoading = ref(true)
-
   const { value: protocols } = useField('protocols')
   const { value: tls } = useField('tls')
-  const { value: authorityCertificate } = useField('authorityCertificate')
-  const { value: subjectNameCertificate } = useField('subjectNameCertificate')
 
-  useField('tls.certificate', { initialValue: 0 })
   useField('tls.ciphers', { initialValue: 'Modern_v2025Q1' })
   useField('tls.minimumVersion', { initialValue: 'tls_1_3' })
 
@@ -42,11 +31,6 @@
   const { setValue: setUseHttp3 } = useField('protocols.http.useHttp3')
 
   const { errorMessage: quicPortError, value: quicPortValue } = useField('protocols.http.quicPorts')
-
-  const openDigitalCertificateDrawer = (type = 'edge_certificate') => {
-    digitalCertificateDrawerRef.value.changeCertificateType(type)
-    digitalCertificateDrawerRef.value.openCreateDrawer()
-  }
 
   const handleHttps = (value) => {
     if (!value) {
@@ -64,79 +48,18 @@
     () => protocols.value?.http?.useHttps || protocols.value?.http?.useHttp3
   )
 
-  const onDigitalCertificateSuccess = ({ id, authority }) => {
-    tls.value.certificate = id
-    authorityCertificate.value = authority
-    fetchCertificates()
-  }
-
-  const warningDigitalCertificateMessage = computed(() => {
-    if (statusDigitalCertificate.value === 'pending') {
-      return {
-        text: 'This certificate is pending validation and HTTPS may not work until it\u2019s validated',
-        color: 'text-[var(--p-tag-warning-color)]'
-      }
-    } else if (statusDigitalCertificate.value === 'failed') {
-      return {
-        text: 'This digital certificate failed and HTTPS cannot be used until the issue is resolved',
-        color: 'text-[var(--error-color)]'
-      }
-    }
-
-    return ''
-  })
-
-  const selectCertificate = (option) => {
-    statusDigitalCertificate.value = option.status
-    authorityCertificate.value = option.authority
-    subjectNameCertificate.value = option.subjectName
-  }
-
   const loadInitialTls = {
-    certificate: 0,
     ciphers: 7,
     minimumVersion: 'tls_1_3'
-  }
-
-  const fetchCertificates = async () => {
-    certificateLoading.value = true
-    try {
-      const response = await digitalCertificatesService.listDigitalCertificatesDropdown({
-        type: 'edge_certificate',
-        fields: ['id,name,status,authority,type,subject_name'],
-        pageSize: 100,
-        page: 1,
-        ordering: 'name'
-      })
-
-      certificateOptions.value = response.body.flatMap((group) =>
-        (group.items || []).map((item) => ({
-          label: item.name,
-          value: item.id,
-          authority: item.authority,
-          status: item.status,
-          subjectName: item.subjectName,
-          icon: item.icon,
-          group: group.label
-        }))
-      )
-    } finally {
-      certificateLoading.value = false
-    }
   }
 
   watch(tls, (newTls) => {
     if (!newTls) {
       tls.value = loadInitialTls
     } else {
-      loadInitialTls.certificate = newTls.certificate
       loadInitialTls.ciphers = newTls.ciphers
       loadInitialTls.minimumVersion = newTls.minimumVersion
     }
-  })
-
-  onMounted(() => {
-    fetchCertificates()
   })
 </script>
 <template>
@@ -146,11 +69,6 @@
     data-testid="form-horizontal-protocol-settings"
   >
     <template #inputs>
-      <DigitalCertificatesDrawer
-        ref="digitalCertificateDrawerRef"
-        isWorkloadCreation
-        @onSuccess="onDigitalCertificateSuccess"
-      />
       <div class="flex gap-6 max-sm:flex-col">
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <LabelBlock
@@ -202,49 +120,6 @@
         v-if="protocols?.http?.useHttps"
       >
         <div class="flex flex-col w-full sm:max-w-xs gap-2">
-          <FieldDropdown
-            data-testid="domains-form__edge-certificate-field"
-            label="Digital Certificate"
-            name="tls.certificate"
-            :options="certificateOptions"
-            :loading="certificateLoading"
-            optionLabel="label"
-            optionValue="value"
-            :value="tls?.certificate"
-            filter
-            placeholder="Select a certificate"
-            @onSelectOption="selectCertificate"
-          >
-            <template #footer>
-              <ul class="p-2">
-                <li>
-                  <PrimeButton
-                    @click="openDigitalCertificateDrawer('edge_certificate')"
-                    class="w-full whitespace-nowrap flex"
-                    text
-                    size="small"
-                    icon="pi pi-plus-circle"
-                    data-testid="domains-form__create-digital-certificate-button"
-                    :pt="{
-                      label: { class: 'w-full text-left' },
-                      root: { class: 'p-2' }
-                    }"
-                    label="Create Digital Certificate"
-                  />
-                </li>
-              </ul>
-            </template>
-          </FieldDropdown>
-          <small
-            v-if="warningDigitalCertificateMessage"
-            :class="warningDigitalCertificateMessage.color"
-            class="text-xs font-normal"
-            data-testid="form-horizontal-delivery-settings-digital-certificate-warning"
-          >
-            {{ warningDigitalCertificateMessage.text }}
-          </small>
-        </div>
-        <div class="flex flex-col w-full sm:max-w-xs gap-2">
           <LabelBlock
             for="port-https"
             data-testid="form-horizontal-delivery-settings-https-ports-label"
@@ -252,11 +127,6 @@
             :isRequired="protocols?.http?.useHttps"
           />
           <span class="p-input-icon-right">
-            <i
-              class="pi pi-lock text-[var(--text-color-secondary)]"
-              v-if="!protocols?.http?.useHttps"
-              data-testid="form-horizontal-delivery-settings-https-ports-lock-icon"
-            />
             <MultiSelect
               :options="HTTPS_PORT_LIST_OPTIONS"
               v-model="httpsPortValue"
@@ -268,7 +138,6 @@
               :class="{ 'p-invalid': httpsPortError }"
               placeholder="Select an HTTPS port"
               class="w-full"
-              :disabled="!protocols?.http?.useHttps"
               data-testid="form-horizontal-delivery-settings-https-ports-multi-select"
             />
             <small

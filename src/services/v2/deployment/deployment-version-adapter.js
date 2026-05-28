@@ -1,3 +1,6 @@
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { mapStateToStatus } from '@/services/v2/deployment/deployment-adapter'
+
 const isObject = (value) => {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
@@ -17,6 +20,18 @@ const pickDefined = (payload) => {
 }
 
 const ARCHIVE_REASONS = new Set(['SUPERSEDED', 'SECURITY_ISSUE', 'POLICY_VIOLATION', 'MANUAL'])
+
+// UI convention: post env-detach (migration 0010) the API no longer carries an
+// "environment" concept for versions. The Figma surfaces an env-like pill that
+// we derive from `traffic_role`. Revisit when product defines a real notion.
+const TRAFFIC_ROLE_TO_ENV_LABEL = {
+  ACTIVE: 'Production',
+  CANDIDATE: 'Canary',
+  VALID_URL: 'Stage',
+  INACTIVE: 'Stage'
+}
+
+const TRAFFIC_ROLES_WITH_HISTORY_ICON = new Set(['VALID_URL', 'INACTIVE'])
 
 const normalizeGradualRollout = (gradual) => {
   const source = isObject(gradual) ? gradual : {}
@@ -71,6 +86,7 @@ const normalizeAudit = (audit) => {
   return {
     trigger: source.trigger ?? null,
     requested_by_user_id: source.requested_by_user_id ?? null,
+    requested_by_email: source.requested_by_email ?? null,
     requested_at: source.requested_at ?? null,
     ready_at: source.ready_at ?? null
   }
@@ -80,7 +96,8 @@ const normalizeAuditActor = (actor) => {
   if (!isObject(actor)) return null
   return {
     user_id: actor.user_id ?? null,
-    trigger: actor.trigger ?? null
+    trigger: actor.trigger ?? null,
+    email: actor.email ?? null
   }
 }
 
@@ -90,6 +107,7 @@ const normalizeVersion = (version) => {
   return {
     id: source.id ?? null,
     deployment_id: source.deployment_id ?? null,
+    name: source.name ?? '',
     resource_version_ids: toStringArray(source.resource_version_ids),
     traffic_role: source.traffic_role ?? null,
     strategy: normalizeStrategy(source.strategy),
@@ -118,15 +136,56 @@ const normalizeResources = (resources) => {
     .filter(Boolean)
 }
 
+const formatDurationFromAudit = (requestedAt, readyAt) => {
+  if (!requestedAt || !readyAt) return ''
+  const start = new Date(requestedAt).getTime()
+  const end = new Date(readyAt).getTime()
+  if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return ''
+  const totalSeconds = Math.round((end - start) / 1000)
+  if (totalSeconds < 60) return `${totalSeconds}s`
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return seconds ? `${minutes}m ${seconds}s` : `${minutes}m`
+}
+
+const deriveDisplayFields = (normalized) => {
+  const trafficRole = normalized.traffic_role
+  const envLabel = TRAFFIC_ROLE_TO_ENV_LABEL[trafficRole] || ''
+  return {
+    status: mapStateToStatus(normalized.state),
+    isCurrent: trafficRole === 'ACTIVE',
+    environmentLabel: envLabel,
+    environmentIcon: TRAFFIC_ROLES_WITH_HISTORY_ICON.has(trafficRole) ? 'pi pi-history' : null,
+    duration: formatDurationFromAudit(normalized.audit?.requested_at, normalized.audit?.ready_at),
+    lastEditor:
+      normalized.audit?.requested_by_email ||
+      normalized.last_modified_by?.email ||
+      normalized.audit?.requested_by_user_id ||
+      normalized.last_modified_by?.user_id ||
+      '',
+    lastModified: normalized.created_at ? formatDateToDayMonthYearHour(normalized.created_at) : '-'
+  }
+}
+
 export const DeploymentVersionAdapter = {
   transformList(data) {
     if (!Array.isArray(data)) return []
-    return data.map((item) => normalizeVersion(item))
+    return data.map((item) => {
+      const normalized = normalizeVersion(item)
+      return {
+        ...normalized,
+        ...deriveDisplayFields(normalized)
+      }
+    })
   },
 
   transformItem(data) {
     if (!data) return null
-    return normalizeVersion(data)
+    const normalized = normalizeVersion(data)
+    return {
+      ...normalized,
+      ...deriveDisplayFields(normalized)
+    }
   },
 
   transformCreatePayload(payload = {}) {
