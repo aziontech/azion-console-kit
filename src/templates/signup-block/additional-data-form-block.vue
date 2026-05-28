@@ -1,7 +1,7 @@
 <template>
   <form
     class="w-full flex flex-col"
-    @submit.prevent="submitForm"
+    @submit.prevent
   >
     <div
       class="flex flex-col gap-8"

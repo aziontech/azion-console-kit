@@ -5,7 +5,7 @@
       <!-- Card Container (only for step 1) -->
       <div class="w-full">
         <CardBox
-          v-show="isAdditionalDataStep"
+          v-if="isAdditionalDataStep"
           title="How are you planning to use Azion?"
           class="mx-auto max-w-xl"
         >
@@ -28,7 +28,7 @@
           </template>
         </CardBox>
         <div
-          v-if="isCheckoutStep"
+          v-else-if="isCheckoutStep"
           class="w-full"
         >
           <!-- Checkout Component -->
@@ -42,7 +42,7 @@
           />
         </div>
         <PlanSuccessBlock
-          v-if="isSuccessStep"
+          v-else-if="isSuccessStep"
           :plan="selectedPlan"
           @onStart="handleStartFromSuccess"
         />
@@ -95,6 +95,7 @@
   import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
   import * as Sentry from '@sentry/vue'
   import { loadUserAndAccountInfo } from '@/helpers/account-data'
+  import { persistOnboardingData } from '@/helpers/persist-onboarding-data'
   import { queryClient } from '@/services/v2/base/query/queryClient'
   import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
@@ -174,7 +175,7 @@
 
     if (plan === 'hobby') {
       try {
-        await additionalDataRef.value?.submitForm()
+        await persistOnboardingData({ plan })
         await submitServiceOrder({ accountId, planId })
 
         invalidateBillingCaches()
@@ -251,7 +252,7 @@
     })
     markAwaitingActiveServiceOrder()
     try {
-      await additionalDataRef.value?.submitForm()
+      await persistOnboardingData({ plan: selectedPlan.value })
       invalidateBillingCaches()
       await loadUserAndAccountInfo({ force: true })
     } catch (err) {
