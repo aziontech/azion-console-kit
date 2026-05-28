@@ -26,7 +26,7 @@
     },
     {
       title: 'Start from Scratch',
-      description: `Start from blank ${handleTextDomainWorkload.singularTitle}.`,
+      description: `Start from a blank ${handleTextDomainWorkload.singularTitle}.`,
       buttonLabel: 'Create',
       action: handleCreateFromScratch
     }

@@ -26,6 +26,6 @@
 
   defineProps({
     pricingUrl: { type: String, default: 'https://www.azion.com/en/pricing/' },
-    comparePlansUrl: { type: String, default: 'https://www.azion.com/en/pricing/' }
+    comparePlansUrl: { type: String, default: 'https://www.azion.com/en/plans/' }
   })
 </script>

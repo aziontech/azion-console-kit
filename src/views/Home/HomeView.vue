@@ -25,6 +25,10 @@
   defineOptions({ name: 'home-view' })
 
   const user = accountData
+  const welcomeName = computed(() => {
+    const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim()
+    return fullName || user.name
+  })
   const showInviteDialog = ref(false)
 
   const homeSection = ref(null)
@@ -86,7 +90,7 @@
           :class="homeStyle.firstColumn"
         >
           <div class="flex w-full justify-between items-center">
-            <h1 class="text-[22px] font-semibold">Welcome, {{ user.name }}</h1>
+            <h1 class="text-[22px] font-semibold">Welcome, {{ welcomeName }}</h1>
             <PrimeButton
               icon="pi pi-user-plus"
               severity="secondary"
