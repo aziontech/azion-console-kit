@@ -1,10 +1,9 @@
 <template>
   <PrimeButton
     icon="pi pi-flag"
-    size="small"
+    size="medium"
     label="Feedback"
-    :outlined="props.outlined"
-    :class="props.class"
+    kind="outlined"
     @click="visible = true"
     v-tooltip.bottom="{ value: 'Feedback', showDelay: 200 }"
     data-testid="header-block__open-feedback-button"
@@ -82,7 +81,6 @@
             size="small"
             @click="visible = false"
             data-testid="feedback-dialog__dialog-footer__cancel-button"
-            class="w-20"
           />
           <PrimeButton
             kind="secondary"
@@ -92,7 +90,6 @@
             :loading="loading"
             @click="sendFeedback()"
             data-testid="feedback-dialog__dialog-footer__confirm-button"
-            class="sm:w-36"
           />
         </div>
       </div>
@@ -119,9 +116,6 @@
     styleTextColor: {
       type: String,
       default: () => 'text-color'
-    },
-    class: {
-      type: String
     },
     outlined: {
       type: Boolean,

@@ -3,13 +3,9 @@
     @click="openCreateModalToggle"
     icon="pi pi-plus"
     :label="currentLabel"
-    size="small"
-    :class="{
-      'bg-header hover:bg-header-button-hover': !createModalIsOpen,
-      'bg-header-button-enabled': createModalIsOpen
-    }"
+    size="medium"
+    kind="outlined"
     v-tooltip.bottom="{ value: 'Create', showDelay: 200 }"
-    class="h-8 w-8 md:w-fit text-white border-header"
   />
 
   <PrimeDialog

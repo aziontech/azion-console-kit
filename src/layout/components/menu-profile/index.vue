@@ -1,10 +1,10 @@
 <template>
-  <Avatar
+  <IconButton
     @click="toggleProfile"
+    size="medium"
+    kind="outlined"
     icon="pi pi-user"
-    class="transition-all bg-header-avatar cursor-pointer"
     v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
-    data-testid="profile-block__avatar"
   />
 
   <Sidebar
@@ -333,6 +333,7 @@
   import { storeToRefs } from 'pinia'
   import Avatar from '@aziontech/webkit/avatar'
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'
   import PrimeMenu from '@aziontech/webkit/menu'

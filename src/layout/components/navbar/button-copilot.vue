@@ -4,11 +4,11 @@
     type="button"
     @click="toggleSidebarComponent('copilot')"
     :class="buttonClasses"
-    class="special-button inline-flex items-center justify-center h-7 rounded-[var(--shape-button)] px-2"
+    class="special-button inline-flex items-center justify-center h-9 rounded-[var(--shape-button)] px-2"
     v-tooltip.bottom="{ value: 'Azion Copilot', showDelay: 200 }"
   >
     <div
-      class="special-button-content shadow !shadow-[#ffffff50] w-[30px] h-[30px] md:w-auto justify-center md:justify-start"
+      class="special-button-content shadow !shadow-[#ffffff50] w-9 h-9 md:w-auto justify-center md:justify-start"
       :class="aiChatIsOpen"
     >
       <i class="ai ai-ask-azion"></i>{{ currentLabel }}
