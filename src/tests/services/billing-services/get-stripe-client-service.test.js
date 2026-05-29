@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, afterEach } from 'vitest'
-import { getStripeClientService } from '@/services/billing-services'
+import { getStripeClientService, warmStripeClient } from '@/services/billing-services'
 import { loadStripe } from '@stripe/stripe-js/pure'
 
 vi.mock('@stripe/stripe-js/pure', () => ({
@@ -62,5 +62,26 @@ describe('Billing Services', () => {
 
     await expect(sut()).resolves.not.toThrowError()
     expect(loadStripe).toHaveBeenCalledWith('some-stripe-token', { locale: 'en' })
+  })
+
+  describe('warmStripeClient', () => {
+    it('should kick off the Stripe client load without awaiting', async () => {
+      vi.stubEnv('VITE_ENVIRONMENT', 'production')
+      vi.stubEnv('VITE_STRIPE_TOKEN_PROD', 'some-stripe-token')
+
+      expect(() => warmStripeClient()).not.toThrow()
+      await Promise.resolve()
+
+      expect(loadStripe).toHaveBeenCalledWith('some-stripe-token', { locale: 'en' })
+    })
+
+    it('should swallow load errors so the preceding screen is never affected', async () => {
+      vi.stubEnv('VITE_ENVIRONMENT', 'invalid-stub-env')
+
+      // Fire-and-forget: must not throw synchronously and must not surface an
+      // unhandled rejection when the underlying load fails.
+      expect(() => warmStripeClient()).not.toThrow()
+      await expect(Promise.resolve()).resolves.not.toThrow()
+    })
   })
 })
