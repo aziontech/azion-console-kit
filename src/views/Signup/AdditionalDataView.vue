@@ -100,6 +100,7 @@
   import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
   import * as Sentry from '@sentry/vue'
   import { loadUserAndAccountInfo } from '@/helpers/account-data'
+  import { useWarmStripe } from '@/composables/useWarmStripe'
   import { persistOnboardingData } from '@/helpers/persist-onboarding-data'
   import { queryClient } from '@/services/v2/base/query/queryClient'
   import { queryKeys } from '@/services/v2/base/query/queryKeys'
@@ -113,6 +114,7 @@
       .catch(Sentry.captureException)
   }
   const { clear: clearAdditionalDataFormState } = useAdditionalDataFormState()
+  const { warmStripe } = useWarmStripe()
   const {
     initialize: initializePlans,
     billingCycle: storedBillingCycle,
@@ -291,6 +293,10 @@
 
   onMounted(async () => {
     initializePlans()
+    // Warm Stripe.js while the user fills the additional-data form so the Pro
+    // checkout step (the very next screen) reuses the already-downloaded
+    // client instead of blocking on a cold js.stripe.com load.
+    warmStripe()
     // Cache-aware: uses the existing plans entry when fresh, fetches only
     // when stale/missing. Replaces the previous `refetch()` call that
     // always hit the network.
