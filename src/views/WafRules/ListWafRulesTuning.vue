@@ -8,7 +8,7 @@
 
   // TODO: migrate import to @aziontech/webkit/list-data-table when published
   import DataTable from '@aziontech/webkit/list-data-table'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import MultiSelect from '@aziontech/webkit/multiselect'
@@ -555,7 +555,7 @@
         :fieldsInFilter="listFields"
         @applyFilter="filterSearch"
       />
-      <PrimeButton
+      <Button
         kind="outlined"
         size="small"
         label="Export to CSV"
@@ -667,7 +667,7 @@
     class="!mt-0"
   >
     <template #default>
-      <PrimeButton
+      <Button
         kind="secondary"
         size="medium"
         icon="pi pi-plus"

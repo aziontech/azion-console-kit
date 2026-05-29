@@ -67,7 +67,7 @@
     </template>
 
     <template #footer>
-      <PrimeButton
+      <Button
         kind="secondary"
         size="medium"
         data-testid="domains-dialog__confirm__button"
@@ -83,7 +83,7 @@
   import PrimeDialog from '@aziontech/webkit/dialog'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PrimeInputText from '@aziontech/webkit/inputtext'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import CopyBlock from '@aziontech/webkit/button-copy'
 

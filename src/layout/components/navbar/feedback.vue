@@ -1,5 +1,5 @@
 <template>
-  <PrimeButton
+  <Button
     icon="pi pi-flag"
     size="medium"
     label="Feedback"
@@ -74,7 +74,7 @@
           </span>
         </div>
         <div class="flex gap-2 w-full sm:w-auto">
-          <PrimeButton
+          <Button
             kind="outlined"
             type="button"
             label="Cancel"
@@ -82,7 +82,7 @@
             @click="visible = false"
             data-testid="feedback-dialog__dialog-footer__cancel-button"
           />
-          <PrimeButton
+          <Button
             kind="secondary"
             type="button"
             label="Send feedback"
@@ -108,7 +108,7 @@
   import Dialog from '@aziontech/webkit/dialog'
   import Dropdown from '@aziontech/webkit/dropdown'
   import Textarea from '@aziontech/webkit/textarea'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
 
   defineOptions({ name: 'console-feedback' })
 

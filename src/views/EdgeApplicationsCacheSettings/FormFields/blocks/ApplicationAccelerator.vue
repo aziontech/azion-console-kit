@@ -206,7 +206,7 @@
                   <template #footer>
                     <ul class="p-2">
                       <li>
-                        <PrimeButton
+                        <Button
                           kind="text"
                           @click="openCreateDeviceGroupDrawer"
                           data-testid="domains-form__create-edge-firewall-button"
@@ -247,7 +247,7 @@
   import FieldDropdownMultiSelectLazyLoader from '@aziontech/webkit/field-dropdown-multi-select-lazy-loader'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
   import { useRoute } from 'vue-router'
 

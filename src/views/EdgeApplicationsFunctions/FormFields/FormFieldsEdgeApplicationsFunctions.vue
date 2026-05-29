@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref, watch, markRaw } from 'vue'
   import { useField } from 'vee-validate'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -270,7 +270,7 @@
             <template #footer>
               <ul class="p-2">
                 <li>
-                  <PrimeButton
+                  <Button
                     kind="text"
                     data-testid="edge-applications-functions-form__create-function-button"
                     @click="openDrawer"
@@ -338,7 +338,7 @@
                         >
                           <p>Configure the form builder.</p>
                           <!--
-                          <PrimeButton
+                          <Button
                             kind="outlined"
                             @click="azionJsonFormWindowOpener()"
                             label="Read documentation"
@@ -404,7 +404,7 @@
         class="flex justify-end mt-[-1rem]"
         v-if="isFirstSelectPanelValue && hasFormBuilder"
       >
-        <PrimeButton
+        <Button
           kind="text"
           @click="formBuilderToggle()"
           :label="updateLabelEditForm()"

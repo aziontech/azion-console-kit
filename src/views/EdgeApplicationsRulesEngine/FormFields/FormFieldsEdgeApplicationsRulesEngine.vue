@@ -2,7 +2,7 @@
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
 
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import FieldAutoComplete from '@aziontech/webkit/field-auto-complete'
@@ -736,7 +736,7 @@
           v-if="!isDefaultPhase"
           data-testid="rule-form-criteria-item-conditional-add-button"
         >
-          <PrimeButton
+          <Button
             kind="outlined"
             icon="pi pi-plus-circle"
             label="And"
@@ -747,7 +747,7 @@
             "
             @click="addNewConditional({ index: criteriaIndex, operator: 'and' })"
           />
-          <PrimeButton
+          <Button
             kind="outlined"
             icon="pi pi-plus-circle"
             label="Or"
@@ -806,7 +806,7 @@
         v-if="!isDefaultPhase"
         class="flex items-center gap-2"
       >
-        <PrimeButton
+        <Button
           kind="outlined"
           icon="pi pi-plus-circle"
           label="Add Criteria"
@@ -908,7 +908,7 @@
                   <template #footer>
                     <ul class="p-2">
                       <li>
-                        <PrimeButton
+                        <Button
                           kind="text"
                           data-testid="edge-applications-rules-engine-form__create-function-instance-button"
                           @click="openDrawerFunction(behaviorIndex)"
@@ -938,7 +938,7 @@
                 <template #footer>
                   <ul class="p-2">
                     <li>
-                      <PrimeButton
+                      <Button
                         kind="text"
                         data-testid="edge-applications-rules-engine-form__create-connector-button"
                         @click="openDrawerConnector(behaviorIndex)"
@@ -967,7 +967,7 @@
                 <template #footer>
                   <ul class="p-2">
                     <li>
-                      <PrimeButton
+                      <Button
                         kind="text"
                         data-testid="edge-applications-rules-engine-form__create-origin-button"
                         @click="openDrawerOrigin"
@@ -996,7 +996,7 @@
                 <template #footer>
                   <ul class="p-2">
                     <li>
-                      <PrimeButton
+                      <Button
                         kind="text"
                         data-testid="edge-applications-rules-engine-form__create-cache-policy-button"
                         @click="openDrawer"
@@ -1050,7 +1050,7 @@
         </div>
       </div>
       <div>
-        <PrimeButton
+        <Button
           kind="outlined"
           :disabled="disableAddBehaviorButtonComputed"
           icon="pi pi-plus-circle"

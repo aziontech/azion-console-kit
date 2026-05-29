@@ -2,7 +2,7 @@
   import { ref, onMounted, computed } from 'vue'
   import { useRouter } from 'vue-router'
   import { useField } from 'vee-validate'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import Divider from '@aziontech/webkit/divider'
@@ -184,7 +184,7 @@
   <FormHorizontal title="GitHub Connection">
     <template #description>
       Provide access to GitHub to import an existing project.
-      <PrimeButton
+      <Button
         kind="text"
         size="medium"
         icon="pi pi-external-link"
@@ -452,14 +452,14 @@
       </template>
 
       <div class="flex flex-col sm:flex-row gap-4">
-        <PrimeButton
+        <Button
           kind="outlined"
           size="medium"
           icon="pi pi-plus-circle"
           label="Variable"
           @click="addVariable"
         />
-        <PrimeButton
+        <Button
           kind="text"
           size="medium"
           icon="pi pi-external-link"

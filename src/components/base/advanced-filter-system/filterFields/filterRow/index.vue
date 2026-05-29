@@ -42,7 +42,7 @@
       <!-- Action Buttons -->
       <div class="flex gap-1">
         <!-- Add OR Button -->
-        <PrimeButton
+        <Button
           kind="outlined"
           icon="pi pi-plus"
           label="OR"
@@ -51,7 +51,7 @@
         />
 
         <!-- Add AND Button -->
-        <PrimeButton
+        <Button
           kind="outlined"
           icon="pi pi-plus"
           label="AND"
@@ -93,7 +93,7 @@
 
 <script setup>
   import { computed, defineModel, ref, watch } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import { FIELDS_MAPPING } from '@/components/base/filterFields/filterRow/component'

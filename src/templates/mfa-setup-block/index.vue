@@ -17,7 +17,7 @@
           <ul class="list-decimal text-color-secondary list-inside">
             <li>
               Install
-              <PrimeButton
+              <Button
                 kind="text"
                 size="medium"
                 label="Google Authenticator"
@@ -68,7 +68,7 @@
           </div>
         </div>
 
-        <PrimeButton
+        <Button
           kind="secondary"
           size="medium"
           label="Verify code"
@@ -88,7 +88,7 @@
 </script>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import InputText from '@aziontech/webkit/inputtext'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import Skeleton from '@aziontech/webkit/skeleton'

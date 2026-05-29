@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import FieldText from '@aziontech/webkit/field-text'
   import Drawer from '@/views/EdgeApplications/V3/Drawer'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
@@ -242,7 +242,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   @click="openDrawer"
                   data-testid="domains-form__create-edge-application-button"
@@ -276,7 +276,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   @click="openDrawerEdgeFirewall"
                   data-testid="domains-form__create-edge-firewall-button"
@@ -333,7 +333,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   @click="openDigitalCertificateDrawer('certificate')"
                   size="small"
@@ -395,7 +395,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   @click="openDigitalCertificateDrawer('trusted_ca_certificate')"
                   size="small"

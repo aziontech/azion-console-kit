@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref, inject, watch } from 'vue'
   import { useRouter } from 'vue-router'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import PrimeInputText from '@aziontech/webkit/inputtext'
   import { useAccountStore } from '@/stores/account'
   import { useCreateModalStore } from '@/stores/create-modal'
@@ -308,7 +308,7 @@
           v-for="(menuitem, index) in filteredTabs"
           :key="index"
         >
-          <PrimeButton
+          <Button
             kind="text"
             :class="{
               'surface-200': menuitem.value === selectedTab
@@ -367,7 +367,7 @@
           <template v-else>
             <div class="text-sm">
               <span>{{ resultsText }}</span>
-              <PrimeButton
+              <Button
                 kind="text"
                 label="Back to the list."
                 size="small"

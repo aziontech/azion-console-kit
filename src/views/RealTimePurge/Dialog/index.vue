@@ -1,7 +1,7 @@
 <script setup>
   import { ref, watch, inject } from 'vue'
   import PrimeDialog from '@aziontech/webkit/dialog'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
 
@@ -76,13 +76,13 @@
         />
       </template>
       <template #footer>
-        <PrimeButton
+        <Button
           kind="primary"
           size="medium"
           label="Cancel"
           @click="closeDialog"
         />
-        <PrimeButton
+        <Button
           kind="secondary"
           size="medium"
           label="Confirm"

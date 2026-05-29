@@ -1,19 +1,19 @@
 <template>
   <div class="flex !flex-row items-center gap-2 w-fit justify-start md:w-auto">
-    <PrimeButton
+    <Button
       kind="text"
       label="Other Link"
       v-if="!!otherLink"
       size="small"
       @click="navigateToOtherLink"
     />
-    <PrimeButton
+    <Button
       kind="text"
       label="Get Help"
       size="small"
       @click="navigateToGetHelp"
     />
-    <PrimeButton
+    <Button
       kind="primary"
       v-if="otherActions"
       size="small"
@@ -22,7 +22,7 @@
       label="Other Actions"
       data-testid="data-table-other-actions-button"
     />
-    <PrimeButton
+    <Button
       :class="buttonClass"
       :disabled="disabled"
       @click="handleClick"
@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { useRouter } from 'vue-router'
   import { useLayout } from '@/composables/use-layout'
   const { OpenSidebarComponent } = useLayout()

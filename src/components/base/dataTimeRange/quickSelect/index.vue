@@ -29,7 +29,7 @@
           optionValue="value"
         />
       </div>
-      <PrimeButton
+      <Button
         kind="outlined"
         label="Apply"
         size="small"
@@ -41,7 +41,7 @@
     <div class="mt-4">
       <div class="text-sm font-medium leading-5 text-color mb-3">Commonly used</div>
       <div class="grid grid-cols-2 grid-rows-6 grid-flow-col">
-        <PrimeButton
+        <Button
           kind="text"
           :label="range.label"
           v-for="range in commonDateRanges"
@@ -89,7 +89,7 @@
 
 <script setup>
   import { ref, defineModel, onMounted, onUnmounted, watch } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InputNumber from '@aziontech/webkit/inputnumber'
   import InputSwitch from '@aziontech/webkit/inputswitch'

@@ -44,7 +44,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   data-testid="edge-connectors-form__mutual-authentication-settings__create-trusted-ca-certificate-button"
                   @click="openDrawer('trusted_ca_certificate')"
@@ -76,7 +76,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   data-testid="edge-connectors-form__mutual-authentication-settings__create-trusted-ca-certificate-button"
                   @click="openDrawer('certificateRevogationList')"
@@ -97,7 +97,7 @@
 <script setup>
   import { ref } from 'vue'
   import { useField } from 'vee-validate'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'

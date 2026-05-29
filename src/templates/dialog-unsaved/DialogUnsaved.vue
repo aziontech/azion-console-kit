@@ -1,6 +1,6 @@
 <script setup>
   import PrimeDialog from '@aziontech/webkit/dialog'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
 
   defineOptions({ name: 'dialog-unsaved' })
 
@@ -30,14 +30,14 @@
       leave?
     </div>
     <template #footer>
-      <PrimeButton
+      <Button
         kind="primary"
         size="small"
         label="Leave page"
         data-testid="dialog-unsaved__leave-page"
         @click="emit('leave')"
       />
-      <PrimeButton
+      <Button
         kind="secondary"
         size="small"
         label="Keep editing"

@@ -1,5 +1,5 @@
 <template>
-  <PrimeButton
+  <Button
     kind="outlined"
     size="medium"
     @click="connectWithGithub"
@@ -11,7 +11,7 @@
 
 <script setup>
   import { ref, watch } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { useToast } from '@aziontech/webkit/use-toast'
 

@@ -32,7 +32,7 @@
             {{ errors.confirmPassword }}
           </InlineMessage>
         </div>
-        <PrimeButton
+        <Button
           kind="secondary"
           size="medium"
           :loading="isButtonLoading"
@@ -58,7 +58,7 @@
             </p>
           </div>
 
-          <PrimeButton
+          <Button
             kind="secondary"
             size="medium"
             :loading="isButtonLoading"
@@ -74,7 +74,7 @@
 </template>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import FieldPassword from '@aziontech/webkit/field-password'
   import { useForm } from 'vee-validate'

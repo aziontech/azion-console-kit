@@ -6,7 +6,7 @@
   import FieldNumber from '@aziontech/webkit/field-number'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import DrawerFunction from '@/views/EdgeFirewallFunctions/Drawer/index.vue'
@@ -655,7 +655,7 @@
                 <template #footer>
                   <ul class="p-2">
                     <li>
-                      <PrimeButton
+                      <Button
                         kind="text"
                         data-testid="edge-firewall-rules-form__create-networklist-button"
                         @click="openDrawerNetworkList(criteriaIndex, criteriaInnerRowIndex)"
@@ -673,7 +673,7 @@
         </div>
 
         <div class="flex gap-2 mb-8">
-          <PrimeButton
+          <Button
             kind="outlined"
             icon="pi pi-plus-circle"
             label="And"
@@ -681,7 +681,7 @@
             :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
             @click="addConditional({ index: criteriaIndex, operator: 'and' })"
           />
-          <PrimeButton
+          <Button
             kind="outlined"
             icon="pi pi-plus-circle"
             label="Or"
@@ -717,7 +717,7 @@
       </div>
 
       <div>
-        <PrimeButton
+        <Button
           kind="outlined"
           :disabled="maximumCriteriaReached"
           icon="pi pi-plus-circle"
@@ -816,7 +816,7 @@
                 <template #footer>
                   <ul class="p-2">
                     <li>
-                      <PrimeButton
+                      <Button
                         kind="text"
                         data-testid="edge-firewall-rules-form__create-function-instance-button"
                         @click="openDrawerFunction(behaviorItemIndex)"
@@ -848,7 +848,7 @@
                 <template #footer>
                   <ul class="p-2">
                     <li>
-                      <PrimeButton
+                      <Button
                         kind="text"
                         data-testid="edge-firewall-rules-form__create-waf-rule-button"
                         @click="openDrawerWafRules(behaviorItemIndex)"
@@ -974,7 +974,7 @@
       </div>
       <Divider type="solid" />
       <div>
-        <PrimeButton
+        <Button
           kind="outlined"
           :disabled="disableAddBehaviorButtonComputed"
           icon="pi pi-plus-circle"

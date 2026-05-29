@@ -1,7 +1,7 @@
 <script setup>
   import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerResource from '@/views/EdgeServices/Drawer'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { computed, ref } from 'vue'
 
   defineOptions({ name: 'list-edge-service-resources-tab' })
@@ -143,7 +143,7 @@
       @on-load-data="handleLoadData"
     >
       <template #header-actions>
-        <PrimeButton
+        <Button
           size="medium"
           icon="pi pi-plus"
           label="Resource"
@@ -152,7 +152,7 @@
         />
       </template>
       <template #emptyBlockButton>
-        <PrimeButton
+        <Button
           kind="secondary"
           size="medium"
           icon="pi pi-plus"

@@ -8,7 +8,7 @@
   import FieldInputGroup from '@aziontech/webkit/field-input-group'
   import CopyBlock from '@aziontech/webkit/button-copy'
 
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import { useFieldArray, useField } from 'vee-validate'
   import { ref, watch, computed } from 'vue'
@@ -246,7 +246,7 @@
           </div>
         </div>
         <div class="flex mt-1">
-          <PrimeButton
+          <Button
             kind="outlined"
             @click="addNewDomain"
             label="Add Domain"
@@ -283,7 +283,7 @@
               data-testid="workload-custom-domain-field"
             >
               <template #button>
-                <PrimeButton
+                <Button
                   kind="outlined"
                   label=".azion.app"
                   size="small"

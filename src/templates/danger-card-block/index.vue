@@ -13,7 +13,7 @@
     </div>
 
     <div class="pt-8">
-      <PrimeButton
+      <Button
         :label="buttonLabel"
         danger
         icon="pi pi-trash"
@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
 
   defineOptions({
     name: 'DangerCard'

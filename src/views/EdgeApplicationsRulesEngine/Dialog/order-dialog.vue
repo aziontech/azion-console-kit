@@ -43,14 +43,14 @@
 
     <template #footer>
       <div class="flex flex-row w-full justify-end md:flex-nowrap gap-3">
-        <PrimeButton
+        <Button
           kind="outlined"
           size="medium"
           label="Cancel"
           @click="cancelDialog()"
           data-testid="review-changes-dialog-footer-cancel-button"
         />
-        <PrimeButton
+        <Button
           kind="secondary"
           size="medium"
           label="Save"
@@ -64,7 +64,7 @@
 
 <script setup>
   import { inject, computed } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import ReorderedRules from './components/ReorderedRules.vue'

@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import InputNumber from '@aziontech/webkit/inputnumber'
@@ -578,7 +578,7 @@
           :options="subscriptionModulesSwitchOptions"
           data-testid="form-horizontal-modules-subscription-switch"
         />
-        <PrimeButton
+        <Button
           kind="outlined"
           size="medium"
           icon="pi pi-shopping-cart"

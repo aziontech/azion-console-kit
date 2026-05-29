@@ -90,7 +90,7 @@
               <div class="text-sm text-color-secondary">
                 Selecting 'Set Now' sets the time dynamically to the exact moment of each refresh.
               </div>
-              <PrimeButton
+              <Button
                 kind="secondary"
                 label="Set Now"
                 size="small"
@@ -139,7 +139,7 @@
   import { computed, defineModel, nextTick, onMounted, ref } from 'vue'
   import QuickSelect from './quickSelect/index.vue'
   import InputDateRange from './inputDateRange/index.vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'

@@ -36,7 +36,7 @@
             </small>
           </div>
 
-          <PrimeButton
+          <Button
             kind="secondary"
             size="small"
             :loading="isSendingEmailLoading"
@@ -49,7 +49,7 @@
       </div>
       <div class="flex flex-wrap justify-center items-center gap-1 mt-8">
         <p class="text-sm font-normal">Already have an account?</p>
-        <PrimeButton
+        <Button
           kind="text"
           size="small"
           label="Sign In"
@@ -76,7 +76,7 @@
 
         <div class="w-full flex flex-wrap gap-2">
           <p class="text-start">Didn't receive the email?</p>
-          <PrimeButton
+          <Button
             kind="text"
             size="medium"
             label="Resend Email"
@@ -97,7 +97,7 @@
 
 <script setup>
   import InputText from '@aziontech/webkit/inputtext'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import PrimeBadge from '@aziontech/webkit/badge'
 
   import * as yup from 'yup'

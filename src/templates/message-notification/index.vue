@@ -26,7 +26,7 @@
           v-for="(action, index) in buttons"
           :key="index"
         >
-          <PrimeButton
+          <Button
             v-if="!action.hidden"
             v-bind="action"
             size="small"
@@ -38,7 +38,7 @@
   </div>
 </template>
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { computed } from 'vue'
 
   defineOptions({

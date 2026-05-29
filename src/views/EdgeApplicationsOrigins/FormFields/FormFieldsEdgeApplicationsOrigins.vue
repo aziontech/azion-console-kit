@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import CopyBlock from '@aziontech/webkit/button-copy'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
@@ -435,7 +435,7 @@
         <Divider type="dashed" />
       </div>
       <div>
-        <PrimeButton
+        <Button
           kind="outlined"
           size="medium"
           icon="pi pi-plus-circle"

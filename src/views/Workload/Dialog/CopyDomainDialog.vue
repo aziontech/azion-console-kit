@@ -45,7 +45,7 @@
       </div>
 
       <div class="flex justify-start w-full">
-        <PrimeButton
+        <Button
           kind="outlined"
           size="medium"
           icon="pi pi-clone"
@@ -70,7 +70,7 @@
     </template>
 
     <template #footer>
-      <PrimeButton
+      <Button
         kind="secondary"
         size="medium"
         data-testid="workloads-dialog__confirm__button"
@@ -86,7 +86,7 @@
   import PrimeDialog from '@aziontech/webkit/dialog'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PrimeInputText from '@aziontech/webkit/inputtext'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
 
   defineOptions({ name: 'CopyDomainDialog' })

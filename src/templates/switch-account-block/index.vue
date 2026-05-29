@@ -2,7 +2,7 @@
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   // TODO: migrate import to @aziontech/webkit/list-data-table when published
   import DataTable from '@aziontech/webkit/list-data-table'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import PrimeCard from '@aziontech/webkit/card'
   import PrimeDialog from '@aziontech/webkit/dialog'
@@ -179,7 +179,7 @@
 
 <template>
   <div>
-    <PrimeButton
+    <Button
       v-if="visibleButton"
       kind="text"
       size="small"

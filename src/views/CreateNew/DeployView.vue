@@ -54,7 +54,7 @@
 
               <div class="flex w-full justify-end">
                 <div class="flex sm:flex-row flex-col gap-3 md:gap-4">
-                  <PrimeButton
+                  <Button
                     kind="text"
                     v-if="isSuccessfullyFinished"
                     icon="pi pi-external-link"
@@ -64,7 +64,7 @@
                     class="px-0 py-1"
                   />
                   <div class="flex justify-end">
-                    <PrimeButton
+                    <Button
                       kind="secondary"
                       v-if="isSuccessfullyFinished"
                       label="Manage"
@@ -76,7 +76,7 @@
                     v-if="deployFailed"
                     class="md:ml-auto flex"
                   >
-                    <PrimeButton
+                    <Button
                       kind="secondary"
                       size="medium"
                       @click="retry"
@@ -134,7 +134,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useSolutionStore } from '@/stores/solution-create'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import ScriptRunnerBlock from '@/templates/script-runner-block'
   import PrimeCard from '@aziontech/webkit/card'
   import { useToast } from '@aziontech/webkit/use-toast'

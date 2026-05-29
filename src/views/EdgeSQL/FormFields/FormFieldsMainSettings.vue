@@ -38,7 +38,7 @@
     >
       <template #inputs>
         <div>
-          <PrimeButton
+          <Button
             kind="primary"
             size="medium"
             data-testid="account-settings__delete-account"
@@ -61,7 +61,7 @@
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useRoute, useRouter } from 'vue-router'
 
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { useField } from 'vee-validate'
 
   defineOptions({ name: 'form-fields-create-database' })

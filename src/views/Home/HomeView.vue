@@ -1,7 +1,7 @@
 <script setup>
   import { inject, onMounted, onUnmounted, ref, computed } from 'vue'
   import { useRouter } from 'vue-router'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { usersService } from '@/services/v2/users/users-service'
   import { teamsService } from '@/services/v2/teams/teams-service'
   import { useAccountStore } from '@/stores/account'
@@ -91,7 +91,7 @@
         >
           <div class="flex w-full justify-between items-center">
             <h1 class="text-[22px] font-semibold">Welcome, {{ welcomeName }}</h1>
-            <PrimeButton
+            <Button
               kind="secondary"
               icon="pi pi-user-plus"
               label="Invite User"

@@ -40,7 +40,7 @@
       </div>
 
       <div class="p-6">
-        <PrimeButton
+        <Button
           kind="secondary"
           size="medium"
           v-if="communication.ctaText && communication.ctaHref"
@@ -55,7 +55,7 @@
 
 <script setup>
   import { ref, onMounted, computed } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import { listCommunicationsService } from '@/services/appcues-services'
 

@@ -2,7 +2,7 @@
   import { inject, onMounted, ref, watchEffect } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import Sidebar from '@aziontech/webkit/sidebar'
   import Skeleton from '@aziontech/webkit/skeleton'
@@ -173,7 +173,7 @@
           <div class="flex gap-3 items-center">
             <div class="flex gap-1 items-center">
               <span class="text-xs font-medium text-color-primary">By</span>
-              <PrimeButton
+              <Button
                 kind="text"
                 @click="goToVendorPage"
                 :label="solution.vendor.name"
@@ -194,7 +194,7 @@
             </div>
           </div>
         </div>
-        <PrimeButton
+        <Button
           kind="text"
           label="View more details"
           size="small"
@@ -253,7 +253,7 @@
             <div class="flex gap-3">
               <div class="flex items-center gap-1">
                 <span class="text-xs font-medium text-color-primary">By</span>
-                <PrimeButton
+                <Button
                   kind="text"
                   size="medium"
                   @click="goToVendorPage"

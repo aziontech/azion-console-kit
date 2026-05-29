@@ -1,6 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import MultiSelect from '@aziontech/webkit/multiselect'
@@ -458,7 +458,7 @@
               disabled
             />
           </span>
-          <PrimeButton
+          <Button
             kind="outlined"
             size="medium"
             icon="pi pi-clone"
@@ -520,7 +520,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   @click="openDigitalCertificateDrawer"
                   size="small"

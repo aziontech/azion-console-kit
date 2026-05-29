@@ -50,7 +50,7 @@
           >{{ hasRequestErrorMessage }}</InlineMessage
         >
 
-        <PrimeButton
+        <Button
           kind="secondary"
           size="medium"
           label="Verify"
@@ -70,7 +70,7 @@
 </script>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import InputText from '@aziontech/webkit/inputtext'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
 

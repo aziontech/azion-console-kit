@@ -1,6 +1,6 @@
 <script setup>
   import { computed, ref } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -125,7 +125,7 @@
         }"
       >
         <template #emptyBlockButton>
-          <PrimeButton
+          <Button
             kind="secondary"
             size="medium"
             icon="pi pi-download"

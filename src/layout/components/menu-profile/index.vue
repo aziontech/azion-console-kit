@@ -160,7 +160,7 @@
           </Dropdown>
         </div>
         <Divider class="surface-border p-1 m-0 mb-2" />
-        <PrimeButton
+        <Button
           kind="text"
           data-testid="profile-block__sidebar__logout-btn"
           label="Logout"
@@ -312,7 +312,7 @@
 
       <Divider class="-ml-2 w-[calc(100%+1rem)] mb-3 mt-2" />
 
-      <PrimeButton
+      <Button
         kind="text"
         data-testid="profile-block__mobile-menu__logout-btn"
         label="Logout"
@@ -332,7 +332,7 @@
   import { RouterLink } from 'vue-router'
   import { storeToRefs } from 'pinia'
   import Avatar from '@aziontech/webkit/avatar'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'

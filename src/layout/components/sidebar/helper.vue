@@ -3,7 +3,7 @@
   import DiscordLogo from '@assets/svg/discord-logo'
   import { useHelperCenter } from '@/composables/use-helper-center'
   import { useLayout } from '@/composables/use-layout'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import InputText from '@aziontech/webkit/inputtext'
   import PrimeMenu from '@aziontech/webkit/menu'
@@ -137,7 +137,7 @@
               v-else
               class="pl-6 pt-6 mb-24"
             >
-              <PrimeButton
+              <Button
                 kind="outlined"
                 icon="pi pi-chevron-left"
                 label="Back"

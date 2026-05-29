@@ -4,7 +4,7 @@
   import DialogFilter from '@/components/base/advanced-filter-system/filterFields/temp/index.vue'
   import AzionQueryLanguage from '@/components/base/advanced-filter-system/filterAQL/azion-query-language.vue'
   import FilterTagsDisplay from '@/components/base/advanced-filter-system/filterTagsDisplay'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
 
   import { useAccountStore } from '@/stores/account'
   import { createUtcDateFromUserTimezoneParts } from '@/helpers/convert-date'
@@ -312,7 +312,7 @@
           @select="onDateRangeSelect"
           @autoRefresh="onAutoRefreshTick"
         />
-        <PrimeButton
+        <Button
           kind="outlined"
           v-if="!hasPendingDateUpdate && !hasPendingQueryUpdate"
           icon="pi pi-refresh"
@@ -322,7 +322,7 @@
           @click="applyFilters"
           class="w-[5.875rem]"
         />
-        <PrimeButton
+        <Button
           kind="secondary"
           v-else
           icon="pi pi-arrow-circle-right"

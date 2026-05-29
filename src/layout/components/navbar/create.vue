@@ -1,5 +1,5 @@
 <template>
-  <PrimeButton
+  <Button
     @click="openCreateModalToggle"
     icon="pi pi-plus"
     :label="currentLabel"
@@ -79,7 +79,7 @@
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import { useToast } from '@aziontech/webkit/use-toast'
 
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import Sidebar from '@aziontech/webkit/sidebar'

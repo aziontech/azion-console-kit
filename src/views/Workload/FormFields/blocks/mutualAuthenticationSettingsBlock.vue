@@ -6,7 +6,7 @@
 
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer'
   import fieldDropdownMultiSelectLazyLoader from '@aziontech/webkit/field-dropdown-multi-select-lazy-loader'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
   import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
   import { ref, watch } from 'vue'
@@ -137,7 +137,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   @click="openDrawer('trusted_ca_certificate')"
                   size="small"
@@ -171,7 +171,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   @click="openDrawer('certificateRevogationList')"
                   size="small"

@@ -19,25 +19,25 @@
           class="w-full flex flex-col md:flex-row gap-3 xl:justify-center items-center flex-wrap justify-center"
         >
           <div class="flex gap-1">
-            <PrimeButton
+            <Button
               kind="text"
               size="small"
               label="About"
               @click="openAzionSiteAboutUs"
             />
-            <PrimeButton
+            <Button
               kind="text"
               size="small"
               label="Blog"
               @click="openAzionBlog"
             />
-            <PrimeButton
+            <Button
               kind="text"
               size="small"
               label="Legal"
               @click="azionPrivacyPolicyWindowOpener"
             />
-            <PrimeButton
+            <Button
               kind="text"
               size="small"
               label="Docs"
@@ -100,7 +100,7 @@
   import { computed } from 'vue'
   import Toolbar from '@aziontech/webkit/toolbar'
   import AzionSystemStatus from '@aziontech/webkit/azion-system-status'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import { useRoute } from 'vue-router'
 

@@ -1,5 +1,5 @@
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import { useLayout } from '@/composables/use-layout'
   import AzionAIChatBlock from '@/modules/azion-ai-chat/layout'
@@ -101,7 +101,7 @@
         #chatSuggestions
         v-if="hasSupport"
       >
-        <PrimeButton
+        <Button
           kind="text"
           label="Open a support ticket"
           @click="openContactSupport"

@@ -1,5 +1,5 @@
 <template>
-  <PrimeButton
+  <Button
     :kind="buttonKind"
     size="medium"
     type="button"
@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import Menu from '@aziontech/webkit/menu'
   import { computed, ref } from 'vue'
 

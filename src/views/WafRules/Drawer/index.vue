@@ -12,7 +12,7 @@
   import Tag from '@aziontech/webkit/tag'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
@@ -482,7 +482,7 @@
                   @applyFilter="filterSearch"
                   ref="advancedFilterRef"
                 />
-                <PrimeButton
+                <Button
                   kind="outlined"
                   size="small"
                   label="Export to CSV"

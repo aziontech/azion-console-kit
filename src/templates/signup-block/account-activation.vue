@@ -11,7 +11,7 @@
     </section>
     <section class="w-full flex flex-wrap gap-2">
       <p class="text-start text-sm">Didn't receive the email?</p>
-      <PrimeButton
+      <Button
         kind="text"
         size="small"
         label="Resend Email"
@@ -25,7 +25,7 @@
         v-if="showCounter"
       />
     </section>
-    <PrimeButton
+    <Button
       kind="secondary"
       size="medium"
       label="Return to Sign In"
@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import PrimeBadge from '@aziontech/webkit/badge'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, ref } from 'vue'

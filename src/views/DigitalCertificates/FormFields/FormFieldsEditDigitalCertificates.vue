@@ -1,6 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import CopyBlock from '@aziontech/webkit/button-copy'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
@@ -61,7 +61,7 @@
         <div class="flex flex-wrap items-center">
           <p>
             If you have not yet pointed a DNS zone, please check the
-            <PrimeButton
+            <Button
               kind="text"
               size="medium"
               icon="pi pi-external-link"

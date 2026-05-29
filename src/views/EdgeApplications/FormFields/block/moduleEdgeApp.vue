@@ -34,7 +34,7 @@
         data-testid="form-horizontal-modules-subscription"
       >
         <span class="text-color text-base font-medium leading-5">Subscription modules</span>
-        <PrimeButton
+        <Button
           kind="outlined"
           size="medium"
           icon="pi pi-shopping-cart"
@@ -51,7 +51,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import Tag from '@aziontech/webkit/tag'
   import { contactSalesEdgeApplicationService } from '@/helpers'
 

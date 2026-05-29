@@ -28,7 +28,7 @@
             <template #footer>
               <ul class="p-2">
                 <li>
-                  <PrimeButton
+                  <Button
                     kind="text"
                     data-testid="data-stream-form__data-settings__template-field__create-custom-template-button"
                     @click="openCreateTemplateDrawer"
@@ -57,7 +57,7 @@
           class="min-h-[300px] surface-border border rounded-sm overflow-hidden"
           data-testid="data-stream-form__data-settings__data-set-field"
         />
-        <PrimeButton
+        <Button
           kind="outlined"
           v-if="isCustomTemplate"
           icon="pi pi-pencil"
@@ -66,7 +66,7 @@
           @click="openEditTemplateDrawer"
           class="absolute top-10 right-2 bg-[#171717]"
         />
-        <PrimeButton
+        <Button
           kind="outlined"
           v-else
           icon="pi pi-copy"
@@ -93,7 +93,7 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'

@@ -1,5 +1,5 @@
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import advancedFilter from '@/templates/advanced-filter'
   import { computed, ref, watch, inject } from 'vue'
   import { MAP_SERVICE_OPERATION } from '@modules/real-time-metrics/constants'
@@ -236,7 +236,7 @@
       @applyFilter="applyFilter"
     />
     <div class="flex align-items-center w-full md:max-w-fit">
-      <PrimeButton
+      <Button
         kind="outlined"
         size="small"
         icon="pi pi-external-link"

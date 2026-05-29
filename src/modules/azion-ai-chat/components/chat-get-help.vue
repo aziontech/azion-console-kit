@@ -1,5 +1,5 @@
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { computed } from 'vue'
 
   defineOptions({ name: 'get-help' })
@@ -31,7 +31,7 @@
 </script>
 
 <template>
-  <PrimeButton
+  <Button
     kind="text"
     size="small"
     label="Get Help"

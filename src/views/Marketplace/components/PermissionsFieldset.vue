@@ -1,6 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
 
   const props = defineProps({
     permissions: {
@@ -76,7 +76,7 @@
         </div>
         <div class="text-sm text-color-secondary h-8 flex flex-row items-center">
           <span>Read more about</span>
-          <PrimeButton
+          <Button
             kind="text"
             label="Marketplace's Permissions"
             icon="pi pi-external-link"

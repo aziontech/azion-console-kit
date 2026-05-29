@@ -1,6 +1,6 @@
 <script setup>
   import { ref, computed, defineModel, onMounted } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Calendar from '@aziontech/webkit/calendar'
   import Dropdown from '@aziontech/webkit/dropdown'
@@ -554,7 +554,7 @@
         <!-- Time selector -->
         <div class="border surface-border rounded-lg p-1 w-min">
           <div class="max-h-48 overflow-y-auto overflow-x-hidden space-y-1">
-            <PrimeButton
+            <Button
               kind="secondary"
               :label="timeSlot"
               v-for="timeSlot in TIME_SLOTS"
@@ -609,7 +609,7 @@
             :readonly="mode !== 'absolute'"
             @keydown.enter="updateRange"
           />
-          <PrimeButton
+          <Button
             kind="outlined"
             label="Apply"
             @click="updateRange"

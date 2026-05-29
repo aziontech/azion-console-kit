@@ -74,7 +74,7 @@
     </div>
 
     <div class="flex justify-content-end gap-2 mt-4">
-      <PrimeButton
+      <Button
         kind="secondary"
         label="Confirm"
         size="small"
@@ -88,7 +88,7 @@
 <script setup>
   import { computed, inject } from 'vue'
   import PrimePassword from '@aziontech/webkit/password'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import CopyBlock from '@aziontech/webkit/button-copy'
 
   defineOptions({ name: 'CopyCredentialDialog' })

@@ -5,7 +5,7 @@
 
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer/'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import MultiSelect from '@aziontech/webkit/multiselect'
   import { useField } from 'vee-validate'
   import { ref, computed, watch, onMounted } from 'vue'
@@ -218,7 +218,7 @@
             <template #footer>
               <ul class="p-2">
                 <li>
-                  <PrimeButton
+                  <Button
                     kind="text"
                     @click="openDigitalCertificateDrawer('edge_certificate')"
                     size="small"

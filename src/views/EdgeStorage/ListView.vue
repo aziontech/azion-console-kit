@@ -18,7 +18,7 @@
             createPagePath="/object-storage/create"
             data-testid="create_Bucket_button"
           />
-          <PrimeButton
+          <Button
             kind="outlined"
             v-else
             icon="pi pi-cog"
@@ -249,7 +249,7 @@
                       <div class="flex items-center gap-5 absolute w-fit overflow-visible z-10">
                         <span class="text-sm">{{ selectedItems.length }} files selected</span>
                         <div class="flex gap-2">
-                          <PrimeButton
+                          <Button
                             kind="outlined"
                             size="small"
                             :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'"
@@ -258,7 +258,7 @@
                             @click="handleDownload(selectedFiles)"
                             class="px-4"
                           />
-                          <PrimeButton
+                          <Button
                             kind="outlined"
                             size="small"
                             icon="pi pi-arrow-right-arrow-left"
@@ -266,7 +266,7 @@
                             @click="handleMoveSelectedItems"
                             class="px-4"
                           />
-                          <PrimeButton
+                          <Button
                             kind="primary"
                             size="small"
                             icon="pi pi-trash"
@@ -442,7 +442,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import BucketListTable from './components/BucketListTable.vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import SplitButton from '@aziontech/webkit/splitbutton'
   import Checkbox from '@aziontech/webkit/checkbox'

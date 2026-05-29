@@ -56,7 +56,7 @@
               </div>
 
               <!-- Next button -->
-              <PrimeButton
+              <Button
                 size="medium"
                 type="button"
                 label="Next"
@@ -118,7 +118,7 @@
 
                 <!-- Forgot password link -->
                 <div>
-                  <PrimeButton
+                  <Button
                     kind="text"
                     size="medium"
                     label="Forgot Password?"
@@ -129,7 +129,7 @@
               </div>
 
               <!-- Sign In button -->
-              <PrimeButton
+              <Button
                 size="medium"
                 :loading="isButtonLoading"
                 label="Sign In"
@@ -146,7 +146,7 @@
 
       <div class="flex flex-wrap justify-center items-center pt-6 gap-1">
         <p class="text-sm">Don't have an account?</p>
-        <PrimeButton
+        <Button
           kind="text"
           size="medium"
           label="Sign Up"
@@ -163,7 +163,7 @@
   import { verifyLoginMethodService } from '@/services/auth-services/get-login-method-service'
   import { validateOAuthRedirect } from '@/helpers/oauth-security'
   import { trackSignInSafely } from '@/helpers/track-auth-event'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import InputText from '@aziontech/webkit/inputtext'
   import FieldPassword from '@aziontech/webkit/field-password'

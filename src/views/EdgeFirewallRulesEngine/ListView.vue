@@ -1,6 +1,6 @@
 <script setup>
   import { computed, ref, inject, onMounted } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Tag from '@aziontech/webkit/tag'
   import InputNumber from '@aziontech/webkit/inputnumber'
@@ -584,7 +584,7 @@
         <slot name="emptyBlock" />
       </template>
       <template #emptyBlockButton>
-        <PrimeButton
+        <Button
           kind="secondary"
           size="medium"
           icon="pi pi-plus"
@@ -602,14 +602,14 @@
       <div
         class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"
       >
-        <PrimeButton
+        <Button
           kind="outlined"
           size="medium"
           label="Discard Changes"
           @click="discardChanges"
           data-testid="review-changes-dialog-footer-cancel-button"
         />
-        <PrimeButton
+        <Button
           label="Review Changes"
           :badgeClass="badgeClass"
           data-testid="rules-engine-save-order-button"

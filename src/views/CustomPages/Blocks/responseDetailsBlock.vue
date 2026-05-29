@@ -27,7 +27,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   @click="openDrawerConnector"
                   size="small"
@@ -114,7 +114,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextarea from '@aziontech/webkit/field-text-area'
   import ConnectorDrawer from '@/views/EdgeConnectors/Drawer/index.vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'

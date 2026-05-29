@@ -2,7 +2,7 @@
   import { useThemeStore } from '@/stores/theme'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { useToast } from '@aziontech/webkit/use-toast'
   import CreateEdgeServiceDrawer from '@/views/EdgeServices/CreateEdgeServiceDrawer'
   import { capitalizeFirstLetter } from '@/helpers'
@@ -131,7 +131,7 @@
               <template #footer>
                 <ul class="p-2">
                   <li>
-                    <PrimeButton
+                    <Button
                       kind="text"
                       data-testid="edge-applications-rules-engine-form__create-cache-policy-button"
                       @click="openDrawer"

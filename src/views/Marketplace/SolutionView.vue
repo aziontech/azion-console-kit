@@ -24,7 +24,7 @@
               class="gap-1 items-center hidden sm:flex"
             >
               <span class="text-xs font-medium text-color-primary">By</span>
-              <PrimeButton
+              <Button
                 kind="text"
                 :label="solution.vendor.name"
                 icon="pi pi-external-link"
@@ -196,7 +196,7 @@
               <div class="text-xl font-medium mb-3">{{ sidebarTitle }}</div>
               <p class="text-base text-color-secondary mb-8">
                 {{ sidebarDescription }}
-                <PrimeButton
+                <Button
                   kind="text"
                   label="Read more"
                   size="small"
@@ -211,7 +211,7 @@
                 v-if="isLastVersion"
                 >Latest version installed!</InlineMessage
               >
-              <PrimeButton
+              <Button
                 size="medium"
                 v-else
                 :label="sidebarButtonLabel"
@@ -232,7 +232,7 @@
                 width="8rem"
                 height="1rem"
               />
-              <PrimeButton
+              <Button
                 kind="text"
                 v-else
                 :label="solution.vendor.url"
@@ -245,7 +245,7 @@
             <Divider class="my-2" />
             <div class="h-8 w-full flex flex-row justify-between align-items-center">
               <span class="text-sm text-color-secondary flex-shrink-0">Need help?</span>
-              <PrimeButton
+              <Button
                 kind="text"
                 label="Azion Sales Team"
                 size="small"
@@ -282,7 +282,7 @@
   import { computed, onBeforeMount, ref } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import Divider from '@aziontech/webkit/divider'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import Skeleton from '@aziontech/webkit/skeleton'

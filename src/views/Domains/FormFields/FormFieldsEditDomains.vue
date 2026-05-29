@@ -1,6 +1,6 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import InputText from '@aziontech/webkit/inputtext'
@@ -305,7 +305,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   @click="openDrawer"
                   size="small"
@@ -344,7 +344,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   @click="openDrawerEdgeFirewall"
                   data-testid="domains-form__create-edge-firewall-button"
@@ -401,7 +401,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   @click="openDigitalCertificateDrawer(EDGE_CERTIFICATE)"
                   size="small"
@@ -462,7 +462,7 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
                   kind="text"
                   @click="openDigitalCertificateDrawer(TRUSTED_CA_CERTIFICATE)"
                   size="small"

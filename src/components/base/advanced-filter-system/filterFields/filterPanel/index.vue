@@ -92,7 +92,7 @@
     <div
       class="px-8 py-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
     >
-      <PrimeButton
+      <Button
         kind="primary"
         type="button"
         label="Cancel"
@@ -101,7 +101,7 @@
         data-testid="filter-cancel-button"
         class="max-md:min-w-max"
       />
-      <PrimeButton
+      <Button
         kind="secondary"
         type="button"
         label="Add filter"
@@ -117,7 +117,7 @@
 
 <script setup>
   import { ref, computed, defineModel } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import InputText from '@aziontech/webkit/inputtext'
   import FilterRow from '../filterRow/index.vue'

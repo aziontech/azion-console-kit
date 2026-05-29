@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import LabelBlock from '@aziontech/webkit/label'
@@ -273,7 +273,7 @@
       </div>
       <div class="flex flex-col gap-8 sm:items-start">
         <Divider />
-        <PrimeButton
+        <Button
           kind="outlined"
           size="medium"
           @click="addErrorResponse"

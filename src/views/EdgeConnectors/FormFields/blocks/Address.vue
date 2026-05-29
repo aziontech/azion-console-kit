@@ -201,7 +201,7 @@
       </Card>
 
       <div class="flex sm:flex-row flex-col sm:items-center items-start w-full gap-3">
-        <PrimeButton
+        <Button
           kind="primary"
           label="Add Address"
           icon="pi pi-plus-circle"
@@ -228,7 +228,7 @@
   import { computed, ref } from 'vue'
   import { useField, useFieldArray } from 'vee-validate'
   import AccordionTab from '@aziontech/webkit/accordion-tab'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Tag from '@aziontech/webkit/tag'
   import Divider from '@aziontech/webkit/divider'
