@@ -1,5 +1,8 @@
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
-import { mapStateToStatus } from '@/services/v2/deployment/deployment-adapter'
+import {
+  mapStateToStatus,
+  resolveResourceMeta
+} from '@/services/v2/deployment/deployment-adapter'
 
 const isObject = (value) => {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -101,6 +104,25 @@ const normalizeAuditActor = (actor) => {
   }
 }
 
+const normalizeVersionResources = (resources) => {
+  if (!Array.isArray(resources)) return []
+  return resources
+    .map((resource) => {
+      if (!isObject(resource)) return null
+      const type = resource.resource_type ?? null
+      const meta = resolveResourceMeta(type)
+      return {
+        id: resource.resource_id ?? null,
+        type,
+        label: meta.label,
+        icon: meta.icon,
+        name: resource.resource_name ?? '',
+        versionId: resource.resource_version_id ?? null
+      }
+    })
+    .filter(Boolean)
+}
+
 const normalizeVersion = (version) => {
   const source = isObject(version) ? version : {}
 
@@ -109,6 +131,7 @@ const normalizeVersion = (version) => {
     deployment_id: source.deployment_id ?? null,
     name: source.name ?? '',
     resource_version_ids: toStringArray(source.resource_version_ids),
+    resources: normalizeVersionResources(source.resources),
     traffic_role: source.traffic_role ?? null,
     strategy: normalizeStrategy(source.strategy),
     urls: normalizeUrls(source.urls),

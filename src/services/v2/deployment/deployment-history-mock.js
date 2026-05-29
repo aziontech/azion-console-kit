@@ -26,6 +26,21 @@ const isoFromBase = (hoursAgo = 0, minutesAgo = 0) => {
   return date.toISOString()
 }
 
+const defaultResources = [
+  {
+    resource_type: 'application',
+    resource_id: '01HRX900APP000000000000001',
+    resource_version_id: 'v1.4.2',
+    resource_name: 'checkout-app'
+  },
+  {
+    resource_type: 'firewall',
+    resource_id: '01HRX900FWL000000000000001',
+    resource_version_id: 'v2.0.1',
+    resource_name: 'edge-firewall-prod'
+  }
+]
+
 const buildVersion = (overrides = {}) => {
   const requestedAt = overrides.requested_at ?? overrides.created_at ?? isoFromBase(0)
   const readyAt = overrides.ready_at ?? null
@@ -36,14 +51,7 @@ const buildVersion = (overrides = {}) => {
     // include a name field; we surface this here so the row's primary label
     // reads as a human-friendly version label instead of the ULID.
     name: overrides.name ?? 'deployment-version',
-    resources: overrides.resources ?? [
-      {
-        resource_type: 'application',
-        resource_id: '01HRX900APP000000000000001',
-        resource_version_id: '01HRX901APPV00000000000001',
-        resource_name: 'primary-app'
-      }
-    ],
+    resources: overrides.resources ?? defaultResources,
     traffic_role: overrides.traffic_role ?? 'INACTIVE',
     strategy: overrides.strategy ?? baseStrategy,
     urls: overrides.urls ?? {
@@ -89,7 +97,11 @@ export const deploymentHistoryMock = [
     state: 'building',
     requested_at: isoFromBase(0),
     ready_at: null,
-    created_at: isoFromBase(0)
+    created_at: isoFromBase(0),
+    urls: {
+      canonical_url: 'https://checkout.azion.app',
+      deployment_url: 'https://checkout-redesign.azion.app'
+    }
   }),
   buildVersion({
     id: '01HRX92PS4N7D3M2Y8T6Q1K5VD',
@@ -98,7 +110,11 @@ export const deploymentHistoryMock = [
     state: 'ready',
     requested_at: isoFromBase(1, 2),
     ready_at: isoFromBase(1, 0),
-    created_at: isoFromBase(1, 2)
+    created_at: isoFromBase(1, 2),
+    urls: {
+      canonical_url: 'https://payments.azion.app',
+      deployment_url: 'https://payments-gateway.azion.app'
+    }
   }),
   buildVersion({
     id: '01HRX92PS4N7D3M2Y8T6Q1K5VE',
@@ -150,7 +166,21 @@ export const deploymentHistoryMock = [
       trigger: 'console',
       requested_by_user_id: '654',
       requested_by_email: 'ethan.jones@azion.com'
-    }
+    },
+    resources: [
+      {
+        resource_type: 'application',
+        resource_id: '01HRX900APP000000000000099',
+        resource_version_id: 'v0.2.0',
+        resource_name: 'homepage-experiment'
+      },
+      {
+        resource_type: 'custom_page',
+        resource_id: '01HRX900CPG000000000000099',
+        resource_version_id: 'v0.1.0',
+        resource_name: 'banner-variant-b'
+      }
+    ]
   }),
   buildVersion({
     id: '01HRX92PS4N7D3M2Y8T6Q1K5VJ',
@@ -174,7 +204,11 @@ export const deploymentHistoryMock = [
     state: 'ready',
     requested_at: isoFromBase(7, 5),
     ready_at: isoFromBase(7, 3, 21),
-    created_at: isoFromBase(7, 5)
+    created_at: isoFromBase(7, 5),
+    urls: {
+      canonical_url: 'https://observability.azion.app',
+      deployment_url: 'https://observability-stack.azion.app'
+    }
   })
 ]
 

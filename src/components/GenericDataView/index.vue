@@ -7,6 +7,8 @@
   import Skeleton from '@aziontech/webkit/skeleton'
   import Menu from '@aziontech/webkit/menu'
   import DataTable from '@aziontech/webkit/list-data-table'
+  import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
+  import Illustration from '@/assets/svg/illustration-layers.vue'
 
   defineOptions({ name: 'generic-data-view' })
 
@@ -123,6 +125,10 @@
     showHeader: {
       type: Boolean,
       default: true
+    },
+    documentationService: {
+      type: Function,
+      default: null
     }
   })
 
@@ -334,20 +340,25 @@
       </div>
     </div>
 
-    <div
-      v-else-if="!hasDeployments"
-      :class="[
-        'empty-state px-6 py-6 text-center text-[var(--text-color-secondary)]',
-        isCompactMode ? '' : 'rounded-md border border-[var(--surface-border)]'
-      ]"
-    >
-      <h3 class="m-0 text-base font-semibold leading-6 text-[var(--text-color)]">
-        {{ emptyTitle }}
-      </h3>
-      <p class="m-0 mt-2 text-sm leading-6">
-        {{ emptyDescription }}
-      </p>
-    </div>
+    <template v-else-if="!hasDeployments">
+      <slot
+        name="empty"
+        :title="emptyTitle"
+        :description="emptyDescription"
+      >
+        <EmptyResultsBlock
+          :title="emptyTitle"
+          :description="emptyDescription"
+          :documentationService="documentationService"
+          :noBorder="isCompactMode"
+          inTabs
+        >
+          <template #illustration>
+            <Illustration />
+          </template>
+        </EmptyResultsBlock>
+      </slot>
+    </template>
 
     <div
       v-else-if="!items.length"

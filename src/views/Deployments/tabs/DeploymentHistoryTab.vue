@@ -5,11 +5,15 @@
   import Menu from '@aziontech/webkit/menu'
   import Calendar from '@aziontech/webkit/calendar'
   import Dropdown from '@aziontech/webkit/dropdown'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import PrimeButton from '@aziontech/webkit/button'
   import GenericDataView from '@/components/GenericDataView'
   import { deploymentHistoryService } from '@/services/v2/deployment/deployment-history-service'
+  import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
   import InlineTag from '@/components/InlineTag'
   import StatusTag from '@/components/StatusTag'
   import EditorAvatarCell from '@/views/Deployments/components/EditorAvatarCell.vue'
+  import DeploymentVersionDrawer from '@/views/Deployments/components/DeploymentVersionDrawer.vue'
 
   defineOptions({ name: 'deployments-history-tab' })
 
@@ -28,6 +32,16 @@
 
   const rowMenuRef = ref(null)
   const rowMenuItems = ref([])
+
+  const drawerVisible = ref(false)
+  const selectedVersion = ref(null)
+
+  const confirmDialog = ref({
+    visible: false,
+    action: null,
+    version: null,
+    loading: false
+  })
 
   const statusAllOption = { label: 'Status', value: 'all' }
   const environmentAllOption = { label: 'Environment', value: 'all' }
@@ -151,14 +165,94 @@
     }
   }
 
-  const goToDetails = (version) => {
+  const openDrawer = (version) => {
     if (!version) return
-    // TODO: wire navigation when version detail page exists.
+    selectedVersion.value = version
+    drawerVisible.value = true
   }
 
-  const openRowMenu = ({ event }) => {
-    rowMenuItems.value = [{ label: 'View details', icon: 'pi pi-eye', disabled: true }]
+  const goToDetails = (version) => openDrawer(version)
+
+  const openRowMenu = ({ event, version }) => {
+    rowMenuItems.value = [
+      {
+        label: 'View details',
+        icon: 'pi pi-eye',
+        command: () => openDrawer(version)
+      }
+    ]
     rowMenuRef.value?.toggle?.(event)
+  }
+
+  const onRequestRollback = (version) => {
+    confirmDialog.value = {
+      visible: true,
+      action: 'rollback',
+      version,
+      loading: false
+    }
+  }
+
+  const onRequestRedeploy = (version) => {
+    confirmDialog.value = {
+      visible: true,
+      action: 'redeploy',
+      version,
+      loading: false
+    }
+  }
+
+  const confirmDialogTitle = computed(() =>
+    confirmDialog.value.action === 'rollback' ? 'Roll back version' : 'Redeploy version'
+  )
+
+  const confirmDialogMessage = computed(() => {
+    const name =
+      confirmDialog.value.version?.name || confirmDialog.value.version?.id || 'this version'
+    return confirmDialog.value.action === 'rollback'
+      ? `Roll back to "${name}"? Traffic will move to the previous active version.`
+      : `Redeploy "${name}"? It will become the active version for its environment.`
+  })
+
+  const closeConfirmDialog = () => {
+    confirmDialog.value = { visible: false, action: null, version: null, loading: false }
+  }
+
+  const runConfirmedAction = async () => {
+    const { action, version } = confirmDialog.value
+    if (!action || !version?.id || !version?.deployment_id) return
+
+    confirmDialog.value.loading = true
+    try {
+      if (action === 'rollback') {
+        await deploymentVersionService.rollbackVersionService(version.deployment_id, version.id)
+      } else {
+        await deploymentVersionService.activateVersionService(version.deployment_id, version.id)
+      }
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Success',
+        detail:
+          action === 'rollback'
+            ? 'Rollback requested successfully'
+            : 'Redeploy requested successfully'
+      })
+      closeConfirmDialog()
+      drawerVisible.value = false
+      selectedVersion.value = null
+      await loadVersions()
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail:
+          error?.message ||
+          (action === 'rollback' ? 'Failed to roll back version' : 'Failed to redeploy version')
+      })
+      confirmDialog.value.loading = false
+    }
   }
 
   const onPage = (event) => {
@@ -204,7 +298,7 @@
       overflowMenuAriaLabel="More history actions"
       @refresh="loadVersions"
       @page="onPage"
-      @open-row-menu="({ event }) => openRowMenu({ event })"
+      @open-row-menu="({ event, deployment }) => openRowMenu({ event, version: deployment })"
     >
       <template #toolbar-extras>
         <Dropdown
@@ -296,6 +390,41 @@
       :popup="true"
       :model="rowMenuItems"
     />
+
+    <DeploymentVersionDrawer
+      v-model:visible="drawerVisible"
+      :version="selectedVersion"
+      @rollback="onRequestRollback"
+      @redeploy="onRequestRedeploy"
+    />
+
+    <PrimeDialog
+      v-model:visible="confirmDialog.visible"
+      modal
+      :closable="!confirmDialog.loading"
+      :header="confirmDialogTitle"
+      class="max-w-md w-full"
+      :pt="{
+        headerTitle: { 'data-testid': 'deployment-history__confirm-dialog__title' }
+      }"
+    >
+      <p class="text-sm text-[var(--text-color-secondary)]">
+        {{ confirmDialogMessage }}
+      </p>
+      <template #footer>
+        <PrimeButton
+          label="Cancel"
+          outlined
+          :disabled="confirmDialog.loading"
+          @click="closeConfirmDialog"
+        />
+        <PrimeButton
+          :label="confirmDialog.action === 'rollback' ? 'Rollback' : 'Redeploy'"
+          :loading="confirmDialog.loading"
+          @click="runConfirmedAction"
+        />
+      </template>
+    </PrimeDialog>
   </div>
 </template>
 
