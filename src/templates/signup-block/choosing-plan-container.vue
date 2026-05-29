@@ -29,7 +29,7 @@
       type: String,
       required: true,
       validator: (value) => ['hobby', 'pro'].includes(value),
-      default: 'pro'
+      default: 'hobby'
     },
     checkoutSessionClientSecret: {
       type: String,
