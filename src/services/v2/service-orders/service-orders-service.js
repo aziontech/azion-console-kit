@@ -33,18 +33,6 @@ export class ServiceOrdersService extends BaseService {
     return ServiceOrdersAdapter.transformPlanDetailResponse(response.data)
   }
 
-  getAccountPlanStatus = async () => {
-    try {
-      await this.http.request({
-        method: 'GET',
-        url: this.#currentPlanURL
-      })
-      return true
-    } catch {
-      return false
-    }
-  }
-
   listServiceOrders = async (params = {}) => {
     const response = await this.http.request({
       method: 'GET',

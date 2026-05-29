@@ -1,7 +1,12 @@
 <template>
-  <div class="flex flex-col min-h-screen var(--bg-color)">
+  <div class="flex flex-col flex-1 var(--bg-color)">
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col items-center py-8 px-4 gap-6">
+    <div
+      :class="[
+        'flex-1 flex flex-col items-center py-8 px-4 gap-6',
+        { 'justify-center': isSuccessStep }
+      ]"
+    >
       <!-- Card Container (only for step 1) -->
       <div class="w-full">
         <CardBox
@@ -85,7 +90,7 @@
   import ChoosingPlanContainer from '@/templates/signup-block/choosing-plan-container.vue'
   import PlanSuccessBlock from '@/templates/signup-block/plan-success-block.vue'
   import ActionButton from '@aziontech/webkit/actions/button'
-  import { computed, inject, onMounted, ref } from 'vue'
+  import { computed, inject, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { usePlans } from '@/composables/usePlans'
   import { usePlansList, ensurePlansList, getPlanPricingId } from '@/composables/usePlansService'
@@ -95,6 +100,7 @@
   import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
   import * as Sentry from '@sentry/vue'
   import { loadUserAndAccountInfo } from '@/helpers/account-data'
+  import { persistOnboardingData } from '@/helpers/persist-onboarding-data'
   import { queryClient } from '@/services/v2/base/query/queryClient'
   import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
@@ -107,7 +113,11 @@
       .catch(Sentry.captureException)
   }
   const { clear: clearAdditionalDataFormState } = useAdditionalDataFormState()
-  const { initialize: initializePlans, billingCycle: storedBillingCycle } = usePlans()
+  const {
+    initialize: initializePlans,
+    billingCycle: storedBillingCycle,
+    clear: clearPlans
+  } = usePlans()
   const accountStore = useAccountStore()
   // Auto-fetch on mount when the cache entry is stale/missing (staleTime
   // 1h). The view reads `plansData.value` reactively in helpers like
@@ -161,8 +171,6 @@
     const accountId = accountStore.accountData?.id
     const billingCycle = storedBillingCycle.value || 'yearly'
 
-    await additionalDataRef.value?.submitForm()
-
     if (!plan || !accountId) return
 
     trackSignUp('planSelected', { plan, billingCycle })
@@ -172,6 +180,7 @@
 
     if (plan === 'hobby') {
       try {
+        await persistOnboardingData({ plan })
         await submitServiceOrder({ accountId, planId })
 
         invalidateBillingCaches()
@@ -248,6 +257,7 @@
     })
     markAwaitingActiveServiceOrder()
     try {
+      await persistOnboardingData({ plan: selectedPlan.value })
       invalidateBillingCaches()
       await loadUserAndAccountInfo({ force: true })
     } catch (err) {
@@ -269,10 +279,15 @@
   }
 
   const handleStartFromSuccess = () => {
-    clearAdditionalDataFormState()
     invalidateBillingCaches()
     router.push({ name: 'home' })
   }
+
+  watch(isSuccessStep, (reachedSuccess) => {
+    if (!reachedSuccess) return
+    clearAdditionalDataFormState()
+    clearPlans()
+  })
 
   onMounted(async () => {
     initializePlans()

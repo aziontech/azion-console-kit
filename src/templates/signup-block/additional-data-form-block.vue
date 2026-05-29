@@ -1,7 +1,7 @@
 <template>
   <form
     class="w-full flex flex-col"
-    @submit.prevent="submitForm"
+    @submit.prevent
   >
     <div
       class="flex flex-col gap-8"
@@ -9,7 +9,7 @@
     >
       <!-- Plan Selector Card -->
       <div class="flex flex-col gap-2">
-        <label class="text-xs leading-4 text-color-secondary">Plan Selected</label>
+        <label class="text-xs leading-4 text-color-secondary">Selected Plan</label>
         <PlanSelectorCard
           :plan="plan"
           :planData="selectedPlanData"
@@ -246,9 +246,9 @@
   const usageIntentOptions = [
     { value: 'learn', description: 'Learn', ariaLabel: 'Learn usage intent' },
     {
-      value: 'personal-project',
-      description: 'Personal Project',
-      ariaLabel: 'Personal project usage intent'
+      value: 'personal-projects',
+      description: 'Personal Projects',
+      ariaLabel: 'Personal projects usage intent'
     },
     { value: 'work', description: 'Work', ariaLabel: 'Work usage intent' }
   ]
@@ -375,7 +375,7 @@
 
   const usageIntentToApiValue = {
     learn: 'Study',
-    'personal-project': 'Personal',
+    'personal-projects': 'Personal',
     work: 'Work'
   }
 

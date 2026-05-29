@@ -5,7 +5,6 @@ import {
   contractService
 } from '@/services/v2/account'
 import { DEFAULT_JOB_ROLE } from '@/services/v2/account/job-role-validator'
-import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { useAccountStore } from '@/stores/account'
@@ -60,11 +59,10 @@ const pickAddressSnapshot = (settings) => {
 }
 
 /**
- * Refresh the account + user + settings caches and signal whether the
- * account has an entitled plan. Does NOT load billing or contract data —
- * use `loadAccountHydration` for the full post-login warm-up. Pass
- * `force: true` to drop the Vue Query entries first so the next fetch hits
- * the network (used after plan changes / downgrades).
+ * Refresh the account + user + settings caches. Does NOT load billing or
+ * contract data — use `loadAccountHydration` for the full post-login
+ * warm-up. Pass `force: true` to drop the Vue Query entries first so the
+ * next fetch hits the network (used after plan changes / downgrades).
  *
  * @param {Object} [options]
  * @param {boolean} [options.force=false]
@@ -78,16 +76,14 @@ export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
     clearBillingDerivedFields(accountStore)
   }
 
-  const [accountInfo, userInfo, accountSettingsInfo, hasAccountPlan] = await Promise.all([
+  const [accountInfo, userInfo, accountSettingsInfo] = await Promise.all([
     accountService.getAccountInfo(),
     userService.getUserInfo(),
-    accountSettingsService.getAccountSettingsInfo().catch(() => null),
-    serviceOrdersService.getAccountPlanStatus()
+    accountSettingsService.getAccountSettingsInfo().catch(() => null)
   ])
 
   Object.assign(accountInfo, pickUserSnapshot(userInfo), pickAddressSnapshot(accountSettingsInfo), {
-    jobRole: accountSettingsInfo?.jobRole ?? DEFAULT_JOB_ROLE,
-    hasAccountPlan
+    jobRole: accountSettingsInfo?.jobRole ?? DEFAULT_JOB_ROLE
   })
 
   accountStore.setAccountData(accountInfo)
@@ -111,10 +107,9 @@ export const loadContractData = async ({ force = false } = {}) => {
 }
 
 /**
- * Full post-login account hydration. Loads user/account/settings/SO status
- * first (needed to derive `client_id` and `needsOnboarding`), then chains
- * billing + contract in parallel — those depend on the data above and on
- * the store getters that derive from it.
+ * Full post-login account hydration. Loads user/account/settings first
+ * (needed to derive `client_id`, `kind`, and `first_login`), then loads
+ * contract data — which depends on `client_id`.
  *
  * The accountGuard awaits this BEFORE making redirect decisions so the
  * `needsOnboarding` and `hasAccessConsole` getters return correct values

@@ -65,7 +65,7 @@
     pro: {
       label: 'Pro',
       tagLabel: 'Pro Plan',
-      description: 'For professional or commercial workloads.'
+      description: 'For professional or commercial use.'
     }
   }
 

@@ -414,7 +414,7 @@
     font-size: 12px !important;
   }
 
-  .address-full-width :deep([class*='max-w-lg']) {
+  :deep([class*='max-w-lg']) {
     max-width: none !important;
   }
 

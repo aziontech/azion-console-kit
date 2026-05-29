@@ -87,9 +87,12 @@
           </small>
         </div>
 
-        <InlineMessage severity="info">
-          Sensitive data is handled by a PCI-compliant payment partner.
-        </InlineMessage>
+        <div
+          class="flex items-center gap-2 rounded-md bg-[#a6a6a61f] px-3 py-2 text-xs leading-snug text-color"
+        >
+          <i class="pi pi-info-circle text-sm shrink-0" />
+          <span>Sensitive data is handled by a PCI-compliant payment partner.</span>
+        </div>
       </form>
     </div>
   </div>
@@ -97,7 +100,6 @@
 
 <script setup>
   import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useAccountStore } from '@/stores/account'
   import { useThemeStore } from '@/stores/theme'

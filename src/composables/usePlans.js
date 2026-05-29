@@ -1,22 +1,98 @@
-import { computed, onScopeDispose, ref, watch } from 'vue'
+import { computed, effectScope, onScopeDispose, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAccountStore } from '@/stores/account'
+import {
+  readScoped,
+  writeScoped,
+  removeScoped,
+  migrateGuestTo
+} from '@/helpers/client-scoped-storage'
+import { onSwitchAccount } from '@/services/v2/base/auth/session-broadcast'
 
+const BASE_KEY = 'plans:v1'
 const VALID_PLANS = ['hobby', 'pro']
 const VALID_BILLING_CYCLES = ['monthly', 'yearly']
 
 const isValidPlan = (value) => VALID_PLANS.includes(value)
 const isValidBillingCycle = (value) => VALID_BILLING_CYCLES.includes(value)
 
+const isStorageAvailable = () => typeof window !== 'undefined' && Boolean(window.localStorage)
+
 // Signup-scoped state. The user is in a single onboarding flow at a time, so
 // sharing the plan/cycle choice across the components in that flow is
-// intentional. Module-level refs survive in-session navigation; URL params
-// (?plan, ?billing-cycle) are the source of truth across reloads/deep links.
+// intentional. Module-level refs survive in-session navigation; localStorage
+// scoped by client_id is the source of truth across reloads, deep links, and
+// account switches (storage wins over URL).
 const _plan = ref(null)
 const _billingCycle = ref(null)
+
+const persistScope = () => {
+  if (!isStorageAvailable()) return
+  const value = { plan: _plan.value, billingCycle: _billingCycle.value }
+  if (!value.plan && !value.billingCycle) {
+    removeScoped(BASE_KEY)
+    return
+  }
+  writeScoped(BASE_KEY, value)
+}
+
+const hydrateFromScope = () => {
+  const stored = readScoped(BASE_KEY)
+  if (stored && (stored.plan || stored.billingCycle)) {
+    _plan.value = stored.plan ?? null
+    _billingCycle.value = stored.billingCycle ?? null
+    return true
+  }
+  return false
+}
+
+let _isSynced = false
+const _moduleScope = effectScope(true)
+
+const setupSync = (accountStore) => {
+  if (_isSynced) return
+  _isSynced = true
+
+  _moduleScope.run(() => {
+    watch([_plan, _billingCycle], persistScope)
+
+    watch(
+      () => accountStore.account?.client_id,
+      (newId, oldId) => {
+        if (newId && !oldId) {
+          migrateGuestTo(BASE_KEY, newId)
+          hydrateFromScope()
+        } else if (newId && oldId && newId !== oldId) {
+          _plan.value = null
+          _billingCycle.value = null
+          if (!hydrateFromScope()) {
+            _plan.value = 'pro'
+            _billingCycle.value = 'monthly'
+          }
+        } else if (!newId && oldId) {
+          _plan.value = null
+          _billingCycle.value = null
+        }
+      }
+    )
+  })
+
+  onSwitchAccount(() => {
+    _plan.value = null
+    _billingCycle.value = null
+    if (!hydrateFromScope()) {
+      _plan.value = 'pro'
+      _billingCycle.value = 'monthly'
+    }
+  })
+}
 
 export function usePlans() {
   const route = useRoute()
   const router = useRouter()
+  const accountStore = useAccountStore()
+
+  setupSync(accountStore)
 
   const readFromUrl = () => {
     if (!route) return null
@@ -56,6 +132,11 @@ export function usePlans() {
   }
 
   const initialize = () => {
+    if (hydrateFromScope()) {
+      syncToUrl()
+      return
+    }
+
     const urlParams = readFromUrl()
     if (urlParams) {
       _plan.value = urlParams.plan || null
@@ -90,6 +171,7 @@ export function usePlans() {
   const clear = async () => {
     _plan.value = null
     _billingCycle.value = null
+    removeScoped(BASE_KEY)
     await syncToUrl()
   }
 

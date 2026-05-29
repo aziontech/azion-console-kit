@@ -16,8 +16,7 @@
           </div>
         </div>
         <p class="text-sm leading-[1.25] text-color-secondary">
-          Upgrade to unlock higher limits and keep your applications running at scale. Explore
-          additional capabilities available with the Pro plan:
+          Upgrade to unlock higher limits and keep your applications running at scale.
         </p>
       </div>
     </template>

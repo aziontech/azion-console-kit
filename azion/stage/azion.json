@@ -88,6 +88,16 @@
       "origin-id": 249560,
       "origin-key": "692eae10-1ab6-402c-ad7a-c1d9d6a1fe74",
       "name": "origin-help-center"
+    },
+    {
+      "origin-id": 261404,
+      "origin-key": "d5f048ce-e3bf-476b-b002-be739a49870a",
+      "name": "origin-edge-api"
+    },
+    {
+      "origin-id": 261413,
+      "origin-key": "91464f6b-b496-4f10-b513-33173a095ec0",
+      "name": "origin-edge-api"
     }
   ],
   "rules-engine": {
@@ -222,6 +232,26 @@
         "id": 488886,
         "name": "Cache Controll to index.html",
         "phase": "response"
+      },
+      {
+        "id": 563188,
+        "name": "Route Edge API Requests",
+        "phase": "request"
+      },
+      {
+        "id": 537350,
+        "name": "Run Function | SSE Beholder Proxy",
+        "phase": "request"
+      },
+      {
+        "id": 488499,
+        "name": "Debug",
+        "phase": "response"
+      },
+      {
+        "id": 563632,
+        "name": "Route Edge API Requests",
+        "phase": "request"
       }
     ]
   },
@@ -237,6 +267,10 @@
     {
       "id": 266296,
       "name": "Statics - Cache .html"
+    },
+    {
+      "id": 261825,
+      "name": "Marketplace - Cache"
     }
   ]
 }
