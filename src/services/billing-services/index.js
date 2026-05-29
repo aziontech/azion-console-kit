@@ -7,7 +7,7 @@ import { loadInvoiceDataService } from './load-invoice-data-service'
 import { loadPaymentMethodDefaultService } from './load-payment-method-default-service'
 import { listServiceAndProductsChangesService } from './list-service-and-products-changes'
 import { loadInvoiceLastUpdatedService } from './load-invoice-last-updated-service'
-import { getStripeClientService } from './get-stripe-client-service'
+import { getStripeClientService, warmStripeClient } from './get-stripe-client-service'
 import {
   listServiceAndProductsChangesAccountingService,
   joinEdgeApplicationWithTieredCache
@@ -24,6 +24,7 @@ export {
   listServiceAndProductsChangesService,
   loadInvoiceLastUpdatedService,
   getStripeClientService,
+  warmStripeClient,
   listServiceAndProductsChangesAccountingService,
   joinEdgeApplicationWithTieredCache
 }

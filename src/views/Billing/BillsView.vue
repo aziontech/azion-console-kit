@@ -150,6 +150,7 @@
   import { useCheckoutSessionPreparer } from '@/composables/useCheckoutSessionPreparer'
   import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
   import { useAccountStore } from '@/stores/account'
+  import { useWarmStripe } from '@/composables/useWarmStripe'
   import * as Sentry from '@sentry/vue'
 
   // Modals/drawers are heavy (Stripe element, plan grid) and only render on
@@ -313,6 +314,7 @@
     activeServiceOrder
   } = useServiceOrders()
   const { prepare: prepareCheckoutSession, recoverFromStaleSession } = useCheckoutSessionPreparer()
+  const { warmStripe } = useWarmStripe()
 
   const downgradeEffectiveAt = ref(null)
 
@@ -389,6 +391,11 @@
   )
 
   onMounted(async () => {
+    // Warm Stripe.js up front: the plan-info, add-payment and change-cycle
+    // drawers opened from this view all mount Stripe behind a user action, so
+    // pre-downloading the client here keeps those drawers from stalling on a
+    // cold js.stripe.com load.
+    warmStripe()
     // Post-checkout entry refreshes once so the cards reflect the just-paid
     // SO without depending on stale persisted cache.
     try {
