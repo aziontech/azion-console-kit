@@ -1,8 +1,5 @@
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
-import {
-  mapStateToStatus,
-  resolveResourceMeta
-} from '@/services/v2/deployment/deployment-adapter'
+import { mapStateToStatus, resolveResourceMeta } from '@/services/v2/deployment/deployment-adapter'
 
 const isObject = (value) => {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
