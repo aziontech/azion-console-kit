@@ -58,8 +58,7 @@
       headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
       closeButton: { class: 'border surface-border' },
       content: {
-        class:
-          '[&::-webkit-scrollbar]:hidden flex flex-col justify-between overflow w-full md:p-8 pb-0'
+        class: '[&::-webkit-scrollbar]:hidden flex flex-col  overflow w-full md:p-8 pb-0'
       }
     }"
   >
