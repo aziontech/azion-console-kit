@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <div class="bg-surface flex flex-col gap-6 px-6 py-6">
       <div class="flex items-center justify-between h-6">
-        <span class="text-sm leading-none text-muted">Next Charge Value</span>
+        <span class="text-sm leading-none text-muted">Next Charge Amount</span>
         <Currency
           size="small"
           prefix="$"

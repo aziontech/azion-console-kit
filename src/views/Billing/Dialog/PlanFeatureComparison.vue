@@ -5,7 +5,7 @@
         <span class="text-sm font-semibold text-color">{{ fromPlanLabel }}</span>
         <span
           class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-orange-500/15 text-orange-500 border border-orange-500/30"
-          >Actual Plan</span
+          >Current Plan</span
         >
       </div>
       <div class="flex items-center">

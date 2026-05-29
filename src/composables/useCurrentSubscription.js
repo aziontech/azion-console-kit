@@ -30,7 +30,7 @@ export function useCurrentSubscription() {
   const { accountData } = storeToRefs(accountStore)
 
   const accountId = computed(() => accountData.value?.id ?? null)
-  const hasFinishedOnboarding = computed(() => accountData.value?.hasAccountPlan !== false)
+  const hasFinishedOnboarding = computed(() => accountData.value?.first_login !== true)
   const hasContractedPlan = hasFinishedOnboarding
 
   const {
@@ -73,7 +73,7 @@ export function useCurrentSubscription() {
   const isHobby = computed(() => planSku.value === 'hobby')
 
   const planTitle = computed(() => (isPro.value ? 'Pro Plan' : 'Hobby'))
-  const planTag = computed(() => (hasContractedPlan.value ? 'Actual Plan' : null))
+  const planTag = computed(() => (hasContractedPlan.value ? 'Current Plan' : null))
 
   const planStartDate = computed(() =>
     formatPlanStartDate(activeServiceOrder.value?.currentPeriodStart)
