@@ -49,8 +49,7 @@ const RESOURCE_TYPE_META = {
   application: { label: 'Application', icon: 'ai ai-edge-application' },
   firewall: { label: 'Firewall', icon: 'ai ai-edge-firewall' },
   custom_page: { label: 'Custom Page', icon: 'ai ai-custom-pages' },
-  function: { label: 'Function', icon: 'ai ai-edge-functions' },
-  network_list: { label: 'Network List', icon: 'ai ai-network-lists' }
+  function: { label: 'Function', icon: 'ai ai-edge-functions' }
 }
 
 const snakeToTitle = (value) =>
@@ -60,18 +59,20 @@ const snakeToTitle = (value) =>
     .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
     .join(' ')
 
+export const resolveResourceMeta = (type) => {
+  if (!type) return { type: '', label: '', icon: 'pi pi-box' }
+  const meta = RESOURCE_TYPE_META[type]
+  return {
+    type,
+    label: meta?.label ?? snakeToTitle(type),
+    icon: meta?.icon ?? 'pi pi-box'
+  }
+}
+
 const mapResourceTypes = (allowedResourceTypes) => {
   if (!Array.isArray(allowedResourceTypes)) return []
   return allowedResourceTypes
-    .map((type) => {
-      if (!type) return null
-      const meta = RESOURCE_TYPE_META[type]
-      return {
-        type,
-        label: meta?.label ?? snakeToTitle(type),
-        icon: meta?.icon ?? 'pi pi-box'
-      }
-    })
+    .map((type) => (type ? resolveResourceMeta(type) : null))
     .filter(Boolean)
 }
 
