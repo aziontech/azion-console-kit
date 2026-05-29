@@ -14,6 +14,10 @@
     title: {
       type: String,
       required: true
+    },
+    widthClass: {
+      type: String,
+      default: 'max-w-4xl'
     }
   })
   const visibleDrawer = computed({
@@ -34,7 +38,7 @@
   }
 
   const sizeSidebar = computed(() =>
-    handlePositionDrawer.value === 'right' ? 'max-w-4xl w-full p-0' : 'w-full p-0'
+    handlePositionDrawer.value === 'right' ? `${props.widthClass} w-full p-0` : 'w-full p-0'
   )
 
   const iconExpand = computed(

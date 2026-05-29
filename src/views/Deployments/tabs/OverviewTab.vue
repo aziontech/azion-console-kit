@@ -8,6 +8,7 @@
   import { deploymentService } from '@/services/v2/deployment/deployment-service'
   import { mapPolicyToLabel } from '@/services/v2/deployment/deployment-adapter'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
+  import { documentationDeployProducts } from '@/helpers/azion-documentation-catalog'
   import MessageCard from '@/components/MessageCard'
   import InlineTag from '@/components/InlineTag'
   import ResourceTypesList from '@/views/Deployments/components/ResourceTypesList.vue'
@@ -226,13 +227,14 @@
       :showHeader="false"
       v-model:searchTerm="searchTerm"
       searchPlaceholder="Search Deployments"
-      emptyTitle="No Deployments yet"
-      emptyDescription="Deployments will appear here once you trigger a deploy."
+      emptyTitle="No Deployment Settings found"
+      emptyDescription="Create a new deployment configuration or reuse an existing one across your workloads."
       filteredEmptyTitle="No deployments found"
       filteredEmptyDescription="Try changing your search or filters."
       rowActionsAriaLabel="Deployment actions"
       filterButtonAriaLabel="Filter Deployments"
       overflowMenuAriaLabel="More deployment actions"
+      :documentationService="documentationDeployProducts.deployments"
       @refresh="loadDeployments"
       @page="onPage"
       @apply-filter="onApplyFilter"
