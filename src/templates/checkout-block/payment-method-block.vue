@@ -1,6 +1,6 @@
 <template>
-  <div class="border border-default border-solid rounded-md bg-surface">
-    <div class="flex items-center justify-between px-6 py-3 border-b border-default">
+  <div class="border border-[var(--border-muted)] border-solid rounded-md bg-surface">
+    <div class="flex items-center justify-between px-6 py-3 border-b border-[var(--border-muted)]">
       <span class="text-lg font-semibold text-default">Payment Method</span>
     </div>
 
@@ -10,27 +10,6 @@
         @submit.prevent
         class="space-y-6"
       >
-        <!-- <div class="flex flex-col gap-2 w-full">
-          <LabelBlock
-            label="Card Holder Name"
-            :isRequired="true"
-          />
-          <InputText
-            data-testid="payment-method-form__card-holder-name__input"
-            name="cardholderName"
-            v-model="cardHolderName"
-            @blur="validateCardholderName"
-            :class="{ 'p-invalid': displayError.cardHolderName }"
-            placeholder="John Doe"
-          />
-          <small
-            v-if="displayError.cardHolderName"
-            class="p-error text-xs font-normal leading-tight"
-          >
-            {{ displayError.cardHolderName }}
-          </small>
-        </div> -->
-
         <div
           class="flex flex-col gap-2 w-full"
           :class="{ 'stripe-input-invalid': displayError.paymentElement }"
@@ -108,9 +87,12 @@
           </small>
         </div>
 
-        <InlineMessage severity="info">
-          Sensitive data is handled by a PCI-compliant payment partner.
-        </InlineMessage>
+        <div
+          class="flex items-center gap-2 rounded-md bg-[#a6a6a61f] px-3 py-2 text-xs leading-snug text-color"
+        >
+          <i class="pi pi-info-circle text-sm shrink-0" />
+          <span>Sensitive data is handled by a PCI-compliant payment partner.</span>
+        </div>
       </form>
     </div>
   </div>
@@ -118,7 +100,6 @@
 
 <script setup>
   import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useAccountStore } from '@/stores/account'
   import { useThemeStore } from '@/stores/theme'
@@ -126,12 +107,13 @@
     buildCheckoutAppearance,
     checkoutFonts
   } from '@/templates/checkout-block/helpers/stripe-appearance.js'
+  import { isStaleCheckoutSessionError } from '@/templates/checkout-block/helpers/stripe-error-mapper.js'
 
   defineOptions({
     name: 'payment-method-block'
   })
 
-  const emit = defineEmits(['readiness-change'])
+  const emit = defineEmits(['readiness-change', 'stale-session'])
 
   const props = defineProps({
     stripeClientService: {
@@ -169,10 +151,10 @@
   const isPaymentFormReady = () => {
     return Boolean(
       props.checkoutSessionClientSecret &&
-        paymentElement.value &&
-        paymentElementReady.value &&
-        paymentElementComplete.value &&
-        !displayError.value.paymentElement
+      paymentElement.value &&
+      paymentElementReady.value &&
+      paymentElementComplete.value &&
+      !displayError.value.paymentElement
     )
   }
 
@@ -271,8 +253,20 @@
       })
 
       paymentElement.value.mount('#payment-element')
-    } catch {
+    } catch (error) {
       if (currentInitializationVersion !== initializationVersion.value) {
+        return
+      }
+
+      // If Stripe rejected the secret because the underlying session is gone
+      // (expired / already consumed / wrong env), ask the parent to recover
+      // by invalidating the cached SO and re-issuing a fresh session. We
+      // suppress the inline error in this case so the user sees a loading
+      // state rather than a scary "Unable to initialize" while recovery
+      // runs.
+      if (isStaleCheckoutSessionError(error)) {
+        emit('stale-session', { reason: 'no_such_checkout_session' })
+        emitReadinessChange()
         return
       }
 

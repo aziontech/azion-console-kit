@@ -1,6 +1,6 @@
 <template>
-  <div class="relative flex h-full flex-col overflow-hidden pt-6 w-[600px]">
-    <div class="checkout-scroll-area flex flex-1 flex-col gap-6 px-8 overflow-y-auto">
+  <div class="relative flex lg:h-full flex-col lg:overflow-hidden pt-6 w-full lg:w-[600px]">
+    <div class="checkout-scroll-area flex flex-1 flex-col gap-6 px-4 lg:px-8 overflow-y-auto">
       <PricingCalculationBlock
         ref="pricingCalculationRef"
         :plan="plan"

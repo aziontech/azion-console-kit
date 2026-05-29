@@ -1,16 +1,17 @@
 <template>
   <div
-    class="flex shrink-0 justify-end gap-3 border-t border-default bg-[var(--surface-50)] px-4 py-3 md:px-8"
+    class="flex shrink-0 justify-end gap-3 border-t border-[var(--border-default)] bg-[var(--surface-50)] px-4 py-3 md:px-8"
   >
-    <Button
-      class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
-      outlined
+    <ActionButton
+      kind="outlined"
+      size="medium"
       label="Cancel"
       :disabled="isSubmitting"
       @click="$emit('cancel')"
     />
-    <Button
-      class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
+    <ActionButton
+      kind="primary"
+      size="medium"
       :label="submitLabel"
       :loading="isSubmitting"
       :disabled="isConfirmDisabled"
@@ -20,7 +21,7 @@
 </template>
 
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
 
   defineOptions({ name: 'checkout-submission-footer' })
 

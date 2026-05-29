@@ -9,11 +9,7 @@
             @submit.prevent
           >
             <div class="gap-2 flex flex-col">
-              <!-- <h1 class="text-start text-xl lg:text-2xl font-medium">Sign Up for a Free Account</h1> -->
-              <h1 class="text-start text-xl lg:text-2xl font-medium">Create your account</h1>
-              <!-- <p class="text-sm text-start text-color-secondary">
-                US$ 300 credit to use over 12 months, no credit card is required.
-              </p> -->
+              <h1 class="text-start text-xl lg:text-2xl font-medium">{{ signupHeading }}</h1>
             </div>
 
             <div>
@@ -82,17 +78,22 @@
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeDivider from '@aziontech/webkit/divider'
   import LoginWithEmailBlock from '@/templates/signup-block/login-with-email-block'
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { computed, ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
 
   const props = defineProps({
     signupService: { required: true, type: Function },
     resendEmailService: { required: true, type: Function }
   })
 
+  const route = useRoute()
   const router = useRouter()
   const showLoginFromEmail = ref(true)
   const showActivation = ref(true)
+
+  const signupHeading = computed(() =>
+    route.query.plan === 'pro' ? 'Sign Up for the Pro Plan' : 'Sign Up for a Free Account'
+  )
 
   const showActivationEmail = () => {
     showActivation.value = false

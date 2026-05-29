@@ -1,6 +1,6 @@
 <template>
-  <div class="border border-default border-solid rounded-md bg-surface">
-    <PlanCardHeader :label="planLabel">
+  <div class="border border-[var(--border-muted)] border-solid rounded-md bg-surface">
+    <PlanCardHeader label="Charged">
       <template #action>
         <BillingCycleToggle
           v-model="billingCycle"
@@ -66,8 +66,6 @@
   const billingCycle = ref('monthly')
 
   const planPricing = computed(() => getPlanPricing(plans.value, props.plan))
-
-  const planLabel = computed(() => (props.plan === 'pro' ? 'Pro Plan' : props.plan))
 
   const subtotal = computed(() => {
     if (billingCycle.value === 'yearly') {
