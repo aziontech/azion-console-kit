@@ -5,10 +5,7 @@
   import { useToast } from '@aziontech/webkit/use-toast'
   import Tag from '@aziontech/webkit/prime-tag'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'
-  import {
-    resourcePackTypeMeta,
-    getResourcePackRows
-  } from '@/helpers/deployment-status'
+  import { resourcePackTypeMeta, getResourcePackRows } from '@/helpers/deployment-status'
   import CurrentBadge from '@/components/CurrentBadge'
   import { getWorkloadEnvironmentsService } from '@/services/v2/workload/workload-versions-mock'
   import { clipboardWrite } from '@/helpers/clipboard'

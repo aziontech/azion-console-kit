@@ -10,7 +10,6 @@
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import MessageCard from '@/components/MessageCard'
   import InlineTag from '@/components/InlineTag'
-  import StatusTag from '@/components/StatusTag'
   import ResourceTypesList from '@/views/Deployments/components/ResourceTypesList.vue'
   import EditorAvatarCell from '@/views/Deployments/components/EditorAvatarCell.vue'
 
@@ -57,13 +56,6 @@
       cellClass:
         'min-w-[200px] flex-[1.6_1_200px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
     },
-    // {
-    //   key: 'status',
-    //   label: 'Status',
-    //   headerClass: 'min-w-[140px] flex-[1_1_140px] flex items-center justify-end',
-    //   cellClass:
-    //     'min-w-[140px] flex-[1_1_140px] flex justify-end max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-lg:justify-start max-sm:flex-col max-sm:gap-1'
-    // },
     {
       key: 'lastModified',
       label: 'Last Modified',
@@ -268,10 +260,6 @@
       <template #cell-resources="{ item: deployment }">
         <ResourceTypesList :items="deployment.resourceTypes" />
       </template>
-
-      <!-- <template #cell-status="{ item: deployment }">
-        <StatusTag :status="deployment.status" />
-      </template> -->
 
       <template #cell-lastModified="{ item: deployment }">
         <span

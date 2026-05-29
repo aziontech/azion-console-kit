@@ -136,8 +136,7 @@
         skipCache: hasFilter || !!searchTerm.value?.trim()
       })
       versions.value = Array.isArray(result?.body) ? result.body : []
-      totalRecords.value =
-        typeof result?.count === 'number' ? result.count : versions.value.length
+      totalRecords.value = typeof result?.count === 'number' ? result.count : versions.value.length
     } catch (error) {
       toast.add({
         closable: true,
@@ -177,11 +176,7 @@
 
   watchDebounced([searchTerm], () => loadVersions(), { debounce: 350, deep: true })
 
-  watch(
-    [filterValues, sortBy, paginatorFirst, paginatorRows],
-    () => loadVersions(),
-    { deep: true }
-  )
+  watch([filterValues, sortBy, paginatorFirst, paginatorRows], () => loadVersions(), { deep: true })
 
   onMounted(loadVersions)
 </script>
