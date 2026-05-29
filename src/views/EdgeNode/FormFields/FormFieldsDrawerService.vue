@@ -132,17 +132,13 @@
                 <ul class="p-2">
                   <li>
                     <PrimeButton
-                      class="w-full whitespace-nowrap flex"
+                      kind="text"
                       data-testid="edge-applications-rules-engine-form__create-cache-policy-button"
-                      text
                       @click="openDrawer"
                       size="small"
                       icon="pi pi-plus-circle"
-                      :pt="{
-                        label: { class: 'w-full text-left' },
-                        root: { class: 'p-2' }
-                      }"
                       label="Create Edge Service"
+                      class="w-full whitespace-nowrap flex"
                     />
                   </li>
                 </ul>

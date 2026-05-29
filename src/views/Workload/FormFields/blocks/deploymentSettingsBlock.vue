@@ -112,17 +112,13 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
+                  kind="text"
                   @click="openDrawerEdgeApplication"
-                  class="w-full whitespace-nowrap flex"
                   data-testid="domains-form__create-edge-application-button"
-                  text
                   size="small"
                   icon="pi pi-plus-circle"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
                   label="Create Application"
+                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -155,17 +151,13 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
+                  kind="text"
                   @click="openDrawerEdgeFirewall"
-                  class="w-full whitespace-nowrap flex"
                   data-testid="domains-form__create-edge-firewall-button"
-                  text
                   size="small"
                   icon="pi pi-plus-circle"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
                   label="Create Firewall"
+                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -196,17 +188,13 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
+                  kind="text"
                   @click="openDrawerCustomPages"
-                  class="w-full whitespace-nowrap flex"
                   data-testid="domains-form__create-custom-pages-button"
-                  text
                   size="small"
                   icon="pi pi-plus-circle"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
                   label="Create Custom Page"
+                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>

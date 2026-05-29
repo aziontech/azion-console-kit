@@ -48,17 +48,17 @@
           v-if="showActions(message)"
         >
           <PrimeButton
+            kind="text"
             v-if="message.action.link"
             :data-testid="handleDataTestIdInItem(message, 'link')"
-            link
             size="small"
             :label="message.action.link.label"
             @click="handleClick(message, 'link')"
           />
           <PrimeButton
+            kind="outlined"
             v-if="message.action.secondary"
             :data-testid="handleDataTestIdInItem(message, 'secondary')"
-            outlined
             size="small"
             :icon="getButtonIcon(message.action.secondary)"
             :label="getButtonLabel(message.action.secondary)"
@@ -66,8 +66,8 @@
             :disabled="isButtonAnimating(message.action.secondary)"
           />
           <PrimeButton
+            kind="secondary"
             v-if="message.action.primary"
-            severity="secondary"
             :data-testid="handleDataTestIdInItem(message, 'primary')"
             size="small"
             :label="message.action.primary.label"
@@ -82,7 +82,7 @@
 <script setup>
   import PrimeButton from '@aziontech/webkit/button'
   import Toast from '@aziontech/webkit/toast'
-  import Tag from '@aziontech/webkit/prime-tag'
+  import Tag from '@aziontech/webkit/tag'
   import { reactive } from 'vue'
 
   defineOptions({ name: 'ToastBlock' })

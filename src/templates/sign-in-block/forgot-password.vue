@@ -37,24 +37,24 @@
           </div>
 
           <PrimeButton
+            kind="secondary"
             size="small"
-            class="w-full flex-row-reverse"
             :loading="isSendingEmailLoading"
             label="Send Email"
-            severity="secondary"
             @click="sendEmail()"
             :disabled="!meta.valid"
+            class="w-full flex-row-reverse"
           />
         </div>
       </div>
       <div class="flex flex-wrap justify-center items-center gap-1 mt-8">
         <p class="text-sm font-normal">Already have an account?</p>
         <PrimeButton
+          kind="text"
           size="small"
           label="Sign In"
-          link
-          class="p-0"
           @click="$emit('goToSignIn')"
+          class="p-0"
         />
       </div>
     </div>
@@ -77,11 +77,12 @@
         <div class="w-full flex flex-wrap gap-2">
           <p class="text-start">Didn't receive the email?</p>
           <PrimeButton
-            class="p-0"
-            link
+            kind="text"
+            size="medium"
             label="Resend Email"
             @click="resendEmail()"
             :disabled="isEmailResent"
+            class="p-0"
           />
           <PrimeBadge
             class="rounded-md animate-fadeIn"

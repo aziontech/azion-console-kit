@@ -18,11 +18,12 @@
             <li>
               Install
               <PrimeButton
-                link
+                kind="text"
+                size="medium"
                 label="Google Authenticator"
-                class="p-0"
                 @click="props.openGoogleAuthenticatorAppDocumentation"
-              ></PrimeButton>
+                class="p-0"
+              />
               on your device.
             </li>
             <li>Open the app and tap "+" button.</li>
@@ -68,11 +69,12 @@
         </div>
 
         <PrimeButton
-          class="w-full flex-row-reverse"
+          kind="secondary"
+          size="medium"
           label="Verify code"
           :loading="isButtonLoading"
-          severity="secondary"
           type="submit"
+          class="w-full flex-row-reverse"
         />
       </div>
     </div>

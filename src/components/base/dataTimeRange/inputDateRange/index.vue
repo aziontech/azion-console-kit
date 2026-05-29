@@ -1,6 +1,7 @@
 <script setup>
   import { ref, computed, defineModel, onMounted } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import Calendar from '@aziontech/webkit/calendar'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InputText from '@aziontech/webkit/inputtext'
@@ -491,11 +492,12 @@
     <template v-if="mode === 'absolute'">
       <div class="flex justify-center">
         <div class="flex items-center gap-3">
-          <PrimeButton
+          <IconButton
+            kind="outlined"
             icon="pi pi-chevron-left"
             size="small"
-            outlined
             @click="previousMonth"
+            aria-label="button"
           />
           <div class="flex items-center gap-2">
             <Dropdown
@@ -513,11 +515,12 @@
               @change="onYearChange"
             />
           </div>
-          <PrimeButton
+          <IconButton
+            kind="outlined"
             icon="pi pi-chevron-right"
             size="small"
-            outlined
             @click="nextMonth"
+            aria-label="button"
           />
         </div>
       </div>
@@ -552,17 +555,14 @@
         <div class="border surface-border rounded-lg p-1 w-min">
           <div class="max-h-48 overflow-y-auto overflow-x-hidden space-y-1">
             <PrimeButton
+              kind="secondary"
               :label="timeSlot"
               v-for="timeSlot in TIME_SLOTS"
               :key="timeSlot"
-              class="m-1"
-              severity="secondary"
               size="small"
               :outlined="selectedTime !== timeSlot"
               @click="selectTime(timeSlot)"
-              :pt="{
-                label: { class: 'text-xs font-normal' }
-              }"
+              class="m-1"
             />
           </div>
         </div>
@@ -610,12 +610,12 @@
             @keydown.enter="updateRange"
           />
           <PrimeButton
+            kind="outlined"
             label="Apply"
             @click="updateRange"
-            outlined
             :disabled="mode !== 'absolute'"
-            class="whitespace-nowrap w-20"
             size="small"
+            class="whitespace-nowrap w-20"
           />
         </div>
       </div>

@@ -21,25 +21,25 @@
     </div>
 
     <template #closeicon>
-      <PrimeButton
-        outlined
+      <IconButton
+        kind="outlined"
         icon="pi pi-times"
         size="small"
         @click="handleCancel"
+        aria-label="button"
       />
     </template>
 
     <template #footer>
       <div class="flex gap-2 flex-col-reverse md:flex-row sm:justify-end w-full md:w-auto">
         <PrimeButton
-          severity="primary"
-          outlined
+          kind="primary"
           label="Cancel"
           size="small"
           @click="handleCancel"
         />
         <PrimeButton
-          severity="secondary"
+          kind="secondary"
           label="Clone"
           :disabled="isLoading"
           :icon="loadingIcon"
@@ -60,6 +60,7 @@
 
   import PrimeDialog from '@aziontech/webkit/dialog'
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import FieldText from '@aziontech/webkit/field-text'
 
   defineOptions({ name: 'CloneBlock' })

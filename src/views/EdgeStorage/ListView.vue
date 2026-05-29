@@ -19,12 +19,12 @@
             data-testid="create_Bucket_button"
           />
           <PrimeButton
+            kind="outlined"
             v-else
             icon="pi pi-cog"
             size="small"
             @click="handleSettingsTrackEvent"
             :label="isGreaterThanMD ? 'Settings' : ''"
-            outlined
             class="px-4 py-1 flex items-center justify-center"
           />
         </template>
@@ -100,13 +100,14 @@
                               />
                             </div>
                             <div class="flex gap-2">
-                              <PrimeButton
-                                outlined
+                              <IconButton
+                                kind="outlined"
                                 icon="pi pi-refresh"
                                 v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                                 size="small"
                                 @click="handleRefresh"
                                 data-testid="data-table-actions-column-header-refresh"
+                                aria-label="data table actions column header refresh"
                               />
                               <DataTable.Export @export="handleExportTableDataToCSV()" />
                               <DataTableColumnSelector
@@ -249,29 +250,29 @@
                         <span class="text-sm">{{ selectedItems.length }} files selected</span>
                         <div class="flex gap-2">
                           <PrimeButton
+                            kind="outlined"
                             size="small"
-                            outlined
                             :icon="isDownloading ? 'pi pi-spin pi-spinner' : 'pi pi-download'"
                             label="Download"
-                            class="px-4"
                             :disabled="isDownloading"
                             @click="handleDownload(selectedFiles)"
+                            class="px-4"
                           />
                           <PrimeButton
+                            kind="outlined"
                             size="small"
-                            outlined
                             icon="pi pi-arrow-right-arrow-left"
                             label="Move"
-                            class="px-4"
                             @click="handleMoveSelectedItems"
+                            class="px-4"
                           />
                           <PrimeButton
+                            kind="primary"
                             size="small"
                             icon="pi pi-trash"
                             label="Delete"
-                            severity="danger"
-                            class="px-4"
                             @click="handleDeleteSelectedItems"
+                            class="px-4 !bg-[var(--danger)] !text-[var(--danger-contrast)]"
                           />
                         </div>
                       </div>
@@ -296,18 +297,20 @@
                             autofocus
                             size="small"
                           />
-                          <PrimeButton
+                          <IconButton
+                            kind="outlined"
                             icon="pi pi-check"
                             size="small"
-                            outlined
                             @click="handleSaveNewFolder"
                             :disabled="!newFolderName.trim() || hasInvalidChars"
+                            aria-label="button"
                           />
-                          <PrimeButton
+                          <IconButton
+                            kind="outlined"
                             icon="pi pi-times"
                             size="small"
-                            outlined
                             @click="handleCancelNewFolder"
+                            aria-label="button"
                           />
                         </div>
                       </template>
@@ -328,21 +331,23 @@
                             autofocus
                             size="small"
                           />
-                          <PrimeButton
+                          <IconButton
+                            kind="outlined"
                             :icon="isRenaming ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
                             size="small"
-                            outlined
                             @click="handleSaveRename"
                             :disabled="
                               isRenaming || !renameValue.trim() || renameValue === renamingItem.name
                             "
+                            aria-label="button"
                           />
-                          <PrimeButton
+                          <IconButton
+                            kind="outlined"
                             icon="pi pi-times"
                             size="small"
-                            outlined
                             :disabled="isRenaming"
                             @click="handleCancelRename"
+                            aria-label="button"
                           />
                         </div>
                       </template>
@@ -438,6 +443,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import BucketListTable from './components/BucketListTable.vue'
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import SplitButton from '@aziontech/webkit/splitbutton'
   import Checkbox from '@aziontech/webkit/checkbox'
   import InputText from '@aziontech/webkit/inputtext'

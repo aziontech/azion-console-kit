@@ -30,11 +30,11 @@
         />
       </div>
       <PrimeButton
+        kind="outlined"
         label="Apply"
-        outlined
-        class="whitespace-nowrap px-4"
         size="small"
         @click="applyQuickSelect"
+        class="whitespace-nowrap px-4"
       />
     </div>
 
@@ -42,15 +42,14 @@
       <div class="text-sm font-medium leading-5 text-color mb-3">Commonly used</div>
       <div class="grid grid-cols-2 grid-rows-6 grid-flow-col">
         <PrimeButton
+          kind="text"
+          :label="range.label"
           v-for="range in commonDateRanges"
           :key="range.value"
           size="small"
-          link
-          class="justify-start text-left w-full"
           @click="applyCommonRange(range)"
-        >
-          {{ range.label }}
-        </PrimeButton>
+          class="justify-start text-left w-full"
+        />
       </div>
     </div>
 

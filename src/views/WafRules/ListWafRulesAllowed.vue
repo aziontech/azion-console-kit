@@ -260,20 +260,20 @@
       >
         <template #default>
           <PrimeButton
-            class="max-md:w-full w-fit"
-            severity="secondary"
+            kind="secondary"
+            size="medium"
             label="Create from Tuning"
-            outlined
             @click="goToWafRulesTuning"
-          >
-          </PrimeButton>
-          <PrimeButton
             class="max-md:w-full w-fit"
-            severity="secondary"
+          />
+          <PrimeButton
+            kind="secondary"
+            size="medium"
             icon="pi pi-plus"
             label="Allowed Rule"
             @click="openCreateDrawerWafAllowed"
             data-testid="create_Allowed Rule_button"
+            class="max-md:w-full w-fit"
           />
         </template>
         <template #illustration>

@@ -34,16 +34,17 @@
 
       <div class="flex justify-end gap-2 mt-2">
         <PrimeButton
+          kind="outlined"
           label="Cancel"
-          outlined
           size="small"
           @click="emit('update:visible', false)"
         />
         <PrimeButton
+          kind="primary"
           label="Truncate Table"
           size="small"
-          severity="danger"
           @click="truncateTable"
+          class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
         />
       </div>
     </div>

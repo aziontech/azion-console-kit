@@ -1,10 +1,11 @@
 <template>
-  <Button
+  <IconButton
+    kind="outlined"
     type="button"
     icon="pi pi-share-alt"
     size="small"
     @click="toggle"
-    outlined
+    aria-label="button"
   />
 
   <OverlayPanel ref="overlayPanel">
@@ -25,9 +26,9 @@
         </div>
         <div>
           <Button
+            kind="outlined"
             ref="copyButton"
             v-tooltip="tooltipConfig"
-            outlined
             icon="pi pi-copy"
             size="small"
             label="Copy link"
@@ -42,6 +43,7 @@
 <script setup>
   import { ref, computed, nextTick } from 'vue'
   import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import InputText from '@aziontech/webkit/inputtext'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'
 

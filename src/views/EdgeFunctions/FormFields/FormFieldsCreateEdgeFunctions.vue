@@ -361,7 +361,7 @@
                 >
                   <p>Configure the form builder.</p>
                   <PrimeButton
-                    outlined
+                    kind="outlined"
                     @click="azionJsonFormWindowOpener()"
                     label="Read documentation"
                     size="small"
@@ -369,12 +369,12 @@
                 </div>
                 <div class="absolute right-2.5 bottom-2 surface-section">
                   <PrimeButton
+                    kind="primary"
                     size="small"
                     label="Remove Form"
                     icon="pi pi-times"
-                    outlined
-                    severity="danger"
                     @click="resetFormBuilder"
+                    class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
                   />
                 </div>
               </div>

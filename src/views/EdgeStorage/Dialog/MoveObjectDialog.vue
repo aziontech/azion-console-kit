@@ -66,16 +66,18 @@
     </div>
 
     <template #closeicon>
-      <PrimeButton
-        outlined
+      <IconButton
+        kind="outlined"
+        size="medium"
         @click="cancelDialog()"
         icon="pi pi-times"
+        aria-label="button"
       />
     </template>
 
     <template #footer>
       <PrimeButton
-        outlined
+        kind="outlined"
         label="Cancel"
         size="small"
         @click="cancelDialog()"
@@ -94,6 +96,7 @@
 <script setup>
   import { computed, ref, inject } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import InputText from '@aziontech/webkit/inputtext'
   import Divider from '@aziontech/webkit/divider'

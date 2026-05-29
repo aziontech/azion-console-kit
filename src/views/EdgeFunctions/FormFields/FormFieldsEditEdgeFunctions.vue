@@ -375,7 +375,7 @@
                 >
                   <p>Configure the form builder.</p>
                   <PrimeButton
-                    outlined
+                    kind="outlined"
                     @click="azionJsonFormWindowOpener()"
                     label="Read documentation"
                     size="small"
@@ -384,11 +384,11 @@
               </div>
               <div class="flex items-center justify-end mt-2">
                 <PrimeButton
-                  text
+                  kind="text"
                   size="small"
                   label="Remove Form"
-                  severity="danger"
                   @click="resetFormBuilder"
+                  class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
                 />
               </div>
             </template>

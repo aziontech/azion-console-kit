@@ -33,12 +33,13 @@
           </InlineMessage>
         </div>
         <PrimeButton
-          class="w-full flex-row-reverse"
+          kind="secondary"
+          size="medium"
           :loading="isButtonLoading"
           label="Reset Password"
-          severity="secondary"
           type="submit"
           :disabled="!meta.valid"
+          class="w-full flex-row-reverse"
         />
       </div>
 
@@ -58,12 +59,13 @@
           </div>
 
           <PrimeButton
-            class="w-full flex-row-reverse"
+            kind="secondary"
+            size="medium"
             :loading="isButtonLoading"
             label="Sign In"
             @click="goToSignIn()"
-            severity="secondary"
             type="button"
+            class="w-full flex-row-reverse"
           />
         </div>
       </div>

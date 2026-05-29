@@ -90,11 +90,11 @@
               <div class="text-sm">
                 <span>No results found.</span>
                 <PrimeButton
+                  kind="text"
                   label="Go to full integrations list."
-                  link
-                  class="ml-3 p-0"
                   size="small"
                   @click="resetFilters"
+                  class="ml-3 p-0"
                 />
               </div>
               <LoadingEmptySearch />

@@ -1,8 +1,9 @@
 <template>
   <SocialIdpsBlock direction="bottom-to-top" />
   <PrimeButton
+    kind="outlined"
+    size="medium"
     label="Sign Up with Email"
-    outlined
     @click="handleSignUpEmailClick"
   />
 </template>

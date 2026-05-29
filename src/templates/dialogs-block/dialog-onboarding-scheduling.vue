@@ -16,12 +16,14 @@
 
     <template #footer>
       <PrimeButton
-        outlined
+        kind="outlined"
+        size="medium"
         @click="closeCallback"
         label="Remind Later"
       />
       <PrimeButton
-        severity="secondary"
+        kind="secondary"
+        size="medium"
         @click="openOnboarding"
         icon="pi pi-calendar-plus"
         label="Schedule Now"

@@ -17,11 +17,12 @@
         :key="idp.slug"
       >
         <PrimeButton
+          kind="outlined"
+          size="medium"
           v-if="idp.isActive"
           :label="formatName(idp.name)"
           :icon="getIcon(idp.slug)"
           @click="authenticate(idp)"
-          outlined
           :loading="submittedIdp === idp.uuid"
           :disabled="submittedIdp"
         />

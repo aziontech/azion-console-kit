@@ -144,13 +144,8 @@
       <PrimeButton
         label="Documentation"
         v-if="route.meta.showDocumentButton"
-        :pt="{
-          label: { class: 'text-white' },
-          icon: { class: 'text-white' }
-        }"
         @click="openDocumentation"
         size="small"
-        iconPos="right"
         icon="pi pi-external-link"
         class="text-white border-header bg-header hover:bg-header-button-hover"
       />

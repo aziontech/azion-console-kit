@@ -46,9 +46,10 @@
 
       <div class="flex justify-start w-full">
         <PrimeButton
+          kind="outlined"
+          size="medium"
           icon="pi pi-clone"
           data-testid="workloads-dialog__copy-workload__button"
-          outlined
           type="button"
           aria-label="Copy"
           label="Copy"
@@ -58,19 +59,22 @@
       </div>
     </div>
     <template #closeicon>
-      <PrimeButton
-        outlined
+      <IconButton
+        kind="outlined"
+        size="medium"
         type="button"
         icon="pi pi-times"
         @click="closeDialog"
+        aria-label="button"
       />
     </template>
 
     <template #footer>
       <PrimeButton
+        kind="secondary"
+        size="medium"
         data-testid="workloads-dialog__confirm__button"
         label="Confirm"
-        severity="secondary"
         @click="closeDialog"
       />
     </template>
@@ -83,6 +87,7 @@
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PrimeInputText from '@aziontech/webkit/inputtext'
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
 
   defineOptions({ name: 'CopyDomainDialog' })
 

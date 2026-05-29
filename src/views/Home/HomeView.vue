@@ -92,11 +92,10 @@
           <div class="flex w-full justify-between items-center">
             <h1 class="text-[22px] font-semibold">Welcome, {{ welcomeName }}</h1>
             <PrimeButton
+              kind="secondary"
               icon="pi pi-user-plus"
-              severity="secondary"
               label="Invite User"
               size="small"
-              outlined
               @click="openInviteDialog"
               class="whitespace-nowrap"
             />

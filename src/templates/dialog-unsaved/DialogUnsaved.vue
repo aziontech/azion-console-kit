@@ -31,15 +31,14 @@
     </div>
     <template #footer>
       <PrimeButton
-        severity="primary"
+        kind="primary"
         size="small"
         label="Leave page"
         data-testid="dialog-unsaved__leave-page"
-        outlined
         @click="emit('leave')"
       />
       <PrimeButton
-        severity="secondary"
+        kind="secondary"
         size="small"
         label="Keep editing"
         @click="emit('stay')"

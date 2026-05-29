@@ -2,6 +2,7 @@
   import { inject, computed } from 'vue'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { capitalizeFirstLetter } from '@/helpers'
   defineOptions({ name: 'edge-services-toggle-status' })
@@ -86,24 +87,27 @@
         {{ getDescriptionContent }}
       </div>
       <template #closeicon>
-        <PrimeButton
-          outlined
+        <IconButton
+          kind="outlined"
+          size="medium"
           @click="closeDialog()"
           icon="pi pi-times"
+          aria-label="button"
         />
       </template>
       <template #footer>
         <PrimeButton
-          severity="primary"
+          kind="primary"
+          size="medium"
           label="Cancel"
-          outlined
           @click="closeDialog()"
         />
         <PrimeButton
-          class="m-0"
-          severity="secondary"
+          kind="secondary"
+          size="medium"
           label="Confirm"
           @click="onConfirm"
+          class="m-0"
         />
       </template>
     </PrimeDialog>

@@ -126,7 +126,8 @@
       >
         <template #emptyBlockButton>
           <PrimeButton
-            severity="secondary"
+            kind="secondary"
+            size="medium"
             icon="pi pi-download"
             label="Download Orchestrator"
             @click="downloadOrchestrator"

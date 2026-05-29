@@ -7,13 +7,12 @@
   >
     Create a Let's Encrypt™ digital certificate directly from
     <PrimeButton
-      link
+      kind="text"
+      :label="handleTextDomainWorkload.pluralTitle"
       size="small"
-      class="p-0"
       @click="navigateToDomains"
-    >
-      {{ handleTextDomainWorkload.pluralTitle }}
-    </PrimeButton>
+      class="p-0"
+    />
   </InlineMessage>
 </template>
 

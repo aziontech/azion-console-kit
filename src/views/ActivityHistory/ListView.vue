@@ -36,8 +36,9 @@
       >
         <template #emptyBlockButton>
           <PrimeButton
+            kind="secondary"
+            size="medium"
             label="Go to Home"
-            severity="secondary"
             @click="goToHome"
           />
         </template>

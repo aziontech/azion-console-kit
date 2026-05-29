@@ -30,17 +30,19 @@
           <p class="text-sm font-normal text-center text-color-secondary">
             By signing up, you agree to the
             <PrimeButton
+              kind="text"
+              size="medium"
               label="Terms of Service"
-              link
-              class="p-0 text-sm"
               @click="azionTermsAndServicesWindowOpener"
+              class="p-0 text-sm"
             />
             and
             <PrimeButton
+              kind="text"
+              size="medium"
               label="Privacy Policy."
-              link
-              class="p-0 text-sm"
               @click="azionPrivacyPolicyWindowOpener"
+              class="p-0 text-sm"
             />
           </p>
         </div>
@@ -50,8 +52,9 @@
         >
           <p class="text-sm font-normal">Already have an account?</p>
           <PrimeButton
+            kind="secondary"
+            size="medium"
             label="Sign In"
-            severity="secondary"
             @click="goToLogin"
           />
         </div>

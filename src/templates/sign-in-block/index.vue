@@ -57,13 +57,14 @@
 
               <!-- Next button -->
               <PrimeButton
-                class="w-full flex-row-reverse"
+                size="medium"
                 type="button"
                 label="Next"
                 data-testid="signin-block__next-button"
                 :loading="isProccedButtonLoading"
                 :disabled="!email"
                 @click="checkLoginMethod"
+                class="w-full flex-row-reverse"
               />
             </div>
 
@@ -90,12 +91,14 @@
           >
             <!-- Back button and email display -->
             <div class="flex items-center gap-2">
-              <PrimeButton
+              <IconButton
+                kind="outlined"
+                size="medium"
                 v-tooltip.top="{ value: 'Back', showDelay: 200 }"
-                class="w-7 h-7"
-                outlined
                 icon="pi pi-chevron-left"
                 @click="resetPasswordStep"
+                class="w-7 h-7"
+                aria-label="button"
               />
               <p class="text-sm">{{ email }}</p>
             </div>
@@ -116,23 +119,25 @@
                 <!-- Forgot password link -->
                 <div>
                   <PrimeButton
-                    link
-                    class="p-0 text-sm"
+                    kind="text"
+                    size="medium"
                     label="Forgot Password?"
                     @click="$emit('goToForgotPassword', true)"
+                    class="p-0 text-sm"
                   />
                 </div>
               </div>
 
               <!-- Sign In button -->
               <PrimeButton
-                class="w-full flex-row-reverse"
+                size="medium"
                 :loading="isButtonLoading"
                 label="Sign In"
                 type="button"
                 @click="validateAndSubmit"
                 :disabled="!password"
                 data-testid="signin-block__signin-button"
+                class="w-full flex-row-reverse"
               />
             </div>
           </div>
@@ -142,10 +147,11 @@
       <div class="flex flex-wrap justify-center items-center pt-6 gap-1">
         <p class="text-sm">Don't have an account?</p>
         <PrimeButton
+          kind="text"
+          size="medium"
           label="Sign Up"
-          class="p-0 text-sm"
-          link
           @click="goToSignup"
+          class="p-0 text-sm"
         />
       </div>
     </div>
@@ -158,6 +164,7 @@
   import { validateOAuthRedirect } from '@/helpers/oauth-security'
   import { trackSignInSafely } from '@/helpers/track-auth-event'
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import InputText from '@aziontech/webkit/inputtext'
   import FieldPassword from '@aziontech/webkit/field-password'
   import SocialIdpsBlock from '@/templates/social-idps-block'

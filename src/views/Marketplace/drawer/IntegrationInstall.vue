@@ -8,7 +8,7 @@
   import Dropdown from '@aziontech/webkit/dropdown'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import Sidebar from '@aziontech/webkit/sidebar'
-  import Tag from '@aziontech/webkit/prime-tag'
+  import Tag from '@aziontech/webkit/tag'
   import { useField, useForm } from 'vee-validate'
   import { computed, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
@@ -266,17 +266,12 @@
                       <Divider class="mb-2" />
                       <div class="px-2">
                         <PrimeButton
+                          kind="text"
                           label="Create New"
-                          icon-pos="left"
                           icon="pi pi-plus-circle"
-                          text
                           size="small"
-                          class="w-full text-left mb-2 pl-2 py-2"
-                          :pt="{
-                            label: { class: 'font-normal' },
-                            root: { class: 'rounded-md hover:surface-200' }
-                          }"
                           @click="handleCreateNew"
+                          class="w-full text-left mb-2 pl-2 py-2"
                         />
                       </div>
                     </template>
@@ -301,11 +296,11 @@
                 >
                   No Application has been created. Go to
                   <PrimeButton
-                    class="p-0"
+                    kind="text"
                     label="Application"
-                    link
                     size="small"
                     @click="handleCreateNew"
+                    class="p-0"
                   />
                   to create a new one.
                 </InlineMessage>

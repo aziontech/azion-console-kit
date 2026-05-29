@@ -30,12 +30,14 @@
 
     <template #footer>
       <PrimeButton
-        outlined
+        kind="outlined"
+        size="medium"
         label="Cancel"
         @click="emit('cancel')"
       />
       <PrimeButton
-        severity="secondary"
+        kind="secondary"
+        size="medium"
         label="Confirm"
         @click="emit('confirm')"
       />

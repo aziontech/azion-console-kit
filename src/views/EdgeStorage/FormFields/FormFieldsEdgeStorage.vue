@@ -89,10 +89,12 @@
           </div>
           <div>
             <PrimeButton
+              kind="primary"
+              size="medium"
               data-testid="account-settings__delete-account"
               label="Delete Bucket"
-              severity="danger"
               @click="$emit('delete-bucket')"
+              class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
             />
           </div>
         </div>

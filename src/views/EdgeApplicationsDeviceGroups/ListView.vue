@@ -164,12 +164,13 @@
   >
     <template #emptyBlockButton>
       <PrimeButton
-        class="max-md:w-full w-fit"
+        kind="secondary"
+        size="medium"
         data-testid="create-device-group-button"
         @click="openCreateDeviceGroupDrawer"
-        severity="secondary"
         icon="pi pi-plus"
         label="Device Group"
+        class="max-md:w-full w-fit"
       />
     </template>
   </ListTable>

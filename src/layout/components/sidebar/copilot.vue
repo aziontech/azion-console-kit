@@ -1,5 +1,6 @@
 <script setup>
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import { useLayout } from '@/composables/use-layout'
   import AzionAIChatBlock from '@/modules/azion-ai-chat/layout'
   import { useRouter } from 'vue-router'
@@ -67,29 +68,32 @@
     >
       <template #chatControls="{ clearChat }">
         <div class="flex gap-2">
-          <PrimeButton
+          <IconButton
+            kind="outlined"
+            size="medium"
             icon="pi pi-eraser"
-            outlined
-            class="surface-border h-8 w-8"
             aria-label="New chat"
             v-tooltip.bottom="'New chat'"
             @click="clearChat"
-          />
-          <PrimeButton
-            icon="pi pi-arrow-up-right-and-arrow-down-left-from-center"
-            outlined
             class="surface-border h-8 w-8"
+          />
+          <IconButton
+            kind="outlined"
+            size="medium"
+            icon="pi pi-arrow-up-right-and-arrow-down-left-from-center"
             aria-label="Open chat to full page"
             v-tooltip.bottom="'Open chat to full page'"
             @click="openChatInNewTab"
-          />
-          <PrimeButton
-            icon="pi pi-times"
-            outlined
             class="surface-border h-8 w-8"
+          />
+          <IconButton
+            kind="outlined"
+            size="medium"
+            icon="pi pi-times"
             aria-label="Close"
             v-tooltip.bottom="'Close'"
             @click="closeSidebar"
+            class="surface-border h-8 w-8"
           />
         </div>
       </template>
@@ -98,11 +102,10 @@
         v-if="hasSupport"
       >
         <PrimeButton
+          kind="text"
           label="Open a support ticket"
           @click="openContactSupport"
-          iconPos="right"
           size="small"
-          link
           icon="pi pi-external-link"
         />
       </template>

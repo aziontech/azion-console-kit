@@ -77,14 +77,13 @@
         <div class="text-sm text-color-secondary h-8 flex flex-row items-center">
           <span>Read more about</span>
           <PrimeButton
+            kind="text"
             label="Marketplace's Permissions"
-            link
-            icon-pos="right"
             icon="pi pi-external-link"
             size="small"
-            class="p-0 ml-4"
             type="button"
             @click="handleOpenPermissionsDoc"
+            class="p-0 ml-4"
           />
         </div>
       </div>

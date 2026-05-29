@@ -3,6 +3,7 @@
   // TODO: migrate import to @aziontech/webkit/list-data-table when published
   import DataTable from '@aziontech/webkit/list-data-table'
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import PrimeCard from '@aziontech/webkit/card'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import Divider from '@aziontech/webkit/divider'
@@ -11,7 +12,7 @@
   import InputText from '@aziontech/webkit/inputtext'
   import Skeleton from '@aziontech/webkit/skeleton'
   import Menu from '@aziontech/webkit/menu'
-  import PrimeTag from '@aziontech/webkit/prime-tag'
+  import Tag from '@aziontech/webkit/tag'
   import { computed, inject, onMounted, ref, watch } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { trackSignInSafely } from '@/helpers/track-auth-event'
@@ -180,22 +181,15 @@
   <div>
     <PrimeButton
       v-if="visibleButton"
-      class="font-semibold h-8 w-auto truncate max-w-[180px] border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
+      kind="text"
       size="small"
       :loading="isLoadingAccount"
-      :pt="{
-        label: { class: '!text-white' },
-        icon: { class: '!text-white' }
-      }"
+      :icon="account.accountTypeIcon"
+      :label="account.name"
       v-tooltip.bottom="{ value: 'Switch account', showDelay: 200 }"
       @click="visibleDialog(true)"
-    >
-      <i
-        class="text-white"
-        :class="account.accountTypeIcon"
-      />
-      <span class="truncate text-white"> {{ account.name }}</span>
-    </PrimeButton>
+      class="font-semibold h-8 w-auto truncate max-w-[180px] border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover !text-white"
+    />
 
     <PrimeDialog
       :blockScroll="true"
@@ -229,15 +223,16 @@
                 <h3 class="text-lg font-medium">
                   {{ account.name }}
                 </h3>
-                <PrimeButton
+                <IconButton
+                  kind="outlined"
+                  size="medium"
                   icon="pi pi-cog"
                   type="button"
-                  outlined
-                  class="hidden max-sm:flex flex-shrink-0"
                   aria-label="menu"
                   aria-haspopup="true"
                   aria-controls="overlay_menu"
                   @click="toggle"
+                  class="hidden max-sm:flex flex-shrink-0"
                 />
               </div>
 
@@ -261,27 +256,28 @@
                 </div>
               </div>
               <div class="flex items-center gap-2">
-                <PrimeTag
+                <Tag
                   :value="account.accountTypeName"
                   :icon="account.accountTypeIcon"
                   severity="info"
                 />
-                <PrimeTag
+                <Tag
                   value="Current Logged"
                   severity="success"
                 />
               </div>
             </div>
 
-            <PrimeButton
+            <IconButton
+              kind="outlined"
+              size="medium"
               icon="pi pi-cog"
               type="button"
-              outlined
-              class="max-sm:hidden"
               aria-label="menu"
               aria-haspopup="true"
               aria-controls="overlay_menu"
               @click="toggle"
+              class="max-sm:hidden"
             />
             <Menu
               :pt="{

@@ -1,10 +1,10 @@
 <template>
-  <PrimeButton
+  <button
     v-if="showButton"
+    type="button"
     @click="toggleSidebarComponent('copilot')"
     :class="buttonClasses"
-    size="small"
-    class="special-button"
+    class="special-button inline-flex items-center justify-center h-7 rounded-[var(--shape-button)] px-2"
     v-tooltip.bottom="{ value: 'Azion Copilot', showDelay: 200 }"
   >
     <div
@@ -13,12 +13,11 @@
     >
       <i class="ai ai-ask-azion"></i>{{ currentLabel }}
     </div>
-  </PrimeButton>
+  </button>
 </template>
 
 <script setup>
   import { computed, inject } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
   import { useLayout } from '@/composables/use-layout'
   import { useRoute } from 'vue-router'
 

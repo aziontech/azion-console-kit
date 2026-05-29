@@ -56,13 +56,14 @@
                   </div>
                 </div>
                 <div>
-                  <PrimeButton
+                  <IconButton
+                    kind="primary"
+                    size="medium"
                     icon="pi pi-trash"
-                    severity="primary"
-                    outlined
                     :disabled="addresses.length === 1"
                     @click.stop="removeAddressByIndex(addressIndex)"
                     :data-testid="`edge-connectors-form__address-management__remove-button[${addressIndex}]`"
+                    aria-label="button"
                   />
                 </div>
               </div>
@@ -201,11 +202,10 @@
 
       <div class="flex sm:flex-row flex-col sm:items-center items-start w-full gap-3">
         <PrimeButton
+          kind="primary"
           label="Add Address"
-          severity="primary"
           icon="pi pi-plus-circle"
           size="small"
-          outlined
           :disabled="disableAddButton"
           @click="addNewAddress('click')"
         />
@@ -229,7 +229,8 @@
   import { useField, useFieldArray } from 'vee-validate'
   import AccordionTab from '@aziontech/webkit/accordion-tab'
   import PrimeButton from '@aziontech/webkit/button'
-  import Tag from '@aziontech/webkit/prime-tag'
+  import IconButton from '@aziontech/webkit/icon-button'
+  import Tag from '@aziontech/webkit/tag'
   import Divider from '@aziontech/webkit/divider'
   import Card from '@aziontech/webkit/card'
   import Accordion from 'primevue/accordion'

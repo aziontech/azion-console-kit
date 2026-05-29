@@ -9,10 +9,10 @@
         <span>{{ currentStatus.current?.name || 'Processing...' }}</span>
       </div>
       <PrimeButton
+        kind="outlined"
         v-if="operationType === EDGE_STORAGE_OPERATION_TYPE.UPLOAD"
         icon="pi pi-times-circle"
         size="small"
-        outlined
         label="Cancel"
         @click="handleCancel"
       />

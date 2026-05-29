@@ -56,11 +56,13 @@
 
     <template #actions>
       <PrimeButton
+        size="medium"
         :label="props.buttons.backToHome"
         @click="handleGoBackHome"
       />
       <PrimeButton
-        outlined
+        kind="outlined"
+        size="medium"
         :label="props.buttons.documentation"
         @click="props.documentationService"
       />

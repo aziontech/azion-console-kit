@@ -187,14 +187,15 @@
 
     <template #footer>
       <PrimeButton
-        severity="primary"
+        kind="primary"
+        size="medium"
         label="Cancel"
-        outlined
         @click="closeDialog"
         data-testid="invite-user-dialog__cancel-button"
       />
       <PrimeButton
-        severity="secondary"
+        kind="secondary"
+        size="medium"
         label="Send Invite"
         :loading="loading"
         :disabled="!meta.valid"

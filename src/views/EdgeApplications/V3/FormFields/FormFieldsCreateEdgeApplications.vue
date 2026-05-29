@@ -6,7 +6,7 @@
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import InputNumber from '@aziontech/webkit/inputnumber'
   import MultiSelect from '@aziontech/webkit/multiselect'
-  import PrimeTag from '@aziontech/webkit/prime-tag'
+  import Tag from '@aziontech/webkit/tag'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
@@ -556,7 +556,7 @@
           data-testid="form-horizontal-modules-default-switch"
         >
           <template #footer="{ item }">
-            <PrimeTag
+            <Tag
               v-if="item?.tag"
               :value="item.tag.value"
               :icon="item.tag.icon"
@@ -579,12 +579,13 @@
           data-testid="form-horizontal-modules-subscription-switch"
         />
         <PrimeButton
-          outlined
+          kind="outlined"
+          size="medium"
           icon="pi pi-shopping-cart"
-          class="max-w-[170px] whitespace-nowrap"
           label="Contact sales"
           @click="props.contactSalesEdgeApplicationService()"
           data-testid="form-horizontal-modules-subscription-contact-sales-button"
+          class="max-w-[170px] whitespace-nowrap"
         />
       </div>
     </template>

@@ -144,6 +144,7 @@
     >
       <template #header-actions>
         <PrimeButton
+          size="medium"
           icon="pi pi-plus"
           label="Resource"
           @click="openCreateServiceDrawer"
@@ -152,12 +153,13 @@
       </template>
       <template #emptyBlockButton>
         <PrimeButton
-          class="max-md:w-full w-fit"
-          severity="secondary"
+          kind="secondary"
+          size="medium"
           icon="pi pi-plus"
           label="Resource"
           @click="openCreateServiceDrawer"
           data-testid="list-table-block__create-resource-button"
+          class="max-md:w-full w-fit"
         />
       </template>
     </ListTable>

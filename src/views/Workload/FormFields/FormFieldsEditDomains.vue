@@ -7,7 +7,7 @@
   import LabelBlock from '@aziontech/webkit/label'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import InputText from '@aziontech/webkit/inputtext'
-  import PrimeTag from '@aziontech/webkit/prime-tag'
+  import Tag from '@aziontech/webkit/tag'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
@@ -229,7 +229,7 @@
           :options="environmentOptions"
         >
           <template #footer="{ item }">
-            <PrimeTag
+            <Tag
               v-if="item?.tag"
               :value="item.tag.value"
               :icon="item.tag.icon"
@@ -459,8 +459,9 @@
             />
           </span>
           <PrimeButton
+            kind="outlined"
+            size="medium"
             icon="pi pi-clone"
-            outlined
             data-testid="edit-domains-form__domain-field__copy-button"
             type="button"
             aria-label="Copy to Clipboard"
@@ -520,17 +521,13 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
+                  kind="text"
                   @click="openDigitalCertificateDrawer"
-                  class="w-full whitespace-nowrap flex"
-                  text
                   size="small"
                   icon="pi pi-plus-circle"
                   data-testid="domains-form__create-digital-certificate-button"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
                   label="Create Digital Certificate"
+                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>

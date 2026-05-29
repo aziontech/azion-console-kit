@@ -64,8 +64,8 @@
               <p class="text-[var(--text-color-secondary)]">{{ item.description }}</p>
             </div>
             <PrimeButton
+              kind="outlined"
               :label="item.buttonLabel"
-              outlined
               size="small"
               @click="item.action"
             />

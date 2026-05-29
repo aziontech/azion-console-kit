@@ -313,24 +313,24 @@
           @autoRefresh="onAutoRefreshTick"
         />
         <PrimeButton
+          kind="outlined"
           v-if="!hasPendingDateUpdate && !hasPendingQueryUpdate"
           icon="pi pi-refresh"
-          outlined
           size="small"
           label="Refresh"
-          class="w-[5.875rem]"
           :disabled="isInvalidRange || hasAqlValidationError"
           @click="applyFilters"
+          class="w-[5.875rem]"
         />
         <PrimeButton
+          kind="secondary"
           v-else
           icon="pi pi-arrow-circle-right"
-          severity="secondary"
           size="small"
           label="Update"
           :disabled="isInvalidRange || hasAqlValidationError"
-          class="w-[5.875rem]"
           @click="applyFilters"
+          class="w-[5.875rem]"
         />
       </div>
       <div class="flex flex-1 w-full">

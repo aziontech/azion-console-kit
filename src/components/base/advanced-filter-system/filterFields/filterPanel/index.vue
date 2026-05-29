@@ -2,12 +2,12 @@
   <div>
     <div class="border-b px-8 py-2.5 justify-between surface-border flex">
       <h3 class="text-sm font-semibold text-color">Add filter</h3>
-      <PrimeButton
+      <IconButton
+        kind="primary"
         icon="pi pi-times"
-        severity="primary"
         size="small"
-        outlined
         @click="$emit('cancel')"
+        aria-label="button"
       />
     </div>
 
@@ -93,24 +93,23 @@
       class="px-8 py-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
     >
       <PrimeButton
+        kind="primary"
         type="button"
         label="Cancel"
         @click="$emit('cancel')"
-        class="max-md:min-w-max"
-        severity="primary"
         size="small"
-        outlined
         data-testid="filter-cancel-button"
+        class="max-md:min-w-max"
       />
       <PrimeButton
+        kind="secondary"
         type="button"
-        class="max-md:w-full"
         label="Add filter"
-        severity="secondary"
         size="small"
         :disabled="!isFormValid"
         @click="addFilter"
         data-testid="filter-apply-button"
+        class="max-md:w-full"
       />
     </div>
   </div>
@@ -119,6 +118,7 @@
 <script setup>
   import { ref, computed, defineModel } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import InputText from '@aziontech/webkit/inputtext'
   import FilterRow from '../filterRow/index.vue'
   import Divider from '@aziontech/webkit/divider'

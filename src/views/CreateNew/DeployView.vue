@@ -55,24 +55,19 @@
               <div class="flex w-full justify-end">
                 <div class="flex sm:flex-row flex-col gap-3 md:gap-4">
                   <PrimeButton
+                    kind="text"
                     v-if="isSuccessfullyFinished"
-                    link
                     icon="pi pi-external-link"
-                    iconPos="right"
                     size="small"
-                    class="px-0 py-1"
                     :label="results.domain.url"
-                    :pt="{
-                      root: { class: 'justify-center' },
-                      label: { class: 'grow-0 truncate' }
-                    }"
                     @click="goToUrl"
+                    class="px-0 py-1"
                   />
                   <div class="flex justify-end">
                     <PrimeButton
+                      kind="secondary"
                       v-if="isSuccessfullyFinished"
                       label="Manage"
-                      severity="secondary"
                       size="small"
                       @click="goToEdgeApplicationEditView"
                     />
@@ -82,16 +77,12 @@
                     class="md:ml-auto flex"
                   >
                     <PrimeButton
+                      kind="secondary"
+                      size="medium"
                       @click="retry"
-                      severity="secondary"
-                      :pt="{
-                        root: { class: 'justify-center' },
-                        label: { class: 'grow-0' }
-                      }"
-                      class="md:ml-auto w-full"
                       label="Back"
                       icon="pi pi-chevron-left"
-                      iconPos="left"
+                      class="md:ml-auto w-full"
                     />
                   </div>
                 </div>
@@ -110,12 +101,11 @@
             <b>Next Steps</b>
           </Divider>
           <div class="ml-0 mt-0 w-full max-w-screen-lg grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <PrimeButton
+            <button
               v-for="(step, index) in nextSteps"
               :key="index"
-              class="p-6 lg:h-36 w-full text-left h-auto items-start justify-start border-solid border surface-border hover:border-primary transition-all"
-              link
               type="button"
+              class="p-6 lg:h-36 w-full text-left h-auto items-start justify-start border-solid border surface-border hover:border-primary transition-all rounded-[var(--shape-button)]"
               @click="step.handle"
             >
               <div class="flex flex-col justify-between gap-2 items-start">
@@ -128,7 +118,7 @@
                   </div>
                 </div>
               </div>
-            </PrimeButton>
+            </button>
           </div>
         </div>
       </div>
@@ -138,7 +128,7 @@
 
 <script setup>
   import { computed, onMounted, onUnmounted, ref, inject } from 'vue'
-  import Tag from '@aziontech/webkit/prime-tag'
+  import Tag from '@aziontech/webkit/tag'
   import Divider from '@aziontech/webkit/divider'
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'

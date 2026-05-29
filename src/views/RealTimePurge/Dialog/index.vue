@@ -2,6 +2,7 @@
   import { ref, watch, inject } from 'vue'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
 
   defineOptions({ name: 'dialog-real-time-purge' })
@@ -65,26 +66,28 @@
         </div>
       </div>
       <template #closeicon>
-        <PrimeButton
-          outlined
+        <IconButton
+          kind="outlined"
+          size="medium"
           type="button"
           icon="pi pi-times"
           @click="closeDialog"
+          aria-label="button"
         />
       </template>
       <template #footer>
         <PrimeButton
-          severity="primary"
+          kind="primary"
+          size="medium"
           label="Cancel"
-          outlined
           @click="closeDialog"
         />
         <PrimeButton
-          severity="secondary"
+          kind="secondary"
+          size="medium"
           label="Confirm"
           :loading="loading"
           @click="handleRealTimePurge"
-          iconPos="right"
         />
       </template>
     </PrimeDialog>

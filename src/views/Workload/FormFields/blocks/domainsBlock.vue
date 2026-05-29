@@ -9,6 +9,7 @@
   import CopyBlock from '@aziontech/webkit/button-copy'
 
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import { useFieldArray, useField } from 'vee-validate'
   import { ref, watch, computed } from 'vue'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
@@ -210,13 +211,15 @@
               </div>
             </div>
 
-            <PrimeButton
+            <IconButton
+              size="medium"
               v-if="hasMultipleDomains"
               @click="removeDomain(index)"
               icon="pi pi-trash"
-              class="p-button-outlined p-button-sm p-button-danger"
               data-testid="domains-form__remove-domain-button"
               title="Remove domain"
+              class="p-button-outlined p-button-sm p-button-danger"
+              aria-label="domains form__remove domain button"
             />
           </div>
           <div class="max-w-lg">
@@ -244,10 +247,10 @@
         </div>
         <div class="flex mt-1">
           <PrimeButton
+            kind="outlined"
             @click="addNewDomain"
             label="Add Domain"
             icon="pi pi-plus-circle"
-            outlined
             size="small"
             data-testid="domains-form__add-domain-button"
             title="Add Domain"
@@ -281,10 +284,10 @@
             >
               <template #button>
                 <PrimeButton
+                  kind="outlined"
                   label=".azion.app"
                   size="small"
                   class="rounded-md rounded-l-none select-none focus:outline-none focus:ring-0"
-                  outlined
                 />
               </template>
             </FieldInputGroup>

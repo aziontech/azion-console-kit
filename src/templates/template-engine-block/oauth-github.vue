@@ -1,10 +1,10 @@
 <template>
   <PrimeButton
+    kind="outlined"
+    size="medium"
     @click="connectWithGithub"
     label="Connect with GitHub"
-    outlined
     icon="pi pi-github"
-    iconPos="left"
     :loading="props.loading"
   />
 </template>

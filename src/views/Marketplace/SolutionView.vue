@@ -25,13 +25,12 @@
             >
               <span class="text-xs font-medium text-color-primary">By</span>
               <PrimeButton
-                link
-                class="px-0 py-1"
+                kind="text"
                 :label="solution.vendor.name"
                 icon="pi pi-external-link"
-                iconPos="right"
                 size="small"
                 @click="openVendorSite"
+                class="px-0 py-1"
               />
             </div>
             <div class="flex gap-1 items-center">
@@ -198,12 +197,12 @@
               <p class="text-base text-color-secondary mb-8">
                 {{ sidebarDescription }}
                 <PrimeButton
+                  kind="text"
                   label="Read more"
-                  link
                   size="small"
-                  class="p-0"
                   v-if="solution.isLaunched"
                   @click="openMarketplaceIntegrationsDocumentation()"
+                  class="p-0"
                 />
               </p>
               <InlineMessage
@@ -213,13 +212,13 @@
                 >Latest version installed!</InlineMessage
               >
               <PrimeButton
+                size="medium"
                 v-else
-                class="w-full"
                 :label="sidebarButtonLabel"
                 @click="startLaunchSolution"
                 :loading="loading"
-                icon-pos="right"
                 :icon="loadIcon"
+                class="w-full"
               />
             </template>
           </div>
@@ -234,27 +233,25 @@
                 height="1rem"
               />
               <PrimeButton
+                kind="text"
                 v-else
-                class="p-0 text-right"
                 :label="solution.vendor.url"
                 size="small"
-                link
                 icon="pi pi-external-link"
-                iconPos="right"
                 @click="openVendorSite"
+                class="p-0 text-right"
               />
             </div>
             <Divider class="my-2" />
             <div class="h-8 w-full flex flex-row justify-between align-items-center">
               <span class="text-sm text-color-secondary flex-shrink-0">Need help?</span>
               <PrimeButton
-                class="p-0 text-right"
+                kind="text"
                 label="Azion Sales Team"
                 size="small"
-                link
                 icon="pi pi-external-link"
-                iconPos="right"
                 @click="contactSalesEdgeApplicationService()"
+                class="p-0 text-right"
               />
             </div>
           </div>

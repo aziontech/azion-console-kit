@@ -29,17 +29,13 @@
               <ul class="p-2">
                 <li>
                   <PrimeButton
-                    class="w-full whitespace-nowrap flex"
+                    kind="text"
                     data-testid="data-stream-form__data-settings__template-field__create-custom-template-button"
-                    text
                     @click="openCreateTemplateDrawer"
                     size="small"
                     icon="pi pi-plus-circle"
-                    :pt="{
-                      label: { class: 'w-full text-left' },
-                      root: { class: 'p-2' }
-                    }"
                     label="Create Custom Template"
+                    class="w-full whitespace-nowrap flex"
                   />
                 </li>
               </ul>
@@ -62,22 +58,22 @@
           data-testid="data-stream-form__data-settings__data-set-field"
         />
         <PrimeButton
+          kind="outlined"
           v-if="isCustomTemplate"
           icon="pi pi-pencil"
-          outlined
-          class="absolute top-10 right-2 bg-[#171717]"
           label="Edit Template"
           size="small"
           @click="openEditTemplateDrawer"
+          class="absolute top-10 right-2 bg-[#171717]"
         />
         <PrimeButton
+          kind="outlined"
           v-else
           icon="pi pi-copy"
-          outlined
-          class="absolute top-10 right-2 bg-[#171717]"
           label="Duplicate Template"
           size="small"
           @click="openDuplicateTemplateDrawer"
+          class="absolute top-10 right-2 bg-[#171717]"
         />
         <small
           class="text-xs text-color-secondary font-normal leading-5"

@@ -219,17 +219,13 @@
               <ul class="p-2">
                 <li>
                   <PrimeButton
+                    kind="text"
                     @click="openDigitalCertificateDrawer('edge_certificate')"
-                    class="w-full whitespace-nowrap flex"
-                    text
                     size="small"
                     icon="pi pi-plus-circle"
                     data-testid="domains-form__create-digital-certificate-button"
-                    :pt="{
-                      label: { class: 'w-full text-left' },
-                      root: { class: 'p-2' }
-                    }"
                     label="Create Digital Certificate"
+                    class="w-full whitespace-nowrap flex"
                   />
                 </li>
               </ul>

@@ -1,40 +1,25 @@
 <template>
   <div class="flex !flex-row items-center gap-2 w-fit justify-start md:w-auto">
     <PrimeButton
+      kind="text"
+      label="Other Link"
       v-if="!!otherLink"
       size="small"
-      link
       @click="navigateToOtherLink"
-      :pt="{
-        label: { class: 'whitespace-nowrap' }
-      }"
-    >
-      Other Link
-    </PrimeButton>
+    />
     <PrimeButton
+      kind="text"
+      label="Get Help"
       size="small"
-      link
       @click="navigateToGetHelp"
-      :pt="{
-        label: { class: 'whitespace-nowrap' }
-      }"
-    >
-      Get Help
-    </PrimeButton>
+    />
     <PrimeButton
+      kind="primary"
       v-if="otherActions"
       size="small"
       icon="pi pi-upload"
-      :pt="{
-        root: { class: 'min-w-0 max-w-full' },
-        label: {
-          class: 'whitespace-nowrap truncate'
-        }
-      }"
       @click="emit('other-actions')"
       label="Other Actions"
-      severity="primary"
-      outlined
       data-testid="data-table-other-actions-button"
     />
     <PrimeButton

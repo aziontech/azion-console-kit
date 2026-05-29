@@ -237,13 +237,12 @@
     />
     <div class="flex align-items-center w-full md:max-w-fit">
       <PrimeButton
-        class="h-auto w-full md:max-w-fit"
-        outlined
+        kind="outlined"
         size="small"
-        icon-pos="right"
         icon="pi pi-external-link"
         label="Open in GraphiQL Playground"
         @click="props.playgroundOpener()"
+        class="h-auto w-full md:max-w-fit"
       />
     </div>
   </div>

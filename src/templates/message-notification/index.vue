@@ -27,10 +27,10 @@
           :key="index"
         >
           <PrimeButton
-            class="w-full min-w-max"
             v-if="!action.hidden"
             v-bind="action"
             size="small"
+            class="w-full min-w-max"
           />
         </div>
       </slot>

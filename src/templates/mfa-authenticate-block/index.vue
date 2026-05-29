@@ -51,11 +51,12 @@
         >
 
         <PrimeButton
-          class="w-full flex-row-reverse"
+          kind="secondary"
+          size="medium"
           label="Verify"
           :loading="isButtonLoading"
-          severity="secondary"
           type="submit"
+          class="w-full flex-row-reverse"
         />
       </div>
     </div>

@@ -90,19 +90,19 @@
       </div>
       <template #footer>
         <PrimeButton
-          severity="primary"
+          kind="primary"
+          size="medium"
           label="Cancel"
-          outlined
           @click="closeDialog"
         />
         <PrimeButton
-          severity="secondary"
+          kind="secondary"
+          size="medium"
           label="Allow Rules"
           :loading="loading"
           :disabled="!name"
           data-testid="allow-rules-button"
           @click="handleAllowRule"
-          iconPos="right"
         />
       </template>
     </PrimeDialog>

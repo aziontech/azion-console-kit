@@ -20,8 +20,8 @@
             <div class="flex justify-between">
               <span class="font-medium text-lg text-color">Invoice Data</span>
               <PrimeButton
+                kind="outlined"
                 icon="pi pi-download"
-                outlined
                 size="small"
                 label="Export"
                 @click="invoiceDownload"

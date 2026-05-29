@@ -28,17 +28,13 @@
             <ul class="p-2">
               <li>
                 <PrimeButton
-                  class="w-full whitespace-nowrap flex"
+                  kind="text"
                   @click="openDrawerConnector"
-                  text
                   size="small"
                   icon="pi pi-plus-circle"
                   data-testid="response-details__create-connector-button"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
                   label="Create Connector"
+                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>

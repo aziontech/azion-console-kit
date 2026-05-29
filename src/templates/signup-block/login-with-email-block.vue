@@ -39,10 +39,11 @@
   </div>
 
   <PrimeButton
-    class="animate-fadeIn"
+    size="medium"
     :label="labelButton"
     :loading="loading"
     @click="eventButtonSignUp"
+    class="animate-fadeIn"
   />
 </template>
 

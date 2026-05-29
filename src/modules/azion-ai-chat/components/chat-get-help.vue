@@ -32,11 +32,10 @@
 
 <template>
   <PrimeButton
-    link
+    kind="text"
     size="small"
     label="Get Help"
     icon="ai ai-ask-azion"
-    icon-pos="right"
     v-prompt="formatPrompt"
   />
 </template>

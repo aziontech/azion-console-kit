@@ -3,6 +3,7 @@
   import { computed, ref, watch } from 'vue'
 
   import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import FieldAutoComplete from '@aziontech/webkit/field-auto-complete'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
@@ -681,13 +682,14 @@
               {{ item.conditional }}
             </Divider>
 
-            <PrimeButton
+            <IconButton
+              kind="outlined"
               v-if="conditionalIndex !== 0"
               icon="pi pi-trash"
               size="small"
-              outlined
               @click="removeConditional(criteriaIndex, conditionalIndex)"
               data-testid="rule-form-criteria-item-conditional-remove-button"
+              aria-label="rule form criteria item conditional remove button"
             />
           </div>
 
@@ -735,6 +737,7 @@
           data-testid="rule-form-criteria-item-conditional-add-button"
         >
           <PrimeButton
+            kind="outlined"
             icon="pi pi-plus-circle"
             label="And"
             size="small"
@@ -742,10 +745,10 @@
               maximumConditionalsByCriteriaReached(criteriaIndex) ||
               !isApplicationAcceleratorEnabled
             "
-            outlined
             @click="addNewConditional({ index: criteriaIndex, operator: 'and' })"
           />
           <PrimeButton
+            kind="outlined"
             icon="pi pi-plus-circle"
             label="Or"
             size="small"
@@ -753,7 +756,6 @@
               maximumConditionalsByCriteriaReached(criteriaIndex) ||
               !isApplicationAcceleratorEnabled
             "
-            outlined
             @click="addNewConditional({ index: criteriaIndex, operator: 'or' })"
           />
           <InlineMessage
@@ -788,13 +790,14 @@
             align="left"
             type="solid"
           />
-          <PrimeButton
+          <IconButton
+            kind="outlined"
             v-if="criteriaIndex !== criteria.length - 1"
             icon="pi pi-trash"
             size="small"
-            outlined
             @click="removeCriteriaDecorator(criteriaIndex + 1)"
             :data-testid="`edge-application-rule-form__criteria-remove[${criteriaIndex}]__button`"
+            aria-label="button"
           />
         </div>
       </div>
@@ -804,10 +807,10 @@
         class="flex items-center gap-2"
       >
         <PrimeButton
+          kind="outlined"
           icon="pi pi-plus-circle"
           label="Add Criteria"
           size="small"
-          outlined
           :disabled="maximumCriteriaReached || !isApplicationAcceleratorEnabled"
           @click="addNewCriteria"
           data-testid="rule-form-criteria-add-button"
@@ -853,13 +856,14 @@
             {{ getBehaviorLabel(behaviorItem) }}
           </Divider>
 
-          <PrimeButton
+          <IconButton
+            kind="outlined"
             v-if="behaviorIndex !== 0"
             icon="pi pi-trash"
             size="small"
-            outlined
             @click="removeBehavior(behaviorIndex)"
             data-testid="rule-form-behaviors-item-remove-button"
+            aria-label="rule form behaviors item remove button"
           />
         </div>
 
@@ -905,17 +909,13 @@
                     <ul class="p-2">
                       <li>
                         <PrimeButton
-                          class="w-full whitespace-nowrap flex"
+                          kind="text"
                           data-testid="edge-applications-rules-engine-form__create-function-instance-button"
-                          text
                           @click="openDrawerFunction(behaviorIndex)"
                           size="small"
                           icon="pi pi-plus-circle"
-                          :pt="{
-                            label: { class: 'w-full text-left' },
-                            root: { class: 'p-2' }
-                          }"
                           label="Create Function Instance"
+                          class="w-full whitespace-nowrap flex"
                         />
                       </li>
                     </ul>
@@ -939,17 +939,13 @@
                   <ul class="p-2">
                     <li>
                       <PrimeButton
-                        class="w-full whitespace-nowrap flex"
+                        kind="text"
                         data-testid="edge-applications-rules-engine-form__create-connector-button"
-                        text
                         @click="openDrawerConnector(behaviorIndex)"
                         size="small"
                         icon="pi pi-plus-circle"
-                        :pt="{
-                          label: { class: 'w-full text-left' },
-                          root: { class: 'p-2' }
-                        }"
                         label="Create Connector"
+                        class="w-full whitespace-nowrap flex"
                       />
                     </li>
                   </ul>
@@ -972,17 +968,13 @@
                   <ul class="p-2">
                     <li>
                       <PrimeButton
-                        class="w-full whitespace-nowrap flex"
+                        kind="text"
                         data-testid="edge-applications-rules-engine-form__create-origin-button"
-                        text
                         @click="openDrawerOrigin"
                         size="small"
                         icon="pi pi-plus-circle"
-                        :pt="{
-                          label: { class: 'w-full text-left' },
-                          root: { class: 'p-2' }
-                        }"
                         label="Create Origin"
+                        class="w-full whitespace-nowrap flex"
                       />
                     </li>
                   </ul>
@@ -1005,17 +997,13 @@
                   <ul class="p-2">
                     <li>
                       <PrimeButton
-                        class="w-full whitespace-nowrap flex"
+                        kind="text"
                         data-testid="edge-applications-rules-engine-form__create-cache-policy-button"
-                        text
                         @click="openDrawer"
                         size="small"
                         icon="pi pi-plus-circle"
-                        :pt="{
-                          label: { class: 'w-full text-left' },
-                          root: { class: 'p-2' }
-                        }"
                         label="Create Cache Policy"
+                        class="w-full whitespace-nowrap flex"
                       />
                     </li>
                   </ul>
@@ -1063,11 +1051,11 @@
       </div>
       <div>
         <PrimeButton
+          kind="outlined"
           :disabled="disableAddBehaviorButtonComputed"
           icon="pi pi-plus-circle"
           label="Add Behavior"
           size="small"
-          outlined
           @click="addNewBehavior"
           data-testid="rule-form-behaviors-add-button"
         />

@@ -62,12 +62,12 @@
           <p>
             If you have not yet pointed a DNS zone, please check the
             <PrimeButton
-              link
-              class="w-fit p-0 text-sm"
-              icon-pos="right"
+              kind="text"
+              size="medium"
               icon="pi pi-external-link"
               label="Documentation"
               @click="openDocumentation"
+              class="w-fit p-0 text-sm"
             />
           </p>
         </div>

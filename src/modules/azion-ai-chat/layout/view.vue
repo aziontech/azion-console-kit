@@ -6,13 +6,14 @@
         v-if="getStartConversation"
       >
         <PrimeButton
+          kind="outlined"
+          size="medium"
           icon="pi pi-eraser"
-          outlined
           label="New chat"
-          class="surface-border"
           aria-label="New chat"
           v-tooltip.bottom="'New chat'"
           @click="clearChat"
+          class="surface-border"
         />
       </div>
       <div

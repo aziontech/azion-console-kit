@@ -480,12 +480,13 @@
             >
               <template #emptyBlockButton>
                 <PrimeButton
-                  class="max-md:w-full w-fit"
-                  severity="secondary"
+                  kind="secondary"
+                  size="medium"
                   icon="pi pi-plus"
                   label="Record"
                   @click="openCreateDrawerEDNSResource"
                   data-testid="create_Record_button"
+                  class="max-md:w-full w-fit"
                 />
               </template>
             </ListTable>

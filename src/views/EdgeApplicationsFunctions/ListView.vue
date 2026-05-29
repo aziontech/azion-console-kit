@@ -183,9 +183,10 @@
   >
     <template #emptyBlockButton>
       <PrimeButton
+        kind="secondary"
+        size="medium"
         icon="pi pi-plus"
         data-testid="functions-instance__create-button"
-        severity="secondary"
         label="Function Instance"
         @click="openCreateFunctionDrawer"
       />

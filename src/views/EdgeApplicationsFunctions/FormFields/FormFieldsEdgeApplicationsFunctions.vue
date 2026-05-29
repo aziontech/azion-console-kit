@@ -271,17 +271,13 @@
               <ul class="p-2">
                 <li>
                   <PrimeButton
-                    class="w-full whitespace-nowrap flex"
+                    kind="text"
                     data-testid="edge-applications-functions-form__create-function-button"
-                    text
                     @click="openDrawer"
                     size="small"
                     icon="pi pi-plus-circle"
-                    :pt="{
-                      label: { class: 'w-full text-left' },
-                      root: { class: 'p-2' }
-                    }"
                     label="Create Function"
+                    class="w-full whitespace-nowrap flex"
                   />
                 </li>
               </ul>
@@ -343,7 +339,7 @@
                           <p>Configure the form builder.</p>
                           <!--
                           <PrimeButton
-                            outlined
+                            kind="outlined"
                             @click="azionJsonFormWindowOpener()"
                             label="Read documentation"
                             size="small"
@@ -409,10 +405,10 @@
         v-if="isFirstSelectPanelValue && hasFormBuilder"
       >
         <PrimeButton
+          kind="text"
           @click="formBuilderToggle()"
           :label="updateLabelEditForm()"
           size="small"
-          text
         />
       </div>
     </template>
