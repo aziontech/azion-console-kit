@@ -198,7 +198,7 @@
     if (target === current) {
       if (target === 'hobby') return 'Subscribed'
       if (props.billingCycle === localBillingCycle.value) return 'Subscribed'
-      return localBillingCycle.value === 'yearly' ? 'Upgrade Cycle' : 'Downgrade Cycle'
+      return localBillingCycle.value === 'yearly' ? 'Switch to Annual' : 'Downgrade Cycle'
     }
     const targetRank = PLAN_RANK[target] ?? 0
     const currentRank = PLAN_RANK[current] ?? 0
