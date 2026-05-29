@@ -133,7 +133,7 @@
       :loading="false"
       :rowsLimit="ROWS_LIMIT"
       viewAllLink="/activity-history"
-      viewAllLabel="View all Activities..."
+      viewAllLabel="View all Activity..."
       :emptyBlock="{
         title: 'No activities yet',
         description: 'Your recent activities will appear here.'

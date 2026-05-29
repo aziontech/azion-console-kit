@@ -1,7 +1,12 @@
 <template>
   <div class="flex flex-col flex-1 var(--bg-color)">
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col items-center py-8 px-4 gap-6">
+    <div
+      :class="[
+        'flex-1 flex flex-col items-center py-8 px-4 gap-6',
+        { 'justify-center': isSuccessStep }
+      ]"
+    >
       <!-- Card Container (only for step 1) -->
       <div class="w-full">
         <CardBox
@@ -95,6 +100,7 @@
   import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
   import * as Sentry from '@sentry/vue'
   import { loadUserAndAccountInfo } from '@/helpers/account-data'
+  import { persistOnboardingData } from '@/helpers/persist-onboarding-data'
   import { queryClient } from '@/services/v2/base/query/queryClient'
   import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
@@ -165,8 +171,6 @@
     const accountId = accountStore.accountData?.id
     const billingCycle = storedBillingCycle.value || 'yearly'
 
-    await additionalDataRef.value?.submitForm()
-
     if (!plan || !accountId) return
 
     trackSignUp('planSelected', { plan, billingCycle })
@@ -176,6 +180,7 @@
 
     if (plan === 'hobby') {
       try {
+        await persistOnboardingData({ plan })
         await submitServiceOrder({ accountId, planId })
 
         invalidateBillingCaches()
@@ -252,6 +257,7 @@
     })
     markAwaitingActiveServiceOrder()
     try {
+      await persistOnboardingData({ plan: selectedPlan.value })
       invalidateBillingCaches()
       await loadUserAndAccountInfo({ force: true })
     } catch (err) {
