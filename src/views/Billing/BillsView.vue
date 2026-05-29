@@ -391,11 +391,6 @@
   )
 
   onMounted(async () => {
-    // Warm Stripe.js up front: the plan-info, add-payment and change-cycle
-    // drawers opened from this view all mount Stripe behind a user action, so
-    // pre-downloading the client here keeps those drawers from stalling on a
-    // cold js.stripe.com load.
-    warmStripe()
     // Post-checkout entry refreshes once so the cards reflect the just-paid
     // SO without depending on stale persisted cache.
     try {
@@ -436,6 +431,10 @@
   }
 
   const showOtherPlans = async () => {
+    // Intent to change plan: warm the Stripe SDK while the user browses plans,
+    // so the checkout drawer reuses it. Loads the SDK only — no checkout
+    // session is created here.
+    warmStripe()
     const initialCycle = subscription.isPro.value ? 'yearly' : 'monthly'
     setParam('billingCycle', initialCycle)
     await syncToUrl()
@@ -513,6 +512,9 @@
   }
 
   const openUpgradeToPro = async () => {
+    // Direct upgrade-to-Pro intent: warm the SDK before the checkout drawer
+    // mounts. SDK only — no checkout session created here.
+    warmStripe()
     setParam('billingCycle', 'monthly')
     await syncToUrl()
     trackBilling('upgradeBannerClicked', { location: 'upgrade-card' })

@@ -117,6 +117,7 @@
   const { warmStripe } = useWarmStripe()
   const {
     initialize: initializePlans,
+    plan: chosenPlan,
     billingCycle: storedBillingCycle,
     clear: clearPlans
   } = usePlans()
@@ -291,12 +292,21 @@
     clearPlans()
   })
 
+  // Warm Stripe only once the user actually commits to Pro (the only paid
+  // plan). This pre-loads the SDK while they finish the form, so the checkout
+  // step reuses it — but never fires Stripe for hobby/undecided users, and
+  // never creates a checkout session (warm only loads the SDK). `immediate`
+  // covers arriving with ?plan=pro already selected.
+  watch(
+    chosenPlan,
+    (plan) => {
+      if (plan === 'pro') warmStripe()
+    },
+    { immediate: true }
+  )
+
   onMounted(async () => {
     initializePlans()
-    // Warm Stripe.js while the user fills the additional-data form so the Pro
-    // checkout step (the very next screen) reuses the already-downloaded
-    // client instead of blocking on a cold js.stripe.com load.
-    warmStripe()
     // Cache-aware: uses the existing plans entry when fresh, fetches only
     // when stale/missing. Replaces the previous `refetch()` call that
     // always hit the network.
