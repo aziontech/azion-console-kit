@@ -89,10 +89,7 @@
     </div>
 
     <div
-      :class="[
-        'flex-1 flex flex-col gap-3',
-        showPreview ? 'p-4 md:pl-0 md:pr-4 md:py-4' : 'p-4'
-      ]"
+      :class="['flex-1 flex flex-col gap-3', showPreview ? 'p-4 md:pl-0 md:pr-4 md:py-4' : 'p-4']"
     >
       <slot
         name="info"
@@ -158,12 +155,7 @@
           <span class="text-xs font-normal font-['Proto_Mono'] text-color-muted leading-4">
             resources created
           </span>
-          <div
-            :class="[
-              'flex flex-wrap gap-x-4 gap-y-1.5',
-              showPreview ? 'flex-col gap-2' : ''
-            ]"
-          >
+          <div :class="['flex flex-wrap gap-x-4 gap-y-1.5', showPreview ? 'flex-col gap-2' : '']">
             <div
               v-for="(resource, index) in props.resources"
               :key="index"
