@@ -49,18 +49,25 @@
   const hasPreview = computed(() => {
     return props.previewSrc || (props.templateTitle && props.templateDescription && props.githubUrl)
   })
+
+  // In resourcesOnly mode (DeploySuccessCard) the title/description/github block is hidden,
+  // but the template's preview image should still surface when it was provided.
+  const showPreview = computed(() => {
+    if (props.resourcesOnly) return !!props.previewSrc
+    return hasPreview.value
+  })
 </script>
 
 <template>
   <div
     :class="[
       'bg-[var(--surface-50)] rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden',
-      { '!flex-col': props.resourcesOnly || !hasPreview }
+      { '!flex-col': !showPreview }
     ]"
   >
-    <!-- Preview section: only show if there's an image OR template info exists -->
+    <!-- Preview section: render whenever showPreview is true -->
     <div
-      v-if="hasPreview && !props.resourcesOnly"
+      v-if="showPreview"
       class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center"
     >
       <slot
@@ -84,7 +91,7 @@
     <div
       :class="[
         'flex-1 flex flex-col gap-3',
-        hasPreview && !props.resourcesOnly ? 'p-4 md:pl-0 md:pr-4 md:py-4' : 'p-4'
+        showPreview ? 'p-4 md:pl-0 md:pr-4 md:py-4' : 'p-4'
       ]"
     >
       <slot
@@ -146,7 +153,7 @@
         <!-- Resources Created Section -->
         <div
           v-if="props.resources && props.resources.length > 0"
-          :class="['flex flex-col', !hasPreview || props.resourcesOnly ? 'gap-2' : 'gap-3 pt-2']"
+          :class="['flex flex-col', showPreview ? 'gap-3 pt-2' : 'gap-2']"
         >
           <span class="text-xs font-normal font-['Proto_Mono'] text-color-muted leading-4">
             resources created
@@ -154,7 +161,7 @@
           <div
             :class="[
               'flex flex-wrap gap-x-4 gap-y-1.5',
-              !hasPreview || props.resourcesOnly ? '' : 'flex-col gap-2'
+              showPreview ? 'flex-col gap-2' : ''
             ]"
           >
             <div

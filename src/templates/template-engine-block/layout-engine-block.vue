@@ -686,7 +686,12 @@
       <template #content>
         <div class="p-4 sm:p-6 flex flex-col gap-6">
           <div
-            v-if="props.templateTitle && props.templateDescription && props.githubUrl"
+            v-if="
+              props.previewSrc ||
+              props.templateTitle ||
+              props.templateDescription ||
+              props.githubUrl
+            "
             class="bg-[var(--surface-50)] h-auto md:h-40 rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
           >
             <div class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center">
@@ -756,11 +761,17 @@
                   </div>
                 </div>
 
-                <p class="text-xs text-color-secondary leading-4">
+                <p
+                  v-if="props.templateDescription"
+                  class="text-xs text-color-secondary leading-4"
+                >
                   {{ props.templateDescription }}
                 </p>
 
-                <div class="flex flex-col gap-1.5 mt-auto">
+                <div
+                  v-if="props.githubUrl"
+                  class="flex flex-col gap-1.5 mt-auto"
+                >
                   <span class="text-[10px] text-color-secondary leading-3">Cloning from</span>
                   <div class="flex items-center gap-1">
                     <i class="pi pi-github text-color-secondary text-[14px]" />
