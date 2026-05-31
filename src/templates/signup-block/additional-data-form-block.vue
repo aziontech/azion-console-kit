@@ -169,6 +169,8 @@
     name: 'additional-data-form-block'
   })
 
+  const emit = defineEmits(['plan-change'])
+
   // Fetch plans from API
   const { data: plansData } = usePlansList()
 
@@ -227,6 +229,7 @@
   } = usePlans()
 
   // Local billing cycle state
+  const DEFAULT_BILLING_CYCLE = 'monthly'
   const billingCycle = ref('monthly')
 
   // Plan drawer state
@@ -414,11 +417,12 @@
     billingCycle.value = selectedBillingCycle
     setPlanParam('plan', selectedPlan)
     setPlanParam('billingCycle', selectedBillingCycle)
+    emit('plan-change', { plan: selectedPlan, billingCycle: selectedBillingCycle })
   }
 
   // Pre-fill form fields on mount
   onMounted(async () => {
-    initializePlans()
+    initializePlans({ defaultPlan: 'hobby', defaultBillingCycle: DEFAULT_BILLING_CYCLE })
 
     // Pre-fill plan from URL params/storage
     if (storedPlan.value && ['hobby', 'pro'].includes(storedPlan.value)) {

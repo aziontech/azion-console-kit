@@ -1,13 +1,17 @@
 <template>
-  <div class="w-full max-w-5xl mx-auto bg-surface rounded border surface-border lg:h-[800px]">
-    <div class="flex lg:h-full lg:min-h-0 lg:overflow-hidden flex-col-reverse lg:flex-row">
+  <div class="w-full max-w-5xl mx-auto bg-surface rounded border surface-border">
+    <div class="flex flex-col-reverse lg:flex-row">
       <CheckoutPlanBlock
         ref="planBlockRef"
         :plan="plan"
         :checkoutSessionClientSecret="checkoutSessionClientSecret"
+        :draftServiceOrderId="draftServiceOrderId"
         :getStripeClientService="getStripeClientService"
         @onBack="emit('onBack')"
         @onSubmit="handleSubmit"
+        @payment-element-ready="emit('payment-element-ready')"
+        @stale-session="emit('stale-session', $event)"
+        @checkout-session-prepared="emit('checkout-session-prepared', $event)"
       />
       <CheckoutFeaturesBlock :plan="plan" />
     </div>
@@ -34,10 +38,22 @@
     checkoutSessionClientSecret: {
       type: String,
       default: ''
+    },
+    draftServiceOrderId: {
+      type: [String, Number],
+      default: null
     }
   })
 
-  const emit = defineEmits(['onSuccess', 'onError', 'onBack', 'onSubmit'])
+  const emit = defineEmits([
+    'onSuccess',
+    'onError',
+    'onBack',
+    'onSubmit',
+    'payment-element-ready',
+    'stale-session',
+    'checkout-session-prepared'
+  ])
 
   const isSubmitting = ref(false)
   const showLoading = ref(false)
