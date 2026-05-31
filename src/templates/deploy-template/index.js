@@ -9,7 +9,6 @@
  * - IntersectionObserver triggers the entry animation
  *
  * Components:
- * - BaseDeployCard: Base presentational card with slots (100% stateless)
  * - DeployRepositoryCard: Step 1 - Template selection and git configuration
  * - TemplateSettingsCard: Step 2 - Template settings form
  * - DeployStatusCard: Step 3 - Deploy progress, logs, and results
@@ -31,10 +30,8 @@
  * - Both cards MUST exist in DOM simultaneously - scroll is real, not simulated
  * - Step 2 starts with opacity: 0, animates when IntersectionObserver detects it
  * - Use scrollIntoView({ behavior: 'smooth' }) - no external scroll libraries
- * - BaseDeployCard is 100% presentational - no state, no business logic
  * - Responsive: on mobile, both cards occupy full width, scroll behavior identical
  */
-export { default as BaseDeployCard } from './BaseDeployCard.vue'
 export { default as DeployRepositoryCard } from './DeployRepositoryCard.vue'
 export { default as TemplateSettingsCard } from './TemplateSettingsCard.vue'
 export { default as DeployStatusCard } from './DeployStatusCard.vue'

@@ -5,7 +5,8 @@
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { getScriptRunnerLogsService } from '@/services/script-runner-service'
   import PrimeButton from 'primevue/button'
-  import BaseDeployCard from '../deploy-template/BaseDeployCard.vue'
+  import Skeleton from 'primevue/skeleton'
+  import CardBox from '@aziontech/webkit/content/card-box'
   import TemplateSettingsCard from '../deploy-template/TemplateSettingsCard.vue'
   import DeployStatusCard from '../deploy-template/DeployStatusCard.vue'
   import DeploySuccessCard from '../deploy-template/DeploySuccessCard.vue'
@@ -655,133 +656,129 @@
     </div>
 
     <!-- Skeleton loading state -->
-    <BaseDeployCard
+    <CardBox
       v-if="currentStep !== 'success' && !props.loaded"
       :title="props.title || 'Start from Template'"
-      :loading="true"
-    />
-
-    <BaseDeployCard
-      v-if="currentStep !== 'success' && props.loaded"
-      :title="props.title || 'Start from Template'"
-      :step-index="0"
-      :hide-footer="currentStep !== 'repository'"
     >
       <template #content>
-        <div
-          v-if="props.templateTitle && props.templateDescription && props.githubUrl"
-          class="bg-[var(--surface-50)] h-auto md:h-40 rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
-        >
-          <div class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center">
-            <slot
-              name="preview"
-              :preview-src="props.previewSrc"
-              :preview-alt="props.previewAlt"
-            >
-              <div
-                class="w-full h-40 md:h-48 bg-surface-section l-rounded-lg flex flex-col justify-center items-center overflow-hidden"
-              >
-                <img
-                  v-if="props.previewSrc"
-                  :src="props.previewSrc"
-                  :alt="props.previewAlt || props.templateTitle"
-                  class="w-full h-40 object-cover"
-                />
-              </div>
-            </slot>
+        <div class="p-4 sm:p-6 flex flex-col gap-6">
+          <div class="flex flex-col gap-4">
+            <Skeleton class="h-4 w-full" />
+            <Skeleton class="h-4 w-3/4" />
+            <Skeleton class="h-4 w-5/6" />
           </div>
+          <div class="flex flex-col gap-4">
+            <Skeleton class="h-10 w-full" />
+            <Skeleton class="h-10 w-2/3" />
+          </div>
+        </div>
+      </template>
+    </CardBox>
 
-          <div class="flex-1 py-4 px-4 md:pl-0 md:pr-4 flex flex-col gap-3">
-            <slot
-              name="info"
-              :template-title="props.templateTitle"
-              :template-url="props.templateUrl"
-              :template-icon="props.templateIcon"
-              :template-description="props.templateDescription"
-              :github-url="props.githubUrl"
-            >
-              <div
-                v-if="props.templateTitle"
-                class="flex items-center gap-2.5"
+    <CardBox
+      v-if="currentStep !== 'success' && props.loaded"
+      :title="props.title || 'Start from Template'"
+      :class="{
+        '[&>footer]:hidden':
+          currentStep !== 'repository' || (!showNextButton && !$slots['footer-actions'])
+      }"
+    >
+      <template #content>
+        <div class="p-4 sm:p-6 flex flex-col gap-6">
+          <div
+            v-if="props.templateTitle && props.templateDescription && props.githubUrl"
+            class="bg-[var(--surface-50)] h-auto md:h-40 rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
+          >
+            <div class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center">
+              <slot
+                name="preview"
+                :preview-src="props.previewSrc"
+                :preview-alt="props.previewAlt"
               >
-                <img
-                  v-if="props.templateIcon"
-                  class="w-7 h-7 rounded"
-                  :src="props.templateIcon"
-                  alt=""
-                />
-                <div class="flex-1 flex items-center gap-1.5">
-                  <div class="flex-1 flex flex-col justify-center gap-1">
-                    <div class="flex items-center gap-1.5">
-                      <a
-                        v-if="props.templateUrl"
-                        :href="props.templateUrl"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-sm font-semibold text-color transition-colors line-clamp-1"
-                      >
-                        {{ props.templateTitle }}
-                      </a>
-                      <span
-                        v-else
-                        class="text-sm font-semibold text-color line-clamp-1"
-                      >
-                        {{ props.templateTitle }}
-                      </span>
-                      <div v-if="props.templateUrl">
-                        <i
-                          @click="openPreviewTempalte"
-                          class="pi pi-external-link text-sm cursor-pointer text-color-secondary"
-                        />
+                <div
+                  class="w-full h-40 md:h-48 bg-surface-section l-rounded-lg flex flex-col justify-center items-center overflow-hidden"
+                >
+                  <img
+                    v-if="props.previewSrc"
+                    :src="props.previewSrc"
+                    :alt="props.previewAlt || props.templateTitle"
+                    class="w-full h-40 object-cover"
+                  />
+                </div>
+              </slot>
+            </div>
+
+            <div class="flex-1 py-4 px-4 md:pl-0 md:pr-4 flex flex-col gap-3">
+              <slot
+                name="info"
+                :template-title="props.templateTitle"
+                :template-url="props.templateUrl"
+                :template-icon="props.templateIcon"
+                :template-description="props.templateDescription"
+                :github-url="props.githubUrl"
+              >
+                <div
+                  v-if="props.templateTitle"
+                  class="flex items-center gap-2.5"
+                >
+                  <img
+                    v-if="props.templateIcon"
+                    class="w-7 h-7 rounded"
+                    :src="props.templateIcon"
+                    alt=""
+                  />
+                  <div class="flex-1 flex items-center gap-1.5">
+                    <div class="flex-1 flex flex-col justify-center gap-1">
+                      <div class="flex items-center gap-1.5">
+                        <a
+                          v-if="props.templateUrl"
+                          :href="props.templateUrl"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="text-sm font-semibold text-color transition-colors line-clamp-1"
+                        >
+                          {{ props.templateTitle }}
+                        </a>
+                        <span
+                          v-else
+                          class="text-sm font-semibold text-color line-clamp-1"
+                        >
+                          {{ props.templateTitle }}
+                        </span>
+                        <div v-if="props.templateUrl">
+                          <i
+                            @click="openPreviewTempalte"
+                            class="pi pi-external-link text-sm cursor-pointer text-color-secondary"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <p class="text-xs text-color-secondary leading-4">
-                {{ props.templateDescription }}
-              </p>
+                <p class="text-xs text-color-secondary leading-4">
+                  {{ props.templateDescription }}
+                </p>
 
-              <div class="flex flex-col gap-1.5 mt-auto">
-                <span class="text-[10px] text-color-secondary leading-3">Cloning from</span>
-                <div class="flex items-center gap-1">
-                  <i class="pi pi-github text-color-secondary text-[14px]" />
-                  <span
-                    class="text-[10px] text-color-secondary leading-3 line-clamp-3 cursor-pointer"
-                    @click="openGitHub"
-                  >
-                    {{ props.githubUrl }}
-                  </span>
+                <div class="flex flex-col gap-1.5 mt-auto">
+                  <span class="text-[10px] text-color-secondary leading-3">Cloning from</span>
+                  <div class="flex items-center gap-1">
+                    <i class="pi pi-github text-color-secondary text-[14px]" />
+                    <span
+                      class="text-[10px] text-color-secondary leading-3 line-clamp-3 cursor-pointer"
+                      @click="openGitHub"
+                    >
+                      {{ props.githubUrl }}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </slot>
+              </slot>
+            </div>
           </div>
-        </div>
 
-        <slot
-          v-if="currentStep === 'repository' || isWaitingTemplateInfo"
-          name="github-connection"
-          :has-integrations-list="hasIntegrationsList"
-          :list-of-integrations="listOfIntegrations"
-          :is-integrations-loading="isIntegrationsLoading"
-          :oauth-github-ref="oauthGithubRef"
-          :trigger-connect-with-github="triggerConnectWithGithub"
-          :set-callback-url="setCallbackUrl"
-          :vcs-integration-field-name="vcsIntegrationFieldName"
-          :disabled="shouldDisableRepositoryInputs"
-        />
-
-        <div
-          v-if="(currentStep === 'repository' || isWaitingTemplateInfo) && $slots.inputs"
-          class="flex flex-col gap-4"
-        >
           <slot
-            name="inputs"
-            :schema="props.schema"
-            :is-drawer="props.isDrawer"
-            :form-data="formData"
-            :form-errors="formErrors"
+            v-if="currentStep === 'repository' || isWaitingTemplateInfo"
+            name="github-connection"
             :has-integrations-list="hasIntegrationsList"
             :list-of-integrations="listOfIntegrations"
             :is-integrations-loading="isIntegrationsLoading"
@@ -791,23 +788,41 @@
             :vcs-integration-field-name="vcsIntegrationFieldName"
             :disabled="shouldDisableRepositoryInputs"
           />
-        </div>
 
-        <slot
-          v-if="currentStep === 'repository' || isWaitingTemplateInfo"
-          name="form-content"
-          :schema="props.schema"
-          :is-drawer="props.isDrawer"
-          :form-data="formData"
-          :form-errors="formErrors"
-          :disabled="shouldDisableRepositoryInputs"
-        />
+          <div
+            v-if="(currentStep === 'repository' || isWaitingTemplateInfo) && $slots.inputs"
+            class="flex flex-col gap-4"
+          >
+            <slot
+              name="inputs"
+              :schema="props.schema"
+              :is-drawer="props.isDrawer"
+              :form-data="formData"
+              :form-errors="formErrors"
+              :has-integrations-list="hasIntegrationsList"
+              :list-of-integrations="listOfIntegrations"
+              :is-integrations-loading="isIntegrationsLoading"
+              :oauth-github-ref="oauthGithubRef"
+              :trigger-connect-with-github="triggerConnectWithGithub"
+              :set-callback-url="setCallbackUrl"
+              :vcs-integration-field-name="vcsIntegrationFieldName"
+              :disabled="shouldDisableRepositoryInputs"
+            />
+          </div>
+
+          <slot
+            v-if="currentStep === 'repository' || isWaitingTemplateInfo"
+            name="form-content"
+            :schema="props.schema"
+            :is-drawer="props.isDrawer"
+            :form-data="formData"
+            :form-errors="formErrors"
+            :disabled="shouldDisableRepositoryInputs"
+          />
+        </div>
       </template>
 
-      <template
-        v-if="currentStep === 'repository' && (showNextButton || $slots['footer-actions'])"
-        #footer
-      >
+      <template #footer>
         <slot name="footer-actions">
           <!-- Next button: shown when hasSettings is true -->
           <PrimeButton
@@ -831,7 +846,7 @@
           />
         </slot>
       </template>
-    </BaseDeployCard>
+    </CardBox>
 
     <!-- Only render TemplateSettingsCard when hasSettings is true -->
     <div

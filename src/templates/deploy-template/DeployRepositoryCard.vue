@@ -3,7 +3,7 @@
   import { useToast } from 'primevue/usetoast'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import PrimeButton from 'primevue/button'
-  import BaseDeployCard from './BaseDeployCard.vue'
+  import CardBox from '@aziontech/webkit/content/card-box'
   import TemplateInfoBlock from './TemplateInfoBlock.vue'
 
   const props = defineProps({
@@ -169,82 +169,81 @@
 </script>
 
 <template>
-  <BaseDeployCard
+  <CardBox
     title="Start from Template"
-    :hide-footer="props.collapsed"
+    :class="{ '[&>footer]:hidden': props.collapsed }"
   >
     <template #content>
-      <TemplateInfoBlock
-        :preview-src="props.imagePreview"
-        :preview-alt="props.previewAlt"
-        :template-title="props.templateTitle"
-        :template-url="props.templateUrl"
-        :template-description="props.templateDescription"
-        :github-url="props.githubUrl"
-      >
-        <template #preview="slotProps">
-          <slot
-            name="preview"
-            v-bind="slotProps"
-          />
-        </template>
+      <div class="p-4 sm:p-6 flex flex-col gap-6">
+        <TemplateInfoBlock
+          :preview-src="props.imagePreview"
+          :preview-alt="props.previewAlt"
+          :template-title="props.templateTitle"
+          :template-url="props.templateUrl"
+          :template-description="props.templateDescription"
+          :github-url="props.githubUrl"
+        >
+          <template #preview="slotProps">
+            <slot
+              name="preview"
+              v-bind="slotProps"
+            />
+          </template>
 
-        <template #info="slotProps">
-          <slot
-            name="info"
-            v-bind="slotProps"
-          />
-        </template>
-      </TemplateInfoBlock>
+          <template #info="slotProps">
+            <slot
+              name="info"
+              v-bind="slotProps"
+            />
+          </template>
+        </TemplateInfoBlock>
 
-      <div
-        v-if="!props.collapsed"
-        class="text-xs text-color-secondary leading-4"
-      >
-        Configure your Git repository to integrate your codebase and automate deployments directly
-        from your version control system.
-      </div>
+        <div
+          v-if="!props.collapsed"
+          class="text-xs text-color-secondary leading-4"
+        >
+          Configure your Git repository to integrate your codebase and automate deployments directly
+          from your version control system.
+        </div>
 
-      <slot
-        v-if="!props.collapsed"
-        name="github-connection"
-        :has-integrations-list="hasIntegrationsList"
-        :list-of-integrations="listOfIntegrations"
-        :is-integrations-loading="isIntegrationsLoading"
-        :oauth-github-ref="oauthGithubRef"
-        :trigger-connect-with-github="triggerConnectWithGithub"
-        :set-callback-url="setCallbackUrl"
-        :vcs-integration-field-name="vcsIntegrationFieldName"
-      />
-
-      <div
-        v-if="!props.collapsed && $slots.inputs"
-        class="flex flex-col gap-4"
-      >
         <slot
-          name="inputs"
+          v-if="!props.collapsed"
+          name="github-connection"
+          :has-integrations-list="hasIntegrationsList"
+          :list-of-integrations="listOfIntegrations"
+          :is-integrations-loading="isIntegrationsLoading"
+          :oauth-github-ref="oauthGithubRef"
+          :trigger-connect-with-github="triggerConnectWithGithub"
+          :set-callback-url="setCallbackUrl"
+          :vcs-integration-field-name="vcsIntegrationFieldName"
+        />
+
+        <div
+          v-if="!props.collapsed && $slots.inputs"
+          class="flex flex-col gap-4"
+        >
+          <slot
+            name="inputs"
+            :schema="props.schema"
+            :is-drawer="props.isDrawer"
+            :form-data="formData"
+            :form-errors="formErrors"
+          />
+        </div>
+
+        <slot
+          v-if="!props.collapsed"
+          name="form-content"
           :schema="props.schema"
           :is-drawer="props.isDrawer"
           :form-data="formData"
           :form-errors="formErrors"
         />
       </div>
-
-      <slot
-        v-if="!props.collapsed"
-        name="form-content"
-        :schema="props.schema"
-        :is-drawer="props.isDrawer"
-        :form-data="formData"
-        :form-errors="formErrors"
-      />
     </template>
 
     <template #footer>
-      <slot
-        name="footer-actions"
-        v-if="!props.collapsed"
-      >
+      <slot name="footer-actions">
         <PrimeButton
           type="button"
           class="w-full flex-row-reverse"
@@ -256,5 +255,5 @@
         />
       </slot>
     </template>
-  </BaseDeployCard>
+  </CardBox>
 </template>

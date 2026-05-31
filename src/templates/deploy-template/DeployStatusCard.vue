@@ -1,6 +1,6 @@
 <script setup>
   import { computed, onUnmounted, ref, watch } from 'vue'
-  import BaseDeployCard from './BaseDeployCard.vue'
+  import CardBox from '@aziontech/webkit/content/card-box'
   import ScriptRunnerBlock from '@/templates/script-runner-block'
 
   const props = defineProps({
@@ -160,25 +160,28 @@
 
 <template>
   <div class="flex flex-col w-full gap-8">
-    <BaseDeployCard
-      title="Deployment"
-      :hide-footer="true"
-    >
-      <template #header-right>
-        <span v-if="isUnfinished">
+    <CardBox title="Deployment">
+      <template #header>
+        <h2 class="text-label-md text-[var(--text-default)]">Deployment</h2>
+        <span
+          v-if="isUnfinished"
+          class="ml-auto text-sm font-normal text-color-secondary"
+        >
           {{ elapsedTime }}
         </span>
       </template>
 
       <template #content>
-        <ScriptRunnerBlock
-          title="Deployment Logs"
-          :getLogsService="props.getLogsService"
-          :executionId="props.executionId"
-          :start="props.deployStarted"
-          @onFinish.once="handleFinish"
-        />
+        <div class="p-4 sm:p-6 flex flex-col gap-6">
+          <ScriptRunnerBlock
+            title="Deployment Logs"
+            :getLogsService="props.getLogsService"
+            :executionId="props.executionId"
+            :start="props.deployStarted"
+            @onFinish.once="handleFinish"
+          />
+        </div>
       </template>
-    </BaseDeployCard>
+    </CardBox>
   </div>
 </template>

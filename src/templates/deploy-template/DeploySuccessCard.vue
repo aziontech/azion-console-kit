@@ -7,7 +7,7 @@
   import PrimeButton from 'primevue/button'
   import { useRouter } from 'vue-router'
 
-  import BaseDeployCard from './BaseDeployCard.vue'
+  import CardBox from '@aziontech/webkit/content/card-box'
   import TemplateInfoBlock from './TemplateInfoBlock.vue'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import LabelBlock from '@aziontech/webkit/label'
@@ -344,225 +344,221 @@
 </script>
 
 <template>
-  <BaseDeployCard
-    title="Deployment Successful"
-    :hide-footer="true"
-  >
+  <CardBox title="Deployment Successful">
     <template #content>
-      <p class="text-sm text-color-secondary leading-5">
-        Your application is being distributed, in few minutes, the application will be available on
+      <div class="p-4 sm:p-6 flex flex-col gap-6">
+        <p class="text-sm text-color-secondary leading-5">
+          Your application is being distributed, in few minutes, the application will be available
+          on
 
-        <a
-          :href="props.appUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-[var(--text-color-link)] text-xs inline-flex items-center gap-1"
-        >
-          <span class="hover:underline">{{ appUrlDisplay }}</span>
-          <i class="pi pi-external-link text-xs !no-underline" />
-        </a>
-      </p>
-
-      <TemplateInfoBlock
-        :preview-src="props.previewSrc"
-        :preview-alt="props.previewAlt"
-        :resources="resourcesCreated"
-        resources-only
-      />
-
-      <div class="flex flex-col gap-3">
-        <span class="text-sm font-semibold text-color">Additional Settings</span>
-        <Accordion>
-          <AccordionTab
-            :pt="{
-              header: { class: 'bg-[var(--surface-ground)]' },
-              headerAction: {
-                class: 'bg-[var(--surface-ground)] hover:opacity-100 focus:shadow-none'
-              },
-              content: { class: '!p-0 bg-[var(--surface-section)]' }
-            }"
+          <a
+            :href="props.appUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-[var(--text-color-link)] text-xs inline-flex items-center gap-1"
           >
-            <template #header>
-              <div class="flex items-center gap-2">
-                <i class="pi pi-globe" />
-                <span>Customize Domain</span>
-              </div>
-            </template>
-            <div class="flex flex-col gap-4 p-4">
-              <div
-                v-if="isLoadingWorkload"
-                class="flex items-center justify-center py-4"
-              >
-                <i class="pi pi-spin pi-spinner text-2xl text-primary" />
-              </div>
-              <template v-else>
-                <div class="flex flex-col gap-2">
-                  <LabelBlock label="Domain" />
-                  <div
-                    v-for="(domain, index) in domains"
-                    :key="index"
-                    class="flex flex-col sm:flex-row gap-2 w-full"
-                  >
-                    <div class="flex flex-col w-full gap-2">
-                      <FieldDropdown
-                        editable
-                        :focusOnHover="false"
-                        :name="`domains[${index}].domain`"
-                        :options="domainsOptions"
-                        optionLabel="label"
-                        optionValue="label"
-                        placeholder="example.com"
-                        emptyMessage="No domains available"
-                        :value="domain.domain"
-                        :class="{ 'p-invalid': domainsErrorMessage && domainsMeta.touched }"
-                        @change="updateDomainValue(index, $event.value)"
-                        data-testid="domains-form__domain-dropdown"
+            <span class="hover:underline">{{ appUrlDisplay }}</span>
+            <i class="pi pi-external-link text-xs !no-underline" />
+          </a>
+        </p>
+
+        <TemplateInfoBlock
+          :preview-src="props.previewSrc"
+          :preview-alt="props.previewAlt"
+          :resources="resourcesCreated"
+          resources-only
+        />
+
+        <div class="flex flex-col gap-3">
+          <span class="text-sm font-semibold text-color">Additional Settings</span>
+          <Accordion>
+            <AccordionTab
+              :pt="{
+                header: { class: 'bg-[var(--surface-ground)]' },
+                headerAction: {
+                  class: 'bg-[var(--surface-ground)] hover:opacity-100 focus:shadow-none'
+                },
+                content: { class: '!p-0 bg-[var(--surface-section)]' }
+              }"
+            >
+              <template #header>
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-globe" />
+                  <span>Customize Domain</span>
+                </div>
+              </template>
+              <div class="flex flex-col gap-4 p-4">
+                <div
+                  v-if="isLoadingWorkload"
+                  class="flex items-center justify-center py-4"
+                >
+                  <i class="pi pi-spin pi-spinner text-2xl text-primary" />
+                </div>
+                <template v-else>
+                  <div class="flex flex-col gap-2">
+                    <LabelBlock label="Domain" />
+                    <div
+                      v-for="(domain, index) in domains"
+                      :key="index"
+                      class="flex flex-col sm:flex-row gap-2 w-full"
+                    >
+                      <div class="flex flex-col w-full gap-2">
+                        <FieldDropdown
+                          editable
+                          :focusOnHover="false"
+                          :name="`domains[${index}].domain`"
+                          :options="domainsOptions"
+                          optionLabel="label"
+                          optionValue="label"
+                          placeholder="example.com"
+                          emptyMessage="No domains available"
+                          :value="domain.domain"
+                          :class="{ 'p-invalid': domainsErrorMessage && domainsMeta.touched }"
+                          @change="updateDomainValue(index, $event.value)"
+                          data-testid="domains-form__domain-dropdown"
+                        />
+                        <small
+                          class="text-xs text-color-secondary font-normal leading-5 -mt-1"
+                          v-if="!index"
+                        >
+                          Type your domain or select from Edge DNS.
+                        </small>
+                      </div>
+
+                      <PrimeButton
+                        v-if="hasMultipleDomains"
+                        :class="{ 'mb-6': !index }"
+                        @click="removeDomain(index)"
+                        icon="pi pi-trash"
+                        class="p-button-outlined p-button-sm p-button-danger self-end"
+                        data-testid="domains-form__remove-domain-button"
+                        title="Remove domain"
                       />
-                      <small
-                        class="text-xs text-color-secondary font-normal leading-5 -mt-1"
-                        v-if="!index"
-                      >
-                        Type your domain or select from Edge DNS.
-                      </small>
                     </div>
 
+                    <small
+                      v-if="domainsErrorMessage && domainsMeta.touched"
+                      class="p-error text-xs font-normal leading-tight"
+                    >
+                      {{ domainsErrorMessage }}
+                    </small>
+                  </div>
+
+                  <div class="flex mt-1">
                     <PrimeButton
-                      v-if="hasMultipleDomains"
-                      :class="{ 'mb-6': !index }"
-                      @click="removeDomain(index)"
-                      icon="pi pi-trash"
-                      class="p-button-outlined p-button-sm p-button-danger self-end"
-                      data-testid="domains-form__remove-domain-button"
-                      title="Remove domain"
+                      @click="addNewDomain"
+                      label="Add Another"
+                      icon="pi pi-plus-circle"
+                      outlined
+                      size="small"
+                      data-testid="domains-form__add-domain-button"
+                      title="Add Another"
                     />
                   </div>
 
-                  <small
-                    v-if="domainsErrorMessage && domainsMeta.touched"
-                    class="p-error text-xs font-normal leading-tight"
-                  >
-                    {{ domainsErrorMessage }}
-                  </small>
-                </div>
-
-                <div class="flex mt-1">
-                  <PrimeButton
-                    @click="addNewDomain"
-                    label="Add Another"
-                    icon="pi pi-plus-circle"
-                    outlined
-                    size="small"
-                    data-testid="domains-form__add-domain-button"
-                    title="Add Another"
+                  <FieldSwitchBlock
+                    nameField="useCustomDomain"
+                    name="useCustomDomain"
+                    auto
+                    title="Custom Domain"
+                    subtitle="You can use an free azion.app domain."
+                    :isCard="false"
                   />
-                </div>
 
-                <FieldSwitchBlock
-                  nameField="useCustomDomain"
-                  name="useCustomDomain"
-                  auto
-                  title="Custom Domain"
-                  subtitle="You can use an free azion.app domain."
-                  :isCard="false"
-                />
-
-                <div
-                  v-if="useCustomDomain"
-                  class="flex w-full gap-2 flex-col"
-                >
-                  <div class="flex flex-col w-full gap-2">
-                    <FieldInputGroup
-                      placeholder="my-custom-name"
-                      label="Azion Custom Domain"
-                      required
-                      :value="customDomain"
-                      name="customDomain"
-                      data-testid="workload-custom-domain-field"
-                    >
-                      <template #button>
-                        <PrimeButton
-                          label=".azion.app"
-                          size="small"
-                          class="rounded-md rounded-l-none select-none focus:outline-none focus:ring-0"
-                          outlined
-                        />
-                      </template>
-                    </FieldInputGroup>
+                  <div
+                    v-if="useCustomDomain"
+                    class="flex w-full gap-2 flex-col"
+                  >
+                    <div class="flex flex-col w-full gap-2">
+                      <FieldInputGroup
+                        placeholder="my-custom-name"
+                        label="Azion Custom Domain"
+                        required
+                        :value="customDomain"
+                        name="customDomain"
+                        data-testid="workload-custom-domain-field"
+                      >
+                        <template #button>
+                          <PrimeButton
+                            label=".azion.app"
+                            size="small"
+                            class="rounded-md rounded-l-none select-none focus:outline-none focus:ring-0"
+                            outlined
+                          />
+                        </template>
+                      </FieldInputGroup>
+                    </div>
                   </div>
-                </div>
 
-                <FieldSwitchBlock
-                  nameField="workloadHostnameAllowAccess"
-                  name="workloadHostnameAllowAccess"
-                  auto
-                  title="Workload Domain Allow Access"
-                  subtitle="Allow direct access to the default Workload domain generated after Workload creation (e.g id.map.azionedge.net)."
-                  :isCard="false"
+                  <FieldSwitchBlock
+                    nameField="workloadHostnameAllowAccess"
+                    name="workloadHostnameAllowAccess"
+                    auto
+                    title="Workload Domain Allow Access"
+                    subtitle="Allow direct access to the default Workload domain generated after Workload creation (e.g id.map.azionedge.net)."
+                    :isCard="false"
+                  />
+                </template>
+              </div>
+              <div class="bg-[var(--surface-ground)] h-16 p-4 flex justify-end rounded-b-md">
+                <PrimeButton
+                  severity="primary"
+                  label="Save"
+                  @click="onSubmit"
+                  icon-pos="right"
+                  class="max-md:w-full md:min-w-[5rem]"
+                  :icon="saveButtonIcon"
+                  :disabled="isSaving"
                 />
-              </template>
-            </div>
-            <div class="bg-[var(--surface-ground)] h-16 p-4 flex justify-end rounded-b-md">
-              <PrimeButton
-                severity="primary"
-                label="Save"
-                @click="onSubmit"
-                icon-pos="right"
-                class="max-md:w-full md:min-w-[5rem]"
-                :icon="saveButtonIcon"
-                :disabled="isSaving"
-              />
-            </div>
-          </AccordionTab>
-        </Accordion>
-      </div>
+              </div>
+            </AccordionTab>
+          </Accordion>
+        </div>
 
-      <div
-        v-if="nextSteps.length > 0"
-        class="flex flex-col gap-3"
-      >
-        <span class="text-sm font-semibold text-color">Next Steps</span>
-        <div class="flex flex-col gap-2">
-          <a
-            v-for="(step, index) in nextSteps"
-            :key="index"
-            :href="step.href"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="min-h-11 py-2 rounded-md border surface-border bg-[var(--surface-ground)] flex items-center px-3 cursor-pointer hover:border-surface transition-colors gap-2 no-underline"
-          >
-            <div
-              class="p-1.5 bg-[var(--surface-100)] rounded shrink-0 flex items-center justify-center"
+        <div
+          v-if="nextSteps.length > 0"
+          class="flex flex-col gap-3"
+        >
+          <span class="text-sm font-semibold text-color">Next Steps</span>
+          <div class="flex flex-col gap-2">
+            <a
+              v-for="(step, index) in nextSteps"
+              :key="index"
+              :href="step.href"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="min-h-11 py-2 rounded-md border surface-border bg-[var(--surface-ground)] flex items-center px-3 cursor-pointer hover:border-surface transition-colors gap-2 no-underline"
             >
-              <i
-                v-if="step.icon && step.icon.startsWith('pi-')"
-                :class="['pi', step.icon, 'w-3.5 h-3.5 text-color']"
-              />
-              <img
-                v-else-if="step.icon"
-                :src="step.icon"
-                :alt="step.label"
-                class="w-3.5 h-3.5"
-              />
-            </div>
+              <div
+                class="p-1.5 bg-[var(--surface-100)] rounded shrink-0 flex items-center justify-center"
+              >
+                <i
+                  v-if="step.icon && step.icon.startsWith('pi-')"
+                  :class="['pi', step.icon, 'w-3.5 h-3.5 text-color']"
+                />
+                <img
+                  v-else-if="step.icon"
+                  :src="step.icon"
+                  :alt="step.label"
+                  class="w-3.5 h-3.5"
+                />
+              </div>
 
-            <span
-              class="flex-1 min-w-0 text-xs font-semibold font-['Sora'] leading-7 text-color truncate"
-            >
-              {{ step.label }}
-            </span>
+              <span
+                class="flex-1 min-w-0 text-xs font-semibold font-['Sora'] leading-7 text-color truncate"
+              >
+                {{ step.label }}
+              </span>
 
-            <div
-              class="w-8 h-8 rounded-md shrink-0 flex items-center justify-center hover:bg-[var(--surface-100)] transition-colors"
-            >
-              <i class="pi pi-chevron-right w-3.5 h-3.5 text-color-secondary" />
-            </div>
-          </a>
+              <div
+                class="w-8 h-8 rounded-md shrink-0 flex items-center justify-center hover:bg-[var(--surface-100)] transition-colors"
+              >
+                <i class="pi pi-chevron-right w-3.5 h-3.5 text-color-secondary" />
+              </div>
+            </a>
+          </div>
         </div>
       </div>
     </template>
-
-    <template #footer>
-      <slot name="footer"> </slot>
-    </template>
-  </BaseDeployCard>
+  </CardBox>
 </template>

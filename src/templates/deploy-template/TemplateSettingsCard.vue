@@ -1,6 +1,6 @@
 <script setup>
   import PrimeButton from 'primevue/button'
-  import BaseDeployCard from './BaseDeployCard.vue'
+  import CardBox from '@aziontech/webkit/content/card-box'
 
   const props = defineProps({
     // Preview for header-meta (compact summary from step 1)
@@ -52,14 +52,16 @@
 </script>
 
 <template>
-  <BaseDeployCard
+  <CardBox
     title="Template Settings"
-    :hide-footer="props.hideFooter"
+    :class="{ '[&>footer]:hidden': props.hideFooter }"
   >
     <template #content>
-      <slot name="form">
-        <div class="flex flex-col gap-6"></div>
-      </slot>
+      <div class="p-4 sm:p-6 flex flex-col gap-6">
+        <slot name="form">
+          <div class="flex flex-col gap-6"></div>
+        </slot>
+      </div>
     </template>
 
     <template #footer>
@@ -75,5 +77,5 @@
         />
       </slot>
     </template>
-  </BaseDeployCard>
+  </CardBox>
 </template>

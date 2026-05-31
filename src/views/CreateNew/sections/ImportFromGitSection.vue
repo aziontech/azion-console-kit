@@ -5,7 +5,7 @@
   import InputText from 'primevue/inputtext'
   import PrimeButton from 'primevue/button'
   import Skeleton from 'primevue/skeleton'
-  import BaseDeployCard from '@/templates/deploy-template/BaseDeployCard.vue'
+  import CardBox from '@aziontech/webkit/content/card-box'
   import { useVcsOAuth } from '@/composables/useVcsOAuth'
   import { solutionService } from '@/services/v2/marketplace/solution-service'
   import { useAccountStore } from '@/stores/account'
@@ -534,46 +534,64 @@
     </div>
 
     <!-- Recommended Templates Card -->
-    <BaseDeployCard
+    <CardBox
       title="Recomended Templates"
-      title-size="text-sm"
-      class="flex-1 min-w-0"
-      :loading="isLoading"
-      backgroudcontent="bg-[var(--surface-100)]"
+      :class="['flex-1 min-w-0', { '[&>footer]:hidden': isLoading }]"
     >
-      <template #content>
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 3xl:grid-cols-3 gap-2.5"
-        >
-          <article
-            v-for="template in limitedTemplates"
-            :key="template.id"
-            class="p-3 sm:p-4 bg-[var(--surface-50)] rounded border surface-border cursor-pointer transition-all duration-200 hover:border-link hover:surface-100 hover:shadow-md"
-            @click="handleTemplateSelect(template)"
+      <template
+        v-if="isLoading"
+        #content
+      >
+        <div class="p-4 sm:p-6 flex flex-col gap-6">
+          <div class="flex flex-col gap-4">
+            <Skeleton class="h-4 w-full" />
+            <Skeleton class="h-4 w-3/4" />
+            <Skeleton class="h-4 w-5/6" />
+          </div>
+          <div class="flex flex-col gap-4">
+            <Skeleton class="h-10 w-full" />
+            <Skeleton class="h-10 w-2/3" />
+          </div>
+        </div>
+      </template>
+      <template
+        v-else
+        #content
+      >
+        <div class="p-4 sm:p-6 flex flex-col gap-6">
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 3xl:grid-cols-3 gap-2.5"
           >
-            <div class="flex flex-col gap-3 sm:gap-4">
-              <img
-                v-if="template.vendor.icon"
-                :src="template.vendor.icon"
-                :alt="template.vendor.name"
-                class="w-8 h-8 sm:w-9 sm:h-9 rounded-sm object-cover"
-              />
-              <div
-                v-else
-                class="w-8 h-8 sm:w-9 sm:h-9 rounded-sm surface-200 flex items-center justify-center text-xs font-semibold text-color-secondary"
-              >
-                {{ template.name?.charAt(0)?.toUpperCase() || 'T' }}
+            <article
+              v-for="template in limitedTemplates"
+              :key="template.id"
+              class="p-3 sm:p-4 bg-[var(--surface-50)] rounded border surface-border cursor-pointer transition-all duration-200 hover:border-link hover:surface-100 hover:shadow-md"
+              @click="handleTemplateSelect(template)"
+            >
+              <div class="flex flex-col gap-3 sm:gap-4">
+                <img
+                  v-if="template.vendor.icon"
+                  :src="template.vendor.icon"
+                  :alt="template.vendor.name"
+                  class="w-8 h-8 sm:w-9 sm:h-9 rounded-sm object-cover"
+                />
+                <div
+                  v-else
+                  class="w-8 h-8 sm:w-9 sm:h-9 rounded-sm surface-200 flex items-center justify-center text-xs font-semibold text-color-secondary"
+                >
+                  {{ template.name?.charAt(0)?.toUpperCase() || 'T' }}
+                </div>
+                <div class="flex flex-col gap-1.5 sm:gap-2">
+                  <h4 class="text-xs font-semibold text-color leading-3">
+                    {{ template.name }}
+                  </h4>
+                  <p class="text-xs text-color-secondary leading-4 line-clamp-2">
+                    {{ template.headline }}
+                  </p>
+                </div>
               </div>
-              <div class="flex flex-col gap-1.5 sm:gap-2">
-                <h4 class="text-xs font-semibold text-color leading-3">
-                  {{ template.name }}
-                </h4>
-                <p class="text-xs text-color-secondary leading-4 line-clamp-2">
-                  {{ template.headline }}
-                </p>
-              </div>
-            </div>
-          </article>
+            </article>
+          </div>
         </div>
       </template>
       <template #footer>
@@ -586,7 +604,7 @@
           @click="handleViewAllTemplates"
         />
       </template>
-    </BaseDeployCard>
+    </CardBox>
   </div>
 </template>
 
