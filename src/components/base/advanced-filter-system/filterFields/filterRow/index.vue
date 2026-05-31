@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-  import { computed, defineModel, ref, watch } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import { FIELDS_MAPPING } from '@/components/base/filterFields/filterRow/component'

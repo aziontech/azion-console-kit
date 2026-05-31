@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, defineModel, onMounted } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
   import Calendar from '@aziontech/webkit/calendar'
   import Dropdown from '@aziontech/webkit/dropdown'

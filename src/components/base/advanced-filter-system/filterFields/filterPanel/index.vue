@@ -117,7 +117,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, defineModel } from 'vue'
+  import { ref, computed } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
   import InputText from '@aziontech/webkit/inputtext'
   import FilterRow from '../filterRow/index.vue'
