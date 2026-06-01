@@ -125,7 +125,7 @@
       >
         <template #header-actions>
           <Button
-            size="medium"
+            size="small"
             icon="pi pi-plus"
             label="Service"
             @click="openCreateServiceDrawer"
@@ -143,7 +143,7 @@
       <template #default>
         <Button
           kind="secondary"
-          size="medium"
+          size="small"
           icon="pi pi-plus"
           label="Service"
           @click="openCreateServiceDrawer"
