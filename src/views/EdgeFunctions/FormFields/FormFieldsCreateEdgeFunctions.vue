@@ -3,7 +3,7 @@
   import { useField } from 'vee-validate'
   import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import { useResize } from '@/composables/useResize'
@@ -360,21 +360,21 @@
                   class="flex flex-col items-center justify-center h-full gap-2"
                 >
                   <p>Configure the form builder.</p>
-                  <PrimeButton
-                    outlined
+                  <Button
+                    kind="outlined"
                     @click="azionJsonFormWindowOpener()"
                     label="Read documentation"
                     size="small"
                   />
                 </div>
                 <div class="absolute right-2.5 bottom-2 surface-section">
-                  <PrimeButton
+                  <Button
+                    kind="primary"
                     size="small"
                     label="Remove Form"
                     icon="pi pi-times"
-                    outlined
-                    severity="danger"
                     @click="resetFormBuilder"
+                    class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
                   />
                 </div>
               </div>

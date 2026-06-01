@@ -2,7 +2,7 @@
   import { ref, computed, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import PrimeMenu from '@aziontech/webkit/menu'
-  import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import TEXT_DOMAIN_WORKLOAD from '@/helpers/handle-text-workload-domain-flag'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { deleteDomainService } from '@/services/domains-services'
@@ -558,11 +558,12 @@
     <div class="flex gap-3 items-center h-7">
       <span class="text-base font-semibold">Resources</span>
       <div class="relative">
-        <PrimeButton
+        <IconButton
+          kind="transparent"
+          size="medium"
           icon="ai ai-filter-alt"
-          severity="secondary"
-          text
           @click="toggleFilterMenu"
+          aria-label="button"
         />
         <PrimeMenu
           ref="filterMenu"

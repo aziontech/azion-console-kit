@@ -3,7 +3,8 @@
   import DiscordLogo from '@assets/svg/discord-logo'
   import { useHelperCenter } from '@/composables/use-helper-center'
   import { useLayout } from '@/composables/use-layout'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import InputText from '@aziontech/webkit/inputtext'
   import PrimeMenu from '@aziontech/webkit/menu'
   import { computed, onMounted, ref, watch } from 'vue'
@@ -79,13 +80,14 @@
   <div class="flex flex-col h-[calc(100vh-3.5rem)] surface-section">
     <div class="flex w-full justify-between pl-6 md:pr-8 pr-3 py-3 border-b surface-border">
       <h3 class="text-color text-lg font-medium">Help</h3>
-      <PrimeButton
+      <IconButton
+        kind="outlined"
+        size="medium"
         icon="pi pi-times"
-        outlined
-        class="surface-border h-8 w-8"
         aria-label="Cancel"
         v-tooltip.bottom="'Close'"
         @click="closeSidebar"
+        class="surface-border h-8 w-8"
       />
     </div>
 
@@ -135,8 +137,8 @@
               v-else
               class="pl-6 pt-6 mb-24"
             >
-              <PrimeButton
-                outlined
+              <Button
+                kind="outlined"
                 icon="pi pi-chevron-left"
                 label="Back"
                 size="small"

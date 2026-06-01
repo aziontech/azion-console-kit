@@ -1,12 +1,12 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import InputNumber from '@aziontech/webkit/inputnumber'
   import MultiSelect from '@aziontech/webkit/multiselect'
-  import PrimeTag from '@aziontech/webkit/prime-tag'
+  import Tag from '@aziontech/webkit/tag'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
@@ -556,7 +556,7 @@
           data-testid="form-horizontal-modules-default-switch"
         >
           <template #footer="{ item }">
-            <PrimeTag
+            <Tag
               v-if="item?.tag"
               :value="item.tag.value"
               :icon="item.tag.icon"
@@ -578,13 +578,14 @@
           :options="subscriptionModulesSwitchOptions"
           data-testid="form-horizontal-modules-subscription-switch"
         />
-        <PrimeButton
-          outlined
+        <Button
+          kind="outlined"
+          size="medium"
           icon="pi pi-shopping-cart"
-          class="max-w-[170px] whitespace-nowrap"
           label="Contact sales"
           @click="props.contactSalesEdgeApplicationService()"
           data-testid="form-horizontal-modules-subscription-contact-sales-button"
+          class="max-w-[170px] whitespace-nowrap"
         />
       </div>
     </template>

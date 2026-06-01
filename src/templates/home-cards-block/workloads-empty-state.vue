@@ -1,7 +1,7 @@
 <script setup>
   import { computed } from 'vue'
   import { useRouter } from 'vue-router'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import Divider from '@aziontech/webkit/divider'
   import { useCreateModalStore } from '@/stores/create-modal'
   import TEXT_DOMAIN_WORKLOAD from '@/helpers/handle-text-workload-domain-flag'
@@ -63,9 +63,9 @@
               <p class="font-semibold text-[var(--text-color)]">{{ item.title }}</p>
               <p class="text-[var(--text-color-secondary)]">{{ item.description }}</p>
             </div>
-            <PrimeButton
+            <Button
+              kind="outlined"
               :label="item.buttonLabel"
-              outlined
               size="small"
               @click="item.action"
             />

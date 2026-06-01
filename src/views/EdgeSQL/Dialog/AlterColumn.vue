@@ -46,16 +46,16 @@
       </div>
 
       <div class="flex justify-end gap-2 mt-2">
-        <PrimeButton
+        <Button
+          kind="outlined"
           label="Cancel"
-          outlined
           size="small"
           @click="emit('update:visible', false)"
         />
-        <PrimeButton
+        <Button
+          kind="secondary"
           label="Confirm"
           size="small"
-          severity="secondary"
           @click="alterColumn"
         />
       </div>
@@ -65,7 +65,7 @@
 
 <script setup>
   import Dialog from '@aziontech/webkit/dialog'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { capitalizeFirstLetter } from '@/helpers'

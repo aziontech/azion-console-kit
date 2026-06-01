@@ -92,7 +92,7 @@
 
 <script setup>
   import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-  import ActionButton from '@aziontech/webkit/actions/button'
+  import ActionButton from '@aziontech/webkit/button'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useThemeStore } from '@/stores/theme'
   import {

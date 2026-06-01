@@ -4,7 +4,7 @@
   import * as yup from 'yup'
   import { useToast } from '@aziontech/webkit/use-toast'
   import PrimeDialog from '@aziontech/webkit/dialog'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
 
@@ -186,15 +186,16 @@
     </form>
 
     <template #footer>
-      <PrimeButton
-        severity="primary"
+      <Button
+        kind="outlined"
+        size="medium"
         label="Cancel"
-        outlined
         @click="closeDialog"
         data-testid="invite-user-dialog__cancel-button"
       />
-      <PrimeButton
-        severity="secondary"
+      <Button
+        kind="secondary"
+        size="medium"
         label="Send Invite"
         :loading="loading"
         :disabled="!meta.valid"

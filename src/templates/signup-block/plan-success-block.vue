@@ -92,7 +92,7 @@
 
 <script setup>
   import { computed, onMounted, inject } from 'vue'
-  import ActionButton from '@aziontech/webkit/actions/button'
+  import ActionButton from '@aziontech/webkit/button'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

@@ -34,7 +34,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import ActionButton from '@aziontech/webkit/actions/button'
+  import ActionButton from '@aziontech/webkit/button'
   import CardFlagBlock from '@/templates/card-flag-block'
 
   defineOptions({ name: 'payment-method-summary' })

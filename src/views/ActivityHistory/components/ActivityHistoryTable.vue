@@ -2,7 +2,7 @@
   import { ref, computed, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
 
   import DataTable from '@aziontech/webkit/list-data-table'
   import DataTimeRange from '@/components/base/dataTimeRange'
@@ -297,12 +297,14 @@
         <template #first-line>
           <div class="flex items-center justify-between w-full gap-3">
             <div class="flex w-full items-center gap-2 flex-1">
-              <PrimeButton
-                outlined
+              <IconButton
+                kind="outlined"
+                size="medium"
                 icon="pi pi-filter"
-                class="h-8"
                 @click="toggleFilter"
                 v-tooltip.top="{ value: 'Filter', showDelay: 200 }"
+                class="h-8"
+                aria-label="button"
               />
               <DataTable.Search
                 v-model="searchValue"

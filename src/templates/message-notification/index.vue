@@ -26,11 +26,11 @@
           v-for="(action, index) in buttons"
           :key="index"
         >
-          <PrimeButton
-            class="w-full min-w-max"
+          <Button
             v-if="!action.hidden"
             v-bind="action"
             size="small"
+            class="w-full min-w-max"
           />
         </div>
       </slot>
@@ -38,7 +38,7 @@
   </div>
 </template>
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { computed } from 'vue'
 
   defineOptions({

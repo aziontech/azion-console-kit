@@ -1,10 +1,10 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import InputText from '@aziontech/webkit/inputtext'
-  import PrimeTag from '@aziontech/webkit/prime-tag'
+  import Tag from '@aziontech/webkit/tag'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
@@ -224,7 +224,7 @@
           :options="environmentOptions"
         >
           <template #footer="{ item }">
-            <PrimeTag
+            <Tag
               v-if="item?.tag"
               :value="item.tag.value"
               :icon="item.tag.icon"
@@ -305,18 +305,14 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
+                  kind="text"
                   @click="openDrawer"
-                  class="w-full whitespace-nowrap flex"
-                  text
                   size="small"
                   icon="pi pi-plus-circle"
                   data-testid="domains-form__create-edge-application-button"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
                   label="Create Application"
+                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -348,18 +344,14 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
+                  kind="text"
                   @click="openDrawerEdgeFirewall"
-                  class="w-full whitespace-nowrap flex"
                   data-testid="domains-form__create-edge-firewall-button"
-                  text
                   size="small"
                   icon="pi pi-plus-circle"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
                   label="Create Firewall"
+                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -409,18 +401,14 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
+                  kind="text"
                   @click="openDigitalCertificateDrawer(EDGE_CERTIFICATE)"
-                  class="w-full whitespace-nowrap flex"
-                  text
                   size="small"
                   icon="pi pi-plus-circle"
                   data-testid="domains-form__create-digital-certificate-button"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
                   label="Create Digital Certificate"
+                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -474,18 +462,14 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
+                  kind="text"
                   @click="openDigitalCertificateDrawer(TRUSTED_CA_CERTIFICATE)"
-                  class="w-full whitespace-nowrap flex"
-                  text
                   size="small"
                   icon="pi pi-plus-circle"
                   data-testid="domains-form__create-digital-certificate-button"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
                   label="Create Digital Certificate"
+                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>

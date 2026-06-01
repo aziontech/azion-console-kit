@@ -1,5 +1,5 @@
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import advancedFilter from '@/templates/advanced-filter'
   import { computed, ref, watch, inject } from 'vue'
   import { MAP_SERVICE_OPERATION } from '@modules/real-time-metrics/constants'
@@ -236,14 +236,13 @@
       @applyFilter="applyFilter"
     />
     <div class="flex align-items-center w-full md:max-w-fit">
-      <PrimeButton
-        class="h-auto w-full md:max-w-fit"
-        outlined
+      <Button
+        kind="outlined"
         size="small"
-        icon-pos="right"
         icon="pi pi-external-link"
         label="Open in GraphiQL Playground"
         @click="props.playgroundOpener()"
+        class="h-auto w-full md:max-w-fit"
       />
     </div>
   </div>

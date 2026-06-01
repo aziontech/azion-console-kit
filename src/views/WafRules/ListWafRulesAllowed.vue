@@ -5,7 +5,7 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import ListTable from '@/components/list-table/ListTable.vue'
   import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
@@ -259,21 +259,21 @@
         :inTabs="true"
       >
         <template #default>
-          <PrimeButton
-            class="max-md:w-full w-fit"
-            severity="secondary"
+          <Button
+            kind="secondary"
+            size="medium"
             label="Create from Tuning"
-            outlined
             @click="goToWafRulesTuning"
-          >
-          </PrimeButton>
-          <PrimeButton
             class="max-md:w-full w-fit"
-            severity="secondary"
+          />
+          <Button
+            kind="secondary"
+            size="medium"
             icon="pi pi-plus"
             label="Allowed Rule"
             @click="openCreateDrawerWafAllowed"
             data-testid="create_Allowed Rule_button"
+            class="max-md:w-full w-fit"
           />
         </template>
         <template #illustration>

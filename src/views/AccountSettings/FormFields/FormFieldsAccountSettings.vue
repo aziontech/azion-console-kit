@@ -11,7 +11,7 @@
   import { useLoadingStore } from '@/stores/loading'
   import { deleteAccountService } from '@/services/account-services/delete-account-service'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { onMounted, ref, watch, computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { capitalizeFirstLetter } from '@/helpers'
@@ -446,9 +446,10 @@
       </div>
       <div class="flex sm:max-w-lg">
         <div>
-          <PrimeButton
+          <Button
+            kind="outlined"
+            size="medium"
             label="Multi-Factor Authentication Management"
-            outlined
             @click="navigateToMfaManagement"
           />
         </div>
@@ -488,15 +489,15 @@
                 <p class="text-color font-medium">{{ integration.label }}</p>
                 <small class="text-color-secondary">Integration active</small>
               </div>
-              <PrimeButton
+              <Button
+                kind="primary"
                 label="Remove"
-                severity="danger"
-                outlined
                 icon="pi pi-trash"
                 size="small"
                 :loading="isGithubConnectLoading"
                 @click="removeGithubIntegration(integration.value)"
                 data-testid="account-settings__remove-github-integration"
+                class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
               />
             </div>
           </div>
@@ -521,10 +522,11 @@
           </small>
         </div>
         <div>
-          <PrimeButton
+          <Button
+            kind="danger"
+            size="medium"
             data-testid="account-settings__delete-account"
             label="Delete account"
-            severity="danger"
             @click="openDeleteDialog"
           />
         </div>

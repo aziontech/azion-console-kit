@@ -1,5 +1,5 @@
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
 
   defineOptions({ name: 'big-number' })
   const props = defineProps({
@@ -27,24 +27,23 @@
         {{ props.label }}
 
         <span>
-          <PrimeButton
-            class="max-md:hidden"
+          <IconButton
+            kind="transparent"
+            size="medium"
             icon="pi pi-question-circle"
-            text
-            rounded
             v-tooltip="props.tooltipMessage"
-            :pt="{
-              root: { class: 'shadow-none' }
-            }"
+            class="max-md:hidden"
+            aria-label="button"
           />
         </span>
 
-        <PrimeButton
-          class="whitespace-nowrap md:hidden"
+        <IconButton
+          kind="transparent"
+          size="medium"
           icon="pi pi-question-circle"
-          text
-          rounded
           v-tooltip.focus="props.tooltipMessage"
+          class="whitespace-nowrap md:hidden"
+          aria-label="button"
         />
       </label>
       <div class="flex gap-1 items-center">

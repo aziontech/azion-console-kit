@@ -2,7 +2,7 @@
   import { computed, useSlots } from 'vue'
   import DataTable from '@aziontech/webkit/list-data-table'
   const DataTableColumnSelector = DataTable.ColumnSelector
-  import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import { useDataTable } from '@/composables/useDataTable'
 
   defineOptions({ name: 'list-table' })
@@ -342,13 +342,14 @@
                   class="flex flex-row items-center gap-2 max-sm:w-full"
                   data-testid="data-table-search"
                 >
-                  <PrimeButton
+                  <IconButton
                     v-if="hasAllowedFilters"
-                    outlined
+                    kind="outlined"
                     icon="pi pi-filter"
                     size="small"
-                    @click="toggleFilter"
                     data-testid="data-table-actions-column-header-toggle-filter"
+                    aria-label="data table actions column header toggle filter"
+                    @click="toggleFilter"
                   />
                   <DataTable.Search
                     class="w-full md:min-w-[20rem]"
@@ -361,13 +362,14 @@
                 </span>
                 <div class="flex gap-2 max-sm:w-full">
                   <slot name="header-actions" />
-                  <PrimeButton
-                    outlined
+                  <IconButton
+                    kind="outlined"
                     icon="pi pi-refresh"
                     size="small"
-                    @click="reload({ page: 1, skipCache: true })"
                     v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                     data-testid="data-table-actions-column-header-refresh"
+                    aria-label="data table actions column header refresh"
+                    @click="reload({ page: 1, skipCache: true })"
                   />
                   <DataTable.Export
                     v-if="hasExportToCsvMapper || exportFileName"

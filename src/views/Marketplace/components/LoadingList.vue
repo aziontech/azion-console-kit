@@ -1,11 +1,10 @@
 <template>
   <Skeleton class="w-52 h-8 rounded" />
   <div class="ml-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    <PrimeButton
+    <div
       v-for="item of 12"
       :key="item"
-      class="p-4 text-left w-full border-solid border surface-border transition-all"
-      link
+      class="p-4 text-left w-full border-solid border surface-border transition-all rounded-[var(--shape-button)]"
     >
       <div class="flex flex-col w-full h-full justify-between gap-3.5 items-start">
         <div class="flex gap-3.5 w-full flex-col">
@@ -17,15 +16,14 @@
           </div>
         </div>
       </div>
-    </PrimeButton>
+    </div>
   </div>
   <Skeleton class="w-52 h-6 rounded" />
   <div class="ml-0 w-full mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    <PrimeButton
+    <div
       v-for="item of 6"
       :key="item"
-      class="p-4 text-left border-solid border surface-border transition-all"
-      link
+      class="p-4 text-left border-solid border surface-border transition-all rounded-[var(--shape-button)]"
     >
       <div class="flex flex-col w-full h-full justify-between gap-3.5 items-start">
         <div class="flex gap-3.5 w-full flex-col">
@@ -37,11 +35,10 @@
           </div>
         </div>
       </div>
-    </PrimeButton>
+    </div>
   </div>
 </template>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
   import Skeleton from '@aziontech/webkit/skeleton'
 </script>

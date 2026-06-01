@@ -1,43 +1,28 @@
 <template>
   <div class="flex !flex-row items-center gap-2 w-fit justify-start md:w-auto">
-    <PrimeButton
+    <Button
+      kind="text"
+      label="Other Link"
       v-if="!!otherLink"
       size="small"
-      link
       @click="navigateToOtherLink"
-      :pt="{
-        label: { class: 'whitespace-nowrap' }
-      }"
-    >
-      Other Link
-    </PrimeButton>
-    <PrimeButton
+    />
+    <Button
+      kind="text"
+      label="Get Help"
       size="small"
-      link
       @click="navigateToGetHelp"
-      :pt="{
-        label: { class: 'whitespace-nowrap' }
-      }"
-    >
-      Get Help
-    </PrimeButton>
-    <PrimeButton
+    />
+    <Button
+      kind="primary"
       v-if="otherActions"
       size="small"
       icon="pi pi-upload"
-      :pt="{
-        root: { class: 'min-w-0 max-w-full' },
-        label: {
-          class: 'whitespace-nowrap truncate'
-        }
-      }"
       @click="emit('other-actions')"
       label="Other Actions"
-      severity="primary"
-      outlined
       data-testid="data-table-other-actions-button"
     />
-    <PrimeButton
+    <Button
       :class="buttonClass"
       :disabled="disabled"
       @click="handleClick"
@@ -50,7 +35,7 @@
 </template>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { useRouter } from 'vue-router'
   import { useLayout } from '@/composables/use-layout'
   const { OpenSidebarComponent } = useLayout()

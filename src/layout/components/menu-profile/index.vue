@@ -1,10 +1,10 @@
 <template>
-  <Avatar
+  <IconButton
     @click="toggleProfile"
+    size="medium"
+    kind="outlined"
     icon="pi pi-user"
-    class="transition-all bg-header-avatar cursor-pointer"
     v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
-    data-testid="profile-block__avatar"
   />
 
   <Sidebar
@@ -160,22 +160,14 @@
           </Dropdown>
         </div>
         <Divider class="surface-border p-1 m-0 mb-2" />
-        <PrimeButton
+        <Button
+          kind="text"
           data-testid="profile-block__sidebar__logout-btn"
-          class="w-full rounded-md flex content-start text-left"
-          :pt="{
-            label: {
-              class: 'font-normal'
-            },
-            root: {
-              class: 'rounded-md hover:surface-200'
-            }
-          }"
           label="Logout"
           size="small"
           icon="pi pi-sign-out"
-          text
           @click="logout"
+          class="w-full rounded-md flex content-start text-left"
         />
       </template>
     </PrimeMenu>
@@ -320,22 +312,14 @@
 
       <Divider class="-ml-2 w-[calc(100%+1rem)] mb-3 mt-2" />
 
-      <PrimeButton
+      <Button
+        kind="text"
         data-testid="profile-block__mobile-menu__logout-btn"
-        class="w-full rounded-md flex content-start text-left"
-        :pt="{
-          label: {
-            class: 'font-normal'
-          },
-          root: {
-            class: 'rounded-md hover:surface-200'
-          }
-        }"
         label="Logout"
         size="small"
         icon="pi pi-sign-out"
-        text
         @click="logout"
+        class="w-full rounded-md flex content-start text-left"
       />
     </template>
   </PrimeMenu>
@@ -348,7 +332,8 @@
   import { RouterLink } from 'vue-router'
   import { storeToRefs } from 'pinia'
   import Avatar from '@aziontech/webkit/avatar'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'
   import PrimeMenu from '@aziontech/webkit/menu'
