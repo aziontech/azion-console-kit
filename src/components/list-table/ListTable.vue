@@ -343,13 +343,13 @@
                   data-testid="data-table-search"
                 >
                   <IconButton
-                    kind="outlined"
                     v-if="hasAllowedFilters"
+                    kind="outlined"
                     icon="pi pi-filter"
                     size="small"
-                    @click="toggleFilter"
                     data-testid="data-table-actions-column-header-toggle-filter"
                     aria-label="data table actions column header toggle filter"
+                    @click="toggleFilter"
                   />
                   <DataTable.Search
                     class="w-full md:min-w-[20rem]"
@@ -366,10 +366,10 @@
                     kind="outlined"
                     icon="pi pi-refresh"
                     size="small"
-                    @click="reload({ page: 1, skipCache: true })"
                     v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                     data-testid="data-table-actions-column-header-refresh"
                     aria-label="data table actions column header refresh"
+                    @click="reload({ page: 1, skipCache: true })"
                   />
                   <DataTable.Export
                     v-if="hasExportToCsvMapper || exportFileName"
