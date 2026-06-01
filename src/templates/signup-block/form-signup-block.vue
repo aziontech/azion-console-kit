@@ -37,7 +37,7 @@
               <Button
                 kind="text"
                 label="Terms of Service"
-                size="small"
+                size="medium"
                 @click="azionTermsAndServicesWindowOpener"
                 class="p-0"
               />
@@ -45,7 +45,7 @@
               <Button
                 kind="text"
                 label="Privacy Policy."
-                size="small"
+                size="medium"
                 @click="azionPrivacyPolicyWindowOpener"
                 class="p-0"
               />

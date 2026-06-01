@@ -57,7 +57,7 @@
 
               <!-- Next button -->
               <Button
-                size="medium"
+                size="large"
                 type="button"
                 label="Next"
                 data-testid="signin-block__next-button"
@@ -151,7 +151,7 @@
           size="medium"
           label="Sign Up"
           @click="goToSignup"
-          class="p-0 text-sm"
+          class="p-0"
         />
       </div>
     </div>
