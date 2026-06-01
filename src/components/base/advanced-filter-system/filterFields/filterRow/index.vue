@@ -61,14 +61,12 @@
 
         <!-- Delete Button (disabled for first row) -->
         <IconButton
-          kind="primary"
-          type="button"
+          kind="danger"
           icon="pi pi-trash"
           size="small"
+          aria-label="button"
           :disabled="props.rowIndex === 0"
           @click="$emit('remove', props.rowIndex)"
-          class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
-          aria-label="button"
         />
       </div>
     </div>

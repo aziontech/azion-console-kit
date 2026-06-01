@@ -80,18 +80,17 @@
         kind="outlined"
         label="Cancel"
         size="medium"
-        @click="cancelDialog()"
         data-testid="delete-dialog-footer-cancel-button"
+        @click="cancelDialog()"
       />
       <Button
         kind="danger"
         size="medium"
         label="Delete"
-        @click="removeItem()"
+        data-testid="delete-dialog-footer-delete-button"
         :icon="getLoadingIcon"
         :disabled="isDisabled"
-        data-testid="delete-dialog-footer-delete-button"
-        class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
+        @click="removeItem()"
       />
     </template>
   </PrimeDialog>
