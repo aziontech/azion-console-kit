@@ -34,20 +34,20 @@
 
             <p class="text-sm font-normal text-center text-color-secondary">
               By signing up, you agree to the
-              <PrimeButton
+              <Button
+                kind="text"
                 label="Terms of Service"
-                link
-                class="p-0"
                 size="small"
                 @click="azionTermsAndServicesWindowOpener"
+                class="p-0"
               />
               and
-              <PrimeButton
+              <Button
+                kind="text"
                 label="Privacy Policy."
-                link
-                class="p-0"
                 size="small"
                 @click="azionPrivacyPolicyWindowOpener"
+                class="p-0"
               />
             </p>
           </form>
@@ -55,12 +55,12 @@
       </div>
       <div class="flex flex-wrap justify-center items-center gap-1 mt-8">
         <p class="text-sm font-normal">Already have an account?</p>
-        <PrimeButton
+        <Button
+          kind="text"
           label="Sign In"
-          link
-          class="p-0"
           size="small"
           @click="goToLogin"
+          class="p-0"
         />
       </div>
     </div>
@@ -75,7 +75,7 @@
   import { azionPrivacyPolicyWindowOpener, azionTermsAndServicesWindowOpener } from '@/helpers'
   import SocialIdpsBlock from '@/templates/social-idps-block'
   import AccountActivation from '@/templates/signup-block/account-activation.vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import PrimeDivider from '@aziontech/webkit/divider'
   import LoginWithEmailBlock from '@/templates/signup-block/login-with-email-block'
   import { computed, ref } from 'vue'

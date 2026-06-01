@@ -23,13 +23,13 @@
     </template>
     <template #footer>
       <div class="flex gap-4 items-center justify-center w-full">
-        <PrimeButton
+        <IconButton
+          kind="transparent"
           icon="pi pi-chevron-left"
-          text
-          rounded
           size="small"
           disabled
           class="w-8 h-8"
+          aria-label="button"
         />
 
         <div class="flex gap-1.5 h-full items-center justify-center">
@@ -45,13 +45,13 @@
           />
         </div>
 
-        <PrimeButton
+        <IconButton
+          kind="transparent"
           icon="pi pi-chevron-right"
-          text
-          rounded
           size="small"
           disabled
           class="w-8 h-8"
+          aria-label="button"
         />
       </div>
     </template>
@@ -113,15 +113,15 @@
 
     <template #footer>
       <div class="flex gap-4 items-center justify-center w-full">
-        <PrimeButton
+        <IconButton
+          kind="transparent"
           icon="pi pi-chevron-left"
-          text
-          rounded
           size="small"
           :disabled="isFirstItem"
           @click="previousItem"
-          class="w-8 h-8"
           :class="{ 'opacity-60': isFirstItem }"
+          class="w-8 h-8"
+          aria-label="button"
         />
 
         <div class="flex gap-1.5 h-full items-center justify-center">
@@ -138,15 +138,15 @@
           />
         </div>
 
-        <PrimeButton
+        <IconButton
+          kind="transparent"
           icon="pi pi-chevron-right"
-          text
-          rounded
           size="small"
           :disabled="isLastItem"
           @click="nextItem"
-          class="w-8 h-8"
           :class="{ 'opacity-60': isLastItem }"
+          class="w-8 h-8"
+          aria-label="button"
         />
       </div>
     </template>
@@ -155,7 +155,7 @@
 
 <script setup>
   import { computed, ref, onMounted } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import HomeCardBlock from '@/views/Home/components/HomeCard.vue'
   import { solutionService } from '@/services/v2/marketplace/solution-service'
 

@@ -98,7 +98,7 @@
   import AdditionalDataFormBlock from '@/templates/signup-block/additional-data-form-block.vue'
   import ChoosingPlanContainer from '@/templates/signup-block/choosing-plan-container.vue'
   import PlanSuccessBlock from '@/templates/signup-block/plan-success-block.vue'
-  import ActionButton from '@aziontech/webkit/actions/button'
+  import ActionButton from '@aziontech/webkit/button'
   import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { usePlans } from '@/composables/usePlans'

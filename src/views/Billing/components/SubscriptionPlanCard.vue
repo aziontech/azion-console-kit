@@ -94,7 +94,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import ActionButton from '@aziontech/webkit/actions/button'
+  import ActionButton from '@aziontech/webkit/button'
   import CardBox from '@aziontech/webkit/content/card-box'
   import Currency from '@aziontech/webkit/content/currency'
   import SkeletonBlock from '@/templates/skeleton-block'

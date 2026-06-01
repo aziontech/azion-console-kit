@@ -18,18 +18,18 @@
       <div
         class="flex align-items-end pb-1 border-noround border-round-right p-inputnumber-button pr-3 border-none border-round-right-lg"
       >
-        <PrimeButton
+        <IconButton
+          kind="outlined"
+          size="medium"
           v-if="!isLoading"
-          severity="Primary"
-          outlined
           icon="pi pi-fw pi-send"
           aria-label="send"
           @click="sendChatMessage"
         />
-        <PrimeButton
+        <IconButton
+          kind="outlined"
+          size="medium"
           v-else
-          severity="Primary"
-          outlined
           icon="pi pi-stop"
           aria-label="send"
           @click="abortRequest"
@@ -46,7 +46,7 @@
 
 <script setup>
   import Textarea from '@aziontech/webkit/textarea'
-  import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import { ref } from 'vue'
   import { useChat } from '../composables/use-chat'
 

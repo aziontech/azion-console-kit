@@ -3,14 +3,14 @@
     v-if="isVisible"
     class="border surface-border rounded-md surface-section flex flex-col relative"
   >
-    <PrimeButton
+    <IconButton
+      kind="transparent"
+      size="medium"
       v-if="communication.dismissible"
       icon="pi pi-times"
-      severity="secondary"
-      text
-      rounded
-      class="absolute top-3 right-3 z-1"
       @click="handleDismiss"
+      class="absolute top-3 right-3 z-1"
+      aria-label="button"
     />
     <div class="flex flex-col">
       <div
@@ -40,13 +40,13 @@
       </div>
 
       <div class="p-6">
-        <PrimeButton
+        <Button
+          kind="secondary"
+          size="medium"
           v-if="communication.ctaText && communication.ctaHref"
           :label="communication.ctaText"
-          severity="secondary"
-          outlined
-          class="w-full uppercase tracking-widest text-xs font-medium"
           @click="handleCtaClick"
+          class="w-full uppercase tracking-widest text-xs font-medium"
         />
       </div>
     </div>
@@ -55,7 +55,8 @@
 
 <script setup>
   import { ref, onMounted, computed } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import { listCommunicationsService } from '@/services/appcues-services'
 
   defineOptions({ name: 'CommunicationsCard' })

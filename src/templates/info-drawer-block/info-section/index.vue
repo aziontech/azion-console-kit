@@ -1,6 +1,6 @@
 <script setup>
   import Divider from '@aziontech/webkit/divider'
-  import PrimeTag from '@aziontech/webkit/prime-tag'
+  import Tag from '@aziontech/webkit/tag'
   import Skeleton from '@aziontech/webkit/skeleton'
 
   defineOptions({ name: 'info-section' })
@@ -45,7 +45,7 @@
         <h2 class="whitespace-normal text-color text-xl font-medium">
           {{ props.title }}
         </h2>
-        <PrimeTag
+        <Tag
           v-for="(tags, i) in props.tags"
           :key="i"
           :severity="tags?.severity ?? 'info'"

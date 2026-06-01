@@ -24,14 +24,13 @@
               class="gap-1 items-center hidden sm:flex"
             >
               <span class="text-xs font-medium text-color-primary">By</span>
-              <PrimeButton
-                link
-                class="px-0 py-1"
+              <Button
+                kind="text"
                 :label="solution.vendor.name"
                 icon="pi pi-external-link"
-                iconPos="right"
                 size="small"
                 @click="openVendorSite"
+                class="px-0 py-1"
               />
             </div>
             <div class="flex gap-1 items-center">
@@ -197,13 +196,13 @@
               <div class="text-xl font-medium mb-3">{{ sidebarTitle }}</div>
               <p class="text-base text-color-secondary mb-8">
                 {{ sidebarDescription }}
-                <PrimeButton
+                <Button
+                  kind="text"
                   label="Read more"
-                  link
                   size="small"
-                  class="p-0"
                   v-if="solution.isLaunched"
                   @click="openMarketplaceIntegrationsDocumentation()"
+                  class="p-0"
                 />
               </p>
               <InlineMessage
@@ -212,14 +211,14 @@
                 v-if="isLastVersion"
                 >Latest version installed!</InlineMessage
               >
-              <PrimeButton
+              <Button
+                size="medium"
                 v-else
-                class="w-full"
                 :label="sidebarButtonLabel"
                 @click="startLaunchSolution"
                 :loading="loading"
-                icon-pos="right"
                 :icon="loadIcon"
+                class="w-full"
               />
             </template>
           </div>
@@ -233,28 +232,26 @@
                 width="8rem"
                 height="1rem"
               />
-              <PrimeButton
+              <Button
+                kind="text"
                 v-else
-                class="p-0 text-right"
                 :label="solution.vendor.url"
                 size="small"
-                link
                 icon="pi pi-external-link"
-                iconPos="right"
                 @click="openVendorSite"
+                class="p-0 text-right"
               />
             </div>
             <Divider class="my-2" />
             <div class="h-8 w-full flex flex-row justify-between align-items-center">
               <span class="text-sm text-color-secondary flex-shrink-0">Need help?</span>
-              <PrimeButton
-                class="p-0 text-right"
+              <Button
+                kind="text"
                 label="Azion Sales Team"
                 size="small"
-                link
                 icon="pi pi-external-link"
-                iconPos="right"
                 @click="contactSalesEdgeApplicationService()"
+                class="p-0 text-right"
               />
             </div>
           </div>
@@ -285,7 +282,7 @@
   import { computed, onBeforeMount, ref } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import Divider from '@aziontech/webkit/divider'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import Skeleton from '@aziontech/webkit/skeleton'

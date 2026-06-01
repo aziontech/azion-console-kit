@@ -24,7 +24,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import SegmentedButton from '@aziontech/webkit/actions/segmented-button'
+  import SegmentedButton from '@aziontech/webkit/segmented-button'
 
   defineOptions({ name: 'billing-cycle-toggle' })
 

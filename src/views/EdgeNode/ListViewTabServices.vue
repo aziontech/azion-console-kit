@@ -4,7 +4,7 @@
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerService from '@/views/EdgeNode/Drawer'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { computed, ref } from 'vue'
   import UnbindDialog from '@/views/EdgeNode/Dialog/Unbind'
   import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
@@ -124,7 +124,8 @@
         @on-load-data="handleLoadData"
       >
         <template #header-actions>
-          <PrimeButton
+          <Button
+            size="small"
             icon="pi pi-plus"
             label="Service"
             @click="openCreateServiceDrawer"
@@ -140,12 +141,13 @@
       :inTabs="true"
     >
       <template #default>
-        <PrimeButton
-          class="max-md:w-full w-fit"
-          severity="secondary"
+        <Button
+          kind="secondary"
+          size="small"
           icon="pi pi-plus"
           label="Service"
           @click="openCreateServiceDrawer"
+          class="max-md:w-full w-fit"
         />
       </template>
       <template #illustration>

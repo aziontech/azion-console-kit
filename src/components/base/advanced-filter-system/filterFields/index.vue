@@ -1,10 +1,11 @@
 <template>
   <div>
-    <PrimeButton
+    <IconButton
+      kind="outlined"
       icon="pi pi-plus"
-      outlined
       size="small"
       @click="toggleOverPanel"
+      aria-label="button"
     />
 
     <!-- OverPanel -->
@@ -31,7 +32,7 @@
 
 <script setup>
   import { ref } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'
   import FilterPanel from './filterPanel/index.vue'
 

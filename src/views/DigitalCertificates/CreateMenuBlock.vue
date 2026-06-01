@@ -1,14 +1,14 @@
 <template>
-  <PrimeButton
+  <Button
+    :kind="buttonKind"
+    size="medium"
     type="button"
     icon="pi pi-chevron-down"
-    iconPos="right"
     :data-testid="`create_${addButtonLabel}_button`"
     :label="addButtonLabel"
     aria-haspopup="true"
     aria-controls="overlay_menu"
     @click="toggle"
-    :severity="severity"
   />
   <Menu
     ref="menu"
@@ -20,13 +20,13 @@
 </template>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import Menu from '@aziontech/webkit/menu'
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
 
   const menu = ref(null)
 
-  defineProps({
+  const props = defineProps({
     addButtonLabel: {
       type: String,
       required: true
@@ -42,6 +42,19 @@
       default: 'primary'
     }
   })
+
+  const SEVERITY_TO_KIND = {
+    primary: 'primary',
+    secondary: 'secondary',
+    contrast: 'secondary',
+    danger: 'primary',
+    info: 'secondary',
+    success: 'primary',
+    warn: 'outlined',
+    warning: 'outlined'
+  }
+
+  const buttonKind = computed(() => SEVERITY_TO_KIND[props.severity] ?? 'primary')
 
   const toggle = (event) => {
     menu.value.toggle(event)

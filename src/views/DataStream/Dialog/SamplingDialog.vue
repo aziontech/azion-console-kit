@@ -29,13 +29,15 @@
     </div>
 
     <template #footer>
-      <PrimeButton
-        outlined
+      <Button
+        kind="outlined"
+        size="medium"
         label="Cancel"
         @click="emit('cancel')"
       />
-      <PrimeButton
-        severity="secondary"
+      <Button
+        kind="secondary"
+        size="medium"
         label="Confirm"
         @click="emit('confirm')"
       />
@@ -46,7 +48,7 @@
 <script setup>
   import PrimeDialog from '@aziontech/webkit/dialog'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
 
   const emit = defineEmits(['confirm', 'cancel'])
 </script>
