@@ -1,7 +1,5 @@
 <script setup>
   import { computed } from 'vue'
-  import ButtonSave from '@aziontech/webkit/button-save'
-  import ButtonCancel from '@aziontech/webkit/button-cancel'
   import Button from '@aziontech/webkit/button'
 
   defineOptions({ name: 'action-bar-block' })

@@ -14,5 +14,5 @@
   import { useLayout } from '@/composables/use-layout'
 
   defineOptions({ name: 'ButtonHelper' })
-  const { isSidebarActive, toggleSidebarComponent, activeComponentKey } = useLayout()
+  const { toggleSidebarComponent } = useLayout()
 </script>
