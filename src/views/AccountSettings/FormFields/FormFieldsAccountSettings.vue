@@ -523,12 +523,11 @@
         </div>
         <div>
           <Button
-            kind="primary"
+            kind="danger"
             size="medium"
             data-testid="account-settings__delete-account"
             label="Delete account"
             @click="openDeleteDialog"
-            class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
           />
         </div>
       </div>
