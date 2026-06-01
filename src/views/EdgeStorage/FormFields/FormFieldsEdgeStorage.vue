@@ -89,12 +89,11 @@
           </div>
           <div>
             <Button
-              kind="primary"
+              kind="danger"
               size="medium"
               data-testid="account-settings__delete-account"
               label="Delete Bucket"
               @click="$emit('delete-bucket')"
-              class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
             />
           </div>
         </div>

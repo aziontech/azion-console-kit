@@ -187,7 +187,7 @@
 
     <template #footer>
       <Button
-        kind="primary"
+        kind="outlined"
         size="medium"
         label="Cancel"
         @click="closeDialog"

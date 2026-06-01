@@ -79,12 +79,12 @@
       <Button
         kind="outlined"
         label="Cancel"
-        size="small"
+        size="medium"
         @click="cancelDialog()"
         data-testid="delete-dialog-footer-cancel-button"
       />
       <Button
-        kind="primary"
+        kind="danger"
         size="medium"
         label="Delete"
         @click="removeItem()"
