@@ -37,7 +37,7 @@
   import { paymentService } from '@/services/v2/payment/payment-service'
   import MessageNotification from '@/templates/message-notification'
   import { useAccountStore } from '@/stores/account'
-  import ActionButton from '@aziontech/webkit/actions/button'
+  import ActionButton from '@aziontech/webkit/button'
   import { computed, ref, onMounted } from 'vue'
   import { formatUnitValue } from '@/helpers'
   import SkeletonBlock from '@/templates/skeleton-block'

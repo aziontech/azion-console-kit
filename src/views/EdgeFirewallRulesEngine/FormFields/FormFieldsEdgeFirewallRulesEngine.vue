@@ -6,7 +6,8 @@
   import FieldNumber from '@aziontech/webkit/field-number'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import DrawerFunction from '@/views/EdgeFirewallFunctions/Drawer/index.vue'
   import DrawerNetworkList from '@/views/NetworkLists/Drawer/index.vue'
@@ -567,12 +568,13 @@
               {{ criteriaRow.conditional }}
             </Divider>
 
-            <PrimeButton
+            <IconButton
+              kind="outlined"
               v-if="criteriaInnerRowIndex !== 0"
               icon="pi pi-trash"
               size="small"
-              outlined
               @click="handleDeleteCriteria(criteriaIndex, criteriaInnerRowIndex)"
+              aria-label="button"
             />
           </div>
 
@@ -653,18 +655,14 @@
                 <template #footer>
                   <ul class="p-2">
                     <li>
-                      <PrimeButton
-                        class="w-full whitespace-nowrap flex"
+                      <Button
+                        kind="text"
                         data-testid="edge-firewall-rules-form__create-networklist-button"
-                        text
                         @click="openDrawerNetworkList(criteriaIndex, criteriaInnerRowIndex)"
                         size="small"
                         icon="pi pi-plus-circle"
-                        :pt="{
-                          label: { class: 'w-full text-left' },
-                          root: { class: 'p-2' }
-                        }"
                         label="Create Network List"
+                        class="w-full whitespace-nowrap flex"
                       />
                     </li>
                   </ul>
@@ -675,19 +673,19 @@
         </div>
 
         <div class="flex gap-2 mb-8">
-          <PrimeButton
+          <Button
+            kind="outlined"
             icon="pi pi-plus-circle"
             label="And"
             size="small"
-            outlined
             :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
             @click="addConditional({ index: criteriaIndex, operator: 'and' })"
           />
-          <PrimeButton
+          <Button
+            kind="outlined"
             icon="pi pi-plus-circle"
             label="Or"
             size="small"
-            outlined
             :disabled="maximumConditionalsByCriteriaReached(criteriaIndex)"
             @click="addConditional({ index: criteriaIndex, operator: 'or' })"
           />
@@ -707,23 +705,24 @@
             align="left"
             type="solid"
           />
-          <PrimeButton
+          <IconButton
+            kind="outlined"
             v-if="criteriaIndex !== criteria.length - 1"
             icon="pi pi-trash"
             size="small"
-            outlined
             @click="handleDeleteCriteria(criteriaIndex + 1, null)"
+            aria-label="button"
           />
         </div>
       </div>
 
       <div>
-        <PrimeButton
+        <Button
+          kind="outlined"
           :disabled="maximumCriteriaReached"
           icon="pi pi-plus-circle"
           label="Add Criteria"
           size="small"
-          outlined
           @click="addNewCriteria"
         />
       </div>
@@ -767,12 +766,13 @@
           >
             {{ generateBehaviorLabelSection(behaviorItem) }}
           </Divider>
-          <PrimeButton
+          <IconButton
+            kind="outlined"
             v-if="behaviorItemIndex !== 0"
             icon="pi pi-trash"
             size="small"
-            outlined
             @click="handleDeleteBehavior(behaviorItemIndex)"
+            aria-label="button"
           />
         </div>
 
@@ -816,18 +816,14 @@
                 <template #footer>
                   <ul class="p-2">
                     <li>
-                      <PrimeButton
-                        class="w-full whitespace-nowrap flex"
+                      <Button
+                        kind="text"
                         data-testid="edge-firewall-rules-form__create-function-instance-button"
-                        text
                         @click="openDrawerFunction(behaviorItemIndex)"
                         size="small"
                         icon="pi pi-plus-circle"
-                        :pt="{
-                          label: { class: 'w-full text-left' },
-                          root: { class: 'p-2' }
-                        }"
                         label="Create Function Instance"
+                        class="w-full whitespace-nowrap flex"
                       />
                     </li>
                   </ul>
@@ -852,18 +848,14 @@
                 <template #footer>
                   <ul class="p-2">
                     <li>
-                      <PrimeButton
-                        class="w-full whitespace-nowrap flex"
+                      <Button
+                        kind="text"
                         data-testid="edge-firewall-rules-form__create-waf-rule-button"
-                        text
                         @click="openDrawerWafRules(behaviorItemIndex)"
                         size="small"
                         icon="pi pi-plus-circle"
-                        :pt="{
-                          label: { class: 'w-full text-left' },
-                          root: { class: 'p-2' }
-                        }"
                         label="Create Waf Rule"
+                        class="w-full whitespace-nowrap flex"
                       />
                     </li>
                   </ul>
@@ -982,12 +974,12 @@
       </div>
       <Divider type="solid" />
       <div>
-        <PrimeButton
+        <Button
+          kind="outlined"
           :disabled="disableAddBehaviorButtonComputed"
           icon="pi pi-plus-circle"
           label="Add Behavior"
           size="small"
-          outlined
           @click="handleAddBehavior"
         />
       </div>

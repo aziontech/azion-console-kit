@@ -2,7 +2,8 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import CopyBlock from '@aziontech/webkit/button-copy'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import InputNumber from '@aziontech/webkit/field-number'
@@ -375,13 +376,14 @@
             >
               And
             </Divider>
-            <PrimeButton
-              class="h-8 max-sm:w-full position-absolute right-0 top-0"
+            <IconButton
+              kind="outlined"
+              size="medium"
               icon="pi pi-trash"
-              outlined
               type="button"
               aria-label="Remove Origin"
               @click="removeCurrentAddress(index)"
+              class="h-8 max-sm:w-full position-absolute right-0 top-0"
             />
           </div>
         </div>
@@ -433,14 +435,15 @@
         <Divider type="dashed" />
       </div>
       <div>
-        <PrimeButton
-          class="h-8 max-sm:w-full"
+        <Button
+          kind="outlined"
+          size="medium"
           icon="pi pi-plus-circle"
-          outlined
           type="button"
           aria-label="Add Origin"
           label="Add Origin"
           @click="addAddress"
+          class="h-8 max-sm:w-full"
         />
       </div>
     </template>

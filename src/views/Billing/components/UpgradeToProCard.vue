@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-  import ActionButton from '@aziontech/webkit/actions/button'
+  import ActionButton from '@aziontech/webkit/button'
   import CardBox from '@aziontech/webkit/content/card-box'
   import { PRO_UPGRADE_HIGHLIGHTS } from '@/templates/checkout-block/helpers/plan-features'
 

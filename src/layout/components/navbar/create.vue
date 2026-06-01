@@ -1,18 +1,10 @@
 <template>
-  <PrimeButton
+  <Button
     @click="openCreateModalToggle"
     icon="pi pi-plus"
     :label="currentLabel"
-    class="h-8 w-8 md:w-fit text-white border-header"
-    size="small"
-    :pt="{
-      label: { class: 'text-white' },
-      icon: { class: 'text-white' }
-    }"
-    :class="{
-      'bg-header hover:bg-header-button-hover': !createModalIsOpen,
-      'bg-header-button-enabled': createModalIsOpen
-    }"
+    size="medium"
+    kind="outlined"
     v-tooltip.bottom="{ value: 'Create', showDelay: 200 }"
   />
 
@@ -57,13 +49,13 @@
         <h2>Create</h2>
         <div class="flex gap-2">
           <ConsoleFeedback />
-          <PrimeButton
+          <IconButton
+            kind="transparent"
             icon="pi pi-times"
             @click="closeCreateModalStore()"
             size="small"
-            class="flex-none surface-border text-sm w-8 h-8"
-            text
             aria-label="Close create modal"
+            class="flex-none surface-border text-sm w-8 h-8"
           />
         </div>
       </div>
@@ -87,7 +79,8 @@
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import { useToast } from '@aziontech/webkit/use-toast'
 
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import Sidebar from '@aziontech/webkit/sidebar'
   import MakeCreateModalBlock from '@/templates/create-modal-block/make-create-modal-block.vue'

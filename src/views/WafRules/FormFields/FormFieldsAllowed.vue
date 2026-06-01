@@ -1,7 +1,8 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import Accordion from 'primevue/accordion'
@@ -150,13 +151,14 @@
                     </div>
                   </div>
                   <div>
-                    <PrimeButton
+                    <IconButton
+                      kind="primary"
+                      size="medium"
                       icon="pi pi-trash"
-                      severity="primary"
-                      outlined
                       :disabled="conditions.length === 1"
                       @click.stop="deleteMatchZone(indexCondition)"
                       :data-testid="`allowed-rules-form__delete-match-zone[${indexCondition}]__button`"
+                      aria-label="button"
                     />
                   </div>
                 </div>
@@ -195,13 +197,13 @@
         </div>
       </div>
       <div>
-        <PrimeButton
-          severity="secondary"
+        <Button
+          kind="outlined"
+          size="medium"
           icon="pi pi-plus"
           label="Condition"
-          class="sm:w-auto"
           :disabled="conditions?.length >= 9"
-          outlined
+          class="sm:w-auto"
           @click="addCondition"
           data-testid="allowed-rules-form__add-match-zone__button"
         />

@@ -85,10 +85,10 @@
   resolved "https://registry.npmjs.org/@aziontech/theme/-/theme-2.0.4.tgz"
   integrity sha512-3AiiYORhklGqPqVggKeoVn3yQe26wsQ5+9LowEF2SI6nNBwBnXVg7WAMLHmoKf5T7g7uSfTDAgzz/TZ0tlEorA==
 
-"@aziontech/webkit@^3.0.5":
-  version "3.0.5"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-3.0.5.tgz#a5eeda5f8e9e55ac393a6c1695c9969722203fb6"
-  integrity sha512-OIijSDT+OGXqxyhg6p32BO68lBe+7igeHN5sY42qg6tn7XDnQQGHoSNur/DF0eKnFYx2cDPiciySF/APsKScVw==
+"@aziontech/webkit@^3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-3.3.0.tgz#c525988ce9cefdb2e4267d6107d69af03a53caae"
+  integrity sha512-6PyfFPB26QRjbkb1rIrk5BqHwl9Ao29hBIg8yZ+F+MDKhyuhJTXMGStsYa6S3IkpJVBtter3PaxH5G/lYWSX3w==
   dependencies:
     "@vueuse/core" "^10.11.1"
     clsx "^2.1.1"

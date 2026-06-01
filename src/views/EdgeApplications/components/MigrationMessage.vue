@@ -29,11 +29,12 @@
       >Custom Pages</a
     >. You can access both features through the main menu.
     <template #closeicon="{ close }">
-      <PrimeButton
-        outlined
-        severity="secondary"
+      <IconButton
+        kind="secondary"
+        size="medium"
         @click="close()"
         icon="pi pi-times"
+        aria-label="button"
       />
     </template>
   </Message>
@@ -41,7 +42,7 @@
 
 <script setup>
   import Message from '@aziontech/webkit/message'
-  import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import { useRouter } from 'vue-router'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
 

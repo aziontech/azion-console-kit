@@ -4,7 +4,7 @@
   import FieldNumber from '@aziontech/webkit/field-number'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import InputText from '@aziontech/webkit/inputtext'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import { documentationGuideProducts } from '@/helpers'
   import { useField } from 'vee-validate'
@@ -171,12 +171,13 @@
             data-testid="edge-dns-records-form__settings__record-type-field"
           >
             <template #description>
-              <PrimeButton
+              <Button
+                kind="text"
+                size="medium"
                 label="Read more about Record Types"
-                link
-                class="text-xs p-0 leading-5 text-start"
                 @click="documentationGuideProducts.edgeDnsRecordTypes"
                 data-testid="edge-dns-records-form__settings__record-type-field__read-more-btn"
+                class="text-xs p-0 leading-5 text-start"
               />
             </template>
           </FieldDropdown>

@@ -6,19 +6,18 @@
     v-if="show"
   >
     Create a Let's Encrypt™ digital certificate directly from
-    <PrimeButton
-      link
+    <Button
+      kind="text"
+      :label="handleTextDomainWorkload.pluralTitle"
       size="small"
-      class="p-0"
       @click="navigateToDomains"
-    >
-      {{ handleTextDomainWorkload.pluralTitle }}
-    </PrimeButton>
+      class="p-0"
+    />
   </InlineMessage>
 </template>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { useRouter } from 'vue-router'

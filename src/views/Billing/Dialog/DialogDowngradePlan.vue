@@ -68,7 +68,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import Dialog from '@aziontech/webkit/dialog'
-  import ActionButton from '@aziontech/webkit/actions/button'
+  import ActionButton from '@aziontech/webkit/button'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PlanFeatureComparison from '@/views/Billing/Dialog/PlanFeatureComparison.vue'
   import { getPlanLabel } from '@/templates/checkout-block/helpers/plan-features'

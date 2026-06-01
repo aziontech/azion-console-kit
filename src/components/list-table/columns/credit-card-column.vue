@@ -5,7 +5,7 @@
       :cardFlag="props.cardBrand"
     />
     {{ props.cardNumber || '-' }}
-    <PrimeTag
+    <Tag
       severity="info"
       :value="props.status"
       v-if="props.status"
@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-  import PrimeTag from '@aziontech/webkit/prime-tag'
+  import Tag from '@aziontech/webkit/tag'
   import cardFlagBlock from '@templates/card-flag-block'
 
   const props = defineProps({

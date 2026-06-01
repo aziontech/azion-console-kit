@@ -10,26 +10,29 @@
       <p class="text-color-secondary">The selected node(s) will be authorized.</p>
 
       <template #closeicon>
-        <PrimeButton
-          outlined
+        <IconButton
+          kind="outlined"
+          size="medium"
           @click="closeDialog()"
           icon="pi pi-times"
+          aria-label="button"
         />
       </template>
 
       <template #footer>
         <div class="flex gap-2 flex-col-reverse lg:flex-row justify-end">
-          <PrimeButton
-            severity="primary"
-            outlined
+          <Button
+            kind="primary"
+            size="medium"
             label="Cancel"
             @click="closeDialog()"
-          ></PrimeButton>
-          <PrimeButton
-            severity="primary"
+          />
+          <Button
+            kind="primary"
+            size="medium"
             label="Confirm"
             @click="authorizeEdgeNode()"
-          ></PrimeButton>
+          />
         </div>
       </template>
     </DialogAuthorize>
@@ -40,7 +43,8 @@
   import { inject } from 'vue'
   import { useToast } from '@aziontech/webkit/use-toast'
   import DialogAuthorize from '@aziontech/webkit/dialog'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import { edgeNodeService } from '@/services/v2/edge-node/edge-node-service'
 
   defineOptions({ name: 'Authorize-Dialog' })

@@ -18,15 +18,13 @@
     />
   </div>
 
-  <PrimeButton
+  <IconButton
+    size="medium"
     icon="pi pi-search"
-    class="bg-header hover:bg-header-button-hover !text-white px-2 py-1 flex border-header h-8 w-8 md:hidden"
-    :pt="{
-      label: { class: 'text-white' },
-      icon: { class: 'text-white' }
-    }"
     @click="openSearch"
     v-tooltip.bottom="{ value: 'Search', showDelay: 200 }"
+    class="bg-header hover:bg-header-button-hover !text-white px-2 py-1 flex border-header h-8 w-8 md:hidden"
+    aria-label="button"
   />
 
   <PrimeDialog
@@ -70,10 +68,10 @@
   import { ref, watchEffect } from 'vue'
   import { useMagicKeys } from '@vueuse/core'
 
-  import Tag from '@aziontech/webkit/prime-tag'
+  import Tag from '@aziontech/webkit/tag'
   import InputText from '@aziontech/webkit/inputtext'
   import PrimeDialog from '@aziontech/webkit/dialog'
-  import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
 
   const { meta, k: keyboardKeyK, control } = useMagicKeys()
 

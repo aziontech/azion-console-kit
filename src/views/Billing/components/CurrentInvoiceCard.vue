@@ -90,7 +90,7 @@
 
 <script setup>
   import { computed, onMounted, ref } from 'vue'
-  import ActionButton from '@aziontech/webkit/actions/button'
+  import ActionButton from '@aziontech/webkit/button'
   import CardBox from '@aziontech/webkit/content/card-box'
   import Currency from '@aziontech/webkit/content/currency'
   import SubscriptionPlanRow from './SubscriptionPlanRow.vue'
