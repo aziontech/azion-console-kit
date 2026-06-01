@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, defineModel, onMounted } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Calendar from '@aziontech/webkit/calendar'

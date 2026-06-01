@@ -4,6 +4,8 @@
       <PricingCalculationBlock
         ref="pricingCalculationRef"
         :plan="plan"
+        :draftServiceOrderId="draftServiceOrderId"
+        context="signup"
         @update:billing-cycle="handleBillingCycleChange"
         @update:checkout-session-client-secret="handleCheckoutSessionClientSecretChange"
       />
@@ -13,6 +15,8 @@
         :stripeClientService="getStripeClientService"
         :checkoutSessionClientSecret="checkoutSessionClientSecret"
         @readiness-change="handlePaymentReadinessChange"
+        @element-ready="emit('payment-element-ready')"
+        @stale-session="handleStaleCheckoutSession"
       />
 
       <AddressInformationBlock
@@ -43,7 +47,13 @@
   defineOptions({
     name: 'checkout-plan-block'
   })
-  const emit = defineEmits(['onBack', 'onSubmit'])
+  const emit = defineEmits([
+    'onBack',
+    'onSubmit',
+    'payment-element-ready',
+    'stale-session',
+    'checkout-session-prepared'
+  ])
   const toast = useToast()
   const { scrollToError } = useScrollToError()
 
@@ -60,6 +70,10 @@
     checkoutSessionClientSecret: {
       type: String,
       default: ''
+    },
+    draftServiceOrderId: {
+      type: [String, Number],
+      default: null
     }
   })
 
@@ -68,7 +82,7 @@
   const addressInformationRef = ref(null)
   const isSubmitting = ref(false)
   const showLoading = ref(false)
-  const billingCycle = ref('yearly')
+  const billingCycle = ref('monthly')
   const checkoutSessionClientSecret = ref(props.checkoutSessionClientSecret)
   const isPaymentFormReady = ref(false)
   const isAddressFormReady = ref(false)
@@ -88,6 +102,11 @@
 
   const handleCheckoutSessionClientSecretChange = (value) => {
     checkoutSessionClientSecret.value = value
+    if (!value) return
+    emit('checkout-session-prepared', {
+      clientSecret: value,
+      billingCycle: billingCycle.value
+    })
   }
 
   const handlePaymentReadinessChange = (isReady) => {
@@ -96,6 +115,15 @@
 
   const handleAddressReadinessChange = (isReady) => {
     isAddressFormReady.value = Boolean(isReady)
+  }
+
+  const handleStaleCheckoutSession = (payload = {}) => {
+    isPaymentFormReady.value = false
+    emit('stale-session', {
+      ...payload,
+      plan: props.plan,
+      billingCycle: billingCycle.value
+    })
   }
 
   const handleBack = () => {

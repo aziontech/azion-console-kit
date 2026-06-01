@@ -73,6 +73,15 @@ export class ServiceOrdersService extends BaseService {
     return ServiceOrdersAdapter.transformCreateResponse(response.data)
   }
 
+  prepareSignupCheckout = async (payload) => {
+    const response = await this.http.request({
+      method: 'POST',
+      url: `${this.#baseURL}/signup/checkout/prepare`,
+      body: ServiceOrdersAdapter.toCreatePayload(payload)
+    })
+    return ServiceOrdersAdapter.transformCreateResponse(response.data)
+  }
+
   updateServiceOrder = async (id, payload) => {
     const response = await this.http.request({
       method: 'PATCH',

@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-  import { ref, defineModel } from 'vue'
+  import { ref } from 'vue'
   import IconButton from '@aziontech/webkit/icon-button'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'
   import FilterPanel from './filterPanel/index.vue'
