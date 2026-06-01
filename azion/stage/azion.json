@@ -5,6 +5,7 @@
   "env": "production",
   "prefix": "20240821142547",
   "rotate-prefix": false,
+  "skip-deletion": true, 
   "not-first-run": true,
   "function": {
     "id": 28363,
@@ -239,16 +240,6 @@
         "phase": "request"
       },
       {
-        "id": 537350,
-        "name": "Run Function | SSE Beholder Proxy",
-        "phase": "request"
-      },
-      {
-        "id": 488499,
-        "name": "Debug",
-        "phase": "response"
-      },
-      {
         "id": 563632,
         "name": "Route Edge API Requests",
         "phase": "request"
@@ -267,10 +258,6 @@
     {
       "id": 266296,
       "name": "Statics - Cache .html"
-    },
-    {
-      "id": 261825,
-      "name": "Marketplace - Cache"
     }
   ]
 }

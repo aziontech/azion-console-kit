@@ -43,3 +43,16 @@ export const getStripeClientService = async () => {
     throw new Error(error.message).message
   }
 }
+
+/**
+ * Fire-and-forget warmer meant to run on the screen *before* any payment form
+ * (signup additional-data step, billing overview). `loadStripe` from
+ * `@stripe/stripe-js/pure` injects and memoizes the js.stripe.com `<script>`
+ * on first call, so kicking it off early moves the slow external download off
+ * the checkout critical path — the later `getStripeClientService()` reuses the
+ * cached download and resolves immediately. Errors are swallowed here; the
+ * consuming payment component surfaces load failures when it actually mounts.
+ */
+export const warmStripeClient = () => {
+  getStripeClientService().catch(() => {})
+}
