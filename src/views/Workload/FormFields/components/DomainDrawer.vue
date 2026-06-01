@@ -7,7 +7,7 @@
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import RadioButton from '@aziontech/webkit/radiobutton'
-  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import MessageCard from '@/components/MessageCard'
   import PrimeButton from '@aziontech/webkit/button'
   import LabelBlock from '@aziontech/webkit/label'
   import DigitalCertificatesDrawer from '@/views/DigitalCertificates/Drawer/'
@@ -28,7 +28,8 @@
     if (typeof data?.domain === 'string' && data.domain.endsWith(AZION_APP_SUFFIX)) {
       return DOMAIN_TYPE.AZION
     }
-    return DOMAIN_TYPE.OWN
+    if (data?.domain) return DOMAIN_TYPE.OWN
+    return DOMAIN_TYPE.AZION
   }
 
   const buildInitialValues = (data) => {
@@ -214,6 +215,7 @@
   <EmptyDrawer
     v-model:visible="visibleDrawer"
     :title="title"
+    width-class="max-w-2xl"
   >
     <template #content>
       <form
@@ -252,13 +254,12 @@
             </Transition>
           </div>
         </div>
-        <InlineMessage
+        <MessageCard
           v-if="isAzionDomain"
-          severity="info"
-        >
-          Your workload is always accessible at a azion.app subdomain based on the workload name.
-          Custom domains allow visitors to access your project at your own domains.
-        </InlineMessage>
+          type="info"
+          description="Your workload is always accessible at a azion.app subdomain based on the workload name. Custom domains allow visitors to access your project at your own domains."
+          data-testid="domain-drawer__azion-domain-info"
+        />
 
         <div class="flex flex-col gap-2">
           <LabelBlock
