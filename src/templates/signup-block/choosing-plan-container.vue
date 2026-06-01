@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full max-w-5xl mx-auto bg-surface rounded border surface-border lg:h-[800px]">
-    <div class="flex lg:h-full lg:min-h-0 lg:overflow-hidden flex-col-reverse lg:flex-row">
+  <div class="w-full max-w-5xl mx-auto bg-surface rounded border surface-border">
+    <div class="flex flex-col-reverse lg:flex-row">
       <CheckoutPlanBlock
         ref="planBlockRef"
         :plan="plan"
