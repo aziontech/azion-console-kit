@@ -1,6 +1,6 @@
 <template>
   <div class="relative flex lg:h-full flex-col lg:overflow-hidden pt-6 w-full lg:w-[600px]">
-    <div class="checkout-scroll-area flex flex-1 flex-col gap-6 px-4 lg:px-8 overflow-y-auto">
+    <div class="checkout-scroll-area flex flex-1 flex-col gap-6 px-4 lg:px-8 pb-6 overflow-y-auto">
       <PricingCalculationBlock
         ref="pricingCalculationRef"
         :plan="plan"
@@ -183,11 +183,32 @@
 
 <style scoped>
   .checkout-scroll-area {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
   }
 
   .checkout-scroll-area::-webkit-scrollbar {
-    display: none;
+    width: 8px;
+    height: 8px;
+  }
+
+  .checkout-scroll-area::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 4px;
+  }
+
+  .checkout-scroll-area:hover,
+  .checkout-scroll-area:focus-within {
+    scrollbar-color: var(--border-default) transparent;
+  }
+
+  .checkout-scroll-area:hover::-webkit-scrollbar-thumb,
+  .checkout-scroll-area:focus-within::-webkit-scrollbar-thumb {
+    background-color: var(--border-default);
+  }
+
+  .checkout-scroll-area:hover::-webkit-scrollbar-thumb:hover,
+  .checkout-scroll-area:focus-within::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-color-secondary);
   }
 </style>

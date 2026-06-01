@@ -9,10 +9,10 @@
           <div
             v-for="feature in features"
             :key="feature.title"
-            class="flex items-center gap-2.5 h-5 text-xs leading-none text-default"
+            class="flex items-center gap-2.5 text-xs leading-none text-default"
           >
             <i class="pi pi-check text-base shrink-0 text-success-check" />
-            <span>{{ feature.title }}</span>
+            <span class="leading-5">{{ feature.title }}</span>
           </div>
         </div>
         <p class="text-sm leading-[1.25] text-color-secondary">
@@ -23,16 +23,14 @@
 
     <template #footer>
       <div class="w-full flex justify-between items-center gap-4 flex-wrap">
-        <p class="text-xs leading-5 text-color-secondary">
-          Learn more about
-          <a
-            :href="pricingAndPlansUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-[var(--text-color-link)]"
-            >Pricing and Plans</a
-          >.
-        </p>
+        <a
+          :href="pricingAndPlansUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-xs leading-5 text-[var(--text-color-link)]"
+        >
+          View all plan limits
+        </a>
         <ActionButton
           label="Upgrade to Pro"
           kind="primary"

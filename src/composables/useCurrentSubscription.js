@@ -87,12 +87,23 @@ export function useCurrentSubscription() {
   const nextChargeDate = computed(() =>
     formatNextChargeDate(activeServiceOrder.value?.currentPeriodEnd)
   )
-  const nextChargeValue = computed(() => planChargeValue.value)
   const lastUpdate = computed(() =>
     formatLastUpdate(currentServiceOrder.value?.updatedAt ?? activeServiceOrder.value?.updatedAt)
   )
 
   const scheduledDowngrade = computed(() => activeServiceOrder.value?.downgradePending ?? null)
+
+  const scheduledDowngradePricing = computed(() => {
+    const toPriceId = scheduledDowngrade.value?.toPriceId
+    if (!toPriceId) return null
+    return findPricingById(plansData.value, toPriceId)
+  })
+
+  const nextChargeValue = computed(() => {
+    if (!hasContractedPlan.value) return 0
+    const pricing = scheduledDowngradePricing.value ?? activePricing.value
+    return toFiniteNumber(pricing?.priceValue, 0)
+  })
 
   const currentInvoiceAmountCharged = computed(() =>
     toFiniteNumber(activeServiceOrder.value?.invoiceAmountCharged, null)

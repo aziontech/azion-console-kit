@@ -112,7 +112,7 @@
 
   defineOptions({ name: 'console-feedback' })
 
-  const props = defineProps({
+  defineProps({
     styleTextColor: {
       type: String,
       default: () => 'text-color'

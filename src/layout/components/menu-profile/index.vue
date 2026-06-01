@@ -331,7 +331,6 @@
   import { computed, inject, ref, watch, onBeforeMount } from 'vue'
   import { RouterLink } from 'vue-router'
   import { storeToRefs } from 'pinia'
-  import Avatar from '@aziontech/webkit/avatar'
   import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'

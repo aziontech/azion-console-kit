@@ -66,7 +66,7 @@ const setupSync = (accountStore) => {
           _plan.value = null
           _billingCycle.value = null
           if (!hydrateFromScope()) {
-            _plan.value = 'pro'
+            _plan.value = 'hobby'
             _billingCycle.value = 'monthly'
           }
         } else if (!newId && oldId) {
@@ -81,7 +81,7 @@ const setupSync = (accountStore) => {
     _plan.value = null
     _billingCycle.value = null
     if (!hydrateFromScope()) {
-      _plan.value = 'pro'
+      _plan.value = 'hobby'
       _billingCycle.value = 'monthly'
     }
   })
@@ -132,21 +132,27 @@ export function usePlans() {
   }
 
   const initialize = () => {
-    if (hydrateFromScope()) {
-      syncToUrl()
+    const urlParams = readFromUrl()
+
+    if (urlParams) {
+      if (urlParams.plan) _plan.value = urlParams.plan
+      if (urlParams.billingCycle) _billingCycle.value = urlParams.billingCycle
+
+      if (!_plan.value || !_billingCycle.value) {
+        const stored = readScoped(BASE_KEY)
+        if (stored) {
+          if (!_plan.value && stored.plan) _plan.value = stored.plan
+          if (!_billingCycle.value && stored.billingCycle) _billingCycle.value = stored.billingCycle
+        }
+      }
       return
     }
 
-    const urlParams = readFromUrl()
-    if (urlParams) {
-      _plan.value = urlParams.plan || null
-      _billingCycle.value = urlParams.billingCycle || null
-      return
-    }
+    if (hydrateFromScope()) return
 
     if (_plan.value || _billingCycle.value) return
 
-    _plan.value = 'pro'
+    _plan.value = 'hobby'
     _billingCycle.value = 'monthly'
   }
 
