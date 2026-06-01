@@ -59,6 +59,15 @@ export const workloadRoutes = {
           }
         ]
       }
+    },
+    {
+      path: 'edit/:id/deployment/:deploymentId',
+      name: 'workload-deployment-details',
+      component: () => import('@views/Workload/DeploymentDetailsView.vue'),
+      meta: {
+        title: 'Deployment Details',
+        flag: 'checkout_access_without_flag'
+      }
     }
   ]
 }
