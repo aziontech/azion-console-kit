@@ -150,6 +150,7 @@
           <DeploymentsListSection
             v-if="activeTab === TAB_TO_INDEX['deployment']"
             :workloadId="workloadId"
+            class="mt-4"
           />
         </TabPanel>
         <TabPanel

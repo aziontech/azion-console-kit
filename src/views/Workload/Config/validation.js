@@ -75,7 +75,18 @@ export const validationSchema = yup.object({
   // application/firewall/customPage are legacy flat fields kept for adapter compatibility.
   // The new per-environment configuration lives in `environmentDeployments` below.
   application: yup.number().nullable().notRequired().label('Application'),
-  environmentDeployments: yup.object().default({}),
+  environmentDeployments: yup
+    .object()
+    .default({})
+    .test(
+      'all-envs-have-deployment',
+      'Each environment in use needs a Deployment Settings linked.',
+      function (value) {
+        const domains = this.parent.domains || []
+        const envIds = [...new Set(domains.map((domain) => domain?.environment).filter(Boolean))]
+        return envIds.every((id) => value?.[id]?.deploymentId != null)
+      }
+    ),
   active: yup.boolean(),
   networkMap: yup.string(),
   firewall: yup.number().label('Firewall').nullable(),
