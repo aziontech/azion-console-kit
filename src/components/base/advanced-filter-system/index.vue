@@ -9,7 +9,7 @@
   import { useAccountStore } from '@/stores/account'
   import { createUtcDateFromUserTimezoneParts } from '@/helpers/convert-date'
   import { createRelativeRange } from '@utils/date.js'
-  import { listTimezonesService } from '@/services/users-services'
+  import { listTimezonesService } from '@/services/v2/listTimezones'
 
   defineOptions({ name: 'advanced-filter-system' })
   const accountStore = useAccountStore()
@@ -308,7 +308,7 @@
           :maxDays="props.filterDateRangeMaxDays"
           :defaultUtcOffset="userUTC"
           :userTimezone="userTimezone"
-          :listTimezonesService="listTimezonesService"
+          :listTimezonesService="listTimezonesService.listTimezones"
           @select="onDateRangeSelect"
           @autoRefresh="onAutoRefreshTick"
         />
