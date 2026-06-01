@@ -39,7 +39,7 @@
   </div>
 
   <Button
-    size="medium"
+    size="large"
     :label="labelButton"
     :loading="loading"
     @click="eventButtonSignUp"
