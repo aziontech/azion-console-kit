@@ -27,6 +27,10 @@
     isOverlapped: {
       type: Boolean,
       default: false
+    },
+    widthClass: {
+      type: String,
+      default: ''
     }
   })
   const visibleDrawer = computed({
@@ -43,6 +47,12 @@
   const toggleDrawerVisibility = (isVisible) => {
     emit('update:visible', isVisible)
   }
+
+  const resolvedWidthClass = computed(() => {
+    if (isExpanded.value) return ''
+    if (props.widthClass) return props.widthClass
+    return props.isOverlapped ? 'max-w-5xl' : 'max-w-4xl'
+  })
 </script>
 
 <template>
@@ -54,16 +64,7 @@
       tabindex="0"
       :pt="{
         root: {
-          class: [
-            'w-full',
-            'transition-all',
-            'duration-300',
-            'ease-in-out',
-            {
-              'max-w-5xl': !isExpanded && props.isOverlapped,
-              'max-w-4xl': !isExpanded && !props.isOverlapped
-            }
-          ]
+          class: ['w-full', 'transition-all', 'duration-300', 'ease-in-out', resolvedWidthClass]
         },
         headercontent: { class: 'flex justify-content-between items-center w-full pr-2' },
         content: { class: 'p-8 mb-14' }
