@@ -9,7 +9,7 @@
         folder and follow the instructions.
       </p>
     </section>
-    <section class="w-full flex flex-wrap gap-2">
+    <section class="w-full flex flex-wrap gap-2 items-center">
       <p class="text-start text-sm">Didn't receive the email?</p>
       <Button
         kind="text"
