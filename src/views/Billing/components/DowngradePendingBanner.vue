@@ -16,14 +16,20 @@
       />
     </div>
 
-    <p class="flex-1 text-xs leading-5 text-default">
-      {{ message }}
-    </p>
+    <div class="flex-1 flex flex-col gap-0.5">
+      <p class="text-xs leading-5 text-color">
+        {{ mainMessage }}
+      </p>
+      <p class="text-xs leading-5 text-color-secondary">
+        Your usage limits will be reduced after this date.
+      </p>
+    </div>
 
-    <Button
-      severity="secondary"
-      class="h-8 px-4 font-protomono text-xs flex items-center justify-center shrink-0"
+    <ActionButton
+      kind="secondary"
+      size="small"
       label="Keep current plan"
+      class="shrink-0"
       @click="$emit('cancel')"
     />
   </div>
@@ -31,7 +37,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import Button from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/button'
   import { formatBillingDate } from '@/utils/billing-date'
 
   defineOptions({ name: 'downgrade-pending-banner' })
@@ -45,9 +51,9 @@
 
   const formattedDate = computed(() => formatBillingDate(props.effectiveAt))
 
-  const message = computed(() => {
+  const mainMessage = computed(() => {
     const date = formattedDate.value || '--'
     const target = props.targetPlanLabel ? ` to ${props.targetPlanLabel}` : ''
-    return `You scheduled a downgrade${target} on ${date}. Your usage limits will be reduced after this date.`
+    return `You scheduled a downgrade${target} on ${date}.`
   })
 </script>

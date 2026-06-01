@@ -66,30 +66,32 @@
     </div>
 
     <template #closeicon>
-      <PrimeButton
-        outlined
+      <IconButton
+        kind="outlined"
+        size="medium"
         @click="cancelDialog()"
         icon="pi pi-times"
+        aria-label="button"
       />
     </template>
 
     <template #footer>
-      <PrimeButton
-        outlined
+      <Button
+        kind="outlined"
         label="Cancel"
-        size="small"
-        @click="cancelDialog()"
+        size="medium"
         data-testid="delete-dialog-footer-cancel-button"
-      ></PrimeButton>
-      <PrimeButton
-        severity="danger"
+        @click="cancelDialog()"
+      />
+      <Button
+        kind="danger"
+        size="medium"
         label="Delete"
-        icon-pos="right"
-        @click="removeItem()"
+        data-testid="delete-dialog-footer-delete-button"
         :icon="getLoadingIcon"
         :disabled="isDisabled"
-        data-testid="delete-dialog-footer-delete-button"
-      ></PrimeButton>
+        @click="removeItem()"
+      />
     </template>
   </PrimeDialog>
 </template>
@@ -99,7 +101,8 @@
   import { useField, useForm } from 'vee-validate'
   import { useToast } from '@aziontech/webkit/use-toast'
   import * as yup from 'yup'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import InputText from '@aziontech/webkit/inputtext'
   import Message from '@aziontech/webkit/message'

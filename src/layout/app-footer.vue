@@ -19,52 +19,52 @@
           class="w-full flex flex-col md:flex-row gap-3 xl:justify-center items-center flex-wrap justify-center"
         >
           <div class="flex gap-1">
-            <PrimeButton
+            <Button
+              kind="text"
               size="small"
               label="About"
-              link
               @click="openAzionSiteAboutUs"
             />
-            <PrimeButton
+            <Button
+              kind="text"
               size="small"
               label="Blog"
-              link
               @click="openAzionBlog"
             />
-            <PrimeButton
+            <Button
+              kind="text"
               size="small"
               label="Legal"
-              link
               @click="azionPrivacyPolicyWindowOpener"
             />
-            <PrimeButton
+            <Button
+              kind="text"
               size="small"
               label="Docs"
-              link
               @click="openDocumentation"
             />
           </div>
           <!-- Social Buttons -->
           <div class="flex gap-2">
-            <PrimeButton
+            <IconButton
+              kind="outlined"
               icon="pi pi-github"
-              outlined
               size="small"
               aria-label="Visit Azion on GitHub"
               v-tooltip.top="{ value: 'Github', showDelay: 200 }"
               @click="openAzionGithub"
             />
-            <PrimeButton
+            <IconButton
+              kind="outlined"
               icon="pi pi-discord"
-              outlined
               size="small"
               aria-label="Join Azion Discord community"
               v-tooltip.top="{ value: 'Discord', showDelay: 200 }"
               @click="openAzionDiscord"
             />
-            <PrimeButton
+            <IconButton
+              kind="outlined"
               icon="ai ai-x"
-              outlined
               size="small"
               aria-label="Follow Azion on X (Twitter)"
               v-tooltip.top="{ value: 'X', showDelay: 200 }"
@@ -100,7 +100,8 @@
   import { computed } from 'vue'
   import Toolbar from '@aziontech/webkit/toolbar'
   import AzionSystemStatus from '@aziontech/webkit/azion-system-status'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import { useRoute } from 'vue-router'
 
   const route = useRoute()

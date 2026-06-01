@@ -2,6 +2,7 @@
   import { computed } from 'vue'
   import ButtonSave from '@aziontech/webkit/button-save'
   import ButtonCancel from '@aziontech/webkit/button-cancel'
+  import Button from '@aziontech/webkit/button'
 
   defineOptions({ name: 'action-bar-block' })
 
@@ -45,16 +46,20 @@
         data-testid="form-actions-buttons"
       >
         <slot>
-          <ButtonCancel
+          <Button
             :label="props.secondaryActionLabel"
             :disabled="isDisabledCancel"
+            kind="outlined"
+            size="medium"
             class="max-md:min-w-max"
             data-testid="form-actions-cancel-button"
             @click="handleCancel"
           />
-          <ButtonSave
+          <Button
             :label="props.primaryActionLabel"
             :loading="isDisabledSubmit"
+            kind="primary"
+            size="medium"
             class="max-md:w-full md:min-w-[5rem]"
             data-testid="form-actions-submit-button"
             @click="handleSubmit"

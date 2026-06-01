@@ -206,29 +206,12 @@ export class SignUpTracker {
 
   /**
    * @param {Object} payload
-   * @param {'hobby'|'pro'} payload.plan
-   *
+   * @param {string} payload.plan
    * @returns {AnalyticsTrackerAdapter}
    */
-  successScreenViewed(payload) {
+  successScreenViewed(payload = {}) {
     this.#trackerAdapter.addEvent({
-      eventName: 'Sign Up Success Screen Viewed',
-      props: {
-        plan: payload.plan
-      }
-    })
-    return this.#trackerAdapter
-  }
-
-  /**
-   * @param {Object} payload
-   * @param {'hobby'|'pro'} payload.plan
-   *
-   * @returns {AnalyticsTrackerAdapter}
-   */
-  startDeployingClicked(payload) {
-    this.#trackerAdapter.addEvent({
-      eventName: 'Sign Up Start Deploying Clicked',
+      eventName: 'Plan Success Screen Viewed',
       props: {
         plan: payload.plan
       }
@@ -239,116 +222,13 @@ export class SignUpTracker {
   /**
    * @param {Object} payload
    * @param {string} payload.plan
-   * @param {string} payload.billingCycle
+   * @returns {AnalyticsTrackerAdapter}
    */
-  planSelected(payload) {
+  startDeployingClicked(payload = {}) {
     this.#trackerAdapter.addEvent({
-      eventName: 'Sign Up Plan Selected',
+      eventName: 'Start Deploying Clicked',
       props: {
-        plan: payload?.plan,
-        billingCycle: payload?.billingCycle
-      }
-    })
-    return this.#trackerAdapter
-  }
-
-  /**
-   * @param {Object} payload
-   * @param {string} payload.fromCycle
-   * @param {string} payload.toCycle
-   */
-  billingCycleToggled(payload) {
-    this.#trackerAdapter.addEvent({
-      eventName: 'Sign Up Billing Cycle Toggled',
-      props: {
-        fromCycle: payload?.fromCycle,
-        toCycle: payload?.toCycle
-      }
-    })
-    return this.#trackerAdapter
-  }
-
-  /**
-   * @param {Object} payload
-   * @param {string} payload.plan
-   * @param {string} payload.billingCycle
-   */
-  checkoutStarted(payload) {
-    this.#trackerAdapter.addEvent({
-      eventName: 'Sign Up Checkout Started',
-      props: {
-        plan: payload?.plan,
-        billingCycle: payload?.billingCycle
-      }
-    })
-    return this.#trackerAdapter
-  }
-
-  /**
-   * @param {Object} payload
-   * @param {string} payload.plan
-   * @param {string} payload.billingCycle
-   * @param {string} [payload.methodType]
-   */
-  paymentMethodSubmitted(payload) {
-    this.#trackerAdapter.addEvent({
-      eventName: 'Sign Up Payment Method Submitted',
-      props: {
-        plan: payload?.plan,
-        billingCycle: payload?.billingCycle,
-        methodType: payload?.methodType
-      }
-    })
-    return this.#trackerAdapter
-  }
-
-  /**
-   * @param {Object} payload
-   * @param {string} payload.plan
-   * @param {string} payload.billingCycle
-   * @param {string|number} [payload.amount]
-   * @param {string} [payload.currency]
-   */
-  paymentConfirmed(payload) {
-    this.#trackerAdapter.addEvent({
-      eventName: 'Sign Up Payment Confirmed',
-      props: {
-        plan: payload?.plan,
-        billingCycle: payload?.billingCycle,
-        amount: payload?.amount,
-        currency: payload?.currency
-      }
-    })
-    return this.#trackerAdapter
-  }
-
-  /**
-   * @param {Object} payload
-   * @param {string} payload.errorType
-   * @param {string} payload.errorMessage
-   * @param {string} [payload.gateway]
-   */
-  paymentFailed(payload) {
-    this.#trackerAdapter.addEvent({
-      eventName: 'Sign Up Payment Failed',
-      props: {
-        errorType: payload?.errorType,
-        errorMessage: payload?.errorMessage,
-        gateway: payload?.gateway
-      }
-    })
-    return this.#trackerAdapter
-  }
-
-  /**
-   * @param {Object} payload
-   * @param {'email'|'resend'} payload.source
-   */
-  emailVerificationClicked(payload) {
-    this.#trackerAdapter.addEvent({
-      eventName: 'Email Verification Clicked',
-      props: {
-        source: payload?.source
+        plan: payload.plan
       }
     })
     return this.#trackerAdapter

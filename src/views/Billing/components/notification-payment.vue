@@ -6,11 +6,6 @@
     :createService="paymentService.addCredit"
     @onSuccess="successCredit"
   />
-  <DrawerPaymentMethod
-    ref="drawerPaymentMethodRef"
-    :getStripeClientService="props.getStripeClientService"
-    @onSuccess="successPaymentMethod"
-  />
 
   <SkeletonBlock
     v-if="!showNotification && loadingNotification"
@@ -25,11 +20,11 @@
   >
     <template #description>
       {{ notificationPayment.description }}
-      <PrimeButton
+      <ActionButton
         v-if="!props.linkText.hidden"
         :label="labelLink"
-        link
-        class="p-0 text-sm"
+        kind="text"
+        size="small"
         :disabled="props.linkText.disabled"
         @click="redirectPayment"
       />
@@ -39,11 +34,10 @@
 </template>
 <script setup>
   import DrawerAddCredit from '@/views/Billing/Drawer/DrawerAddCredit.vue'
-  import DrawerPaymentMethod from '@/views/Billing/Drawer/DrawerPaymentMethod.vue'
   import { paymentService } from '@/services/v2/payment/payment-service'
   import MessageNotification from '@/templates/message-notification'
   import { useAccountStore } from '@/stores/account'
-  import PrimeButton from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/button'
   import { computed, ref, onMounted } from 'vue'
   import { formatUnitValue } from '@/helpers'
   import SkeletonBlock from '@/templates/skeleton-block'
@@ -52,19 +46,12 @@
 
   defineOptions({ name: 'notification-payment' })
 
-  const emit = defineEmits([
-    'clickAddCredit',
-    'clickAddPaymentMethod',
-    'clickLink',
-    'onSuccessCredit',
-    'onSuccessPaymentMethod'
-  ])
+  const emit = defineEmits(['clickAddCredit', 'clickLink', 'onSuccessCredit'])
 
   const toast = useToast()
   const showNotification = ref(false)
   const loadingNotification = ref(false)
   const drawerAddCreditRef = ref(null)
-  const drawerPaymentMethodRef = ref(null)
   const labelLink = ref('payment methods.')
 
   const props = defineProps({
@@ -85,12 +72,6 @@
       })
     },
     linkText: {
-      type: Object,
-      default: () => ({
-        disabled: false
-      })
-    },
-    buttonPaymentMethod: {
       type: Object,
       default: () => ({
         disabled: false
@@ -133,16 +114,6 @@
       hidden: !props.cardDefault.cardData,
       outlined: true,
       ...props.buttonCredit
-    },
-    {
-      label: 'Payment Method',
-      icon: 'pi pi-plus',
-      onClick: () => {
-        openDrawerPaymentMethod()
-        emit('clickAddPaymentMethod')
-      },
-      severity: 'secondary',
-      ...props.buttonPaymentMethod
     }
   ])
 
@@ -154,12 +125,6 @@
   }
 
   const NOTIFICATION_CONFIGS = {
-    TRIAL: {
-      title: 'Your free trial credit balance is running',
-      type: 'info',
-      getDescription: (credit, days) =>
-        `You have $${credit} to use in ${days} days. To use Azion with no service interruptions at the end of your trial, add a`
-    },
     BLOCKED: {
       title: 'Your account is blocked',
       type: 'error',
@@ -189,26 +154,19 @@
         return
       }
 
-      if (status === 'TRIAL' || status === 'ONLINE') {
-        const { credit, days, formatCredit } = accountData
-        if (!(credit > 0 && days > 0)) {
-          loadingNotification.value = false
-          showNotification.value = false
-          return
-        }
-        notificationPayment.value = {
-          ...NOTIFICATION_CONFIGS.TRIAL,
-          description: NOTIFICATION_CONFIGS.TRIAL.getDescription(formatCredit, days)
-        }
-      } else if (status === 'BLOCKED' || status === 'DEFAULTING') {
+      if (status === 'BLOCKED' || status === 'DEFAULTING') {
         const total = await totalPending()
         notificationPayment.value = {
           ...NOTIFICATION_CONFIGS[status],
           description: NOTIFICATION_CONFIGS[status].getDescription(total)
         }
+        loadingNotification.value = false
+        showNotification.value = true
+        return
       }
+
       loadingNotification.value = false
-      showNotification.value = true
+      showNotification.value = false
     } catch {
       showNotification.value = false
       loadingNotification.value = false
@@ -235,11 +193,6 @@
     }
   }
 
-  const successPaymentMethod = () => {
-    reload()
-    emit('onSuccessPaymentMethod')
-  }
-
   const successCredit = () => {
     reload()
     emit('onSuccessCredit')
@@ -249,10 +202,6 @@
     drawerAddCreditRef.value?.openDrawer()
   }
 
-  const openDrawerPaymentMethod = async () => {
-    drawerPaymentMethodRef.value?.openDrawer()
-  }
-
   onMounted(() => {
     const account = useAccountStore()
     loadText(account)
@@ -260,7 +209,6 @@
 
   defineExpose({
     reload,
-    openDrawerCredit,
-    openDrawerPaymentMethod
+    openDrawerCredit
   })
 </script>

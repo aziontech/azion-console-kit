@@ -11,13 +11,13 @@
     </section>
     <section class="w-full flex flex-wrap gap-2">
       <p class="text-start text-sm">Didn't receive the email?</p>
-      <PrimeButton
+      <Button
+        kind="text"
         size="small"
         label="Resend Email"
-        class="p-0"
-        link
         @click="resendEmail"
         :disabled="isSubmitDisabled"
+        class="p-0"
       />
       <PrimeBadge
         class="rounded-md animate-fadeIn"
@@ -25,21 +25,21 @@
         v-if="showCounter"
       />
     </section>
-    <PrimeButton
+    <Button
+      kind="secondary"
+      size="medium"
       label="Return to Sign In"
       @click="goToLogin"
-      severity="secondary"
     />
   </div>
 </template>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import PrimeBadge from '@aziontech/webkit/badge'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import { computed, inject, ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import * as Sentry from '@sentry/vue'
 
   const SUBMIT_TIMER = 60
 
@@ -53,8 +53,6 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
   const showCounter = computed(() => counter.value > 0)
 
   const { email } = route.query
@@ -79,9 +77,6 @@
 
   const resendEmail = async () => {
     disableSubmitByTimer(SUBMIT_TIMER)
-    Promise.resolve()
-      .then(() => tracker?.signUp?.emailVerificationClicked?.({ source: 'resend' })?.track?.())
-      .catch(Sentry.captureException)
     try {
       const res = await props.resendEmailService({ email: decodedEmail })
       toast.add({ severity: 'success', detail: res, summary: 'Email sent!' })

@@ -1,7 +1,7 @@
 <script setup>
   import { ref, watch } from 'vue'
   import PrimeDialog from '@aziontech/webkit/dialog'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import TextArea from '@aziontech/webkit/textarea'
 
   defineOptions({ name: 'dialog-allow-rule' })
@@ -89,20 +89,20 @@
         />
       </div>
       <template #footer>
-        <PrimeButton
-          severity="primary"
+        <Button
+          kind="primary"
+          size="medium"
           label="Cancel"
-          outlined
           @click="closeDialog"
         />
-        <PrimeButton
-          severity="secondary"
+        <Button
+          kind="secondary"
+          size="medium"
           label="Allow Rules"
           :loading="loading"
           :disabled="!name"
           data-testid="allow-rules-button"
           @click="handleAllowRule"
-          iconPos="right"
         />
       </template>
     </PrimeDialog>

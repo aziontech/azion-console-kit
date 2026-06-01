@@ -4,7 +4,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActivityHistoryTable from './components/ActivityHistoryTable.vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
 
   const router = useRouter()
 
@@ -35,9 +35,10 @@
         :documentationService="documentationService"
       >
         <template #emptyBlockButton>
-          <PrimeButton
+          <Button
+            kind="secondary"
+            size="medium"
             label="Go to Home"
-            severity="secondary"
             @click="goToHome"
           />
         </template>

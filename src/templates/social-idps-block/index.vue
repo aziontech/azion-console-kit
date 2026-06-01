@@ -16,12 +16,13 @@
         v-for="idp in idps"
         :key="idp.slug"
       >
-        <PrimeButton
+        <Button
+          kind="outlined"
+          size="large"
           v-if="idp.isActive"
           :label="formatName(idp.name)"
           :icon="getIcon(idp.slug)"
           @click="authenticate(idp)"
-          outlined
           :loading="submittedIdp === idp.uuid"
           :disabled="submittedIdp"
         />
@@ -34,7 +35,7 @@
   import { useAccountStore } from '@/stores/account'
   import { useLoadingStore } from '@/stores/loading'
   import { validateOAuthRedirect } from '@/helpers/oauth-security'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, onMounted, ref, inject, onUnmounted, defineModel } from 'vue'
