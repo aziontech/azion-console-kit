@@ -18,7 +18,7 @@
       >
         <Button
           kind="outlined"
-          size="medium"
+          size="large"
           v-if="idp.isActive"
           :label="formatName(idp.name)"
           :icon="getIcon(idp.slug)"

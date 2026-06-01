@@ -198,7 +198,10 @@
       .string()
       .trim()
       .max(61, 'Your Full Name must be less than 61 characters')
-      .matches(/[A-Za-zÀ-ž.'-]+ [A-Za-zÀ-ž.'-]+/, 'Your Full Name must include first and last name')
+      .matches(
+        /[A-Za-zÀ-ž.'-]+\s+[A-Za-zÀ-ž.'-]+/,
+        'Your Full Name must include first and last name'
+      )
       .required('Your Full Name is required')
   })
 
@@ -424,10 +427,8 @@
   onMounted(async () => {
     initializePlans({ defaultPlan: 'hobby', defaultBillingCycle: DEFAULT_BILLING_CYCLE })
 
-    // Pre-fill plan from URL params/storage
-    if (storedPlan.value && ['hobby', 'pro'].includes(storedPlan.value)) {
-      plan.value = storedPlan.value
-    }
+    // Pre-fill plan from URL params/storage; default to Hobby when missing/invalid
+    plan.value = ['hobby', 'pro'].includes(storedPlan.value) ? storedPlan.value : 'hobby'
 
     // Pre-fill billing cycle
     if (storedBillingCycle.value) {

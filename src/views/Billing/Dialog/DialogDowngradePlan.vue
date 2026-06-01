@@ -122,7 +122,13 @@
     return 'Downgrade plan'
   })
 
-  const keepLabel = computed(() => `Keep ${getPlanLabel(props.fromPlan)}`)
+  const keepLabel = computed(() => {
+    if (props.cycleChange) {
+      const fromCycleLabel = props.fromCycle === 'yearly' ? 'Annual' : 'Monthly'
+      return `Keep ${fromCycleLabel}`
+    }
+    return `Keep ${getPlanLabel(props.fromPlan)}`
+  })
 
   const effectiveDate = computed(() => formatBillingDate(props.effectiveAt))
 

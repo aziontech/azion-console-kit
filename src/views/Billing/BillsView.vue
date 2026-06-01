@@ -61,29 +61,8 @@
     title="No payment activity yet."
     description="Add a payment method and start using services and products to view your activity."
     :inTabs="true"
-    createButtonLabel="Add Credit"
     :documentationService="props.documentPaymentHistoryService"
-  >
-    <template #default>
-      <ActionButton
-        class="max-md:w-full w-fit"
-        kind="outlined"
-        size="medium"
-        label="Credit"
-        icon="pi pi-plus"
-        :disabled="!defaultCardStatus.hasData"
-        @click="goToPayment"
-      />
-      <ActionButton
-        class="max-md:w-full w-fit"
-        kind="secondary"
-        size="medium"
-        icon="pi pi-plus"
-        label="Payment Method"
-        @click="goToPayment"
-      />
-    </template>
-  </EmptyResultsBlock>
+  />
 
   <PlanSelectionDrawer
     v-model:visible="showChangePlanDrawer"
@@ -135,7 +114,6 @@
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
-  import ActionButton from '@aziontech/webkit/button'
   import SubscriptionPlanCard from './components/SubscriptionPlanCard.vue'
   import UpgradeToProCard from './components/UpgradeToProCard.vue'
   import CurrentInvoiceCard from './components/CurrentInvoiceCard.vue'
@@ -327,11 +305,6 @@
       drawerMode.value = 'subscribe'
     }
   })
-
-  const defaultCardStatus = computed(() => ({
-    loaded: props.cardDefault?.loader,
-    hasData: !!props.cardDefault?.cardData
-  }))
 
   const { defaultPaymentMethod } = useBillingPaymentMethods()
 

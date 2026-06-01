@@ -15,13 +15,14 @@
         disableAfterCreateToastFeedback
         @on-edit-fail="handleTrackFailEdit"
         @on-edit-success="successSubmit"
-        @loaded-service-object="isFormLoading = false"
+        @loaded-service-object="handleLoadedServiceObject"
       >
         <template #form="{ loading }">
           <div class="relative flex flex-col gap-8 max-md:gap-6">
             <FormFieldsYourSettings
               :timezoneOptions="optionsTimezone"
               :listCountriesPhoneService="listCountriesPhoneService"
+              :loadedUserData="loadedUserData"
               @password-strength="onPasswordStrengthChange"
             />
             <div
@@ -105,6 +106,12 @@
   const userData = ref({})
   const userChanges = ref({})
   const optionsTimezone = ref([])
+  const loadedUserData = ref(null)
+
+  const handleLoadedServiceObject = (data) => {
+    loadedUserData.value = data
+    isFormLoading.value = false
+  }
 
   const loadUser = async () => {
     const [user, timezones] = await Promise.all([
