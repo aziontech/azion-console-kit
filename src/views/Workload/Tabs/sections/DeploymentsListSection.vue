@@ -1,129 +1,29 @@
 <script setup>
   import { ref, computed } from 'vue'
+  import { useRouter } from 'vue-router'
   import GenericDataView from '@/components/GenericDataView'
   import StatusTag from '@/components/StatusTag'
   import CurrentBadge from '@/components/CurrentBadge'
   import Dropdown from '@aziontech/webkit/dropdown'
+  import {
+    MOCK_DEPLOYMENTS,
+    STATUS_TAG,
+    statusTag
+  } from '@/views/Workload/Tabs/sections/deployments.mock'
 
   defineOptions({ name: 'deployments-list-section' })
 
-  // eslint-disable-next-line no-unused-vars
   const props = defineProps({
     workloadId: { type: [String, Number], required: true }
   })
 
-  // TODO: replace with real service when the deployments-per-workload endpoint is ready
-  const MOCK_DEPLOYMENTS = [
-    {
-      id: 'd-1',
-      deploymentId: '129318321',
-      environment: 'Production',
-      status: 'building',
-      duration: null,
-      isCurrent: true,
-      isRollback: false,
-      createdAt: '2026-05-15T11:00:25Z',
-      author: 'rafael.umman@azion.com'
-    },
-    {
-      id: 'd-2',
-      deploymentId: '129318321',
-      environment: 'Production',
-      status: 'ready',
-      duration: '99s',
-      isCurrent: false,
-      isRollback: false,
-      createdAt: '2026-05-15T11:00:25Z',
-      author: 'rafael.umman@azion.com'
-    },
-    {
-      id: 'd-3',
-      deploymentId: '129318321',
-      environment: 'Production',
-      status: 'building',
-      duration: null,
-      isCurrent: false,
-      isRollback: false,
-      createdAt: '2026-05-15T11:00:25Z',
-      author: 'rafael.umman@azion.com'
-    },
-    {
-      id: 'd-4',
-      deploymentId: '129318321',
-      environment: 'Stage',
-      status: 'error',
-      duration: null,
-      isCurrent: false,
-      isRollback: true,
-      createdAt: '2026-05-15T11:00:25Z',
-      author: 'rafael.umman@azion.com'
-    },
-    {
-      id: 'd-5',
-      deploymentId: '129318321',
-      environment: 'Stage',
-      status: 'queued',
-      duration: null,
-      isCurrent: false,
-      isRollback: true,
-      createdAt: '2026-05-15T11:00:25Z',
-      author: 'rafael.umman@azion.com'
-    },
-    {
-      id: 'd-6',
-      deploymentId: '129318321',
-      environment: 'Production',
-      status: 'ready',
-      duration: '99s',
-      isCurrent: false,
-      isRollback: false,
-      createdAt: '2026-05-15T11:00:25Z',
-      author: 'rafael.umman@azion.com'
-    },
-    {
-      id: 'd-7',
-      deploymentId: '129318321',
-      environment: 'Production',
-      status: 'building',
-      duration: null,
-      isCurrent: false,
-      isRollback: false,
-      createdAt: '2026-05-15T11:00:25Z',
-      author: 'rafael.umman@azion.com'
-    },
-    {
-      id: 'd-8',
-      deploymentId: '129318321',
-      environment: 'Stage',
-      status: 'error',
-      duration: null,
-      isCurrent: false,
-      isRollback: true,
-      createdAt: '2026-05-15T11:00:25Z',
-      author: 'rafael.umman@azion.com'
-    },
-    {
-      id: 'd-9',
-      deploymentId: '129318321',
-      environment: 'Stage',
-      status: 'queued',
-      duration: null,
-      isCurrent: false,
-      isRollback: true,
-      createdAt: '2026-05-15T11:00:25Z',
-      author: 'rafael.umman@azion.com'
-    }
-  ]
+  const router = useRouter()
 
-  const STATUS_TAG = {
-    ready: { content: 'Ready', severity: 'success' },
-    building: { content: 'Building', severity: 'secondary' },
-    error: { content: 'Error', severity: 'danger' },
-    queued: { content: 'Queued', severity: 'warning' }
-  }
-
-  const statusTag = (status) =>
-    STATUS_TAG[status] ?? { content: status || 'Unknown', severity: 'secondary' }
+  const goToDetails = (item) =>
+    router.push({
+      name: 'workload-deployment-details',
+      params: { id: props.workloadId, deploymentId: item.id }
+    })
 
   const ALL = 'all'
   const dateOptions = [
@@ -303,7 +203,14 @@
     </template>
     <template #cell-deployment="{ item }">
       <div class="flex flex-col gap-0.5 min-w-0">
-        <span class="text-sm font-medium truncate">{{ item.deploymentId }}</span>
+        <button
+          type="button"
+          class="deployment-id-button m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-medium leading-6 text-[var(--text-color)] hover:text-[var(--primary-color)] hover:underline focus-visible:text-[var(--primary-color)] focus-visible:outline-none"
+          :data-testid="`workload-deployments__row__id-${item.id}`"
+          @click="goToDetails(item)"
+        >
+          {{ item.deploymentId }}
+        </button>
         <div class="flex items-center gap-2 min-w-0">
           <span class="text-xs text-color-secondary truncate">{{ item.environment }}</span>
           <i
@@ -337,3 +244,13 @@
     </template>
   </GenericDataView>
 </template>
+
+<style scoped>
+  .deployment-id-button {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+  }
+</style>
