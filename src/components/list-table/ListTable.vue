@@ -346,7 +346,7 @@
                     v-if="hasAllowedFilters"
                     kind="outlined"
                     icon="pi pi-filter"
-                    size="small"
+                    size="medium"
                     data-testid="data-table-actions-column-header-toggle-filter"
                     aria-label="data table actions column header toggle filter"
                     @click="toggleFilter"
@@ -365,7 +365,7 @@
                   <IconButton
                     kind="outlined"
                     icon="pi pi-refresh"
-                    size="small"
+                    size="medium"
                     v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                     data-testid="data-table-actions-column-header-refresh"
                     aria-label="data table actions column header refresh"
