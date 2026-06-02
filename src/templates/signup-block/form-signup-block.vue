@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-md md:min-w-[448px]">
     <div v-if="showActivation">
-      <div class="flex surface-border border rounded-md p-6">
+      <div class="flex surface-border border rounded-md p-6 surface-card">
         <div class="w-full flex flex-col gap-8 animate-fadeIn">
           <form
             class="flex flex-col gap-8"
