@@ -7,20 +7,25 @@ on:
   push:
     branches:
       - dev
-  workflow_dispatch:
+
 env:
   HUSKY: 0
+
 jobs:
   package-audit:
     runs-on: ubuntu-latest
     container:
       image: node:22-alpine
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
       - name: Install SO deps
         run: apk add curl bash git
+      
       - name: Install dependencies
         run: yarn ci
+
       - name: Run package-auditor
         run: yarn package-audit
