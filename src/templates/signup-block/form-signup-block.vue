@@ -78,21 +78,24 @@
   import Button from '@aziontech/webkit/button'
   import PrimeDivider from '@aziontech/webkit/divider'
   import LoginWithEmailBlock from '@/templates/signup-block/login-with-email-block'
+  import { usePlans } from '@/composables/usePlans'
   import { computed, ref } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRouter } from 'vue-router'
 
   const props = defineProps({
     signupService: { required: true, type: Function },
     resendEmailService: { required: true, type: Function }
   })
 
-  const route = useRoute()
   const router = useRouter()
+  const { plan, initialize: initializePlans } = usePlans()
+  initializePlans({ defaultPlan: 'hobby' })
+
   const showLoginFromEmail = ref(true)
   const showActivation = ref(true)
 
   const signupHeading = computed(() =>
-    route.query.plan === 'pro' ? 'Sign Up for the Pro Plan' : 'Sign Up for a Free Account'
+    plan.value === 'pro' ? 'Sign Up for the Pro Plan' : 'Sign Up for a Free Account'
   )
 
   const showActivationEmail = () => {
