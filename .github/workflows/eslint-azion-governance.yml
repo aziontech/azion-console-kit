@@ -14,7 +14,7 @@ permissions:
   pull-requests: read
 
 jobs:
-  eslint:
+  eslint-azion-governance:
     runs-on: ubuntu-latest
     container:
       image: node:22-alpine
