@@ -1,19 +1,15 @@
 <template>
   <IconButton
-    @click="sidebarToggle"
-    @keydown="handleButtonKeyDown"
     v-if="isAccountTypeClient"
+    ref="menuButton"
     size="medium"
+    kind="outlined"
     icon="pi pi-bars"
     aria-label="Toggle navigation menu"
-    :class="{
-      'bg-header-button-enabled': showSidebar,
-      'bg-header hover:bg-header-button-hover': !showSidebar
-    }"
     v-tooltip.bottom="{ value: 'Menu', showDelay: 200 }"
     data-testid="sidebar-block__toggle-button"
-    ref="menuButton"
-    class="text-white flex-none border-header w-9 h-9"
+    @click="sidebarToggle"
+    @keydown="handleButtonKeyDown"
   />
 
   <Sidebar

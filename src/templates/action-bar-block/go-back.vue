@@ -31,7 +31,6 @@
       data-testid="action-bar__go-back"
       label="Back to list"
       @click="handleClick"
-      class="max-md:w-full md:min-w-[5rem]"
     />
   </div>
 </template>
