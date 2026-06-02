@@ -150,10 +150,7 @@ export const validationSchema = yup.object({
           'Each domain needs a certificate when HTTPS is enabled.',
           (rows) =>
             (rows || []).every(
-              (domain) =>
-                domain?.certificate !== undefined &&
-                domain?.certificate !== null &&
-                domain.certificate !== 0
+              (domain) => domain?.certificate !== undefined && domain?.certificate !== null
             )
         )
     }),
