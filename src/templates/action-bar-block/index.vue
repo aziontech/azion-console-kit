@@ -28,7 +28,7 @@
 </script>
 <template>
   <div
-    class="flex w-full gap-4 justify-end h-16 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
+    class="flex w-full gap-4 justify-end h-16 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-4 md:px-8"
     data-testid="form-actions-container"
   >
     <div
@@ -49,7 +49,6 @@
             :disabled="isDisabledCancel"
             kind="outlined"
             size="medium"
-            class="max-md:min-w-max"
             data-testid="form-actions-cancel-button"
             @click="handleCancel"
           />
@@ -58,7 +57,6 @@
             :loading="isDisabledSubmit"
             kind="primary"
             size="medium"
-            class="max-md:w-full md:min-w-[5rem]"
             data-testid="form-actions-submit-button"
             @click="handleSubmit"
           />
