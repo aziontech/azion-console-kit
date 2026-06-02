@@ -35,8 +35,7 @@ jobs:
         
       - name: Configure token
         run: |
-          azion -t ${{ secrets.AZION_PERSONAL_TOKEN }}  
-          azion whoami
+          azion -t ${{ secrets.AZION_PERSONAL_TOKEN }}
 
       - name: Install storybook dependencies
         run: |

@@ -1,0 +1,43 @@
+name: Eslint Azion Governance
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches:
+      - dev
+
+env:
+  HUSKY: 0
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-alpine
+    
+    steps:
+      - name: Install SO Dependencies
+        run: apk add --no-cache curl bash git
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Install dependencies --frozen-lockfile
+        run: yarn install:lock
+
+      - name: Architecture Lint (Changed Files)
+        if: github.event_name == 'pull_request'
+        run: yarn lint:architecture:changed --base origin/${{ github.base_ref }}
+        
+      - name: Architecture Conformance Report
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          yarn architecture:report --format markdown >> $GITHUB_STEP_SUMMARY
