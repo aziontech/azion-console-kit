@@ -38,7 +38,7 @@
   import Button from '@aziontech/webkit/button'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import { computed, onMounted, ref, inject, onUnmounted, defineModel } from 'vue'
+  import { computed, onMounted, ref, inject, onUnmounted } from 'vue'
   import socialIdpsData from '@/helpers/social-idps'
 
   defineOptions({ name: 'social-idps-block' })

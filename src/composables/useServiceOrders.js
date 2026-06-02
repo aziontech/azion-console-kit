@@ -35,6 +35,11 @@ export function useServiceOrders() {
     ...mutationOptions
   })
 
+  const prepareSignupCheckoutMutation = useMutation({
+    mutationFn: (payload) => serviceOrdersService.prepareSignupCheckout(payload),
+    ...mutationOptions
+  })
+
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }) => serviceOrdersService.updateServiceOrder(id, payload),
     ...mutationOptions
@@ -63,6 +68,7 @@ export function useServiceOrders() {
   const isSubmitting = computed(
     () =>
       createMutation.isPending.value ||
+      prepareSignupCheckoutMutation.isPending.value ||
       updateMutation.isPending.value ||
       upgradeMutation.isPending.value ||
       downgradeMutation.isPending.value ||
@@ -82,6 +88,8 @@ export function useServiceOrders() {
   }
 
   const createServiceOrder = (payload) => createMutation.mutateAsync(payload)
+
+  const prepareSignupCheckout = (payload) => prepareSignupCheckoutMutation.mutateAsync(payload)
 
   const updateServiceOrder = (id, payload) => updateMutation.mutateAsync({ id, payload })
 
@@ -164,6 +172,7 @@ export function useServiceOrders() {
     loadAccountServiceOrders,
     getServiceOrder,
     createServiceOrder,
+    prepareSignupCheckout,
     updateServiceOrder,
     submitServiceOrder,
     upgrade,

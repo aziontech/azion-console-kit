@@ -72,11 +72,12 @@
               </div>
             </div>
             <div
+              ref="paymentElementContainer"
               id="payment-element"
               name="paymentElement"
               data-testid="payment-method-form__payment-element__input"
               class="stripe-input"
-              :class="{ 'absolute inset-0 invisible': !paymentElementReady }"
+              :class="{ 'absolute inset-0 opacity-0 pointer-events-none': !paymentElementReady }"
             />
           </div>
           <small
@@ -113,7 +114,7 @@
     name: 'payment-method-block'
   })
 
-  const emit = defineEmits(['readiness-change', 'stale-session'])
+  const emit = defineEmits(['readiness-change', 'stale-session', 'element-ready'])
 
   const props = defineProps({
     stripeClientService: {
@@ -132,6 +133,7 @@
   const stripe = ref(null)
   const checkout = ref(null)
   const paymentElement = ref(null)
+  const paymentElementContainer = ref(null)
   const paymentElementReady = ref(false)
   const paymentElementComplete = ref(false)
   const initializationVersion = ref(0)
@@ -160,6 +162,15 @@
 
   const emitReadinessChange = () => {
     emit('readiness-change', isPaymentFormReady())
+  }
+
+  const markPaymentElementReady = (version) => {
+    if (version !== initializationVersion.value || paymentElementReady.value) return
+
+    paymentElementReady.value = true
+    resetPaymentElementErrors()
+    emit('element-ready')
+    emitReadinessChange()
   }
 
   const unmountPaymentElement = () => {
@@ -220,10 +231,7 @@
       })
 
       paymentElement.value.on('ready', () => {
-        if (currentInitializationVersion !== initializationVersion.value) return
-        paymentElementReady.value = true
-        resetPaymentElementErrors()
-        emitReadinessChange()
+        markPaymentElementReady(currentInitializationVersion)
       })
 
       paymentElement.value.on('change', (event) => {
@@ -252,7 +260,7 @@
         emitReadinessChange()
       })
 
-      paymentElement.value.mount('#payment-element')
+      paymentElement.value.mount(paymentElementContainer.value)
     } catch (error) {
       if (currentInitializationVersion !== initializationVersion.value) {
         return

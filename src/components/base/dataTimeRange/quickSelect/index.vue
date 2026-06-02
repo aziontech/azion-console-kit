@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-  import { ref, defineModel, onMounted, onUnmounted, watch } from 'vue'
+  import { ref, onMounted, onUnmounted, watch } from 'vue'
   import Button from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InputNumber from '@aziontech/webkit/inputnumber'

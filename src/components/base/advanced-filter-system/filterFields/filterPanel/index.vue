@@ -116,7 +116,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, defineModel } from 'vue'
+  import { ref, computed } from 'vue'
   import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import InputText from '@aziontech/webkit/inputtext'

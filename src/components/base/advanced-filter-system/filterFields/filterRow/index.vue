@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-  import { computed, defineModel, ref, watch } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Dropdown from '@aziontech/webkit/dropdown'

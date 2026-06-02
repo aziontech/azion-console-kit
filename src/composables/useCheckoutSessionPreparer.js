@@ -17,6 +17,77 @@ const extractSecret = (response) =>
   response?.serviceOrder?.clientSecret ||
   ''
 
+export const prepareCheckoutSessionForServiceOrder = async ({
+  accountId,
+  plan,
+  cycle,
+  plans,
+  draftServiceOrderId,
+  signup,
+  ensureServiceOrdersList,
+  getCurrentServiceOrder,
+  createServiceOrder,
+  prepareSignupCheckout,
+  updateServiceOrder,
+  upgrade
+}) => {
+  const planId = plans?.find((item) => item.sku?.toLowerCase() === plan.toLowerCase())?.id
+  const planPricingId = getPlanPricingId(plans, plan, cycle)
+
+  if (!planId || !planPricingId) {
+    throw new Error(`Plan pricing not found for ${plan} (${cycle}).`)
+  }
+
+  if (signup) {
+    const prepareResponse = await prepareSignupCheckout({
+      planId,
+      planPricingId
+    })
+    const signupSecret = extractSecret(prepareResponse)
+    if (signupSecret) return signupSecret
+    throw new Error('Payment session client secret missing in response.')
+  }
+
+  if (draftServiceOrderId) {
+    const updateResponse = await updateServiceOrder(draftServiceOrderId, {
+      planId,
+      planPricingId
+    })
+    const refreshedSecret = extractSecret(updateResponse)
+    if (refreshedSecret) return refreshedSecret
+    throw new Error('Unable to refresh the existing checkout session.')
+  }
+
+  await ensureServiceOrdersList(accountId)
+  const currentSO = getCurrentServiceOrder(accountId)
+
+  if (currentSO?.status === SO_STATUS.DRAFT && currentSO.serviceOrderId) {
+    const updateResponse = await updateServiceOrder(currentSO.serviceOrderId, {
+      planId,
+      planPricingId
+    })
+    const refreshedSecret = extractSecret(updateResponse)
+    if (refreshedSecret) return refreshedSecret
+    throw new Error('Unable to refresh the existing checkout session.')
+  }
+
+  const response =
+    currentSO?.status === SO_STATUS.ACTIVE && currentSO.serviceOrderId
+      ? await upgrade({
+          id: currentSO.serviceOrderId,
+          accountId,
+          newPlanId: planId,
+          priceId: planPricingId
+        })
+      : await createServiceOrder({ planId, planPricingId })
+
+  const secret = extractSecret(response)
+  if (!secret) {
+    throw new Error('Payment session client secret missing in response.')
+  }
+  return secret
+}
+
 /**
  * Prepares a Stripe checkout session for the requested plan/cycle. When a
  * DRAFT service order already exists for the same plan, this issues a PATCH
@@ -25,15 +96,16 @@ const extractSecret = (response) =>
  * consumed since the last time the cache was warmed. The PATCH is cheap
  * compared to the bug surface of mounting Stripe.js with a dead secret.
  *
- * Concurrent invocations dedupe through Vue Query's mutation cache; no
- * manual in-flight tracking required.
+ * Callers that can fire multiple preparations in parallel must keep their
+ * own "latest request wins" guard before applying returned secrets.
  */
 export function useCheckoutSessionPreparer() {
   const accountStore = useAccountStore()
-  const { createServiceOrder, updateServiceOrder, upgrade } = useServiceOrders()
+  const { createServiceOrder, prepareSignupCheckout, updateServiceOrder, upgrade } =
+    useServiceOrders()
 
   const prepareMutation = useMutation({
-    mutationFn: async ({ plan, cycle }) => {
+    mutationFn: async ({ plan, cycle, draftServiceOrderId, signup }) => {
       const plans = await ensurePlansList()
 
       if (!accountStore.accountData?.country) {
@@ -45,46 +117,30 @@ export function useCheckoutSessionPreparer() {
         throw new Error('Account data not available yet.')
       }
 
-      const planId = plans?.find((item) => item.sku?.toLowerCase() === plan.toLowerCase())?.id
-      const planPricingId = getPlanPricingId(plans, plan, cycle)
-
-      if (!planId || !planPricingId) {
-        throw new Error(`Plan pricing not found for ${plan} (${cycle}).`)
-      }
-
-      await ensureServiceOrdersList(accountId)
-      const currentSO = getCurrentServiceOrder(accountId)
-
-      if (currentSO?.status === SO_STATUS.DRAFT && currentSO.serviceOrderId) {
-        const updateResponse = await updateServiceOrder(currentSO.serviceOrderId, {
-          planId,
-          planPricingId
-        })
-        const refreshedSecret = extractSecret(updateResponse)
-        if (refreshedSecret) return refreshedSecret
-        throw new Error('Unable to refresh the existing checkout session.')
-      }
-
-      const response =
-        currentSO?.status === SO_STATUS.ACTIVE && currentSO.serviceOrderId
-          ? await upgrade({
-              id: currentSO.serviceOrderId,
-              accountId,
-              newPlanId: planId,
-              priceId: planPricingId
-            })
-          : await createServiceOrder({ planId, planPricingId })
-
-      const secret = extractSecret(response)
-      if (!secret) {
-        throw new Error('Payment session client secret missing in response.')
-      }
-      return secret
+      return prepareCheckoutSessionForServiceOrder({
+        accountId,
+        plan,
+        cycle,
+        plans,
+        draftServiceOrderId,
+        signup,
+        ensureServiceOrdersList,
+        getCurrentServiceOrder,
+        createServiceOrder,
+        prepareSignupCheckout,
+        updateServiceOrder,
+        upgrade
+      })
     }
   })
 
-  const prepare = ({ plan, preferredCycle = null }) =>
-    prepareMutation.mutateAsync({ plan, cycle: preferredCycle || 'monthly' })
+  const prepare = ({ plan, preferredCycle = null, draftServiceOrderId = null, signup = false }) =>
+    prepareMutation.mutateAsync({
+      plan,
+      cycle: preferredCycle || 'monthly',
+      draftServiceOrderId,
+      signup
+    })
 
   /**
    * Recovery path for when Stripe rejects the secret returned by `prepare`
@@ -92,10 +148,15 @@ export function useCheckoutSessionPreparer() {
    * SO snapshots so the next `prepare` reads server-truth, then re-prepares
    * — yielding a brand-new Stripe Checkout Session.
    */
-  const recoverFromStaleSession = ({ plan, preferredCycle = null }) => {
+  const recoverFromStaleSession = ({
+    plan,
+    preferredCycle = null,
+    draftServiceOrderId = null,
+    signup = false
+  }) => {
     queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
     invalidateCurrentAccountSubscription()
-    return prepare({ plan, preferredCycle })
+    return prepare({ plan, preferredCycle, draftServiceOrderId, signup })
   }
 
   return {

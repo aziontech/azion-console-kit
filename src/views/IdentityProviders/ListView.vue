@@ -130,6 +130,10 @@
   }
 
   const handleEditRedirect = (item) => {
+    if (item.id === 'azion-default-sso') {
+      toastBuilder('info', 'The Internal Identity Source cannot be edited.')
+      return
+    }
     router.push({ path: `identity-providers/edit/${item.protocol}/${item.id}` })
   }
 
@@ -165,12 +169,28 @@
         :listService="props.listIdentityProvidersService"
         :columns="getColumns"
         :actions="actionsRow"
-        :enableEditClick="false"
         :editInDrawer="handleEditRedirect"
         exportFileName="Identity Providers"
         emptyListMessage="No identity providers found."
         @on-load-data="handleLoadData"
-      />
+      >
+        <template #column-name="{ data: rowData, value }">
+          <div
+            class="cursor-pointer hover:underline"
+            @click="handleEditRedirect(rowData)"
+          >
+            <component :is="columnBuilder({ data: value, columnAppearance: 'text-with-tag' })" />
+          </div>
+        </template>
+        <template #column-protocol="{ data: rowData, value }">
+          <div
+            class="cursor-pointer hover:underline"
+            @click="handleEditRedirect(rowData)"
+          >
+            {{ value }}
+          </div>
+        </template>
+      </ListTable>
       <EmptyResultsBlock
         v-else
         title="No Identity Provider yet"

@@ -11,8 +11,7 @@
   const currentWidth = inject('currentWidth')
   const SCREEN_BREAKPOINT_MD = 768
 
-  
-  const currentLabel = computed(() => currentWidth.value > SCREEN_BREAKPOINT_MD ? 'Copilot' : '')
+  const currentLabel = computed(() => (currentWidth.value > SCREEN_BREAKPOINT_MD ? 'Copilot' : ''))
   const showButton = computed(() => route.name !== 'copilot')
 </script>
 
@@ -23,5 +22,5 @@
     size="medium"
     :label="currentLabel"
     @click="toggleSidebarComponent('copilot')"
-  /> 
+  />
 </template>
