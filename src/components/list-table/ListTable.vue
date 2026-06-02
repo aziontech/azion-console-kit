@@ -229,9 +229,32 @@
     return props.frozenColumns?.includes(field)
   }
 
+  function isInteractiveRowTarget(event) {
+    const target = event?.originalEvent?.target
+    const element = target instanceof Element ? target : target?.parentElement
+    if (!element) return false
+
+    return !!element.closest(
+      [
+        'button',
+        'a',
+        'input',
+        'select',
+        'textarea',
+        '[role="button"]',
+        '[data-testid="data-table-actions-column-body-actions"]',
+        '[data-testid="data-table-actions-column-body-action"]',
+        '.p-button',
+        '.p-menu',
+        '.disabled-click-row'
+      ].join(',')
+    )
+  }
+
   function handleRowClick(event) {
     if (props.disabledList) return
     if (!props.enableEditClick) return
+    if (isInteractiveRowTarget(event)) return
     if (props.frozenColumns?.length) return null
 
     return editItemSelected(event.originalEvent, event.data)
