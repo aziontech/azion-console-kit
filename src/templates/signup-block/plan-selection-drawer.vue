@@ -146,7 +146,7 @@
 
   const CYCLE_OPTIONS = [
     { label: 'Monthly', value: 'monthly' },
-    { label: 'Yearly', value: 'yearly' }
+    { label: 'Annual', value: 'yearly' }
   ]
 
   // In billing context, Pro users only have a meaningful single direction:
@@ -267,11 +267,11 @@
 
   const getCardPrefix = (planValue) => (isPricedPlan(planValue) ? '$' : '')
 
-  const getCardSuffix = (planValue) => (isPricedPlan(planValue) ? 'per month' : '')
+  const getCardSuffix = (planValue) => (isPricedPlan(planValue) ? '/mo' : '')
 
   const getPricingDetails = (planValue) => {
     if (isPricedPlan(planValue)) {
-      return localBillingCycle.value === 'yearly' ? 'Billed annually' : 'Billed monthly'
+      return localBillingCycle.value === 'yearly' ? 'Billed annually · Save 20%' : 'Billed monthly'
     }
     return getComparisonInfo(planValue)?.description ?? ''
   }
