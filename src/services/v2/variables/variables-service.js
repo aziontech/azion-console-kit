@@ -1,14 +1,21 @@
 import { VariablesAdapter } from '@/services/v2/variables/variables-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { hasFlagUseV6Configurations } from '@/composables/user-flag'
 
 export class VariablesService extends BaseService {
   #baseURL = 'v3/variables'
 
-  #fetchList = async () => {
+  #getPayloadTransform = () =>
+    hasFlagUseV6Configurations()
+      ? VariablesAdapter.transformPayloadV6
+      : VariablesAdapter.transformPayload
+
+  #fetchList = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
       url: this.#baseURL,
+      params,
       config: { baseURL: '/api' }
     })
     const results = Array.isArray(data) ? data : (data?.results ?? [])
@@ -24,10 +31,14 @@ export class VariablesService extends BaseService {
   list = async (params = {}) => {
     const skipCache = params?.hasFilter || params?.skipCache || params?.search
 
-    return await this.useEnsureQueryData(queryKeys.variables.list(), () => this.#fetchList(), {
-      persist: !skipCache,
-      skipCache
-    })
+    return await this.useEnsureQueryData(
+      queryKeys.variables.list(),
+      () => this.#fetchList(params),
+      {
+        persist: !skipCache,
+        skipCache
+      }
+    )
   }
 
   getVariableFromCache = (id) => {
@@ -40,7 +51,8 @@ export class VariablesService extends BaseService {
         id: item.id,
         key: item.key,
         value: item.value?.content ?? item.value,
-        secret: item.value?.isSecret ?? false
+        secret: item.value?.isSecret ?? false,
+        scope: item.scope
       }),
       listPath: 'body'
     })
@@ -59,15 +71,17 @@ export class VariablesService extends BaseService {
       id: variable.id,
       key: variable.key,
       value: variable.value?.content ?? variable.value,
-      secret: variable.value?.isSecret ?? false
+      secret: variable.value?.isSecret ?? false,
+      scope: variable.scope
     }
   }
 
   create = async (payload) => {
+    const body = this.#getPayloadTransform()(payload)
     const { data } = await this.http.request({
       method: 'POST',
       url: this.#baseURL,
-      body: payload,
+      body,
       config: { baseURL: '/api' }
     })
 
@@ -79,12 +93,13 @@ export class VariablesService extends BaseService {
       id: variable.id,
       key: variable.key,
       value: variable.value?.content ?? variable.value,
-      secret: variable.value?.isSecret ?? false
+      secret: variable.value?.isSecret ?? false,
+      scope: variable.scope
     }
   }
 
   edit = async (payload) => {
-    const body = VariablesAdapter.transformPayload(payload)
+    const body = this.#getPayloadTransform()(payload)
     await this.http.request({
       method: 'PUT',
       url: `${this.#baseURL}/${payload.id}`,

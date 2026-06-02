@@ -8,6 +8,7 @@
   import { DataTableActionsButtons } from '@/components/list-table'
   import { variablesService } from '@/services/v2/variables'
   import { documentationCatalog } from '@/helpers'
+  import { hasFlagUseV6Configurations } from '@/composables/user-flag'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -17,6 +18,20 @@
   const router = useRouter()
   const enableRedirect = ref(true)
   const listTableRef = ref()
+  const isV6 = hasFlagUseV6Configurations()
+
+  const SCOPE_TYPE_LABELS = {
+    global: 'Global',
+    environment: 'Environment',
+    deployment: 'Deployment',
+    resource: 'Resource'
+  }
+
+  const formatScope = (scope) => {
+    if (!Array.isArray(scope) || !scope.length) return '—'
+    const labels = scope.map((item) => SCOPE_TYPE_LABELS[item?.type] ?? item?.type ?? '—')
+    return [...new Set(labels)].join(', ')
+  }
 
   const handleNavigateToCreate = () => {
     router.push('/variables/create')
@@ -33,45 +48,52 @@
   ]
 
   const getColumns = computed(() => {
-    return [
-      {
-        field: 'key',
-        header: 'Key',
-        headerStyle: ''
-      },
-      {
-        field: 'value',
-        header: 'Value',
-        type: 'component',
-        filterPath: 'value.content',
-        style: 'max-width: 300px',
-        component: (columnData) => {
-          if (columnData.isSecret) {
-            return h('span', `${columnData.content}`)
-          } else {
-            return columnBuilder({
-              data: columnData.content,
-              columnAppearance: 'text-format-with-popup',
-              dependencies: {
-                showCopy: true
-              }
-            })
-          }
+    const keyColumn = {
+      field: 'key',
+      header: 'Key',
+      headerStyle: ''
+    }
+    const valueColumn = {
+      field: 'value',
+      header: 'Value',
+      type: 'component',
+      filterPath: 'value.content',
+      style: 'max-width: 300px',
+      component: (columnData) => {
+        if (columnData.isSecret) {
+          return h('span', `${columnData.content}`)
+        } else {
+          return columnBuilder({
+            data: columnData.content,
+            columnAppearance: 'text-format-with-popup',
+            dependencies: {
+              showCopy: true
+            }
+          })
         }
-      },
-      {
-        field: 'lastEditor',
-        header: 'Last Editor',
-        sortField: 'last_editor',
-        filterPath: 'last_editor'
-      },
-      {
-        field: 'lastModified',
-        header: 'Last Modified',
-        sortField: 'lastModified',
-        filterPath: 'lastModified'
       }
-    ]
+    }
+    const scopeColumn = {
+      field: 'scope',
+      header: 'Scope',
+      type: 'component',
+      component: (data) => h('span', { 'data-testid': 'variables-list__scope' }, formatScope(data))
+    }
+    const lastEditorColumn = {
+      field: 'lastEditor',
+      header: 'Last Editor',
+      sortField: 'last_editor',
+      filterPath: 'last_editor'
+    }
+    const lastModifiedColumn = {
+      field: 'lastModified',
+      header: 'Last Modified',
+      sortField: 'lastModified',
+      filterPath: 'lastModified'
+    }
+
+    if (!isV6) return [keyColumn, valueColumn, lastEditorColumn, lastModifiedColumn]
+    return [keyColumn, valueColumn, scopeColumn, lastEditorColumn, lastModifiedColumn]
   })
 
   const checkIfIsEditable = (item) => {

@@ -5,10 +5,15 @@
   import InlineMessage from '@aziontech/webkit/inlinemessage'
 
   import { useField } from 'vee-validate'
+  import { hasFlagUseV6Configurations } from '@/composables/user-flag'
+  import FormFieldsScope from './FormFieldsScope.vue'
+
   defineOptions({ name: 'form-fields-variables' })
 
   const { value: key } = useField('key')
   const { value: value } = useField('value')
+
+  const isV6 = hasFlagUseV6Configurations()
 </script>
 
 <template>
@@ -59,4 +64,5 @@
       </div>
     </template>
   </FormHorizontal>
+  <FormFieldsScope v-if="isV6" />
 </template>
