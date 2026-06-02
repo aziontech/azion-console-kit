@@ -4,7 +4,7 @@
       <template #action>
         <BillingCycleToggle
           v-model="billingCycle"
-          :disabled="Boolean(props.lockedCycle) || isCheckoutPreparing"
+          :disabled="props.disabled || Boolean(props.lockedCycle) || isCheckoutPreparing"
         />
       </template>
     </PlanCardHeader>
@@ -64,6 +64,10 @@
       type: String,
       default: 'billing',
       validator: (value) => ['billing', 'signup'].includes(value)
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   })
 

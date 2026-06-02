@@ -40,8 +40,16 @@ const mountDrawer = (props = {}) =>
     global: {
       stubs: {
         CheckoutFeaturesBlock: { template: '<div />' },
-        PricingCalculationBlock: { template: '<div />' },
-        PaymentMethodBlock: { template: '<div />' },
+        PricingCalculationBlock: {
+          name: 'PricingCalculationBlock',
+          props: ['disabled'],
+          emits: ['update:billingCycle', 'update:checkoutSessionClientSecret'],
+          template: '<div />'
+        },
+        PaymentMethodBlock: {
+          props: ['checkoutSessionClientSecret'],
+          template: '<div data-testid="checkout-secret">{{ checkoutSessionClientSecret }}</div>'
+        },
         PaymentMethodSetupBlock: { template: '<div />' },
         PaymentMethodSummary: { template: '<div />' },
         AddressInformationBlock: { template: '<div />' },
@@ -62,6 +70,8 @@ const mountDrawer = (props = {}) =>
     }
   })
 
+const flushPromises = () => Promise.resolve().then(() => Promise.resolve())
+
 describe('DrawerPlanInfo', () => {
   it('starts billing checkout preparation from an explicit confirm click', async () => {
     const wrapper = mountDrawer({ initialClientSecret: '' })
@@ -76,5 +86,38 @@ describe('DrawerPlanInfo', () => {
       plan: 'pro',
       billingCycle: 'yearly'
     })
+
+    wrapper.emitted('prepareCheckoutSession')[0][0].done('cs_yearly')
+    await flushPromises()
+  })
+
+  it('keeps pricing cycle locked while checkout preparation is in flight', async () => {
+    const wrapper = mountDrawer({ initialClientSecret: '' })
+    const confirm = wrapper.get('[data-testid="confirm"]')
+
+    await confirm.trigger('click')
+
+    expect(wrapper.findComponent({ name: 'PricingCalculationBlock' }).props('disabled')).toBe(true)
+
+    wrapper.emitted('prepareCheckoutSession')[0][0].done('cs_yearly')
+    await flushPromises()
+
+    expect(wrapper.findComponent({ name: 'PricingCalculationBlock' }).props('disabled')).toBe(false)
+  })
+
+  it('discards a prepared checkout session when the billing cycle changes before it resolves', async () => {
+    const wrapper = mountDrawer({ initialClientSecret: '' })
+    const pricing = wrapper.findComponent({ name: 'PricingCalculationBlock' })
+
+    await wrapper.get('[data-testid="confirm"]').trigger('click')
+
+    const prepareEvent = wrapper.emitted('prepareCheckoutSession')[0][0]
+    pricing.vm.$emit('update:billingCycle', 'monthly')
+    pricing.vm.$emit('update:checkoutSessionClientSecret', '')
+    prepareEvent.done('cs_yearly')
+    await flushPromises()
+
+    expect(wrapper.get('[data-testid="confirm"]').text()).toBe('Continue')
+    expect(wrapper.get('[data-testid="checkout-secret"]').text()).toBe('')
   })
 })

@@ -36,6 +36,7 @@
             :plan="plan"
             :lockedCycle="lockedCycle"
             :mode="mode"
+            :disabled="isSubmitting"
             @update:billing-cycle="handleBillingCycleChange"
             @update:checkout-session-client-secret="handleCheckoutSessionClientSecretChange"
           />
@@ -294,30 +295,22 @@
       }
 
       if (!checkoutSessionClientSecret.value) {
+        const requestedBillingCycle = billingCycle.value
         const clientSecret = await new Promise((resolve, reject) => {
           emit('prepareCheckoutSession', {
             plan: props.plan,
-            billingCycle: billingCycle.value,
+            billingCycle: requestedBillingCycle,
             done: resolve,
             fail: (err) =>
               reject(typeof err === 'string' ? new Error(err) : err || new Error('Failed'))
           })
         })
+        if (billingCycle.value !== requestedBillingCycle) return
         if (!clientSecret) {
           throw new Error('Unable to initialize payment session.')
         }
         checkoutSessionClientSecret.value = clientSecret
         isPaymentFormReady.value = false
-        return
-      }
-
-      if (showDefaultPaymentSummary.value) {
-        emit('submit', {
-          plan: props.plan,
-          billingCycle: billingCycle.value,
-          useDefaultPaymentMethod: true,
-          paymentMethodId: defaultPaymentCard.value?.id ?? null
-        })
         return
       }
 

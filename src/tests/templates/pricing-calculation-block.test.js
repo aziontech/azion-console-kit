@@ -124,6 +124,13 @@ describe('pricing-calculation-block', () => {
     expect(mocks.prepareCheckoutSession).not.toHaveBeenCalled()
   })
 
+  it('disables the billing cycle toggle when requested by the parent drawer', () => {
+    const wrapper = mountPricingCalculationBlock({ disabled: true })
+    const toggle = wrapper.findComponent({ name: 'BillingCycleToggle' })
+
+    expect(toggle.props('disabled')).toBe(true)
+  })
+
   it('keeps the latest billing-cycle checkout session when older signup preparation resolves later', async () => {
     const yearlyPreparation = createDeferred()
     const monthlyPreparation = createDeferred()

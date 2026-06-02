@@ -282,6 +282,7 @@
   const {
     downgrade: downgradeServiceOrderPlan,
     upgrade: upgradeServiceOrderPlan,
+    createServiceOrder,
     cancelDowngrade: cancelDowngradeServiceOrderPlan,
     loadAccountServiceOrders,
     serviceOrder,
@@ -404,7 +405,8 @@
   const extractCheckoutClientSecret = (response) =>
     response?.payment?.clientSecret ||
     response?.data?.payment?.clientSecret ||
-    response?.serviceOrder?.payment?.clientSecret ||
+    response?.data?.clientSecret ||
+    response?.serviceOrder?.clientSecret ||
     ''
 
   const showOtherPlans = async () => {
@@ -527,9 +529,13 @@
     }
   }
 
-  const resolveCycleChangePayload = async ({ plan, billingCycle }) => {
+  const resolveServiceOrderUpgradePayload = async ({
+    plan,
+    billingCycle,
+    requireActiveServiceOrder = true
+  }) => {
     const active = await ensureActiveServiceOrder()
-    if (!active?.serviceOrderId) {
+    if (requireActiveServiceOrder && !active?.serviceOrderId) {
       throw new Error('Missing active service order.')
     }
 
@@ -538,17 +544,18 @@
     const planPricingId = findPriceId(plan, billingCycle)
 
     if (!accountId || !planId || !planPricingId) {
-      throw new Error('Missing data required to change cycle.')
+      throw new Error('Missing data required to change plan.')
     }
 
-    return { serviceOrderId: active.serviceOrderId, accountId, planId, planPricingId }
+    return { serviceOrderId: active?.serviceOrderId ?? null, accountId, planId, planPricingId }
   }
 
   const upgradeServiceOrderCycle = async ({ plan, billingCycle }) => {
-    const { serviceOrderId, accountId, planId, planPricingId } = await resolveCycleChangePayload({
-      plan,
-      billingCycle
-    })
+    const { serviceOrderId, accountId, planId, planPricingId } =
+      await resolveServiceOrderUpgradePayload({
+        plan,
+        billingCycle
+      })
 
     await upgradeServiceOrderPlan({
       id: serviceOrderId,
@@ -559,17 +566,21 @@
   }
 
   const prepareBillingCheckoutSession = async ({ plan, billingCycle }) => {
-    const { serviceOrderId, accountId, planId, planPricingId } = await resolveCycleChangePayload({
-      plan,
-      billingCycle
-    })
+    const { serviceOrderId, accountId, planId, planPricingId } =
+      await resolveServiceOrderUpgradePayload({
+        plan,
+        billingCycle,
+        requireActiveServiceOrder: false
+      })
 
-    const response = await upgradeServiceOrderPlan({
-      id: serviceOrderId,
-      accountId,
-      newPlanId: planId,
-      priceId: planPricingId
-    })
+    const response = serviceOrderId
+      ? await upgradeServiceOrderPlan({
+          id: serviceOrderId,
+          accountId,
+          newPlanId: planId,
+          priceId: planPricingId
+        })
+      : await createServiceOrder({ planId, planPricingId })
 
     const clientSecret = extractCheckoutClientSecret(response)
     if (!clientSecret) {
@@ -597,10 +608,11 @@
   }
 
   const downgradeServiceOrderCycle = async ({ plan, billingCycle }) => {
-    const { serviceOrderId, accountId, planId, planPricingId } = await resolveCycleChangePayload({
-      plan,
-      billingCycle
-    })
+    const { serviceOrderId, accountId, planId, planPricingId } =
+      await resolveServiceOrderUpgradePayload({
+        plan,
+        billingCycle
+      })
 
     await downgradeServiceOrderPlan({
       id: serviceOrderId,
