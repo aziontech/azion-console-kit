@@ -32,7 +32,7 @@
             size="small"
             prefix="-$"
             :value="formattedYearlyDiscount"
-            suffix="per month"
+            suffix="/mo"
             :showSuffix="true"
           />
         </div>
