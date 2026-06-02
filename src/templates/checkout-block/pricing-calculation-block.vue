@@ -4,7 +4,7 @@
       <template #action>
         <BillingCycleToggle
           v-model="billingCycle"
-          :disabled="Boolean(props.lockedCycle) || isPreparing"
+          :disabled="Boolean(props.lockedCycle) || isCheckoutPreparing"
         />
       </template>
     </PlanCardHeader>
@@ -71,6 +71,7 @@
   const { initialize, billingCycle: sharedBillingCycle, setParam } = usePlans()
   const { data: plans } = serviceOrdersService.useListPlansQuery()
   const { prepare: prepareCheckoutSession, isPreparing } = useCheckoutSessionPreparer()
+  const isCheckoutPreparing = computed(() => props.context === 'signup' && isPreparing.value)
 
   const DEFAULT_BILLING_CYCLE = 'monthly'
   const billingCycle = ref(DEFAULT_BILLING_CYCLE)
@@ -164,6 +165,8 @@
       checkoutSessionRequestVersion += 1
       const version = checkoutSessionRequestVersion
       emit('update:checkoutSessionClientSecret', '')
+
+      if (props.context !== 'signup') return
 
       if (pendingPlanPricingTimer) {
         clearTimeout(pendingPlanPricingTimer)

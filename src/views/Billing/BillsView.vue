@@ -17,9 +17,7 @@
 
       <UpgradeToProCard
         v-if="subscriptionState.isHobby"
-        :loading="preparingPlan === 'pro'"
         @upgrade="openUpgradeToPro"
-        @upgrade-intent="handleUpgradeIntent"
       />
       <CurrentInvoiceCard
         v-else
@@ -73,7 +71,6 @@
     :currentPlan="currentPlanSlug"
     :billingCycle="currentActiveCycle"
     :plans="plansData || []"
-    :loadingPlan="preparingPlan"
     @select="handleSelectPlan"
   />
 
@@ -86,9 +83,9 @@
     :initialClientSecret="checkoutSessionClientSecret"
     :getStripeClientService="props.getStripeClientService"
     :indented="showChangePlanDrawer"
+    @prepareCheckoutSession="handlePrepareCheckoutSession"
     @submit="handlePlanInfoSubmit"
     @submitCycleChange="handleCycleUpgradeSubmit"
-    @stale-session="handleStaleCheckoutSession"
   />
 
   <DialogDowngradePlan
@@ -126,7 +123,6 @@
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
   import { useBillingPaymentMethods } from '@/composables/useBillingPaymentMethods'
   import { useServiceOrders } from '@/composables/useServiceOrders'
-  import { useCheckoutSessionPreparer } from '@/composables/useCheckoutSessionPreparer'
   import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
   import { useAccountStore } from '@/stores/account'
   import { useWarmStripe } from '@/composables/useWarmStripe'
@@ -264,10 +260,6 @@
   const selectedPlan = ref(null)
   const lockedCycle = ref(null)
   const checkoutSessionClientSecret = ref('')
-  const checkoutPreparationKey = ref('')
-  let checkoutPreparationVersion = 0
-  let currentCheckoutPreparationPromise = null
-  const preparingPlan = ref(null)
   const downgradeTarget = ref({
     toPlan: 'hobby',
     cycleChange: false,
@@ -295,7 +287,6 @@
     serviceOrder,
     activeServiceOrder
   } = useServiceOrders()
-  const { prepare: prepareCheckoutSession, recoverFromStaleSession } = useCheckoutSessionPreparer()
   const { warmStripe } = useWarmStripe()
 
   const downgradeEffectiveAt = ref(null)
@@ -306,68 +297,9 @@
   watch(showPlanInfoDrawer, (visible) => {
     if (!visible) {
       checkoutSessionClientSecret.value = ''
-      checkoutPreparationKey.value = ''
       drawerMode.value = 'subscribe'
     }
   })
-
-  const buildPreparationKey = (plan, cycle) => `${plan}:${cycle || 'monthly'}`
-
-  const prepareCheckoutAhead = ({ plan, preferredCycle = null, force = false } = {}) => {
-    const cycle = preferredCycle || storedBillingCycle.value || 'monthly'
-    const key = buildPreparationKey(plan, cycle)
-
-    if (
-      !force &&
-      checkoutPreparationKey.value === key &&
-      checkoutSessionClientSecret.value &&
-      !currentCheckoutPreparationPromise
-    ) {
-      return Promise.resolve(checkoutSessionClientSecret.value)
-    }
-
-    if (currentCheckoutPreparationPromise && checkoutPreparationKey.value === key) {
-      return currentCheckoutPreparationPromise
-    }
-
-    const version = ++checkoutPreparationVersion
-    checkoutPreparationKey.value = key
-    if (force) checkoutSessionClientSecret.value = ''
-
-    const promise = prepareCheckoutSession({ plan, preferredCycle: cycle })
-      .then((secret) => {
-        if (version === checkoutPreparationVersion) {
-          checkoutSessionClientSecret.value = secret
-        }
-        return secret
-      })
-      .finally(() => {
-        if (currentCheckoutPreparationPromise === promise) {
-          currentCheckoutPreparationPromise = null
-        }
-      })
-
-    currentCheckoutPreparationPromise = promise
-    return promise
-  }
-
-  const schedulePrepareForPro = (preferredCycle = null) => {
-    if (
-      subscription.isPro.value &&
-      subscription.billingCycle.value === (preferredCycle || storedBillingCycle.value)
-    ) {
-      return
-    }
-    const cycle = preferredCycle || storedBillingCycle.value || 'monthly'
-    const key = buildPreparationKey('pro', cycle)
-    if (
-      checkoutPreparationKey.value === key &&
-      (checkoutSessionClientSecret.value || currentCheckoutPreparationPromise)
-    ) {
-      return
-    }
-    prepareCheckoutAhead({ plan: 'pro', preferredCycle: cycle }).catch(Sentry.captureException)
-  }
 
   const { defaultPaymentMethod } = useBillingPaymentMethods()
 
@@ -427,10 +359,8 @@
   )
 
   onMounted(async () => {
-    // Warm Stripe.js up front: the plan-info, add-payment and change-cycle
-    // drawers opened from this view all mount Stripe behind a user action, so
-    // pre-downloading the client here keeps those drawers from stalling on a
-    // cold js.stripe.com load.
+    // Warm only loads Stripe.js. Service-order mutations still happen only
+    // after an explicit user action.
     warmStripe()
     // Post-checkout entry refreshes once so the cards reflect the just-paid
     // SO without depending on stale persisted cache.
@@ -471,6 +401,12 @@
     return plan?.pricings?.find((pricing) => pricing.periodicity === cycle)?.id ?? null
   }
 
+  const extractCheckoutClientSecret = (response) =>
+    response?.payment?.clientSecret ||
+    response?.data?.payment?.clientSecret ||
+    response?.serviceOrder?.payment?.clientSecret ||
+    ''
+
   const showOtherPlans = async () => {
     const initialCycle = subscription.isPro.value ? 'yearly' : 'monthly'
     setParam('billingCycle', initialCycle)
@@ -481,77 +417,19 @@
       source: 'subscription-card'
     })
     showChangePlanDrawer.value = true
-    schedulePrepareForPro(initialCycle)
   }
 
-  const openDrawerWithCheckoutSession = async ({ plan, preferredCycle, lockedCycle: locked }) => {
-    if (preparingPlan.value) return
+  const openPlanInfoDrawer = async ({ plan, preferredCycle, lockedCycle: locked }) => {
+    checkoutSessionClientSecret.value = ''
     drawerMode.value = 'subscribe'
     selectedPlan.value = plan
     lockedCycle.value = locked
-    preparingPlan.value = plan
-    try {
-      const secret = await prepareCheckoutAhead({ plan, preferredCycle })
-      checkoutSessionClientSecret.value = secret
-      showPlanInfoDrawer.value = true
-      trackBilling('checkoutStarted', {
-        plan,
-        billingCycle: preferredCycle || storedBillingCycle.value,
-        mode: 'subscribe'
-      })
-    } catch (err) {
-      const detail =
-        (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
-        'Unable to initialize payment session.'
-      trackBilling('planChangeFailed', {
-        plan,
-        billingCycle: preferredCycle,
-        errorType: 'checkout-session',
-        errorMessage: detail
-      })
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail,
-        closable: true
-      })
-    } finally {
-      preparingPlan.value = null
-    }
-  }
-
-  const handleUpgradeIntent = () => {
-    schedulePrepareForPro('monthly')
-  }
-
-  // Stripe rejected the previously issued client secret (session expired or
-  // already consumed). Re-prepare with a fresh PATCH so the payment element
-  // re-mounts against a live session — without forcing the user to close the
-  // drawer.
-  const handleStaleCheckoutSession = async ({ plan, billingCycle: cycle } = {}) => {
-    const targetPlan = plan || selectedPlan.value
-    if (!targetPlan) return
-    const targetCycle = cycle || storedBillingCycle.value || null
-    checkoutSessionClientSecret.value = ''
-    checkoutPreparationKey.value = ''
-    try {
-      const fresh = await recoverFromStaleSession({
-        plan: targetPlan,
-        preferredCycle: targetCycle
-      })
-      checkoutSessionClientSecret.value = fresh
-      checkoutPreparationKey.value = buildPreparationKey(targetPlan, targetCycle)
-    } catch (err) {
-      Sentry.captureException(err)
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail:
-          (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
-          'Unable to refresh the checkout session.',
-        closable: true
-      })
-    }
+    showPlanInfoDrawer.value = true
+    trackBilling('checkoutStarted', {
+      plan,
+      billingCycle: preferredCycle || storedBillingCycle.value,
+      mode: 'subscribe'
+    })
   }
 
   const openUpgradeToPro = async () => {
@@ -563,7 +441,7 @@
       fromCycle: subscription.billingCycle.value,
       source: 'upgrade-card'
     })
-    await openDrawerWithCheckoutSession({
+    await openPlanInfoDrawer({
       plan: 'pro',
       preferredCycle: 'monthly',
       lockedCycle: null
@@ -615,7 +493,7 @@
         fromCycle,
         isCycleOnlyChange: false
       })
-      await openDrawerWithCheckoutSession({
+      await openPlanInfoDrawer({
         plan,
         preferredCycle: billingCycle,
         lockedCycle: null
@@ -678,6 +556,44 @@
       newPlanId: planId,
       priceId: planPricingId
     })
+  }
+
+  const prepareBillingCheckoutSession = async ({ plan, billingCycle }) => {
+    const { serviceOrderId, accountId, planId, planPricingId } = await resolveCycleChangePayload({
+      plan,
+      billingCycle
+    })
+
+    const response = await upgradeServiceOrderPlan({
+      id: serviceOrderId,
+      accountId,
+      newPlanId: planId,
+      priceId: planPricingId
+    })
+
+    const clientSecret = extractCheckoutClientSecret(response)
+    if (!clientSecret) {
+      throw new Error('Payment session client secret missing in response.')
+    }
+    return clientSecret
+  }
+
+  const handlePrepareCheckoutSession = async ({ plan, billingCycle, done, fail }) => {
+    try {
+      const clientSecret = await prepareBillingCheckoutSession({ plan, billingCycle })
+      done?.(clientSecret)
+    } catch (err) {
+      const detail =
+        (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
+        'Unable to initialize payment session.'
+      trackBilling('planChangeFailed', {
+        plan,
+        billingCycle,
+        errorType: 'checkout-session',
+        errorMessage: detail
+      })
+      fail?.(detail)
+    }
   }
 
   const downgradeServiceOrderCycle = async ({ plan, billingCycle }) => {
