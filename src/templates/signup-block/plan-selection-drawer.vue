@@ -27,7 +27,79 @@
         />
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+      <div
+        v-if="isMobile"
+        class="plan-carousel-wrapper"
+      >
+        <Carousel
+          :slidesCount="planOptions.length"
+          :slidesPerView="1"
+          :spaceBetween="16"
+          :maxSlideWidth="360"
+          :initialIndex="initialCarouselIndex"
+          snapAlign="center"
+          ariaLabel="Plans"
+        >
+          <template
+            v-for="(planOption, idx) in planOptions"
+            #[`slide-${idx}`]
+            :key="planOption.value"
+          >
+            <CardPricing
+              :planTitle="planOption.label"
+              :description="planOption.description"
+              :pricingDetails="getPricingDetails(planOption.value)"
+              :showTag="Boolean(planOption.tagLabel)"
+              :tagLabel="planOption.tagLabel || 'Popular'"
+              :value="getCardValue(planOption.value)"
+              :prefix="getCardPrefix(planOption.value)"
+              :suffix="getCardSuffix(planOption.value)"
+              :showPrefix="isPricedPlan(planOption.value)"
+              :showSuffix="isPricedPlan(planOption.value)"
+              slotPosition="middle"
+              class="h-full"
+            >
+              <template #actions>
+                <ActionButton
+                  :label="planOption.buttonLabel"
+                  :kind="resolveButtonKind(planOption.value)"
+                  size="large"
+                  :loading="isLoadingPlan(planOption.value)"
+                  :disabled="isCurrentPlanSelection(planOption.value) || Boolean(props.loadingPlan)"
+                  class="w-full"
+                  @click="handleChoosePlan(planOption.value)"
+                />
+              </template>
+
+              <div class="flex flex-col gap-2">
+                <p
+                  v-if="planOption?.sectionTitle"
+                  class="text-xs leading-none text-[var(--text-muted)]"
+                >
+                  {{ planOption?.sectionTitle }}
+                </p>
+                <ul class="flex flex-col gap-2">
+                  <li
+                    v-for="feature in getIconFeatures(planOption)"
+                    :key="feature.title"
+                    class="flex items-center gap-2.5 text-xs leading-none text-color"
+                  >
+                    <span class="inline-flex items-center justify-center size-5 shrink-0">
+                      <i :class="[feature.icon, 'text-base text-color']" />
+                    </span>
+                    <span>{{ feature.title }}</span>
+                  </li>
+                </ul>
+              </div>
+            </CardPricing>
+          </template>
+        </Carousel>
+      </div>
+
+      <div
+        v-else
+        class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch"
+      >
         <CardPricing
           v-for="planOption in planOptions"
           :key="planOption.value"
@@ -88,7 +160,9 @@
   import ActionButton from '@aziontech/webkit/button'
   import SegmentedButton from '@aziontech/webkit/segmented-button'
   import { usePlans } from '@/composables/usePlans'
+  import { useResize } from '@/composables/useResize'
   import { getComparisonInfo } from '@/views/Billing/plan-comparison-features'
+  import Carousel from '@/components/Carousel.vue'
 
   defineOptions({
     name: 'plan-selection-drawer'
@@ -142,7 +216,8 @@
   })
 
   const emit = defineEmits(['update:visible', 'select', 'billing-cycle-toggled'])
-  const { setParam } = usePlans()
+  const { setParam, plan: storedPlan } = usePlans()
+  const { isMobile } = useResize()
 
   const CYCLE_OPTIONS = [
     { label: 'Monthly', value: 'monthly' },
@@ -232,6 +307,18 @@
       ...option,
       buttonLabel: isCurrentPlanSelection(option.value) ? 'Selected Plan' : option.buttonLabel
     }))
+  })
+
+  // Mobile carousel opens on the plan the user previously chose (persisted in
+  // localStorage via usePlans) so a returning user is not always shown Hobby
+  // first. Falls back to the active subscription, then to the first option.
+  const initialCarouselIndex = computed(() => {
+    const preferred = storedPlan.value || props.currentPlan
+    if (!preferred) return 0
+    const idx = planOptions.value.findIndex(
+      (option) => option.value?.toLowerCase() === preferred.toLowerCase()
+    )
+    return idx >= 0 ? idx : 0
   })
 
   const getPlanData = (planValue) => {
