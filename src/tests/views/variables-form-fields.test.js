@@ -64,15 +64,15 @@ describe('FormFieldsVariables', () => {
       secretChangeValueOnly: true
     })
 
-    expect(wrapper.get('[data-testid="variables-form__key-field"]').attributes('data-disabled')).toBe(
-      'true'
-    )
+    expect(
+      wrapper.get('[data-testid="variables-form__key-field"]').attributes('data-disabled')
+    ).toBe('true')
     expect(
       wrapper.get('[data-testid="variables-form__secret-field"]').attributes('data-disabled')
     ).toBe('true')
-    expect(wrapper.get('[data-testid="variables-form__value-field"]').attributes('placeholder')).toBe(
-      'NEW_SECRET_VALUE'
-    )
+    expect(
+      wrapper.get('[data-testid="variables-form__value-field"]').attributes('placeholder')
+    ).toBe('NEW_SECRET_VALUE')
   })
 
   it('does not lock fields only because the current form value is secret', () => {
@@ -81,15 +81,15 @@ describe('FormFieldsVariables', () => {
       secretChangeValueOnly: false
     })
 
-    expect(wrapper.get('[data-testid="variables-form__key-field"]').attributes('data-disabled')).toBe(
-      'false'
-    )
+    expect(
+      wrapper.get('[data-testid="variables-form__key-field"]').attributes('data-disabled')
+    ).toBe('false')
     expect(
       wrapper.get('[data-testid="variables-form__secret-field"]').attributes('data-disabled')
     ).toBe('false')
-    expect(wrapper.get('[data-testid="variables-form__value-field"]').attributes('placeholder')).toBe(
-      'VARIABLE_VALUE'
-    )
+    expect(
+      wrapper.get('[data-testid="variables-form__value-field"]').attributes('placeholder')
+    ).toBe('VARIABLE_VALUE')
   })
 
   it('locks all fields while edit data is loading', () => {
@@ -99,12 +99,12 @@ describe('FormFieldsVariables', () => {
       secretChangeValueOnly: false
     })
 
-    expect(wrapper.get('[data-testid="variables-form__key-field"]').attributes('data-disabled')).toBe(
-      'true'
-    )
-    expect(wrapper.get('[data-testid="variables-form__value-field"]').attributes('data-disabled')).toBe(
-      'true'
-    )
+    expect(
+      wrapper.get('[data-testid="variables-form__key-field"]').attributes('data-disabled')
+    ).toBe('true')
+    expect(
+      wrapper.get('[data-testid="variables-form__value-field"]').attributes('data-disabled')
+    ).toBe('true')
     expect(
       wrapper.get('[data-testid="variables-form__secret-field"]').attributes('data-disabled')
     ).toBe('true')
