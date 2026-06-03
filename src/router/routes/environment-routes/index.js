@@ -2,6 +2,9 @@
 export const environmentRoutes = {
   path: '/environments',
   name: 'environment',
+  meta: {
+    flag: 'use_v6_configurations'
+  },
   children: [
     {
       path: '',

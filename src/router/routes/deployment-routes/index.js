@@ -4,6 +4,9 @@
 export const deploymentRoutes = {
   path: '/deployments',
   name: 'deployments',
+  meta: {
+    flag: 'use_v6_configurations'
+  },
   children: [
     {
       path: '',

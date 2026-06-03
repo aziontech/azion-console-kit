@@ -11,6 +11,7 @@
   import Column from '@aziontech/webkit/column'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { variablesService } from '@/services/v2/variables'
+  import { hasFlagUseV6Configurations } from '@/composables/user-flag'
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
   import { useResize } from '@/composables/useResize'
 
@@ -438,8 +439,14 @@
     loadingGlobalVariables.value = true
 
     try {
-      const response = await variablesService.list()
-      const variables = Array.isArray(response?.body) ? response.body : []
+      const params = hasFlagUseV6Configurations() ? { scope_type: 'global', skipCache: true } : {}
+      const response = await variablesService.list(params)
+      const allVariables = Array.isArray(response?.body) ? response.body : []
+      const variables = hasFlagUseV6Configurations()
+        ? allVariables.filter((variable) =>
+            (variable.scope ?? []).some((scope) => scope?.type === 'global')
+          )
+        : allVariables
 
       allGlobalVariables.value = variables.map((variable) => ({
         id: variable.id,
