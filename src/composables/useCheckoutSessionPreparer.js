@@ -4,11 +4,8 @@ import { useAccountStore } from '@/stores/account'
 import { useServiceOrders } from '@/composables/useServiceOrders'
 import { ensureServiceOrdersList, getCurrentServiceOrder } from '@/composables/useServiceOrdersList'
 import { ensurePlansList, getPlanPricingId } from '@/composables/usePlansService'
-import { invalidateCurrentAccountSubscription } from '@/composables/useCurrentAccountSubscriptionService'
 import { SO_STATUS } from '@/services/v2/service-orders/service-orders-constants'
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
-import { queryClient } from '@/services/v2/base/query/queryClient'
-import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 const extractSecret = (response) =>
   response?.payment?.clientSecret ||
@@ -28,8 +25,7 @@ export const prepareCheckoutSessionForServiceOrder = async ({
   getCurrentServiceOrder,
   createServiceOrder,
   prepareSignupCheckout,
-  updateServiceOrder,
-  upgrade
+  updateServiceOrder
 }) => {
   const planId = plans?.find((item) => item.sku?.toLowerCase() === plan.toLowerCase())?.id
   const planPricingId = getPlanPricingId(plans, plan, cycle)
@@ -71,15 +67,11 @@ export const prepareCheckoutSessionForServiceOrder = async ({
     throw new Error('Unable to refresh the existing checkout session.')
   }
 
-  const response =
-    currentSO?.status === SO_STATUS.ACTIVE && currentSO.serviceOrderId
-      ? await upgrade({
-          id: currentSO.serviceOrderId,
-          accountId,
-          newPlanId: planId,
-          priceId: planPricingId
-        })
-      : await createServiceOrder({ planId, planPricingId })
+  if (currentSO?.status === SO_STATUS.ACTIVE) {
+    throw new Error('Checkout preparation is only supported before an active service order exists.')
+  }
+
+  const response = await createServiceOrder({ planId, planPricingId })
 
   const secret = extractSecret(response)
   if (!secret) {
@@ -101,8 +93,7 @@ export const prepareCheckoutSessionForServiceOrder = async ({
  */
 export function useCheckoutSessionPreparer() {
   const accountStore = useAccountStore()
-  const { createServiceOrder, prepareSignupCheckout, updateServiceOrder, upgrade } =
-    useServiceOrders()
+  const { createServiceOrder, prepareSignupCheckout, updateServiceOrder } = useServiceOrders()
 
   const prepareMutation = useMutation({
     mutationFn: async ({ plan, cycle, draftServiceOrderId, signup }) => {
@@ -128,8 +119,7 @@ export function useCheckoutSessionPreparer() {
         getCurrentServiceOrder,
         createServiceOrder,
         prepareSignupCheckout,
-        updateServiceOrder,
-        upgrade
+        updateServiceOrder
       })
     }
   })
@@ -142,26 +132,8 @@ export function useCheckoutSessionPreparer() {
       signup
     })
 
-  /**
-   * Recovery path for when Stripe rejects the secret returned by `prepare`
-   * (`No such checkout.session`, `resource_missing`, etc). Drops the cached
-   * SO snapshots so the next `prepare` reads server-truth, then re-prepares
-   * — yielding a brand-new Stripe Checkout Session.
-   */
-  const recoverFromStaleSession = ({
-    plan,
-    preferredCycle = null,
-    draftServiceOrderId = null,
-    signup = false
-  }) => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
-    invalidateCurrentAccountSubscription()
-    return prepare({ plan, preferredCycle, draftServiceOrderId, signup })
-  }
-
   return {
     isPreparing: computed(() => prepareMutation.isPending.value),
-    prepare,
-    recoverFromStaleSession
+    prepare
   }
 }

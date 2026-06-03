@@ -2,8 +2,6 @@
   <CardBox
     title="Upgrade to Pro"
     class="w-full min-[1100px]:w-1/2"
-    @mouseenter="signalUpgradeIntent"
-    @focusin="signalUpgradeIntent"
   >
     <template #content>
       <div class="p-6 flex flex-col gap-6 justify-between h-full">
@@ -37,8 +35,6 @@
           label="Upgrade to Pro"
           kind="primary"
           size="medium"
-          :loading="props.loading"
-          :disabled="props.loading"
           @click="handleUpgradeClick"
         />
       </div>
@@ -53,28 +49,13 @@
 
   defineOptions({ name: 'upgrade-to-pro-card' })
 
-  const props = defineProps({
-    loading: {
-      type: Boolean,
-      default: false
-    }
-  })
-
-  const emit = defineEmits(['upgrade', 'upgrade-intent'])
+  const emit = defineEmits(['upgrade'])
 
   const features = PRO_UPGRADE_HIGHLIGHTS
 
   const pricingAndPlansUrl = 'https://www.azion.com/en/pricing/'
 
-  let intentSignalled = false
-  const signalUpgradeIntent = () => {
-    if (intentSignalled) return
-    intentSignalled = true
-    emit('upgrade-intent')
-  }
-
   const handleUpgradeClick = () => {
-    if (props.loading) return
     emit('upgrade')
   }
 </script>
