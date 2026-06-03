@@ -115,7 +115,7 @@
     "tailwindcss": "^3.3.3",
     "vite": "^6.4.2",
     "vite-plugin-istanbul": "^6.0.2",
-    "vitest": "^0.33.0",
+    "vitest": "^4.1.0",
     "vitest-sonar-reporter": "^1.0.0"
   },
   "resolutions": {
