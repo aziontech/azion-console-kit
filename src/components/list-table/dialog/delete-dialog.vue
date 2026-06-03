@@ -17,13 +17,11 @@
     >
       <div data-testid="delete-dialog-warning">
         <Message
-          severity="warn"
-          :closable="false"
+          severity="warning"
           data-testid="delete-dialog-warning-message"
-        >
-          {{ warningMessage }}
-        </Message>
-
+          title="Info Message"
+          :description="warningMessage"
+        />
         <p
           class="pt-4 text-color-secondary"
           data-testid="delete-dialog-warning-message-details"

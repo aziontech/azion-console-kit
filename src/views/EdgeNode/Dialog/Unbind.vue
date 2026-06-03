@@ -15,12 +15,11 @@
     >
       <div data-testid="unbind-dialog__warning__wrapper">
         <Message
-          severity="warn"
-          :closable="false"
+          severity="warning"
           data-testid="unbind-dialog__warning__inline-message"
-        >
-          Once confirmed, this action can't be reversed.
-        </Message>
+          title="Info Message"
+          description="Once confirmed, this action can't be reversed."
+        />
 
         <p
           class="pt-4 text-color-secondary"
