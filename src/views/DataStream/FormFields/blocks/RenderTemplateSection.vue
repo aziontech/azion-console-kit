@@ -54,7 +54,8 @@
           language="json"
           :theme="theme"
           :options="dataSetMonacoOptions"
-          class="min-h-[300px] surface-border border rounded-sm overflow-hidden"
+          height="300px"
+          class="surface-border border rounded-sm overflow-hidden"
           data-testid="data-stream-form__data-settings__data-set-field"
         />
         <Button
