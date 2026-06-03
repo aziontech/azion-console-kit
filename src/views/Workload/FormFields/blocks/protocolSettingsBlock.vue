@@ -342,7 +342,7 @@
           @onSwitchChange="handleHttp3"
           :isCard="false"
           title="HTTP/3 support"
-          subtitle="Enable HTTP/3 support. Only available for HTTPS port 443"
+          subtitle="Enable HTTP/3 over QUIC. Requires HTTPS support to be enabled."
         />
       </div>
       <div
@@ -357,10 +357,6 @@
             isRequired
           />
           <span class="p-input-icon-right">
-            <i
-              class="pi pi-lock text-[var(--text-color-secondary)]"
-              data-testid="form-horizontal-delivery-settings-https-ports-lock-icon"
-            />
             <MultiSelect
               :options="http3PortOptions"
               v-model="quicPortValue"
@@ -370,14 +366,8 @@
               optionLabel="name"
               display="chip"
               :class="{ 'p-invalid': quicPortError }"
-              placeholder="Select an HTTPS port"
+              placeholder="Select an HTTP/3 port"
               class="w-full"
-              disabled
-              :pt="{
-                trigger: {
-                  class: 'hidden'
-                }
-              }"
               data-testid="form-horizontal-delivery-settings-http3-ports-multi-select"
             />
             <small
