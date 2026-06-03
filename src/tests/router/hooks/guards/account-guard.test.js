@@ -25,7 +25,7 @@ vi.mock('@/composables/useServiceOrdersList', () => ({
 }))
 
 vi.mock('@/services/v2/service-orders/service-orders-constants', () => ({
-  SO_TERMINAL_STATUSES: ['CANCELED', 'EXPIRED']
+  SO_ENTITLED_STATUSES: ['ACTIVE', 'PAST_DUE', 'BLOCKED']
 }))
 
 describe('accountGuard hasSession check', () => {
@@ -186,5 +186,72 @@ describe('accountGuard onboarding prefetch', () => {
     })
 
     expect(result).toEqual({ name: 'additional-data' })
+  })
+})
+
+describe('accountGuard hasActivePlan derivation', () => {
+  beforeEach(async () => {
+    const { loadAccountHydration } = await import('@/helpers/account-data')
+    const { ensureServiceOrdersList } = await import('@/composables/useServiceOrdersList')
+    loadAccountHydration.mockReset()
+    loadAccountHydration.mockResolvedValue(undefined)
+    ensureServiceOrdersList.mockReset()
+  })
+
+  const runGuard = async (orders, setHasActivePlan) => {
+    const { ensureServiceOrdersList } = await import('@/composables/useServiceOrdersList')
+    ensureServiceOrdersList.mockResolvedValueOnce({ data: orders })
+
+    await accountGuard({
+      to: { meta: { isPublic: false }, name: 'home', fullPath: '/' },
+      accountStore: {
+        hasActiveUserId: false,
+        hasSession: true,
+        needsOnboarding: false,
+        accountData: { id: 1 },
+        setHasActivePlan
+      },
+      tracker: { reset: vi.fn() }
+    })
+  }
+
+  it('treats DRAFT-only as no active plan so onboarding still triggers', async () => {
+    const setHasActivePlan = vi.fn()
+    await runGuard([{ status: 'DRAFT' }], setHasActivePlan)
+    expect(setHasActivePlan).toHaveBeenCalledWith(false)
+  })
+
+  it('treats ACTIVE as active plan', async () => {
+    const setHasActivePlan = vi.fn()
+    await runGuard([{ status: 'ACTIVE' }], setHasActivePlan)
+    expect(setHasActivePlan).toHaveBeenCalledWith(true)
+  })
+
+  it('treats PAST_DUE and BLOCKED as active plan (still entitled)', async () => {
+    const setHasActivePlanPastDue = vi.fn()
+    await runGuard([{ status: 'PAST_DUE' }], setHasActivePlanPastDue)
+    expect(setHasActivePlanPastDue).toHaveBeenCalledWith(true)
+
+    const setHasActivePlanBlocked = vi.fn()
+    await runGuard([{ status: 'BLOCKED' }], setHasActivePlanBlocked)
+    expect(setHasActivePlanBlocked).toHaveBeenCalledWith(true)
+  })
+
+  it('treats CANCELED and EXPIRED as no active plan', async () => {
+    const setHasActivePlan = vi.fn()
+    await runGuard([{ status: 'CANCELED' }, { status: 'EXPIRED' }], setHasActivePlan)
+    expect(setHasActivePlan).toHaveBeenCalledWith(false)
+  })
+
+  it('treats DRAFT + CANCELED as no active plan', async () => {
+    const setHasActivePlan = vi.fn()
+    await runGuard([{ status: 'DRAFT' }, { status: 'CANCELED' }], setHasActivePlan)
+    expect(setHasActivePlan).toHaveBeenCalledWith(false)
+  })
+
+  it('treats DRAFT + ACTIVE as active plan (ACTIVE wins)', async () => {
+    const setHasActivePlan = vi.fn()
+    await runGuard([{ status: 'DRAFT' }, { status: 'ACTIVE' }], setHasActivePlan)
+    expect(setHasActivePlan).toHaveBeenCalledWith(true)
   })
 })
