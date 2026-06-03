@@ -16,13 +16,12 @@
         v-for="idp in idps"
         :key="idp.slug"
       >
-        <Button
-          kind="outlined"
-          size="large"
+        <PrimeButton
           v-if="idp.isActive"
           :label="formatName(idp.name)"
           :icon="getIcon(idp.slug)"
           @click="authenticate(idp)"
+          outlined
           :loading="submittedIdp === idp.uuid"
           :disabled="submittedIdp"
         />
@@ -35,23 +34,15 @@
   import { useAccountStore } from '@/stores/account'
   import { useLoadingStore } from '@/stores/loading'
   import { validateOAuthRedirect } from '@/helpers/oauth-security'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import { computed, onMounted, ref, inject, onUnmounted } from 'vue'
+  import { computed, onMounted, ref, inject, onUnmounted, defineModel } from 'vue'
   import socialIdpsData from '@/helpers/social-idps'
 
   defineOptions({ name: 'social-idps-block' })
 
   const tracker = inject('tracker')
-
-  const props = defineProps({
-    context: {
-      type: String,
-      default: 'signup',
-      validator: (value) => ['signup', 'login'].includes(value)
-    }
-  })
 
   const idps = ref([])
   const submittedIdp = ref(null)
@@ -95,17 +86,8 @@
 
     if (validateOAuthRedirect(idp.loginUrl)) {
       accountStore.setSsoSignUpMethod(idp.slug)
-      // Set the login_sso flag based on provider
-      const loginFlag = `login_sso_${idp.slug}`
-      accountStore.setSignupTypeFlag(loginFlag)
       window.location.assign(idp.loginUrl)
-
-      // Track based on context (signup or login)
-      if (props.context === 'login') {
-        tracker.signIn.userClickedSignIn({ method: idp.slug }).track()
-      } else {
-        tracker.signUp.userClickedSignedUp({ method: idp.slug }).track()
-      }
+      tracker.signUp.userClickedSignedUp({ method: idp.slug }).track()
     } else {
       loadingStore.finishLoading()
       submittedIdp.value = null

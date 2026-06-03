@@ -3,7 +3,7 @@
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import MultiSelect from '@aziontech/webkit/multiselect'
   import FieldText from '@aziontech/webkit/field-text'
   import Drawer from '@/views/EdgeApplications/Drawer'
@@ -495,14 +495,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
                   @click="openDrawer"
+                  class="w-full whitespace-nowrap flex"
                   data-testid="domains-form__create-edge-application-button"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Application"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -529,14 +533,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
                   @click="openDrawerEdgeFirewall"
+                  class="w-full whitespace-nowrap flex"
                   data-testid="domains-form__create-edge-firewall-button"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Firewall"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -579,14 +587,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
                   @click="openDigitalCertificateDrawer"
+                  class="w-full whitespace-nowrap flex"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
                   data-testid="domains-form__create-digital-certificate-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Digital Certificate"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>

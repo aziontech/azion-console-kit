@@ -56,15 +56,14 @@
               </div>
 
               <!-- Next button -->
-              <Button
-                size="large"
+              <PrimeButton
+                class="w-full flex-row-reverse"
                 type="button"
                 label="Next"
                 data-testid="signin-block__next-button"
                 :loading="isProccedButtonLoading"
                 :disabled="!email"
                 @click="checkLoginMethod"
-                class="w-full flex-row-reverse"
               />
             </div>
 
@@ -78,10 +77,7 @@
               </Divider>
             </div>
 
-            <SocialIdpsBlock
-              v-model:showSocialIdps="showSocialIdps"
-              context="login"
-            />
+            <SocialIdpsBlock v-model:showSocialIdps="showSocialIdps" />
           </div>
 
           <!-- Password step -->
@@ -91,14 +87,12 @@
           >
             <!-- Back button and email display -->
             <div class="flex items-center gap-2">
-              <IconButton
-                kind="outlined"
-                size="medium"
+              <PrimeButton
                 v-tooltip.top="{ value: 'Back', showDelay: 200 }"
+                class="w-7 h-7"
+                outlined
                 icon="pi pi-chevron-left"
                 @click="resetPasswordStep"
-                class="w-7 h-7"
-                aria-label="button"
               />
               <p class="text-sm">{{ email }}</p>
             </div>
@@ -118,26 +112,24 @@
 
                 <!-- Forgot password link -->
                 <div>
-                  <Button
-                    kind="text"
-                    size="medium"
+                  <PrimeButton
+                    link
+                    class="p-0 text-sm"
                     label="Forgot Password?"
                     @click="$emit('goToForgotPassword', true)"
-                    class="p-0 text-sm"
                   />
                 </div>
               </div>
 
               <!-- Sign In button -->
-              <Button
-                size="medium"
+              <PrimeButton
+                class="w-full flex-row-reverse"
                 :loading="isButtonLoading"
                 label="Sign In"
                 type="button"
                 @click="validateAndSubmit"
                 :disabled="!password"
                 data-testid="signin-block__signin-button"
-                class="w-full flex-row-reverse"
               />
             </div>
           </div>
@@ -146,12 +138,11 @@
 
       <div class="flex flex-wrap justify-center items-center pt-6 gap-1">
         <p class="text-sm">Don't have an account?</p>
-        <Button
-          kind="text"
-          size="medium"
+        <PrimeButton
           label="Sign Up"
+          class="p-0 text-sm"
+          link
           @click="goToSignup"
-          class="p-0"
         />
       </div>
     </div>
@@ -162,23 +153,18 @@
   import { ProccessRequestError, UnexpectedError, UserNotFoundError } from '@/services/axios/errors'
   import { verifyLoginMethodService } from '@/services/auth-services/get-login-method-service'
   import { validateOAuthRedirect } from '@/helpers/oauth-security'
-  import { trackSignInSafely } from '@/helpers/track-auth-event'
-  import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import InputText from '@aziontech/webkit/inputtext'
   import FieldPassword from '@aziontech/webkit/field-password'
   import SocialIdpsBlock from '@/templates/social-idps-block'
   import { useField, useForm } from 'vee-validate'
   import { ref, inject, onMounted, computed, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useAccountStore } from '@/stores/account'
-
   import Divider from '@aziontech/webkit/divider'
   import * as yup from 'yup'
   import { useToast } from '@aziontech/webkit/use-toast'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  const accountStore = useAccountStore()
 
   defineOptions({ name: 'signInBlock' })
 
@@ -279,19 +265,16 @@
 
       await props.authenticationLoginService(loginData)
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verify()
-
+      tracker.signIn.userSignedIn()
       if (twoFactor) {
         const mfaRoute = trustedDevice ? 'authentication' : 'setup'
         router.push(`/mfa/${mfaRoute}`)
         return
       }
 
-      // Load user data and track before switchAccount (which cancels pending requests)
-      await trackSignInSafely({ tracker, method: 'email', email: values.email, loadUserData: true })
       await switchClientAccount(userInfo.props)
     } catch {
-      const signupTypeFlags = accountStore.getSignupTypeFlags()
-      tracker.signIn.userFailedSignIn({ method: 'email', signupTypeFlags }).track()
+      tracker.signIn.userFailedSignIn().track()
       hasRequestErrorMessage.value = new UserNotFoundError().message
       isButtonLoading.value = false
     }

@@ -13,7 +13,7 @@
     </div>
 
     <div class="pt-8">
-      <Button
+      <PrimeButton
         :label="buttonLabel"
         danger
         icon="pi pi-trash"
@@ -21,13 +21,17 @@
         @click="handleAction"
         :loading="loading"
         :disabled="disabled"
+        :pt="{
+          root: { class: 'p-button-danger' },
+          label: { class: 'font-medium' }
+        }"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({
     name: 'DangerCard'

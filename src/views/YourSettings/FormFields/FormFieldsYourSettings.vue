@@ -1,6 +1,6 @@
 <script setup>
   import { useField } from 'vee-validate'
-  import { nextTick, ref, watch } from 'vue'
+  import { ref } from 'vue'
 
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import Dropdown from '@aziontech/webkit/dropdown'
@@ -13,7 +13,7 @@
 
   const emit = defineEmits(['password-strength'])
 
-  const props = defineProps({
+  defineProps({
     timezoneOptions: {
       type: Array,
       required: true
@@ -21,10 +21,6 @@
     listCountriesPhoneService: {
       type: Function,
       required: true
-    },
-    loadedUserData: {
-      type: Object,
-      default: null
     }
   })
 
@@ -36,22 +32,6 @@
   const { value: timezone } = useField('timezone')
   const { value: language } = useField('language')
   const { value: email } = useField('email')
-  const { value: mobile } = useField('mobile')
-  const { value: countryCallCode } = useField('countryCallCode')
-
-  watch(
-    () => props.loadedUserData,
-    async (data) => {
-      if (!data) return
-      await nextTick()
-      await nextTick()
-      if (data.mobile && !mobile.value) mobile.value = data.mobile
-      if (data.countryCallCode && !countryCallCode.value) {
-        countryCallCode.value = data.countryCallCode
-      }
-    },
-    { immediate: true }
-  )
 
   const passwordRequirementsList = ref([
     { label: '8 characters', key: 'minLength', valid: false },

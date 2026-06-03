@@ -131,14 +131,18 @@
             <template #footer>
               <ul class="p-2">
                 <li>
-                  <Button
-                    kind="text"
+                  <PrimeButton
                     @click="openDrawerEdgeStorage"
+                    class="w-full whitespace-nowrap flex"
                     data-testid="domains-form__create-edge-storage-button"
+                    text
                     size="small"
                     icon="pi pi-plus-circle"
+                    :pt="{
+                      label: { class: 'w-full text-left' },
+                      root: { class: 'p-2' }
+                    }"
                     label="Create Object Storage"
-                    class="w-full whitespace-nowrap flex"
                   />
                 </li>
               </ul>
@@ -190,7 +194,7 @@
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import DrawerEdgeStorage from '@/views/EdgeStorage/Drawer/index.vue'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsConnectionOptions' })

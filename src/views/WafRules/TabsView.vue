@@ -7,7 +7,7 @@
   import TabPanel from '@aziontech/webkit/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { ref, computed, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
@@ -184,7 +184,7 @@
           v-if="addButtonController.showAddButtonTab"
           class="flex ml-4 items-center"
         >
-          <Button
+          <PrimeButton
             :label="addButtonController.label"
             size="small"
             icon="pi pi-plus"

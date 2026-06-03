@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref, watch, markRaw } from 'vue'
   import { useField } from 'vee-validate'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -18,13 +18,6 @@
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
 
   const emit = defineEmits(['toggleDrawer', 'additionalErrors'])
-
-  const props = defineProps({
-    allowedRuntime: {
-      type: String,
-      default: null // null = all, 'azion_lua' = only Lua
-    }
-  })
 
   const renderers = markRaw([...vanillaRenderers])
 
@@ -74,12 +67,9 @@
   }
 
   const listEdgeFunctionsServiceDecorator = async (queryParams) => {
-    const runtimeParams = props.allowedRuntime ? { runtime: props.allowedRuntime } : {}
-
     const result = await edgeFunctionService.listEdgeFunctionsDropdown({
       executionEnvironment: 'application',
-      fields: ['id', 'name', 'default_args', 'azion_form', 'execution_environment', 'runtime'],
-      ...runtimeParams,
+      fields: ['id', 'name', 'default_args', 'azion_form', 'execution_environment'],
       ...queryParams
     })
 
@@ -246,44 +236,41 @@
           @onSuccess="handleDrawerSuccess"
         />
 
-        <div class="flex">
-          <FieldDropdownLazyLoader
-            required
-            disableEmitFirstRender
-            data-testid="edge-application-function-instance-form__edge-function"
-            label="Function"
-            name="edgeFunctionID"
-            optionLabel="name"
-            optionValue="id"
-            inputId="edgeFunctionID"
-            :service="listEdgeFunctionsServiceDecorator"
-            :loadService="loadEdgeFunctionServiceDecorator"
-            :moreOptions="['defaultArgs', 'azionForm']"
-            :value="edgeFunctionID"
-            @onSelectOption="changeArgs"
-            :description="
-              allowedRuntime === 'azion_lua'
-                ? 'Only Lua functions can be used in the Response phase.'
-                : ''
-            "
-          >
-            <template #footer>
-              <ul class="p-2">
-                <li>
-                  <Button
-                    kind="text"
-                    data-testid="edge-applications-functions-form__create-function-button"
-                    @click="openDrawer"
-                    size="small"
-                    icon="pi pi-plus-circle"
-                    label="Create Function"
-                    class="w-full whitespace-nowrap flex"
-                  />
-                </li>
-              </ul>
-            </template>
-          </FieldDropdownLazyLoader>
-        </div>
+        <FieldDropdownLazyLoader
+          required
+          disableEmitFirstRender
+          data-testid="edge-application-function-instance-form__edge-function"
+          label="Function"
+          name="edgeFunctionID"
+          optionLabel="name"
+          optionValue="id"
+          inputId="edgeFunctionID"
+          :service="listEdgeFunctionsServiceDecorator"
+          :loadService="loadEdgeFunctionServiceDecorator"
+          :moreOptions="['defaultArgs', 'azionForm']"
+          :value="edgeFunctionID"
+          @onSelectOption="changeArgs"
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="edge-applications-functions-form__create-function-button"
+                  text
+                  @click="openDrawer"
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Function"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
       </div>
 
       <div
@@ -338,8 +325,8 @@
                         >
                           <p>Configure the form builder.</p>
                           <!--
-                          <Button
-                            kind="outlined"
+                          <PrimeButton
+                            outlined
                             @click="azionJsonFormWindowOpener()"
                             label="Read documentation"
                             size="small"
@@ -404,11 +391,11 @@
         class="flex justify-end mt-[-1rem]"
         v-if="isFirstSelectPanelValue && hasFormBuilder"
       >
-        <Button
-          kind="text"
+        <PrimeButton
           @click="formBuilderToggle()"
           :label="updateLabelEditForm()"
           size="small"
+          text
         />
       </div>
     </template>

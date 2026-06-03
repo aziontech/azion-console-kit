@@ -35,14 +35,16 @@ jobs:
         
       - name: Configure token
         run: |
-          azion -t ${{ secrets.AZION_PERSONAL_TOKEN }}
+          azion -t ${{ secrets.AZION_PERSONAL_TOKEN }}  
+          azion whoami
 
       - name: Install storybook dependencies
         run: |
           yarn storybook:install
       
       - name: Building Storybook
-        run: yarn storybook:build
+        run: |
+          yarn storybook:build
           
       - name: Azion Deploy
         run: |

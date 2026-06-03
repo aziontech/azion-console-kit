@@ -135,8 +135,8 @@ function addViolationsToBucket(bucket, result, archViolations) {
 async function scan() {
   const eslint = new ESLint({
     cwd: PROJECT_ROOT,
-    useEslintrc: false,
-    overrideConfigFile: path.join(PROJECT_ROOT, '.eslintrc-architecture.cjs')
+    // Use the project's .eslintrc.cjs configuration
+    useEslintrc: true
   })
 
   const results = await eslint.lintFiles(TARGET_PATTERNS)

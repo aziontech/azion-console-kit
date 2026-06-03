@@ -1,17 +1,17 @@
 <template>
-  <Button
-    kind="outlined"
-    size="medium"
+  <PrimeButton
     @click="connectWithGithub"
     label="Connect with GitHub"
+    outlined
     icon="pi pi-github"
+    iconPos="left"
     :loading="props.loading"
   />
 </template>
 
 <script setup>
   import { ref, watch } from 'vue'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { useToast } from '@aziontech/webkit/use-toast'
 

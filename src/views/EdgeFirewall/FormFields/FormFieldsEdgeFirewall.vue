@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
-  import Tag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/tag'
   import { useField } from 'vee-validate'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
@@ -70,7 +70,7 @@
           :options="switchOptions"
         >
           <template #footer="{ item }">
-            <Tag
+            <PrimeTag
               v-if="item?.tag"
               :value="item.tag.value"
               :icon="item.tag.icon"

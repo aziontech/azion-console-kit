@@ -32,14 +32,13 @@
             {{ errors.confirmPassword }}
           </InlineMessage>
         </div>
-        <Button
-          kind="secondary"
-          size="medium"
+        <PrimeButton
+          class="w-full flex-row-reverse"
           :loading="isButtonLoading"
           label="Reset Password"
+          severity="secondary"
           type="submit"
           :disabled="!meta.valid"
-          class="w-full flex-row-reverse"
         />
       </div>
 
@@ -58,14 +57,13 @@
             </p>
           </div>
 
-          <Button
-            kind="secondary"
-            size="medium"
+          <PrimeButton
+            class="w-full flex-row-reverse"
             :loading="isButtonLoading"
             label="Sign In"
             @click="goToSignIn()"
+            severity="secondary"
             type="button"
-            class="w-full flex-row-reverse"
           />
         </div>
       </div>
@@ -74,7 +72,7 @@
 </template>
 
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import FieldPassword from '@aziontech/webkit/field-password'
   import { useForm } from 'vee-validate'

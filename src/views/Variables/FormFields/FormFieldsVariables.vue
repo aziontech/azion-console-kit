@@ -4,30 +4,11 @@
   import FieldText from '@aziontech/webkit/field-text'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
 
-  import { computed } from 'vue'
   import { useField } from 'vee-validate'
-
   defineOptions({ name: 'form-fields-variables' })
-
-  const props = defineProps({
-    secretChangeValueOnly: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  })
 
   const { value: key } = useField('key')
   const { value: value } = useField('value')
-
-  const valueDescription = computed(() =>
-    props.secretChangeValueOnly
-      ? 'Enter a new value for this secret. The current secret value is not exposed.'
-      : 'Enter the data associated with the variable key.'
-  )
 </script>
 
 <template>
@@ -45,7 +26,6 @@
         description="Give a name or identifier for the variable. Accepts upper-case letters, numbers, and
         underscore."
         data-testid="variables-form__key-field"
-        :disabled="disabled || secretChangeValueOnly"
         sensitive
       />
 
@@ -53,11 +33,10 @@
         label="Value"
         required
         name="value"
-        :placeholder="secretChangeValueOnly ? 'NEW_SECRET_VALUE' : 'VARIABLE_VALUE'"
+        placeholder="VARIABLE_VALUE"
         :value="value"
-        :description="valueDescription"
+        description="Enter the data associated with the variable key."
         data-testid="variables-form__value-field"
-        :disabled="disabled"
         sensitive
       />
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
@@ -68,7 +47,6 @@
             auto
             :isCard="false"
             title="Secret"
-            :disabled="disabled || secretChangeValueOnly"
             data-testid="variables-form__secret-field"
           />
         </div>

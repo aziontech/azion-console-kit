@@ -1,5 +1,5 @@
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import DrawerBlock from '@/views/CustomPages/Drawer/drawerSelectPageCode'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import DataTable from '@aziontech/webkit/list-data-table'
@@ -223,12 +223,11 @@
                   v-model="searchValue"
                 />
               </span>
-              <Button
-                kind="secondary"
-                size="medium"
+              <PrimeButton
                 icon="pi pi-plus"
                 label="Custom Page Code"
                 data-testid="status-code__add-button"
+                severity="secondary"
                 @click="openCreateStatusCodeDrawer"
                 :disabled="disabledButtonAdd"
                 class="w-full sm:w-auto"

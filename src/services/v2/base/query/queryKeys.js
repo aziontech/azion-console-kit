@@ -41,7 +41,7 @@ export const queryKeys = {
   },
   accountSettings: {
     all: ['account-settings'],
-    info: () => [...queryKeys.accountSettings.all, 'info']
+    jobRole: () => [...queryKeys.accountSettings.all, 'job-role']
   },
   solutions: {
     all: ['solutions'],
@@ -192,8 +192,7 @@ export const queryKeys = {
   },
   billing: {
     all: ['billing'],
-    lastBill: () => [...queryKeys.billing.all, 'last-bill'],
-    invoicesList: () => [...queryKeys.billing.all, 'invoices', 'list']
+    lastBill: () => [...queryKeys.billing.all, 'last-bill']
   },
   variables: {
     all: ['variables'],
@@ -306,16 +305,6 @@ export const queryKeys = {
   personalToken: {
     all: ['personal-tokens'],
     list: (params) => [...queryKeys.personalToken.all, 'list', normalizeParams(params)]
-  },
-  plans: {
-    all: ['plans'],
-    list: () => [...queryKeys.plans.all, 'list']
-  },
-  serviceOrders: {
-    all: ['service-orders'],
-    list: (params) => [...queryKeys.serviceOrders.all, 'list', normalizeParams(params)],
-    detail: (id) => [...queryKeys.serviceOrders.all, 'detail', id],
-    billingPaymentMethods: () => [...queryKeys.serviceOrders.all, 'billing', 'payment-methods']
   },
   edgeService: {
     all: ['edge-services'],

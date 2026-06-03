@@ -57,7 +57,7 @@
       required: true
     },
     loadOIDCIdentityProviderService: {
-      type: Function,
+      type: String,
       required: true
     },
     loadSAMLIdentityProviderService: {

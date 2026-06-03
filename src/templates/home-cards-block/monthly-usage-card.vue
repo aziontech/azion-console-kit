@@ -2,13 +2,13 @@
   <HomeCardBlock title="Monthly Usage">
     <template #header-action>
       <div class="flex justify-end">
-        <IconButton
-          kind="transparent"
+        <PrimeButton
           v-if="!isLoading"
           icon="pi pi-sliders-v"
           size="small"
+          severity="secondary"
+          text
           @click="toggleColumnSelector"
-          aria-label="button"
         />
         <OverlayPanel
           ref="columnSelectorPanel"
@@ -113,7 +113,7 @@
   import { storeToRefs } from 'pinia'
   import HomeCardBlock from '@/views/Home/components/HomeCard.vue'
   import SkeletonBlock from '@/templates/skeleton-block'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'
   import Listbox from '@aziontech/webkit/listbox'
   import Checkbox from '@aziontech/webkit/checkbox'

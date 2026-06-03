@@ -2,7 +2,7 @@
   import { useThemeStore } from '@/stores/theme'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useToast } from '@aziontech/webkit/use-toast'
   import CreateEdgeServiceDrawer from '@/views/EdgeServices/CreateEdgeServiceDrawer'
   import { capitalizeFirstLetter } from '@/helpers'
@@ -131,14 +131,18 @@
               <template #footer>
                 <ul class="p-2">
                   <li>
-                    <Button
-                      kind="text"
+                    <PrimeButton
+                      class="w-full whitespace-nowrap flex"
                       data-testid="edge-applications-rules-engine-form__create-cache-policy-button"
+                      text
                       @click="openDrawer"
                       size="small"
                       icon="pi pi-plus-circle"
+                      :pt="{
+                        label: { class: 'w-full text-left' },
+                        root: { class: 'p-2' }
+                      }"
                       label="Create Edge Service"
-                      class="w-full whitespace-nowrap flex"
                     />
                   </li>
                 </ul>

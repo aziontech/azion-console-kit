@@ -10,7 +10,7 @@
   import ListViewTabResources from '@/views/EdgeServices/ListViewTabResources'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
@@ -190,7 +190,7 @@
             v-if="addButtonController.showAddButtonTab"
             class="flex ml-4 items-center"
           >
-            <Button
+            <PrimeButton
               :label="addButtonController.label"
               size="small"
               icon="pi pi-plus"

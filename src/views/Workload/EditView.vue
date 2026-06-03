@@ -18,15 +18,11 @@
         @on-edit-fail="handleTrackFailEditEvent"
       >
         <template #form="{ loading }">
-          <div class="relative flex flex-col gap-8 max-md:gap-6">
-            <FormFieldsWorkload isEdit />
-            <div
-              v-if="loading"
-              class="absolute inset-0 z-10 bg-[var(--surface-ground)]"
-            >
-              <FormSkeleton />
-            </div>
-          </div>
+          <FormSkeleton v-if="loading" />
+          <FormFieldsWorkload
+            v-show="!loading"
+            isEdit
+          />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate

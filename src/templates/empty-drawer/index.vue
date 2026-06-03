@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import Sidebar from '@aziontech/webkit/sidebar'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({ name: 'empty-drawer' })
 
@@ -73,12 +73,10 @@
         <h2>{{ title }}</h2>
         <div class="flex items-center gap-2">
           <slot name="header-actions"></slot>
-          <IconButton
-            kind="outlined"
-            size="medium"
+          <PrimeButton
             @click="toggleExpandDrawer"
+            outlined
             :icon="isExpanded ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
-            aria-label="button"
           />
         </div>
       </template>

@@ -63,7 +63,6 @@ const getConfig = () => {
     optimizeDeps: webkitViteConfig.optimizeDeps,
     resolve: {
       preserveSymlinks: true, // Vite doesn't follow the symlink (@aziontech/icons in dev mode)
-      dedupe: ['vee-validate', 'vue'],
       extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -130,16 +129,8 @@ const getConfig = () => {
           target: 'https://api.appcues.com',
           rewrite: (path) => path.replace(/^\/appcues/, '')
         }),
-        ...(BEHOLDER_URL && {
-          '/sse': createProxyConfig({
-            target: BEHOLDER_URL
-          })
-        }),
-        '/edge_api': createProxyConfig({
-          target: IS_PROD
-            ? 'https://jkjuyhi0gza.map.azionedge.net'
-            : 'https://urvlgkvpxla.map.azionedge.net',
-          rewrite: (path) => path.replace(/^\/edge_api/, '')
+        '/sse': createProxyConfig({
+          target: BEHOLDER_URL
         })
       }
     }
