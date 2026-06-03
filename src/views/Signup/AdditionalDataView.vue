@@ -115,8 +115,6 @@
   import { loadUserAndAccountInfo } from '@/helpers/account-data'
   import { useWarmStripe } from '@/composables/useWarmStripe'
   import { persistOnboardingData } from '@/helpers/persist-onboarding-data'
-  import { trackSignUpSafely } from '@/helpers/track-auth-event'
-  import { getFirstSessionUrl } from '@/helpers/first-session-url'
   import { queryClient } from '@/services/v2/base/query/queryClient'
   import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
@@ -127,18 +125,6 @@
     Promise.resolve()
       .then(() => tracker?.signUp?.[method]?.(payload)?.track?.())
       .catch(Sentry.captureException)
-  }
-  // Submit the sign-up to HubSpot once the additional-data has been persisted,
-  // mirroring the login flow (see trackSignInSafely in sign-in-block). Reads the
-  // freshly loaded account data from the store, so call it after
-  // loadUserAndAccountInfo.
-  const trackSignUpToHubspot = () => {
-    trackSignUpSafely({
-      tracker,
-      method: accountStore.ssoSignUpMethod || 'email',
-      signupTypeFlags: accountStore.getSignupTypeFlags(),
-      firstSessionUrl: getFirstSessionUrl()
-    })
   }
   const { clear: clearAdditionalDataFormState } = useAdditionalDataFormState()
   const { warmStripe } = useWarmStripe()
@@ -437,7 +423,6 @@
 
         invalidateBillingCaches()
         await loadUserAndAccountInfo({ force: true })
-        trackSignUpToHubspot()
         handleProceedToCheckout()
       } catch (err) {
         // eslint-disable-next-line no-console
@@ -507,7 +492,6 @@
       await persistOnboardingData({ plan: selectedPlan.value })
       invalidateBillingCaches()
       await loadUserAndAccountInfo({ force: true })
-      trackSignUpToHubspot()
     } catch (err) {
       Sentry.captureException(err)
     }

@@ -30,10 +30,8 @@ export default function afterEachRoute(to, from, failure) {
     .catch(Sentry.captureException)
 
   const isOnboardingStep = to.name === 'additional-data'
-  const isPublicRoute = to.meta?.isPublic === true
-  const shouldSkipPrefetch = isOnboardingStep || isPublicRoute
 
-  if (!shouldSkipPrefetch) {
+  if (!isOnboardingStep) {
     sessionManager.afterLogin()
   }
 }
