@@ -239,7 +239,7 @@
         Filter
       </h5>
       <IconButton
-        kind="primary"
+        kind="outlined"
         size="medium"
         type="button"
         @click="toggle"
@@ -395,7 +395,7 @@
       data-testid="filter-buttons-container"
     >
       <ButtonPrime
-        kind="primary"
+        kind="outlined"
         type="button"
         label="Cancel"
         @click="toggle"
