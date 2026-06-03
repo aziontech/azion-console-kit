@@ -1,5 +1,5 @@
 <script setup>
-  import ButtonPrime from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'
@@ -239,7 +239,7 @@
         Filter
       </h5>
       <IconButton
-        kind="primary"
+        kind="outlined"
         size="medium"
         type="button"
         @click="toggle"
@@ -394,8 +394,8 @@
       class="px-8 py-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
       data-testid="filter-buttons-container"
     >
-      <ButtonPrime
-        kind="primary"
+      <Button
+        kind="outlined"
         type="button"
         label="Cancel"
         @click="toggle"
@@ -403,7 +403,7 @@
         data-testid="filter-cancel-button"
         class="max-md:min-w-max"
       />
-      <ButtonPrime
+      <Button
         kind="secondary"
         type="button"
         label="Apply"
@@ -614,7 +614,7 @@
         <div
           class="p-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
         >
-          <ButtonPrime
+          <Button
             kind="primary"
             type="button"
             label="Cancel"
@@ -623,7 +623,7 @@
             data-testid="filter-sidebar-cancel-button"
             class="max-md:min-w-max"
           />
-          <ButtonPrime
+          <Button
             kind="secondary"
             type="button"
             label="Apply"
