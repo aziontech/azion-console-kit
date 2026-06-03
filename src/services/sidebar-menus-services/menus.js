@@ -24,7 +24,18 @@ function createDeploymentsItem() {
     label: 'Deployments',
     icon: 'ai ai-deploy-pillar',
     to: '/deployments',
-    id: 'deployments'
+    id: 'deployments',
+    clientFlag: 'use_v6_configurations'
+  }
+}
+
+function createEnvironmentsItem() {
+  return {
+    label: 'Environments',
+    icon: 'pi pi-server',
+    to: '/environments',
+    id: 'environments',
+    clientFlag: 'use_v6_configurations'
   }
 }
 
@@ -224,6 +235,7 @@ export function getMenuItens(showMarketplaceProductsItens) {
     createHomeItem(),
     createMarketplaceItem(),
     createDeploymentsItem(),
+    createEnvironmentsItem(),
     {
       label: 'Build',
       items: createBuildItems()
