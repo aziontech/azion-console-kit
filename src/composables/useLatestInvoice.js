@@ -2,10 +2,6 @@ import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { invoicesService } from '@/services/v2/billing/invoices-service'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
-import { toMilliseconds } from '@/services/v2/base/query/config'
-
-const STALE_TIME = toMilliseconds({ seconds: 60 })
-const GC_TIME = toMilliseconds({ minutes: 5 })
 
 export function useLatestInvoice(options = {}) {
   const { enabled = true } = options
@@ -13,10 +9,11 @@ export function useLatestInvoice(options = {}) {
   const query = useQuery({
     queryKey: queryKeys.billing.invoicesList(),
     queryFn: () => invoicesService.listAccountInvoices({ limit: 1 }),
-    staleTime: STALE_TIME,
-    gcTime: GC_TIME,
-    refetchOnMount: false,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: false,
+    meta: { persist: false },
     enabled
   })
 

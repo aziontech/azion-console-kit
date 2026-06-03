@@ -18,10 +18,11 @@ export class ServiceOrdersService extends BaseService {
 
   useListPlansQuery() {
     return this.useQuery(queryKeys.plans.list(), () => this.listPlansService(), {
-      staleTime: this.toMilliseconds({ hours: 1 }),
-      gcTime: this.toMilliseconds({ hours: 24 }),
-      refetchOnMount: false,
-      refetchOnWindowFocus: false
+      staleTime: 0,
+      gcTime: 0,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: false,
+      meta: { persist: false }
     })
   }
 

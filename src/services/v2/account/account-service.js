@@ -16,7 +16,9 @@ export class AccountService extends BaseService {
 
   async getAccountInfo() {
     const queryKey = queryKeys.account.info()
-    return await this.useEnsureQueryData(queryKey, async () => this.fetchAccountInfo())
+    return await this.useEnsureQueryData(queryKey, async () => this.fetchAccountInfo(), {
+      meta: { skipCache: true, persist: false }
+    })
   }
 
   _adaptAccountInfo(response) {

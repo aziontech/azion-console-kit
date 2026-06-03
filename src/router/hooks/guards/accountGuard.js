@@ -2,6 +2,8 @@ import { loadAccountHydration } from '@/helpers/account-data'
 import { setRedirectRoute } from '@/helpers'
 import { sessionManager } from '@/services/v2/base/auth'
 import { ensurePlansList } from '@/composables/usePlansService'
+import { ensureServiceOrdersList } from '@/composables/useServiceOrdersList'
+import { SO_TERMINAL_STATUSES } from '@/services/v2/service-orders/service-orders-constants'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
 export async function accountGuard({ to, accountStore, tracker }) {
@@ -21,6 +23,14 @@ export async function accountGuard({ to, accountStore, tracker }) {
       // guard would race the contract/billing fetches.
       await loadAccountHydration()
       sessionManager.afterLogin()
+
+      const accountId = accountStore.accountData?.id
+      const serviceOrdersResponse = await ensureServiceOrdersList(accountId).catch(() => null)
+      const serviceOrders = serviceOrdersResponse?.data ?? []
+      const hasActivePlan = serviceOrders.some(
+        (so) => so.status && !SO_TERMINAL_STATUSES.includes(so.status)
+      )
+      accountStore.setHasActivePlan(hasActivePlan)
 
       const needsOnboarding = accountStore.needsOnboarding
       const isAdditionalDataRoute = to.name === 'additional-data'

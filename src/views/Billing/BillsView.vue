@@ -352,12 +352,7 @@
   }
 
   const schedulePrepareForPro = (preferredCycle = null) => {
-    if (
-      subscription.isPro.value &&
-      subscription.billingCycle.value === (preferredCycle || storedBillingCycle.value)
-    ) {
-      return
-    }
+    if (subscription.isPro.value) return
     const cycle = preferredCycle || storedBillingCycle.value || 'monthly'
     const key = buildPreparationKey('pro', cycle)
     if (
@@ -410,6 +405,11 @@
   }
 
   const refreshInvoiceAndHistory = async () => {
+    if (!hasContentToList.value) {
+      hasContentToList.value = true
+      await loadCurrentInvoice()
+      return
+    }
     await Promise.allSettled([loadCurrentInvoice(), listTableRef.value?.reload?.()])
   }
 
@@ -481,7 +481,6 @@
       source: 'subscription-card'
     })
     showChangePlanDrawer.value = true
-    schedulePrepareForPro(initialCycle)
   }
 
   const openDrawerWithCheckoutSession = async ({ plan, preferredCycle, lockedCycle: locked }) => {
