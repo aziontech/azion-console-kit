@@ -1,13 +1,13 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import MultiSelect from '@aziontech/webkit/multiselect'
   import LabelBlock from '@aziontech/webkit/label'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import InputText from '@aziontech/webkit/inputtext'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/tag'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
@@ -229,7 +229,7 @@
           :options="environmentOptions"
         >
           <template #footer="{ item }">
-            <PrimeTag
+            <Tag
               v-if="item?.tag"
               :value="item.tag.value"
               :icon="item.tag.icon"
@@ -458,9 +458,10 @@
               disabled
             />
           </span>
-          <PrimeButton
+          <Button
+            kind="outlined"
+            size="medium"
             icon="pi pi-clone"
-            outlined
             data-testid="edit-domains-form__domain-field__copy-button"
             type="button"
             aria-label="Copy to Clipboard"
@@ -519,18 +520,14 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <PrimeButton
+                <Button
+                  kind="text"
                   @click="openDigitalCertificateDrawer"
-                  class="w-full whitespace-nowrap flex"
-                  text
                   size="small"
                   icon="pi pi-plus-circle"
                   data-testid="domains-form__create-digital-certificate-button"
-                  :pt="{
-                    label: { class: 'w-full text-left' },
-                    root: { class: 'p-2' }
-                  }"
                   label="Create Digital Certificate"
+                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>

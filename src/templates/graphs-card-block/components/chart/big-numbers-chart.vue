@@ -5,7 +5,7 @@
         {{ resultChart[0].value }}
         <span class="text-sm font-normal">{{ resultChart[0].unit }}</span>
       </h2>
-      <PrimeTag
+      <Tag
         :class="variationProps?.class"
         :value="variationProps.value"
         :icon="variationProps?.icon"
@@ -18,7 +18,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/tag'
   import AggregationInfo from '../aggregation-info.vue'
 
   const props = defineProps({

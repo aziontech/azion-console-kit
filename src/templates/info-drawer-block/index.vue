@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import Sidebar from '@aziontech/webkit/sidebar'
-  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
 
   defineOptions({ name: 'info-drawer-block' })
   const emit = defineEmits(['update:visible'])
@@ -63,12 +63,14 @@
       <h2 class="text-xl truncate">{{ props.title }}</h2>
       <div class="flex gap-2 items-center">
         <slot name="header-actions"></slot>
-        <Button
-          outlined
-          class="text-color"
+        <IconButton
+          kind="outlined"
+          size="medium"
           :icon="iconExpand"
           @click="handlePosition"
-        ></Button>
+          class="text-color"
+          aria-label="button"
+        />
       </div>
     </template>
 

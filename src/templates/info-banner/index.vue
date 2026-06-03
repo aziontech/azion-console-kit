@@ -1,7 +1,7 @@
 <script setup>
   import { computed } from 'vue'
   import { motion, AnimatePresence } from 'motion-v'
-  import PrimeButton from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import { useInfoBannerStore } from '@/stores/info-banner'
 
   defineOptions({ name: 'InfoBanner' })
@@ -87,13 +87,13 @@
               class="flex-1 text-xs leading-5 text-[#ededed]"
               v-html="banner.content"
             />
-            <PrimeButton
-              text
-              rounded
-              severity="secondary"
+            <IconButton
+              kind="transparent"
+              size="medium"
               icon="pi pi-times"
-              class="!w-7 !h-7"
               @click="handleClose(banner.id)"
+              class="!w-7 !h-7"
+              aria-label="button"
             />
           </motion.div>
         </motion.div>

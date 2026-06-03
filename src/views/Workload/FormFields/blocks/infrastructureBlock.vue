@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/tag'
   import { computed } from 'vue'
   import { useField } from 'vee-validate'
 
@@ -69,7 +69,7 @@
           :options="environmentOptionsRadios"
         >
           <template #footer="{ item }">
-            <PrimeTag
+            <Tag
               v-if="item?.tag"
               :value="item.tag.value"
               :icon="item.tag.icon"

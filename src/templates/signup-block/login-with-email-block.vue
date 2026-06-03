@@ -38,16 +38,17 @@
     />
   </div>
 
-  <PrimeButton
-    class="animate-fadeIn"
+  <Button
+    size="large"
     :label="labelButton"
     :loading="loading"
     @click="eventButtonSignUp"
+    class="animate-fadeIn"
   />
 </template>
 
 <script setup>
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import InputText from '@aziontech/webkit/inputtext'
   import FieldPassword from '@aziontech/webkit/field-password'
 
@@ -183,6 +184,9 @@
   const handleSignUpEmailClick = () => {
     const accountStore = useAccountStore()
     accountStore.resetSsoSignUpMethod()
+    // Set signup_email flag when user chooses email signup
+    accountStore.setSignupTypeFlag('login_email')
+    accountStore.setSignupTypeFlag('signup_email')
     showForm.value = true
     labelButton.value = 'Sign Up'
   }

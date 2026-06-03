@@ -1,11 +1,11 @@
 <template>
   <div class="flex gap-2">
-    <PrimeTag
+    <Tag
       icon="pi pi-calculator"
       :value="aggregationTypeLabel"
       severity="info"
     />
-    <PrimeTag
+    <Tag
       v-if="displayTag"
       :class="variationProps?.class"
       :value="variationProps.value"
@@ -21,7 +21,7 @@
 
 <script setup>
   import PrimeSkeleton from '@aziontech/webkit/skeleton'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/tag'
   import { computed } from 'vue'
 
   const props = defineProps({

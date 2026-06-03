@@ -31,17 +31,19 @@
           v-if="activeTab === 0"
           class="absolute right-0 top-0 z-10 flex items-center gap-1"
         >
-          <PrimeButton
+          <IconButton
+            kind="outlined"
             icon="pi pi-chevron-left"
             size="small"
-            outlined
             @click="shiftQuick(-1)"
+            aria-label="button"
           />
-          <PrimeButton
+          <IconButton
+            kind="outlined"
             icon="pi pi-chevron-right"
             size="small"
-            outlined
             @click="shiftQuick(1)"
+            aria-label="button"
           />
         </div>
         <TabView
@@ -88,9 +90,9 @@
               <div class="text-sm text-color-secondary">
                 Selecting 'Set Now' sets the time dynamically to the exact moment of each refresh.
               </div>
-              <PrimeButton
+              <Button
+                kind="secondary"
                 label="Set Now"
-                severity="secondary"
                 size="small"
                 @click="setNow"
               />
@@ -134,10 +136,11 @@
 </template>
 
 <script setup>
-  import { computed, defineModel, nextTick, onMounted, ref } from 'vue'
+  import { computed, nextTick, onMounted, ref } from 'vue'
   import QuickSelect from './quickSelect/index.vue'
   import InputDateRange from './inputDateRange/index.vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'
   import TabView from 'primevue/tabview'

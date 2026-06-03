@@ -75,9 +75,9 @@
 
     <template #footer>
       <Button
+        kind="secondary"
         label="Confirm"
         size="small"
-        severity="secondary"
         data-testid="copy-token-dialog__dialog-footer__confirm-button"
         @click="closeDialog"
       />

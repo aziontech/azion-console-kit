@@ -2,7 +2,8 @@
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   // TODO: migrate import to @aziontech/webkit/list-data-table when published
   import DataTable from '@aziontech/webkit/list-data-table'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import PrimeCard from '@aziontech/webkit/card'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import Divider from '@aziontech/webkit/divider'
@@ -11,8 +12,10 @@
   import InputText from '@aziontech/webkit/inputtext'
   import Skeleton from '@aziontech/webkit/skeleton'
   import Menu from '@aziontech/webkit/menu'
-  import PrimeTag from '@aziontech/webkit/tag'
-  import { computed, onMounted, ref, watch } from 'vue'
+  import Tag from '@aziontech/webkit/tag'
+  import { computed, inject, onMounted, ref, watch } from 'vue'
+  import { useAccountStore } from '@/stores/account'
+  import { trackSignInSafely } from '@/helpers/track-auth-event'
 
   defineOptions({ name: 'SwitchAccountBlock' })
   const emit = defineEmits(['update:showSwitchAccount'])
@@ -91,6 +94,17 @@
   ])
   const menu = ref()
 
+  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+  const accountStore = useAccountStore()
+
+  const getSignInMethod = () => {
+    const flags = accountStore.getSignupTypeFlags()
+    if (flags.login_sso_google || flags.signup_sso_google) return 'google'
+    if (flags.login_sso_github || flags.signup_sso_github) return 'github'
+    return 'email'
+  }
+
   // Lazy loading state (previously managed by with-lazy-and-dropdown-filter.vue)
   const isLoading = ref(false)
   const first = ref(1)
@@ -157,30 +171,25 @@
   }
   const onSelectedAccount = async (rowSelected) => {
     visible.value = false
+
+    await trackSignInSafely({ tracker, method: getSignInMethod() })
     await props.accountHandler.switchAccountAndRedirect(rowSelected.accountId)
   }
 </script>
 
 <template>
   <div>
-    <PrimeButton
+    <Button
       v-if="visibleButton"
-      class="font-semibold h-8 w-auto truncate max-w-[180px] border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
+      kind="text"
       size="small"
       :loading="isLoadingAccount"
-      :pt="{
-        label: { class: '!text-white' },
-        icon: { class: '!text-white' }
-      }"
+      :icon="account.accountTypeIcon"
+      :label="account.name"
       v-tooltip.bottom="{ value: 'Switch account', showDelay: 200 }"
       @click="visibleDialog(true)"
-    >
-      <i
-        class="text-white"
-        :class="account.accountTypeIcon"
-      />
-      <span class="truncate text-white"> {{ account.name }}</span>
-    </PrimeButton>
+      class="font-semibold h-8 w-auto truncate max-w-[180px] border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover !text-white"
+    />
 
     <PrimeDialog
       :blockScroll="true"
@@ -214,15 +223,16 @@
                 <h3 class="text-lg font-medium">
                   {{ account.name }}
                 </h3>
-                <PrimeButton
+                <IconButton
+                  kind="outlined"
+                  size="medium"
                   icon="pi pi-cog"
                   type="button"
-                  outlined
-                  class="hidden max-sm:flex flex-shrink-0"
                   aria-label="menu"
                   aria-haspopup="true"
                   aria-controls="overlay_menu"
                   @click="toggle"
+                  class="hidden max-sm:flex flex-shrink-0"
                 />
               </div>
 
@@ -246,27 +256,28 @@
                 </div>
               </div>
               <div class="flex items-center gap-2">
-                <PrimeTag
+                <Tag
                   :value="account.accountTypeName"
                   :icon="account.accountTypeIcon"
                   severity="info"
                 />
-                <PrimeTag
+                <Tag
                   value="Current Logged"
                   severity="success"
                 />
               </div>
             </div>
 
-            <PrimeButton
+            <IconButton
+              kind="outlined"
+              size="medium"
               icon="pi pi-cog"
               type="button"
-              outlined
-              class="max-sm:hidden"
               aria-label="menu"
               aria-haspopup="true"
               aria-controls="overlay_menu"
               @click="toggle"
+              class="max-sm:hidden"
             />
             <Menu
               :pt="{

@@ -32,25 +32,28 @@
     </div>
 
     <template #closeicon>
-      <PrimeButton
-        outlined
+      <IconButton
+        kind="outlined"
+        size="medium"
         @click="cancelDialog"
         icon="pi pi-times"
+        aria-label="button"
       />
     </template>
 
     <template #footer>
       <div class="flex flex-row w-full justify-end md:flex-nowrap gap-3">
-        <PrimeButton
-          outlined
+        <Button
+          kind="outlined"
+          size="medium"
           label="Cancel"
           @click="cancelDialog()"
           data-testid="review-changes-dialog-footer-cancel-button"
         />
-        <PrimeButton
-          severity="secondary"
+        <Button
+          kind="secondary"
+          size="medium"
           label="Save"
-          icon-pos="right"
           @click="saveRules()"
           data-testid="review-changes-dialog-footer-delete-button"
         />
@@ -61,7 +64,8 @@
 
 <script setup>
   import { inject, computed } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import ReorderedRules from './components/ReorderedRules.vue'
 

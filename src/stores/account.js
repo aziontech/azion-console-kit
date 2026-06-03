@@ -3,12 +3,22 @@ import { defineStore } from 'pinia'
 export const useAccountStore = defineStore({
   id: 'account',
   persist: {
-    paths: ['identifySignUpProvider', 'hasSession']
+    paths: ['identifySignUpProvider', 'hasSession', 'signupTypeFlags']
   },
   state: () => ({
     account: {},
     hasSession: false,
     identifySignUpProvider: '',
+    signupTypeFlags: {
+      login_sso_google: false,
+      login_sso_github: false,
+      login_email: false,
+      signup_sso_google: false,
+      signup_sso_github: false,
+      signup_email: false
+    },
+    currentPlanSku: null,
+    hasActivePlan: false,
     accountStatuses: {
       BLOCKED: 'BLOCKED',
       DEFAULTING: 'DEFAULTING',
@@ -77,6 +87,13 @@ export const useAccountStore = defineStore({
     isFirstLogin(state) {
       return state.account?.first_login
     },
+    needsOnboarding(state) {
+      return (
+        state.account?.first_login === true &&
+        state.account?.kind === 'client' &&
+        !state.hasActivePlan
+      )
+    },
     accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'
     },
@@ -133,6 +150,12 @@ export const useAccountStore = defineStore({
     },
     isClientAccount(state) {
       return state.account?.kind === 'client'
+    },
+    isHobbyPlan(state) {
+      return state.currentPlanSku === 'hobby'
+    },
+    isProPlan(state) {
+      return state.currentPlanSku === 'pro'
     }
   },
   actions: {
@@ -142,16 +165,48 @@ export const useAccountStore = defineStore({
     setHasSession(value) {
       this.hasSession = !!value
     },
+    setCurrentPlan(sku) {
+      this.currentPlanSku = sku ?? null
+    },
+    setHasActivePlan(value) {
+      this.hasActivePlan = !!value
+    },
     resetAccount() {
       this.account = {}
       this.hasSession = false
       this.identifySignUpProvider = ''
+      this.signupTypeFlags = {
+        login_sso_google: false,
+        login_sso_github: false,
+        login_email: false,
+        signup_sso_google: false,
+        signup_sso_github: false,
+        signup_email: false
+      }
+      this.currentPlanSku = null
+      this.hasActivePlan = false
     },
     setSsoSignUpMethod(method) {
       this.identifySignUpProvider = method
     },
     resetSsoSignUpMethod() {
       this.identifySignUpProvider = ''
+    },
+    /**
+     * Sets a signup type flag to true.
+     * @param {string} flag - The flag name (e.g., 'signup_sso_google', 'login_email')
+     */
+    setSignupTypeFlag(flag) {
+      if (flag in this.signupTypeFlags) {
+        this.signupTypeFlags[flag] = true
+      }
+    },
+    /**
+     * Gets all signup type flags.
+     * @returns {Object} The signup type flags object
+     */
+    getSignupTypeFlags() {
+      return { ...this.signupTypeFlags }
     }
   }
 })

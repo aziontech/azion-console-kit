@@ -29,18 +29,20 @@
           <slot name="form" />
           <p class="text-sm font-normal text-center text-color-secondary">
             By signing up, you agree to the
-            <PrimeButton
+            <Button
+              kind="text"
+              size="medium"
               label="Terms of Service"
-              link
-              class="p-0 text-sm"
               @click="azionTermsAndServicesWindowOpener"
+              class="p-0 text-sm"
             />
             and
-            <PrimeButton
+            <Button
+              kind="text"
+              size="medium"
               label="Privacy Policy."
-              link
-              class="p-0 text-sm"
               @click="azionPrivacyPolicyWindowOpener"
+              class="p-0 text-sm"
             />
           </p>
         </div>
@@ -49,9 +51,10 @@
           class="flex flex-wrap justify-center items-center gap-3 mt-8 max-w-md"
         >
           <p class="text-sm font-normal">Already have an account?</p>
-          <PrimeButton
+          <Button
+            kind="secondary"
+            size="medium"
             label="Sign In"
-            severity="secondary"
             @click="goToLogin"
           />
         </div>
@@ -62,7 +65,7 @@
 
 <script setup>
   import { azionPrivacyPolicyWindowOpener, azionTermsAndServicesWindowOpener } from '@/helpers'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { useRouter } from 'vue-router'
 
   defineOptions({

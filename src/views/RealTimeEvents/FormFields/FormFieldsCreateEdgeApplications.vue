@@ -1,14 +1,14 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import Card from '@aziontech/webkit/card'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InputNumber from '@aziontech/webkit/inputnumber'
   import InputSwitch from '@aziontech/webkit/inputswitch'
   import InputText from '@aziontech/webkit/inputtext'
   import RadioButton from '@aziontech/webkit/radiobutton'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/tag'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
 
@@ -612,7 +612,7 @@
             </template>
             <template #subtitle>Customize advanced cache settings.</template>
             <template #footer>
-              <PrimeTag
+              <Tag
                 value="Automatically enabled in all accounts."
                 icon="pi pi-lock"
                 severity="info"
@@ -752,12 +752,13 @@
             >
           </Card>
         </div>
-        <PrimeButton
-          outlined
+        <Button
+          kind="outlined"
+          size="medium"
           icon="pi pi-shopping-cart"
-          class="max-w-[170px] whitespace-nowrap"
           label="Contact sales"
           @click="props.contactSalesEdgeApplicationService()"
+          class="max-w-[170px] whitespace-nowrap"
         />
       </div>
     </template>

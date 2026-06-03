@@ -1,0 +1,39 @@
+name: Eslint Security Check
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    branches:
+      - dev
+  push:
+    branches:
+      - dev
+
+env:
+  HUSKY: 0
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  eslint-security-linter:
+    runs-on: ubuntu-latest
+    
+    container:
+      image: node:22-alpine
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Install SO deps
+        run: apk add curl bash git
+      
+      - name: Install dependencies --frozen-lockfile
+        run: yarn install:lock
+        
+      - name: Run eslint security check
+        run: yarn lint:security-check

@@ -3,7 +3,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PageLoadingBlock from '@/templates/loading-block'
   import TemplateEngineBlock from '@/templates/template-engine-block'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
@@ -265,18 +265,13 @@
                     <template #footer>
                       <Divider class="mb-2" />
                       <div class="px-2">
-                        <PrimeButton
+                        <Button
+                          kind="text"
                           label="Create New"
-                          icon-pos="left"
                           icon="pi pi-plus-circle"
-                          text
                           size="small"
-                          class="w-full text-left mb-2 pl-2 py-2"
-                          :pt="{
-                            label: { class: 'font-normal' },
-                            root: { class: 'rounded-md hover:surface-200' }
-                          }"
                           @click="handleCreateNew"
+                          class="w-full text-left mb-2 pl-2 py-2"
                         />
                       </div>
                     </template>
@@ -300,12 +295,12 @@
                   class="max-w-lg"
                 >
                   No Application has been created. Go to
-                  <PrimeButton
-                    class="p-0"
+                  <Button
+                    kind="text"
                     label="Application"
-                    link
                     size="small"
                     @click="handleCreateNew"
+                    class="p-0"
                   />
                   to create a new one.
                 </InlineMessage>

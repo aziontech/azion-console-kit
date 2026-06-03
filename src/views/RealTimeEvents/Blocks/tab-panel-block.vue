@@ -6,8 +6,8 @@
   import { useRouteFilterManager } from '@/helpers'
   import * as Drawer from '@/views/RealTimeEvents/Drawer'
   import { eventsPlaygroundOpener } from '@/helpers'
-  import PrimeButton from '@aziontech/webkit/button'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import IconButton from '@aziontech/webkit/icon-button'
+  import Tag from '@aziontech/webkit/tag'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
   import { FilterMatchMode } from '@aziontech/webkit/api'
@@ -227,17 +227,19 @@
     </div>
     <div class="flex flex-col gap-2">
       <div class="flex gap-2 justify-end">
-        <PrimeTag
+        <Tag
           :value="totalRecordsFound"
           severity="info"
         />
-        <PrimeButton
-          outlined
+        <IconButton
+          kind="outlined"
+          size="medium"
           icon="ai ai-graphql"
-          class="min-w-max"
           @click="eventsPlaygroundOpener"
           v-tooltip.left="{ value: 'View on GraphQL', showDelay: 200 }"
           data-testid="data-table-actions-column-header-toggle-columns"
+          class="min-w-max"
+          aria-label="data table actions column header toggle columns"
         />
       </div>
       <div
@@ -247,7 +249,6 @@
         <DataTable
           ref="dataTableRef"
           class="overflow-clip rounded-md"
-          scrollable
           removableSort
           :data="data"
           :columns="selectedColumns"
@@ -264,7 +265,6 @@
           :exportFunction="exportFunctionMapper"
           :loading="isLoading"
           :notShowEmptyBlock="true"
-          scrollHeight="auto"
           :pt="{ bodyRow: { 'data-testid': 'table-body-row' } }"
           data-testid="table-tab-panel-block"
           :first="firstItemIndex"
@@ -304,14 +304,16 @@
                 class="flex justify-end w-full gap-2"
                 data-testid="data-table-actions-column-header"
               >
-                <PrimeButton
+                <IconButton
+                  kind="outlined"
+                  size="medium"
                   v-if="hasExportToCsvMapper"
-                  outlined
                   icon="pi pi-download"
-                  class="min-w-max"
                   @click="handleExportTableDataToCSV"
                   v-tooltip.left="{ value: 'Export to CSV', showDelay: 200 }"
                   data-testid="data-table-actions-column-header-toggle-columns"
+                  class="min-w-max"
+                  aria-label="data table actions column header toggle columns"
                 />
               </div>
             </template>

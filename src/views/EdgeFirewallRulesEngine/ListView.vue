@@ -1,7 +1,8 @@
 <script setup>
   import { computed, ref, inject, onMounted } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import Button from '@aziontech/webkit/button'
+  import IconButton from '@aziontech/webkit/icon-button'
+  import Tag from '@aziontech/webkit/tag'
   import InputNumber from '@aziontech/webkit/inputnumber'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useToast } from '@aziontech/webkit/use-toast'
@@ -429,13 +430,14 @@
                 @search="reload"
               />
               <div class="flex gap-2">
-                <PrimeButton
-                  outlined
+                <IconButton
+                  kind="outlined"
                   icon="pi pi-refresh"
                   size="small"
                   @click="reload({ page: 1, skipCache: true })"
                   v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                   data-testid="data-table-actions-column-header-refresh"
+                  aria-label="data table actions column header refresh"
                 />
                 <DataTable.Export @export="handleExportTableDataToCSV('Firewall Rules Engine')" />
                 <DataTable.ColumnSelector
@@ -523,7 +525,7 @@
                   :data-testid="`list-table-block__column__${col.field}__row`"
                 />
               </template>
-              <PrimeTag
+              <Tag
                 v-if="
                   rowData.status !== undefined &&
                   rowData.status.content !== 'Active' &&
@@ -582,9 +584,10 @@
         <slot name="emptyBlock" />
       </template>
       <template #emptyBlockButton>
-        <PrimeButton
+        <Button
+          kind="secondary"
+          size="medium"
           icon="pi pi-plus"
-          severity="secondary"
           label="Rule"
           @click="openCreateDrawer"
           data-testid="create_Rules Engine_button"
@@ -599,15 +602,15 @@
       <div
         class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"
       >
-        <PrimeButton
-          outlined
+        <Button
+          kind="outlined"
+          size="medium"
           label="Discard Changes"
           @click="discardChanges"
           data-testid="review-changes-dialog-footer-cancel-button"
         />
-        <PrimeButton
+        <Button
           label="Review Changes"
-          class="bg-surface"
           :badgeClass="badgeClass"
           data-testid="rules-engine-save-order-button"
           size="small"
@@ -615,6 +618,7 @@
           :loading="isLoadingButtonOrder"
           @click="updateRulesOrder(data, alteredRows, reload)"
           :badge="!isLoadingButtonOrder ? alteredRows.length : undefined"
+          class="bg-surface"
         />
       </div>
     </teleport>
