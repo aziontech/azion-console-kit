@@ -160,6 +160,7 @@
       emit('update:billingCycle', value)
 
       if (previousValue === undefined) return
+      if (props.mode === 'change-cycle') return
 
       checkoutSessionRequestVersion += 1
       const version = checkoutSessionRequestVersion
