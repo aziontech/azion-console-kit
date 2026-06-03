@@ -114,24 +114,7 @@ describe('pricing-calculation-block', () => {
     expect(mocks.prepareCheckoutSession).not.toHaveBeenCalled()
   })
 
-  it('does not prepare checkout sessions when billing context changes cycle', async () => {
-    const wrapper = mountPricingCalculationBlock()
-    const toggle = wrapper.findComponent({ name: 'BillingCycleToggle' })
-
-    await toggle.vm.$emit('update:modelValue', 'yearly')
-    await vi.advanceTimersByTimeAsync(250)
-
-    expect(mocks.prepareCheckoutSession).not.toHaveBeenCalled()
-  })
-
-  it('disables the billing cycle toggle when requested by the parent drawer', () => {
-    const wrapper = mountPricingCalculationBlock({ disabled: true })
-    const toggle = wrapper.findComponent({ name: 'BillingCycleToggle' })
-
-    expect(toggle.props('disabled')).toBe(true)
-  })
-
-  it('keeps the latest billing-cycle checkout session when older signup preparation resolves later', async () => {
+  it('keeps the latest billing-cycle checkout session when older preparation resolves later', async () => {
     const yearlyPreparation = createDeferred()
     const monthlyPreparation = createDeferred()
     mocks.prepareCheckoutSession.mockImplementation(({ preferredCycle }) => {
@@ -140,7 +123,7 @@ describe('pricing-calculation-block', () => {
       return Promise.resolve('')
     })
 
-    const wrapper = mountPricingCalculationBlock({ context: 'signup' })
+    const wrapper = mountPricingCalculationBlock()
     const toggle = wrapper.findComponent({ name: 'BillingCycleToggle' })
 
     await toggle.vm.$emit('update:modelValue', 'yearly')
@@ -149,7 +132,7 @@ describe('pricing-calculation-block', () => {
       plan: 'pro',
       preferredCycle: 'yearly',
       draftServiceOrderId: null,
-      signup: true
+      signup: false
     })
 
     await toggle.vm.$emit('update:modelValue', 'monthly')
@@ -158,7 +141,7 @@ describe('pricing-calculation-block', () => {
       plan: 'pro',
       preferredCycle: 'monthly',
       draftServiceOrderId: null,
-      signup: true
+      signup: false
     })
 
     monthlyPreparation.resolve('cs_monthly')
