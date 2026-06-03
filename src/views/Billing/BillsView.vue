@@ -352,12 +352,7 @@
   }
 
   const schedulePrepareForPro = (preferredCycle = null) => {
-    if (
-      subscription.isPro.value &&
-      subscription.billingCycle.value === (preferredCycle || storedBillingCycle.value)
-    ) {
-      return
-    }
+    if (subscription.isPro.value) return
     const cycle = preferredCycle || storedBillingCycle.value || 'monthly'
     const key = buildPreparationKey('pro', cycle)
     if (
@@ -481,7 +476,6 @@
       source: 'subscription-card'
     })
     showChangePlanDrawer.value = true
-    schedulePrepareForPro(initialCycle)
   }
 
   const openDrawerWithCheckoutSession = async ({ plan, preferredCycle, lockedCycle: locked }) => {

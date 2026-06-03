@@ -127,12 +127,16 @@ export function useCurrentSubscription() {
     await refetchServiceOrders()
   }
 
-  // Kept for transitional callers that want a one-shot freshness check after
-  // an external event (e.g., post-checkout return). It no longer loops —
-  // mutations should invalidate the cache; SSE drives background refresh.
-  const refetchUntil = async (predicate) => {
+  const refetchUntil = async (predicate, { maxAttempts = 5, delayMs = 500 } = {}) => {
     await refetch()
-    return predicate ? Boolean(predicate(activeServiceOrder.value)) : true
+    if (!predicate) return true
+    let attempt = 1
+    while (attempt < maxAttempts && !predicate(activeServiceOrder.value)) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs))
+      await refetch()
+      attempt += 1
+    }
+    return Boolean(predicate(activeServiceOrder.value))
   }
 
   return {
