@@ -405,6 +405,11 @@
   }
 
   const refreshInvoiceAndHistory = async () => {
+    if (!hasContentToList.value) {
+      hasContentToList.value = true
+      await loadCurrentInvoice()
+      return
+    }
     await Promise.allSettled([loadCurrentInvoice(), listTableRef.value?.reload?.()])
   }
 
