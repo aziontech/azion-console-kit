@@ -9,11 +9,10 @@
   import DataTable from '@aziontech/webkit/list-data-table'
   import advancedFilter from '@/templates/advanced-filter'
   import Dropdown from '@aziontech/webkit/dropdown'
-  import Tag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/tag'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { useAccountStore } from '@/stores/account'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
@@ -465,7 +464,7 @@
                   enableClearOption
                 />
                 <div class="flex items-center ml-auto">
-                  <Tag
+                  <PrimeTag
                     class="no-wrap whitespace-nowrap ml-auto"
                     :value="recordsFoundLabel"
                     severity="info"
@@ -482,22 +481,21 @@
                   @applyFilter="filterSearch"
                   ref="advancedFilterRef"
                 />
-                <Button
-                  kind="outlined"
+                <PrimeButton
+                  class="md:hidden"
+                  outlined
                   size="small"
                   label="Export to CSV"
                   icon="pi pi-download"
                   @click="downloadCSV"
-                  class="md:hidden"
                 />
-                <IconButton
-                  kind="outlined"
+                <PrimeButton
+                  class="hidden md:flex"
+                  outlined
                   size="small"
                   icon="pi pi-download"
                   v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
                   @click="downloadCSV"
-                  class="hidden md:flex"
-                  aria-label="button"
                 />
               </div>
 

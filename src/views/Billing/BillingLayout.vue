@@ -1,13 +1,13 @@
 <template>
-  <router-view v-slot="routeSlot">
+  <router-view v-slot="{ Component }">
     <component
-      v-if="routeSlot?.Component"
       ref="componentRef"
-      :is="routeSlot.Component"
+      :is="Component"
       v-bind="props"
       :cardDefault="cardDefault"
       @loadCard="loadCardDefault"
       @openDrawerAddCredit="openDrawerCredit"
+      @openDrawerAddPaymentMethod="openDrawerPaymentMethod"
     >
       <template #notification="slotProp">
         <NotificationPayment
@@ -15,6 +15,7 @@
           v-bind="propsNotification(slotProp)"
           @clickLink="slotProp.redirectLink"
           @onSuccessCredit="successDrawer"
+          @onSuccessPaymentMethod="successDrawer"
         />
       </template>
     </component>
@@ -24,7 +25,7 @@
 <script setup>
   import { ref, onMounted } from 'vue'
   import NotificationPayment from '@/views/Billing/components/notification-payment'
-  import { loadContractData } from '@/helpers/account-data'
+  import { loadBillingData, loadContractData } from '@/helpers/account-data'
 
   const props = defineProps({
     loadPaymentMethodDefaultService: { type: Function, required: true },
@@ -59,8 +60,7 @@
       ...linkText
     },
     buttonPaymentMethod: {
-      ...buttonPaymentMethod,
-      hidden: true
+      ...buttonPaymentMethod
     }
   })
 
@@ -85,7 +85,12 @@
     notificationPaymentRef.value?.openDrawerCredit()
   }
 
+  const openDrawerPaymentMethod = () => {
+    notificationPaymentRef.value?.openDrawerPaymentMethod()
+  }
+
   onMounted(() => {
+    loadBillingData()
     loadContractData()
     loadCardDefault()
   })

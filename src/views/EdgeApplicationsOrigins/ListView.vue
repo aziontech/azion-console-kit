@@ -2,7 +2,7 @@
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerOrigin from '@/views/EdgeApplicationsOrigins/Drawer'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, inject, ref } from 'vue'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import edgeConnectorsGif from '@/assets/images/edgeConnectors.gif'
@@ -159,14 +159,13 @@
       }"
     >
       <template #emptyBlockButton>
-        <Button
-          kind="secondary"
-          size="medium"
+        <PrimeButton
+          class="max-md:w-full w-fit"
+          severity="secondary"
           icon="pi pi-plus"
           label="Origin"
           @click="openCreateOriginDrawer"
           data-testid="origins__add-button"
-          class="max-md:w-full w-fit"
         />
       </template>
     </ListTable>

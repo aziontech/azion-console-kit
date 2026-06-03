@@ -4,10 +4,8 @@ import {
   CreateTracker,
   ProductTracker,
   WafRulesTracker,
-  RealTimeMetricsTracker,
-  BillingTracker
+  RealTimeMetricsTracker
 } from './trackers'
-import { cleanObject } from '../../utils/cleanObject.js'
 
 /**
  * @typedef {Object} TrackerEvent
@@ -26,9 +24,7 @@ export class AnalyticsTrackerAdapter {
   #analyticsClient = null
   /** @type {Boolean} */
   #hasAnalyticsClient = false
-  #userTraits = {}
-  #groupTraits = {}
-  #groupId = null
+  #traits = {}
 
   /** @type {SignUpTracker} */
   #signUpTracker = null
@@ -38,12 +34,10 @@ export class AnalyticsTrackerAdapter {
   #createTracker = null
   /** @type {ProductTracker} */
   #productTracker = null
-  /** @type {WafRulesTracker} */
+  /** @type {WafTracker} */
   #wafRulesTracker = null
   /** @type {RealTimeMetricsTracker} */
   #realTimeMetricsTracker = null
-  /** @type {BillingTracker} */
-  #billingTracker = null
 
   /**
    * Creates an instance of AnalyticsTrackerAdapter.
@@ -59,7 +53,6 @@ export class AnalyticsTrackerAdapter {
     this.#productTracker = new ProductTracker(this)
     this.#wafRulesTracker = new WafRulesTracker(this)
     this.#realTimeMetricsTracker = new RealTimeMetricsTracker(this)
-    this.#billingTracker = new BillingTracker(this)
   }
 
   /**
@@ -81,11 +74,8 @@ export class AnalyticsTrackerAdapter {
     if (!this.#hasAnalytics()) return
     this.#events.forEach(async (action) => {
       const { eventName, props } = action
-      const propsWithTraits = cleanObject({
-        ...props,
-        ...this.#userTraits,
-        application: 'console-kit'
-      })
+      props.application = 'console-kit'
+      const propsWithTraits = { ...props, ...this.#traits }
       await this.#analyticsClient.track(eventName, propsWithTraits)
     })
     this.#events = []
@@ -94,48 +84,14 @@ export class AnalyticsTrackerAdapter {
   /**
    * A method to identify a user.
    *
-   * @param {string|number} id - The identifier of the user
+   * @param {type} id - The identifier of the user
    * @return {Promise<void>}
    */
   async identify(id) {
-    if (id === undefined || id === null || id === '' || !this.#hasAnalytics()) return
+    const userId = `${id}`
+    if (!userId || !this.#hasAnalytics()) return
 
-    const cleanedTraits = cleanObject(this.#userTraits)
-    await this.#analyticsClient.identify(String(id), cleanedTraits)
-  }
-
-  /**
-   * Group call for B2B segmentation. Associates the current user with an
-   * account, sending account-level traits separate from user-level traits.
-   *
-   * @param {string|number} groupId - Account identifier
-   * @param {Object} [traits] - Account traits to attach (firmographic, tiering)
-   * @return {Promise<void>}
-   */
-  async group(groupId, traits) {
-    if (groupId === undefined || groupId === null || groupId === '' || !this.#hasAnalytics()) {
-      return
-    }
-    if (traits) this.assignAccountTraits(groupId, traits)
-    const cleaned = cleanObject(this.#groupTraits)
-    await this.#analyticsClient.group(String(groupId), cleaned)
-  }
-
-  /**
-   * Page view event.
-   *
-   * @param {string} [name] - Page name
-   * @param {Object} [props] - Additional page properties
-   * @return {Promise<void>}
-   */
-  async page(name, props = {}) {
-    if (!this.#hasAnalytics()) return
-    const payload = cleanObject({ ...props, ...this.#userTraits, application: 'console-kit' })
-    if (name) {
-      await this.#analyticsClient.page(name, payload)
-    } else {
-      await this.#analyticsClient.page(payload)
-    }
+    await this.#analyticsClient.identify(userId, this.#traits)
   }
 
   /**
@@ -143,50 +99,22 @@ export class AnalyticsTrackerAdapter {
    */
   reset() {
     this.#events = []
-    this.#userTraits = {}
-    this.#groupTraits = {}
-    this.#groupId = null
+    this.#traits = {}
     if (this.#hasAnalytics()) {
       this.#analyticsClient.reset()
     }
   }
 
   /**
-   * Assigns user-level traits. Merged into every `track()` and sent on `identify()`.
    *
-   * @param {Object} traitsToAssign
-   */
-  assignUserTraits(traitsToAssign) {
-    if (!this.#hasAnalytics()) return
-    if (!traitsToAssign || typeof traitsToAssign !== 'object') {
-      throw new Error('Invalid traits provided')
-    }
-    this.#userTraits = cleanObject(traitsToAssign)
-  }
-
-  /**
-   * Backward-compatible alias for assignUserTraits.
-   * @deprecated prefer `assignUserTraits` or `assignAccountTraits`.
-   * @param {Object} traitsToAssign
+   * @param {Object} traitsToAssign - traits that should be sended with all tracking calls
    */
   assignGroupTraits(traitsToAssign) {
-    this.assignUserTraits(traitsToAssign)
-  }
-
-  /**
-   * Assigns account-level (group) traits. Sent on `group()` only — NOT merged
-   * into `track()` props (Segment dedupes account dims via the group).
-   *
-   * @param {string|number} groupId
-   * @param {Object} traitsToAssign
-   */
-  assignAccountTraits(groupId, traitsToAssign) {
     if (!this.#hasAnalytics()) return
-    if (!traitsToAssign || typeof traitsToAssign !== 'object') {
+    if (!traitsToAssign) {
       throw new Error('Invalid traits provided')
     }
-    this.#groupId = groupId
-    this.#groupTraits = cleanObject(traitsToAssign)
+    this.#traits = { ...traitsToAssign }
   }
 
   /**
@@ -218,7 +146,7 @@ export class AnalyticsTrackerAdapter {
   }
 
   /**
-   * @return {WafRulesTracker}
+   * @return {ProductTracker}
    */
   get wafRules() {
     return this.#wafRulesTracker
@@ -229,12 +157,5 @@ export class AnalyticsTrackerAdapter {
    */
   get realTimeMetrics() {
     return this.#realTimeMetricsTracker
-  }
-
-  /**
-   * @return {BillingTracker}
-   */
-  get billing() {
-    return this.#billingTracker
   }
 }

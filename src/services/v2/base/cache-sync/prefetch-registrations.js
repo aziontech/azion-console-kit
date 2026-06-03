@@ -179,14 +179,16 @@ export function registerPrefetchQueryFns() {
   // =========================================================================
 
   prefetchRegistry.register(['digital-certificates', 'list'], async () => {
-    const { digitalCertificatesService } =
-      await import('../../digital-certificates/digital-certificates-service')
+    const { digitalCertificatesService } = await import(
+      '../../digital-certificates/digital-certificates-service'
+    )
     return digitalCertificatesService.prefetchList()
   })
 
   prefetchRegistry.register(['digital-certificates', 'detail'], async (queryKey) => {
-    const { digitalCertificatesService } =
-      await import('../../digital-certificates/digital-certificates-service')
+    const { digitalCertificatesService } = await import(
+      '../../digital-certificates/digital-certificates-service'
+    )
     const id = queryKey[2]
     return digitalCertificatesService.loadDigitalCertificate({ id })
   })
@@ -271,14 +273,16 @@ export function registerPrefetchQueryFns() {
   // =========================================================================
 
   prefetchRegistry.register(['digital-certificates-crl', 'list'], async () => {
-    const { digitalCertificatesCRLService } =
-      await import('../../digital-certificates/digital-certificates-crl-service')
+    const { digitalCertificatesCRLService } = await import(
+      '../../digital-certificates/digital-certificates-crl-service'
+    )
     return digitalCertificatesCRLService.prefetchList()
   })
 
   prefetchRegistry.register(['digital-certificates-crl', 'detail'], async (queryKey) => {
-    const { digitalCertificatesCRLService } =
-      await import('../../digital-certificates/digital-certificates-crl-service')
+    const { digitalCertificatesCRLService } = await import(
+      '../../digital-certificates/digital-certificates-crl-service'
+    )
     const id = queryKey[2]
     return digitalCertificatesCRLService.loadDigitalCertificateCRL({ id })
   })
@@ -323,72 +327,5 @@ export function registerPrefetchQueryFns() {
     const { teamPermissionService } = await import('../../team-permission/team-permission-service')
     const id = queryKey[2]
     return teamPermissionService.load({ id })
-  })
-
-  // =========================================================================
-  // Service Orders - Structure: ['service-orders', 'list', params] or ['service-orders', 'detail', id]
-  // SSE billing/payment events invalidate these keys; without this handler,
-  // the UI would stay stale after webhook-driven SO state changes.
-  // =========================================================================
-
-  prefetchRegistry.register(['service-orders', 'list'], async (queryKey) => {
-    const { serviceOrdersService } = await import('../../service-orders/service-orders-service')
-    const params = queryKey[2] ?? {}
-    return serviceOrdersService.listServiceOrders(params)
-  })
-
-  prefetchRegistry.register(['service-orders', 'detail'], async (queryKey) => {
-    const { serviceOrdersService } = await import('../../service-orders/service-orders-service')
-    const id = queryKey[2]
-    return serviceOrdersService.getServiceOrder(id)
-  })
-
-  // =========================================================================
-  // Plans - Structure: ['plans', 'list']
-  // Static catalogue; registration mainly enables explicit invalidation flows.
-  // =========================================================================
-
-  prefetchRegistry.register(['plans', 'list'], async () => {
-    const { serviceOrdersService } = await import('../../service-orders/service-orders-service')
-    return serviceOrdersService.listPlansService()
-  })
-
-  // =========================================================================
-  // Account - Structure: ['account', 'info']
-  // =========================================================================
-
-  prefetchRegistry.register(['account', 'info'], async () => {
-    const { accountService } = await import('../../account/account-service')
-    return accountService.fetchAccountInfo()
-  })
-
-  // =========================================================================
-  // User - Structure: ['user', 'info']
-  // =========================================================================
-
-  prefetchRegistry.register(['user', 'info'], async () => {
-    const { userService } = await import('../../account/user-service')
-    return userService.fetchUserInfo()
-  })
-
-  // =========================================================================
-  // Account Settings - Structure: ['account-settings', 'info']
-  // Invalidated after address/job role updates.
-  // =========================================================================
-
-  prefetchRegistry.register(['account-settings', 'info'], async () => {
-    const { accountSettingsService } = await import('../../account/account-settings-service')
-    return accountSettingsService.fetchAccountSettingsInfo()
-  })
-
-  // =========================================================================
-  // Contract Service Plans - Structure: ['contract', 'service-plans', clientId]
-  // =========================================================================
-
-  prefetchRegistry.register(['contract', 'service-plans'], async (queryKey) => {
-    const { contractService } = await import('../../account/contract-service')
-    const clientId = queryKey[2]
-    if (!clientId) return null
-    return contractService.fetchContractServicePlan(clientId)
   })
 }

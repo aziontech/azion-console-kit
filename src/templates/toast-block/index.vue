@@ -47,27 +47,27 @@
           class="flex flex-row gap-2 align-self-end mt-5"
           v-if="showActions(message)"
         >
-          <Button
-            kind="text"
+          <PrimeButton
             v-if="message.action.link"
             :data-testid="handleDataTestIdInItem(message, 'link')"
+            link
             size="small"
             :label="message.action.link.label"
             @click="handleClick(message, 'link')"
           />
-          <Button
-            kind="outlined"
+          <PrimeButton
             v-if="message.action.secondary"
             :data-testid="handleDataTestIdInItem(message, 'secondary')"
+            outlined
             size="small"
             :icon="getButtonIcon(message.action.secondary)"
             :label="getButtonLabel(message.action.secondary)"
             @click="handleClick(message, 'secondary')"
             :disabled="isButtonAnimating(message.action.secondary)"
           />
-          <Button
-            kind="secondary"
+          <PrimeButton
             v-if="message.action.primary"
+            severity="secondary"
             :data-testid="handleDataTestIdInItem(message, 'primary')"
             size="small"
             :label="message.action.primary.label"
@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Toast from '@aziontech/webkit/toast'
   import Tag from '@aziontech/webkit/tag'
   import { reactive } from 'vue'

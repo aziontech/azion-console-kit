@@ -1,23 +1,30 @@
 <script setup>
-  import { ref, computed } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import IconButton from '@aziontech/webkit/icon-button'
-  import SkeletonBlock from '@/templates/skeleton-block'
+  import TabPanel from '@aziontech/webkit/tabpanel'
+  import TabView from 'primevue/tabview'
+  import Tag from '@aziontech/webkit/tag'
+  import PaymentListView from './PaymentListView.vue'
   import BillsView from '@/views/Billing/BillsView.vue'
-  import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
+  import SkeletonBlock from '@/templates/skeleton-block'
 
-  const emit = defineEmits(['loadCard', 'openDrawerAddCredit'])
+  import { ref, computed, onMounted } from 'vue'
 
-  const subscription = useCurrentSubscription()
-  const isRefreshing = ref(false)
+  import { useRoute, useRouter } from 'vue-router'
+  import { useAccountStore } from '@/stores/account'
+  import { storeToRefs } from 'pinia'
+
+  const route = useRoute()
+  const router = useRouter()
+  const accountStore = useAccountStore()
+  const emit = defineEmits(['loadCard', 'openDrawerAddCredit', 'openDrawerAddPaymentMethod'])
+
+  const { accountIsNotRegular } = storeToRefs(accountStore)
+
+  const activeTab = ref(0)
+
   const viewBillsRef = ref(null)
-
-  const loadingLastUpdated = computed(() => subscription.isLoading.value || isRefreshing.value)
-  const invoiceLastUpdated = computed(() => {
-    const value = subscription.lastUpdate.value
-    return value ? `Last Update: ${value}` : 'Last Update: --'
-  })
+  const paymentListViewRef = ref(null)
 
   const props = defineProps({
     loadPaymentMethodDefaultService: { type: Function, required: true },
@@ -35,30 +42,94 @@
     cardDefault: { type: Object, required: true }
   })
 
+  const invoiceLastUpdated = ref('')
+  const loadingLastUpdated = ref(false)
+
+  const TABS_MAP = {
+    bills: 0,
+    payment: 1
+  }
+
+  const getTabFromValue = (selectedTabIndex) => {
+    const tabNames = Object.keys(TABS_MAP)
+    const selectedTab = tabNames.find((tabName) => TABS_MAP[tabName] === selectedTabIndex)
+    return selectedTab
+  }
+
+  const changeRouteByClickingOnTab = ({ index = 0 }) => {
+    changeTab(index)
+  }
+
+  const changeTab = (index) => {
+    const tab = getTabFromValue(index)
+    activeTab.value = index
+    const params = {
+      tab
+    }
+    const { query } = route
+
+    router.push({
+      name: 'billing-tabs',
+      params,
+      query
+    })
+  }
+
+  const isActiveTab = computed(() => ({
+    payment: activeTab.value === TABS_MAP.payment,
+    bills: activeTab.value === TABS_MAP.bills
+  }))
+
+  const renderTabCurrentRouter = async () => {
+    const { tab = TABS_MAP.bills } = route.params
+    const activeTabIndexByRoute = TABS_MAP[tab]
+    changeRouteByClickingOnTab({ index: activeTabIndexByRoute })
+  }
+
+  const loadInvoiceLastUpdated = async () => {
+    try {
+      loadingLastUpdated.value = true
+      invoiceLastUpdated.value = accountIsNotRegular.value
+        ? await props.loadInvoiceLastUpdatedService()
+        : ''
+    } finally {
+      loadingLastUpdated.value = false
+    }
+  }
+
   const callBackDrawer = async () => {
+    if (paymentListViewRef.value) {
+      await paymentListViewRef.value.reloadList()
+    }
     if (viewBillsRef.value) {
       await viewBillsRef.value.reloadList()
     }
   }
 
-  const handleRefresh = async () => {
-    if (isRefreshing.value) return
-    isRefreshing.value = true
-    try {
-      await Promise.allSettled([subscription.refetch(), callBackDrawer()])
-    } finally {
-      isRefreshing.value = false
-    }
+  const redirectPaymentMethod = () => {
+    changeTab(TABS_MAP.payment)
   }
 
   const propsNotification = () => ({
-    linkText: { hidden: true },
-    buttonCredit: {},
-    buttonPaymentMethod: { hidden: true }
+    redirectLink: redirectPaymentMethod,
+    linkText: {
+      hidden: isActiveTab.value.payment
+    },
+    buttonCredit: {
+      hidden: isActiveTab.value.payment
+    },
+    buttonPaymentMethod: {
+      hidden: isActiveTab.value.payment
+    }
   })
 
   defineExpose({
     callBackDrawer
+  })
+
+  onMounted(() => {
+    renderTabCurrentRouter()
+    loadInvoiceLastUpdated()
   })
 </script>
 <template>
@@ -70,22 +141,17 @@
         :isRightAlignment="true"
       >
         <template #default>
-          <div class="flex items-center gap-3">
-            <SkeletonBlock
-              width="12rem"
-              :isLoaded="!loadingLastUpdated"
-            >
-              <span class="text-xs text-color">{{ invoiceLastUpdated }}</span>
-            </SkeletonBlock>
-            <IconButton
-              kind="outlined"
-              size="small"
-              :icon="isRefreshing ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'"
-              :disabled="isRefreshing"
-              ariaLabel="Refresh billing"
-              @click="handleRefresh"
+          <SkeletonBlock
+            width="10rem"
+            :isLoaded="!loadingLastUpdated"
+            v-if="invoiceLastUpdated"
+          >
+            <Tag
+              severity="info"
+              icon="pi pi-refresh"
+              :value="invoiceLastUpdated"
             />
-          </div>
+          </SkeletonBlock>
         </template>
       </PageHeadingBlock>
     </template>
@@ -96,13 +162,45 @@
           v-bind="propsNotification()"
         />
       </div>
-      <BillsView
-        ref="viewBillsRef"
-        v-bind="props"
-        :isReloading="isRefreshing"
-        @loadCard="emit('loadCard')"
-        @openDrawerAddCredit="emit('openDrawerAddCredit')"
-      />
+      <TabView
+        :activeIndex="activeTab"
+        @tab-click="changeRouteByClickingOnTab"
+        class="w-full h-full"
+      >
+        <TabPanel
+          header="Bills"
+          :pt="{
+            headerAction: {
+              'data-testid': 'billing__bills-tab__button'
+            }
+          }"
+        >
+          <BillsView
+            v-if="isActiveTab.bills"
+            ref="viewBillsRef"
+            v-bind="props"
+            @changeTab="changeTab"
+          />
+        </TabPanel>
+        <TabPanel
+          v-if="accountIsNotRegular"
+          header="Payment Methods"
+          :pt="{
+            headerAction: {
+              'data-testid': 'billing__payment-methods-tab__button'
+            }
+          }"
+        >
+          <PaymentListView
+            ref="paymentListViewRef"
+            v-if="isActiveTab.payment"
+            @update-credit-event="emit('loadCard')"
+            @openDrawerAddCredit="emit('openDrawerAddCredit')"
+            @openDrawerAddPaymentMethod="emit('openDrawerAddPaymentMethod')"
+            v-bind="props"
+          />
+        </TabPanel>
+      </TabView>
     </template>
   </ContentBlock>
 </template>

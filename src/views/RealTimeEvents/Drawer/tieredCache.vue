@@ -107,7 +107,7 @@
                           </p>
                         </template>
                         <template #button>
-                          <Button
+                          <PrimeButton
                             label="Copy"
                             class="items-center min-w-min"
                             icon="pi pi-copy"

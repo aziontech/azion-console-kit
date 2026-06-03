@@ -1,7 +1,7 @@
 <script setup>
   import { inject, onMounted, onUnmounted, ref, computed } from 'vue'
   import { useRouter } from 'vue-router'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { usersService } from '@/services/v2/users/users-service'
   import { teamsService } from '@/services/v2/teams/teams-service'
   import { useAccountStore } from '@/stores/account'
@@ -25,10 +25,6 @@
   defineOptions({ name: 'home-view' })
 
   const user = accountData
-  const welcomeName = computed(() => {
-    const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim()
-    return fullName || user.name
-  })
   const showInviteDialog = ref(false)
 
   const homeSection = ref(null)
@@ -90,12 +86,13 @@
           :class="homeStyle.firstColumn"
         >
           <div class="flex w-full justify-between items-center">
-            <h1 class="text-[22px] font-semibold">Welcome, {{ welcomeName }}</h1>
-            <Button
-              kind="secondary"
+            <h1 class="text-[22px] font-semibold">Welcome {{ user.name }}</h1>
+            <PrimeButton
               icon="pi pi-user-plus"
+              severity="secondary"
               label="Invite User"
               size="small"
+              outlined
               @click="openInviteDialog"
               class="whitespace-nowrap"
             />

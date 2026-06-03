@@ -91,8 +91,7 @@ async function lintFiles(filePaths) {
 
   const eslint = new ESLint({
     cwd: PROJECT_ROOT,
-    useEslintrc: false,
-    overrideConfigFile: path.join(PROJECT_ROOT, '.eslintrc-architecture.cjs'),
+    useEslintrc: true,
     overrideConfig: {
       rules: TANSTACK_RULES
     }

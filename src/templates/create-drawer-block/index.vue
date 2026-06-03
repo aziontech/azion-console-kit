@@ -7,7 +7,7 @@
   import Sidebar from '@aziontech/webkit/sidebar'
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { capitalizeFirstLetter } from '@/helpers'
   import { useScrollToError } from '@/composables/useScrollToError'
   import { provideDrawerUnsaved } from '@/composables/useDrawerUnsaved'
@@ -199,13 +199,11 @@
         <h2>{{ title }}</h2>
         <div class="flex items-center gap-2">
           <ConsoleFeedback styleTextColor="text-color" />
-          <IconButton
-            kind="outlined"
-            size="medium"
+          <PrimeButton
             v-if="expandable"
             @click="toggleExpandDrawer"
+            outlined
             :icon="isExpanded ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
-            aria-label="button"
           />
         </div>
       </template>

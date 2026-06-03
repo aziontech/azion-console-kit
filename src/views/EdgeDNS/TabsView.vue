@@ -5,7 +5,7 @@
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import EditDrawerBlock from '@templates/edit-drawer-block'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import TabView from 'primevue/tabview'
   import { useToast } from '@aziontech/webkit/use-toast'
@@ -437,7 +437,7 @@
             v-if="addButtonController.showAddButtonTab"
             class="flex ml-4 items-center"
           >
-            <Button
+            <PrimeButton
               :label="addButtonController.label"
               size="small"
               icon="pi pi-plus"
@@ -479,14 +479,13 @@
               @on-before-go-to-edit="handleBeforeGoToEdit"
             >
               <template #emptyBlockButton>
-                <Button
-                  kind="secondary"
-                  size="medium"
+                <PrimeButton
+                  class="max-md:w-full w-fit"
+                  severity="secondary"
                   icon="pi pi-plus"
                   label="Record"
                   @click="openCreateDrawerEDNSResource"
                   data-testid="create_Record_button"
-                  class="max-md:w-full w-fit"
                 />
               </template>
             </ListTable>

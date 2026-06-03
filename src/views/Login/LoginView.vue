@@ -24,14 +24,12 @@
   import ForgotPassword from '@/templates/sign-in-block/forgot-password.vue'
   import { sessionManager } from '@/services/v2/base/auth'
   import { useAccountStore } from '@/stores/account'
-  import { usePlans } from '@/composables/usePlans'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const route = useRoute()
   const router = useRouter()
-  const { initialize } = usePlans()
 
   const props = defineProps({
     authenticationLoginService: {
@@ -59,8 +57,6 @@
   const showForgotPasswordStep = ref(false)
 
   onMounted(async () => {
-    initialize()
-
     if (useAccountStore().hasSession) {
       window.location.assign('/')
       return
@@ -71,11 +67,8 @@
     const isActivatedEmail = !!email && !activated
 
     if (isActivatedEmail) {
-      // Set signup_email flag for tracking when user completes email signup
-      const accountStore = useAccountStore()
-      accountStore.setSignupTypeFlag('signup_email')
-
       tracker.signUp.userActivatedAccount().track()
+      tracker.signUp.userSignedUp({ method: 'email' }).track()
 
       const newQuery = { ...route.query, activated: 'true' }
       router.replace({ query: newQuery })

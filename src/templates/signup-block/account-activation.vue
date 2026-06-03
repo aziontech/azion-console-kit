@@ -9,15 +9,15 @@
         folder and follow the instructions.
       </p>
     </section>
-    <section class="w-full flex flex-wrap gap-2 items-center">
+    <section class="w-full flex flex-wrap gap-2">
       <p class="text-start text-sm">Didn't receive the email?</p>
-      <Button
-        kind="text"
+      <PrimeButton
         size="small"
         label="Resend Email"
+        class="p-0"
+        link
         @click="resendEmail"
         :disabled="isSubmitDisabled"
-        class="p-0"
       />
       <PrimeBadge
         class="rounded-md animate-fadeIn"
@@ -25,17 +25,16 @@
         v-if="showCounter"
       />
     </section>
-    <Button
-      kind="secondary"
-      size="medium"
+    <PrimeButton
       label="Return to Sign In"
       @click="goToLogin"
+      severity="secondary"
     />
   </div>
 </template>
 
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import PrimeBadge from '@aziontech/webkit/badge'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, ref } from 'vue'

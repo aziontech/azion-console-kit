@@ -20,7 +20,7 @@
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
   import MigrationMessage from './components/MigrationMessage.vue'
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
@@ -443,7 +443,7 @@
             v-if="addButtonController.showAddButtonTab"
             class="flex ml-4 items-center"
           >
-            <Button
+            <PrimeButton
               :label="addButtonController.label"
               size="small"
               icon="pi pi-plus"

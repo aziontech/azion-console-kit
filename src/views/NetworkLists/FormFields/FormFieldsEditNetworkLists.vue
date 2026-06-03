@@ -4,7 +4,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
-  import Tag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/tag'
 
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
@@ -81,7 +81,7 @@
         :options="networkGrouRadio"
       >
         <template #footer="{ item }">
-          <Tag
+          <PrimeTag
             v-if="item?.tag"
             :value="item.tag.value"
             :icon="item.tag.icon"

@@ -1,15 +1,15 @@
 <script setup>
-  import { ref, onMounted, computed, watch } from 'vue'
+  import { ref, onMounted, defineModel, computed, watch } from 'vue'
   import DataTimeRange from '@/components/base/dataTimeRange'
   import DialogFilter from '@/components/base/advanced-filter-system/filterFields/temp/index.vue'
   import AzionQueryLanguage from '@/components/base/advanced-filter-system/filterAQL/azion-query-language.vue'
   import FilterTagsDisplay from '@/components/base/advanced-filter-system/filterTagsDisplay'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
 
   import { useAccountStore } from '@/stores/account'
   import { createUtcDateFromUserTimezoneParts } from '@/helpers/convert-date'
   import { createRelativeRange } from '@utils/date.js'
-  import { listTimezonesService } from '@/services/v2/listTimezones'
+  import { listTimezonesService } from '@/services/users-services'
 
   defineOptions({ name: 'advanced-filter-system' })
   const accountStore = useAccountStore()
@@ -308,29 +308,29 @@
           :maxDays="props.filterDateRangeMaxDays"
           :defaultUtcOffset="userUTC"
           :userTimezone="userTimezone"
-          :listTimezonesService="listTimezonesService.listTimezones"
+          :listTimezonesService="listTimezonesService"
           @select="onDateRangeSelect"
           @autoRefresh="onAutoRefreshTick"
         />
-        <Button
-          kind="outlined"
+        <PrimeButton
           v-if="!hasPendingDateUpdate && !hasPendingQueryUpdate"
           icon="pi pi-refresh"
+          outlined
           size="small"
           label="Refresh"
+          class="w-[5.875rem]"
           :disabled="isInvalidRange || hasAqlValidationError"
           @click="applyFilters"
-          class="w-[5.875rem]"
         />
-        <Button
-          kind="secondary"
+        <PrimeButton
           v-else
           icon="pi pi-arrow-circle-right"
+          severity="secondary"
           size="small"
           label="Update"
           :disabled="isInvalidRange || hasAqlValidationError"
-          @click="applyFilters"
           class="w-[5.875rem]"
+          @click="applyFilters"
         />
       </div>
       <div class="flex flex-1 w-full">
