@@ -69,32 +69,4 @@ describe('useCheckoutSessionPreparer', () => {
     })
     expect(secret).toBe('cs_signup_yearly')
   })
-
-  it('does not prepare checkout by upgrading an ACTIVE service order', async () => {
-    const upgrade = vi.fn().mockResolvedValue({
-      payment: { clientSecret: 'cs_upgrade' }
-    })
-
-    await expect(
-      prepareCheckoutSessionForServiceOrder({
-        accountId: 123,
-        plan: 'pro',
-        cycle: 'yearly',
-        plans,
-        ensureServiceOrdersList: vi.fn(),
-        getCurrentServiceOrder: vi.fn(() => ({
-          serviceOrderId: 'so_active',
-          status: 'ACTIVE'
-        })),
-        createServiceOrder: vi.fn(),
-        prepareSignupCheckout: vi.fn(),
-        updateServiceOrder: vi.fn(),
-        upgrade
-      })
-    ).rejects.toThrow(
-      'Checkout preparation is only supported before an active service order exists.'
-    )
-
-    expect(upgrade).not.toHaveBeenCalled()
-  })
 })

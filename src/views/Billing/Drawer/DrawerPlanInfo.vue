@@ -36,7 +36,6 @@
             :plan="plan"
             :lockedCycle="lockedCycle"
             :mode="mode"
-            :disabled="isSubmitting"
             @update:billing-cycle="handleBillingCycleChange"
             @update:checkout-session-client-secret="handleCheckoutSessionClientSecretChange"
           />
@@ -63,7 +62,7 @@
               :stripeClientService="getStripeClientService"
               :checkoutSessionClientSecret="checkoutSessionClientSecret"
               @readiness-change="handlePaymentReadinessChange"
-              @stale-session="handleStaleCheckoutSession"
+              @stale-session="$emit('stale-session', { plan, billingCycle })"
             />
 
             <AddressInformationBlock
@@ -136,12 +135,7 @@
     }
   })
 
-  const emit = defineEmits([
-    'update:visible',
-    'submit',
-    'submitCycleChange',
-    'prepareCheckoutSession'
-  ])
+  const emit = defineEmits(['update:visible', 'submit', 'submitCycleChange', 'stale-session'])
 
   const toast = useToast()
   const { setParam } = usePlans()
@@ -164,8 +158,7 @@
   const isChangeCycleMode = computed(() => props.mode === 'change-cycle')
 
   const showDefaultPaymentSummary = computed(
-    () =>
-      isChangeCycleMode.value && useDefaultPaymentMethod.value && Boolean(defaultPaymentCard.value)
+    () => useDefaultPaymentMethod.value && Boolean(defaultPaymentCard.value)
   )
 
   const handleSwapPaymentMethod = async () => {
@@ -206,7 +199,6 @@
 
   const submitLabel = computed(() => {
     if (isChangeCycleMode.value) return 'Confirm'
-    if (!checkoutSessionClientSecret.value) return 'Continue'
     return props.mode === 'edit' ? 'Update Plan' : 'Subscribe'
   })
 
@@ -216,7 +208,7 @@
       if (showDefaultPaymentSummary.value) return false
       return !setupIntentClientSecret.value || !isPaymentFormReady.value
     }
-    if (!checkoutSessionClientSecret.value) return false
+    if (showDefaultPaymentSummary.value) return !checkoutSessionClientSecret.value
     return (
       !checkoutSessionClientSecret.value || !isPaymentFormReady.value || !isAddressFormReady.value
     )
@@ -236,11 +228,6 @@
 
   const handleAddressReadinessChange = (isReady) => {
     isAddressFormReady.value = Boolean(isReady)
-  }
-
-  const handleStaleCheckoutSession = () => {
-    checkoutSessionClientSecret.value = ''
-    isPaymentFormReady.value = false
   }
 
   const closeDrawer = () => {
@@ -294,23 +281,13 @@
         return
       }
 
-      if (!checkoutSessionClientSecret.value) {
-        const requestedBillingCycle = billingCycle.value
-        const clientSecret = await new Promise((resolve, reject) => {
-          emit('prepareCheckoutSession', {
-            plan: props.plan,
-            billingCycle: requestedBillingCycle,
-            done: resolve,
-            fail: (err) =>
-              reject(typeof err === 'string' ? new Error(err) : err || new Error('Failed'))
-          })
+      if (showDefaultPaymentSummary.value) {
+        emit('submit', {
+          plan: props.plan,
+          billingCycle: billingCycle.value,
+          useDefaultPaymentMethod: true,
+          paymentMethodId: defaultPaymentCard.value?.id ?? null
         })
-        if (billingCycle.value !== requestedBillingCycle) return
-        if (!clientSecret) {
-          throw new Error('Unable to initialize payment session.')
-        }
-        checkoutSessionClientSecret.value = clientSecret
-        isPaymentFormReady.value = false
         return
       }
 
