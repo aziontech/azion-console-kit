@@ -37,9 +37,9 @@
           size="medium"
           :loading="isButtonLoading"
           label="Reset Password"
+          type="submit"
           :disabled="!meta.valid"
           class="w-full flex-row-reverse"
-          @click="resetPassword"
         />
       </div>
 

@@ -55,8 +55,8 @@
           size="medium"
           label="Verify"
           :loading="isButtonLoading"
+          type="submit"
           class="w-full flex-row-reverse"
-          @click="validateCode"
         />
       </div>
     </div>

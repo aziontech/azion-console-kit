@@ -73,8 +73,8 @@
           size="medium"
           label="Verify code"
           :loading="isButtonLoading"
+          type="submit"
           class="w-full flex-row-reverse"
-          @click="authorizeDevice"
         />
       </div>
     </div>
