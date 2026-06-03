@@ -12,6 +12,8 @@
 
   defineOptions({ name: 'generic-data-view' })
 
+  const ACTIONS_TRACK_WIDTH = 44
+
   const props = defineProps({
     items: {
       type: Array,
@@ -168,6 +170,62 @@
     if (value == null || value === '') return '--'
     return value
   }
+
+  const resolveSize = (column) => column?.size || 'minmax(0, 1fr)'
+
+  const extractMinPx = (size) => {
+    if (!size) return 0
+    const str = String(size)
+    const minmaxMatch = str.match(/minmax\(\s*(\d+)px/)
+    if (minmaxMatch) return parseInt(minmaxMatch[1], 10)
+    const pxMatch = str.match(/^\s*(\d+)px\s*$/)
+    if (pxMatch) return parseInt(pxMatch[1], 10)
+    return 0
+  }
+
+  const gridTemplateColumns = computed(() => {
+    const tracks = props.columns.map(resolveSize)
+    if (props.showRowActions) tracks.push(`${ACTIONS_TRACK_WIDTH}px`)
+    return tracks.join(' ')
+  })
+
+  const minTableWidth = computed(() => {
+    const sum = props.columns.reduce((total, col) => total + extractMinPx(resolveSize(col)), 0)
+    return sum + (props.showRowActions ? ACTIONS_TRACK_WIDTH : 0)
+  })
+
+  const tableInnerStyle = computed(() => ({
+    '--min-table-width': `${minTableWidth.value}px`
+  }))
+
+  const rowStyle = computed(() => ({
+    gridTemplateColumns: gridTemplateColumns.value
+  }))
+
+  const alignClass = (column) => {
+    const align = column?.align
+    if (align === 'end') return 'align-end'
+    if (align === 'center') return 'align-center'
+    return 'align-start'
+  }
+
+  const mobileSlotMap = computed(() => {
+    const map = { primary: null, secondary: null, badge: null, body: [], footer: [] }
+    for (const col of props.columns) {
+      const slot = col?.mobileSlot
+      if (!slot || slot === 'hidden') continue
+      if (slot === 'body' || slot === 'footer') {
+        map[slot].push(col)
+      } else if (slot in map) {
+        map[slot] = col
+      }
+    }
+    return map
+  })
+
+  const hasMobileCardLayout = computed(() =>
+    props.columns.some((col) => col?.mobileSlot && col.mobileSlot !== 'hidden')
+  )
 
   const isCompactMode = computed(() => props.toolbarMode === 'compact')
   const hasAllowedFilters = computed(() => props.allowedFilters?.length > 0)
@@ -377,87 +435,199 @@
       v-else
       :class="[
         'table-surface',
+        { 'has-card-layout': hasMobileCardLayout },
         isCompactMode ? '' : 'overflow-hidden rounded-md border border-[var(--surface-border)]'
       ]"
     >
-      <div
-        v-if="showHeader"
-        class="deployment-header hidden items-center gap-3 border-b border-[var(--surface-border)] px-4 py-3 text-[14px] font-normal leading-6 tracking-[0.0625rem] text-[var(--text-color-secondary)] lg:flex"
-      >
-        <span
-          v-for="column in columns"
-          :key="column.key"
-          :class="column.headerClass || column.cellClass"
+      <div class="table-scroll">
+        <div
+          class="table-inner"
+          :style="tableInnerStyle"
         >
-          {{ column.label }}
-        </span>
-        <span
-          v-if="showRowActions"
-          class="w-11 shrink-0"
-        />
-      </div>
-
-      <DataView
-        :value="items"
-        dataKey="id"
-        :paginator="true"
-        :lazy="lazy"
-        :totalRecords="lazy ? totalRecords : undefined"
-        :rows="paginatorRows"
-        :first="paginatorFirst"
-        :rowsPerPageOptions="[10, 20, 50]"
-        paginator-template="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown JumpToPageInput"
-        current-page-report-template="Showing {first} to {last} of {totalRecords} entries"
-        @page="emit('page', $event)"
-      >
-        <template #list="{ data: deployment }">
           <div
-            class="deployment-row flex min-h-[4.5rem] items-center gap-3 border-b border-[var(--surface-border)] px-4 py-3 text-sm leading-6 text-[var(--text-color)] max-lg:min-h-0 max-lg:flex-col max-lg:items-stretch max-lg:p-4"
+            v-if="showHeader"
+            class="grid-row header-row"
+            :style="rowStyle"
           >
-            <div
+            <span
               v-for="column in columns"
               :key="column.key"
-              :class="column.cellClass"
+              class="header-cell"
+              :class="alignClass(column)"
             >
-              <span
-                class="hidden max-lg:block max-lg:w-[min(35%,7.5rem)] max-lg:shrink-0 max-lg:text-[0.625rem] max-lg:font-normal max-lg:uppercase max-lg:tracking-[0.0625rem] max-lg:text-[var(--text-color-secondary)] max-sm:mb-1 max-sm:w-full"
-                >{{ column.label }}</span
-              >
-              <slot
-                :name="`cell-${column.key}`"
-                :item="deployment"
-                :column="column"
-                :isPrimary="isPrimaryColumn(column)"
-                :onPrimaryClick="() => triggerPrimaryClick(deployment)"
-              >
-                <span
-                  class="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
-                  :class="{ 'cursor-pointer hover:underline': isPrimaryColumn(column) }"
-                  @click="isPrimaryColumn(column) ? triggerPrimaryClick(deployment) : null"
-                >
-                  {{ resolveDisplayValue(deployment, column) }}
-                </span>
-              </slot>
-            </div>
-
-            <div
+              {{ column.label }}
+            </span>
+            <span
               v-if="showRowActions"
-              class="flex w-11 shrink-0 justify-end max-lg:w-full max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:items-end max-sm:gap-1"
-            >
-              <span
-                class="hidden max-lg:block max-lg:w-[min(35%,7.5rem)] max-lg:shrink-0 max-sm:hidden"
-              />
-              <PrimeButton
-                icon="pi pi-ellipsis-v"
-                text
-                size="small"
-                :aria-label="rowActionsAriaLabel"
-                @click="emit('open-row-menu', { event: $event, deployment })"
-              />
-            </div>
+              class="actions-cell"
+              aria-hidden="true"
+            />
           </div>
-        </template>
-      </DataView>
+
+          <DataView
+            :value="items"
+            dataKey="id"
+            :paginator="true"
+            :lazy="lazy"
+            :totalRecords="lazy ? totalRecords : undefined"
+            :rows="paginatorRows"
+            :first="paginatorFirst"
+            :rowsPerPageOptions="[10, 20, 50]"
+            paginator-template="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown JumpToPageInput"
+            current-page-report-template="Showing {first} to {last} of {totalRecords} entries"
+            @page="emit('page', $event)"
+          >
+            <template #list="{ data: deployment }">
+              <div
+                class="grid-row data-row"
+                :class="{ 'card-row': hasMobileCardLayout }"
+                :style="rowStyle"
+              >
+                <div
+                  v-for="column in columns"
+                  :key="column.key"
+                  class="cell"
+                  :class="alignClass(column)"
+                >
+                  <span class="mobile-label">{{ column.mobileLabel || column.label }}</span>
+                  <div class="cell-content">
+                    <slot
+                      :name="`cell-${column.key}`"
+                      :item="deployment"
+                      :column="column"
+                      :isPrimary="isPrimaryColumn(column)"
+                      :onPrimaryClick="() => triggerPrimaryClick(deployment)"
+                    >
+                      <span
+                        class="cell-default"
+                        :class="{ 'cursor-pointer hover:underline': isPrimaryColumn(column) }"
+                        @click="isPrimaryColumn(column) ? triggerPrimaryClick(deployment) : null"
+                      >
+                        {{ resolveDisplayValue(deployment, column) }}
+                      </span>
+                    </slot>
+                  </div>
+                </div>
+
+                <div
+                  v-if="showRowActions"
+                  class="actions-cell"
+                >
+                  <PrimeButton
+                    icon="pi pi-ellipsis-v"
+                    text
+                    size="small"
+                    :aria-label="rowActionsAriaLabel"
+                    @click="emit('open-row-menu', { event: $event, deployment })"
+                  />
+                </div>
+
+                <div
+                  v-if="hasMobileCardLayout"
+                  class="card-view"
+                >
+                  <div class="card-top">
+                    <div
+                      v-if="mobileSlotMap.primary"
+                      class="card-primary"
+                    >
+                      <slot
+                        :name="`cell-${mobileSlotMap.primary.key}`"
+                        :item="deployment"
+                        :column="mobileSlotMap.primary"
+                        :isPrimary="isPrimaryColumn(mobileSlotMap.primary)"
+                        :onPrimaryClick="() => triggerPrimaryClick(deployment)"
+                        :cardMode="true"
+                      />
+                    </div>
+                    <div
+                      v-if="mobileSlotMap.badge"
+                      class="card-badge"
+                    >
+                      <slot
+                        :name="`cell-${mobileSlotMap.badge.key}`"
+                        :item="deployment"
+                        :column="mobileSlotMap.badge"
+                        :cardMode="true"
+                      />
+                    </div>
+                    <PrimeButton
+                      v-if="showRowActions"
+                      class="card-more"
+                      icon="pi pi-ellipsis-v"
+                      text
+                      size="small"
+                      :aria-label="rowActionsAriaLabel"
+                      @click="emit('open-row-menu', { event: $event, deployment })"
+                    />
+                  </div>
+                  <div
+                    v-if="$slots['mobile-secondary']"
+                    class="card-secondary"
+                  >
+                    <slot
+                      name="mobile-secondary"
+                      :item="deployment"
+                    />
+                  </div>
+                  <div
+                    v-else-if="mobileSlotMap.secondary"
+                    class="card-secondary"
+                  >
+                    <slot
+                      :name="`cell-${mobileSlotMap.secondary.key}`"
+                      :item="deployment"
+                      :column="mobileSlotMap.secondary"
+                      :cardMode="true"
+                    />
+                  </div>
+                  <div
+                    v-if="mobileSlotMap.body.length"
+                    class="card-body"
+                  >
+                    <div
+                      v-for="col in mobileSlotMap.body"
+                      :key="col.key"
+                      class="card-body-row"
+                    >
+                      <slot
+                        :name="`cell-${col.key}`"
+                        :item="deployment"
+                        :column="col"
+                        :cardMode="true"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    v-if="mobileSlotMap.footer.length"
+                    class="card-divider"
+                  />
+                  <div
+                    v-if="mobileSlotMap.footer.length"
+                    class="card-footer"
+                  >
+                    <div
+                      v-for="col in mobileSlotMap.footer.slice(0, 2)"
+                      :key="col.key"
+                      class="card-field"
+                    >
+                      <span class="card-field-label">{{ col.mobileLabel || col.label }}</span>
+                      <div class="card-field-value">
+                        <slot
+                          :name="`cell-${col.key}`"
+                          :item="deployment"
+                          :column="col"
+                          :cardMode="true"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </DataView>
+        </div>
+      </div>
     </div>
 
     <DataTable.Filter
@@ -552,25 +722,322 @@
     color: var(--text-color-secondary);
   }
 
-  .deployment-header {
-    background: var(--table-header-color, var(--surface-section));
-  }
-
   .table-surface {
     background: var(--surface-section);
   }
 
-  .deployment-row {
-    background: var(--surface-section);
+  .table-scroll {
+    overflow-x: auto;
   }
 
-  .deployment-row:hover {
+  .table-inner {
+    min-width: var(--min-table-width, 0);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .grid-row {
+    display: grid;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--surface-section);
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  .header-row {
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5rem;
+    letter-spacing: 0.0625rem;
+    color: var(--text-color-secondary);
+    background: var(--table-header-color, var(--surface-section));
+  }
+
+  .data-row {
+    min-height: 4.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    color: var(--text-color);
+  }
+
+  .data-row:hover {
     background: var(--table-body-row-hover-bg, var(--surface-ground));
   }
 
-  .deployment-row:last-child {
-    border-bottom: none;
+  :deep(.p-grid) > .grid-row:last-child {
+    border-bottom: 0;
   }
+
+  .cell,
+  .header-cell {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cell-content {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .cell.align-start,
+  .header-cell.align-start {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .cell.align-end,
+  .header-cell.align-end {
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .cell.align-end .cell-content,
+  .cell.align-center .cell-content {
+    flex: 0 1 auto;
+  }
+
+  .cell.align-center,
+  .header-cell.align-center {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .actions-cell {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+
+  .cell-default {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-label {
+    display: none;
+  }
+
+  .card-view {
+    display: none;
+  }
+
+  @media (max-width: 1023.98px) {
+    .table-scroll {
+      overflow-x: visible;
+    }
+
+    .table-inner {
+      min-width: 0;
+    }
+
+    .header-row {
+      display: none;
+    }
+
+    .data-row {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+      min-height: 0;
+      padding: 1rem;
+    }
+
+    .cell {
+      align-items: flex-start;
+      justify-content: flex-start;
+      text-align: left;
+      gap: 1rem;
+    }
+
+    .cell .cell-content {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .mobile-label {
+      display: block;
+      width: min(35%, 7.5rem);
+      flex-shrink: 0;
+      font-size: 0.625rem;
+      font-weight: 400;
+      line-height: 1.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.0625rem;
+      color: var(--text-color-secondary);
+    }
+
+    .actions-cell {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .has-card-layout .data-row.card-row {
+      display: block;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      min-height: 0;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .has-card-layout :deep(.p-grid) > * {
+      min-width: 0;
+    }
+
+    .has-card-layout .data-row.card-row > .cell,
+    .has-card-layout .data-row.card-row > .actions-cell {
+      display: none;
+    }
+
+    .has-card-layout .card-view {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5625rem;
+      padding: 0.8125rem 0.875rem;
+      border: 1px solid var(--surface-border);
+      border-radius: 0.75rem;
+      background: var(--surface-section);
+      transition: border-color 0.12s ease;
+      min-width: 0;
+    }
+
+    .has-card-layout .card-view:active {
+      border-color: var(--text-color-secondary);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 0;
+    }
+
+    .card-primary {
+      flex: 1;
+      min-width: 0;
+      font-size: 0.9375rem;
+      font-weight: 600;
+    }
+
+    .card-primary :deep(.workload-name-button) {
+      font-size: 0.9375rem;
+      font-weight: 600;
+    }
+
+    .card-badge {
+      flex-shrink: 0;
+    }
+
+    .card-more {
+      flex-shrink: 0;
+    }
+
+    .card-secondary {
+      font-family: var(--font-mono, ui-monospace, monospace);
+      font-size: 0.6875rem;
+      color: var(--text-color-secondary);
+      margin-top: -0.1875rem;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      min-width: 0;
+    }
+
+    .card-body-row {
+      min-width: 0;
+      font-size: 0.8125rem;
+      color: var(--text-color-secondary);
+    }
+
+    .card-divider {
+      height: 1px;
+      background: var(--surface-border);
+      margin: 0.0625rem 0;
+    }
+
+    .card-footer {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 0.625rem 0.875rem;
+    }
+
+    .card-field {
+      min-width: 0;
+    }
+
+    .card-field-label {
+      display: block;
+      font-size: 0.625rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-color-secondary);
+      margin-bottom: 0.1875rem;
+    }
+
+    .card-field-value {
+      font-size: 0.78125rem;
+      color: var(--text-color);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card-field-value :deep(*) {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  @media (min-width: 640px) and (max-width: 1023.98px) {
+    .has-card-layout :deep(.p-grid) {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      align-content: start;
+      gap: 0.75rem;
+      padding: 1rem;
+      margin: 0;
+    }
+  }
+
+  @media (max-width: 639.98px) {
+    .cell {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .mobile-label {
+      width: 100%;
+    }
+
+    .has-card-layout :deep(.p-grid) {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.625rem;
+      padding: 0.75rem;
+      margin: 0;
+    }
+  }
+
   :deep(.p-paginator) {
     display: flex;
     justify-content: flex-end;

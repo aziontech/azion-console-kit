@@ -46,34 +46,20 @@
   const environmentAllOption = { label: 'Environment', value: 'all' }
 
   const columns = computed(() => [
-    {
-      key: 'deployment',
-      label: 'Deployment',
-      headerClass: 'min-w-[220px] flex-[1.4_1_220px]',
-      cellClass:
-        'min-w-[220px] flex-[1.4_1_220px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      headerClass: 'min-w-[160px] flex-[1_1_160px]',
-      cellClass:
-        'min-w-[160px] flex-[1_1_160px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
-    },
+    { key: 'deployment', label: 'Deployment', size: 'minmax(220px, 1.4fr)', align: 'start' },
+    { key: 'status', label: 'Status', size: 'minmax(160px, 1fr)', align: 'start' },
     {
       key: 'lastModified',
       label: 'Last Modified',
-      headerClass: 'min-w-[180px] flex-[1.2_1_180px] flex items-center justify-end',
-      cellClass:
-        'min-w-[180px] flex-[1.2_1_180px] flex justify-end max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-lg:justify-start max-sm:flex-col max-sm:gap-1',
+      size: 'minmax(180px, 1.2fr)',
+      align: 'end',
       field: 'lastModified'
     },
     {
       key: 'lastEditor',
       label: 'Last Editor',
-      headerClass: 'min-w-[220px] flex-[1.2_1_220px] flex items-center justify-end',
-      cellClass:
-        'min-w-[220px] flex-[1.2_1_220px] flex justify-end max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-lg:justify-start max-sm:flex-col max-sm:gap-1',
+      size: 'minmax(220px, 1.2fr)',
+      align: 'end',
       field: 'lastEditor'
     }
   ])
@@ -357,7 +343,7 @@
 
       <template #cell-lastModified="{ item: version }">
         <span
-          class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-right text-sm text-[var(--text-color-secondary)]"
+          class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-[var(--text-color-secondary)]"
         >
           {{ version.lastModified || '--' }}
         </span>
