@@ -22,11 +22,16 @@ export const switchAccountRoutes = {
     /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
     const tracker = inject('tracker')
     const accountStore = useAccountStore()
+    const verifiedAuth = { current: null }
+    const verifyAndStore = async () => {
+      verifiedAuth.current = await verify()
+      return verifiedAuth.current
+    }
 
     try {
       const EnableSocialLogin = true
       const redirect = await accountHandler.switchAccountFromSocialIdp(
-        verify,
+        verifyAndStore,
         refresh,
         EnableSocialLogin
       )
@@ -39,7 +44,11 @@ export const switchAccountRoutes = {
 
         if (!isFirstLogin) {
           const ssoMethod = signupTypeFlags.login_sso_google ? 'google' : 'github'
-          await trackSignInSafely({ tracker, method: ssoMethod, loadUserData: true })
+          await trackSignInSafely({
+            tracker,
+            method: ssoMethod,
+            userTrackingInfo: verifiedAuth.current?.user_tracking_info
+          })
         }
       }
 

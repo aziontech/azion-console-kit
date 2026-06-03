@@ -59,9 +59,7 @@ const pickAddressSnapshot = (settings) => {
 }
 
 /**
- * Refresh the account + user + settings caches. Does NOT load billing or
- * contract data — use `loadAccountHydration` for the full post-login
- * warm-up. Pass `force: true` to drop the Vue Query entries first so the
+ * Refresh the account + user + settings caches. Pass `force: true` to drop the Vue Query entries first so the
  * next fetch hits the network (used after plan changes / downgrades).
  *
  * @param {Object} [options]
@@ -87,6 +85,7 @@ export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
   })
 
   accountStore.setAccountData(accountInfo)
+  accountStore.setHasActivePlan(Boolean(accountInfo.has_service_order_plan))
   setFeatureFlags(accountInfo.client_flags)
 }
 
@@ -107,15 +106,12 @@ export const loadContractData = async ({ force = false } = {}) => {
 }
 
 /**
- * Full post-login account hydration. Loads user/account/settings first
- * (needed to derive `client_id`, `kind`, and `first_login`), then loads
- * contract data — which depends on `client_id`.
+ * Full post-login account hydration. Loads user/account/settings
+ * needed to derive `client_id`, `kind`, `first_login`, and `hasActivePlan`.
  *
  * The accountGuard awaits this BEFORE making redirect decisions so the
- * `needsOnboarding` and `hasAccessConsole` getters return correct values
- * the first time they're read.
+ * `needsOnboarding` getter returns correct values the first time it is read.
  */
 export const loadAccountHydration = async ({ force = false } = {}) => {
   await loadUserAndAccountInfo({ force })
-  await loadContractData({ force })
 }
