@@ -58,37 +58,37 @@
     {
       key: 'workload',
       label: 'Name',
-      headerClass: 'min-w-[220px] flex-[2_1_220px]',
-      cellClass:
-        'min-w-[220px] flex-[2_1_220px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
+      size: 'minmax(220px, 2fr)',
+      align: 'start',
+      mobileSlot: 'primary'
     },
     {
       key: 'domain',
       label: 'Domain',
-      headerClass: 'min-w-[200px] flex-[2_1_200px]',
-      cellClass:
-        'min-w-[200px] flex-[2_1_200px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
+      size: 'minmax(200px, 2fr)',
+      align: 'start',
+      mobileSlot: 'body'
     },
     {
       key: 'status',
       label: 'Status',
-      headerClass: 'min-w-[120px] flex-[1_1_120px] flex items-center justify-end',
-      cellClass:
-        'min-w-[120px] flex-[1_1_120px] flex justify-end max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-lg:justify-start max-sm:flex-col max-sm:gap-1'
+      size: 'minmax(120px, 1fr)',
+      align: 'end',
+      mobileSlot: 'badge'
     },
     {
       key: 'lastModified',
       label: 'Last Modified',
-      headerClass: 'min-w-[180px] flex-[1.2_1_180px] flex items-center justify-end',
-      cellClass:
-        'min-w-[180px] flex-[1.2_1_180px] flex justify-end max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-lg:justify-start max-sm:flex-col max-sm:gap-1'
+      size: 'minmax(180px, 1.2fr)',
+      align: 'end',
+      mobileSlot: 'footer'
     },
     {
       key: 'lastEditor',
       label: 'Last Editor',
-      headerClass: 'min-w-[200px] flex-[1.2_1_200px] flex items-center justify-end',
-      cellClass:
-        'min-w-[200px] flex-[1.2_1_200px] flex justify-end max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-lg:justify-start max-sm:flex-col max-sm:gap-1'
+      size: 'minmax(200px, 1.2fr)',
+      align: 'end',
+      mobileSlot: 'footer'
     }
   ])
 
@@ -294,7 +294,7 @@
         @row-primary-click="goToEdit"
         @open-row-menu="openRowMenu"
       >
-        <template #cell-workload="{ item: workload, onPrimaryClick }">
+        <template #cell-workload="{ item: workload, onPrimaryClick, cardMode }">
           <div class="min-w-0 flex flex-col gap-1">
             <div class="flex min-w-0 items-center gap-2">
               <button
@@ -311,11 +311,16 @@
               />
             </div>
             <span
+              v-if="!cardMode"
               class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-xs leading-5 text-[var(--text-color-secondary)]"
             >
               {{ workload.id }}
             </span>
           </div>
+        </template>
+
+        <template #mobile-secondary="{ item: workload }">
+          {{ workload.id }}
         </template>
 
         <template #cell-domain="{ item: workload }">
@@ -347,13 +352,13 @@
         </template>
 
         <template #cell-lastModified="{ item: workload }">
-          <span class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-right">
+          <span class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
             {{ workload.lastModified || '--' }}
           </span>
         </template>
 
         <template #cell-lastEditor="{ item: workload }">
-          <span class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-right">
+          <span class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
             {{ workload.lastEditor || '--' }}
           </span>
         </template>

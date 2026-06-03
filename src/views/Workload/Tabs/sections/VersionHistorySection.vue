@@ -46,49 +46,33 @@
   ]
 
   const columns = [
-    {
-      key: 'version',
-      label: 'Version',
-      headerClass: 'min-w-[260px] flex-[2.5_1_260px]',
-      cellClass:
-        'min-w-[260px] flex-[2.5_1_260px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
-    },
+    { key: 'version', label: 'Version', size: 'minmax(260px, 2.5fr)', align: 'start' },
     {
       key: 'environment',
       label: 'Environment',
-      headerClass: 'min-w-[130px] flex-[1.1_1_130px]',
-      cellClass:
-        'min-w-[130px] flex-[1.1_1_130px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1',
+      size: 'minmax(130px, 1.1fr)',
+      align: 'start',
       field: 'environment'
     },
-    {
-      key: 'status',
-      label: 'Status',
-      headerClass: 'min-w-[120px] flex-[1.25_1_120px]',
-      cellClass:
-        'min-w-[120px] flex-[1.25_1_120px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
-    },
+    { key: 'status', label: 'Status', size: 'minmax(120px, 1.25fr)', align: 'start' },
     {
       key: 'resource-pack',
       label: 'Resource Pack',
-      headerClass: 'min-w-[320px] flex-[2.5_1_320px]',
-      cellClass:
-        'min-w-[320px] flex-[2.5_1_320px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1'
+      size: 'minmax(320px, 2.5fr)',
+      align: 'start'
     },
     {
       key: 'author',
       label: 'Created by',
-      headerClass: 'min-w-[180px] flex-[1.4_1_180px]',
-      cellClass:
-        'min-w-[180px] flex-[1.4_1_180px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1',
+      size: 'minmax(180px, 1.4fr)',
+      align: 'start',
       field: 'author'
     },
     {
       key: 'createdAt',
       label: 'Last Modified',
-      headerClass: 'min-w-[170px] flex-[1.4_1_170px]',
-      cellClass:
-        'min-w-[170px] flex-[1.4_1_170px] max-lg:flex max-lg:min-w-0 max-lg:items-start max-lg:gap-4 max-sm:flex-col max-sm:gap-1',
+      size: 'minmax(170px, 1.4fr)',
+      align: 'start',
       field: 'createdAt'
     }
   ]
