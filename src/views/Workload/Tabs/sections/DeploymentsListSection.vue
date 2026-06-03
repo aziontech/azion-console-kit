@@ -121,10 +121,10 @@
   }
 
   const columns = [
-    { key: 'deployment', label: 'Deployment', cellClass: 'flex-1 min-w-0' },
-    { key: 'status', label: 'Status', cellClass: 'flex-1 min-w-0' },
-    { key: 'createdAt', label: 'Date', cellClass: 'flex-1 min-w-0' },
-    { key: 'author', label: 'Author', cellClass: 'flex-1 min-w-0' }
+    { key: 'deployment', label: 'Deployment', size: 'minmax(0, 1fr)', align: 'start' },
+    { key: 'status', label: 'Status', size: 'minmax(0, 1fr)', align: 'start' },
+    { key: 'createdAt', label: 'Date', size: 'minmax(0, 1fr)', align: 'start' },
+    { key: 'author', label: 'Author', size: 'minmax(0, 1fr)', align: 'start' }
   ]
 
   const onPage = (event) => {
