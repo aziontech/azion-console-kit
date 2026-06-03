@@ -22,7 +22,6 @@ export async function accountGuard({ to, accountStore, tracker }) {
       // by the time the redirect decision below executes. Without this, the
       // guard would race the contract/billing fetches.
       await loadAccountHydration()
-      sessionManager.afterLogin()
 
       const accountId = accountStore.accountData?.id
       const serviceOrdersResponse = await ensureServiceOrdersList(accountId).catch(() => null)
