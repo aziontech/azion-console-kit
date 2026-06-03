@@ -5,6 +5,8 @@ import {
   patchFullnameService,
   updateAccountInfoService
 } from '@/services/signup-services'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 const USAGE_INTENT_TO_API_VALUE = {
   learn: 'Study',
@@ -110,7 +112,10 @@ export const persistOnboardingData = async ({ plan } = {}) => {
 
   const [updatedAccount] = await Promise.all(requests)
 
+  queryClient.removeQueries({ queryKey: queryKeys.account.info() })
+
   accountStore.setAccountData({
+    first_login: false,
     jobRole: updatedAccount.jobRole,
     first_name: firstName,
     last_name: lastName,

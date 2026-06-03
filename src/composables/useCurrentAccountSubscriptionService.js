@@ -3,23 +3,23 @@ import { accountCurrentService } from '@/services/v2/account/account-current-ser
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-import { toMilliseconds } from '@/services/v2/base/query/config'
 
-const STALE_TIME = toMilliseconds({ seconds: 30 })
-const GC_TIME = toMilliseconds({ minutes: 5 })
+const NO_CACHE_META = { persist: false }
 
 const buildServiceOrderQuery = () => ({
   queryKey: queryKeys.account.info().concat('service-order'),
   queryFn: () => accountCurrentService.fetchCurrentServiceOrder(),
-  staleTime: STALE_TIME,
-  gcTime: GC_TIME
+  staleTime: 0,
+  gcTime: 0,
+  meta: NO_CACHE_META
 })
 
 const buildPlanQuery = () => ({
   queryKey: queryKeys.account.info().concat('plan'),
   queryFn: () => accountCurrentService.fetchCurrentPlan(),
-  staleTime: STALE_TIME,
-  gcTime: GC_TIME
+  staleTime: 0,
+  gcTime: 0,
+  meta: NO_CACHE_META
 })
 
 /**
@@ -31,7 +31,7 @@ export function useCurrentAccountServiceOrder(options = {}) {
   const { enabled = true } = options
   return useQuery({
     ...buildServiceOrderQuery(),
-    refetchOnMount: false,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: false,
     enabled
   })
@@ -45,7 +45,7 @@ export function useCurrentAccountPlan(options = {}) {
   const { enabled = true } = options
   return useQuery({
     ...buildPlanQuery(),
-    refetchOnMount: false,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: false,
     enabled
   })

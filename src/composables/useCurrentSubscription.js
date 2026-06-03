@@ -30,8 +30,6 @@ export function useCurrentSubscription() {
   const { accountData } = storeToRefs(accountStore)
 
   const accountId = computed(() => accountData.value?.id ?? null)
-  const hasFinishedOnboarding = computed(() => accountData.value?.first_login !== true)
-  const hasContractedPlan = hasFinishedOnboarding
 
   const {
     activeServiceOrder,
@@ -39,6 +37,11 @@ export function useCurrentSubscription() {
     isLoading: isLoadingServiceOrder,
     refetch: refetchServiceOrders
   } = useServiceOrdersList(accountId)
+
+  const hasFinishedOnboarding = computed(
+    () => accountData.value?.first_login !== true || Boolean(activeServiceOrder.value)
+  )
+  const hasContractedPlan = hasFinishedOnboarding
 
   // Plans are only needed to enrich the active SO with pricing/sku metadata.
   // Gating with `enabled` keeps the catalogue request off the wire while the

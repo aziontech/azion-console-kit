@@ -20,6 +20,14 @@ vi.mock('@/composables/usePlansService', () => ({
   ensurePlansList: vi.fn().mockResolvedValue([])
 }))
 
+vi.mock('@/composables/useServiceOrdersList', () => ({
+  ensureServiceOrdersList: vi.fn(async () => ({ data: [] }))
+}))
+
+vi.mock('@/services/v2/service-orders/service-orders-constants', () => ({
+  SO_TERMINAL_STATUSES: ['CANCELED', 'EXPIRED']
+}))
+
 describe('accountGuard hasSession check', () => {
   it('should redirect to login without calling API when hasSession=false', async () => {
     const { loadAccountHydration } = await import('@/helpers/account-data')
@@ -43,7 +51,9 @@ describe('accountGuard hasSession check', () => {
       accountStore: {
         hasActiveUserId: false,
         hasSession: true,
-        needsOnboarding: false
+        needsOnboarding: false,
+        accountData: { id: 1 },
+        setHasActivePlan: vi.fn()
       },
       tracker: { reset: vi.fn() }
     })
@@ -102,7 +112,9 @@ describe('accountGuard onboarding prefetch', () => {
       accountStore: {
         hasActiveUserId: false,
         hasSession: true,
-        needsOnboarding: true
+        needsOnboarding: true,
+        accountData: { id: 1 },
+        setHasActivePlan: vi.fn()
       },
       tracker: { reset: vi.fn() }
     })
@@ -122,7 +134,9 @@ describe('accountGuard onboarding prefetch', () => {
       accountStore: {
         hasActiveUserId: false,
         hasSession: true,
-        needsOnboarding: true
+        needsOnboarding: true,
+        accountData: { id: 1 },
+        setHasActivePlan: vi.fn()
       },
       tracker: { reset: vi.fn() }
     })
@@ -142,7 +156,9 @@ describe('accountGuard onboarding prefetch', () => {
       accountStore: {
         hasActiveUserId: false,
         hasSession: true,
-        needsOnboarding: false
+        needsOnboarding: false,
+        accountData: { id: 1 },
+        setHasActivePlan: vi.fn()
       },
       tracker: { reset: vi.fn() }
     })
@@ -162,7 +178,9 @@ describe('accountGuard onboarding prefetch', () => {
       accountStore: {
         hasActiveUserId: false,
         hasSession: true,
-        needsOnboarding: true
+        needsOnboarding: true,
+        accountData: { id: 1 },
+        setHasActivePlan: vi.fn()
       },
       tracker: { reset: vi.fn() }
     })
