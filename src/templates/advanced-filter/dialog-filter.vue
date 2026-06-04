@@ -1,5 +1,5 @@
 <script setup>
-  import ButtonPrime from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'
@@ -215,7 +215,7 @@
   defineExpose({ show, hide })
 </script>
 <template>
-  <ButtonPrime
+  <Button
     kind="secondary"
     ref="buttonOverPanel"
     icon="pi pi-plus"
@@ -408,7 +408,7 @@
       class="px-8 py-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
       data-testid="filter-buttons-container"
     >
-      <ButtonPrime
+      <Button
         kind="primary"
         type="button"
         label="Cancel"
@@ -417,7 +417,7 @@
         data-testid="filter-cancel-button"
         class="max-md:min-w-max"
       />
-      <ButtonPrime
+      <Button
         kind="secondary"
         type="button"
         label="Apply"
@@ -628,24 +628,22 @@
         <div
           class="p-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
         >
-          <ButtonPrime
+          <Button
             kind="primary"
-            type="button"
             label="Cancel"
-            @click="toggle"
-            size="small"
+            size="medium"
             data-testid="filter-sidebar-cancel-button"
             class="max-md:min-w-max"
+            @click="toggle"
           />
-          <ButtonPrime
+          <Button
             kind="secondary"
-            type="button"
             label="Apply"
-            size="small"
-            @click="onSubmit"
-            :disabled="disabledSubmit"
+            size="medium"
             data-testid="filter-sidebar-apply-button"
             class="max-md:w-full"
+            :disabled="disabledSubmit"
+            @click="onSubmit"
           />
         </div>
       </div>

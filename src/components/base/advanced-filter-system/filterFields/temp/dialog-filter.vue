@@ -615,23 +615,21 @@
           class="p-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
         >
           <Button
-            kind="primary"
-            type="button"
+            kind="outlined"
             label="Cancel"
-            @click="toggle"
-            size="small"
+            size="medium"
             data-testid="filter-sidebar-cancel-button"
             class="max-md:min-w-max"
+            @click="toggle"
           />
           <Button
             kind="secondary"
-            type="button"
             label="Apply"
-            size="small"
-            @click="onSubmit"
-            :disabled="disabledSubmit"
+            size="medium"
             data-testid="filter-sidebar-apply-button"
             class="max-md:w-full"
+            :disabled="disabledSubmit"
+            @click="onSubmit"
           />
         </div>
       </div>
