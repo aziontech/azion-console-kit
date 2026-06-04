@@ -154,10 +154,48 @@
     return cleanedName
   }
 
+  const getSignupErrorFeedback = (error) => {
+    const fallbackMessage = 'Unable to complete sign up. Please try again.'
+
+    if (typeof error === 'string') {
+      try {
+        const parsedError = JSON.parse(error)
+        return {
+          message: parsedError?.message || fallbackMessage,
+          fieldName: parsedError?.fieldName || ''
+        }
+      } catch {
+        return { message: error || fallbackMessage, fieldName: '' }
+      }
+    }
+
+    return {
+      message: error?.message || fallbackMessage,
+      fieldName: ''
+    }
+  }
+
+  const trackFailedSignUp = ({ fieldName, message }) => {
+    try {
+      tracker.signUp
+        .userFailedSignUp({
+          errorType: 'api',
+          fieldName,
+          errorMessage: message
+        })
+        .track()
+    } catch {
+      // Tracking must not keep the signup button loading.
+    }
+  }
+
   const signUp = handleSubmit(async (values) => {
     loading.value = true
     try {
       const name = extractNameFromEmail(values.email)
+      if (!recaptcha) {
+        throw new Error('reCAPTCHA is not ready. Please try again.')
+      }
       const captcha = await recaptcha.execute('signup')
       const formattedEmail = encodeEmail(values.email)
 
@@ -165,19 +203,13 @@
       await router.push({ query: { email: formattedEmail } })
 
       tracker.signUp.userClickedSignedUp({ method: 'email' }).track()
-      loading.value = false
       emit('loginWithEmail')
     } catch (err) {
-      const { message = '', fieldName = '' } = JSON.parse(err)
-      tracker.signUp
-        .userFailedSignUp({
-          errorType: 'api',
-          fieldName: fieldName,
-          errorMessage: message
-        })
-        .track()
-      loading.value = false
+      const { message, fieldName } = getSignupErrorFeedback(err)
+      trackFailedSignUp({ fieldName, message })
       toast.add({ severity: 'error', detail: message, summary: 'Error' })
+    } finally {
+      loading.value = false
     }
   })
 
