@@ -189,6 +189,15 @@
     }
   }
 
+  const trackClickedSignUpSafely = ({ method }) => {
+    try {
+      const tracking = tracker?.signUp?.userClickedSignedUp?.({ method })?.track?.()
+      tracking?.catch?.(() => {})
+    } catch {
+      // Tracking must not block the activation step after account creation.
+    }
+  }
+
   const signUp = handleSubmit(async (values) => {
     loading.value = true
     try {
@@ -202,7 +211,7 @@
       await props.signupService({ ...values, name, captcha })
       await router.push({ query: { email: formattedEmail } })
 
-      tracker.signUp.userClickedSignedUp({ method: 'email' }).track()
+      trackClickedSignUpSafely({ method: 'email' })
       emit('loginWithEmail')
     } catch (err) {
       const { message, fieldName } = getSignupErrorFeedback(err)

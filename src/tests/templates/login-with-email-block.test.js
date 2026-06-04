@@ -1,5 +1,5 @@
-import { mount } from '@vue/test-utils'
-import { describe, expect, it, vi } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import LoginWithEmailBlock from '@/templates/signup-block/login-with-email-block.vue'
 
 const mocks = vi.hoisted(() => ({
@@ -46,8 +46,6 @@ vi.mock('vee-validate', async () => {
     useField: () => ({ value: ref('') })
   }
 })
-
-const flushPromises = () => Promise.resolve().then(() => Promise.resolve())
 
 const ButtonStub = {
   props: {
@@ -111,6 +109,13 @@ const mountBlock = (props = {}) =>
   })
 
 describe('LoginWithEmailBlock', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mocks.executeRecaptcha.mockResolvedValue('captcha-token')
+    mocks.routerPush.mockResolvedValue()
+    mocks.trackerTrack.mockResolvedValue()
+  })
+
   it('stops loading when recaptcha fails before the signup request', async () => {
     mocks.executeRecaptcha.mockRejectedValueOnce(new Error('recaptcha failed'))
     const signupService = vi.fn()
@@ -130,5 +135,28 @@ describe('LoginWithEmailBlock', () => {
         summary: 'Error'
       })
     )
+  })
+
+  it('shows the activation step when signup succeeds even if tracking fails', async () => {
+    mocks.trackerTrack.mockImplementationOnce(() => {
+      throw new Error('tracking failed')
+    })
+    const signupService = vi.fn().mockResolvedValue(null)
+    const wrapper = mountBlock({ signupService })
+
+    await flushPromises()
+    await wrapper.get('[data-testid="signup-button"]').trigger('click')
+    await wrapper.get('[data-testid="signup-button"]').trigger('click')
+    await flushPromises()
+
+    expect(signupService).toHaveBeenCalledWith({
+      email: 'user@example.com',
+      password: 'Password1!',
+      name: 'user',
+      captcha: 'captcha-token'
+    })
+    expect(wrapper.emitted('loginWithEmail')).toHaveLength(1)
+    expect(mocks.toastAdd).not.toHaveBeenCalled()
+    expect(wrapper.get('[data-testid="signup-button"]').attributes('disabled')).toBeUndefined()
   })
 })
