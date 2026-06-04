@@ -3,7 +3,7 @@
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
   import FormFieldsCreateEdgeApplications from '@/views/EdgeApplications/V3/FormFields/FormFieldsCreateEdgeApplications.vue'
-  import { ref, inject, defineExpose } from 'vue'
+  import { ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { createEdgeApplicationService } from '@/services/edge-application-services'
   import { useRoute } from 'vue-router'

@@ -2,7 +2,7 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
-  import { ref, inject, defineExpose } from 'vue'
+  import { ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { createDomainService } from '@/services/domains-services/v4'
   import {
