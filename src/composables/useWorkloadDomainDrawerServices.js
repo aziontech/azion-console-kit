@@ -6,7 +6,7 @@ import {
 } from '@/services/edge-application-services/v4'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 
-const CACHE_TIME_MS = 60_000
+const STALE_TIME_MS = 0
 
 const listEdgeApplicationsKey = (params) => [
   'workload-domain-drawer',
@@ -33,14 +33,14 @@ export function useWorkloadDomainDrawerServices() {
     queryClient.fetchQuery({
       queryKey: listEdgeApplicationsKey(params),
       queryFn: () => listLegacyEdgeApplicationsService(params),
-      staleTime: CACHE_TIME_MS
+      staleTime: STALE_TIME_MS
     })
 
   const loadEdgeApplicationsService = (payload) =>
     queryClient.fetchQuery({
       queryKey: loadEdgeApplicationKey(payload),
       queryFn: () => loadLegacyEdgeApplicationsService(payload),
-      staleTime: CACHE_TIME_MS
+      staleTime: STALE_TIME_MS
     })
 
   return {

@@ -162,28 +162,31 @@
         const parsedError = JSON.parse(error)
         return {
           message: parsedError?.message || fallbackMessage,
-          fieldName: parsedError?.fieldName || ''
+          fieldName: parsedError?.fieldName || '',
+          errorType: parsedError?.fieldName ? 'field' : 'api'
         }
       } catch {
-        return { message: error || fallbackMessage, fieldName: '' }
+        return { message: error || fallbackMessage, fieldName: '', errorType: 'api' }
       }
     }
 
     return {
       message: error?.message || fallbackMessage,
-      fieldName: ''
+      fieldName: '',
+      errorType: error?.response || error?.status || error?.statusCode ? 'api' : 'client'
     }
   }
 
-  const trackFailedSignUp = ({ fieldName, message }) => {
+  const trackFailedSignUp = ({ errorType, fieldName, message }) => {
     try {
-      tracker.signUp
-        .userFailedSignUp({
-          errorType: 'api',
+      const tracking = tracker?.signUp
+        ?.userFailedSignUp?.({
+          errorType,
           fieldName,
           errorMessage: message
         })
-        .track()
+        ?.track?.()
+      tracking?.catch?.(() => {})
     } catch {
       // Tracking must not keep the signup button loading.
     }
@@ -198,7 +201,17 @@
     }
   }
 
+  const pushSignupEmailQuerySafely = async (email) => {
+    try {
+      await router.push({ query: { email } })
+    } catch {
+      // Signup already succeeded; activation receives the email through the event payload.
+    }
+  }
+
   const signUp = handleSubmit(async (values) => {
+    if (loading.value) return
+
     loading.value = true
     try {
       const name = extractNameFromEmail(values.email)
@@ -209,13 +222,13 @@
       const formattedEmail = encodeEmail(values.email)
 
       await props.signupService({ ...values, name, captcha })
-      await router.push({ query: { email: formattedEmail } })
+      await pushSignupEmailQuerySafely(formattedEmail)
 
       trackClickedSignUpSafely({ method: 'email' })
-      emit('loginWithEmail')
+      emit('loginWithEmail', formattedEmail)
     } catch (err) {
-      const { message, fieldName } = getSignupErrorFeedback(err)
-      trackFailedSignUp({ fieldName, message })
+      const { errorType, message, fieldName } = getSignupErrorFeedback(err)
+      trackFailedSignUp({ errorType, fieldName, message })
       toast.add({ severity: 'error', detail: message, summary: 'Error' })
     } finally {
       loading.value = false

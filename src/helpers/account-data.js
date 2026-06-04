@@ -85,7 +85,7 @@ export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
   })
 
   accountStore.setAccountData(accountInfo)
-  accountStore.setHasActivePlan(Boolean(accountInfo.has_service_order_plan))
+  accountStore.setHasActivePlan(accountInfo.has_service_order_plan === true)
   setFeatureFlags(accountInfo.client_flags)
 }
 

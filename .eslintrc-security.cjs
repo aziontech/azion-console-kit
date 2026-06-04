@@ -21,11 +21,8 @@ Module._resolveFilename = function (request, parent, isMain, options) {
 module.exports = {
   root: true,
   plugins: ['azion-architecture', 'no-unsanitized'],
-  extends: [
-    'plugin:vue/vue3-essential',
-    'plugin:security/recommended-legacy',
-    'plugin:xss/recommended'
-  ],
+  extends: ['plugin:security/recommended-legacy', 'plugin:xss/recommended'],
+  parser: 'vue-eslint-parser',
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module'

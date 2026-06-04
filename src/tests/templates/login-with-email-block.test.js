@@ -8,7 +8,9 @@ const mocks = vi.hoisted(() => ({
   hideBadge: vi.fn(),
   toastAdd: vi.fn(),
   routerPush: vi.fn(),
-  trackerTrack: vi.fn()
+  trackerTrack: vi.fn(),
+  userClickedSignedUp: vi.fn(),
+  userFailedSignUp: vi.fn()
 }))
 
 vi.mock('recaptcha-v3', () => ({
@@ -50,13 +52,14 @@ vi.mock('vee-validate', async () => {
 const ButtonStub = {
   props: {
     label: String,
-    loading: Boolean
+    loading: Boolean,
+    disabled: Boolean
   },
   emits: ['click'],
   template: `
     <button
       type="button"
-      :disabled="loading"
+      :disabled="loading || disabled"
       data-testid="signup-button"
       @click="$emit('click')"
     >
@@ -95,8 +98,8 @@ const mountBlock = (props = {}) =>
       provide: {
         tracker: {
           signUp: {
-            userClickedSignedUp: () => ({ track: mocks.trackerTrack }),
-            userFailedSignUp: () => ({ track: mocks.trackerTrack })
+            userClickedSignedUp: mocks.userClickedSignedUp,
+            userFailedSignUp: mocks.userFailedSignUp
           }
         }
       },
@@ -114,6 +117,8 @@ describe('LoginWithEmailBlock', () => {
     mocks.executeRecaptcha.mockResolvedValue('captcha-token')
     mocks.routerPush.mockResolvedValue()
     mocks.trackerTrack.mockResolvedValue()
+    mocks.userClickedSignedUp.mockReturnValue({ track: mocks.trackerTrack })
+    mocks.userFailedSignUp.mockReturnValue({ track: mocks.trackerTrack })
   })
 
   it('stops loading when recaptcha fails before the signup request', async () => {
@@ -128,6 +133,11 @@ describe('LoginWithEmailBlock', () => {
 
     expect(mocks.executeRecaptcha).toHaveBeenCalledWith('signup')
     expect(signupService).not.toHaveBeenCalled()
+    expect(mocks.userFailedSignUp).toHaveBeenCalledWith({
+      errorType: 'client',
+      fieldName: '',
+      errorMessage: 'recaptcha failed'
+    })
     expect(wrapper.get('[data-testid="signup-button"]').attributes('disabled')).toBeUndefined()
     expect(mocks.toastAdd).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -155,8 +165,23 @@ describe('LoginWithEmailBlock', () => {
       name: 'user',
       captcha: 'captcha-token'
     })
-    expect(wrapper.emitted('loginWithEmail')).toHaveLength(1)
+    expect(wrapper.emitted('loginWithEmail')).toEqual([['user%40example.com']])
     expect(mocks.toastAdd).not.toHaveBeenCalled()
     expect(wrapper.get('[data-testid="signup-button"]').attributes('disabled')).toBeUndefined()
+  })
+
+  it('shows the activation step when signup succeeds even if query navigation fails', async () => {
+    mocks.routerPush.mockRejectedValueOnce(new Error('navigation failed'))
+    const signupService = vi.fn().mockResolvedValue(null)
+    const wrapper = mountBlock({ signupService })
+
+    await flushPromises()
+    await wrapper.get('[data-testid="signup-button"]').trigger('click')
+    await wrapper.get('[data-testid="signup-button"]').trigger('click')
+    await flushPromises()
+
+    expect(signupService).toHaveBeenCalledOnce()
+    expect(wrapper.emitted('loginWithEmail')).toEqual([['user%40example.com']])
+    expect(mocks.toastAdd).not.toHaveBeenCalled()
   })
 })

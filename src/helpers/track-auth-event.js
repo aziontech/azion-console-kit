@@ -1,5 +1,4 @@
 import { useAccountStore } from '@/stores/account'
-import { loadUserAndAccountInfo } from '@/helpers/account-data'
 
 const splitFullName = (fullName) => {
   const [firstname, ...lastNameParts] = (fullName || '').trim().split(/\s+/).filter(Boolean)
@@ -36,24 +35,10 @@ const parseUserTrackingInfo = (userTrackingInfo) => {
  * @param {Object} [params.userTrackingInfo] - Optional token verification tracking payload
  * @returns {Promise<void>}
  */
-export async function trackSignInSafely({
-  tracker,
-  method,
-  email,
-  userTrackingInfo,
-  loadUserData = false
-}) {
+export async function trackSignInSafely({ tracker, method, email, userTrackingInfo }) {
   try {
     const accountStore = useAccountStore()
     const tokenTrackingData = parseUserTrackingInfo(userTrackingInfo)
-
-    if (loadUserData && !tokenTrackingData) {
-      try {
-        await loadUserAndAccountInfo()
-      } catch (loadError) {
-        // Continue without user data - still track with available info
-      }
-    }
 
     const signupTypeFlags = accountStore.getSignupTypeFlags()
     const { userId: consoleUserId, accountData, isClientAccount } = accountStore

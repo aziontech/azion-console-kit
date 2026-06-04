@@ -11,13 +11,20 @@ const { ESLint } = require('eslint')
 
 const PROJECT_ROOT = path.resolve(__dirname, '..')
 const LINT_EXTENSIONS = new Set(['.vue', '.js', '.jsx', '.cjs', '.mjs'])
+const DEFAULT_BASE_REF = 'origin/dev'
+const FULL_SHA_RE = /^[0-9a-f]{40}$/i
+const ZERO_SHA_RE = /^0{40}$/
 
 function parseArgs(argv) {
-  const options = { base: 'origin/dev' }
+  const options = { base: DEFAULT_BASE_REF }
 
   for (let index = 0; index < argv.length; index++) {
-    if (argv[index] === '--base' && argv[index + 1]) {
-      options.base = argv[index + 1]
+    if (argv[index] === '--base') {
+      const value = argv[index + 1]?.trim()
+      if (!value || value.startsWith('--')) {
+        throw new Error('--base requires a non-empty ref')
+      }
+      options.base = value
       index++
     }
   }
@@ -31,11 +38,34 @@ function git(args) {
 
 function hasRef(ref) {
   try {
-    git(['rev-parse', '--verify', '--quiet', ref])
+    git(['cat-file', '-e', `${ref}^{commit}`])
     return true
   } catch {
     return false
   }
+}
+
+function fallbackToPreviousCommit(base) {
+  if (hasRef('HEAD~1')) {
+    console.warn(`Base ref "${base}" is unavailable. Falling back to "HEAD~1".`)
+    return 'HEAD~1'
+  }
+
+  console.warn(`Base ref "${base}" is unavailable and HEAD has no parent. Using HEAD.`)
+  return 'HEAD'
+}
+
+function resolveBaseRef(base) {
+  if (ZERO_SHA_RE.test(base)) {
+    return fallbackToPreviousCommit(base)
+  }
+
+  if (FULL_SHA_RE.test(base) && !hasRef(base)) {
+    return fallbackToPreviousCommit(base)
+  }
+
+  fetchBaseRef(base)
+  return base
 }
 
 function fetchBaseRef(base) {
@@ -50,17 +80,17 @@ function fetchBaseRef(base) {
 }
 
 function getChangedFiles(base) {
-  fetchBaseRef(base)
+  const diffBase = resolveBaseRef(base)
 
   try {
-    const output = git(['diff', '--name-only', '--diff-filter=AM', `${base}...HEAD`])
+    const output = git(['diff', '--name-only', '--diff-filter=AM', `${diffBase}...HEAD`])
     return output.trim().split('\n').filter(Boolean)
   } catch {
     try {
-      const output = git(['diff', '--name-only', '--diff-filter=AM', base, 'HEAD'])
+      const output = git(['diff', '--name-only', '--diff-filter=AM', diffBase, 'HEAD'])
       return output.trim().split('\n').filter(Boolean)
     } catch (error) {
-      console.error(`Failed to get changed files against base "${base}"`)
+      console.error(`Failed to get changed files against base "${diffBase}"`)
       console.error(error.message)
       process.exit(2)
     }

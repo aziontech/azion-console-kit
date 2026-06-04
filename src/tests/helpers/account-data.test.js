@@ -83,4 +83,16 @@ describe('account data hydration', () => {
 
     expect(useAccountStore().setHasActivePlan).toHaveBeenCalledWith(false)
   })
+
+  it('does not treat non-boolean service order plan values as active', async () => {
+    accountService.getAccountInfo.mockResolvedValueOnce({
+      id: 1,
+      client_flags: [],
+      has_service_order_plan: 'false'
+    })
+
+    await loadAccountHydration()
+
+    expect(useAccountStore().setHasActivePlan).toHaveBeenCalledWith(false)
+  })
 })
