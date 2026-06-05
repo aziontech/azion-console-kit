@@ -31,6 +31,7 @@ vi.mock('@/services/v2/service-orders/service-orders-constants', () => ({
 describe('accountGuard hasSession check', () => {
   it('should redirect to login without calling API when hasSession=false', async () => {
     const { loadAccountHydration } = await import('@/helpers/account-data')
+    const { sessionManager } = await import('@/services/v2/base/auth')
 
     const result = await accountGuard({
       to: { meta: { isPublic: false }, fullPath: '/products' },
@@ -39,12 +40,15 @@ describe('accountGuard hasSession check', () => {
     })
 
     expect(loadAccountHydration).not.toHaveBeenCalled()
+    expect(sessionManager.afterLogin).not.toHaveBeenCalled()
     expect(result).toBe('/login')
   })
 
   it('should attempt session restore when hasSession=true', async () => {
     const { loadAccountHydration } = await import('@/helpers/account-data')
+    const { sessionManager } = await import('@/services/v2/base/auth')
     loadAccountHydration.mockResolvedValue(undefined)
+    sessionManager.afterLogin.mockClear()
 
     const result = await accountGuard({
       to: { meta: { isPublic: false }, fullPath: '/products' },
@@ -59,6 +63,7 @@ describe('accountGuard hasSession check', () => {
     })
 
     expect(loadAccountHydration).toHaveBeenCalled()
+    expect(sessionManager.afterLogin).not.toHaveBeenCalled()
     expect(result).toBeUndefined()
   })
 
@@ -104,8 +109,10 @@ describe('accountGuard onboarding prefetch', () => {
   it('prefetches plans when redirecting to additional-data (needsOnboarding=true)', async () => {
     const { loadAccountHydration } = await import('@/helpers/account-data')
     const { ensurePlansList } = await import('@/composables/usePlansService')
+    const { sessionManager } = await import('@/services/v2/base/auth')
     loadAccountHydration.mockResolvedValue(undefined)
     ensurePlansList.mockClear()
+    sessionManager.afterLogin.mockClear()
 
     const result = await accountGuard({
       to: { meta: { isPublic: false }, name: 'home', fullPath: '/' },
@@ -120,6 +127,7 @@ describe('accountGuard onboarding prefetch', () => {
     })
 
     expect(ensurePlansList).toHaveBeenCalledOnce()
+    expect(sessionManager.afterLogin).not.toHaveBeenCalled()
     expect(result).toEqual({ name: 'additional-data' })
   })
 
