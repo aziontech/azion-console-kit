@@ -83,15 +83,15 @@ describe('account data hydration', () => {
     expect(useAccountStore().account.has_service_order_plan).toBe(false)
   })
 
-  it('preserves non-boolean service order plan values for store-level validation', async () => {
+  it('stores normalized false from account service for non-active plan state', async () => {
     accountService.getAccountInfo.mockResolvedValueOnce({
       id: 1,
       client_flags: [],
-      has_service_order_plan: 'false'
+      has_service_order_plan: false
     })
 
     await loadAccountHydration()
 
-    expect(useAccountStore().account.has_service_order_plan).toBe('false')
+    expect(useAccountStore().account.has_service_order_plan).toBe(false)
   })
 })
