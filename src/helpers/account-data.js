@@ -106,7 +106,7 @@ export const loadContractData = async ({ force = false } = {}) => {
 
 /**
  * Full post-login account hydration. Loads user/account/settings
- * needed to derive `client_id`, `kind`, `first_login`, and `hasServiceOrderPlan`.
+ * needed by redirects, feature flags, and the plan gate.
  *
  * The accountGuard awaits this BEFORE making redirect decisions so the
  * `needsOnboarding` getter returns correct values the first time it is read.

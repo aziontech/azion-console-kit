@@ -69,4 +69,41 @@ describe('trackSignInSafely', () => {
     })
     expect(track).toHaveBeenCalledTimes(1)
   })
+
+  it('tracks sign-in with store data when token verification tracking data is missing', async () => {
+    const { tracker, track, userSignedIn } = makeTracker()
+
+    useAccountStore.mockReturnValue({
+      getSignupTypeFlags: vi.fn(() => ({ login_sso_google: true })),
+      accountData: {
+        id: 456,
+        kind: 'client',
+        email: 'jane.doe@example.com',
+        first_name: 'Jane',
+        last_name: 'Doe',
+        company_name: 'Azion'
+      },
+      isClientAccount: true,
+      userId: 123
+    })
+
+    await trackSignInSafely({
+      tracker,
+      method: 'google'
+    })
+
+    expect(loadUserAndAccountInfo).not.toHaveBeenCalled()
+    expect(userSignedIn).toHaveBeenCalledWith({
+      method: 'google',
+      signupTypeFlags: { login_sso_google: true },
+      email: 'jane.doe@example.com',
+      userId: 123,
+      accountId: 456,
+      firstname: 'Jane',
+      lastname: 'Doe',
+      company: 'Azion',
+      accountKind: 'client'
+    })
+    expect(track).toHaveBeenCalledTimes(1)
+  })
 })

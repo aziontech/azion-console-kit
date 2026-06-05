@@ -9,7 +9,6 @@ export function useEdgeApplicationV3CreateService() {
   const createEdgeApplicationService = (payload) => createMutation.mutateAsync(payload)
 
   return {
-    createEdgeApplicationService,
-    isCreating: createMutation.isPending
+    createEdgeApplicationService
   }
 }

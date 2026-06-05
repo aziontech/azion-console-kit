@@ -16,7 +16,7 @@ export async function accountGuard({ to, accountStore, tracker }) {
 
     try {
       // Await account identity hydration before deciding onboarding redirects.
-      // `loadAccountHydration` derives `hasActivePlan` from account info.
+      // `has_service_order_plan` from account info drives the plan gate.
       await loadAccountHydration()
 
       const needsOnboarding = accountStore.needsOnboarding

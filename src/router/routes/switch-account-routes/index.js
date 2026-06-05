@@ -42,7 +42,7 @@ export const switchAccountRoutes = {
       if (isSsoLogin) {
         const { isFirstLogin } = accountStore
 
-        if (!isFirstLogin && verifiedAuth.current?.user_tracking_info) {
+        if (!isFirstLogin && redirect !== '/login') {
           const ssoMethod = signupTypeFlags.login_sso_google ? 'google' : 'github'
           await trackSignInSafely({
             tracker,

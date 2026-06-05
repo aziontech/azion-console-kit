@@ -46,7 +46,6 @@ export function useWorkloadDomainDrawerServices() {
   return {
     createDomainService,
     listEdgeApplicationsService,
-    loadEdgeApplicationsService,
-    isCreatingDomain: createDomainMutation.isPending
+    loadEdgeApplicationsService
   }
 }
