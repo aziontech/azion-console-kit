@@ -58,24 +58,26 @@
           class="surface-border border rounded-sm overflow-hidden"
           data-testid="data-stream-form__data-settings__data-set-field"
         />
-        <Button
-          kind="outlined"
-          v-if="isCustomTemplate"
-          icon="pi pi-pencil"
-          label="Edit Template"
-          size="small"
-          @click="openEditTemplateDrawer"
-          class="absolute top-10 right-2 bg-[#171717]"
-        />
-        <Button
-          kind="outlined"
-          v-else
-          icon="pi pi-copy"
-          label="Duplicate Template"
-          size="small"
-          @click="openDuplicateTemplateDrawer"
-          class="absolute top-10 right-2 bg-[#171717]"
-        />
+        <div class="absolute top-10 right-2">
+          <Button
+            kind="outlined"
+            v-if="isCustomTemplate"
+            icon="pi pi-pencil"
+            label="Edit Template"
+            size="small"
+            @click="openEditTemplateDrawer"
+            class="bg-[#171717]"
+          />
+          <Button
+            kind="outlined"
+            v-else
+            icon="pi pi-copy"
+            label="Duplicate Template"
+            size="small"
+            @click="openDuplicateTemplateDrawer"
+            class="bg-[#171717]"
+          />
+        </div>
         <small
           class="text-xs text-color-secondary font-normal leading-5"
           data-testid="data-stream-form__data-settings__data-set-description"
