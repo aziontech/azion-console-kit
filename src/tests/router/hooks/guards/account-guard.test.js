@@ -24,10 +24,6 @@ vi.mock('@/composables/useServiceOrdersList', () => ({
   ensureServiceOrdersList: vi.fn(async () => ({ data: [] }))
 }))
 
-vi.mock('@/services/v2/service-orders/service-orders-constants', () => ({
-  SO_ENTITLED_STATUSES: ['ACTIVE', 'PAST_DUE', 'BLOCKED']
-}))
-
 describe('accountGuard hasSession check', () => {
   it('should redirect to login without calling API when hasSession=false', async () => {
     const { loadAccountHydration } = await import('@/helpers/account-data')
@@ -56,8 +52,7 @@ describe('accountGuard hasSession check', () => {
         hasActiveUserId: false,
         hasSession: true,
         needsOnboarding: false,
-        accountData: { id: 1 },
-        setHasActivePlan: vi.fn()
+        accountData: { id: 1 }
       },
       tracker: { reset: vi.fn() }
     })
@@ -120,8 +115,7 @@ describe('accountGuard onboarding prefetch', () => {
         hasActiveUserId: false,
         hasSession: true,
         needsOnboarding: true,
-        accountData: { id: 1 },
-        setHasActivePlan: vi.fn()
+        accountData: { id: 1 }
       },
       tracker: { reset: vi.fn() }
     })
@@ -143,8 +137,7 @@ describe('accountGuard onboarding prefetch', () => {
         hasActiveUserId: false,
         hasSession: true,
         needsOnboarding: true,
-        accountData: { id: 1 },
-        setHasActivePlan: vi.fn()
+        accountData: { id: 1 }
       },
       tracker: { reset: vi.fn() }
     })
@@ -165,8 +158,7 @@ describe('accountGuard onboarding prefetch', () => {
         hasActiveUserId: false,
         hasSession: true,
         needsOnboarding: false,
-        accountData: { id: 1 },
-        setHasActivePlan: vi.fn()
+        accountData: { id: 1 }
       },
       tracker: { reset: vi.fn() }
     })
@@ -187,8 +179,7 @@ describe('accountGuard onboarding prefetch', () => {
         hasActiveUserId: false,
         hasSession: true,
         needsOnboarding: true,
-        accountData: { id: 1 },
-        setHasActivePlan: vi.fn()
+        accountData: { id: 1 }
       },
       tracker: { reset: vi.fn() }
     })
@@ -206,7 +197,7 @@ describe('accountGuard hasActivePlan derivation', () => {
     ensureServiceOrdersList.mockReset()
   })
 
-  const runGuard = async (setHasActivePlan = vi.fn()) => {
+  const runGuard = async () => {
     const { ensureServiceOrdersList } = await import('@/composables/useServiceOrdersList')
 
     await accountGuard({
@@ -215,19 +206,17 @@ describe('accountGuard hasActivePlan derivation', () => {
         hasActiveUserId: false,
         hasSession: true,
         needsOnboarding: false,
-        accountData: { id: 1 },
-        setHasActivePlan
+        accountData: { id: 1 }
       },
       tracker: { reset: vi.fn() }
     })
 
-    return { ensureServiceOrdersList, setHasActivePlan }
+    return { ensureServiceOrdersList }
   }
 
   it('does not load service orders during session restore', async () => {
-    const { ensureServiceOrdersList, setHasActivePlan } = await runGuard()
+    const { ensureServiceOrdersList } = await runGuard()
 
     expect(ensureServiceOrdersList).not.toHaveBeenCalled()
-    expect(setHasActivePlan).not.toHaveBeenCalled()
   })
 })

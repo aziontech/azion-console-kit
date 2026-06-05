@@ -85,7 +85,6 @@ export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
   })
 
   accountStore.setAccountData(accountInfo)
-  accountStore.setHasActivePlan(accountInfo.has_service_order_plan === true)
   setFeatureFlags(accountInfo.client_flags)
 }
 
@@ -107,7 +106,7 @@ export const loadContractData = async ({ force = false } = {}) => {
 
 /**
  * Full post-login account hydration. Loads user/account/settings
- * needed to derive `client_id`, `kind`, `first_login`, and `hasActivePlan`.
+ * needed to derive `client_id`, `kind`, `first_login`, and `hasServiceOrderPlan`.
  *
  * The accountGuard awaits this BEFORE making redirect decisions so the
  * `needsOnboarding` getter returns correct values the first time it is read.

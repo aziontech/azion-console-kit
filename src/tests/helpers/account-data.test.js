@@ -39,8 +39,7 @@ describe('account data hydration', () => {
       account: {},
       setAccountData: vi.fn((accountData) => {
         accountStore.account = { ...accountStore.account, ...accountData }
-      }),
-      setHasActivePlan: vi.fn()
+      })
     }
     useAccountStore.mockReturnValue(accountStore)
     accountService.getAccountInfo.mockResolvedValue({
@@ -66,13 +65,13 @@ describe('account data hydration', () => {
     expect(setFeatureFlags).toHaveBeenCalledWith([])
   })
 
-  it('derives active plan state from account info during login hydration', async () => {
+  it('stores service order plan state from account info during login hydration', async () => {
     await loadAccountHydration()
 
-    expect(useAccountStore().setHasActivePlan).toHaveBeenCalledWith(true)
+    expect(useAccountStore().account.has_service_order_plan).toBe(true)
   })
 
-  it('marks active plan as false when account info has no service order plan', async () => {
+  it('stores false when account info requires plan configuration', async () => {
     accountService.getAccountInfo.mockResolvedValueOnce({
       id: 1,
       client_flags: [],
@@ -81,10 +80,10 @@ describe('account data hydration', () => {
 
     await loadAccountHydration()
 
-    expect(useAccountStore().setHasActivePlan).toHaveBeenCalledWith(false)
+    expect(useAccountStore().account.has_service_order_plan).toBe(false)
   })
 
-  it('does not treat non-boolean service order plan values as active', async () => {
+  it('preserves non-boolean service order plan values for store-level validation', async () => {
     accountService.getAccountInfo.mockResolvedValueOnce({
       id: 1,
       client_flags: [],
@@ -93,6 +92,6 @@ describe('account data hydration', () => {
 
     await loadAccountHydration()
 
-    expect(useAccountStore().setHasActivePlan).toHaveBeenCalledWith(false)
+    expect(useAccountStore().account.has_service_order_plan).toBe('false')
   })
 })
