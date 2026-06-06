@@ -9,8 +9,8 @@
   import PrimeButton from '@aziontech/webkit/button'
   import { environmentService } from '@/services/v2/environment/environment-service'
   import { deploymentService } from '@/services/v2/deployment/deployment-service'
-  import { resourcePackTypeMeta } from '@/helpers/deployment-status'
-  import { useResourceOptions, toCanonicalResourceKey } from '../helpers/resource-options'
+  import { resourcePackTypeMeta, RESOURCE_PACK_DEFAULT_KEYS } from '@/helpers/deployment-status'
+  import { useResourceOptions } from '../helpers/resource-options'
 
   defineOptions({ name: 'deployment-settings-block' })
 
@@ -67,7 +67,7 @@
     { immediate: true, deep: true }
   )
 
-  // Deployment metadata cache (id → { id, name, allowed_resource_types }).
+  // Deployment metadata cache (id → { id, name, resourceKeys }).
   const deploymentCache = ref({})
   const deploymentLoading = ref({})
 
@@ -84,9 +84,7 @@
           [data.id]: {
             id: data.id,
             name: data.name,
-            allowed_resource_types: Array.isArray(data.allowed_resource_types)
-              ? data.allowed_resource_types.map(toCanonicalResourceKey)
-              : []
+            resourceKeys: [...RESOURCE_PACK_DEFAULT_KEYS]
           }
         }
       }
@@ -309,11 +307,11 @@
             </template>
 
             <div
-              v-if="deploymentDataFor(env.id)?.allowed_resource_types?.length"
+              v-if="deploymentDataFor(env.id)?.resourceKeys?.length"
               class="flex flex-wrap gap-2 p-2 border-t surface-border"
             >
               <div
-                v-for="key in deploymentDataFor(env.id).allowed_resource_types"
+                v-for="key in deploymentDataFor(env.id).resourceKeys"
                 :key="key"
                 class="flex flex-col gap-1 p-3 flex-1 basis-[calc(33.333%-0.5rem)] min-w-[140px]"
               >

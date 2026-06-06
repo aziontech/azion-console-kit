@@ -3,7 +3,6 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import FieldMultiSelect from '@aziontech/webkit/field-multi-select'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldNumber from '@aziontech/webkit/field-number'
   import RadioButton from '@aziontech/webkit/radiobutton'
@@ -30,7 +29,6 @@
     setValue: setDeploymentVersionPolicy,
     errorMessage: deploymentVersionPolicyError
   } = useField('deployment_version_policy')
-  const { value: allowedResourceTypes } = useField('allowed_resource_types')
   const { value: strategyCanaryEnabled } = useField('strategy_canary_enabled')
   const { value: strategyCanaryDefaultPercentage } = useField('strategy_canary_default_percentage')
   const { value: strategySkewEnabled } = useField('strategy_skew_enabled')
@@ -60,14 +58,6 @@
       subtitle: 'Allow multiple reachable versions via versioned URLs.',
       value: 'versioned_urls'
     }
-  ]
-
-  const resourceTypeOptions = [
-    { label: 'Application', value: 'application' },
-    { label: 'Firewall', value: 'firewall' },
-    { label: 'Custom Page', value: 'custom_page' },
-    { label: 'Function', value: 'function' },
-    { label: 'Network List', value: 'network_list' }
   ]
 </script>
 
@@ -199,19 +189,6 @@
             {{ deploymentVersionPolicyError }}
           </small>
         </div>
-
-        <FieldMultiSelect
-          label="Allowed Resource Types"
-          name="allowed_resource_types"
-          required
-          :options="resourceTypeOptions"
-          :value="allowedResourceTypes"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="self"
-          description="Resource types that can be part of versions of this deployment."
-          data-testid="deployment-form__allowed-resource-types-field"
-        />
       </div>
     </template>
   </FormHorizontal>

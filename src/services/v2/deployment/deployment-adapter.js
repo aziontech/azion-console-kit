@@ -4,11 +4,6 @@ const isObject = (value) => {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
-const toStringArray = (value) => {
-  if (!Array.isArray(value)) return []
-  return value.map((item) => String(item))
-}
-
 const pickDefined = (payload) => {
   return Object.entries(payload).reduce((acc, [key, value]) => {
     if (value !== undefined) {
@@ -69,13 +64,6 @@ export const resolveResourceMeta = (type) => {
   }
 }
 
-const mapResourceTypes = (allowedResourceTypes) => {
-  if (!Array.isArray(allowedResourceTypes)) return []
-  return allowedResourceTypes
-    .map((type) => (type ? resolveResourceMeta(type) : null))
-    .filter(Boolean)
-}
-
 const normalizeCanary = (canary) => {
   const source = isObject(canary) ? canary : {}
   return {
@@ -118,13 +106,12 @@ const normalizeDeployment = (deployment) => {
     description: source.description ?? null,
     binding_policy: source.binding_policy ?? null,
     deployment_version_policy: source.deployment_version_policy ?? null,
-    allowed_resource_types: toStringArray(source.allowed_resource_types),
     strategy_defaults: normalizeStrategyDefaults(source.strategy_defaults),
     state: source.state ?? null,
     state_detail: source.state_detail ?? null,
     client_id: source.client_id ?? null,
-    created_at: source.created_at ?? null,
-    updated_at: source.updated_at ?? null,
+    created_at: formatDateToDayMonthYearHour(source.created_at) ?? null,
+    updated_at: formatDateToDayMonthYearHour(source.updated_at) ?? null,
     created_by: normalizeAuditActor(source.created_by),
     last_modified_by: normalizeAuditActor(source.last_modified_by)
   }
@@ -142,11 +129,8 @@ export const DeploymentAdapter = {
         status: mapStateToStatus(normalized.state),
         policy: normalized.deployment_version_policy,
         policyLabel: mapPolicyToLabel(normalized.deployment_version_policy),
-        resourceTypes: mapResourceTypes(normalized.allowed_resource_types),
         lastEditor,
-        lastModified: normalized.updated_at
-          ? formatDateToDayMonthYearHour(normalized.updated_at)
-          : '-'
+        lastModified: normalized.updated_at || normalized.created_at || '-'
       }
     })
   },
@@ -162,7 +146,6 @@ export const DeploymentAdapter = {
       description: payload.description,
       binding_policy: payload.binding_policy,
       deployment_version_policy: payload.deployment_version_policy,
-      allowed_resource_types: payload.allowed_resource_types,
       strategy_defaults: payload.strategy_defaults
     })
   },
@@ -173,7 +156,6 @@ export const DeploymentAdapter = {
       description: payload.description,
       binding_policy: payload.binding_policy,
       deployment_version_policy: payload.deployment_version_policy,
-      allowed_resource_types: payload.allowed_resource_types,
       strategy_defaults: payload.strategy_defaults
     })
   }
