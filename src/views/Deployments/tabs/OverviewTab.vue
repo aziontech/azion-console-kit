@@ -11,8 +11,8 @@
   import { documentationDeployProducts } from '@/helpers/azion-documentation-catalog'
   import MessageCard from '@/components/MessageCard'
   import InlineTag from '@/components/InlineTag'
-  import ResourceTypesList from '@/views/Deployments/components/ResourceTypesList.vue'
   import EditorAvatarCell from '@/views/Deployments/components/EditorAvatarCell.vue'
+  import DeploymentDrawer from '@/views/Deployments/components/DeploymentDrawer.vue'
 
   defineOptions({ name: 'deployments-overview-tab' })
 
@@ -34,6 +34,10 @@
   const rowMenuRef = ref(null)
   const rowMenuItems = ref([])
 
+  const drawerVisible = ref(false)
+  const selectedDeploymentId = ref(null)
+  const drawerInitialTab = ref('versions')
+
   const allowedFilters = [
     { field: 'name', header: 'Name', filterPath: 'name' },
     { field: 'id', header: 'ID', filterPath: 'id' },
@@ -43,15 +47,14 @@
   ]
 
   const columns = computed(() => [
-    { key: 'deployment', label: 'Deployment', size: 'minmax(220px, 2fr)', align: 'start' },
-    { key: 'resources', label: 'Resources', size: 'minmax(200px, 1.6fr)', align: 'start' },
+    { key: 'deployment', label: 'Deployment', size: 'minmax(220px, 2.4fr)', align: 'start' },
     { key: 'lastModified', label: 'Last Modified', size: 'minmax(180px, 1.2fr)', align: 'end' },
     { key: 'lastEditor', label: 'Last Editor', size: 'minmax(220px, 1.4fr)', align: 'end' }
   ])
 
   const sortFieldMap = {
     deployment: 'name',
-    lastModified: 'last_modified',
+    lastModified: 'created_at',
     status: 'active',
     lastEditor: 'last_editor'
   }
@@ -100,9 +103,11 @@
     }
   }
 
-  const goToDetails = (deployment) => {
+  const openDeploymentDrawer = (deployment, tab = 'versions') => {
     if (!deployment?.id) return
-    router.push(`/deployments/edit/${deployment.id}`)
+    selectedDeploymentId.value = deployment.id
+    drawerInitialTab.value = tab
+    drawerVisible.value = true
   }
 
   const cloneDeployment = (deployment) => {
@@ -123,7 +128,11 @@
 
   const openRowMenu = ({ event, deployment }) => {
     rowMenuItems.value = [
-      { label: 'Edit', icon: 'pi pi-pencil', command: () => goToDetails(deployment) },
+      {
+        label: 'Edit',
+        icon: 'pi pi-pencil',
+        command: () => openDeploymentDrawer(deployment, 'settings')
+      },
       { label: 'Clone', icon: 'pi pi-copy', command: () => cloneDeployment(deployment) },
       { label: 'Delete', icon: 'pi pi-trash', command: () => handleDelete(deployment) }
     ]
@@ -215,7 +224,7 @@
       @page="onPage"
       @apply-filter="onApplyFilter"
       @remove-filter="onRemoveFilter"
-      @row-primary-click="goToDetails"
+      @row-primary-click="openDeploymentDrawer($event, 'versions')"
       @open-row-menu="openRowMenu"
     >
       <template #cell-deployment="{ item: deployment, onPrimaryClick }">
@@ -235,10 +244,6 @@
         </div>
       </template>
 
-      <template #cell-resources="{ item: deployment }">
-        <ResourceTypesList :items="deployment.resourceTypes" />
-      </template>
-
       <template #cell-lastModified="{ item: deployment }">
         <span
           class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-[var(--text-color-secondary)]"
@@ -256,6 +261,15 @@
       ref="rowMenuRef"
       :popup="true"
       :model="rowMenuItems"
+    />
+
+    <DeploymentDrawer
+      v-if="drawerVisible"
+      :key="selectedDeploymentId"
+      v-model:visible="drawerVisible"
+      :deploymentId="selectedDeploymentId"
+      :initialTab="drawerInitialTab"
+      @saved="loadDeployments"
     />
   </div>
 </template>

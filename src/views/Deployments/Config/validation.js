@@ -1,13 +1,5 @@
 import * as yup from 'yup'
 
-export const ALLOWED_RESOURCE_TYPES = [
-  'application',
-  'firewall',
-  'custom_page',
-  'function',
-  'network_list'
-]
-
 export const validationSchema = yup.object({
   name: yup.string().required().min(3).max(255).label('Name'),
   description: yup.string().nullable().default(''),
@@ -17,12 +9,6 @@ export const validationSchema = yup.object({
     .required()
     .oneOf(['single_version', 'versioned_urls'])
     .label('Deployment Version Policy'),
-  allowed_resource_types: yup
-    .array()
-    .of(yup.string().oneOf(ALLOWED_RESOURCE_TYPES))
-    .min(1, 'Select at least one resource type')
-    .required()
-    .label('Allowed Resource Types'),
   strategy_canary_enabled: yup.boolean().default(false),
   strategy_canary_default_percentage: yup
     .number()
@@ -49,7 +35,6 @@ export const initialValues = {
   description: '',
   binding_policy: 'STRICT',
   deployment_version_policy: 'single_version',
-  allowed_resource_types: [...ALLOWED_RESOURCE_TYPES],
   strategy_canary_enabled: false,
   strategy_canary_default_percentage: 10,
   strategy_skew_enabled: false,

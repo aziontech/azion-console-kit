@@ -10,8 +10,8 @@
   import ButtonCancel from '@aziontech/webkit/button-cancel'
   import CreateDeploymentDrawer from './CreateDeploymentDrawer.vue'
   import { deploymentService } from '@/services/v2/deployment/deployment-service'
-  import { resourcePackTypeMeta } from '@/helpers/deployment-status'
-  import { useResourceOptions, toCanonicalResourceKey } from '../helpers/resource-options'
+  import { resourcePackTypeMeta, RESOURCE_PACK_DEFAULT_KEYS } from '@/helpers/deployment-status'
+  import { useResourceOptions } from '../helpers/resource-options'
 
   defineOptions({ name: 'link-deployment-drawer' })
 
@@ -90,7 +90,7 @@
     queryKey: deploymentsQueryKey,
     queryFn: () =>
       deploymentService.listDeploymentsService({
-        fields: ['id', 'name', 'allowed_resource_types']
+        fields: ['id', 'name']
       }),
     enabled: computed(() => props.visible)
   })
@@ -105,10 +105,7 @@
 
   const selectedDeployment = computed(() => findDeployment(values.deploymentId))
 
-  const resourceKeys = computed(() => {
-    const allowed = selectedDeployment.value?.allowed_resource_types
-    return Array.isArray(allowed) ? allowed.map(toCanonicalResourceKey) : []
-  })
+  const resourceKeys = computed(() => RESOURCE_PACK_DEFAULT_KEYS)
 
   // TODO: when the deployment-version → resource binding API is finalized, switch back
   // to `deploymentVersionService.listVersionsService(values.deploymentId)` via useQuery.
@@ -120,10 +117,7 @@
       setFieldValue('resources', {})
       return
     }
-    const rawKeys = Array.isArray(deployment.allowed_resource_types)
-      ? deployment.allowed_resource_types
-      : []
-    const keys = rawKeys.map(toCanonicalResourceKey)
+    const keys = RESOURCE_PACK_DEFAULT_KEYS
     const next = {}
     for (const key of keys) {
       const initial = props.initialResources?.[key] || {}
