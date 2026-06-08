@@ -154,30 +154,84 @@
     return cleanedName
   }
 
+  const getSignupErrorFeedback = (error) => {
+    const fallbackMessage = 'Unable to complete sign up. Please try again.'
+
+    if (typeof error === 'string') {
+      try {
+        const parsedError = JSON.parse(error)
+        return {
+          message: parsedError?.message || fallbackMessage,
+          fieldName: parsedError?.fieldName || '',
+          errorType: parsedError?.fieldName ? 'field' : 'api'
+        }
+      } catch {
+        return { message: error || fallbackMessage, fieldName: '', errorType: 'api' }
+      }
+    }
+
+    return {
+      message: error?.message || fallbackMessage,
+      fieldName: '',
+      errorType: error?.response || error?.status || error?.statusCode ? 'api' : 'client'
+    }
+  }
+
+  const trackFailedSignUp = ({ errorType, fieldName, message }) => {
+    try {
+      const tracking = tracker?.signUp
+        ?.userFailedSignUp?.({
+          errorType,
+          fieldName,
+          errorMessage: message
+        })
+        ?.track?.()
+      tracking?.catch?.(() => {})
+    } catch {
+      // Tracking must not keep the signup button loading.
+    }
+  }
+
+  const trackClickedSignUpSafely = ({ method }) => {
+    try {
+      const tracking = tracker?.signUp?.userClickedSignedUp?.({ method })?.track?.()
+      tracking?.catch?.(() => {})
+    } catch {
+      // Tracking must not block the activation step after account creation.
+    }
+  }
+
+  const pushSignupEmailQuerySafely = async (email) => {
+    try {
+      await router.push({ query: { email } })
+    } catch {
+      // Signup already succeeded; activation receives the email through the event payload.
+    }
+  }
+
   const signUp = handleSubmit(async (values) => {
+    if (loading.value) return
+
     loading.value = true
     try {
       const name = extractNameFromEmail(values.email)
+      if (!recaptcha) {
+        throw new Error('reCAPTCHA is not ready. Please try again.')
+      }
       const captcha = await recaptcha.execute('signup')
       const formattedEmail = encodeEmail(values.email)
 
       await props.signupService({ ...values, name, captcha })
-      await router.push({ query: { email: formattedEmail } })
+      await pushSignupEmailQuerySafely(formattedEmail)
 
-      tracker.signUp.userClickedSignedUp({ method: 'email' }).track()
-      loading.value = false
-      emit('loginWithEmail')
+      trackClickedSignUpSafely({ method: 'email' })
+      emit('loginWithEmail', formattedEmail)
     } catch (err) {
-      const { message = '', fieldName = '' } = JSON.parse(err)
-      tracker.signUp
-        .userFailedSignUp({
-          errorType: 'api',
-          fieldName: fieldName,
-          errorMessage: message
-        })
-        .track()
-      loading.value = false
+      const { errorType, message, fieldName } = getSignupErrorFeedback(err)
+      trackFailedSignUp({ errorType, fieldName, message })
       toast.add({ severity: 'error', detail: message, summary: 'Error' })
+    } finally {
+      loading.value = false
     }
   })
 

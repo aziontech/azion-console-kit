@@ -44,6 +44,10 @@
   const SUBMIT_TIMER = 60
 
   const props = defineProps({
+    email: {
+      type: String,
+      default: ''
+    },
     resendEmailService: {
       required: true,
       type: Function
@@ -55,7 +59,7 @@
   const toast = useToast()
   const showCounter = computed(() => counter.value > 0)
 
-  const { email } = route.query
+  const email = props.email || route.query.email || ''
   if (!email) {
     router.push({ name: 'login' })
   }
@@ -65,9 +69,9 @@
     return re.test(email)
   }
 
-  const decodedEmail = decodeURIComponent(email)
+  const decodedEmail = email ? decodeURIComponent(email) : ''
   const isEmailValid = ref(validateEmail(decodedEmail))
-  if (!isEmailValid.value) {
+  if (email && !isEmailValid.value) {
     toast.add({
       severity: 'error',
       detail: 'Use a valid email format.',
