@@ -116,11 +116,11 @@
   import Dialog from '@aziontech/webkit/dialog'
   import Dropdown from '@aziontech/webkit/dropdown'
   import Textarea from '@aziontech/webkit/textarea'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({ name: 'console-feedback' })
 
-  defineProps({
+  const props = defineProps({
     styleTextColor: {
       type: String,
       default: () => 'text-color'
