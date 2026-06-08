@@ -1,6 +1,5 @@
 <script setup>
   import { computed, onMounted, ref, watch } from 'vue'
-  import { useRouter } from 'vue-router'
   import { watchDebounced } from '@vueuse/core'
   import { useToast } from '@aziontech/webkit/use-toast'
   import Dropdown from '@aziontech/webkit/dropdown'
@@ -8,7 +7,8 @@
   import GenericDataView from '@/components/GenericDataView'
   import StatusTag from '@/components/StatusTag'
   import CurrentBadge from '@/components/CurrentBadge'
-  import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
+  import DeploymentVersionDrawer from '@/views/Deployments/components/DeploymentVersionDrawer.vue'
+  import { listGlobalDeploymentVersionsMock } from '@/services/v2/deployment/deployment-version-mock'
 
   defineOptions({ name: 'deployments-list-section' })
 
@@ -17,7 +17,6 @@
     workloadDeploymentId: { type: [String, Number], default: null }
   })
 
-  const router = useRouter()
   const toast = useToast()
 
   const versions = ref([])
@@ -30,13 +29,34 @@
   const filterValues = ref({ state: 'all' })
   const dateRange = ref(null)
 
+  const drawerVisible = ref(false)
+  const selectedVersion = ref(null)
+
   const statusAllOption = { label: 'Status', value: 'all' }
 
-  const goToDetails = (version) =>
-    router.push({
-      name: 'workload-deployment-details',
-      params: { id: props.workloadId, versionId: version.id }
+  const goToDetails = (version) => {
+    if (!version) return
+    selectedVersion.value = version
+    drawerVisible.value = true
+  }
+
+  const onRollback = (version) => {
+    toast.add({
+      closable: true,
+      severity: 'info',
+      summary: 'Rollback',
+      detail: `Rollback requested for "${version?.name || version?.id || 'version'}"`
     })
+  }
+
+  const onRedeploy = (version) => {
+    toast.add({
+      closable: true,
+      severity: 'info',
+      summary: 'Redeploy',
+      detail: `Redeploy requested for "${version?.name || version?.id || 'version'}"`
+    })
+  }
 
   const matchesDateRange = (version) => {
     const [from, to] = Array.isArray(dateRange.value) ? dateRange.value : []
@@ -67,24 +87,15 @@
   })
 
   const loadVersions = async () => {
-    if (!props.workloadDeploymentId) {
-      versions.value = []
-      totalRecords.value = 0
-      return
-    }
-
     loading.value = true
     try {
       const state = filterValues.value.state
-      const result = await deploymentVersionService.listVersionsService(
-        props.workloadDeploymentId,
-        {
-          page: Math.floor(paginatorFirst.value / paginatorRows.value) + 1,
-          pageSize: paginatorRows.value,
-          search: searchTerm.value?.trim() || undefined,
-          state: state !== 'all' ? state : undefined
-        }
-      )
+      const result = await listGlobalDeploymentVersionsMock({
+        page: Math.floor(paginatorFirst.value / paginatorRows.value) + 1,
+        pageSize: paginatorRows.value,
+        search: searchTerm.value?.trim() || undefined,
+        state: state !== 'all' ? state : undefined
+      })
       versions.value = Array.isArray(result?.body) ? result.body : []
       totalRecords.value = typeof result?.count === 'number' ? result.count : versions.value.length
     } catch (error) {
@@ -243,6 +254,13 @@
       <span class="text-sm truncate">{{ item.lastEditor || '--' }}</span>
     </template>
   </GenericDataView>
+
+  <DeploymentVersionDrawer
+    v-model:visible="drawerVisible"
+    :version="selectedVersion"
+    @rollback="onRollback"
+    @redeploy="onRedeploy"
+  />
 </template>
 
 <style scoped>

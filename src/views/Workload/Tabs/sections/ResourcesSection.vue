@@ -102,24 +102,24 @@
       <div
         v-for="resource in resources"
         :key="resource.key"
-        class="flex items-center justify-between py-2 gap-2"
+        class="flex items-start justify-between py-2 gap-3"
         :data-testid="`overview__resource-${resource.key}`"
       >
-        <div class="flex items-center gap-2 min-w-0">
+        <div class="flex items-center gap-2 min-w-0 flex-shrink">
           <i
             :class="resource.icon"
             class="text-color-secondary text-sm shrink-0"
           />
           <span class="text-sm truncate">{{ resource.label }}</span>
         </div>
-        <div class="flex flex-col items-end min-w-0 max-w-[60%]">
+        <div class="flex flex-col items-end min-w-0 flex-1">
           <span
             class="text-sm truncate w-full text-right"
             :title="resource.name"
           >
             {{ resource.name }}
           </span>
-          <span class="text-xs text-color-secondary">{{ resource.version }}</span>
+          <span class="text-xs text-color-secondary text-right">{{ resource.version }}</span>
         </div>
       </div>
     </div>

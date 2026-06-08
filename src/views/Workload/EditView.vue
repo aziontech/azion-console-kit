@@ -21,23 +21,45 @@
         </div>
       </div>
     </template>
-    <template #action-bar="{ onSubmit, onCancel, loading }">
-      <ActionBarTemplate
-        @onSubmit="onSubmit"
-        @onCancel="onCancel"
-        :loading="loading"
-      />
+    <template #action-bar="{ onCancel }">
+      <Teleport
+        to="#action-bar"
+        v-if="isMounted"
+      >
+        <ActionBarBlock>
+          <PrimeButton
+            outlined
+            type="button"
+            label="Cancel"
+            class="max-md:min-w-max"
+            data-testid="workload-settings__cancel"
+            @click="onCancel"
+          />
+          <PrimeButton
+            outlined
+            type="button"
+            label="Save as Draft"
+            data-testid="workload-settings__save-draft"
+          />
+          <PrimeButton
+            type="button"
+            label="Save and Deploy"
+            data-testid="workload-settings__save-deploy"
+          />
+        </ActionBarBlock>
+      </Teleport>
     </template>
   </EditFormBlock>
 </template>
 
 <script setup>
-  import { inject } from 'vue'
+  import { inject, ref, onMounted } from 'vue'
   import { useRoute } from 'vue-router'
   import EditFormBlock from '@/templates/edit-form-block'
   import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
   import FormSkeleton from './components/FormSkeleton.vue'
-  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import ActionBarBlock from '@/templates/action-bar-block'
+  import PrimeButton from '@aziontech/webkit/button'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { buildValidationSchema } from './Config/validation'
@@ -46,6 +68,13 @@
   const tracker = inject('tracker')
 
   const route = useRoute()
+
+  // Teleport target (#action-bar) lives in the page shell (content-block); only
+  // teleport once it exists after mount, mirroring action-bar-with-teleport.
+  const isMounted = ref(false)
+  onMounted(() => {
+    isMounted.value = true
+  })
 
   defineProps({
     updatedRedirect: { type: String, required: true },

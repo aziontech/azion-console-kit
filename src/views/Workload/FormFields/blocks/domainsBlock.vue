@@ -5,7 +5,7 @@
   import CopyBlock from '@aziontech/webkit/button-copy'
   import PrimeButton from '@aziontech/webkit/button'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import MessageCard from '@/components/MessageCard'
   import CollapsibleCard from '@/components/CollapsibleCard'
   import DomainRow from '../components/DomainRow.vue'
   import DomainDrawer from '../components/DomainDrawer.vue'
@@ -362,14 +362,12 @@
           subtitle="Allow direct access to the default workload domain generated after workload creation (*.map.azionedge.net)."
           data-testid="domains-form__workload-allow-access-field"
         />
-        <InlineMessage
+        <MessageCard
           v-if="!hasSingleVersionEnv"
-          severity="info"
+          type="info"
+          description="This option is only available when at least one domain uses an environment with the Single Version policy (typically Production). Add or select such an environment to enable it."
           data-testid="domains-form__workload-allow-access-disabled-warning"
-        >
-          This option is only available when at least one domain uses an environment with the Single
-          Version policy (typically Production). Add or select such an environment to enable it.
-        </InlineMessage>
+        />
       </div>
 
       <DomainDrawer
