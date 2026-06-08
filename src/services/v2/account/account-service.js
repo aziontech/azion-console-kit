@@ -26,6 +26,7 @@ export class AccountService extends BaseService {
 
     return {
       ...response,
+      has_service_order_plan: response.has_service_order_plan === true,
       accountTypeIcon: getAccountTypeIcon(response.kind),
       accountTypeName: getAccountTypeName(response.kind)
     }

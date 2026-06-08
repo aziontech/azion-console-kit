@@ -18,7 +18,6 @@ export const useAccountStore = defineStore({
       signup_email: false
     },
     currentPlanSku: null,
-    hasActivePlan: false,
     accountStatuses: {
       BLOCKED: 'BLOCKED',
       DEFAULTING: 'DEFAULTING',
@@ -87,11 +86,14 @@ export const useAccountStore = defineStore({
     isFirstLogin(state) {
       return state.account?.first_login
     },
+    hasServiceOrderPlan(state) {
+      return state.account?.has_service_order_plan === true
+    },
     needsOnboarding(state) {
       return (
         state.account?.first_login === true &&
         state.account?.kind === 'client' &&
-        !state.hasActivePlan
+        state.account?.has_service_order_plan !== true
       )
     },
     accountUtcOffset(state) {
@@ -168,9 +170,6 @@ export const useAccountStore = defineStore({
     setCurrentPlan(sku) {
       this.currentPlanSku = sku ?? null
     },
-    setHasActivePlan(value) {
-      this.hasActivePlan = !!value
-    },
     resetAccount() {
       this.account = {}
       this.hasSession = false
@@ -184,7 +183,6 @@ export const useAccountStore = defineStore({
         signup_email: false
       }
       this.currentPlanSku = null
-      this.hasActivePlan = false
     },
     setSsoSignUpMethod(method) {
       this.identifySignUpProvider = method
