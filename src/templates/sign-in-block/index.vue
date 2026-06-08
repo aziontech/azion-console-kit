@@ -286,8 +286,12 @@
         return
       }
 
-      // Load user data and track before switchAccount (which cancels pending requests)
-      await trackSignInSafely({ tracker, method: 'email', email: values.email, loadUserData: true })
+      await trackSignInSafely({
+        tracker,
+        method: 'email',
+        email: values.email,
+        userTrackingInfo: userInfo
+      })
       await switchClientAccount(userInfo.props)
     } catch {
       const signupTypeFlags = accountStore.getSignupTypeFlags()
