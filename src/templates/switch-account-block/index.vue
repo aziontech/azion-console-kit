@@ -178,7 +178,7 @@
 
 <template>
   <div>
-    <Button
+    <PrimeButton
       v-if="visibleButton"
       class="font-semibold h-8 w-auto truncate max-w-[180px] border-header hidden md:flex gap-2 items-center bg-header hover:bg-header-button-hover"
       size="small"

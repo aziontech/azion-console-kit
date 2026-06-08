@@ -34,14 +34,13 @@
             <div
               class="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between border-x border-t surface-border rounded-t-md p-3"
             >
-              <Button
+              <PrimeButton
                 :label="labelRunQuery"
                 :loading="isExecutingQuery || isLoadingQuery"
                 kind="primary"
                 icon="pi pi-play"
                 size="small"
                 severity="primary"
-                :loading="isExecutingQuery || isLoadingQuery"
                 @click="runQuery"
                 v-tooltip="{
                   value: 'Run Query (⌘ ↵)',
@@ -52,7 +51,7 @@
               />
 
               <div class="flex gap-2">
-                <Button
+                <PrimeButton
                   label="Prettify"
                   icon="pi pi-align-left"
                   size="small"
@@ -60,7 +59,7 @@
                   severity="secondary"
                   @click="prettifyCode"
                 />
-                <Button
+                <PrimeButton
                   label="Templates"
                   icon="pi pi-bolt"
                   size="small"
@@ -421,7 +420,6 @@
   import { useRoute } from 'vue-router'
   import { FilterMatchMode } from '@aziontech/webkit/api'
 
-  import Button from '@aziontech/webkit/button'
   import PrimeButton from '@aziontech/webkit/button'
   import Menu from '@aziontech/webkit/menu'
   import SplitButton from '@aziontech/webkit/splitbutton'
