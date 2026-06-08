@@ -369,7 +369,7 @@
                     v-if="hasAllowedFilters"
                     kind="outlined"
                     icon="pi pi-filter"
-                    size="medium"
+                    size="small"
                     data-testid="data-table-actions-column-header-toggle-filter"
                     aria-label="data table actions column header toggle filter"
                     @click="toggleFilter"
@@ -388,7 +388,7 @@
                   <IconButton
                     kind="outlined"
                     icon="pi pi-refresh"
-                    size="medium"
+                    size="small"
                     v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                     data-testid="data-table-actions-column-header-refresh"
                     aria-label="data table actions column header refresh"
