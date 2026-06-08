@@ -81,14 +81,16 @@
       <div class="xl:flex-1 flex flex-col gap-4 min-w-0">
         <ResourcesSection :workload="workload" />
         <section
-          class="border surface-border rounded-md p-4 flex flex-col gap-4"
+          class="border surface-border rounded-md p-4 flex flex-col gap-4 min-w-0"
           data-testid="overview__environments"
         >
           <h3 class="text-sm font-medium m-0">Environments</h3>
-          <GroupedList
-            :groups="environmentGroups"
-            dataTestid="overview__environments-list"
-          />
+          <div class="min-w-0 overflow-hidden">
+            <GroupedList
+              :groups="environmentGroups"
+              dataTestid="overview__environments-list"
+            />
+          </div>
         </section>
       </div>
     </div>
