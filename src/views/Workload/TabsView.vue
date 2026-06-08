@@ -7,7 +7,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
-  import { DataTableActionsButtons } from '@/components/list-table'
+  // import { DataTableActionsButtons } from '@/components/list-table'
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import EditView from './EditView.vue'
   import OverviewTab from './Tabs/OverviewTab.vue'
@@ -132,12 +132,12 @@
         description="Configure domains, protocols, certificates, and select the security and application settings executed by this Workload."
       >
         <template #default>
-          <DataTableActionsButtons
+          <!-- <DataTableActionsButtons
             size="small"
             label="Deploy"
             data-testid="workload-tabs__deploy-button"
             @click="createDrawerVisible = true"
-          />
+          /> -->
         </template>
       </PageHeadingBlock>
     </template>
@@ -167,13 +167,14 @@
           header="Deployment"
           :pt="{ root: { 'data-testid': 'workload-tabs__tab__deployment' } }"
         >
-          <DeploymentsListSection
-            v-if="activeTab === TAB_TO_INDEX['deployment']"
-            :key="deploymentsRefreshKey"
-            :workloadId="workloadId"
-            :workloadDeploymentId="workload?.workloadDeploymentId"
-            class="mt-4"
-          />
+          <div class="mt-4">
+            <DeploymentsListSection
+              v-if="activeTab === TAB_TO_INDEX['deployment']"
+              :key="deploymentsRefreshKey"
+              :workloadId="workloadId"
+              :workloadDeploymentId="workload?.workloadDeploymentId"
+            />
+          </div>
         </TabPanel>
         <TabPanel
           header="Settings"
