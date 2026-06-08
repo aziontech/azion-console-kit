@@ -206,14 +206,18 @@
                   <template #footer>
                     <ul class="p-2">
                       <li>
-                        <Button
-                          kind="text"
+                        <PrimeButton
                           @click="openCreateDeviceGroupDrawer"
+                          class="w-full whitespace-nowrap flex"
                           data-testid="domains-form__create-edge-firewall-button"
+                          text
                           size="small"
                           icon="pi pi-plus-circle"
+                          :pt="{
+                            label: { class: 'w-full text-left' },
+                            root: { class: 'p-2' }
+                          }"
                           label="Create Device Group"
-                          class="w-full whitespace-nowrap flex"
                         />
                       </li>
                     </ul>

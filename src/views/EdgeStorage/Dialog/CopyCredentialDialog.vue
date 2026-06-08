@@ -74,10 +74,10 @@
     </div>
 
     <div class="flex justify-content-end gap-2 mt-4">
-      <Button
-        kind="secondary"
+      <PrimeButton
         label="Confirm"
         size="small"
+        severity="secondary"
         @click="closeDialog"
         data-testid="copy-credential-dialog__dialog-footer__confirm-button"
       />

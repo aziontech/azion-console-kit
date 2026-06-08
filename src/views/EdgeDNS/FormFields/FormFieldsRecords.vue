@@ -171,13 +171,12 @@
             data-testid="edge-dns-records-form__settings__record-type-field"
           >
             <template #description>
-              <Button
-                kind="text"
-                size="medium"
+              <PrimeButton
                 label="Read more about Record Types"
+                link
+                class="text-xs p-0 leading-5 text-start"
                 @click="documentationGuideProducts.edgeDnsRecordTypes"
                 data-testid="edge-dns-records-form__settings__record-type-field__read-more-btn"
-                class="text-xs p-0 leading-5 text-start"
               />
             </template>
           </FieldDropdown>

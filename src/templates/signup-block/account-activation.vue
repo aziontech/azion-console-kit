@@ -11,13 +11,13 @@
     </section>
     <section class="w-full flex flex-wrap gap-2 items-center">
       <p class="text-start text-sm">Didn't receive the email?</p>
-      <Button
-        kind="text"
+      <PrimeButton
         size="small"
         label="Resend Email"
+        class="p-0"
+        link
         @click="resendEmail"
         :disabled="isSubmitDisabled"
-        class="p-0"
       />
       <PrimeBadge
         class="rounded-md animate-fadeIn"
@@ -25,11 +25,10 @@
         v-if="showCounter"
       />
     </section>
-    <Button
-      kind="secondary"
-      size="medium"
+    <PrimeButton
       label="Return to Sign In"
       @click="goToLogin"
+      severity="secondary"
     />
   </div>
 </template>

@@ -89,12 +89,12 @@
             <template v-else>
               <div class="text-sm">
                 <span>No results found.</span>
-                <Button
-                  kind="text"
+                <PrimeButton
                   label="Go to full integrations list."
+                  link
+                  class="ml-3 p-0"
                   size="small"
                   @click="resetFilters"
-                  class="ml-3 p-0"
                 />
               </div>
               <LoadingEmptySearch />

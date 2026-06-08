@@ -153,10 +153,10 @@
       }"
     >
       <template #emptyBlockButton>
-        <Button
-          kind="secondary"
+        <PrimeButton
           icon="pi pi-plus"
           label="Credential"
+          severity="secondary"
           size="small"
           @click="handleCreateCredential"
           data-testid="create_credential_button_empty"

@@ -38,14 +38,12 @@
     >
       <template #inputs>
         <div>
-          <Button
-            kind="primary"
-            size="medium"
+          <PrimeButton
             data-testid="account-settings__delete-account"
             label="Delete database"
+            severity="danger"
             icon="pi pi-trash"
             @click="openDeleteDialog"
-            class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
           />
         </div>
       </template>

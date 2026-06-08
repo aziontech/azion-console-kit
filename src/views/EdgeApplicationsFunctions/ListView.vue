@@ -182,11 +182,10 @@
     @on-before-go-to-edit="handleBeforeGoToEdit"
   >
     <template #emptyBlockButton>
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
         icon="pi pi-plus"
         data-testid="functions-instance__create-button"
+        severity="secondary"
         label="Function Instance"
         @click="openCreateFunctionDrawer"
       />

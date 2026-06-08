@@ -34,20 +34,20 @@
 
             <p class="text-sm font-normal text-center text-color-secondary">
               By signing up, you agree to the
-              <Button
-                kind="text"
+              <PrimeButton
                 label="Terms of Service"
-                size="medium"
-                @click="azionTermsAndServicesWindowOpener"
+                link
                 class="p-0"
+                size="small"
+                @click="azionTermsAndServicesWindowOpener"
               />
               and
-              <Button
-                kind="text"
+              <PrimeButton
                 label="Privacy Policy."
-                size="medium"
-                @click="azionPrivacyPolicyWindowOpener"
+                link
                 class="p-0"
+                size="small"
+                @click="azionPrivacyPolicyWindowOpener"
               />
             </p>
           </form>
@@ -55,12 +55,12 @@
       </div>
       <div class="flex flex-wrap justify-center items-center gap-1 mt-8">
         <p class="text-sm font-normal">Already have an account?</p>
-        <Button
-          kind="text"
+        <PrimeButton
           label="Sign In"
+          link
+          class="p-0"
           size="small"
           @click="goToLogin"
-          class="p-0"
         />
       </div>
     </div>

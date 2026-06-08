@@ -446,10 +446,9 @@
       </div>
       <div class="flex sm:max-w-lg">
         <div>
-          <Button
-            kind="outlined"
-            size="medium"
+          <PrimeButton
             label="Multi-Factor Authentication Management"
+            outlined
             @click="navigateToMfaManagement"
           />
         </div>
@@ -489,15 +488,15 @@
                 <p class="text-color font-medium">{{ integration.label }}</p>
                 <small class="text-color-secondary">Integration active</small>
               </div>
-              <Button
-                kind="primary"
+              <PrimeButton
                 label="Remove"
+                severity="danger"
+                outlined
                 icon="pi pi-trash"
                 size="small"
                 :loading="isGithubConnectLoading"
                 @click="removeGithubIntegration(integration.value)"
                 data-testid="account-settings__remove-github-integration"
-                class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
               />
             </div>
           </div>
@@ -522,11 +521,10 @@
           </small>
         </div>
         <div>
-          <Button
-            kind="danger"
-            size="medium"
+          <PrimeButton
             data-testid="account-settings__delete-account"
             label="Delete account"
+            severity="danger"
             @click="openDeleteDialog"
           />
         </div>

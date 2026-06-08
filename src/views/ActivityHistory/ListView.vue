@@ -35,10 +35,9 @@
         :documentationService="documentationService"
       >
         <template #emptyBlockButton>
-          <Button
-            kind="secondary"
-            size="medium"
+          <PrimeButton
             label="Go to Home"
+            severity="secondary"
             @click="goToHome"
           />
         </template>

@@ -1,7 +1,6 @@
 <script setup>
-  import { ref, computed, onMounted } from 'vue'
-  import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import { ref, computed, defineModel, onMounted } from 'vue'
+  import PrimeButton from '@aziontech/webkit/button'
   import Calendar from '@aziontech/webkit/calendar'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InputText from '@aziontech/webkit/inputtext'
@@ -492,12 +491,11 @@
     <template v-if="mode === 'absolute'">
       <div class="flex justify-center">
         <div class="flex items-center gap-3">
-          <IconButton
-            kind="outlined"
+          <PrimeButton
             icon="pi pi-chevron-left"
             size="small"
+            outlined
             @click="previousMonth"
-            aria-label="button"
           />
           <div class="flex items-center gap-2">
             <Dropdown
@@ -515,12 +513,11 @@
               @change="onYearChange"
             />
           </div>
-          <IconButton
-            kind="outlined"
+          <PrimeButton
             icon="pi pi-chevron-right"
             size="small"
+            outlined
             @click="nextMonth"
-            aria-label="button"
           />
         </div>
       </div>
@@ -554,15 +551,18 @@
         <!-- Time selector -->
         <div class="border surface-border rounded-lg p-1 w-min">
           <div class="max-h-48 overflow-y-auto overflow-x-hidden space-y-1">
-            <Button
-              kind="secondary"
+            <PrimeButton
               :label="timeSlot"
               v-for="timeSlot in TIME_SLOTS"
               :key="timeSlot"
+              class="m-1"
+              severity="secondary"
               size="small"
               :outlined="selectedTime !== timeSlot"
               @click="selectTime(timeSlot)"
-              class="m-1"
+              :pt="{
+                label: { class: 'text-xs font-normal' }
+              }"
             />
           </div>
         </div>
@@ -609,13 +609,13 @@
             :readonly="mode !== 'absolute'"
             @keydown.enter="updateRange"
           />
-          <Button
-            kind="outlined"
+          <PrimeButton
             label="Apply"
             @click="updateRange"
+            outlined
             :disabled="mode !== 'absolute'"
-            size="small"
             class="whitespace-nowrap w-20"
+            size="small"
           />
         </div>
       </div>

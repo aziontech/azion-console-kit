@@ -55,14 +55,12 @@
     </template>
 
     <template #actions>
-      <Button
-        size="medium"
+      <PrimeButton
         :label="props.buttons.backToHome"
         @click="handleGoBackHome"
       />
-      <Button
-        kind="outlined"
-        size="medium"
+      <PrimeButton
+        outlined
         :label="props.buttons.documentation"
         @click="props.documentationService"
       />

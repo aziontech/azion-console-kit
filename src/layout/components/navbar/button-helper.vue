@@ -1,18 +1,23 @@
 <template>
-  <IconButton
+  <PrimeButton
     @click="toggleSidebarComponent('helper')"
+    class="text-white border-header bg-header hover:bg-header-button-hover"
+    :pt="{
+      root: { class: 'max-md:w-[2rem] max-md:h-[2rem] justify-content-center' },
+      label: { class: 'max-md:hidden' },
+      icon: { class: 'max-md:m-0 text-white' }
+    }"
     :class="buttonClasses"
     icon="pi pi-question-circle"
     size="small"
     aria-label="Open help center"
     v-tooltip.bottom="{ value: 'Help', showDelay: 200 }"
-    class="text-white border-header bg-header hover:bg-header-button-hover"
   />
 </template>
 
 <script setup>
   import { computed } from 'vue'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useLayout } from '@/composables/use-layout'
 
   defineOptions({ name: 'ButtonHelper' })

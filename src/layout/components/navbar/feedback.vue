@@ -1,5 +1,10 @@
 <template>
-  <Button
+  <PrimeButton
+    :pt="{
+      root: { class: 'max-md:w-[2rem] h-[2rem] justify-content-center' },
+      label: { class: 'max-md:hidden' },
+      icon: { class: `max-md:m-0 ${props.styleTextColor}` }
+    }"
     icon="pi pi-flag"
     size="small"
     label="Feedback"
@@ -75,24 +80,24 @@
           </span>
         </div>
         <div class="flex gap-2 w-full sm:w-auto">
-          <Button
-            kind="outlined"
+          <PrimeButton
             type="button"
             label="Cancel"
+            outlined
             size="small"
+            class="w-20"
             @click="visible = false"
             data-testid="feedback-dialog__dialog-footer__cancel-button"
-            class="w-20"
           />
-          <Button
-            kind="secondary"
+          <PrimeButton
             type="button"
+            severity="secondary"
             label="Send feedback"
+            class="sm:w-36"
             size="small"
             :loading="loading"
             @click="sendFeedback()"
             data-testid="feedback-dialog__dialog-footer__confirm-button"
-            class="sm:w-36"
           />
         </div>
       </div>

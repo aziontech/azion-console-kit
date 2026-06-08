@@ -1,11 +1,16 @@
 <template>
-  <IconButton
+  <PrimeButton
     @click="sidebarToggle"
     @keydown="handleButtonKeyDown"
     v-if="isAccountTypeClient"
     size="small"
+    class="text-white flex-none border-header w-8 h-8"
     icon="pi pi-bars"
     aria-label="Toggle navigation menu"
+    :pt="{
+      label: { class: 'text-white hover:bg-header-button-hover' },
+      icon: { class: 'text-white' }
+    }"
     :class="{
       'bg-header-button-enabled': showSidebar,
       'bg-header hover:bg-header-button-hover': !showSidebar
@@ -13,7 +18,6 @@
     v-tooltip.bottom="{ value: 'Menu', showDelay: 200 }"
     data-testid="sidebar-block__toggle-button"
     ref="menuButton"
-    class="text-white flex-none border-header w-8 h-8"
   />
 
   <Sidebar
@@ -50,7 +54,7 @@
         >
           <span v-bind="props.icon" />
           <span v-bind="props.label">{{ label }}</span>
-          <Tag
+          <PrimeTag
             v-if="item.tag"
             :severity="item.tag === 'New' ? 'primary' : 'info'"
             :value="item.tag"
@@ -65,9 +69,9 @@
 <script setup>
   import { ref, computed, nextTick } from 'vue'
   import { useRouter } from 'vue-router'
-  import Tag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import { useAccountStore } from '@/stores/account'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import PrimeMenu from '@aziontech/webkit/menu'
   import Sidebar from '@aziontech/webkit/sidebar'
   import { listSidebarMenusService } from '@services/sidebar-menus-services'

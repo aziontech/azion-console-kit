@@ -15,15 +15,13 @@
     </div>
 
     <template #footer>
-      <Button
-        kind="outlined"
-        size="medium"
+      <PrimeButton
+        outlined
         @click="closeCallback"
         label="Remind Later"
       />
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
+        severity="secondary"
         @click="openOnboarding"
         icon="pi pi-calendar-plus"
         label="Schedule Now"

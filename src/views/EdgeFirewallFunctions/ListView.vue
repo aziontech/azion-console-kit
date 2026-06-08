@@ -183,14 +183,13 @@
     }"
   >
     <template #emptyBlockButton>
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        severity="secondary"
         icon="pi pi-plus"
         label="Function Instance"
         data-testid="create_Function Instance_button"
         @click="openCreateFunctionDrawer"
-        class="max-md:w-full w-fit"
       />
     </template>
   </ListTable>

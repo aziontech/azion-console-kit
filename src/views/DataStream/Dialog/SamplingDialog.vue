@@ -29,15 +29,13 @@
     </div>
 
     <template #footer>
-      <Button
-        kind="outlined"
-        size="medium"
+      <PrimeButton
+        outlined
         label="Cancel"
         @click="emit('cancel')"
       />
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
+        severity="secondary"
         label="Confirm"
         @click="emit('confirm')"
       />

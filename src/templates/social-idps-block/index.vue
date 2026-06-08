@@ -16,13 +16,12 @@
         v-for="idp in idps"
         :key="idp.slug"
       >
-        <Button
-          kind="outlined"
-          size="large"
+        <PrimeButton
           v-if="idp.isActive"
           :label="formatName(idp.name)"
           :icon="getIcon(idp.slug)"
           @click="authenticate(idp)"
+          outlined
           :loading="submittedIdp === idp.uuid"
           :disabled="submittedIdp"
         />

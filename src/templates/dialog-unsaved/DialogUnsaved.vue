@@ -30,16 +30,17 @@
       leave?
     </div>
     <template #footer>
-      <Button
-        kind="outlined"
-        size="medium"
+      <PrimeButton
+        severity="primary"
+        size="small"
         label="Leave page"
         data-testid="dialog-unsaved__leave-page"
+        outlined
         @click="emit('leave')"
       />
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
+        severity="secondary"
+        size="small"
         label="Keep editing"
         @click="emit('stay')"
       />

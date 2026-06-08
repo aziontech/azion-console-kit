@@ -360,21 +360,21 @@
                   class="flex flex-col items-center justify-center h-full gap-2"
                 >
                   <p>Configure the form builder.</p>
-                  <Button
-                    kind="outlined"
+                  <PrimeButton
+                    outlined
                     @click="azionJsonFormWindowOpener()"
                     label="Read documentation"
                     size="small"
                   />
                 </div>
                 <div class="absolute right-2.5 bottom-2 surface-section">
-                  <Button
-                    kind="primary"
+                  <PrimeButton
                     size="small"
                     label="Remove Form"
                     icon="pi pi-times"
+                    outlined
+                    severity="danger"
                     @click="resetFormBuilder"
-                    class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
                   />
                 </div>
               </div>

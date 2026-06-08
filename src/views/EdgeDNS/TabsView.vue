@@ -479,14 +479,13 @@
               @on-before-go-to-edit="handleBeforeGoToEdit"
             >
               <template #emptyBlockButton>
-                <Button
-                  kind="secondary"
-                  size="medium"
+                <PrimeButton
+                  class="max-md:w-full w-fit"
+                  severity="secondary"
                   icon="pi pi-plus"
                   label="Record"
                   @click="openCreateDrawerEDNSResource"
                   data-testid="create_Record_button"
-                  class="max-md:w-full w-fit"
                 />
               </template>
             </ListTable>

@@ -137,14 +137,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
                   @click="openDrawer('trusted_ca_certificate')"
+                  class="w-full whitespace-nowrap flex"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
                   data-testid="domains-form__create-digital-certificate-trusted-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Digital Trusted CA certificate"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -171,14 +175,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
                   @click="openDrawer('certificateRevogationList')"
+                  class="w-full whitespace-nowrap flex"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
                   data-testid="domains-form__create-digital-certificate-crl-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Digital CRL certificate"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>

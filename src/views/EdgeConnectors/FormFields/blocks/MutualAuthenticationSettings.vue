@@ -44,14 +44,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
+                  class="w-full whitespace-nowrap flex"
                   data-testid="edge-connectors-form__mutual-authentication-settings__create-trusted-ca-certificate-button"
+                  text
                   @click="openDrawer('trusted_ca_certificate')"
                   size="small"
                   icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Import a Trusted Certificate"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -76,14 +80,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
+                  class="w-full whitespace-nowrap flex"
                   data-testid="edge-connectors-form__mutual-authentication-settings__create-trusted-ca-certificate-button"
+                  text
                   @click="openDrawer('certificateRevogationList')"
                   size="small"
                   icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Import a CRL"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>

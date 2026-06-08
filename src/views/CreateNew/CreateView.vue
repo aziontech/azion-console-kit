@@ -173,13 +173,18 @@
           <div class="flex gap-3 items-center">
             <div class="flex gap-1 items-center">
               <span class="text-xs font-medium text-color-primary">By</span>
-              <Button
-                kind="text"
+              <PrimeButton
+                link
                 @click="goToVendorPage"
+                :pt="{
+                  label: { class: 'text-xs' },
+                  icon: { class: 'text-xs' }
+                }"
+                class="px-0 py-1"
                 :label="solution.vendor.name"
                 icon="pi pi-external-link"
+                iconPos="right"
                 size="small"
-                class="px-0 py-1"
               />
             </div>
             <div class="flex gap-1 items-center">
@@ -194,9 +199,9 @@
             </div>
           </div>
         </div>
-        <Button
-          kind="text"
+        <PrimeButton
           label="View more details"
+          severity="link"
           size="small"
           @click="openDetails"
         />
@@ -253,13 +258,17 @@
             <div class="flex gap-3">
               <div class="flex items-center gap-1">
                 <span class="text-xs font-medium text-color-primary">By</span>
-                <Button
-                  kind="text"
-                  size="medium"
+                <PrimeButton
+                  link
+                  :pt="{
+                    label: { class: 'text-xs' },
+                    icon: { class: 'text-xs' }
+                  }"
                   @click="goToVendorPage"
+                  class="px-0 py-1"
                   :label="solution.vendor.name"
                   icon="pi pi-external-link"
-                  class="px-0 py-1"
+                  iconPos="right"
                 />
               </div>
               <div class="flex items-center gap-1">

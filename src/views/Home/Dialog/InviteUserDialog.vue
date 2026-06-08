@@ -186,16 +186,15 @@
     </form>
 
     <template #footer>
-      <Button
-        kind="primary"
-        size="medium"
+      <PrimeButton
+        severity="primary"
         label="Cancel"
+        outlined
         @click="closeDialog"
         data-testid="invite-user-dialog__cancel-button"
       />
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
+        severity="secondary"
         label="Send Invite"
         :loading="loading"
         :disabled="!meta.valid"

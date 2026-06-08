@@ -223,12 +223,11 @@
                   v-model="searchValue"
                 />
               </span>
-              <Button
-                kind="secondary"
-                size="medium"
+              <PrimeButton
                 icon="pi pi-plus"
                 label="Custom Page Code"
                 data-testid="status-code__add-button"
+                severity="secondary"
                 @click="openCreateStatusCodeDrawer"
                 :disabled="disabledButtonAdd"
                 class="w-full sm:w-auto"

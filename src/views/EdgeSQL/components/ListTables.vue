@@ -7,25 +7,23 @@
       <h3 class="text-lg font-medium text-color-primary">Tables</h3>
 
       <div class="flex gap-2">
-        <IconButton
-          kind="outlined"
+        <PrimeButton
           icon="pi pi-refresh"
           size="small"
+          outlined
           @click="$emit('reload-tables')"
           data-testid="reload-table-button"
-          v-tooltip.top="{ value: 'Reload Tables' }"
           class="w-8 h-8 p-0 flex items-center justify-center"
-          aria-label="reload table button"
+          v-tooltip.top="{ value: 'Reload Tables' }"
         />
-        <IconButton
-          kind="outlined"
+        <PrimeButton
           icon="pi pi-plus"
           size="small"
+          outlined
           @click="$emit('create-table')"
           data-testid="create-table-button"
-          v-tooltip.top="{ value: 'Create Table' }"
           class="w-8 h-8 p-0 flex items-center justify-center"
-          aria-label="create table button"
+          v-tooltip.top="{ value: 'Create Table' }"
         />
       </div>
     </div>
@@ -34,38 +32,35 @@
       v-else
     >
       <div class="flex gap-2 items-center">
-        <IconButton
-          kind="outlined"
+        <PrimeButton
           icon="pi pi-times"
           size="small"
+          outlined
           v-tooltip.top="{ value: 'Cancel' }"
           @click="closeCheckbox"
           data-testid="cancel-table-button"
           class="w-8 h-8 p-0 flex items-center justify-center"
-          aria-label="cancel table button"
         />
         <span class="text-color-secondary">{{ selectedTables.length }} itens selected</span>
       </div>
       <div class="flex gap-2">
-        <IconButton
-          kind="outlined"
+        <PrimeButton
           icon="ai ai-scizors"
           size="small"
+          outlined
           v-tooltip.top="{ value: 'Truncate' }"
           @click="$emit('open-confirm-truncate')"
           data-testid="truncate-table-button"
           class="w-8 h-8 p-0 flex items-center justify-center"
-          aria-label="truncate table button"
         />
-        <IconButton
-          kind="primary"
+        <PrimeButton
           icon="pi pi-trash"
           size="small"
           v-tooltip.top="{ value: 'Delete' }"
           @click="$emit('open-confirm-delete')"
+          severity="danger"
           data-testid="delete-table-button"
-          class="w-8 h-8 p-0 flex items-center justify-center !bg-[var(--danger)] !text-[var(--danger-contrast)]"
-          aria-label="delete table button"
+          class="w-8 h-8 p-0 flex items-center justify-center"
         />
       </div>
     </div>
@@ -132,14 +127,13 @@
               <span class="text-sm font-medium text-color-primary truncate">{{ table.name }}</span>
             </div>
 
-            <IconButton
-              kind="outlined"
+            <PrimeButton
               icon="pi pi-ellipsis-h"
               size="small"
+              outlined
               @click.stop="$emit('show-table-menu', $event, table)"
               data-testid="table-menu-button"
               class="opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              aria-label="table menu button"
             />
           </div>
         </div>
@@ -152,7 +146,7 @@
   import { ref, computed, watch } from 'vue'
   import InputText from '@aziontech/webkit/inputtext'
   import Skeleton from '@aziontech/webkit/skeleton'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Checkbox from '@aziontech/webkit/checkbox'
 
   const emit = defineEmits([

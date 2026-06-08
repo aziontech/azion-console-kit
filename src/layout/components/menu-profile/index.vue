@@ -160,14 +160,22 @@
           </Dropdown>
         </div>
         <Divider class="surface-border p-1 m-0 mb-2" />
-        <Button
-          kind="text"
+        <PrimeButton
           data-testid="profile-block__sidebar__logout-btn"
+          class="w-full rounded-md flex content-start text-left"
+          :pt="{
+            label: {
+              class: 'font-normal'
+            },
+            root: {
+              class: 'rounded-md hover:surface-200'
+            }
+          }"
           label="Logout"
           size="small"
           icon="pi pi-sign-out"
+          text
           @click="logout"
-          class="w-full rounded-md flex content-start text-left"
         />
       </template>
     </PrimeMenu>
@@ -312,14 +320,22 @@
 
       <Divider class="-ml-2 w-[calc(100%+1rem)] mb-3 mt-2" />
 
-      <Button
-        kind="text"
+      <PrimeButton
         data-testid="profile-block__mobile-menu__logout-btn"
+        class="w-full rounded-md flex content-start text-left"
+        :pt="{
+          label: {
+            class: 'font-normal'
+          },
+          root: {
+            class: 'rounded-md hover:surface-200'
+          }
+        }"
         label="Logout"
         size="small"
         icon="pi pi-sign-out"
+        text
         @click="logout"
-        class="w-full rounded-md flex content-start text-left"
       />
     </template>
   </PrimeMenu>

@@ -6,13 +6,14 @@
     v-if="show"
   >
     Create a Let's Encrypt™ digital certificate directly from
-    <Button
-      kind="text"
-      :label="handleTextDomainWorkload.pluralTitle"
+    <PrimeButton
+      link
       size="small"
-      @click="navigateToDomains"
       class="p-0"
-    />
+      @click="navigateToDomains"
+    >
+      {{ handleTextDomainWorkload.pluralTitle }}
+    </PrimeButton>
   </InlineMessage>
 </template>
 

@@ -308,16 +308,19 @@
           v-for="(menuitem, index) in filteredTabs"
           :key="index"
         >
-          <Button
-            kind="text"
+          <PrimeButton
             :class="{
               'surface-200': menuitem.value === selectedTab
             }"
+            class="w-full whitespace-nowrap h-[38px] flex"
+            text
             size="small"
+            :pt="{
+              label: { class: 'w-full text-left' }
+            }"
             @click="onTabChange(menuitem)"
             :label="menuitem.label"
             data-testid="integrations-list-menu-item"
-            class="w-full whitespace-nowrap h-[38px] flex"
           />
         </li>
       </ul>
@@ -367,13 +370,13 @@
           <template v-else>
             <div class="text-sm">
               <span>{{ resultsText }}</span>
-              <Button
-                kind="text"
+              <PrimeButton
                 label="Back to the list."
+                link
+                class="ml-3 p-0"
                 size="small"
                 @click="resetFilters"
                 data-testid="integrations-list-content-search-results-see-all"
-                class="ml-3 p-0"
               />
             </div>
           </template>
@@ -385,13 +388,13 @@
         data-testid="integrations-list-content-recommended"
       >
         <template v-if="filteredTemplates.length > 0">
-          <button
+          <PrimeButton
             v-for="template in filteredTemplates"
             :key="template.id"
-            type="button"
-            class="p-6 surface-card text-left border-solid border surface-border hover:border-primary transition-all rounded-[var(--shape-button)]"
-            data-testid="integrations-list-content-recommended-item"
             @click="redirectToSolution(template, 'recommended')"
+            class="p-6 surface-card text-left border-solid border surface-border hover:border-primary transition-all"
+            link
+            data-testid="integrations-list-content-recommended-item"
           >
             <div class="flex flex-col h-full justify-between gap-3.5 items-start">
               <div class="flex gap-3.5 flex-col">
@@ -418,7 +421,7 @@
                 </div>
               </div>
             </div>
-          </button>
+          </PrimeButton>
         </template>
         <div
           v-else-if="isEmptyDueToNoData"
@@ -436,13 +439,13 @@
         data-testid="integrations-list-content-templates"
       >
         <template v-if="filteredTemplates.length > 0">
-          <button
+          <PrimeButton
             v-for="template in filteredTemplates"
             :key="template.id"
-            type="button"
-            class="p-6 surface-card text-left border-solid border surface-border hover:border-primary transition-all rounded-[var(--shape-button)]"
-            data-testid="integrations-list-content-templates-item"
             @click="redirectToSolution(template, 'templates')"
+            class="p-6 surface-card text-left border-solid border surface-border hover:border-primary transition-all"
+            link
+            data-testid="integrations-list-content-templates-item"
           >
             <div class="flex flex-col h-full justify-between gap-3.5 items-start">
               <div class="flex gap-3.5 flex-col">
@@ -469,7 +472,7 @@
                 </div>
               </div>
             </div>
-          </button>
+          </PrimeButton>
         </template>
         <div
           v-else-if="isEmptyDueToNoData"
@@ -487,13 +490,13 @@
         data-testid="integrations-list-content-new-resources"
       >
         <template v-if="filteredTemplates.length > 0">
-          <button
+          <PrimeButton
             v-for="resource in filteredTemplates"
             :key="resource.to"
-            type="button"
-            class="p-6 surface-card text-left border-solid border surface-border hover:border-primary transition-all rounded-[var(--shape-button)]"
-            data-testid="integrations-list-content-new-resources-item"
             @click="redirect(resource.to, resource.label)"
+            class="p-6 surface-card text-left border-solid border surface-border hover:border-primary transition-all"
+            link
+            data-testid="integrations-list-content-new-resources-item"
           >
             <div class="flex flex-col h-full justify-between gap-3.5 items-start">
               <div class="flex gap-3.5 flex-col">
@@ -509,7 +512,7 @@
                 </div>
               </div>
             </div>
-          </button>
+          </PrimeButton>
         </template>
         <div
           v-else-if="isEmptyDueToNoData"
@@ -527,13 +530,13 @@
         data-testid="integrations-list-content-github-import"
       >
         <template v-if="filteredTemplates.length > 0">
-          <button
+          <PrimeButton
             v-for="(template, index) in filteredTemplates"
             :key="index"
-            type="button"
-            class="p-6 surface-card text-left border-solid border surface-border hover:border-primary transition-all rounded-[var(--shape-button)]"
-            data-testid="integrations-list-content-github-import-item"
             @click="redirectGithubImport(template, 'githubImport')"
+            class="p-6 surface-card text-left border-solid border surface-border hover:border-primary transition-all"
+            link
+            data-testid="integrations-list-content-github-import-item"
           >
             <div class="flex flex-col h-full justify-between gap-3.5 items-start">
               <div class="flex gap-3.5 flex-col">
@@ -554,7 +557,7 @@
                 </div>
               </div>
             </div>
-          </button>
+          </PrimeButton>
         </template>
         <div
           v-else-if="isEmptyDueToNoData"

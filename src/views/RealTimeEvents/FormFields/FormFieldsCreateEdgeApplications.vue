@@ -8,7 +8,7 @@
   import InputSwitch from '@aziontech/webkit/inputswitch'
   import InputText from '@aziontech/webkit/inputtext'
   import RadioButton from '@aziontech/webkit/radiobutton'
-  import Tag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import { useField } from 'vee-validate'
   import { computed } from 'vue'
 
@@ -612,7 +612,7 @@
             </template>
             <template #subtitle>Customize advanced cache settings.</template>
             <template #footer>
-              <Tag
+              <PrimeTag
                 value="Automatically enabled in all accounts."
                 icon="pi pi-lock"
                 severity="info"
@@ -752,13 +752,12 @@
             >
           </Card>
         </div>
-        <Button
-          kind="outlined"
-          size="medium"
+        <PrimeButton
+          outlined
           icon="pi pi-shopping-cart"
+          class="max-w-[170px] whitespace-nowrap"
           label="Contact sales"
           @click="props.contactSalesEdgeApplicationService()"
-          class="max-w-[170px] whitespace-nowrap"
         />
       </div>
     </template>

@@ -32,14 +32,13 @@
             {{ errors.confirmPassword }}
           </InlineMessage>
         </div>
-        <Button
-          kind="secondary"
-          size="medium"
+        <PrimeButton
+          class="w-full flex-row-reverse"
           :loading="isButtonLoading"
           label="Reset Password"
+          severity="secondary"
+          type="submit"
           :disabled="!meta.valid"
-          class="w-full flex-row-reverse"
-          @click="resetPassword"
         />
       </div>
 
@@ -58,14 +57,13 @@
             </p>
           </div>
 
-          <Button
-            kind="secondary"
-            size="medium"
+          <PrimeButton
+            class="w-full flex-row-reverse"
             :loading="isButtonLoading"
             label="Sign In"
             @click="goToSignIn()"
+            severity="secondary"
             type="button"
-            class="w-full flex-row-reverse"
           />
         </div>
       </div>

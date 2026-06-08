@@ -46,16 +46,16 @@
       </div>
 
       <div class="flex justify-end gap-2 mt-2">
-        <Button
-          kind="outlined"
+        <PrimeButton
           label="Cancel"
+          outlined
           size="small"
           @click="emit('update:visible', false)"
         />
-        <Button
-          kind="secondary"
+        <PrimeButton
           label="Confirm"
           size="small"
+          severity="secondary"
           @click="alterColumn"
         />
       </div>

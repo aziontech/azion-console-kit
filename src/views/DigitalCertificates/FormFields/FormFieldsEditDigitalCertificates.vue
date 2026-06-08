@@ -61,13 +61,13 @@
         <div class="flex flex-wrap items-center">
           <p>
             If you have not yet pointed a DNS zone, please check the
-            <Button
-              kind="text"
-              size="medium"
+            <PrimeButton
+              link
+              class="w-fit p-0 text-sm"
+              icon-pos="right"
               icon="pi pi-external-link"
               label="Documentation"
               @click="openDocumentation"
-              class="w-fit p-0 text-sm"
             />
           </p>
         </div>

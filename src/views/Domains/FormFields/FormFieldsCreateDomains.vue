@@ -242,14 +242,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
                   @click="openDrawer"
+                  class="w-full whitespace-nowrap flex"
                   data-testid="domains-form__create-edge-application-button"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Application"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -276,14 +280,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
                   @click="openDrawerEdgeFirewall"
+                  class="w-full whitespace-nowrap flex"
                   data-testid="domains-form__create-edge-firewall-button"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Firewall"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -333,14 +341,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
                   @click="openDigitalCertificateDrawer('certificate')"
+                  class="w-full whitespace-nowrap flex"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
                   data-testid="domains-form__create-digital-certificate-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Digital Certificate"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -395,14 +407,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
                   @click="openDigitalCertificateDrawer('trusted_ca_certificate')"
+                  class="w-full whitespace-nowrap flex"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
                   data-testid="domains-form__create-digital-certificate-trusted-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Digital Trusted CA certificate"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>

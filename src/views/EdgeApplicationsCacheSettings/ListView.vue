@@ -161,10 +161,9 @@
     @on-before-go-to-edit="handleBeforeGoToEdit"
   >
     <template #emptyBlockButton>
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
         icon="pi pi-plus"
+        severity="secondary"
         label="Cache Setting"
         @click="openCreateDrawer"
         data-testid="edge-application-cache-settings-list__create-cache-settings__button"

@@ -2,9 +2,8 @@
   import { computed, ref, inject, onMounted } from 'vue'
   import { useDialog } from '@aziontech/webkit/use-dialog'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
-  import Tag from '@aziontech/webkit/tag'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import InputNumber from '@aziontech/webkit/inputnumber'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { storeToRefs } from 'pinia'
@@ -543,14 +542,13 @@
                   @search="reload"
                 />
                 <div class="flex gap-2">
-                  <IconButton
-                    kind="outlined"
+                  <PrimeButton
+                    outlined
                     icon="pi pi-refresh"
                     size="small"
                     @click="reload({ page: 1, skipCache: true })"
                     v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                     data-testid="data-table-actions-column-header-refresh"
-                    aria-label="data table actions column header refresh"
                   />
                   <DataTable.Export
                     @export="handleExportTableDataToCSV('Application Rules Engine')"
@@ -653,7 +651,7 @@
                   :data-testid="`list-table-block__column__${col.field}__row`"
                 />
               </template>
-              <Tag
+              <PrimeTag
                 v-if="
                   rowData.status !== undefined &&
                   rowData.status.content !== 'Active' &&
@@ -715,10 +713,9 @@
         <slot name="emptyBlock" />
       </template>
       <template #emptyBlockButton>
-        <Button
-          kind="secondary"
-          size="medium"
+        <PrimeButton
           icon="pi pi-plus"
+          severity="secondary"
           label="Rule"
           @click="openCreateRulesEngineDrawerByPhase"
           data-testid="rules-engine-create-button"
@@ -733,15 +730,15 @@
       <div
         class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"
       >
-        <Button
-          kind="outlined"
-          size="medium"
+        <PrimeButton
+          outlined
           label="Discard Changes"
           @click="discardChanges"
           data-testid="review-changes-dialog-footer-cancel-button"
         />
         <Button
           label="Review Changes"
+          class="bg-surface"
           :badgeClass="badgeClass"
           data-testid="rules-engine-save-order-button"
           size="small"
@@ -749,7 +746,6 @@
           :loading="isLoadingButtonOrder"
           @click="updateRulesOrder(data, alteredRows, reload)"
           :badge="!isLoadingButtonOrder ? alteredRows.length : undefined"
-          class="bg-surface"
         />
       </div>
     </teleport>

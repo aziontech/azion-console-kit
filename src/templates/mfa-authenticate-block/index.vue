@@ -50,13 +50,12 @@
           >{{ hasRequestErrorMessage }}</InlineMessage
         >
 
-        <Button
-          kind="secondary"
-          size="medium"
+        <PrimeButton
+          class="w-full flex-row-reverse"
           label="Verify"
           :loading="isButtonLoading"
-          class="w-full flex-row-reverse"
-          @click="validateCode"
+          severity="secondary"
+          type="submit"
         />
       </div>
     </div>

@@ -124,8 +124,7 @@
         @on-load-data="handleLoadData"
       >
         <template #header-actions>
-          <Button
-            size="small"
+          <PrimeButton
             icon="pi pi-plus"
             label="Service"
             @click="openCreateServiceDrawer"
@@ -141,13 +140,12 @@
       :inTabs="true"
     >
       <template #default>
-        <Button
-          kind="secondary"
-          size="small"
+        <PrimeButton
+          class="max-md:w-full w-fit"
+          severity="secondary"
           icon="pi pi-plus"
           label="Service"
           @click="openCreateServiceDrawer"
-          class="max-md:w-full w-fit"
         />
       </template>
       <template #illustration>
