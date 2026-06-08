@@ -3,7 +3,7 @@
     @click="sidebarToggle"
     @keydown="handleButtonKeyDown"
     v-if="isAccountTypeClient"
-    size="medium"
+    size="small"
     icon="pi pi-bars"
     aria-label="Toggle navigation menu"
     :class="{
@@ -13,7 +13,7 @@
     v-tooltip.bottom="{ value: 'Menu', showDelay: 200 }"
     data-testid="sidebar-block__toggle-button"
     ref="menuButton"
-    class="text-white flex-none border-header w-9 h-9"
+    class="text-white flex-none border-header w-8 h-8"
   />
 
   <Sidebar

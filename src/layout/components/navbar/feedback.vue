@@ -1,9 +1,10 @@
 <template>
   <Button
     icon="pi pi-flag"
-    size="medium"
+    size="small"
     label="Feedback"
-    kind="outlined"
+    :outlined="props.outlined"
+    :class="props.class"
     @click="visible = true"
     v-tooltip.bottom="{ value: 'Feedback', showDelay: 200 }"
     data-testid="header-block__open-feedback-button"
@@ -81,6 +82,7 @@
             size="small"
             @click="visible = false"
             data-testid="feedback-dialog__dialog-footer__cancel-button"
+            class="w-20"
           />
           <Button
             kind="secondary"
@@ -90,6 +92,7 @@
             :loading="loading"
             @click="sendFeedback()"
             data-testid="feedback-dialog__dialog-footer__confirm-button"
+            class="sm:w-36"
           />
         </div>
       </div>
@@ -116,6 +119,9 @@
     styleTextColor: {
       type: String,
       default: () => 'text-color'
+    },
+    class: {
+      type: String
     },
     outlined: {
       type: Boolean,

@@ -1,6 +1,6 @@
 <template>
   <header
-    class="azion azion-dark p-3 bg-header text-white border-b surface-border items-center flex md:px-8 md:py-3 w-full fixed top-0 z-10 h-14 justify-between"
+    class="p-3 bg-header text-white border-b surface-border items-center flex md:px-8 md:py-3 w-full fixed top-0 z-10 h-14 justify-between"
     @keyup.esc="closeSideBar"
     ref="app"
   >

@@ -1,10 +1,10 @@
 <template>
-  <IconButton
+  <Avatar
     @click="toggleProfile"
-    size="medium"
-    kind="outlined"
     icon="pi pi-user"
+    class="transition-all bg-header-avatar cursor-pointer"
     v-tooltip.bottom="{ value: 'Account', showDelay: 200 }"
+    data-testid="profile-block__avatar"
   />
 
   <Sidebar
@@ -331,8 +331,8 @@
   import { computed, inject, ref, watch, onBeforeMount } from 'vue'
   import { RouterLink } from 'vue-router'
   import { storeToRefs } from 'pinia'
+  import Avatar from '@aziontech/webkit/avatar'
   import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'
   import PrimeMenu from '@aziontech/webkit/menu'
