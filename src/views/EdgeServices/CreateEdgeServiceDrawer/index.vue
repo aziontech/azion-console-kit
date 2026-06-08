@@ -2,7 +2,7 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
-  import { ref, inject, defineExpose } from 'vue'
+  import { ref, inject } from 'vue'
   import FormFieldsEdgeService from '../FormFields/FormFieldsEdgeService'
   import { edgeServiceService } from '@/services/v2/edge-service/edge-service-service'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
