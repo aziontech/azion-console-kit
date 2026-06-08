@@ -30,6 +30,8 @@
     customPage: 'v2.0.0'
   }
 
+  const LONG_NAME_THRESHOLD = 22
+
   // nested cache: { [key]: { [id]: name } }
   const nameMap = ref({})
 
@@ -69,12 +71,14 @@
       if (id == null) return null
       const meta = META_BY_KEY[key]
       const resolvedName = nameMap.value[key]?.[id]
+      const name = resolvedName || `#${id}`
       return {
         key,
         label: meta?.label ?? key,
         icon: meta?.icon ?? 'pi pi-cog',
-        name: resolvedName || `#${id}`,
-        version: MOCK_VERSIONS[key] ?? 'v1.0.0'
+        name,
+        version: MOCK_VERSIONS[key] ?? 'v1.0.0',
+        isLongName: name.length > LONG_NAME_THRESHOLD
       }
     }).filter(Boolean)
   })
@@ -102,24 +106,29 @@
       <div
         v-for="resource in resources"
         :key="resource.key"
-        class="flex items-start justify-between py-2 gap-3"
+        class="flex py-2 gap-x-3 gap-y-1"
+        :class="resource.isLongName ? 'flex-col items-stretch' : 'items-start justify-between'"
         :data-testid="`overview__resource-${resource.key}`"
       >
-        <div class="flex items-center gap-2 min-w-0 flex-shrink">
+        <div class="flex items-center gap-2 min-w-0">
           <i
             :class="resource.icon"
             class="text-color-secondary text-sm shrink-0"
           />
           <span class="text-sm truncate">{{ resource.label }}</span>
         </div>
-        <div class="flex flex-col items-end min-w-0 flex-1">
+        <div
+          class="flex items-baseline gap-2 min-w-0"
+          :class="resource.isLongName ? 'w-full justify-between' : 'flex-1 justify-end'"
+        >
           <span
-            class="text-sm truncate w-full text-right"
+            class="text-sm truncate"
+            :class="resource.isLongName ? 'text-left' : 'text-right'"
             :title="resource.name"
           >
             {{ resource.name }}
           </span>
-          <span class="text-xs text-color-secondary text-right">{{ resource.version }}</span>
+          <span class="text-xs text-color-secondary shrink-0">{{ resource.version }}</span>
         </div>
       </div>
     </div>
