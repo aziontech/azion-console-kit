@@ -31,15 +31,15 @@
     </div>
     <template #footer>
       <Button
-        kind="primary"
-        size="small"
+        kind="outlined"
+        size="medium"
         label="Leave page"
         data-testid="dialog-unsaved__leave-page"
         @click="emit('leave')"
       />
       <Button
         kind="secondary"
-        size="small"
+        size="medium"
         label="Keep editing"
         @click="emit('stay')"
       />
