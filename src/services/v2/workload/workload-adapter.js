@@ -9,8 +9,14 @@ import { getPrimaryDomain } from '@/services/v2/utils/adapter/domainAdapter'
 import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 const convertPortsArrayToIntegers = (ports) => {
-  return ports.map((port) => parseInt(port.value))
+  return ports
+    .filter((port) => port != null)
+    .map((port) => parseInt(typeof port === 'object' ? port.value : port))
+    .filter((port) => !Number.isNaN(port))
 }
+
+const mapPortToOption = (port, options) =>
+  options.find((option) => option.value === port) || { name: String(port), value: port }
 
 function extractAzionAppSubdomain(fullDomains, zones = []) {
   const cleanDomains = []
@@ -161,13 +167,13 @@ export const WorkloadAdapter = {
               useHttp3: item.protocols.http.quic_ports !== null,
               useHttps: item.protocols.http.https_ports !== null,
               httpPorts: item.protocols.http.http_ports?.map((port) =>
-                HTTP_PORT_LIST_OPTIONS.find((option) => option.value === port)
+                mapPortToOption(port, HTTP_PORT_LIST_OPTIONS)
               ) || [HTTP_PORT_LIST_OPTIONS[0]],
               httpsPorts: item.protocols.http.https_ports?.map((port) =>
-                HTTPS_PORT_LIST_OPTIONS.find((option) => option.value === port)
+                mapPortToOption(port, HTTPS_PORT_LIST_OPTIONS)
               ) || [HTTPS_PORT_LIST_OPTIONS[0]],
               quicPorts: item.protocols.http.quic_ports?.map((port) =>
-                HTTP3_PORT_LIST_OPTIONS.find((option) => option.value === port)
+                mapPortToOption(port, HTTP3_PORT_LIST_OPTIONS)
               ) || [HTTP3_PORT_LIST_OPTIONS[0]]
             }
           }
@@ -209,13 +215,13 @@ export const WorkloadAdapter = {
           useHttp3: workload.protocols.http.quic_ports !== null,
           useHttps: workload.protocols.http.https_ports !== null,
           httpPorts: workload.protocols.http.http_ports?.map((port) =>
-            HTTP_PORT_LIST_OPTIONS.find((option) => option.value === port)
+            mapPortToOption(port, HTTP_PORT_LIST_OPTIONS)
           ) || [HTTP_PORT_LIST_OPTIONS[0]],
           httpsPorts: workload.protocols.http.https_ports?.map((port) =>
-            HTTPS_PORT_LIST_OPTIONS.find((option) => option.value === port)
+            mapPortToOption(port, HTTPS_PORT_LIST_OPTIONS)
           ) || [HTTPS_PORT_LIST_OPTIONS[0]],
           quicPorts: workload.protocols.http.quic_ports?.map((port) =>
-            HTTP3_PORT_LIST_OPTIONS.find((option) => option.value === port)
+            mapPortToOption(port, HTTP3_PORT_LIST_OPTIONS)
           ) || [HTTP3_PORT_LIST_OPTIONS[0]]
         }
       },
