@@ -1,19 +1,20 @@
 /**
+ * Strips the given tag from an HTML string and returns the plain-text result.
  *
- * @param {string} textWithHtmlTags Your tag that contains unwanted html tags inside
- * @param {string} htmlTagToRemove ex: for link <a> tag use a, <p> use p, and so on.
- * @returns
+ * Uses DOMParser (the safe-by-design HTML parser — scripts are not executed) to remove
+ * the requested tag, then returns `.body.textContent` so only inert text leaves the function.
+ *
+ * @param {string} source HTML string that may contain unwanted tags
+ * @param {string} tagSelector CSS selector for the tag(s) to strip (e.g. `'a'`, `'p'`)
+ * @returns {string} Plain text with the targeted tags removed
  */
 
-export const removeHtmlTagFromText = (textWithHtmlTags, htmlTagToRemove) => {
+export const removeHtmlTagFromText = (source, tagSelector) => {
   const parser = new DOMParser()
-  const parsedDisclaimer = parser.parseFromString(textWithHtmlTags, 'text/html')
+  const parsed = parser.parseFromString(source, 'text/html')
 
-  const linkTags = parsedDisclaimer.querySelectorAll(htmlTagToRemove)
+  const matchedNodes = parsed.querySelectorAll(tagSelector)
+  matchedNodes.forEach((node) => node.remove())
 
-  linkTags.forEach((linkTag) => linkTag.remove())
-
-  const disclaimerWithoutLinks = parsedDisclaimer.body.textContent
-
-  return disclaimerWithoutLinks
+  return parsed.body.textContent
 }

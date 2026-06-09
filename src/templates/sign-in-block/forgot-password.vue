@@ -36,25 +36,25 @@
             </small>
           </div>
 
-          <Button
-            kind="secondary"
+          <PrimeButton
             size="small"
+            class="w-full flex-row-reverse"
             :loading="isSendingEmailLoading"
             label="Send Email"
+            severity="secondary"
             @click="sendEmail()"
             :disabled="!meta.valid"
-            class="w-full flex-row-reverse"
           />
         </div>
       </div>
       <div class="flex flex-wrap justify-center items-center gap-1 mt-8">
         <p class="text-sm font-normal">Already have an account?</p>
-        <Button
-          kind="text"
+        <PrimeButton
           size="small"
           label="Sign In"
-          @click="$emit('goToSignIn')"
+          link
           class="p-0"
+          @click="$emit('goToSignIn')"
         />
       </div>
     </div>
@@ -76,13 +76,12 @@
 
         <div class="w-full flex flex-wrap gap-2">
           <p class="text-start">Didn't receive the email?</p>
-          <Button
-            kind="text"
-            size="medium"
+          <PrimeButton
+            class="p-0"
+            link
             label="Resend Email"
             @click="resendEmail()"
             :disabled="isEmailResent"
-            class="p-0"
           />
           <PrimeBadge
             class="rounded-md animate-fadeIn"
@@ -97,7 +96,7 @@
 
 <script setup>
   import InputText from '@aziontech/webkit/inputtext'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import PrimeBadge from '@aziontech/webkit/badge'
 
   import * as yup from 'yup'

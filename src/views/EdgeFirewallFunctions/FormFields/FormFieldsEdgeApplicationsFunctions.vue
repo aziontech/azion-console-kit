@@ -3,7 +3,7 @@
   import { useField } from 'vee-validate'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
@@ -252,14 +252,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
+                  class="w-full whitespace-nowrap flex"
                   data-testid="edge-firewall-functions-form__create-function-button"
+                  text
                   @click="openDrawer"
                   size="small"
                   icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Function"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -319,8 +323,8 @@
                         >
                           <p>Configure the form builder.</p>
                           <!--
-                          <Button
-                            kind="outlined"
+                          <PrimeButton
+                            outlined
                             @click="azionJsonFormWindowOpener()"
                             label="Read documentation"
                             size="small"
@@ -384,11 +388,11 @@
         class="flex justify-end mt-[-1rem]"
         v-if="isFirstSelectPanelValue && hasFormBuilder"
       >
-        <Button
-          kind="text"
+        <PrimeButton
           @click="formBuilderToggle()"
           :label="updateLabelEditForm()"
           size="small"
+          text
         />
       </div>
     </template>

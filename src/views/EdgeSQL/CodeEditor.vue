@@ -34,12 +34,13 @@
             <div
               class="flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between border-x border-t surface-border rounded-t-md p-3"
             >
-              <Button
+              <PrimeButton
                 :label="labelRunQuery"
                 :loading="isExecutingQuery || isLoadingQuery"
                 kind="primary"
                 icon="pi pi-play"
                 size="small"
+                severity="primary"
                 @click="runQuery"
                 v-tooltip="{
                   value: 'Run Query (⌘ ↵)',
@@ -50,18 +51,20 @@
               />
 
               <div class="flex gap-2">
-                <Button
-                  kind="outlined"
+                <PrimeButton
                   label="Prettify"
                   icon="pi pi-align-left"
                   size="small"
+                  outlined
+                  severity="secondary"
                   @click="prettifyCode"
                 />
-                <Button
-                  kind="outlined"
+                <PrimeButton
                   label="Templates"
                   icon="pi pi-bolt"
                   size="small"
+                  severity="secondary"
+                  outlined
                   @click="showTemplatesModal = true"
                 />
               </div>
@@ -156,15 +159,14 @@
                           class="flex flex-col sm:flex-row sm:items-center gap-2 justify-between"
                         >
                           <div class="flex gap-2 items-center">
-                            <IconButton
-                              kind="outlined"
+                            <PrimeButton
                               v-if="sqlAllowedFilters.length"
+                              outlined
                               icon="pi pi-filter"
                               size="small"
                               @click="toggleSqlFilter"
                               :disabled="disabledActionsJsonView"
                               data-testid="data-table-actions-column-header-toggle-filter"
-                              aria-label="data table actions column header toggle filter"
                             />
                             <DataTable.Search
                               v-model="sqlFilters.global.value"
@@ -191,26 +193,24 @@
                                 </div>
                               </template>
                             </SelectButton>
-                            <IconButton
-                              kind="outlined"
+                            <PrimeButton
                               icon="pi pi-refresh"
                               @click="reloadData"
+                              outlined
                               iconOnly
                               v-tooltip="{
                                 value: 'Reload',
                                 position: 'bottom'
                               }"
                               size="small"
-                              aria-label="button"
                             />
-                            <IconButton
-                              kind="outlined"
+                            <PrimeButton
                               icon="pi pi-download"
+                              outlined
                               iconOnly
                               @click="toggleExportMenu($event)"
                               v-tooltip.left="{ value: 'Export', showDelay: 200 }"
                               size="small"
-                              aria-label="button"
                             />
                             <Menu
                               ref="exportMenuRef"
@@ -218,16 +218,14 @@
                               :model="exportMenuItems"
                             />
 
-                            <IconButton
-                              kind="outlined"
-                              size="medium"
+                            <PrimeButton
                               icon="ai ai-column"
+                              outlined
                               iconOnly
                               :disabled="disabledActionsJsonView"
                               @click="toggleSqlColumnSelector"
                               v-tooltip.left="{ value: 'Available Columns', showDelay: 200 }"
                               data-testid="data-table-actions-column-header-toggle-columns"
-                              aria-label="data table actions column header toggle columns"
                             />
                             <OverlayPanel
                               ref="sqlColumnSelectorPanel"
@@ -353,41 +351,39 @@
                         v-if="isRowEditing(rowData)"
                         class="flex gap-1 justify-end"
                       >
-                        <IconButton
-                          kind="outlined"
+                        <PrimeButton
                           :icon="`pi ${isLoadingEditRow ? 'pi-spin pi-spinner' : 'pi-check'}`"
                           size="small"
                           @click.stop="saveRowEdit(rowData)"
+                          outlined
                           iconOnly
                           data-testid="row-save-button"
                           v-tooltip.top="'Save'"
                           :disabled="isLoadingEditRow"
-                          aria-label="row save button"
                         />
-                        <IconButton
-                          kind="secondary"
+                        <PrimeButton
                           icon="pi pi-times"
                           size="small"
+                          severity="secondary"
+                          outlined
                           iconOnly
                           @click.stop="cancelRowEdit(rowData)"
                           data-testid="row-cancel-button"
                           v-tooltip.top="'Cancel'"
-                          aria-label="row cancel button"
                         />
                       </div>
                       <div
                         v-else
                         class="flex justify-end"
                       >
-                        <IconButton
-                          kind="outlined"
+                        <PrimeButton
                           icon="pi pi-ellipsis-h"
                           size="small"
                           :disabled="isExecutingQuery || isLoadingQuery || shouldNotEditRow"
+                          outlined
                           @click.stop="showRowMenu($event, rowData)"
-                          data-testid="row-actions-menu-button"
                           class="w-8 h-8 p-0"
-                          aria-label="row actions menu button"
+                          data-testid="row-actions-menu-button"
                         />
                       </div>
                     </template>
@@ -424,8 +420,7 @@
   import { useRoute } from 'vue-router'
   import { FilterMatchMode } from '@aziontech/webkit/api'
 
-  import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Menu from '@aziontech/webkit/menu'
   import SplitButton from '@aziontech/webkit/splitbutton'
   import SelectButton from '@aziontech/webkit/selectbutton'

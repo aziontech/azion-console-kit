@@ -24,16 +24,24 @@ jobs:
       image: node:22-alpine
 
     steps:
+      - name: Install SO deps
+        run: apk add curl bash git
+
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
-      - name: Install SO deps
-        run: apk add curl bash git
-      
+
+      - name: Trust checkout directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Install dependencies --frozen-lockfile
         run: yarn install:lock
-        
+
       - name: Run eslint security check
-        run: yarn lint:security-check
+        if: github.event_name == 'pull_request'
+        run: yarn lint:security-check:changed --base origin/${{ github.base_ref }}
+
+      - name: Run eslint security check
+        if: github.event_name == 'push'
+        run: yarn lint:security-check:changed --base ${{ github.event.before }}

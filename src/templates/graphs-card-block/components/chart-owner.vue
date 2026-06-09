@@ -1,27 +1,27 @@
 <template>
-  <Tag
+  <PrimeTag
     icon="pi pi-user"
     severity="info"
     :pt="{ icon: { class: 'mr-0' } }"
     v-if="chartOwner === 'user'"
   />
-  <Tag
+  <PrimeTag
     icon="pi pi-users"
     severity="info"
     :pt="{ icon: { class: 'mr-0' } }"
     v-if="chartOwner === 'account'"
   />
-  <Tag
+  <PrimeTag
     :pt="{ icon: { class: 'mr-0' } }"
     v-if="chartOwner === 'azion'"
   >
     <MobileLogo class="w-3 h-3" />
-  </Tag>
+  </PrimeTag>
 </template>
 
 <script setup>
   import MobileLogo from '@assets/svg/mobile-logo'
-  import Tag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
 
   defineProps({
     chartOwner: {

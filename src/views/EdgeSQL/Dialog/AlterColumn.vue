@@ -46,16 +46,16 @@
       </div>
 
       <div class="flex justify-end gap-2 mt-2">
-        <Button
-          kind="outlined"
+        <PrimeButton
           label="Cancel"
+          outlined
           size="small"
           @click="emit('update:visible', false)"
         />
-        <Button
-          kind="secondary"
+        <PrimeButton
           label="Confirm"
           size="small"
+          severity="secondary"
           @click="alterColumn"
         />
       </div>
@@ -65,7 +65,7 @@
 
 <script setup>
   import Dialog from '@aziontech/webkit/dialog'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { capitalizeFirstLetter } from '@/helpers'
@@ -106,22 +106,8 @@
       .filter((segment) => segment.length > 0)
   })
   // Tokenize query strings into keyword/non-keyword parts (no v-html)
-  const KEYWORDS = [
-    'CREATE',
-    'ALTER',
-    'TRUNCATE',
-    'TABLE',
-    'BEGIN',
-    'PRAGMA',
-    'INSERT',
-    'INTO',
-    'DROP',
-    'RENAME',
-    'ON',
-    'COMMIT',
-    'OFF'
-  ]
-  const keywordRegex = new RegExp(`\\b(${KEYWORDS.join('|')})\\b`, 'gi')
+  const keywordRegex =
+    /\b(CREATE|ALTER|TRUNCATE|TABLE|BEGIN|PRAGMA|INSERT|INTO|DROP|RENAME|ON|COMMIT|OFF)\b/gi
 
   const tokenizeSql = (input) => {
     const parts = []
