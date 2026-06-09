@@ -51,10 +51,19 @@
       default: null,
       validator: (value) => value === null || ['monthly', 'yearly'].includes(value)
     },
+    draftServiceOrderId: {
+      type: [String, Number],
+      default: null
+    },
     mode: {
       type: String,
       default: 'subscribe',
       validator: (value) => ['subscribe', 'edit', 'change-cycle'].includes(value)
+    },
+    context: {
+      type: String,
+      default: 'billing',
+      validator: (value) => ['billing', 'signup'].includes(value)
     }
   })
 
@@ -63,7 +72,8 @@
   const { data: plans } = serviceOrdersService.useListPlansQuery()
   const { prepare: prepareCheckoutSession, isPreparing } = useCheckoutSessionPreparer()
 
-  const billingCycle = ref('monthly')
+  const DEFAULT_BILLING_CYCLE = 'monthly'
+  const billingCycle = ref(DEFAULT_BILLING_CYCLE)
 
   const planPricing = computed(() => getPlanPricing(plans.value, props.plan))
 
@@ -104,7 +114,7 @@
   initialize()
   // `lockedCycle` wins so the toggle reflects the cycle the user already
   // committed to outside the drawer (e.g. Pro/m → Pro/y from BillsView).
-  billingCycle.value = props.lockedCycle || sharedBillingCycle.value || 'monthly'
+  billingCycle.value = props.lockedCycle || sharedBillingCycle.value || DEFAULT_BILLING_CYCLE
 
   watch(
     () => props.lockedCycle,
@@ -115,18 +125,27 @@
 
   const BILLING_CYCLE_DEBOUNCE_MS = 250
   let pendingPlanPricingTimer = null
+  let checkoutSessionRequestVersion = 0
 
-  const flushPlanPricingUpdate = async (value) => {
-    emit('update:checkoutSessionClientSecret', '')
+  const isLatestCheckoutSessionRequest = ({ value, version }) =>
+    version === checkoutSessionRequestVersion && value === billingCycle.value
+
+  const flushPlanPricingUpdate = async ({ value, version }) => {
     try {
       const secret = await prepareCheckoutSession({
         plan: props.plan,
-        preferredCycle: value
+        preferredCycle: value,
+        draftServiceOrderId: props.draftServiceOrderId,
+        signup: props.context === 'signup'
       })
+      if (!isLatestCheckoutSessionRequest({ value, version })) return
+
       if (secret) {
         emit('update:checkoutSessionClientSecret', secret)
       }
     } catch (err) {
+      if (!isLatestCheckoutSessionRequest({ value, version })) return
+
       const detail =
         (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
         'Unable to update billing cycle. Please try again.'
@@ -134,20 +153,32 @@
     }
   }
 
-  watch(billingCycle, (value) => {
-    setParam('billingCycle', value)
-    emit('update:billingCycle', value)
+  watch(
+    billingCycle,
+    (value, previousValue) => {
+      setParam('billingCycle', value)
+      emit('update:billingCycle', value)
 
-    if (pendingPlanPricingTimer) {
-      clearTimeout(pendingPlanPricingTimer)
-    }
-    pendingPlanPricingTimer = setTimeout(() => {
-      pendingPlanPricingTimer = null
-      flushPlanPricingUpdate(value)
-    }, BILLING_CYCLE_DEBOUNCE_MS)
-  })
+      if (previousValue === undefined) return
+      if (props.mode === 'change-cycle') return
+
+      checkoutSessionRequestVersion += 1
+      const version = checkoutSessionRequestVersion
+      emit('update:checkoutSessionClientSecret', '')
+
+      if (pendingPlanPricingTimer) {
+        clearTimeout(pendingPlanPricingTimer)
+      }
+      pendingPlanPricingTimer = setTimeout(() => {
+        pendingPlanPricingTimer = null
+        flushPlanPricingUpdate({ value, version })
+      }, BILLING_CYCLE_DEBOUNCE_MS)
+    },
+    { immediate: true }
+  )
 
   onBeforeUnmount(() => {
+    checkoutSessionRequestVersion += 1
     if (pendingPlanPricingTimer) {
       clearTimeout(pendingPlanPricingTimer)
       pendingPlanPricingTimer = null

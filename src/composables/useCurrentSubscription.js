@@ -30,8 +30,6 @@ export function useCurrentSubscription() {
   const { accountData } = storeToRefs(accountStore)
 
   const accountId = computed(() => accountData.value?.id ?? null)
-  const hasFinishedOnboarding = computed(() => accountData.value?.first_login !== true)
-  const hasContractedPlan = hasFinishedOnboarding
 
   const {
     activeServiceOrder,
@@ -39,6 +37,11 @@ export function useCurrentSubscription() {
     isLoading: isLoadingServiceOrder,
     refetch: refetchServiceOrders
   } = useServiceOrdersList(accountId)
+
+  const hasFinishedOnboarding = computed(
+    () => accountData.value?.first_login !== true || Boolean(activeServiceOrder.value)
+  )
+  const hasContractedPlan = hasFinishedOnboarding
 
   // Plans are only needed to enrich the active SO with pricing/sku metadata.
   // Gating with `enabled` keeps the catalogue request off the wire while the
@@ -87,12 +90,23 @@ export function useCurrentSubscription() {
   const nextChargeDate = computed(() =>
     formatNextChargeDate(activeServiceOrder.value?.currentPeriodEnd)
   )
-  const nextChargeValue = computed(() => planChargeValue.value)
   const lastUpdate = computed(() =>
     formatLastUpdate(currentServiceOrder.value?.updatedAt ?? activeServiceOrder.value?.updatedAt)
   )
 
   const scheduledDowngrade = computed(() => activeServiceOrder.value?.downgradePending ?? null)
+
+  const scheduledDowngradePricing = computed(() => {
+    const toPriceId = scheduledDowngrade.value?.toPriceId
+    if (!toPriceId) return null
+    return findPricingById(plansData.value, toPriceId)
+  })
+
+  const nextChargeValue = computed(() => {
+    if (!hasContractedPlan.value) return 0
+    const pricing = scheduledDowngradePricing.value ?? activePricing.value
+    return toFiniteNumber(pricing?.priceValue, 0)
+  })
 
   const currentInvoiceAmountCharged = computed(() =>
     toFiniteNumber(activeServiceOrder.value?.invoiceAmountCharged, null)
@@ -113,12 +127,16 @@ export function useCurrentSubscription() {
     await refetchServiceOrders()
   }
 
-  // Kept for transitional callers that want a one-shot freshness check after
-  // an external event (e.g., post-checkout return). It no longer loops —
-  // mutations should invalidate the cache; SSE drives background refresh.
-  const refetchUntil = async (predicate) => {
+  const refetchUntil = async (predicate, { maxAttempts = 5, delayMs = 500 } = {}) => {
     await refetch()
-    return predicate ? Boolean(predicate(activeServiceOrder.value)) : true
+    if (!predicate) return true
+    let attempt = 1
+    while (attempt < maxAttempts && !predicate(activeServiceOrder.value)) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs))
+      await refetch()
+      attempt += 1
+    }
+    return Boolean(predicate(activeServiceOrder.value))
   }
 
   return {

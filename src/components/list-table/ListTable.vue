@@ -149,6 +149,9 @@
       type: String,
       default: ''
     },
+    scrollHeight: {
+      type: String
+    },
     /**
      * When set, renders a single inline action button per row instead of the ellipsis menu.
      * Accepts an object: { icon: 'pi pi-trash', label: 'Delete', command: fn(rowData), disabled: boolean|fn(rowData) }
@@ -232,13 +235,32 @@
   function handleRowClick(event) {
     if (props.disabledList) return
     if (!props.enableEditClick) return
-    if (props.frozenColumns?.length) return null
 
-    return editItemSelected(event.originalEvent, event.data)
+    const rowData = event.data
+    const originalEvent = event.originalEvent
+
+    // Don't navigate when clicking inside a component column (e.g., CopyBlock, Tag, etc.)
+    const clickedCell = originalEvent.target.closest('td')
+    if (clickedCell) {
+      const columnIndex = Array.from(clickedCell.parentElement.children).indexOf(clickedCell)
+      const adjustedIndex =
+        columnIndex - (props.reorderableRows ? 1 : 0) - (props.showSelectionMode ? 1 : 0)
+      const col = selectedColumns.value[adjustedIndex]
+      if (col?.type === 'component') return null
+    }
+
+    if (!props.frozenColumns.length) {
+      return editItemSelected(originalEvent, rowData)
+    }
+    return null
   }
 
   function handleColumnClick(event, col, rowData) {
     if (isFrozenColumn(col.field)) {
+      return editItemSelected(event, rowData)
+    }
+    if (col?.type === 'component') return null
+    if (!props.frozenColumns.length && props.enableEditClick) {
       return editItemSelected(event, rowData)
     }
     return null
@@ -302,6 +324,7 @@
       v-model:sortField="sortFieldValue"
       v-model:sortOrder="sortOrderValue"
       :rowsPerPageOptions="rowsPerPageOptions"
+      :scrollHeight="scrollHeight"
       :reorderableRows="reorderableRows"
       :emptyListMessage="emptyListMessage"
       :emptyBlock="emptyBlock"
@@ -419,8 +442,7 @@
         :header="col.header"
         :sortField="col?.sortField"
         :class="{
-          'hover:cursor-pointer':
-            !disabledList && (frozenColumns?.length ? isFrozenColumn(col.field) : enableEditClick)
+          'hover:cursor-pointer': !disabledList && (enableEditClick || isFrozenColumn(col.field))
         }"
         data-testid="data-table-column"
         :style="col.style"

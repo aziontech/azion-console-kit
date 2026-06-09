@@ -99,9 +99,12 @@ async function main() {
   if (options.output) {
     const outputPath = path.resolve(process.cwd(), options.output)
     const outputDir = path.dirname(outputPath)
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- CLI script: --output is operator-provided by design
     if (!fs.existsSync(outputDir)) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- CLI script: --output is operator-provided by design
       fs.mkdirSync(outputDir, { recursive: true })
     }
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- CLI script: --output is operator-provided by design
     fs.writeFileSync(outputPath, report, 'utf-8')
     console.error(`Report written to ${outputPath}`)
   } else {

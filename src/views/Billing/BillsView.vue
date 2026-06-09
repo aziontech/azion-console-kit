@@ -19,6 +19,7 @@
         v-if="subscriptionState.isHobby"
         :loading="preparingPlan === 'pro'"
         @upgrade="openUpgradeToPro"
+        @upgrade-intent="handleUpgradeIntent"
       />
       <CurrentInvoiceCard
         v-else
@@ -61,29 +62,8 @@
     title="No payment activity yet."
     description="Add a payment method and start using services and products to view your activity."
     :inTabs="true"
-    createButtonLabel="Add Credit"
     :documentationService="props.documentPaymentHistoryService"
-  >
-    <template #default>
-      <ActionButton
-        class="max-md:w-full w-fit"
-        kind="outlined"
-        size="medium"
-        label="Credit"
-        icon="pi pi-plus"
-        :disabled="!defaultCardStatus.hasData"
-        @click="goToPayment"
-      />
-      <ActionButton
-        class="max-md:w-full w-fit"
-        kind="secondary"
-        size="medium"
-        icon="pi pi-plus"
-        label="Payment Method"
-        @click="goToPayment"
-      />
-    </template>
-  </EmptyResultsBlock>
+  />
 
   <PlanSelectionDrawer
     v-model:visible="showChangePlanDrawer"
@@ -135,7 +115,6 @@
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
-  import ActionButton from '@aziontech/webkit/actions/button'
   import SubscriptionPlanCard from './components/SubscriptionPlanCard.vue'
   import UpgradeToProCard from './components/UpgradeToProCard.vue'
   import CurrentInvoiceCard from './components/CurrentInvoiceCard.vue'
@@ -285,6 +264,9 @@
   const selectedPlan = ref(null)
   const lockedCycle = ref(null)
   const checkoutSessionClientSecret = ref('')
+  const checkoutPreparationKey = ref('')
+  let checkoutPreparationVersion = 0
+  let currentCheckoutPreparationPromise = null
   const preparingPlan = ref(null)
   const downgradeTarget = ref({
     toPlan: 'hobby',
@@ -324,14 +306,63 @@
   watch(showPlanInfoDrawer, (visible) => {
     if (!visible) {
       checkoutSessionClientSecret.value = ''
+      checkoutPreparationKey.value = ''
       drawerMode.value = 'subscribe'
     }
   })
 
-  const defaultCardStatus = computed(() => ({
-    loaded: props.cardDefault?.loader,
-    hasData: !!props.cardDefault?.cardData
-  }))
+  const buildPreparationKey = (plan, cycle) => `${plan}:${cycle || 'monthly'}`
+
+  const prepareCheckoutAhead = ({ plan, preferredCycle = null, force = false } = {}) => {
+    const cycle = preferredCycle || storedBillingCycle.value || 'monthly'
+    const key = buildPreparationKey(plan, cycle)
+
+    if (
+      !force &&
+      checkoutPreparationKey.value === key &&
+      checkoutSessionClientSecret.value &&
+      !currentCheckoutPreparationPromise
+    ) {
+      return Promise.resolve(checkoutSessionClientSecret.value)
+    }
+
+    if (currentCheckoutPreparationPromise && checkoutPreparationKey.value === key) {
+      return currentCheckoutPreparationPromise
+    }
+
+    const version = ++checkoutPreparationVersion
+    checkoutPreparationKey.value = key
+    if (force) checkoutSessionClientSecret.value = ''
+
+    const promise = prepareCheckoutSession({ plan, preferredCycle: cycle })
+      .then((secret) => {
+        if (version === checkoutPreparationVersion) {
+          checkoutSessionClientSecret.value = secret
+        }
+        return secret
+      })
+      .finally(() => {
+        if (currentCheckoutPreparationPromise === promise) {
+          currentCheckoutPreparationPromise = null
+        }
+      })
+
+    currentCheckoutPreparationPromise = promise
+    return promise
+  }
+
+  const schedulePrepareForPro = (preferredCycle = null) => {
+    if (subscription.isPro.value) return
+    const cycle = preferredCycle || storedBillingCycle.value || 'monthly'
+    const key = buildPreparationKey('pro', cycle)
+    if (
+      checkoutPreparationKey.value === key &&
+      (checkoutSessionClientSecret.value || currentCheckoutPreparationPromise)
+    ) {
+      return
+    }
+    prepareCheckoutAhead({ plan: 'pro', preferredCycle: cycle }).catch(Sentry.captureException)
+  }
 
   const { defaultPaymentMethod } = useBillingPaymentMethods()
 
@@ -374,6 +405,11 @@
   }
 
   const refreshInvoiceAndHistory = async () => {
+    if (!hasContentToList.value) {
+      hasContentToList.value = true
+      await loadCurrentInvoice()
+      return
+    }
     await Promise.allSettled([loadCurrentInvoice(), listTableRef.value?.reload?.()])
   }
 
@@ -449,15 +485,14 @@
 
   const openDrawerWithCheckoutSession = async ({ plan, preferredCycle, lockedCycle: locked }) => {
     if (preparingPlan.value) return
-    checkoutSessionClientSecret.value = ''
     drawerMode.value = 'subscribe'
     selectedPlan.value = plan
     lockedCycle.value = locked
-    showPlanInfoDrawer.value = true
     preparingPlan.value = plan
     try {
-      const secret = await prepareCheckoutSession({ plan, preferredCycle })
+      const secret = await prepareCheckoutAhead({ plan, preferredCycle })
       checkoutSessionClientSecret.value = secret
+      showPlanInfoDrawer.value = true
       trackBilling('checkoutStarted', {
         plan,
         billingCycle: preferredCycle || storedBillingCycle.value,
@@ -479,10 +514,13 @@
         detail,
         closable: true
       })
-      showPlanInfoDrawer.value = false
     } finally {
       preparingPlan.value = null
     }
+  }
+
+  const handleUpgradeIntent = () => {
+    schedulePrepareForPro('monthly')
   }
 
   // Stripe rejected the previously issued client secret (session expired or
@@ -492,13 +530,16 @@
   const handleStaleCheckoutSession = async ({ plan, billingCycle: cycle } = {}) => {
     const targetPlan = plan || selectedPlan.value
     if (!targetPlan) return
+    const targetCycle = cycle || storedBillingCycle.value || null
     checkoutSessionClientSecret.value = ''
+    checkoutPreparationKey.value = ''
     try {
       const fresh = await recoverFromStaleSession({
         plan: targetPlan,
-        preferredCycle: cycle || storedBillingCycle.value || null
+        preferredCycle: targetCycle
       })
       checkoutSessionClientSecret.value = fresh
+      checkoutPreparationKey.value = buildPreparationKey(targetPlan, targetCycle)
     } catch (err) {
       Sentry.captureException(err)
       toast.add({

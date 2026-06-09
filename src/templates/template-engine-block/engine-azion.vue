@@ -405,6 +405,7 @@
           `valid-${element.name}`,
           escapeErrorMessage(validator.errorMessage),
           function (value) {
+            // eslint-disable-next-line security/detect-non-literal-regexp -- validator.regex is part of the trusted template-engine schema (developer-authored config, not user input); the template engine's design exposes regex validators as configurable
             const domainRegex = new RegExp(validator.regex)
             const shouldEscapeEmptyAndNotRequiredFields =
               value === undefined && !element.attrs?.required

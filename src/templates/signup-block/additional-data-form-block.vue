@@ -169,6 +169,8 @@
     name: 'additional-data-form-block'
   })
 
+  const emit = defineEmits(['plan-change'])
+
   // Fetch plans from API
   const { data: plansData } = usePlansList()
 
@@ -196,7 +198,10 @@
       .string()
       .trim()
       .max(61, 'Your Full Name must be less than 61 characters')
-      .matches(/[A-Za-zÀ-ž.'-]+ [A-Za-zÀ-ž.'-]+/, 'Your Full Name must include first and last name')
+      .matches(
+        /[A-Za-zÀ-ž.'-]+\s+[A-Za-zÀ-ž.'-]+/,
+        'Your Full Name must include first and last name'
+      )
       .required('Your Full Name is required')
   })
 
@@ -227,6 +232,7 @@
   } = usePlans()
 
   // Local billing cycle state
+  const DEFAULT_BILLING_CYCLE = 'monthly'
   const billingCycle = ref('monthly')
 
   // Plan drawer state
@@ -414,16 +420,15 @@
     billingCycle.value = selectedBillingCycle
     setPlanParam('plan', selectedPlan)
     setPlanParam('billingCycle', selectedBillingCycle)
+    emit('plan-change', { plan: selectedPlan, billingCycle: selectedBillingCycle })
   }
 
   // Pre-fill form fields on mount
   onMounted(async () => {
-    initializePlans()
+    initializePlans({ defaultPlan: 'hobby', defaultBillingCycle: DEFAULT_BILLING_CYCLE })
 
-    // Pre-fill plan from URL params/storage
-    if (storedPlan.value && ['hobby', 'pro'].includes(storedPlan.value)) {
-      plan.value = storedPlan.value
-    }
+    // Pre-fill plan from URL params/storage; default to Hobby when missing/invalid
+    plan.value = ['hobby', 'pro'].includes(storedPlan.value) ? storedPlan.value : 'hobby'
 
     // Pre-fill billing cycle
     if (storedBillingCycle.value) {

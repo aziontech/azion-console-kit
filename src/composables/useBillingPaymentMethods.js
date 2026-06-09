@@ -2,10 +2,6 @@ import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
-import { toMilliseconds } from '@/services/v2/base/query/config'
-
-const STALE_TIME = toMilliseconds({ seconds: 60 })
-const GC_TIME = toMilliseconds({ minutes: 5 })
 
 export function useBillingPaymentMethods(options = {}) {
   const { enabled = true } = options
@@ -13,10 +9,11 @@ export function useBillingPaymentMethods(options = {}) {
   const query = useQuery({
     queryKey: queryKeys.serviceOrders.billingPaymentMethods(),
     queryFn: () => serviceOrdersService.getBillingPaymentMethods(),
-    staleTime: STALE_TIME,
-    gcTime: GC_TIME,
-    refetchOnMount: false,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: false,
+    meta: { persist: false },
     enabled
   })
 

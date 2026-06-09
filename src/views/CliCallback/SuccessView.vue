@@ -20,8 +20,8 @@
 <script>
   export default {
     name: 'cli-callback-success-view',
-    PrimeButton
+    Button
   }
 
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
 </script>

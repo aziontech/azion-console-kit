@@ -11,7 +11,7 @@
       optionLabel="name"
       optionValue="geonameId"
       placeholder="Select a City"
-      appendTo="self"
+      appendTo="body"
       filter
       class="w-full"
       @change="$emit('change', $event)"

@@ -1,8 +1,8 @@
 /* eslint-env node */
 require('@rushstack/eslint-patch/modern-module-resolution')
 
-// Resolve local architecture plugin without external dependencies.
-// Same technique used by @rushstack/eslint-patch above.
+// Register the architecture plugin so eslint-disable directives for its rules
+// don't fail. Rule severities live in .eslintrc-architecture.cjs.
 const Module = require('module')
 const resolveFilename = Module._resolveFilename
 Module._resolveFilename = function (request, parent, isMain, options) {
@@ -14,7 +14,10 @@ Module._resolveFilename = function (request, parent, isMain, options) {
 
 module.exports = {
   root: true,
-  plugins: ['azion-architecture'],
+  // Register security/xss/no-unsanitized plugins so eslint-disable directives for their rules
+  // (added for .eslintrc-security.cjs) don't fail this main lint pass. Rule severities for those
+  // plugins are configured in .eslintrc-security.cjs — here they stay 'off' (default).
+  plugins: ['azion-architecture', 'security', 'xss', 'no-unsanitized'],
   extends: [
     'plugin:vue/vue3-essential',
     'eslint:recommended',
@@ -26,55 +29,11 @@ module.exports = {
       extends: ['plugin:cypress/recommended']
     },
     {
-      // Modern code: TanStack model is mandatory
-      files: ['src/modules/**/*', 'src/services/v2/**/*'],
-      rules: {
-        'azion-architecture/no-direct-http-in-components': 'error',
-        'azion-architecture/no-http-in-stores': 'error',
-        'azion-architecture/require-vue-query': 'error',
-        'azion-architecture/no-try-catch-in-services': 'warn',
-        'azion-architecture/services-http-only': 'warn',
-        'azion-architecture/pure-adapters': 'warn',
-        'azion-architecture/module-isolation': 'off',
-        'azion-architecture/naming-convention': 'off',
-        'azion-architecture/type-separation': 'off'
-      }
-    },
-    {
-      // azion-ai-chat: SSE streaming — Vue Query not applicable
-      files: ['src/modules/azion-ai-chat/**/*'],
-      rules: {
-        'azion-architecture/require-vue-query': 'off',
-        'azion-architecture/no-try-catch-in-services': 'off'
-      }
-    },
-    {
       files: ['scripts/**/*.cjs'],
       env: { node: true },
       rules: {
         'no-console': 'off',
         'id-length': 'off'
-      }
-    },
-    {
-      // Legacy code: tracked for migration, not blocking
-      files: [
-        'src/views/**/*',
-        'src/services/!(v2|axios)/**/*',
-        'src/components/**/*',
-        'src/stores/**/*',
-        'src/composables/**/*'
-      ],
-      rules: {
-        'azion-architecture/no-direct-http-in-components': 'warn',
-        'azion-architecture/no-http-in-stores': 'warn',
-        'azion-architecture/require-vue-query': 'warn',
-        'azion-architecture/no-try-catch-in-services': 'warn',
-        'azion-architecture/services-http-only': 'warn',
-        'azion-architecture/pure-adapters': 'warn',
-        'azion-architecture/module-isolation': 'off',
-        'azion-architecture/naming-convention': 'off',
-        'azion-architecture/type-separation': 'off'
       }
     }
   ],
@@ -83,7 +42,7 @@ module.exports = {
   },
   rules: {
     'no-case-declarations': 0,
-    'no-console': 'error',
+    'no-console': ['error', { allow: ['error'] }],
     'id-length': ['error', { min: 2 }]
   }
 }

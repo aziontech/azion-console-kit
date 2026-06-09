@@ -7,12 +7,13 @@ import {
   removeScoped,
   migrateGuestTo
 } from '@/helpers/client-scoped-storage'
+// Cross-tab/session switch broadcast is a local event listener, not server data.
+// eslint-disable-next-line azion-architecture/require-vue-query
 import { onSwitchAccount } from '@/services/v2/base/auth/session-broadcast'
 
 const BASE_KEY = 'plans:v1'
 const VALID_PLANS = ['hobby', 'pro']
 const VALID_BILLING_CYCLES = ['monthly', 'yearly']
-
 const isValidPlan = (value) => VALID_PLANS.includes(value)
 const isValidBillingCycle = (value) => VALID_BILLING_CYCLES.includes(value)
 
@@ -22,7 +23,8 @@ const isStorageAvailable = () => typeof window !== 'undefined' && Boolean(window
 // sharing the plan/cycle choice across the components in that flow is
 // intentional. Module-level refs survive in-session navigation; localStorage
 // scoped by client_id is the source of truth across reloads, deep links, and
-// account switches (storage wins over URL).
+// account switches. Explicit URL params win over storage so deep links can
+// override a stale local selection.
 const _plan = ref(null)
 const _billingCycle = ref(null)
 
@@ -46,6 +48,19 @@ const hydrateFromScope = () => {
   return false
 }
 
+const applyDefaultSelection = ({ defaultPlan = null, defaultBillingCycle = null } = {}) => {
+  if (defaultPlan && isValidPlan(defaultPlan)) _plan.value = defaultPlan
+  if (defaultBillingCycle && isValidBillingCycle(defaultBillingCycle)) {
+    _billingCycle.value = defaultBillingCycle
+  }
+}
+
+const getDefaultPlan = ({ defaultPlan = null } = {}) =>
+  defaultPlan && isValidPlan(defaultPlan) ? defaultPlan : null
+
+const getDefaultBillingCycle = ({ defaultBillingCycle = null } = {}) =>
+  defaultBillingCycle && isValidBillingCycle(defaultBillingCycle) ? defaultBillingCycle : null
+
 let _isSynced = false
 const _moduleScope = effectScope(true)
 
@@ -66,7 +81,7 @@ const setupSync = (accountStore) => {
           _plan.value = null
           _billingCycle.value = null
           if (!hydrateFromScope()) {
-            _plan.value = 'pro'
+            _plan.value = 'hobby'
             _billingCycle.value = 'monthly'
           }
         } else if (!newId && oldId) {
@@ -81,7 +96,7 @@ const setupSync = (accountStore) => {
     _plan.value = null
     _billingCycle.value = null
     if (!hydrateFromScope()) {
-      _plan.value = 'pro'
+      _plan.value = 'hobby'
       _billingCycle.value = 'monthly'
     }
   })
@@ -131,23 +146,31 @@ export function usePlans() {
     await router.replace({ path: route.path, query: nextQuery })
   }
 
-  const initialize = () => {
-    if (hydrateFromScope()) {
-      syncToUrl()
+  const initialize = (defaults = {}) => {
+    const urlParams = readFromUrl()
+
+    if (urlParams) {
+      if (urlParams.plan) _plan.value = urlParams.plan
+      if (urlParams.billingCycle) _billingCycle.value = urlParams.billingCycle
+
+      if (!_plan.value || !_billingCycle.value) {
+        const stored = readScoped(BASE_KEY)
+        if (stored) {
+          if (!_plan.value && stored.plan) _plan.value = stored.plan
+          if (!_billingCycle.value && stored.billingCycle) _billingCycle.value = stored.billingCycle
+        }
+      }
+
+      if (!_plan.value) _plan.value = getDefaultPlan(defaults)
+      if (!_billingCycle.value) _billingCycle.value = getDefaultBillingCycle(defaults)
       return
     }
 
-    const urlParams = readFromUrl()
-    if (urlParams) {
-      _plan.value = urlParams.plan || null
-      _billingCycle.value = urlParams.billingCycle || null
-      return
-    }
+    if (hydrateFromScope()) return
 
     if (_plan.value || _billingCycle.value) return
 
-    _plan.value = 'pro'
-    _billingCycle.value = 'monthly'
+    applyDefaultSelection(defaults)
   }
 
   const setParam = (key, value) => {

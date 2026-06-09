@@ -30,7 +30,7 @@
 
   const CYCLE_OPTIONS = [
     { label: 'Monthly', value: 'monthly' },
-    { label: 'Yearly', value: 'yearly' }
+    { label: 'Annual', value: 'yearly' }
   ]
 
   const props = defineProps({

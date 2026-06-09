@@ -3,16 +3,13 @@ import { serviceOrdersService } from '@/services/v2/service-orders/service-order
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-import { toMilliseconds } from '@/services/v2/base/query/config'
 
-// Single source of truth for the plans-catalogue query so reactive readers
-// (`usePlansList`) and imperative ones (`ensurePlansList`) hit the exact same
-// cache entry. Plans are effectively static between product launches.
 const PLANS_QUERY = {
   queryKey: queryKeys.plans.list(),
   queryFn: () => serviceOrdersService.listPlansService(),
-  staleTime: toMilliseconds({ hours: 1 }),
-  gcTime: toMilliseconds({ hours: 24 })
+  staleTime: 0,
+  gcTime: 0,
+  meta: { persist: false }
 }
 
 /**
@@ -31,7 +28,7 @@ export function usePlansList(options = {}) {
 
   return useQuery({
     ...PLANS_QUERY,
-    refetchOnMount: false,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: false,
     enabled
   })

@@ -15,12 +15,9 @@ export async function accountGuard({ to, accountStore, tracker }) {
     }
 
     try {
-      // Awaiting full hydration (account+user+settings+SO+billing+contract)
-      // ensures `needsOnboarding` and `hasAccessConsole` reflect real state
-      // by the time the redirect decision below executes. Without this, the
-      // guard would race the contract/billing fetches.
+      // Await account identity hydration before deciding onboarding redirects.
+      // `has_service_order_plan` from account info drives the plan gate.
       await loadAccountHydration()
-      sessionManager.afterLogin()
 
       const needsOnboarding = accountStore.needsOnboarding
       const isAdditionalDataRoute = to.name === 'additional-data'
