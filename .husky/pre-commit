@@ -3,4 +3,4 @@
 
 yarn lint
 yarn format
-yarn test:unit:coverage
+

@@ -31,8 +31,8 @@ const parseItemResponse = (data) => {
 }
 
 export class EnvironmentService extends BaseService {
-  // This is a temporary baseURL for the new deployment api, to be ajusted after the migration is complete
-  #baseURL = '/deployment-api/v1/environments'
+  // Standalone Environment API (split out of the Deployment API). Proxied via the `/environment-api` prefix.
+  #baseURL = '/environment-api/v4/environments'
 
   #fetchList = async () => {
     const { data } = await this.http.request({

@@ -38,6 +38,15 @@ const normalizeProtection = (protection) => {
   }
 }
 
+const normalizeAuditActor = (actor) => {
+  if (!isObject(actor)) return null
+  return {
+    user_id: actor.user_id ?? null,
+    trigger: actor.trigger ?? null,
+    email: actor.email ?? null
+  }
+}
+
 const normalizeBranchTracking = (branchTracking) => {
   if (branchTracking === null) return null
   if (!isObject(branchTracking)) return null
@@ -66,8 +75,8 @@ const normalizeEnvironment = (environment) => {
     client_id: source.client_id ?? null,
     created_at: source.created_at ?? null,
     updated_at: source.updated_at ?? null,
-    created_by: source.created_by ?? null,
-    last_editor: source.last_editor ?? null
+    created_by: normalizeAuditActor(source.created_by),
+    last_modified_by: normalizeAuditActor(source.last_modified_by)
   }
 }
 
@@ -86,8 +95,11 @@ export const EnvironmentAdapter = {
     if (!Array.isArray(data)) return []
     return data.map((item) => {
       const normalized = normalizeEnvironment(item)
+      const lastEditor =
+        normalized.last_modified_by?.email || normalized.last_modified_by?.user_id || '-'
       return {
         ...normalized,
+        last_editor: lastEditor,
         updated_at: normalized.updated_at
           ? formatDateToDayMonthYearHour(normalized.updated_at)
           : '-'
