@@ -1,5 +1,5 @@
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref, inject } from 'vue'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
@@ -161,10 +161,9 @@
     @on-before-go-to-edit="handleBeforeGoToEdit"
   >
     <template #emptyBlockButton>
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
         icon="pi pi-plus"
+        severity="secondary"
         label="Cache Setting"
         @click="openCreateDrawer"
         data-testid="edge-application-cache-settings-list__create-cache-settings__button"

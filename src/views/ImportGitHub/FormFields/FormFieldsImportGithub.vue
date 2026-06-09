@@ -2,8 +2,7 @@
   import { ref, onMounted, computed } from 'vue'
   import { useRouter } from 'vue-router'
   import { useField } from 'vee-validate'
-  import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import Divider from '@aziontech/webkit/divider'
   import { useToast } from '@aziontech/webkit/use-toast'
@@ -184,13 +183,13 @@
   <FormHorizontal title="GitHub Connection">
     <template #description>
       Provide access to GitHub to import an existing project.
-      <Button
-        kind="text"
-        size="medium"
+      <PrimeButton
+        link
+        icon-pos="right"
         icon="pi pi-external-link"
         label="Fork and use a sample project"
-        @click="goToAzionSamples"
         class="w-fit p-0 text-sm"
+        @click="goToAzionSamples"
       />
     </template>
     <template #inputs>
@@ -408,14 +407,12 @@
             >
               New Variable
             </Divider>
-            <IconButton
-              kind="outlined"
-              size="medium"
+            <PrimeButton
+              class="h-8 max-sm:w-full position-absolute right-0 top-0"
               icon="pi pi-trash"
+              outlined
               type="button"
               @click="removeVariable(index)"
-              class="h-8 max-sm:w-full position-absolute right-0 top-0"
-              aria-label="button"
             />
           </div>
           <div class="flex gap-4">
@@ -452,16 +449,15 @@
       </template>
 
       <div class="flex flex-col sm:flex-row gap-4">
-        <Button
-          kind="outlined"
-          size="medium"
+        <PrimeButton
           icon="pi pi-plus-circle"
+          outlined
           label="Variable"
           @click="addVariable"
         />
-        <Button
-          kind="text"
-          size="medium"
+        <PrimeButton
+          link
+          icon-pos="right"
           icon="pi pi-external-link"
           label="View All Variables"
           @click="goToVariablesPage"

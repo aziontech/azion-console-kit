@@ -1,6 +1,7 @@
 <template>
-  <IconButton
+  <PrimeButton
     icon="pi pi-bell"
+    class="overflow-auto text-white border-header bg-header hover:bg-header-button-hover pl-2 h-8 w-8"
     badge="9"
     size="small"
     badgeClass="p-badge-danger"
@@ -8,8 +9,12 @@
     aria-haspopup="true"
     aria-controls="overlay_menu"
     v-tooltip.bottom="{ value: 'Notifications', showDelay: 200 }"
-    class="overflow-auto text-white border-header bg-header hover:bg-header-button-hover pl-2 h-8 w-8"
-    aria-label="button"
+    :pt="{
+      root: { class: 'overflow-visible' },
+      label: { class: 'text-white' },
+      icon: { class: 'text-white' },
+      badge: { class: 'absolute right-[-4px] top-[-8px]' }
+    }"
   />
 
   <PrimeMenu
@@ -30,7 +35,8 @@
 
 <script setup>
   import { ref } from 'vue'
-  import IconButton from '@aziontech/webkit/icon-button'
+
+  import PrimeButton from '@aziontech/webkit/button'
   import PrimeMenu from '@aziontech/webkit/menu'
 
   defineOptions({ name: 'navbar-notiication-block' })

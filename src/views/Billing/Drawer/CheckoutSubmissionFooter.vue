@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-  import ActionButton from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
 
   defineOptions({ name: 'checkout-submission-footer' })
 

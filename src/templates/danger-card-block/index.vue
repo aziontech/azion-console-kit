@@ -21,6 +21,10 @@
         @click="handleAction"
         :loading="loading"
         :disabled="disabled"
+        :pt="{
+          root: { class: 'p-button-danger' },
+          label: { class: 'font-medium' }
+        }"
       />
     </div>
   </div>

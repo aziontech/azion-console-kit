@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeFirewallFunctionService } from '@/services/v2/edge-firewall/edge-firewall-function-service'
   import DrawerFunction from './Drawer'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -183,14 +183,13 @@
     }"
   >
     <template #emptyBlockButton>
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        severity="secondary"
         icon="pi pi-plus"
         label="Function Instance"
         data-testid="create_Function Instance_button"
         @click="openCreateFunctionDrawer"
-        class="max-md:w-full w-fit"
       />
     </template>
   </ListTable>

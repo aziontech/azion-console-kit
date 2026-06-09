@@ -3,10 +3,11 @@
     <div
       class="h-72 w-full bg-gradient-to-t text-[var(--surface-section)] from-current absolute z-10 bottom-0 left-0"
     ></div>
-    <div
+    <PrimeButton
       v-for="item of 9"
       :key="item"
-      class="p-4 text-left border-solid border surface-border transition-all rounded-[var(--shape-button)]"
+      class="p-4 text-left border-solid border surface-border transition-all"
+      link
     >
       <div class="flex flex-col w-full h-full justify-between gap-3.5 items-start">
         <div class="flex w-full gap-3.5 flex-col">
@@ -18,8 +19,10 @@
           </div>
         </div>
       </div>
-    </div>
+    </PrimeButton>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+  import PrimeButton from '@aziontech/webkit/button'
+</script>

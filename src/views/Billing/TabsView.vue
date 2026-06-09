@@ -2,7 +2,7 @@
   import { ref, computed } from 'vue'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import IconButton from '@aziontech/webkit/actions/icon-button'
   import SkeletonBlock from '@/templates/skeleton-block'
   import BillsView from '@/views/Billing/BillsView.vue'
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'

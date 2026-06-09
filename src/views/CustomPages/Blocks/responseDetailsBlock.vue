@@ -27,14 +27,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
+                  class="w-full whitespace-nowrap flex"
                   @click="openDrawerConnector"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
                   data-testid="response-details__create-connector-button"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Connector"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -114,7 +118,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextarea from '@aziontech/webkit/field-text-area'
   import ConnectorDrawer from '@/views/EdgeConnectors/Drawer/index.vue'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
   import { useField } from 'vee-validate'
   import { computed, ref, watch } from 'vue'

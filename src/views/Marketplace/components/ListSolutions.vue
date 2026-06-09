@@ -1,10 +1,11 @@
 <template>
   <div class="ml-0 w-full mt-0 grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-    <button
+    <PrimeButton
       v-for="solution in props.solutions"
       :key="solution.id"
+      class="p-6 surface-card text-left h-[180px] border-solid border surface-border hover:border-primary transition-all"
+      link
       type="button"
-      class="p-6 surface-card text-left h-[180px] border-solid border surface-border hover:border-primary transition-all rounded-[var(--shape-button)]"
       @click="goToSolution(solution)"
     >
       <div class="flex flex-col h-full justify-between gap-3.5 items-start">
@@ -30,11 +31,12 @@
           </div>
         </div>
       </div>
-    </button>
+    </PrimeButton>
   </div>
 </template>
 
 <script setup>
+  import PrimeButton from '@aziontech/webkit/button'
   import { useRouter } from 'vue-router'
 
   const $router = useRouter()

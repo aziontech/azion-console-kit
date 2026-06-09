@@ -56,22 +56,19 @@
       </div>
     </div>
     <template #closeicon>
-      <IconButton
-        kind="outlined"
-        size="medium"
+      <PrimeButton
+        outlined
         type="button"
         icon="pi pi-times"
         @click="closeDialog"
-        aria-label="button"
       />
     </template>
 
     <template #footer>
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
         data-testid="domains-dialog__confirm__button"
         label="Confirm"
+        severity="secondary"
         @click="closeDialog"
       />
     </template>
@@ -83,8 +80,7 @@
   import PrimeDialog from '@aziontech/webkit/dialog'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PrimeInputText from '@aziontech/webkit/inputtext'
-  import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import CopyBlock from '@aziontech/webkit/button-copy'
 
   defineOptions({ name: 'CopyDomainDialog' })

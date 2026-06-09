@@ -19,9 +19,9 @@
           <div class="p-3 md:p-6 flex flex-col gap-4">
             <div class="flex justify-between">
               <span class="font-medium text-lg text-color">Invoice Data</span>
-              <Button
-                kind="outlined"
+              <PrimeButton
                 icon="pi pi-download"
+                outlined
                 size="small"
                 label="Export"
                 @click="invoiceDownload"
@@ -169,7 +169,7 @@
   import SkeletonBlock from '@/templates/skeleton-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import CopyBlock from '@aziontech/webkit/button-copy'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import cardFlagBlock from '@templates/card-flag-block'
   import TableServicesProducts from './components/table-services-products'
   import { listServiceAndProductsChangesAccountingService } from '@/services/billing-services'

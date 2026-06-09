@@ -1,8 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldText from '@aziontech/webkit/field-text'
-  import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Divider from '@aziontech/webkit/divider'
   import LabelBlock from '@aziontech/webkit/label'
   import FieldNumber from '@aziontech/webkit/field-number'
@@ -213,12 +212,10 @@
             >
               Custom Error Response
             </Divider>
-            <IconButton
-              kind="outlined"
-              size="medium"
+            <PrimeButton
               @click="removeErrosResponses(index)"
+              outlined
               icon="pi pi-trash"
-              aria-label="button"
             />
           </div>
 
@@ -273,12 +270,11 @@
       </div>
       <div class="flex flex-col gap-8 sm:items-start">
         <Divider />
-        <Button
-          kind="outlined"
-          size="medium"
+        <PrimeButton
           @click="addErrorResponse"
           data-testid="error-responses-form__add-button"
           label="Add Error Response"
+          outlined
           icon="pi pi-plus-circle"
         />
       </div>

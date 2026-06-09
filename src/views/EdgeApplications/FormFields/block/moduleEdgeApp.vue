@@ -17,7 +17,7 @@
           data-testid="form-horizontal-modules-default-switch"
         >
           <template #footer="{ item }">
-            <Tag
+            <PrimeTag
               v-if="item?.tag"
               :value="item.tag.value"
               :icon="item.tag.icon"
@@ -34,14 +34,13 @@
         data-testid="form-horizontal-modules-subscription"
       >
         <span class="text-color text-base font-medium leading-5">Subscription modules</span>
-        <Button
-          kind="outlined"
-          size="medium"
+        <PrimeButton
+          outlined
           icon="pi pi-shopping-cart"
+          class="max-w-[170px] whitespace-nowrap"
           label="Contact sales"
           @click="openContactSales"
           data-testid="form-horizontal-modules-subscription-contact-sales-button"
-          class="max-w-[170px] whitespace-nowrap"
         />
       </div>
     </template>
@@ -51,8 +50,8 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
-  import Button from '@aziontech/webkit/button'
-  import Tag from '@aziontech/webkit/tag'
+  import PrimeButton from '@aziontech/webkit/button'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import { contactSalesEdgeApplicationService } from '@/helpers'
 
   defineProps({
