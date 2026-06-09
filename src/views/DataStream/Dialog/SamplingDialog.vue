@@ -46,7 +46,7 @@
 <script setup>
   import PrimeDialog from '@aziontech/webkit/dialog'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
 
   const emit = defineEmits(['confirm', 'cancel'])
 </script>

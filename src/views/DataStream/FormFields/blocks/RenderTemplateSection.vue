@@ -98,7 +98,7 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'

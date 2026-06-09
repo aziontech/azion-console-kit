@@ -11,7 +11,7 @@
   import { useLoadingStore } from '@/stores/loading'
   import { deleteAccountService } from '@/services/account-services/delete-account-service'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { onMounted, ref, watch, computed } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { capitalizeFirstLetter } from '@/helpers'

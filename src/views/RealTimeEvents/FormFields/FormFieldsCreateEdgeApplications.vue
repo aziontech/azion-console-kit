@@ -1,7 +1,7 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Card from '@aziontech/webkit/card'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InputNumber from '@aziontech/webkit/inputnumber'

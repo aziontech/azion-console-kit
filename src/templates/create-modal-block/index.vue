@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref, inject, watch } from 'vue'
   import { useRouter } from 'vue-router'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import PrimeInputText from '@aziontech/webkit/inputtext'
   import { useAccountStore } from '@/stores/account'
   import { useCreateModalStore } from '@/stores/create-modal'

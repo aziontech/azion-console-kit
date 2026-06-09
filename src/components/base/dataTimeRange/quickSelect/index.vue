@@ -90,7 +90,7 @@
 
 <script setup>
   import { ref, onMounted, onUnmounted, watch } from 'vue'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InputNumber from '@aziontech/webkit/inputnumber'
   import InputSwitch from '@aziontech/webkit/inputswitch'

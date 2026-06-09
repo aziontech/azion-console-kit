@@ -2,7 +2,7 @@
   import { inject, onMounted, ref, watchEffect } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
 
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import Sidebar from '@aziontech/webkit/sidebar'
   import Skeleton from '@aziontech/webkit/skeleton'

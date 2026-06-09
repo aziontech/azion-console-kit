@@ -144,7 +144,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useSolutionStore } from '@/stores/solution-create'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import ScriptRunnerBlock from '@/templates/script-runner-block'
   import PrimeCard from '@aziontech/webkit/card'
   import { useToast } from '@aziontech/webkit/use-toast'

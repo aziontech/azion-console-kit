@@ -75,7 +75,7 @@
   import { azionPrivacyPolicyWindowOpener, azionTermsAndServicesWindowOpener } from '@/helpers'
   import SocialIdpsBlock from '@/templates/social-idps-block'
   import AccountActivation from '@/templates/signup-block/account-activation.vue'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import PrimeDivider from '@aziontech/webkit/divider'
   import LoginWithEmailBlock from '@/templates/signup-block/login-with-email-block'
   import { usePlans } from '@/composables/usePlans'

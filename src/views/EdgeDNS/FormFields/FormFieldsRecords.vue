@@ -4,7 +4,7 @@
   import FieldNumber from '@aziontech/webkit/field-number'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import InputText from '@aziontech/webkit/inputtext'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import { documentationGuideProducts } from '@/helpers'
   import { useField } from 'vee-validate'

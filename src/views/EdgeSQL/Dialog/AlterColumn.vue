@@ -65,7 +65,7 @@
 
 <script setup>
   import Dialog from '@aziontech/webkit/dialog'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { capitalizeFirstLetter } from '@/helpers'

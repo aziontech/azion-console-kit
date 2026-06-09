@@ -191,7 +191,6 @@
     fetchOnSort,
     fetchOnSearch,
     handleSearchValue,
-    toggleFilter,
     handleApplyFilter,
     handleRemoveFilter,
     exportFunctionMapper,

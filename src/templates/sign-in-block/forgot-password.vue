@@ -96,7 +96,7 @@
 
 <script setup>
   import InputText from '@aziontech/webkit/inputtext'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import PrimeBadge from '@aziontech/webkit/badge'
 
   import * as yup from 'yup'

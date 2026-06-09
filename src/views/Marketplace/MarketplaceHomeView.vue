@@ -118,7 +118,7 @@
   import BannerContentBlock from '@/templates/content-block/banner'
   import InputText from '@aziontech/webkit/inputtext'
   import Listbox from '@aziontech/webkit/listbox'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import ListSolutions from './components/ListSolutions'
   import LoadingList from './components/LoadingList'
   import LoadingEmptySearch from './components/LoadingEmptySearch'

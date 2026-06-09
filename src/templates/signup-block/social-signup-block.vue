@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import SocialIdpsBlock from '@/templates/social-idps-block'
   import { useAccountStore } from '@/stores/account'
   const emit = defineEmits(['change-signup-method'])

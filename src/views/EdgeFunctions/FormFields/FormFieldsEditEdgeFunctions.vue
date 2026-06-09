@@ -5,7 +5,7 @@
   import ResizableSplitter from '@/components/Splitter/ResizableSplitter.vue'
   import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import SelectPanel from '@/components/select-panel'

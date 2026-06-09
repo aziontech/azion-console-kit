@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Menu from '@aziontech/webkit/menu'
   import { ref } from 'vue'
 

@@ -1,5 +1,5 @@
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import DrawerBlock from '@/views/CustomPages/Drawer/drawerSelectPageCode'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import DataTable from '@aziontech/webkit/list-data-table'

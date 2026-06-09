@@ -3,7 +3,7 @@
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import MultiSelect from '@aziontech/webkit/multiselect'
   import FieldText from '@aziontech/webkit/field-text'
   import Drawer from '@/views/EdgeApplications/Drawer'

@@ -348,7 +348,7 @@
   import { RouterLink } from 'vue-router'
   import { storeToRefs } from 'pinia'
   import Avatar from '@aziontech/webkit/avatar'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'
   import PrimeMenu from '@aziontech/webkit/menu'

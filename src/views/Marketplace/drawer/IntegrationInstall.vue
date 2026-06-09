@@ -3,7 +3,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import PageLoadingBlock from '@/templates/loading-block'
   import TemplateEngineBlock from '@/templates/template-engine-block'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InlineMessage from '@aziontech/webkit/inlinemessage'

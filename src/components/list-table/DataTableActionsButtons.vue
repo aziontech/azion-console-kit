@@ -37,7 +37,7 @@
       outlined
       data-testid="data-table-other-actions-button"
     />
-    <Button
+    <PrimeButton
       :class="buttonClass"
       :disabled="disabled"
       @click="handleClick"
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useRouter } from 'vue-router'
   import { useLayout } from '@/composables/use-layout'
   const { OpenSidebarComponent } = useLayout()
