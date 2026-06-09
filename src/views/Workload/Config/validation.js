@@ -227,9 +227,6 @@ const legacyExtras = {
   subjectNameCertificate: yup.array().nullable()
 }
 
-/**
- * Builds the Workload form validation schema for the active account type.
- * @param {boolean} isV6 - whether the account has the `use_v6_configurations` flag.
- */
-export const buildValidationSchema = (isV6) =>
-  yup.object(isV6 ? { ...baseSchema, ...v6Extras } : { ...baseSchema, ...legacyExtras })
+export const buildV6Schema = () => yup.object({ ...baseSchema, ...v6Extras })
+
+export const buildLegacySchema = () => yup.object({ ...baseSchema, ...legacyExtras })

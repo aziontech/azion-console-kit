@@ -62,7 +62,7 @@
   import PrimeButton from '@aziontech/webkit/button'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { buildValidationSchema } from './Config/validation'
+  import { buildV6Schema } from './Config/validation'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -84,7 +84,7 @@
   defineEmits(['loaded-service-object'])
 
   const cachedWorkload = workloadService.getWorkloadFromCache(route.params.id) ?? {}
-  const validationSchema = buildValidationSchema(true)
+  const validationSchema = buildV6Schema()
 
   const editWorkload = (payload) => workloadService.editWorkload(payload, true)
 
