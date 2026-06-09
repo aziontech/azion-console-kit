@@ -1,9 +1,15 @@
 <template>
-  <Button
+  <PrimeButton
+    :pt="{
+      root: { class: 'max-md:w-[2rem] h-[2rem] justify-content-center' },
+      label: { class: 'max-md:hidden' },
+      icon: { class: `max-md:m-0 ${props.styleTextColor}` }
+    }"
     icon="pi pi-flag"
-    size="medium"
+    size="small"
     label="Feedback"
-    kind="outlined"
+    :outlined="props.outlined"
+    :class="props.class"
     @click="visible = true"
     v-tooltip.bottom="{ value: 'Feedback', showDelay: 200 }"
     data-testid="header-block__open-feedback-button"
@@ -74,18 +80,20 @@
           </span>
         </div>
         <div class="flex gap-2 w-full sm:w-auto">
-          <Button
-            kind="outlined"
+          <PrimeButton
             type="button"
             label="Cancel"
+            outlined
             size="small"
+            class="w-20"
             @click="visible = false"
             data-testid="feedback-dialog__dialog-footer__cancel-button"
           />
-          <Button
-            kind="secondary"
+          <PrimeButton
             type="button"
+            severity="secondary"
             label="Send feedback"
+            class="sm:w-36"
             size="small"
             :loading="loading"
             @click="sendFeedback()"
@@ -108,14 +116,17 @@
   import Dialog from '@aziontech/webkit/dialog'
   import Dropdown from '@aziontech/webkit/dropdown'
   import Textarea from '@aziontech/webkit/textarea'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({ name: 'console-feedback' })
 
-  defineProps({
+  const props = defineProps({
     styleTextColor: {
       type: String,
       default: () => 'text-color'
+    },
+    class: {
+      type: String
     },
     outlined: {
       type: Boolean,

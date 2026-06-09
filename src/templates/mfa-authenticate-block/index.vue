@@ -50,13 +50,12 @@
           >{{ hasRequestErrorMessage }}</InlineMessage
         >
 
-        <Button
-          kind="secondary"
-          size="medium"
+        <PrimeButton
+          class="w-full flex-row-reverse"
           label="Verify"
           :loading="isButtonLoading"
+          severity="secondary"
           type="submit"
-          class="w-full flex-row-reverse"
         />
       </div>
     </div>
@@ -70,7 +69,7 @@
 </script>
 
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import InputText from '@aziontech/webkit/inputtext'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
 

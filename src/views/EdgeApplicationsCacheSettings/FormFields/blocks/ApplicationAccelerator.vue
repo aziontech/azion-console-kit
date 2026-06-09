@@ -206,14 +206,18 @@
                   <template #footer>
                     <ul class="p-2">
                       <li>
-                        <Button
-                          kind="text"
+                        <PrimeButton
                           @click="openCreateDeviceGroupDrawer"
+                          class="w-full whitespace-nowrap flex"
                           data-testid="domains-form__create-edge-firewall-button"
+                          text
                           size="small"
                           icon="pi pi-plus-circle"
+                          :pt="{
+                            label: { class: 'w-full text-left' },
+                            root: { class: 'p-2' }
+                          }"
                           label="Create Device Group"
-                          class="w-full whitespace-nowrap flex"
                         />
                       </li>
                     </ul>
@@ -247,7 +251,7 @@
   import FieldDropdownMultiSelectLazyLoader from '@aziontech/webkit/field-dropdown-multi-select-lazy-loader'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
   import { useRoute } from 'vue-router'
 

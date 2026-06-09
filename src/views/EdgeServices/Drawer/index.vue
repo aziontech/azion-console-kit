@@ -49,8 +49,10 @@
       .string()
       .required()
       .test('validateFilePath', 'Must be a valid file path', (val) => {
-        const isValid = /^(\/\.?[\w][\w.-]*)+$/.test(val)
-        return isValid
+        if (!val) return false
+        if (!val.startsWith('/')) return false
+        const segments = val.substring(1).split('/')
+        return segments.length > 0 && segments.every((segment) => /^\.?\w[\w.-]*$/.test(segment))
       })
       .label('Path'),
     contentType: yup.string().required(),

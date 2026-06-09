@@ -436,9 +436,14 @@ export function useEdgeSQL() {
         const tableNames = detectSelectTableNames(flatStatements)
         tableNameExecuted = Array.from(tableNames)[0]
         const { results } = await edgeSQLService.queryDatabase(databaseId, { statements })
-        const countOnlyRegex = /^\s*select\s+count\s*\(\s*\*\s*\)(\s+as\s+\w+)?\s+from\b/i
+        const countNoAliasRegex = /^select count\(\*\) from\b/i
+        const countWithAliasRegex = /^select count\(\*\) as \w+ from\b/i
         const isCountSelect =
-          selectStatements.length > 0 && selectStatements.every((stmt) => countOnlyRegex.test(stmt))
+          selectStatements.length > 0 &&
+          selectStatements.every((stmt) => {
+            const normalized = String(stmt).trim().replace(/\s+/g, ' ')
+            return countNoAliasRegex.test(normalized) || countWithAliasRegex.test(normalized)
+          })
         const queryHasAlias = flatStatements.some((stmt) => /\bas\s+\w+/i.test(String(stmt)))
         queryResults = postprocessSelectResults(results, tableNames, {
           databaseId,

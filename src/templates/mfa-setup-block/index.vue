@@ -17,13 +17,12 @@
           <ul class="list-decimal text-color-secondary list-inside">
             <li>
               Install
-              <Button
-                kind="text"
-                size="medium"
+              <PrimeButton
+                link
                 label="Google Authenticator"
-                @click="props.openGoogleAuthenticatorAppDocumentation"
                 class="p-0"
-              />
+                @click="props.openGoogleAuthenticatorAppDocumentation"
+              ></PrimeButton>
               on your device.
             </li>
             <li>Open the app and tap "+" button.</li>
@@ -68,13 +67,12 @@
           </div>
         </div>
 
-        <Button
-          kind="secondary"
-          size="medium"
+        <PrimeButton
+          class="w-full flex-row-reverse"
           label="Verify code"
           :loading="isButtonLoading"
+          severity="secondary"
           type="submit"
-          class="w-full flex-row-reverse"
         />
       </div>
     </div>
@@ -88,7 +86,7 @@
 </script>
 
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import InputText from '@aziontech/webkit/inputtext'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import Skeleton from '@aziontech/webkit/skeleton'

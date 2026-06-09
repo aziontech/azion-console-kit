@@ -2,7 +2,7 @@
   import { computed, useSlots } from 'vue'
   import DataTable from '@aziontech/webkit/list-data-table'
   const DataTableColumnSelector = DataTable.ColumnSelector
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useDataTable } from '@/composables/useDataTable'
 
   defineOptions({ name: 'list-table' })
@@ -149,6 +149,9 @@
       type: String,
       default: ''
     },
+    scrollHeight: {
+      type: String
+    },
     /**
      * When set, renders a single inline action button per row instead of the ellipsis menu.
      * Accepts an object: { icon: 'pi pi-trash', label: 'Delete', command: fn(rowData), disabled: boolean|fn(rowData) }
@@ -232,13 +235,32 @@
   function handleRowClick(event) {
     if (props.disabledList) return
     if (!props.enableEditClick) return
-    if (props.frozenColumns?.length) return null
 
-    return editItemSelected(event.originalEvent, event.data)
+    const rowData = event.data
+    const originalEvent = event.originalEvent
+
+    // Don't navigate when clicking inside a component column (e.g., CopyBlock, Tag, etc.)
+    const clickedCell = originalEvent.target.closest('td')
+    if (clickedCell) {
+      const columnIndex = Array.from(clickedCell.parentElement.children).indexOf(clickedCell)
+      const adjustedIndex =
+        columnIndex - (props.reorderableRows ? 1 : 0) - (props.showSelectionMode ? 1 : 0)
+      const col = selectedColumns.value[adjustedIndex]
+      if (col?.type === 'component') return null
+    }
+
+    if (!props.frozenColumns.length) {
+      return editItemSelected(originalEvent, rowData)
+    }
+    return null
   }
 
   function handleColumnClick(event, col, rowData) {
     if (isFrozenColumn(col.field)) {
+      return editItemSelected(event, rowData)
+    }
+    if (col?.type === 'component') return null
+    if (!props.frozenColumns.length && props.enableEditClick) {
       return editItemSelected(event, rowData)
     }
     return null
@@ -302,6 +324,7 @@
       v-model:sortField="sortFieldValue"
       v-model:sortOrder="sortOrderValue"
       :rowsPerPageOptions="rowsPerPageOptions"
+      :scrollHeight="scrollHeight"
       :reorderableRows="reorderableRows"
       :emptyListMessage="emptyListMessage"
       :emptyBlock="emptyBlock"
@@ -342,14 +365,13 @@
                   class="flex flex-row items-center gap-2 max-sm:w-full"
                   data-testid="data-table-search"
                 >
-                  <IconButton
+                  <PrimeButton
                     v-if="hasAllowedFilters"
-                    kind="outlined"
+                    outlined
                     icon="pi pi-filter"
-                    size="medium"
-                    data-testid="data-table-actions-column-header-toggle-filter"
-                    aria-label="data table actions column header toggle filter"
+                    size="small"
                     @click="toggleFilter"
+                    data-testid="data-table-actions-column-header-toggle-filter"
                   />
                   <DataTable.Search
                     class="w-full md:min-w-[20rem]"
@@ -362,14 +384,13 @@
                 </span>
                 <div class="flex gap-2 max-sm:w-full">
                   <slot name="header-actions" />
-                  <IconButton
-                    kind="outlined"
+                  <PrimeButton
+                    outlined
                     icon="pi pi-refresh"
-                    size="medium"
+                    size="small"
+                    @click="reload({ page: 1, skipCache: true })"
                     v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                     data-testid="data-table-actions-column-header-refresh"
-                    aria-label="data table actions column header refresh"
-                    @click="reload({ page: 1, skipCache: true })"
                   />
                   <DataTable.Export
                     v-if="hasExportToCsvMapper || exportFileName"
@@ -421,8 +442,7 @@
         :header="col.header"
         :sortField="col?.sortField"
         :class="{
-          'hover:cursor-pointer':
-            !disabledList && (frozenColumns?.length ? isFrozenColumn(col.field) : enableEditClick)
+          'hover:cursor-pointer': !disabledList && (enableEditClick || isFrozenColumn(col.field))
         }"
         data-testid="data-table-column"
         :style="col.style"

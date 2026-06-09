@@ -275,7 +275,7 @@ graph TB
 
 | File                    | Purpose                                              |
 | ----------------------- | ---------------------------------------------------- |
-| `src/stores/account.js` | Account state including `hasServiceOrderPlan` getter |
+| `src/stores/account.js` | Account state including the `needsOnboarding` getter |
 
 ### Helpers
 
@@ -294,20 +294,23 @@ graph TB
 
 ## State Management
 
-### Account Store (`hasServiceOrderPlan`)
+### Account Store (`needsOnboarding`)
 
 ```javascript
 // src/stores/account.js
-hasServiceOrderPlan(state) {
-  // false = needs to purchase (redirects to additional-data)
-  // true = has contract a plan
-  // null = is old account
-  const value = state.account?.has_service_order_plan
-  return false  // Currently forces flow for all users
+needsOnboarding(state) {
+  return (
+    state.account?.first_login === true &&
+    state.account?.kind === 'client' &&
+    state.account?.hasServiceOrderPlan !== true
+  )
 }
 ```
 
-**Important:** The getter currently returns `false` unconditionally, forcing all users through the contracting flow.
+The account adapter maps the raw API field `has_service_order_plan` to the camelCase
+`hasServiceOrderPlan` (strict boolean) in `_adaptAccountInfo`.
+
+**Important:** `hasServiceOrderPlan` is the source of truth for the post-login plan gate. `false` sends the user to plan configuration; `true` skips the plan screen.
 
 ### Service Order State (useServiceOrders)
 
@@ -602,20 +605,19 @@ export async function accountGuard({ to, accountStore, tracker }) {
     }
 
     try {
-      await loadUserAndAccountInfo()
-      sessionManager.afterLogin()
+      await loadAccountHydration()
 
-      // Check if needs service order plan
-      const needsServiceOrder = accountStore.hasServiceOrderPlan === false
+      // Check if account still needs plan configuration.
+      const needsOnboarding = accountStore.needsOnboarding
       const isAdditionalDataRoute = to.name === 'additional-data'
 
-      // If needs service order and not on additional-data route, redirect
-      if (needsServiceOrder && !isAdditionalDataRoute) {
+      // If needs plan configuration and not on additional-data route, redirect.
+      if (needsOnboarding && !isAdditionalDataRoute) {
         return { name: 'additional-data' }
       }
 
-      // If doesn't need service order and trying to access additional-data, go to home
-      if (!needsServiceOrder && isAdditionalDataRoute) {
+      // If plan configuration is already done and trying to access additional-data, go home.
+      if (!needsOnboarding && isAdditionalDataRoute) {
         return { name: 'home' }
       }
 
@@ -640,8 +642,8 @@ beforeEnter: (to, from, next) => {
 
   // Only allow access to additional-data if:
   // 1. User has active session (hasActiveUserId)
-  // 2. hasServiceOrderPlan === false (needs to complete service order)
-  if (accountStore.hasActiveUserId && accountStore.hasServiceOrderPlan === false) {
+  // 2. needsOnboarding === true (has_service_order_plan !== true)
+  if (accountStore.hasActiveUserId && accountStore.needsOnboarding) {
     next()
   } else {
     // If user doesn't need service order, redirect to home
