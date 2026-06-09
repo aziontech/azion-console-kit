@@ -68,8 +68,7 @@ const findFieldInClause = (lowerQuery, fieldLower) => {
   while (cursor <= lowerQuery.length - fieldLen) {
     const fieldStart = lowerQuery.indexOf(fieldLower, cursor)
     if (fieldStart === -1) return null
-    const prevIsBoundary =
-      fieldStart === 0 || !WORD_CHAR_REGEX.test(lowerQuery[fieldStart - 1])
+    const prevIsBoundary = fieldStart === 0 || !WORD_CHAR_REGEX.test(lowerQuery[fieldStart - 1])
     if (prevIsBoundary) {
       const afterField = lowerQuery.substring(fieldStart + fieldLen)
       if (IN_CLAUSE_TRAILER_REGEX.test(afterField)) {
@@ -741,8 +740,7 @@ export default class Aql {
         continue
       }
 
-      const fieldOpRegex =
-        /((?:"[^"]+"|\S+))(\s*)(<=|>=|<>|=|<|>|like|ilike|between|\bin\b)/gi
+      const fieldOpRegex = /((?:"[^"]+"|\S+))(\s*)(<=|>=|<>|=|<|>|like|ilike|between|\bin\b)/gi
       let cursor = 0
       let match
       while ((match = fieldOpRegex.exec(part)) !== null) {
