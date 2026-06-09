@@ -149,6 +149,9 @@
       type: String,
       default: ''
     },
+    scrollHeight: {
+      type: String
+    },
     /**
      * When set, renders a single inline action button per row instead of the ellipsis menu.
      * Accepts an object: { icon: 'pi pi-trash', label: 'Delete', command: fn(rowData), disabled: boolean|fn(rowData) }
@@ -191,6 +194,7 @@
     fetchOnSort,
     fetchOnSearch,
     handleSearchValue,
+    toggleFilter,
     handleApplyFilter,
     handleRemoveFilter,
     exportFunctionMapper,
@@ -228,39 +232,35 @@
     return props.frozenColumns?.includes(field)
   }
 
-  function isInteractiveRowTarget(event) {
-    const target = event?.originalEvent?.target
-    const element = target instanceof Element ? target : target?.parentElement
-    if (!element) return false
-
-    return !!element.closest(
-      [
-        'button',
-        'a',
-        'input',
-        'select',
-        'textarea',
-        '[role="button"]',
-        '[data-testid="data-table-actions-column-body-actions"]',
-        '[data-testid="data-table-actions-column-body-action"]',
-        '.p-button',
-        '.p-menu',
-        '.disabled-click-row'
-      ].join(',')
-    )
-  }
-
   function handleRowClick(event) {
     if (props.disabledList) return
     if (!props.enableEditClick) return
-    if (isInteractiveRowTarget(event)) return
-    if (props.frozenColumns?.length) return null
 
-    return editItemSelected(event.originalEvent, event.data)
+    const rowData = event.data
+    const originalEvent = event.originalEvent
+
+    // Don't navigate when clicking inside a component column (e.g., CopyBlock, Tag, etc.)
+    const clickedCell = originalEvent.target.closest('td')
+    if (clickedCell) {
+      const columnIndex = Array.from(clickedCell.parentElement.children).indexOf(clickedCell)
+      const adjustedIndex =
+        columnIndex - (props.reorderableRows ? 1 : 0) - (props.showSelectionMode ? 1 : 0)
+      const col = selectedColumns.value[adjustedIndex]
+      if (col?.type === 'component') return null
+    }
+
+    if (!props.frozenColumns.length) {
+      return editItemSelected(originalEvent, rowData)
+    }
+    return null
   }
 
   function handleColumnClick(event, col, rowData) {
     if (isFrozenColumn(col.field)) {
+      return editItemSelected(event, rowData)
+    }
+    if (col?.type === 'component') return null
+    if (!props.frozenColumns.length && props.enableEditClick) {
       return editItemSelected(event, rowData)
     }
     return null
@@ -324,6 +324,7 @@
       v-model:sortField="sortFieldValue"
       v-model:sortOrder="sortOrderValue"
       :rowsPerPageOptions="rowsPerPageOptions"
+      :scrollHeight="scrollHeight"
       :reorderableRows="reorderableRows"
       :emptyListMessage="emptyListMessage"
       :emptyBlock="emptyBlock"
@@ -369,6 +370,7 @@
                     outlined
                     icon="pi pi-filter"
                     size="small"
+                    @click="toggleFilter"
                     data-testid="data-table-actions-column-header-toggle-filter"
                   />
                   <DataTable.Search
@@ -386,6 +388,7 @@
                     outlined
                     icon="pi pi-refresh"
                     size="small"
+                    @click="reload({ page: 1, skipCache: true })"
                     v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                     data-testid="data-table-actions-column-header-refresh"
                   />
@@ -439,8 +442,7 @@
         :header="col.header"
         :sortField="col?.sortField"
         :class="{
-          'hover:cursor-pointer':
-            !disabledList && (frozenColumns?.length ? isFrozenColumn(col.field) : enableEditClick)
+          'hover:cursor-pointer': !disabledList && (enableEditClick || isFrozenColumn(col.field))
         }"
         data-testid="data-table-column"
         :style="col.style"
