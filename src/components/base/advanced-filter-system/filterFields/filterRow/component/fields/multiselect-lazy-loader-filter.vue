@@ -18,11 +18,10 @@
             v-model="search"
             :pt="{ root: { class: 'rounded-none w-full' } }"
           />
-          <IconButton
-            size="medium"
+          <PrimeButton
             icon="pi pi-search"
             @click="loadDomains()"
-            aria-label="button"
+            :pt="{ root: { class: 'rounded-none cursor-pointer' } }"
           />
         </div>
       </template>
@@ -42,7 +41,7 @@
   import * as yup from 'yup'
   import { useField } from 'vee-validate'
   import MultiSelect from '@aziontech/webkit/multiselect'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import InputText from '@aziontech/webkit/inputtext'
 
   defineOptions({ name: 'multiSelectLazyLoaderFilter' })

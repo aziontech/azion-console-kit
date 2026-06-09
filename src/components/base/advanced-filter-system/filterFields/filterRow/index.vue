@@ -42,8 +42,8 @@
       <!-- Action Buttons -->
       <div class="flex gap-1">
         <!-- Add OR Button -->
-        <Button
-          kind="outlined"
+        <PrimeButton
+          outlined
           icon="pi pi-plus"
           label="OR"
           size="small"
@@ -51,8 +51,8 @@
         />
 
         <!-- Add AND Button -->
-        <Button
-          kind="outlined"
+        <PrimeButton
+          outlined
           icon="pi pi-plus"
           label="AND"
           size="small"
@@ -60,9 +60,11 @@
         />
 
         <!-- Delete Button (disabled for first row) -->
-        <IconButton
-          kind="danger"
+        <PrimeButton
+          type="button"
           icon="pi pi-trash"
+          severity="danger"
+          outlined
           size="small"
           aria-label="button"
           :disabled="props.rowIndex === 0"
@@ -90,9 +92,8 @@
 </template>
 
 <script setup>
-  import { computed, ref, watch } from 'vue'
-  import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import { computed, defineModel, ref, watch } from 'vue'
+  import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import { FIELDS_MAPPING } from '@/components/base/filterFields/filterRow/component'
 

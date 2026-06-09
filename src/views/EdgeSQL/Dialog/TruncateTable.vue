@@ -33,18 +33,17 @@
       </div>
 
       <div class="flex justify-end gap-2 mt-2">
-        <Button
-          kind="outlined"
+        <PrimeButton
           label="Cancel"
+          outlined
           size="small"
           @click="emit('update:visible', false)"
         />
-        <Button
-          kind="primary"
+        <PrimeButton
           label="Truncate Table"
           size="small"
+          severity="danger"
           @click="truncateTable"
-          class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
         />
       </div>
     </div>
@@ -53,7 +52,7 @@
 
 <script setup>
   import Dialog from '@aziontech/webkit/dialog'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { edgeSQLService } from '@/services/v2/edge-sql/edge-sql-service'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { capitalizeFirstLetter } from '@/helpers'
