@@ -14,7 +14,10 @@ Module._resolveFilename = function (request, parent, isMain, options) {
 
 module.exports = {
   root: true,
-  plugins: ['azion-architecture'],
+  // Register security/xss/no-unsanitized plugins so eslint-disable directives for their rules
+  // (added for .eslintrc-security.cjs) don't fail this main lint pass. Rule severities for those
+  // plugins are configured in .eslintrc-security.cjs — here they stay 'off' (default).
+  plugins: ['azion-architecture', 'security', 'xss', 'no-unsanitized'],
   extends: [
     'plugin:vue/vue3-essential',
     'eslint:recommended',
