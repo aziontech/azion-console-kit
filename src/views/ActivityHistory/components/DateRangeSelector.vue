@@ -1,7 +1,7 @@
 <script setup>
   import { computed } from 'vue'
   import Dropdown from '@aziontech/webkit/dropdown'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
 
   const props = defineProps({
     modelValue: {
@@ -29,12 +29,13 @@
 
 <template>
   <div class="flex items-center">
-    <IconButton
-      kind="outlined"
-      size="medium"
+    <PrimeButton
+      outlined
       icon="pi pi-calendar"
       class="border-r-0 rounded-r-none h-8"
-      aria-label="button"
+      :pt="{
+        root: { class: 'pointer-events-none' }
+      }"
     />
     <Dropdown
       v-model="selectedRange"

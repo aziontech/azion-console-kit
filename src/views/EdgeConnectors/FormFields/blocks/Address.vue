@@ -56,14 +56,13 @@
                   </div>
                 </div>
                 <div>
-                  <IconButton
-                    kind="primary"
-                    size="medium"
+                  <PrimeButton
                     icon="pi pi-trash"
+                    severity="primary"
+                    outlined
                     :disabled="addresses.length === 1"
                     @click.stop="removeAddressByIndex(addressIndex)"
                     :data-testid="`edge-connectors-form__address-management__remove-button[${addressIndex}]`"
-                    aria-label="button"
                   />
                 </div>
               </div>
@@ -201,11 +200,12 @@
       </Card>
 
       <div class="flex sm:flex-row flex-col sm:items-center items-start w-full gap-3">
-        <Button
-          kind="primary"
+        <PrimeButton
           label="Add Address"
+          severity="primary"
           icon="pi pi-plus-circle"
           size="small"
+          outlined
           :disabled="disableAddButton"
           @click="addNewAddress('click')"
         />
@@ -228,9 +228,8 @@
   import { computed, ref } from 'vue'
   import { useField, useFieldArray } from 'vee-validate'
   import AccordionTab from '@aziontech/webkit/accordion-tab'
-  import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
-  import Tag from '@aziontech/webkit/tag'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Tag from '@aziontech/webkit/prime-tag'
   import Divider from '@aziontech/webkit/divider'
   import Card from '@aziontech/webkit/card'
   import Accordion from 'primevue/accordion'

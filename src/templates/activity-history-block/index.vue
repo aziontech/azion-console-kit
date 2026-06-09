@@ -130,7 +130,7 @@
   defineOptions({ name: 'activity-history-block' })
   import Timeline from '@aziontech/webkit/timeline'
   import Card from '@aziontech/webkit/card'
-  import Tag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/prime-tag'
   import InputText from '@aziontech/webkit/inputtext'
   import { ref, computed, onMounted, watch } from 'vue'
   import { useToast } from '@aziontech/webkit/use-toast'

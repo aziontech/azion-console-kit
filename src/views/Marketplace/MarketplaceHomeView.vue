@@ -89,12 +89,12 @@
             <template v-else>
               <div class="text-sm">
                 <span>No results found.</span>
-                <Button
-                  kind="text"
+                <PrimeButton
                   label="Go to full integrations list."
+                  link
+                  class="ml-3 p-0"
                   size="small"
                   @click="resetFilters"
-                  class="ml-3 p-0"
                 />
               </div>
               <LoadingEmptySearch />
@@ -118,7 +118,7 @@
   import BannerContentBlock from '@/templates/content-block/banner'
   import InputText from '@aziontech/webkit/inputtext'
   import Listbox from '@aziontech/webkit/listbox'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import ListSolutions from './components/ListSolutions'
   import LoadingList from './components/LoadingList'
   import LoadingEmptySearch from './components/LoadingEmptySearch'

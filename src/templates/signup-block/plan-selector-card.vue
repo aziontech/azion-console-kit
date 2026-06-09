@@ -31,7 +31,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import ActionButton from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
 
   defineOptions({
     name: 'plan-selector-card'

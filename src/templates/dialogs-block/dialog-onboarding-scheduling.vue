@@ -15,15 +15,13 @@
     </div>
 
     <template #footer>
-      <Button
-        kind="outlined"
-        size="medium"
+      <PrimeButton
+        outlined
         @click="closeCallback"
         label="Remind Later"
       />
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
+        severity="secondary"
         @click="openOnboarding"
         icon="pi pi-calendar-plus"
         label="Schedule Now"
@@ -33,7 +31,7 @@
 </template>
 <script setup>
   import PrimeDialog from '@aziontech/webkit/dialog'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { inject } from 'vue'
   import { useRouter } from 'vue-router'
   import { azionOnboardingWindowOpener } from '@/helpers'

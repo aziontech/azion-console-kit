@@ -5,15 +5,14 @@
         class="sticky w-full flex justify-end p-3 top-0 surface-section border-b surface-border"
         v-if="getStartConversation"
       >
-        <Button
-          kind="outlined"
-          size="medium"
+        <PrimeButton
           icon="pi pi-eraser"
+          outlined
           label="New chat"
+          class="surface-border"
           aria-label="New chat"
           v-tooltip.bottom="'New chat'"
           @click="clearChat"
-          class="surface-border"
         />
       </div>
       <div
@@ -39,7 +38,7 @@
 </template>
 
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Welcome from '../components/chat-welcome.vue'
   import ChatInput from '../components/chat-input.vue'
   import ChatMessages from '../components/chat-list-messages.vue'

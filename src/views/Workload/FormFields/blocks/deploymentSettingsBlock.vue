@@ -2,7 +2,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
 
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useField } from 'vee-validate'
   import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
   import DrawerCustomPages from '@/views/CustomPages/Drawer'
@@ -111,14 +111,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
                   @click="openDrawerEdgeApplication"
+                  class="w-full whitespace-nowrap flex"
                   data-testid="domains-form__create-edge-application-button"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Application"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -150,14 +154,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
                   @click="openDrawerEdgeFirewall"
+                  class="w-full whitespace-nowrap flex"
                   data-testid="domains-form__create-edge-firewall-button"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Firewall"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>
@@ -187,14 +195,18 @@
           <template #footer>
             <ul class="p-2">
               <li>
-                <Button
-                  kind="text"
+                <PrimeButton
                   @click="openDrawerCustomPages"
+                  class="w-full whitespace-nowrap flex"
                   data-testid="domains-form__create-custom-pages-button"
+                  text
                   size="small"
                   icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
                   label="Create Custom Page"
-                  class="w-full whitespace-nowrap flex"
                 />
               </li>
             </ul>

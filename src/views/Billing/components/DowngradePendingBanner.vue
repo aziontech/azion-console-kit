@@ -37,7 +37,7 @@
 
 <script setup>
   import { computed } from 'vue'
-  import ActionButton from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
   import { formatBillingDate } from '@/utils/billing-date'
 
   defineOptions({ name: 'downgrade-pending-banner' })

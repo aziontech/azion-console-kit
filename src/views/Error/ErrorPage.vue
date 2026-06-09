@@ -2,7 +2,7 @@
   import { useRouter } from 'vue-router'
   import Illustration403 from '@aziontech/webkit/svg/error-403'
   import Illustration404 from '@aziontech/webkit/svg/error-404'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import ErrorPageBlock from '@/templates/error-page-block'
 
   const props = defineProps({
@@ -55,14 +55,12 @@
     </template>
 
     <template #actions>
-      <Button
-        size="medium"
+      <PrimeButton
         :label="props.buttons.backToHome"
         @click="handleGoBackHome"
       />
-      <Button
-        kind="outlined"
-        size="medium"
+      <PrimeButton
+        outlined
         :label="props.buttons.documentation"
         @click="props.documentationService"
       />

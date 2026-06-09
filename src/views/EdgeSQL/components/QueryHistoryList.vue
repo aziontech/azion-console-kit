@@ -48,14 +48,13 @@
             <span class="text-sm font-medium text-color-primary truncate">
               {{ query.originalQuery }}
             </span>
-            <IconButton
-              kind="outlined"
+            <Button
               icon="pi pi-ellipsis-h"
               size="small"
+              outlined
               @click.stop="emit('open-menu', $event, query)"
               data-testid="table-menu-button"
               class="opacity-100 sm:opacity-0 min-w-8 group-hover:opacity-100 transition-opacity duration-200"
-              aria-label="table menu button"
             />
           </div>
         </div>
@@ -67,7 +66,7 @@
 <script setup>
   import InputText from '@aziontech/webkit/inputtext'
   import Skeleton from '@aziontech/webkit/skeleton'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import Button from '@aziontech/webkit/button'
 
   const emit = defineEmits(['update:searchTerm', 'select', 'open-menu'])
 

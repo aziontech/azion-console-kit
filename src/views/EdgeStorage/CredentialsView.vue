@@ -1,5 +1,5 @@
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import ListTable from '@/components/list-table/ListTable.vue'
   import CreateDrawerBlock from '@/templates/create-drawer-block'
   import FormFieldsCredential from './FormFields/FormFieldsCredential.vue'
@@ -153,10 +153,10 @@
       }"
     >
       <template #emptyBlockButton>
-        <Button
-          kind="secondary"
+        <PrimeButton
           icon="pi pi-plus"
           label="Credential"
+          severity="secondary"
           size="small"
           @click="handleCreateCredential"
           data-testid="create_credential_button_empty"
