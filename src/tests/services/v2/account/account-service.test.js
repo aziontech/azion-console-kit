@@ -11,7 +11,7 @@ describe('AccountService._adaptAccountInfo', () => {
       has_service_order_plan: true
     })
 
-    expect(result.has_service_order_plan).toBe(true)
+    expect(result.hasServiceOrderPlan).toBe(true)
   })
 
   it('defaults has_service_order_plan to false when backend omits it', () => {
@@ -22,7 +22,7 @@ describe('AccountService._adaptAccountInfo', () => {
       kind: 'client'
     })
 
-    expect(result.has_service_order_plan).toBe(false)
+    expect(result.hasServiceOrderPlan).toBe(false)
   })
 
   it('does not trust non-boolean has_service_order_plan values', () => {
@@ -34,6 +34,6 @@ describe('AccountService._adaptAccountInfo', () => {
       has_service_order_plan: 'true'
     })
 
-    expect(result.has_service_order_plan).toBe(false)
+    expect(result.hasServiceOrderPlan).toBe(false)
   })
 })

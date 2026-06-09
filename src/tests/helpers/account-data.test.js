@@ -45,7 +45,7 @@ describe('account data hydration', () => {
     accountService.getAccountInfo.mockResolvedValue({
       id: 1,
       client_flags: [],
-      has_service_order_plan: true
+      hasServiceOrderPlan: true
     })
     userService.getUserInfo.mockResolvedValue({ results: { id: 10, client_id: 20 } })
     accountSettingsService.getAccountSettingsInfo.mockResolvedValue({ jobRole: 'developer' })
@@ -68,30 +68,30 @@ describe('account data hydration', () => {
   it('stores service order plan state from account info during login hydration', async () => {
     await loadAccountHydration()
 
-    expect(useAccountStore().account.has_service_order_plan).toBe(true)
+    expect(useAccountStore().account.hasServiceOrderPlan).toBe(true)
   })
 
   it('stores false when account info requires plan configuration', async () => {
     accountService.getAccountInfo.mockResolvedValueOnce({
       id: 1,
       client_flags: [],
-      has_service_order_plan: false
+      hasServiceOrderPlan: false
     })
 
     await loadAccountHydration()
 
-    expect(useAccountStore().account.has_service_order_plan).toBe(false)
+    expect(useAccountStore().account.hasServiceOrderPlan).toBe(false)
   })
 
   it('stores normalized false from account service for non-active plan state', async () => {
     accountService.getAccountInfo.mockResolvedValueOnce({
       id: 1,
       client_flags: [],
-      has_service_order_plan: false
+      hasServiceOrderPlan: false
     })
 
     await loadAccountHydration()
 
-    expect(useAccountStore().account.has_service_order_plan).toBe(false)
+    expect(useAccountStore().account.hasServiceOrderPlan).toBe(false)
   })
 })

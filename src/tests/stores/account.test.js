@@ -33,10 +33,9 @@ describe('account store session state', () => {
     store.setAccountData({
       first_login: true,
       kind: 'client',
-      has_service_order_plan: true
+      hasServiceOrderPlan: true
     })
 
-    expect(store.hasServiceOrderPlan).toBe(true)
     expect(store.needsOnboarding).toBe(false)
   })
 
@@ -46,10 +45,9 @@ describe('account store session state', () => {
     store.setAccountData({
       first_login: true,
       kind: 'client',
-      has_service_order_plan: false
+      hasServiceOrderPlan: false
     })
 
-    expect(store.hasServiceOrderPlan).toBe(false)
     expect(store.needsOnboarding).toBe(true)
   })
 
@@ -59,10 +57,9 @@ describe('account store session state', () => {
     store.setAccountData({
       first_login: true,
       kind: 'client',
-      has_service_order_plan: 'true'
+      hasServiceOrderPlan: 'true'
     })
 
-    expect(store.hasServiceOrderPlan).toBe(false)
     expect(store.needsOnboarding).toBe(true)
   })
 })

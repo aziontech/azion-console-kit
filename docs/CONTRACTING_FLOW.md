@@ -275,7 +275,7 @@ graph TB
 
 | File                    | Purpose                                              |
 | ----------------------- | ---------------------------------------------------- |
-| `src/stores/account.js` | Account state including `hasServiceOrderPlan` getter |
+| `src/stores/account.js` | Account state including the `needsOnboarding` getter |
 
 ### Helpers
 
@@ -294,24 +294,23 @@ graph TB
 
 ## State Management
 
-### Account Store (`hasServiceOrderPlan`)
+### Account Store (`needsOnboarding`)
 
 ```javascript
 // src/stores/account.js
-hasServiceOrderPlan(state) {
-  return state.account?.has_service_order_plan === true
-}
-
 needsOnboarding(state) {
   return (
     state.account?.first_login === true &&
     state.account?.kind === 'client' &&
-    state.account?.has_service_order_plan !== true
+    state.account?.hasServiceOrderPlan !== true
   )
 }
 ```
 
-**Important:** `has_service_order_plan` is the source of truth for the post-login plan gate. `false` sends the user to plan configuration; `true` skips the plan screen.
+The account adapter maps the raw API field `has_service_order_plan` to the camelCase
+`hasServiceOrderPlan` (strict boolean) in `_adaptAccountInfo`.
+
+**Important:** `hasServiceOrderPlan` is the source of truth for the post-login plan gate. `false` sends the user to plan configuration; `true` skips the plan screen.
 
 ### Service Order State (useServiceOrders)
 

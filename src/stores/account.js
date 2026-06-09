@@ -86,14 +86,11 @@ export const useAccountStore = defineStore({
     isFirstLogin(state) {
       return state.account?.first_login
     },
-    hasServiceOrderPlan(state) {
-      return state.account?.has_service_order_plan === true
-    },
     needsOnboarding(state) {
       return (
         state.account?.first_login === true &&
         state.account?.kind === 'client' &&
-        state.account?.has_service_order_plan !== true
+        state.account?.hasServiceOrderPlan !== true
       )
     },
     accountUtcOffset(state) {
