@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index.js'
 import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
 
