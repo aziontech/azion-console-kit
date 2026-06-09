@@ -104,28 +104,27 @@
                   data-testid="data-stream-form__destination__headers-field__input"
                 />
               </div>
-              <IconButton
-                kind="outlined"
-                size="medium"
+              <Button
                 icon="pi pi-trash"
+                outlined
                 v-tooltip.top="{ value: 'Remove Header', showDelay: 200 }"
                 @click="removeHeader(index)"
                 v-if="!!index"
-                aria-label="button"
-              />
+              ></Button>
             </div>
           </div>
 
           <Button
-            kind="outlined"
             :disabled="hasNoPermissionToEditDataStream"
+            outlined
             icon="pi pi-plus-circle"
             v-if="hasLessThanFive"
+            iconPos="left"
             label="Header"
             size="small"
+            class="w-fit"
             @click="addHeader()"
             data-testid="data-stream-form__destination__headers-field__add-button"
-            class="w-fit"
           />
         </div>
       </div>
@@ -820,7 +819,6 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
   import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
   import PrimePassword from '@aziontech/webkit/password'
   import InputSwitch from '@aziontech/webkit/inputswitch'
   import LabelBlock from '@aziontech/webkit/label'

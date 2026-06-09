@@ -8,11 +8,11 @@
         <i :class="iconClass"></i>
         <span>{{ currentStatus.current?.name || 'Processing...' }}</span>
       </div>
-      <Button
-        kind="outlined"
+      <PrimeButton
         v-if="operationType === EDGE_STORAGE_OPERATION_TYPE.UPLOAD"
         icon="pi pi-times-circle"
         size="small"
+        outlined
         label="Cancel"
         @click="handleCancel"
       />
@@ -38,7 +38,7 @@
 
 <script setup>
   import ProgressBar from '@aziontech/webkit/progressbar'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed } from 'vue'
   import { useEdgeStorage, EDGE_STORAGE_OPERATION_TYPE } from '@/composables/useEdgeStorage'
 

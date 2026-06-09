@@ -8,8 +8,7 @@
 
   // TODO: migrate import to @aziontech/webkit/list-data-table when published
   import DataTable from '@aziontech/webkit/list-data-table'
-  import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import MultiSelect from '@aziontech/webkit/multiselect'
 
@@ -18,7 +17,7 @@
   import { computed, onMounted, ref, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import Tag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { wafService } from '@/services/v2/waf/waf-service'
@@ -539,7 +538,7 @@
         />
       </div>
       <div class="flex items-center justify-end">
-        <Tag
+        <PrimeTag
           class="no-wrap whitespace-nowrap ml-auto"
           :value="recordsFoundLabel"
           severity="info"
@@ -555,22 +554,21 @@
         :fieldsInFilter="listFields"
         @applyFilter="filterSearch"
       />
-      <Button
-        kind="outlined"
+      <PrimeButton
+        class="md:hidden"
+        outlined
         size="small"
         label="Export to CSV"
         icon="pi pi-download"
         @click="downloadCSV"
-        class="md:hidden"
       />
-      <IconButton
-        kind="outlined"
+      <PrimeButton
+        class="hidden md:flex"
+        outlined
         size="small"
         icon="pi pi-download"
         v-tooltip.bottom="{ value: 'Export to CSV', showDelay: 200 }"
         @click="downloadCSV"
-        class="hidden md:flex"
-        aria-label="button"
       />
     </div>
   </div>
@@ -667,13 +665,12 @@
     class="!mt-0"
   >
     <template #default>
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        severity="secondary"
         icon="pi pi-plus"
         :label="`${handleTextDomainWorkload.singularTitle}`"
         @click="goToDomain"
-        class="max-md:w-full w-fit"
       />
     </template>
     <template #illustration>

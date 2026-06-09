@@ -1,15 +1,14 @@
 <template>
   <SocialIdpsBlock direction="bottom-to-top" />
-  <Button
-    kind="outlined"
-    size="medium"
+  <PrimeButton
     label="Sign Up with Email"
+    outlined
     @click="handleSignUpEmailClick"
   />
 </template>
 
 <script setup>
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import SocialIdpsBlock from '@/templates/social-idps-block'
   import { useAccountStore } from '@/stores/account'
   const emit = defineEmits(['change-signup-method'])

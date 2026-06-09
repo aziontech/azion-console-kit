@@ -28,14 +28,18 @@
             <template #footer>
               <ul class="p-2">
                 <li>
-                  <Button
-                    kind="text"
+                  <PrimeButton
+                    class="w-full whitespace-nowrap flex"
                     data-testid="data-stream-form__data-settings__template-field__create-custom-template-button"
+                    text
                     @click="openCreateTemplateDrawer"
                     size="small"
                     icon="pi pi-plus-circle"
+                    :pt="{
+                      label: { class: 'w-full text-left' },
+                      root: { class: 'p-2' }
+                    }"
                     label="Create Custom Template"
-                    class="w-full whitespace-nowrap flex"
                   />
                 </li>
               </ul>
@@ -58,26 +62,24 @@
           class="surface-border border rounded-sm overflow-hidden"
           data-testid="data-stream-form__data-settings__data-set-field"
         />
-        <div class="absolute top-10 right-2">
-          <Button
-            kind="outlined"
-            v-if="isCustomTemplate"
-            icon="pi pi-pencil"
-            label="Edit Template"
-            size="small"
-            @click="openEditTemplateDrawer"
-            class="bg-[#171717]"
-          />
-          <Button
-            kind="outlined"
-            v-else
-            icon="pi pi-copy"
-            label="Duplicate Template"
-            size="small"
-            @click="openDuplicateTemplateDrawer"
-            class="bg-[#171717]"
-          />
-        </div>
+        <PrimeButton
+          v-if="isCustomTemplate"
+          icon="pi pi-pencil"
+          outlined
+          class="absolute top-10 right-2 bg-[#171717]"
+          label="Edit Template"
+          size="small"
+          @click="openEditTemplateDrawer"
+        />
+        <PrimeButton
+          v-else
+          icon="pi pi-copy"
+          outlined
+          class="absolute top-10 right-2 bg-[#171717]"
+          label="Duplicate Template"
+          size="small"
+          @click="openDuplicateTemplateDrawer"
+        />
         <small
           class="text-xs text-color-secondary font-normal leading-5"
           data-testid="data-stream-form__data-settings__data-set-description"
@@ -96,7 +98,7 @@
 
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useField } from 'vee-validate'
   import { computed, ref } from 'vue'
   import { dataStreamService } from '@/services/v2/data-stream/data-stream-service'

@@ -1,6 +1,6 @@
 <template>
   <header
-    class="azion azion-dark p-3 bg-header text-white border-b surface-border items-center flex md:px-8 md:py-3 w-full fixed top-0 z-10 h-14 justify-between"
+    class="p-3 bg-header text-white border-b surface-border items-center flex md:px-8 md:py-3 w-full fixed top-0 z-10 h-14 justify-between"
     @keyup.esc="closeSideBar"
     ref="app"
   >
@@ -144,8 +144,13 @@
       <Button
         label="Documentation"
         v-if="route.meta.showDocumentButton"
+        :pt="{
+          label: { class: 'text-white' },
+          icon: { class: 'text-white' }
+        }"
         @click="openDocumentation"
         size="small"
+        iconPos="right"
         icon="pi pi-external-link"
         class="text-white border-header bg-header hover:bg-header-button-hover"
       />

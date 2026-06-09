@@ -237,8 +237,8 @@
         @click="searchFilter"
         label="Search"
         size="small"
-        data-testid="search-filter-search-button"
         class="h-auto w-full md:max-w-fit"
+        data-testid="search-filter-search-button"
       />
     </div>
   </div>

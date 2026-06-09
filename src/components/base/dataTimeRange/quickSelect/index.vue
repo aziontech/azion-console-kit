@@ -29,27 +29,28 @@
           optionValue="value"
         />
       </div>
-      <Button
-        kind="outlined"
+      <PrimeButton
         label="Apply"
+        outlined
+        class="whitespace-nowrap px-4"
         size="small"
         @click="applyQuickSelect"
-        class="whitespace-nowrap px-4"
       />
     </div>
 
     <div class="mt-4">
       <div class="text-sm font-medium leading-5 text-color mb-3">Commonly used</div>
       <div class="grid grid-cols-2 grid-rows-6 grid-flow-col">
-        <Button
-          kind="text"
-          :label="range.label"
+        <PrimeButton
           v-for="range in commonDateRanges"
           :key="range.value"
           size="small"
-          @click="applyCommonRange(range)"
+          link
           class="justify-start text-left w-full"
-        />
+          @click="applyCommonRange(range)"
+        >
+          {{ range.label }}
+        </PrimeButton>
       </div>
     </div>
 
@@ -89,7 +90,7 @@
 
 <script setup>
   import { ref, onMounted, onUnmounted, watch } from 'vue'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InputNumber from '@aziontech/webkit/inputnumber'
   import InputSwitch from '@aziontech/webkit/inputswitch'

@@ -2,7 +2,7 @@
   import { computed, useSlots } from 'vue'
   import DataTable from '@aziontech/webkit/list-data-table'
   const DataTableColumnSelector = DataTable.ColumnSelector
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useDataTable } from '@/composables/useDataTable'
 
   defineOptions({ name: 'list-table' })
@@ -191,7 +191,6 @@
     fetchOnSort,
     fetchOnSearch,
     handleSearchValue,
-    toggleFilter,
     handleApplyFilter,
     handleRemoveFilter,
     exportFunctionMapper,
@@ -365,14 +364,12 @@
                   class="flex flex-row items-center gap-2 max-sm:w-full"
                   data-testid="data-table-search"
                 >
-                  <IconButton
+                  <PrimeButton
                     v-if="hasAllowedFilters"
-                    kind="outlined"
+                    outlined
                     icon="pi pi-filter"
-                    size="medium"
+                    size="small"
                     data-testid="data-table-actions-column-header-toggle-filter"
-                    aria-label="data table actions column header toggle filter"
-                    @click="toggleFilter"
                   />
                   <DataTable.Search
                     class="w-full md:min-w-[20rem]"
@@ -385,14 +382,12 @@
                 </span>
                 <div class="flex gap-2 max-sm:w-full">
                   <slot name="header-actions" />
-                  <IconButton
-                    kind="outlined"
+                  <PrimeButton
+                    outlined
                     icon="pi pi-refresh"
-                    size="medium"
+                    size="small"
                     v-tooltip.top="{ value: 'Reload', showDelay: 200 }"
                     data-testid="data-table-actions-column-header-refresh"
-                    aria-label="data table actions column header refresh"
-                    @click="reload({ page: 1, skipCache: true })"
                   />
                   <DataTable.Export
                     v-if="hasExportToCsvMapper || exportFileName"

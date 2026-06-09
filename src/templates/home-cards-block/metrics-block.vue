@@ -1,6 +1,6 @@
 <script setup>
   import { ref, computed, watch, onMounted } from 'vue'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import PrimeButton from '@aziontech/webkit/button'
   import PrimeMenu from '@aziontech/webkit/menu'
   import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
   import { useHomeMetrics } from '@/composables/useHomeMetrics'
@@ -72,12 +72,11 @@
     <div class="flex gap-3 items-center h-7">
       <span class="text-base font-semibold">Metrics</span>
       <div class="relative">
-        <IconButton
-          kind="transparent"
-          size="medium"
+        <PrimeButton
           icon="ai ai-filter-alt"
+          severity="secondary"
+          text
           @click="toggleFilterMenu"
-          aria-label="button"
         />
         <PrimeMenu
           ref="filterMenu"

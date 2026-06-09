@@ -3,7 +3,7 @@
   import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref, inject } from 'vue'
 
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
@@ -163,14 +163,13 @@
     @on-before-go-to-edit="handleBeforeGoToEdit"
   >
     <template #emptyBlockButton>
-      <Button
-        kind="secondary"
-        size="medium"
+      <PrimeButton
+        class="max-md:w-full w-fit"
         data-testid="create-device-group-button"
         @click="openCreateDeviceGroupDrawer"
+        severity="secondary"
         icon="pi pi-plus"
         label="Device Group"
-        class="max-md:w-full w-fit"
       />
     </template>
   </ListTable>

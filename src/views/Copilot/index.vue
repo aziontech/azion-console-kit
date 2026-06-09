@@ -1,7 +1,7 @@
 <script setup>
   import ContentBlock from '@/templates/content-block'
   import copilotView from '@/modules/azion-ai-chat/layout/view'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { useAccountStore } from '@/stores/account'
   import { loadPromptSuggestion } from '@/modules/azion-ai-chat/services/load-prompt-suggestions'
@@ -71,11 +71,12 @@
           v-if="hasSupport"
         >
           <div class="flex justify-center">
-            <Button
-              kind="text"
+            <PrimeButton
               label="Open a support ticket"
               @click="openContactSupport"
+              iconPos="right"
               size="small"
+              link
               icon="pi pi-external-link"
             />
           </div>

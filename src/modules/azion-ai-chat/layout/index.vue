@@ -5,7 +5,7 @@
     <template #start>
       <h3 class="text-color text-lg font-medium flex gap-3">
         Azion Copilot
-        <Tag
+        <PrimeTag
           v-tooltip.bottom="tooltipMessage"
           value="Preview"
         />
@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-  import Tag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import Toolbar from '@aziontech/webkit/toolbar'
   import Welcome from '../components/chat-welcome.vue'
   import ChatInput from '../components/chat-input.vue'
