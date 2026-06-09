@@ -5,7 +5,7 @@
   import ResizableSplitter from '@/components/Splitter/ResizableSplitter.vue'
   import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { JsonForms } from '@jsonforms/vue'
   import { vanillaRenderers } from '@jsonforms/vue-vanilla'
   import SelectPanel from '@/components/select-panel'
@@ -374,8 +374,8 @@
                   class="flex flex-col items-center justify-center h-full gap-2"
                 >
                   <p>Configure the form builder.</p>
-                  <Button
-                    kind="outlined"
+                  <PrimeButton
+                    outlined
                     @click="azionJsonFormWindowOpener()"
                     label="Read documentation"
                     size="small"
@@ -383,12 +383,12 @@
                 </div>
               </div>
               <div class="flex items-center justify-end mt-2">
-                <Button
-                  kind="text"
+                <PrimeButton
+                  text
                   size="small"
                   label="Remove Form"
+                  severity="danger"
                   @click="resetFormBuilder"
-                  class="!bg-[var(--danger)] !text-[var(--danger-contrast)]"
                 />
               </div>
             </template>

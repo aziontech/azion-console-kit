@@ -1,6 +1,5 @@
 <script setup>
-  import Button from '@aziontech/webkit/button'
-  import IconButton from '@aziontech/webkit/icon-button'
+  import ButtonPrime from '@aziontech/webkit/button'
   import Divider from '@aziontech/webkit/divider'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
@@ -204,16 +203,15 @@
   defineExpose({ show, hide })
 </script>
 <template>
-  <IconButton
-    kind="outlined"
+  <ButtonPrime
     ref="buttonOverPanel"
     icon="pi pi-filter"
     v-tooltip.bottom="{ value: 'Add filter', showDelay: 200 }"
+    outlined
     size="small"
     :disabled="disabled"
     @click="toggle"
     data-testid="filter-button"
-    aria-label="filter button"
   />
 
   <OverlayPanel
@@ -238,14 +236,13 @@
       >
         Filter
       </h5>
-      <IconButton
-        kind="outlined"
-        size="medium"
+      <ButtonPrime
         type="button"
         @click="toggle"
         icon="pi pi-times"
+        severity="primary"
+        outlined
         data-testid="filter-close-button"
-        aria-label="filter close button"
       />
     </div>
     <form
@@ -394,24 +391,25 @@
       class="px-8 py-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
       data-testid="filter-buttons-container"
     >
-      <Button
-        kind="outlined"
+      <ButtonPrime
         type="button"
         label="Cancel"
         @click="toggle"
-        size="small"
-        data-testid="filter-cancel-button"
         class="max-md:min-w-max"
+        severity="primary"
+        size="small"
+        outlined
+        data-testid="filter-cancel-button"
       />
-      <Button
-        kind="secondary"
+      <ButtonPrime
         type="button"
+        class="max-md:w-full"
         label="Apply"
+        severity="secondary"
         size="small"
         @click="onSubmit"
         :disabled="disabledSubmit"
         data-testid="filter-apply-button"
-        class="max-md:w-full"
       />
     </div>
   </OverlayPanel>
@@ -436,14 +434,13 @@
         data-testid="filter-sidebar-close-icon"
       >
         <h2 data-testid="filter-sidebar-title">Filter</h2>
-        <IconButton
-          kind="transparent"
+        <ButtonPrime
           icon="pi pi-times"
           @click="visibleChange(false)"
           size="small"
-          data-testid="filter-sidebar-close-button"
           class="flex-none surface-border text-sm w-8 h-8"
-          aria-label="filter sidebar close button"
+          text
+          data-testid="filter-sidebar-close-button"
         />
       </div>
     </template>
@@ -458,14 +455,13 @@
         >
           <div class="flex items-center justify-between">
             <h2 data-testid="filter-sidebar-title">Filter</h2>
-            <IconButton
-              kind="transparent"
+            <ButtonPrime
               icon="pi pi-times"
               @click="toggle"
               size="small"
-              data-testid="filter-sidebar-close-button"
               class="flex-none surface-border text-sm w-8 h-8"
-              aria-label="filter sidebar close button"
+              text
+              data-testid="filter-sidebar-close-button"
             />
           </div>
         </div>
@@ -614,22 +610,25 @@
         <div
           class="p-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
         >
-          <Button
-            kind="outlined"
+          <ButtonPrime
+            type="button"
             label="Cancel"
-            size="medium"
-            data-testid="filter-sidebar-cancel-button"
-            class="max-md:min-w-max"
             @click="toggle"
+            class="max-md:min-w-max"
+            severity="primary"
+            outlined
+            size="small"
+            data-testid="filter-sidebar-cancel-button"
           />
-          <Button
-            kind="secondary"
-            label="Apply"
-            size="medium"
-            data-testid="filter-sidebar-apply-button"
+          <ButtonPrime
+            type="button"
             class="max-md:w-full"
-            :disabled="disabledSubmit"
+            label="Apply"
+            size="small"
+            severity="secondary"
             @click="onSubmit"
+            :disabled="disabledSubmit"
+            data-testid="filter-sidebar-apply-button"
           />
         </div>
       </div>
