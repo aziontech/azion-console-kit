@@ -13,7 +13,7 @@ export const AZION_BLOG = 'https://www.azion.com/en/blog/'
 export const AZION_DISCORD = 'https://discord.com/invite/Yp9N7RMVZy'
 export const AZION_GITHUB = 'https://github.com/aziontech/azion-console-kit'
 export const AZION_X = 'https://x.com/aziontech'
-export const AZION_PLAN = 'https://www.azion.com/en/professional-services&id=#plans'
+export const AZION_PLAN = 'https://www.azion.com/en/support/'
 export const AZION_INTEGRATIONS =
   'https://www.azion.com/en/documentation/products/marketplace/integrations/'
 export const AZION_FORMJSON_DOCUMENTATION =
