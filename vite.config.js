@@ -135,7 +135,7 @@ const getConfig = () => {
         }),
         // this is a temporary proxy for new deployment api, to be removed after the migration is complete
         '/deployment-api': createProxyConfig({
-          target: `https://i29crxkxxva.map.azionedge.net`,
+          target: `https://deployment-api.azion.app`,
           rewrite: (path) => path.replace(/^\/deployment-api/, '')
         }),
         '/environment-api': createProxyConfig({

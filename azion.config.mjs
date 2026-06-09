@@ -6,6 +6,10 @@ const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env
 const environment = VITE_ENVIRONMENT || 'production'
 const domainSuffix = environment === 'production' ? 'net' : 'com'
 
+// New deployment and environment APIs. Stage-only while the migration is in progress.
+const deploymentApiHost = 'deployment-api.azion.app'
+const environmentApiHost = 'environment-api-stage.azion.app'
+
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
     return origin?.map(({ hostHeader, addresses, ...rest }) => {
@@ -148,6 +152,18 @@ const config = {
         addresses: [`api.azion.com`]
       }
     ]),
+    {
+      name: 'origin-deployment-api',
+      type: 'single_origin',
+      hostHeader: deploymentApiHost,
+      addresses: [deploymentApiHost]
+    },
+    {
+      name: 'origin-environment-api',
+      type: 'single_origin',
+      hostHeader: environmentApiHost,
+      addresses: [environmentApiHost]
+    },
     {
       name: 'origin-console-feedback',
       type: 'single_origin',
@@ -319,6 +335,18 @@ const config = {
             conditional: 'and',
             operator: 'does_not_match',
             inputValue: '^/v4'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/deployment-api'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/environment-api'
           },
           {
             variable: '${uri}',
@@ -502,6 +530,46 @@ const config = {
           },
           rewrite: `/iam/api/%{captured[1]}`
         }
+      },
+      {
+        name: 'Route Deployment API Requests',
+        description:
+          'Routes new deployment API requests to the deployment API origin, stripping the /deployment-api prefix.',
+        match: '^/deployment-api',
+        behavior: {
+          forwardCookies: true,
+          setOrigin: {
+            name: 'origin-deployment-api',
+            type: 'single_origin'
+          },
+          capture: {
+            match: '/deployment-api/(.*)',
+            captured: 'captured',
+            subject: 'request_uri'
+          },
+          rewrite: `/%{captured[1]}`,
+          bypassCache: true
+        }
+      },
+      {
+        name: 'Route Environment API Requests',
+        description:
+          'Routes new environment API requests to the environment API origin, stripping the /environment-api prefix.',
+        match: '^/environment-api',
+        behavior: {
+          forwardCookies: true,
+          setOrigin: {
+            name: 'origin-environment-api',
+            type: 'single_origin'
+          },
+          capture: {
+            match: '/environment-api/(.*)',
+            captured: 'captured',
+            subject: 'request_uri'
+          },
+          rewrite: `/%{captured[1]}`,
+          bypassCache: true
+        }
       }
     ],
     response: [
@@ -573,6 +641,18 @@ const config = {
             conditional: 'and',
             operator: 'does_not_match',
             inputValue: '^/v4'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/deployment-api'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/environment-api'
           },
           {
             variable: '${uri}',
