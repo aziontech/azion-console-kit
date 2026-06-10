@@ -129,7 +129,7 @@
       .string()
       .required()
       .matches(
-        /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/,
+        /^(?:[a-z0-9]|[a-z0-9][a-z0-9-]*[a-z0-9])$/,
         'Application Name may only contain lowercase letters, numbers and hyphens'
       )
       .label('Application Name'),
