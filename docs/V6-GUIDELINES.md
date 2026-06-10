@@ -34,7 +34,8 @@ arquivo de rotas — nunca dentro dos componentes/views.
    import { hasFlagUseV6Configurations } from '@/composables/user-flag'
    ```
 
-2. **Rotas com fork** (v6 + legado coexistem) — use `import()` dinâmico no `component`:
+2. **Rotas com fork** (v6 + legado coexistem) — use `import()` dinâmico no `component`. O
+   arquivo v6 mora em `<Feature>/v6/`; o legado permanece intacto onde já está:
 
    ```js
    {
@@ -42,20 +43,20 @@ arquivo de rotas — nunca dentro dos componentes/views.
      name: 'create-<feature>',
      component: () =>
        hasFlagUseV6Configurations()
-         ? import('@views/<Feature>/CreateView.vue')
-         : import('@views/<Feature>/legacy/CreateView.vue'),
+         ? import('@views/<Feature>/v6/CreateView.vue')
+         : import('@views/<Feature>/CreateView.vue'),
      meta: { /* ... */ }
    }
    ```
 
 3. **Rotas exclusivamente v6** (sem legado) — use `meta.flag`; o `flagGuard` já redireciona
-   contas sem a flag para `/not-found`:
+   contas sem a flag para `/not-found`. Arquivo v6-only também vive em `<Feature>/v6/`:
 
    ```js
    {
      path: 'edit/:id/deployment/:versionId',
      name: '<feature>-deployment-details',
-     component: () => import('@views/<Feature>/DeploymentDetailsView.vue'),
+     component: () => import('@views/<Feature>/v6/DeploymentDetailsView.vue'),
      meta: {
        title: 'Deployment Details',
        flag: 'use_v6_configurations'
@@ -65,12 +66,21 @@ arquivo de rotas — nunca dentro dos componentes/views.
 
 ### Convenções de organização
 
-- Views v6 ficam direto em `@views/<Feature>/`.
-- Views legadas ficam em `@views/<Feature>/legacy/` (mesmo nome de arquivo).
-- Blocos/drawers/composições **compartilhados** entre v6 e legado ficam fora de `legacy/` e são
-  reutilizados pelos dois lados.
-- Nenhuma view (v6 ou legado) deve importar `user-flag.js` — quando ela é carregada, o gate do
+- **Arquivos v6 novos vão em `@views/<Feature>/v6/`** (mesmo nome de arquivo que o legado
+  equivalente, quando houver).
+- **Código legado fica intacto onde está hoje.** Não mover. Imports relativos existentes
+  (`./Tabs/...`, `./FormFields/...`) continuam válidos.
+- Blocos/drawers/composições **compartilhados** entre v6 e legado ficam fora de `v6/` e são
+  reutilizados pelos dois lados — tipicamente em `@views/<Feature>/FormFields/`,
+  `@views/<Feature>/Drawer/`, etc.
+- Nenhuma view (v6 ou legada) deve importar `user-flag.js` — quando ela é carregada, o gate do
   router já decidiu por ela.
+
+**Por que esse layout (e não `legacy/` no root):** mover o legado pra subpasta `legacy/` exige
+ajustar todos os imports relativos dentro dos arquivos movidos e todos os consumidores externos
+que importam dali. Em features com legado consolidado (subpastas internas, FormFields
+compartilhados, sub-tabs com ListViews próprios), isso vira blast radius alto sem ganho
+funcional. Criar o v6 em subpasta isola o código novo sem tocar no que já funciona.
 
 ---
 
@@ -96,8 +106,12 @@ Adapters (ex.: `*-adapter.js`) **podem** ler o flag diretamente, pois não são 
 
 ## Implementação de referência
 
-`docs/WORKLOAD-VERSIONING.md` documenta o fork completo do Workload (rota, views, form, services,
-validação) e é a referência canônica deste padrão. Consulte-o antes de iniciar um fork novo.
+`docs/WORKLOAD-VERSIONING.md` documenta o fork completo do Workload e é referência **conceitual**
+do padrão (fork por flag no router, services flag-aware, formas de divergir UI por estado de
+versão). No entanto, o **layout de arquivos** do Workload precede esta guideline: ele usa
+`legacy/` no root (variante antiga) em vez de `v6/` em subpasta. **Workload será migrado
+futuramente para o padrão atual** — até lá, a guideline canônica de layout é a desta seção, não a
+do Workload.
 
 ## Como verificar
 
