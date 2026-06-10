@@ -54,6 +54,7 @@
 <template>
   <CardBox
     title="Template Settings"
+    data-testid="template-engine__settings-card"
     :class="{ '[&>footer]:hidden': props.hideFooter }"
   >
     <template #content>

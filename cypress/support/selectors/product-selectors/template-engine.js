@@ -14,8 +14,12 @@ export default {
   privacySwitch: '[data-testid="field-text-privacy__privacy-switch"]',
   projectNameLabel: '[data-testid="field-text-privacy__label"]',
   projectNameError: '[data-testid="field-text-privacy__error-message"]',
-  // Settings step (password field rendered via JsonForms)
+  // Settings step
+  settingsCard: '[data-testid="template-engine__settings-card"]',
   settingsPasswordInput: '[data-testid="field-password__input"] input',
+  // JsonForms text settings field (wrapper carries data-testid="field-<name>")
+  settingsEnvironmentField: '[data-testid="field-environment"]',
+  settingsEnvironmentInput: '[data-testid="field-environment"] input',
 
   // Footer / settings actions
   nextButton: '[data-testid="template-engine__next-button"]',

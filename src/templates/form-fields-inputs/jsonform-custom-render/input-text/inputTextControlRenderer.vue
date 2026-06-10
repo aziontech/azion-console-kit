@@ -66,6 +66,7 @@
 <template>
   <div
     class="flex flex-col gap-2"
+    :data-testid="`field-${path}`"
     :class="{ '[&_small.p-error]:hidden': errorMessage === 'Required' }"
   >
     <fieldText
