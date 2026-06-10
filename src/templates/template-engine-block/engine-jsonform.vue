@@ -908,6 +908,7 @@
             <Dropdown
               :id="vcsIntegrationFieldName"
               :name="vcsIntegrationFieldName"
+              data-testid="template-engine__git-scope-dropdown"
               :loading="slotProps.isIntegrationsLoading"
               :disabled="isRepositoryDisabled"
               v-model="selectedIntegration"

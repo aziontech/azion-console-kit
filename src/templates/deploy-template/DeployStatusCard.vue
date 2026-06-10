@@ -160,7 +160,10 @@
 
 <template>
   <div class="flex flex-col w-full gap-8">
-    <CardBox title="Deployment">
+    <CardBox
+      title="Deployment"
+      data-testid="deploy-status-card"
+    >
       <template #header>
         <h2 class="text-label-md text-[var(--text-default)]">Deployment</h2>
         <span

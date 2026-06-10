@@ -1,0 +1,38 @@
+{
+  "uuid": "tmpl-e2e-123",
+  "name": "E2E Test Template",
+  "is_active": true,
+  "template_type": "github",
+  "created_at": "2026-06-01T12:00:00Z",
+  "updated_at": "2026-06-01T12:00:00Z",
+  "instantiation_data": {
+    "templateTitle": "E2E Test Template",
+    "templateDescription": "Deploy a sample application straight from a template.",
+    "templatePath": "https://github.com/azion/e2e-template",
+    "preview_url": "https://github.com/azion/e2e-template",
+    "envs": [{ "key": "IS_PUBLIC", "value": "" }]
+  },
+  "input_schema": {
+    "type": "object",
+    "title": "E2E Test Template",
+    "required": ["application_name"],
+    "properties": {
+      "platform_feature__vcs_integration__uuid": {
+        "type": "string",
+        "title": "Git Scope",
+        "required": true,
+        "instantiation_data_path": "",
+        "description": "Select the GitHub scope to deploy from."
+      },
+      "application_name": {
+        "type": "string",
+        "format": "privacy",
+        "label": "Project Name",
+        "title": "Project Name",
+        "required": true,
+        "instantiation_data_path": "",
+        "is_public_data_path": "envs.[0].value"
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@
     :label="currentLabel"
     class="h-8 w-8 md:w-fit text-white border-header"
     size="small"
+    data-testid="navbar__create-button"
     :pt="{
       label: { class: 'text-white' },
       icon: { class: 'text-white' }

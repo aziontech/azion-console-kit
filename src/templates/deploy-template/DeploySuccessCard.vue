@@ -344,7 +344,10 @@
 </script>
 
 <template>
-  <CardBox title="Deployment Successful">
+  <CardBox
+    title="Deployment Successful"
+    data-testid="deploy-success-card"
+  >
     <template #content>
       <div class="p-4 sm:p-6 flex flex-col gap-6">
         <p class="text-sm text-color-secondary leading-5">
@@ -355,6 +358,7 @@
             :href="props.appUrl"
             target="_blank"
             rel="noopener noreferrer"
+            data-testid="deploy-success-card__app-url"
             class="text-[var(--text-color-link)] text-xs inline-flex items-center gap-1"
           >
             <span class="hover:underline">{{ appUrlDisplay }}</span>

@@ -677,6 +677,7 @@
 
     <CardBox
       v-if="currentStep !== 'success' && props.loaded"
+      data-testid="template-engine__inputs-card"
       :title="props.title || 'Start from Template'"
       :class="{
         '[&>footer]:hidden':
@@ -839,6 +840,7 @@
           <PrimeButton
             v-if="props.hasSettings"
             class="w-full flex-row-reverse"
+            data-testid="template-engine__next-button"
             :label="props.nextLabel"
             :loading="props.loading || isWaitingTemplateInfo"
             :disabled="props.disabled || isWaitingTemplateInfo"
@@ -849,6 +851,7 @@
           <PrimeButton
             v-else
             class="w-full flex-row-reverse"
+            data-testid="template-engine__deploy-button"
             :label="props.deployLabel"
             :loading="props.loadingDeploy || isWaitingTemplateInfo"
             :disabled="props.disabledDeploy || isWaitingTemplateInfo"

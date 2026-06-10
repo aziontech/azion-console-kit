@@ -1,0 +1,24 @@
+[
+  {
+    "id": 9001,
+    "name": "E2E Test Template",
+    "solution_reference_id": "tmpl-e2e-123",
+    "vendor": {
+      "slug": "azion",
+      "name": "Azion",
+      "icon": "https://www.azion.com/favicon.ico",
+      "url": "https://www.azion.com"
+    },
+    "slug": "my-template-e2e",
+    "headline": "Deploy a sample application straight from a template.",
+    "icon": "https://www.azion.com/favicon.ico",
+    "featured": true,
+    "new_release": false,
+    "instance_type": {
+      "name": "template",
+      "is_template": true
+    },
+    "category": ["Frontend"],
+    "updated_at": "2026-06-01T12:00:00Z"
+  }
+]

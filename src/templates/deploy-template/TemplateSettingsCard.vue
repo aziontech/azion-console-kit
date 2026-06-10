@@ -69,6 +69,7 @@
         <PrimeButton
           type="button"
           class="w-full flex-row-reverse"
+          data-testid="template-engine__settings-deploy-button"
           :label="props.deployLabel"
           :loading="props.loadingDeploy"
           :disabled="props.disabledDeploy"
