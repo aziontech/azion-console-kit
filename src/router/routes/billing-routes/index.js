@@ -30,7 +30,7 @@ export const billingRoutes = {
     {
       path: ':tab?',
       name: 'billing-tabs',
-      component: () => import('@views/Billing/BillingScreen.vue'),
+      component: () => import('@views/Billing/index.vue'),
       meta: {
         title: 'Billing',
         breadCrumbs: [

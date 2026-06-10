@@ -10,7 +10,7 @@ vi.mock('vue-router', () => ({
 }))
 
 import { useAccountStore } from '@/stores/account'
-import BillingScreen from '@/views/Billing/BillingScreen.vue'
+import BillingScreen from '@/views/Billing/index.vue'
 import TabsView from '@/views/Billing/TabsView.vue'
 import LegacyBillingScreen from '@/views/Billing/legacy/LegacyBillingScreen.vue'
 
