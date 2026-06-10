@@ -27,7 +27,19 @@ describe('account store session state', () => {
     expect(store.hasSession).toBe(false)
   })
 
-  it('should require onboarding for a client with billing_type=null', () => {
+  it('should require onboarding for a first-login client with billing_type=null', () => {
+    const store = useAccountStore()
+
+    store.setAccountData({
+      kind: 'client',
+      first_login: true,
+      billing_type: null
+    })
+
+    expect(store.needsOnboarding).toBe(true)
+  })
+
+  it('should require onboarding for a client with billing_type=null when first_login is absent', () => {
     const store = useAccountStore()
 
     store.setAccountData({
@@ -38,7 +50,7 @@ describe('account store session state', () => {
     expect(store.needsOnboarding).toBe(true)
   })
 
-  it('should require onboarding for a returning (non first-login) client with billing_type=null', () => {
+  it('should not require onboarding for a returning (first_login=false) client with billing_type=null', () => {
     const store = useAccountStore()
 
     store.setAccountData({
@@ -47,7 +59,7 @@ describe('account store session state', () => {
       billing_type: null
     })
 
-    expect(store.needsOnboarding).toBe(true)
+    expect(store.needsOnboarding).toBe(false)
   })
 
   it('should not require onboarding for a client that already has a billing_type', () => {
