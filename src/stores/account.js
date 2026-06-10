@@ -87,11 +87,7 @@ export const useAccountStore = defineStore({
       return state.account?.first_login
     },
     needsOnboarding(state) {
-      return (
-        state.account?.kind === 'client' &&
-        state.account?.first_login === true &&
-        state.account?.billing_type === null
-      )
+      return state.account?.kind === 'client' && state.account?.billing_type === null
     },
     accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'
@@ -128,6 +124,22 @@ export const useAccountStore = defineStore({
     },
     accountIsNotRegular(state) {
       return state.account?.status !== state.accountStatuses.REGULAR
+    },
+    billingType(state) {
+      return state.account?.billing_type ?? null
+    },
+    billingExperience() {
+      switch (this.billingType) {
+        case 'custom':
+          return 'custom'
+        case 'internal':
+          return 'internal'
+        case null:
+          return 'null'
+        case 'plan':
+        default:
+          return 'plan'
+      }
     },
 
     hasHideCreateOptionsFlag(state) {

@@ -23,12 +23,11 @@
           <span class="text-sm font-semibold leading-5 text-color">{{
             subscription.planTitle
           }}</span>
-          <span
+          <Tag
             v-if="subscription.planTag"
-            class="inline-flex items-center px-2 py-1 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] text-xs font-semibold leading-4 text-color"
-          >
-            {{ subscription.planTag }}
-          </span>
+            severity="secondary"
+            :value="subscription.planTag"
+          />
         </SkeletonBlock>
 
         <SubscriptionPlanRow label="Plan Start Date">
@@ -79,6 +78,13 @@
               :cardFlag="paymentMethodBrand"
             />
             {{ paymentMethodLabel }}
+            <ActionButton
+              v-if="hasPaymentMethod"
+              kind="outlined"
+              size="small"
+              label="Change"
+              @click="emit('change-payment-method')"
+            />
           </span>
         </SubscriptionPlanRow>
       </div>
@@ -96,6 +102,7 @@
   import { computed } from 'vue'
   import ActionButton from '@aziontech/webkit/actions/button'
   import CardBox from '@aziontech/webkit/content/card-box'
+  import Tag from '@aziontech/webkit/tag'
   import Currency from '@aziontech/webkit/content/currency'
   import SkeletonBlock from '@/templates/skeleton-block'
   import SubscriptionPlanRow from './SubscriptionPlanRow.vue'
@@ -124,7 +131,11 @@
     return SUPPORTED_FLAGS.includes(normalized) ? normalized : null
   })
 
-  const emit = defineEmits(['change-plan', 'go-to-payment'])
+  const hasPaymentMethod = computed(
+    () => Boolean(props.paymentMethodLabel) && props.paymentMethodLabel !== '--'
+  )
+
+  const emit = defineEmits(['change-plan', 'go-to-payment', 'change-payment-method'])
 
   const isTitleLoaded = computed(() => !props.subscription.isLoading)
 
