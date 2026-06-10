@@ -221,8 +221,17 @@
     }
   }
 
+  const prefillEmailFromUrl = () => {
+    const { email: emailFromUrl } = route.query
+
+    if (emailFromUrl) {
+      email.value = emailFromUrl
+    }
+  }
+
   onMounted(() => {
     verifyErrorsOnUrl()
+    prefillEmailFromUrl()
   })
 
   const showSocialIdps = ref(true)
