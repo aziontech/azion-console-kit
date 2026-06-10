@@ -1,38 +1,55 @@
 {
-  "uuid": "tmpl-e2e-123",
-  "name": "E2E Test Template",
-  "is_active": true,
-  "template_type": "github",
-  "created_at": "2026-06-01T12:00:00Z",
-  "updated_at": "2026-06-01T12:00:00Z",
-  "instantiation_data": {
-    "templateTitle": "E2E Test Template",
-    "templateDescription": "Deploy a sample application straight from a template.",
-    "templatePath": "https://github.com/azion/e2e-template",
-    "preview_url": "https://github.com/azion/e2e-template",
-    "envs": [{ "key": "IS_PUBLIC", "value": "" }]
-  },
+  "template_type": "script-runner",
+  "uuid": "fd52edef-5034-4eb5-9378-64c11faa4435",
+  "name": "[V4] Next.js Live Clone Starter",
+  "instantiation_data": "{\r\n    \"image\": \"azionedge/azion-script-builder-v4:script-builder-v4-latest\",\r\n    \"description\": \"Get started using Deepgram's Live Transcription with this Next.js demo app.\",\r\n    \"repository_url\": \"https://github.com/aziontech/azion-samples/tree/dev/templates/opennextjs/nextjs-live-transcription\",\r\n    \"preview_url\": \"https://demo-nextjs-live-transcription.azion.app/\",\r\n    \"preview_image\": \"https://demo-dt-assets.azion.app/assets/img/demo-nextjs-live-transcription.png\",\r\n    \"envs\": [\r\n        {\r\n            \"key\": \"VCS_REPO_IS_PUBLIC\",\r\n            \"value\": \"\",\r\n            \"store\": false\r\n\r\n        },\r\n        {\r\n            \"key\": \"AZ_NAME\",\r\n            \"value\": \"\",\r\n            \"store\": false\r\n\r\n        },\r\n        {\r\n            \"key\": \"BUILD_ENV_ARGS\",\r\n            \"store\": false,\r\n            \"value\": {\r\n                \"DEEPGRAM_API_KEY\": \"value\"\r\n            }\r\n        },\r\n        {\r\n            \"key\": \"DEPLOY_BUILD_ENV_ARGS\",\r\n            \"value\": \"true\",\r\n            \"store\": false\r\n\r\n        },\r\n        {\r\n            \"key\": \"AZ_TASKS\",\r\n            \"value\": \"JAMSTACK\",\r\n            \"store\": false\r\n\r\n        },\r\n        {\r\n            \"key\": \"AZ_URL\",\r\n            \"value\": \"https://api.azionapi.net\",\r\n            \"store\": false\r\n        },\r\n        {\r\n            \"key\": \"AZ_ENV\",\r\n            \"value\": \"production\",\r\n            \"store\": false\r\n        },\r\n        {\r\n            \"key\": \"AZ_TEMPLATE_NAME\",\r\n            \"value\": \"opennextjs/nextjs-live-transcription\",\r\n            \"store\": false\r\n        },\r\n        {\r\n            \"key\": \"GIT_TEMPLATES_URL\",\r\n            \"value\": \"https://github.com/aziontech/azion-samples.git\",\r\n            \"store\": false\r\n        },\r\n        {\r\n            \"key\": \"VULCAN_PRESET\",\r\n            \"value\": \"opennextjs\",\r\n            \"store\": false\r\n        },\r\n        {\r\n            \"key\": \"VULCAN_MODE\",\r\n            \"value\": \"compute\",\r\n            \"store\": false\r\n        },\r\n        {\r\n            \"key\": \"AZ_COMMAND\",\r\n            \"value\": \"pnpm i\",\r\n            \"store\": false\r\n        },\r\n        {\r\n            \"key\": \"IAM_URL\",\r\n            \"value\": \"https://api.azionapi.net\",\r\n            \"store\": false\r\n        },\r\n        {\r\n            \"key\": \"DEBUG\",\r\n            \"value\": true,\r\n            \"store\": false\r\n        },\r\n        {\r\n            \"key\":\"VCS_ACCESS_TOKEN\",\r\n            \"value\":\"{{context.vcs_integration.access_token}}\",\r\n            \"store\":false\r\n        },\r\n        {\r\n            \"key\":\"VCS_USER_ACCESS_TOKEN\",\r\n            \"value\":\"{{context.vcs_integration.user_access_token}}\",\r\n            \"store\":false\r\n        },\r\n        {\r\n            \"key\":\"VCS_PLATFORM\",\r\n            \"value\":\"{{context.vcs_integration.platform}}\",\r\n            \"store\":false\r\n        },\r\n        {\r\n            \"key\":\"VCS_SCOPE\",\r\n            \"value\":\"{{context.vcs_integration.scope}}\",\r\n            \"store\":false\r\n        },\r\n        {\r\n            \"key\":\"VCS_SCOPE_TYPE\",\r\n            \"value\":\"{{context.vcs_integration.scope_type}}\",\r\n            \"store\":false\r\n        }\r\n    ]\r\n}",
   "input_schema": {
     "type": "object",
-    "title": "E2E Test Template",
-    "required": ["application_name"],
+    "title": "Next.js Live Transcription",
+    "required": [
+      "platform_feature__vcs_integration__uuid",
+      "az_name",
+      "build_DEEPGRAM_API_KEY"
+    ],
     "properties": {
+      "az_name": {
+        "type": "string",
+        "label": "Application Name",
+        "format": "privacy",
+        "maxLength": 100,
+        "validators": [
+          {
+            "regex": "(^(?![aA][zZ][iI][oO][nN]|[bB]2)[A-Za-z0-9\\-]{6,}$)",
+            "errorMessage": "At least 6 characters. Letters, numbers, and hyphens only. No spaces or reserved words like \"Azion\"."
+          }
+        ],
+        "description": "Give a unique and easy-to-remember name to the application.",
+        "placeholder": "Enter a name for your new Edge Application.",
+        "isSettingField": false,
+        "instantiation_data_path": "envs.[1].value"
+      },
+      "build_DEEPGRAM_API_KEY": {
+        "type": "string",
+        "label": "Deepgram API Key",
+        "format": "password",
+        "description": "Input your Deepgram API Key",
+        "placeholder": "Deepgram API Key",
+        "isSettingField": true,
+        "instantiation_data_path": "envs.[2].value.DEEPGRAM_API_KEY"
+      },
       "platform_feature__vcs_integration__uuid": {
         "type": "string",
-        "title": "Git Scope",
-        "required": true,
-        "instantiation_data_path": "",
-        "description": "Select the GitHub scope to deploy from."
-      },
-      "application_name": {
-        "type": "string",
-        "format": "privacy",
-        "label": "Project Name",
-        "title": "Project Name",
-        "required": true,
-        "instantiation_data_path": "",
-        "is_public_data_path": "envs.[0].value"
+        "label": "Git Scope",
+        "maxLength": 100,
+        "description": "Select the scope for this template.",
+        "placeholder": "",
+        "isSettingField": false,
+        "instantiation_data_path": ""
       }
     }
-  }
+  },
+  "is_active": true,
+  "created_at": "2026-04-30T12:09:02.185095Z",
+  "updated_at": "2026-05-18T17:56:54.424630Z",
+  "features": [1]
 }

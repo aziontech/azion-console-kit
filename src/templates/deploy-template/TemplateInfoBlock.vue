@@ -173,6 +173,7 @@
                 :href="resource.url"
                 target="_blank"
                 rel="noopener noreferrer"
+                data-testid="deploy-success-card__resource-link"
                 class="text-xs font-normal font-['Sora'] text-color leading-4 cursor-pointer hover:text-link transition-colors underline-offset-2 hover:underline"
               >
                 {{ resource.name }}

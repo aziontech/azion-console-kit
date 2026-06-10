@@ -14,6 +14,8 @@ export default {
   privacySwitch: '[data-testid="field-text-privacy__privacy-switch"]',
   projectNameLabel: '[data-testid="field-text-privacy__label"]',
   projectNameError: '[data-testid="field-text-privacy__error-message"]',
+  // Settings step (password field rendered via JsonForms)
+  settingsPasswordInput: '[data-testid="field-password__input"] input',
 
   // Footer / settings actions
   nextButton: '[data-testid="template-engine__next-button"]',
@@ -24,5 +26,7 @@ export default {
   inputsCard: '[data-testid="template-engine__inputs-card"]',
   deployStatusCard: '[data-testid="deploy-status-card"]',
   deploySuccessCard: '[data-testid="deploy-success-card"]',
-  deploySuccessUrl: '[data-testid="deploy-success-card__app-url"]'
+  deploySuccessUrl: '[data-testid="deploy-success-card__app-url"]',
+  deploySuccessResourceLink: '[data-testid="deploy-success-card__resource-link"]',
+  deploySuccessNextStepLink: '[data-testid="deploy-success-card__next-step-link"]'
 }

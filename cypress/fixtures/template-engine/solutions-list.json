@@ -1,7 +1,7 @@
 [
   {
     "id": 9001,
-    "name": "E2E Test Template",
+    "name": "[V4] Next.js Live Clone Starter",
     "solution_reference_id": "tmpl-e2e-123",
     "vendor": {
       "slug": "azion",
@@ -10,7 +10,7 @@
       "url": "https://www.azion.com"
     },
     "slug": "my-template-e2e",
-    "headline": "Deploy a sample application straight from a template.",
+    "headline": "Get started using Deepgram's Live Transcription with this Next.js demo app.",
     "icon": "https://www.azion.com/favicon.ico",
     "featured": true,
     "new_release": false,
@@ -19,6 +19,6 @@
       "is_template": true
     },
     "category": ["Frontend"],
-    "updated_at": "2026-06-01T12:00:00Z"
+    "updated_at": "2026-05-18T17:56:54.424630Z"
   }
 ]

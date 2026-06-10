@@ -110,10 +110,10 @@ describe('Template Engine - Deploy Template success flow (mocked)', { tags: ['@d
     cy.wait('@getTemplate')
     cy.wait('@getVcsIntegrations')
 
-    // 4. Git Scope is auto-selected from the mocked integration
-    cy.get(templateEngine.gitScopeDropdown)
-      .should('be.visible')
-      .and('contain', 'azion-e2e-org')
+    // 4. Git Scope: open the dropdown and select the mocked integration
+    cy.get(templateEngine.gitScopeDropdown).should('be.visible').click()
+    cy.contains(templateEngine.dropdownItem, 'azion-e2e-org').click()
+    cy.get(templateEngine.gitScopeDropdown).should('contain', 'azion-e2e-org')
 
     // 5. Project name
     cy.get(templateEngine.projectNameInput).clear()
@@ -125,14 +125,21 @@ describe('Template Engine - Deploy Template success flow (mocked)', { tags: ['@d
       .click()
     cy.get(templateEngine.privacySwitch).should('have.attr', 'aria-pressed', 'false')
 
+    // 7. This template has a settings field (build_DEEPGRAM_API_KEY) -> footer
+    //    shows "Next", which moves to the settings step.
+    cy.get(templateEngine.nextButton).should('not.be.disabled').click()
+
+    // 8. Settings step: fill the required Deepgram API Key
+    cy.get(templateEngine.settingsPasswordInput).type('test-deepgram-key-123')
+
     // Freeze timers before deploy so we can drive the logs polling deterministically
     cy.clock(null, ['setTimeout', 'setInterval'])
 
-    // 7. Deploy
-    cy.get(templateEngine.deployButton).should('not.be.disabled').click()
+    // 9. Deploy from the settings card
+    cy.get(templateEngine.settingsDeployButton).should('not.be.disabled').click()
 
-    // 8. Deploy button is loading/disabled while the request is in-flight
-    cy.get(templateEngine.deployButton).should('be.disabled')
+    // 10. Deploy button is loading/disabled while the request is in-flight
+    cy.get(templateEngine.settingsDeployButton).should('be.disabled')
 
     // 9. Payload reflects the chosen privacy state (private => false)
     cy.wait('@instantiate').then(({ request, response }) => {
@@ -161,7 +168,29 @@ describe('Template Engine - Deploy Template success flow (mocked)', { tags: ['@d
     cy.get(templateEngine.deploySuccessCard).should('be.visible')
 
     cy.get(templateEngine.deploySuccessUrl)
-      .should('have.attr', 'href')
+      .should('have.attr', 'target', '_blank')
+      .and('have.attr', 'href')
       .and('include', MOCKED_DOMAIN)
+
+    // 15. Resource links (Edge Application / Workload) open in a new tab.
+    //     Cypress can't inspect a real new tab, so we assert the anchor is
+    //     configured to open one (target=_blank + noopener + a valid href).
+    cy.get(templateEngine.deploySuccessResourceLink)
+      .should('have.length.at.least', 1)
+      .each(($a) => {
+        cy.wrap($a)
+          .should('have.attr', 'target', '_blank')
+          .and('have.attr', 'rel')
+          .and('include', 'noopener')
+        cy.wrap($a).invoke('attr', 'href').should('not.be.empty')
+      })
+
+    // 16. Next Steps links also open in a new tab
+    cy.get(templateEngine.deploySuccessNextStepLink)
+      .should('have.length.at.least', 1)
+      .each(($a) => {
+        cy.wrap($a).should('have.attr', 'target', '_blank')
+        cy.wrap($a).invoke('attr', 'href').should('not.be.empty')
+      })
   })
 })

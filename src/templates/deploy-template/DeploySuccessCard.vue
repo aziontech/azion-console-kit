@@ -531,6 +531,7 @@
               :href="step.href"
               target="_blank"
               rel="noopener noreferrer"
+              data-testid="deploy-success-card__next-step-link"
               class="min-h-11 py-2 rounded-md border surface-border bg-[var(--surface-ground)] flex items-center px-3 cursor-pointer hover:border-surface transition-colors gap-2 no-underline"
             >
               <div
