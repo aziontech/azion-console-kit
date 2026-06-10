@@ -27,39 +27,51 @@ describe('account store session state', () => {
     expect(store.hasSession).toBe(false)
   })
 
-  it('should use has_service_order_plan=true as contracted plan source of truth', () => {
+  it('should require onboarding only for a first-login client with billing_type=null', () => {
     const store = useAccountStore()
 
     store.setAccountData({
-      first_login: true,
       kind: 'client',
-      hasServiceOrderPlan: true
+      first_login: true,
+      billing_type: null
+    })
+
+    expect(store.needsOnboarding).toBe(true)
+  })
+
+  it('should not require onboarding for a first-login client that already has a billing_type', () => {
+    const store = useAccountStore()
+
+    store.setAccountData({
+      kind: 'client',
+      first_login: true,
+      billing_type: 'plan'
     })
 
     expect(store.needsOnboarding).toBe(false)
   })
 
-  it('should require onboarding when has_service_order_plan=false for first client login', () => {
+  it('should not require onboarding for a returning client even with billing_type=null', () => {
     const store = useAccountStore()
 
     store.setAccountData({
-      first_login: true,
       kind: 'client',
-      hasServiceOrderPlan: false
+      first_login: false,
+      billing_type: null
     })
 
-    expect(store.needsOnboarding).toBe(true)
+    expect(store.needsOnboarding).toBe(false)
   })
 
-  it('should not trust non-boolean has_service_order_plan values', () => {
+  it('should never require onboarding for non-client accounts', () => {
     const store = useAccountStore()
 
     store.setAccountData({
+      kind: 'reseller',
       first_login: true,
-      kind: 'client',
-      hasServiceOrderPlan: 'true'
+      billing_type: null
     })
 
-    expect(store.needsOnboarding).toBe(true)
+    expect(store.needsOnboarding).toBe(false)
   })
 })
