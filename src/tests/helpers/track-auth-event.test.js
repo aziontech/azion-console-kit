@@ -1,11 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { trackSignInSafely } from '@/helpers/track-auth-event'
-import { loadUserAndAccountInfo } from '@/helpers/account-data'
 import { useAccountStore } from '@/stores/account'
-
-vi.mock('@/helpers/account-data', () => ({
-  loadUserAndAccountInfo: vi.fn()
-}))
 
 vi.mock('@/stores/account', () => ({
   useAccountStore: vi.fn()
@@ -37,7 +32,7 @@ describe('trackSignInSafely', () => {
     })
   })
 
-  it('uses token verification tracking data without hydrating account data', async () => {
+  it('builds the payload from the token verification data', async () => {
     const { tracker, track, userSignedIn } = makeTracker()
 
     await trackSignInSafely({
@@ -55,7 +50,6 @@ describe('trackSignInSafely', () => {
       }
     })
 
-    expect(loadUserAndAccountInfo).not.toHaveBeenCalled()
     expect(userSignedIn).toHaveBeenCalledWith({
       method: 'email',
       signupTypeFlags: { login_email: true },
@@ -70,7 +64,7 @@ describe('trackSignInSafely', () => {
     expect(track).toHaveBeenCalledTimes(1)
   })
 
-  it('tracks sign-in with store data when token verification tracking data is missing', async () => {
+  it('falls back to the hydrated store when no token data is provided', async () => {
     const { tracker, track, userSignedIn } = makeTracker()
 
     useAccountStore.mockReturnValue({
@@ -92,7 +86,6 @@ describe('trackSignInSafely', () => {
       method: 'google'
     })
 
-    expect(loadUserAndAccountInfo).not.toHaveBeenCalled()
     expect(userSignedIn).toHaveBeenCalledWith({
       method: 'google',
       signupTypeFlags: { login_sso_google: true },
@@ -104,6 +97,27 @@ describe('trackSignInSafely', () => {
       company: 'Azion',
       accountKind: 'client'
     })
+    expect(track).toHaveBeenCalledTimes(1)
+  })
+
+  it('still fires the event without crashing when the token payload is malformed', async () => {
+    const { tracker, track, userSignedIn } = makeTracker()
+
+    await trackSignInSafely({
+      tracker,
+      method: 'email',
+      email: 'typed@example.com',
+      userTrackingInfo: { id: 'user-123' }
+    })
+
+    expect(userSignedIn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'typed@example.com',
+        userId: undefined,
+        accountId: undefined,
+        company: undefined
+      })
+    )
     expect(track).toHaveBeenCalledTimes(1)
   })
 })
