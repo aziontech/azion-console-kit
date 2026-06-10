@@ -536,10 +536,7 @@
 
     try {
       const { valid } = await validate()
-      if (!valid) {
-        loading.value = false
-        return
-      }
+      if (!valid) return
       const usersPayload = fullName.value
       const [firstName = '', ...lastNameParts] = usersPayload.split(' ')
       const lastName = lastNameParts.join(' ')
