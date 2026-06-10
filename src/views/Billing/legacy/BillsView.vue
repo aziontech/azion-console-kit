@@ -23,7 +23,7 @@
             :isLoaded="isCurrentInvoiceLoaded"
             class="font-medium text-color text-sm"
           >
-            {{ currentInvoice.billingPeriod }}
+            {{ currentInvoice.billingPeriod || '---' }}
           </SkeletonBlock>
         </div>
         <div
@@ -35,7 +35,7 @@
             :isLoaded="isCurrentInvoiceLoaded"
             class="text-color text-sm"
           >
-            {{ currentInvoice.productChanges }}
+            {{ currentInvoice.productChanges || '---' }}
           </SkeletonBlock>
         </div>
         <div
@@ -47,7 +47,7 @@
             :isLoaded="isCurrentInvoiceLoaded"
             class="text-color text-sm"
           >
-            {{ currentInvoice.servicePlan }}
+            {{ currentInvoice.servicePlan || '---' }}
           </SkeletonBlock>
         </div>
       </div>
@@ -63,7 +63,7 @@
             class="text-color"
           >
             <span class="text-color-secondary text-sm">$</span>
-            {{ currentInvoice.creditUsedForPayment }}
+            {{ currentInvoice.creditUsedForPayment || 0 }}
           </SkeletonBlock>
         </div>
         <div class="flex justify-between items-center">
@@ -79,7 +79,7 @@
           >
             <span class="text-sm">$</span>
             <span class="text-2xl">
-              {{ currentInvoice.total }}
+              {{ currentInvoice.total || 0 }}
             </span>
           </SkeletonBlock>
         </div>

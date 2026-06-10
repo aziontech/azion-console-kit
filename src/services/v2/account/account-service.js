@@ -5,10 +5,10 @@ import { queryKeys } from '@/services/v2/base/query/queryKeys'
 const BILLING_TYPE_OVERRIDE_KEY = 'billing_type_override'
 
 const readLocalStorageOverride = () => {
+  if (typeof window === 'undefined') {
+    return null
+  }
   try {
-    if (typeof window === 'undefined' || !window.localStorage) {
-      return null
-    }
     return window.localStorage.getItem(BILLING_TYPE_OVERRIDE_KEY)
   } catch {
     return null
@@ -17,10 +17,9 @@ const readLocalStorageOverride = () => {
 
 const resolveBillingType = (billingType) => {
   const envOverride = import.meta.env.VITE_BILLING_TYPE_OVERRIDE
-  const override =
-    envOverride === undefined || envOverride === '' ? readLocalStorageOverride() : envOverride
+  const override = !envOverride ? readLocalStorageOverride() : envOverride
 
-  if (override === undefined || override === null || override === '') {
+  if (!override) {
     return billingType ?? null
   }
 

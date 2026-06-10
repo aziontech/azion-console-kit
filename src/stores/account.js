@@ -123,7 +123,9 @@ export const useAccountStore = defineStore({
       return account?.client_flags?.includes(flags.MARKETPLACE_PRODUCTS)
     },
     accountIsNotRegular(state) {
-      return state.account?.status !== state.accountStatuses.REGULAR
+      return (
+        state.account?.status !== state.accountStatuses.REGULAR && this.billingType !== 'custom'
+      )
     },
     billingType(state) {
       return state.account?.billing_type ?? null

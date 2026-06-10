@@ -116,3 +116,33 @@ describe('account store billing experience', () => {
     expect(store.billingExperience).toBe('plan')
   })
 })
+
+describe('account store regular billing detection', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  it('should flag a REGULAR status account as regular (hide values)', () => {
+    const store = useAccountStore()
+    store.setAccountData({ status: 'REGULAR', billing_type: 'plan' })
+    expect(store.accountIsNotRegular).toBe(false)
+  })
+
+  it('should flag a billing_type=custom account as regular regardless of status', () => {
+    const store = useAccountStore()
+    store.setAccountData({ status: 'ONLINE', billing_type: 'custom' })
+    expect(store.accountIsNotRegular).toBe(false)
+  })
+
+  it('should not flag an ONLINE plan account as regular (show values)', () => {
+    const store = useAccountStore()
+    store.setAccountData({ status: 'ONLINE', billing_type: 'plan' })
+    expect(store.accountIsNotRegular).toBe(true)
+  })
+
+  it('should not flag a billing_type=internal account as regular', () => {
+    const store = useAccountStore()
+    store.setAccountData({ status: 'ONLINE', billing_type: 'internal' })
+    expect(store.accountIsNotRegular).toBe(true)
+  })
+})
