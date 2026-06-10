@@ -169,7 +169,7 @@
     name: 'additional-data-form-block'
   })
 
-  const emit = defineEmits(['plan-change'])
+  const emit = defineEmits(['plan-change', 'validity-change'])
 
   // Fetch plans from API
   const { data: plansData } = usePlansList()
@@ -210,10 +210,19 @@
       Object.entries(additionalDataFormState.value).filter(([, value]) => value !== undefined)
     )
 
-  const { meta, setFieldValue, validate, validateField } = useForm({
+  const { meta, setFieldValue, validate } = useForm({
     validationSchema,
-    initialValues: buildInitialValues()
+    initialValues: buildInitialValues(),
+    validateOnMount: true
   })
+
+  watch(
+    () => meta.value.valid,
+    (valid) => {
+      emit('validity-change', Boolean(valid))
+    },
+    { immediate: true }
+  )
 
   const { value: plan } = useField('plan')
   const { value: usageIntent } = useField('usageIntent')
@@ -457,12 +466,17 @@
     setAdditionalDataField('companySize', value)
   })
 
-  watch(companyWebsite, (value) => {
+  watch(companyWebsite, async (value) => {
     setAdditionalDataField('companyWebsite', value)
+    await nextTick()
+    await validate()
   })
 
-  watch(fullName, (value) => {
+  watch(fullName, async (value) => {
     setAdditionalDataField('fullName', value)
+    await nextTick()
+    const result = await validate()
+    emit('validity-change', Boolean(result?.valid))
   })
 
   watch(termsAccepted, (value) => {
@@ -492,7 +506,7 @@
       autofilledOnce = true
       setFieldValue('fullName', `${first} ${last}`)
       await nextTick()
-      await validateField('fullName')
+      await validate()
     },
     { immediate: true }
   )

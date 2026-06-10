@@ -19,6 +19,7 @@
               <AdditionalDataFormBlock
                 ref="additionalDataRef"
                 @plan-change="handlePlanChange"
+                @validity-change="handleValidityChange"
               />
             </div>
           </template>
@@ -157,6 +158,10 @@
   const { prepareSignupCheckout, isLoading: isLoadingServiceOrder } = useServiceOrders()
 
   const additionalDataRef = ref(null)
+  const isFormValid = ref(false)
+  const handleValidityChange = (valid) => {
+    isFormValid.value = Boolean(valid)
+  }
   const currentStep = ref('additional-data') // 'additional-data' | 'checkout' | 'success'
   const selectedPlan = ref(null)
   const checkoutSessionClientSecret = ref('')
@@ -176,10 +181,7 @@
       !isSuccessStep.value
   )
   const isCheckoutPremounting = computed(() => shouldMountCheckout.value && !isCheckoutStep.value)
-  const isDisabledSubmit = computed(() => {
-    const metaValid = additionalDataRef.value?.meta?.valid
-    return !metaValid || isSubmitLoading.value
-  })
+  const isDisabledSubmit = computed(() => !isFormValid.value || isSubmitLoading.value)
 
   const isSubmitLoading = computed(() => {
     const formLoading = additionalDataRef.value?.loading
