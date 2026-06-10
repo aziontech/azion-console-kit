@@ -25,15 +25,8 @@
         :clientSecret="setupIntentClientSecret"
         :showHeader="false"
         @readiness-change="handlePaymentReadinessChange"
+        @load-error="handleStripeLoadError"
       />
-
-      <InlineMessage
-        v-if="error"
-        severity="error"
-        class="text-xs break-all"
-      >
-        {{ error }}
-      </InlineMessage>
     </div>
 
     <template #footer>
@@ -63,7 +56,6 @@
   import { useQueryClient } from '@tanstack/vue-query'
   import Dialog from '@aziontech/webkit/dialog'
   import ActionButton from '@aziontech/webkit/actions/button'
-  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PaymentMethodSetupBlock from '@/templates/checkout-block/payment-method-setup-block.vue'
   import { useUpdateDefaultPaymentMethod } from '@/composables/useUpdateDefaultPaymentMethod'
   import { queryKeys } from '@/services/v2/base/query/queryKeys'
@@ -99,7 +91,10 @@
   const isSubmitting = ref(false)
   const isPaymentFormReady = ref(false)
   const setupIntentClientSecret = ref('')
-  const error = ref('')
+
+  const showError = (detail) => {
+    toast.add({ severity: 'error', summary: 'Error', detail: String(detail), closable: true })
+  }
 
   const isVisible = computed({
     get: () => props.visible,
@@ -119,10 +114,14 @@
     isVisible.value = false
   }
 
+  const handleStripeLoadError = (detail) => {
+    showError(detail || 'Unable to load payment fields.')
+    isVisible.value = false
+  }
+
   const initSetupIntent = async () => {
     setupIntentClientSecret.value = ''
     isPaymentFormReady.value = false
-    error.value = ''
     try {
       const { clientSecret } = await createSetupIntent()
       if (!clientSecret) {
@@ -130,7 +129,8 @@
       }
       setupIntentClientSecret.value = clientSecret
     } catch (err) {
-      error.value = err?.message || 'Unable to initialize payment method update.'
+      showError(err?.message || 'Unable to initialize payment method update.')
+      isVisible.value = false
     }
   }
 
@@ -144,14 +144,12 @@
       setupIntentClientSecret.value = ''
       isPaymentFormReady.value = false
       isSubmitting.value = false
-      error.value = ''
     }
   )
 
   const handleSubmit = async () => {
     if (isSubmitting.value) return
     isSubmitting.value = true
-    error.value = ''
     try {
       const newPaymentMethodId = await paymentSetupRef.value?.confirmSetup?.()
       if (!newPaymentMethodId) {
@@ -169,9 +167,10 @@
       emit('updated')
       isVisible.value = false
     } catch (err) {
-      error.value =
+      showError(
         (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
-        'Unable to update payment method.'
+          'Unable to update payment method.'
+      )
     } finally {
       isSubmitting.value = false
     }
