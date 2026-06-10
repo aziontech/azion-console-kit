@@ -117,22 +117,8 @@ export const useAccountStore = defineStore({
     redirectToExternalBillingNeeded(state) {
       return !state.account?.status || state.accountStatuses.REGULAR === state.account?.status
     },
-    billingAccessPermitted(state) {
-      return [
-        state.accountStatuses.BLOCKED,
-        state.accountStatuses.DEFAULTING,
-        state.accountStatuses.TRIAL,
-        state.accountStatuses.ONLINE,
-        state.accountStatuses.REGULAR
-      ].includes(state.account?.status)
-    },
     showExportBilling(state) {
       return [state.accountStatuses.ONLINE, state.accountStatuses.TRIAL].includes(
-        state.account?.status
-      )
-    },
-    paymentReviewPending(state) {
-      return [state.accountStatuses.BLOCKED, state.accountStatuses.DEFAULTING].includes(
         state.account?.status
       )
     },
