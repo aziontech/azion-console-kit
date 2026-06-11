@@ -66,6 +66,7 @@
     </div>
     <AccountActivation
       v-else
+      :email="activationEmail"
       :resendEmailService="props.resendEmailService"
     />
   </div>
@@ -93,12 +94,14 @@
 
   const showLoginFromEmail = ref(true)
   const showActivation = ref(true)
+  const activationEmail = ref('')
 
   const signupHeading = computed(() =>
     plan.value === 'pro' ? 'Sign Up for the Pro Plan' : 'Sign Up for a Free Account'
   )
 
-  const showActivationEmail = () => {
+  const showActivationEmail = (email) => {
+    activationEmail.value = email
     showActivation.value = false
   }
 

@@ -169,7 +169,7 @@
     name: 'additional-data-form-block'
   })
 
-  const emit = defineEmits(['plan-change'])
+  const emit = defineEmits(['plan-change', 'validity-change'])
 
   // Fetch plans from API
   const { data: plansData } = usePlansList()
@@ -210,17 +210,26 @@
       Object.entries(additionalDataFormState.value).filter(([, value]) => value !== undefined)
     )
 
-  const { meta } = useForm({
+  const { meta, setFieldValue, validate } = useForm({
     validationSchema,
-    initialValues: buildInitialValues()
+    initialValues: buildInitialValues(),
+    validateOnMount: true
   })
+
+  watch(
+    () => meta.value.valid,
+    (valid) => {
+      emit('validity-change', Boolean(valid))
+    },
+    { immediate: true }
+  )
 
   const { value: plan } = useField('plan')
   const { value: usageIntent } = useField('usageIntent')
   const { value: role } = useField('role')
   const { value: companySize } = useField('companySize')
   const { value: companyWebsite } = useField('companyWebsite')
-  const { value: fullName } = useField('fullName')
+  const { value: fullName, meta: fullNameMeta } = useField('fullName')
   const { value: termsAccepted } = useField('termsAccepted')
 
   // Initialize plans from URL/storage
@@ -457,12 +466,17 @@
     setAdditionalDataField('companySize', value)
   })
 
-  watch(companyWebsite, (value) => {
+  watch(companyWebsite, async (value) => {
     setAdditionalDataField('companyWebsite', value)
+    await nextTick()
+    await validate()
   })
 
-  watch(fullName, (value) => {
+  watch(fullName, async (value) => {
     setAdditionalDataField('fullName', value)
+    await nextTick()
+    const result = await validate()
+    emit('validity-change', Boolean(result?.valid))
   })
 
   watch(termsAccepted, (value) => {
@@ -477,21 +491,31 @@
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ')
 
+  let autofilledOnce = false
   watch(
     () => [
       accountStore.accountData?.first_name ?? accountStore.accountData?.firstName,
       accountStore.accountData?.last_name ?? accountStore.accountData?.lastName
     ],
-    ([firstName, lastName]) => {
-      if (fullName.value) return
+    async ([firstName, lastName]) => {
+      if (autofilledOnce) return
+      if (fullName.value || fullNameMeta.dirty || fullNameMeta.touched) return
       const first = capitalizeName(firstName)
       const last = capitalizeName(lastName)
-      if (first && last) {
-        fullName.value = `${first} ${last}`
-      }
+      if (!first || !last) return
+      autofilledOnce = true
+      setFieldValue('fullName', `${first} ${last}`)
+      await nextTick()
+      await validate()
     },
     { immediate: true }
   )
+
+  watch(isFormReady, async (ready) => {
+    if (!ready) return
+    await nextTick()
+    await validate()
+  })
 
   watch(plan, (selectedPlan) => {
     if (selectedPlan === undefined) return
@@ -511,6 +535,8 @@
     loading.value = true
 
     try {
+      const { valid } = await validate()
+      if (!valid) return
       const usersPayload = fullName.value
       const [firstName = '', ...lastNameParts] = usersPayload.split(' ')
       const lastName = lastNameParts.join(' ')
