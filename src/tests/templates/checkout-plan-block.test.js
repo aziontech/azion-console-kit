@@ -20,7 +20,8 @@ const mountCheckoutPlanBlock = ({
   confirmCheckoutSession = vi.fn(),
   saveAddress = vi.fn(),
   emitPaymentReady = false,
-  emitAddressReady = false
+  emitAddressReady = false,
+  emitTermsAccepted = false
 } = {}) =>
   mount(CheckoutPlanBlock, {
     props: {
@@ -67,6 +68,13 @@ const mountCheckoutPlanBlock = ({
           methods: {
             saveAddress,
             getCountry: vi.fn(() => 'United States')
+          }
+        }),
+        TermsAcceptanceBlock: defineComponent({
+          template: '<div />',
+          emits: ['update:modelValue'],
+          mounted() {
+            if (emitTermsAccepted) this.$emit('update:modelValue', true)
           }
         }),
         CheckoutActionFooter: {
@@ -125,7 +133,8 @@ describe('checkout-plan-block', () => {
       confirmCheckoutSession,
       saveAddress,
       emitPaymentReady: true,
-      emitAddressReady: true
+      emitAddressReady: true,
+      emitTermsAccepted: true
     })
 
     await flushPromises()
@@ -144,5 +153,21 @@ describe('checkout-plan-block', () => {
       ]
     ])
     expect(mocks.toastAdd).not.toHaveBeenCalled()
+  })
+
+  it('blocks checkout submission until the terms of service are accepted', async () => {
+    const saveAddress = vi.fn()
+    const wrapper = mountCheckoutPlanBlock({
+      saveAddress,
+      emitPaymentReady: true,
+      emitAddressReady: true,
+      emitTermsAccepted: false
+    })
+
+    await flushPromises()
+    await wrapper.get('[data-testid="submit"]').trigger('click')
+    await flushPromises()
+
+    expect(saveAddress).not.toHaveBeenCalled()
   })
 })
