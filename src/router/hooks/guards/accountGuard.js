@@ -15,8 +15,6 @@ export async function accountGuard({ to, accountStore, tracker }) {
     }
 
     try {
-      // Await account identity hydration before deciding onboarding redirects.
-      // `billing_type` from account info drives the onboarding gate.
       await loadAccountHydration()
 
       const needsOnboarding = accountStore.needsOnboarding
