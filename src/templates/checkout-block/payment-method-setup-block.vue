@@ -1,6 +1,9 @@
 <template>
   <div class="border border-[var(--border-muted)] border-solid rounded-md bg-surface">
-    <div class="flex items-center justify-between px-6 py-3 border-b border-[var(--border-muted)]">
+    <div
+      v-if="showHeader"
+      class="flex items-center justify-between px-6 py-3 border-b border-[var(--border-muted)]"
+    >
       <span class="text-base leading-none text-default">Payment Method</span>
       <ActionButton
         kind="text"
@@ -102,11 +105,12 @@
 
   defineOptions({ name: 'payment-method-setup-block' })
 
-  const emit = defineEmits(['readiness-change', 'cancel'])
+  const emit = defineEmits(['readiness-change', 'cancel', 'load-error'])
 
   const props = defineProps({
     stripeClientService: { type: Function, required: true },
-    clientSecret: { type: String, default: '' }
+    clientSecret: { type: String, default: '' },
+    showHeader: { type: Boolean, default: true }
   })
 
   const themeStore = useThemeStore()
@@ -186,6 +190,7 @@
     } catch (err) {
       error.value = err?.message || 'Unable to load payment fields.'
       emitReadiness()
+      emit('load-error', error.value)
     }
   }
 
