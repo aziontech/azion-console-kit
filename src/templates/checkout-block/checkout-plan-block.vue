@@ -40,7 +40,10 @@
   import PaymentMethodBlock from './payment-method-block.vue'
   import PricingCalculationBlock from './pricing-calculation-block.vue'
   import CheckoutActionFooter from '@/templates/checkout-block/checkout-action-footer.vue'
-  import { mapStripeError } from '@/templates/checkout-block/helpers/stripe-error-mapper.js'
+  import {
+    isStaleCheckoutSessionError,
+    mapStripeError
+  } from '@/templates/checkout-block/helpers/stripe-error-mapper.js'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { useScrollToError } from '@/composables/useScrollToError'
 
@@ -184,6 +187,11 @@
 
       emit('onSubmit', checkoutData)
     } catch (error) {
+      if (isStaleCheckoutSessionError(error)) {
+        handleStaleCheckoutSession({ reason: 'no_such_checkout_session' })
+        return
+      }
+
       const detail = mapStripeError(error?.message || error)
       toast.add({
         closable: true,

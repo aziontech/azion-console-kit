@@ -26,7 +26,8 @@ const mocks = vi.hoisted(() => ({
   storedPlan: { value: 'hobby' },
   storedBillingCycle: { value: 'monthly' },
   accountStore: {
-    accountData: { id: 123, email: 'user@example.com' }
+    accountData: { id: 123, email: 'user@example.com' },
+    getSignupTypeFlags: vi.fn(() => ({ signup_email: true }))
   }
 }))
 
@@ -210,6 +211,7 @@ describe('Signup AdditionalDataView checkout preparation', () => {
     mocks.initializePlans.mockReset()
     mocks.removeQueries.mockReset()
     mocks.captureException.mockReset()
+    mocks.accountStore.getSignupTypeFlags.mockReturnValue({ signup_email: true })
     mocks.plansData.value = [
       {
         id: 2,
