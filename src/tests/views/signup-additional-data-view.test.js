@@ -119,12 +119,15 @@ const createDeferred = () => {
 }
 
 const AdditionalDataFormStub = defineComponent({
-  emits: ['plan-change'],
+  emits: ['plan-change', 'validity-change'],
   data: () => ({
     plan: 'hobby',
     meta: { valid: true },
     loading: false
   }),
+  mounted() {
+    this.$emit('validity-change', this.meta.valid)
+  },
   methods: {
     selectPlan(plan, billingCycle) {
       this.plan = plan
