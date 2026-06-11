@@ -2,10 +2,24 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { getAccountTypeIcon, getAccountTypeName } from '@/helpers/account-type-name-mapping.js'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
-const resolveBillingType = (billingType) => {
-  const override = import.meta.env.VITE_BILLING_TYPE_OVERRIDE
+const BILLING_TYPE_OVERRIDE_KEY = 'billing_type_override'
 
-  if (override === undefined || override === '') {
+const readLocalStorageOverride = () => {
+  if (typeof window === 'undefined') {
+    return null
+  }
+  try {
+    return window.localStorage.getItem(BILLING_TYPE_OVERRIDE_KEY)
+  } catch {
+    return null
+  }
+}
+
+const resolveBillingType = (billingType) => {
+  const envOverride = import.meta.env.VITE_BILLING_TYPE_OVERRIDE
+  const override = !envOverride ? readLocalStorageOverride() : envOverride
+
+  if (!override) {
     return billingType ?? null
   }
 

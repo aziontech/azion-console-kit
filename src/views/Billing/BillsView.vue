@@ -13,6 +13,7 @@
         :paymentMethodBrandRaw="paymentMethodBrandRaw"
         @change-plan="showOtherPlans"
         @go-to-payment="goToPayment"
+        @change-payment-method="openChangePaymentMethod"
       />
 
       <UpgradeToProCard
@@ -63,7 +64,17 @@
     description="Add a payment method and start using services and products to view your activity."
     :inTabs="true"
     :documentationService="props.documentPaymentHistoryService"
-  />
+  >
+    <template #default>
+      <PrimeButton
+        class="max-md:w-full w-fit"
+        severity="secondary"
+        icon="pi pi-plus"
+        label="Payment Method"
+        @click="openChangePaymentMethod"
+      />
+    </template>
+  </EmptyResultsBlock>
 
   <PlanSelectionDrawer
     v-model:visible="showChangePlanDrawer"
@@ -106,6 +117,11 @@
     v-model:visible="showCancelDowngradeDialog"
     @confirm="handleCancelDowngradeConfirm"
   />
+
+  <DialogChangePaymentMethod
+    v-model:visible="showChangePaymentMethodDialog"
+    :getStripeClientService="props.getStripeClientService"
+  />
 </template>
 
 <script setup>
@@ -113,6 +129,7 @@
   import { useRouter } from 'vue-router'
   import { storeToRefs } from 'pinia'
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
+  import PrimeButton from '@aziontech/webkit/button'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import SubscriptionPlanCard from './components/SubscriptionPlanCard.vue'
@@ -141,6 +158,9 @@
   const DialogDowngradePlan = defineAsyncComponent(() => import('./Dialog/DialogDowngradePlan.vue'))
   const DialogCancelDowngrade = defineAsyncComponent(
     () => import('./Dialog/DialogCancelDowngrade.vue')
+  )
+  const DialogChangePaymentMethod = defineAsyncComponent(
+    () => import('./Dialog/DialogChangePaymentMethod.vue')
   )
 
   const router = useRouter()
@@ -258,6 +278,7 @@
 
   const showChangePlanDrawer = ref(false)
   const showPlanInfoDrawer = ref(false)
+  const showChangePaymentMethodDialog = ref(false)
   const showDowngradeDialog = ref(false)
   const showCancelDowngradeDialog = ref(false)
   const drawerMode = ref('subscribe')
@@ -948,6 +969,10 @@
 
   const goToPayment = () => {
     emit('changeTab', 1)
+  }
+
+  const openChangePaymentMethod = () => {
+    showChangePaymentMethodDialog.value = true
   }
 
   const loaderPaymentHistoryColumns = computed(() => {
