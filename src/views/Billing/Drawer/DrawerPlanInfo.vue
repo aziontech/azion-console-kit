@@ -71,6 +71,8 @@
               @readiness-change="handleAddressReadinessChange"
             />
           </template>
+
+          <TermsAcceptanceBlock v-model="isTermsAccepted" />
         </div>
 
         <CheckoutSubmissionFooter
@@ -94,6 +96,7 @@
   import PaymentMethodSetupBlock from '@/templates/checkout-block/payment-method-setup-block.vue'
   import PaymentMethodSummary from '@/views/Billing/Drawer/blocks/PaymentMethodSummary.vue'
   import AddressInformationBlock from '@/templates/checkout-block/address-information-block.vue'
+  import TermsAcceptanceBlock from '@/templates/checkout-block/terms-acceptance-block.vue'
   import CheckoutSubmissionFooter from '@/views/Billing/Drawer/CheckoutSubmissionFooter.vue'
   import { usePlans } from '@/composables/usePlans'
   import { useBillingPaymentMethods } from '@/composables/useBillingPaymentMethods'
@@ -151,6 +154,7 @@
   const checkoutSessionClientSecret = ref(props.initialClientSecret)
   const setupIntentClientSecret = ref('')
   const useDefaultPaymentMethod = ref(true)
+  const isTermsAccepted = ref(false)
 
   const { defaultPaymentMethod: defaultPaymentCard } = useBillingPaymentMethods()
   const { createSetupIntent, setDefault: setDefaultPaymentMethod } = useUpdateDefaultPaymentMethod()
@@ -204,6 +208,7 @@
 
   const isConfirmDisabled = computed(() => {
     if (isSubmitting.value) return true
+    if (!isTermsAccepted.value) return true
     if (isChangeCycleMode.value) {
       if (showDefaultPaymentSummary.value) return false
       return !setupIntentClientSecret.value || !isPaymentFormReady.value
@@ -241,7 +246,10 @@
   watch(
     () => props.visible,
     (visible) => {
-      if (visible) setParam('plan', props.plan)
+      if (visible) {
+        isTermsAccepted.value = false
+        setParam('plan', props.plan)
+      }
     },
     { immediate: true }
   )

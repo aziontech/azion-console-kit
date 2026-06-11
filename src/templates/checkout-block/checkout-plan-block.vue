@@ -23,6 +23,8 @@
         ref="addressInformationRef"
         @readiness-change="handleAddressReadinessChange"
       />
+
+      <TermsAcceptanceBlock v-model="isTermsAccepted" />
     </div>
     <CheckoutActionFooter
       :submitting="isSubmitting"
@@ -39,6 +41,7 @@
   import AddressInformationBlock from './address-information-block.vue'
   import PaymentMethodBlock from './payment-method-block.vue'
   import PricingCalculationBlock from './pricing-calculation-block.vue'
+  import TermsAcceptanceBlock from './terms-acceptance-block.vue'
   import CheckoutActionFooter from '@/templates/checkout-block/checkout-action-footer.vue'
   import {
     isStaleCheckoutSessionError,
@@ -89,10 +92,12 @@
   const checkoutSessionClientSecret = ref(props.checkoutSessionClientSecret)
   const isPaymentFormReady = ref(false)
   const isAddressFormReady = ref(false)
+  const isTermsAccepted = ref(false)
 
   const isSubscribeDisabled = computed(() => {
     return (
       isSubmitting.value ||
+      !isTermsAccepted.value ||
       !checkoutSessionClientSecret.value ||
       !isPaymentFormReady.value ||
       !isAddressFormReady.value
