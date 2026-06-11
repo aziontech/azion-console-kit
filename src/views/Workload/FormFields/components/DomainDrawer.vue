@@ -222,6 +222,47 @@
         class="w-full flex flex-col gap-6"
         @submit.prevent="onSave"
       >
+        <div class="flex  gap-3">
+          <div class="flex items-start gap-3">
+            <RadioButton
+              inputId="domain-type-azion"
+              name="domainType"
+              :value="DOMAIN_TYPE.AZION"
+              :modelValue="values.domainType"
+              data-testid="domain-drawer__type-azion"
+              @update:modelValue="onDomainTypeChange"
+            />
+            <label
+              for="domain-type-azion"
+              class="flex flex-col gap-1 cursor-pointer"
+            >
+              <span class="text-sm text-color">Get a free Azion Domain</span>
+              <span class="text-xs text-color-secondary leading-tight">
+                You can use a free azion.app domain.
+              </span>
+            </label>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <RadioButton
+              inputId="domain-type-own"
+              name="domainType"
+              :value="DOMAIN_TYPE.OWN"
+              :modelValue="values.domainType"
+              data-testid="domain-drawer__type-own"
+              @update:modelValue="onDomainTypeChange"
+            />
+            <label
+              for="domain-type-own"
+              class="flex flex-col gap-1 cursor-pointer"
+            >
+              <span class="text-sm text-color">Bring my own Domain</span>
+              <span class="text-xs text-color-secondary leading-tight">
+                Use my DNS to point traffic to this Workload.
+              </span>
+            </label>
+          </div>
+        </div>
         <div class="flex flex-col gap-2">
           <LabelBlock
             label="Domain"
@@ -259,6 +300,7 @@
           type="info"
           description="Your workload is always accessible at a azion.app subdomain based on the workload name. Custom domains allow visitors to access your project at your own domains."
           data-testid="domain-drawer__azion-domain-info"
+          class="max-w-xl"
         />
 
         <div class="flex flex-col gap-2">
@@ -334,48 +376,6 @@
           isWorkloadCreation
           @onSuccess="onCertificateCreated"
         />
-
-        <div class="flex flex-col gap-3">
-          <div class="flex items-start gap-3">
-            <RadioButton
-              inputId="domain-type-azion"
-              name="domainType"
-              :value="DOMAIN_TYPE.AZION"
-              :modelValue="values.domainType"
-              data-testid="domain-drawer__type-azion"
-              @update:modelValue="onDomainTypeChange"
-            />
-            <label
-              for="domain-type-azion"
-              class="flex flex-col gap-1 cursor-pointer"
-            >
-              <span class="text-sm text-color">Get a free Azion Domain</span>
-              <span class="text-xs text-color-secondary leading-tight">
-                You can use a free azion.app domain.
-              </span>
-            </label>
-          </div>
-
-          <div class="flex items-start gap-3">
-            <RadioButton
-              inputId="domain-type-own"
-              name="domainType"
-              :value="DOMAIN_TYPE.OWN"
-              :modelValue="values.domainType"
-              data-testid="domain-drawer__type-own"
-              @update:modelValue="onDomainTypeChange"
-            />
-            <label
-              for="domain-type-own"
-              class="flex flex-col gap-1 cursor-pointer"
-            >
-              <span class="text-sm text-color">Bring my own Domain</span>
-              <span class="text-xs text-color-secondary leading-tight">
-                Use my DNS to point traffic to this Workload.
-              </span>
-            </label>
-          </div>
-        </div>
       </form>
     </template>
 
