@@ -348,5 +348,9 @@ export const queryKeys = {
   timezones: {
     all: ['timezones'],
     list: () => [...queryKeys.timezones.all, 'list']
+  },
+  vulcan: {
+    all: ['vulcan'],
+    presets: () => [...queryKeys.vulcan.all, 'presets']
   }
 }

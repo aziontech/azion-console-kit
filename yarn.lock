@@ -88,10 +88,10 @@
     tailwindcss "^3.4.17"
     vue-tsc "^3.2.5"
 
-"@aziontech/webkit@^3.0.5":
-  version "3.0.5"
-  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-3.0.5.tgz#a5eeda5f8e9e55ac393a6c1695c9969722203fb6"
-  integrity sha512-OIijSDT+OGXqxyhg6p32BO68lBe+7igeHN5sY42qg6tn7XDnQQGHoSNur/DF0eKnFYx2cDPiciySF/APsKScVw==
+"@aziontech/webkit@^3.0.6":
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/@aziontech/webkit/-/webkit-3.0.6.tgz#f027abfeb0f6df9f0802c529bf40bd54c615bd1c"
+  integrity sha512-x8CAXrLJmmBcsqdIxChjUR6urMDce5e/qtXyJQnyoDt4RS06KELlNvYJeHR0cmhLTDimpzu4YIRlSuZdbjR2dg==
   dependencies:
     "@vueuse/core" "^10.11.1"
     clsx "^2.1.1"

@@ -12,7 +12,7 @@
   import { deleteAccountService } from '@/services/account-services/delete-account-service'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
   import PrimeButton from '@aziontech/webkit/button'
-  import { onMounted, ref, watch, computed } from 'vue'
+  import { onMounted, ref, watch, computed, onBeforeUnmount } from 'vue'
   import { useAccountStore } from '@/stores/account'
   import { capitalizeFirstLetter } from '@/helpers'
   import OAuthGithub from '@/templates/template-engine-block/oauth-github.vue'
@@ -93,7 +93,7 @@
       showToast('GitHub integration connected successfully', 'success')
     } catch (error) {
       error.showWithOptions(toast, (error) => ({
-        summary: `GitHub integration failed: ${error.detail}`,
+        summary: `GitHub integration failed: ${error.message}`,
         severity: 'error'
       }))
     } finally {
@@ -101,12 +101,31 @@
     }
   }
 
+  const handleGithubIntegrationMessage = async (event) => {
+    if (event.origin !== window.location.origin) return
+
+    if (event.data.event === 'integration-data') {
+      await saveIntegration(event.data)
+    } else if (event.data.event === 'integration-connected') {
+      await loadListIntegrations()
+      showToast('GitHub integration connected successfully', 'success')
+    } else if (event.data.event === 'integration-error') {
+      const errorMessage =
+        event.data.data?.error_description || event.data.data?.error || 'Unknown error'
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: `GitHub integration failed: ${errorMessage}`
+      })
+    }
+  }
+
   const listenerOnMessage = () => {
-    window.addEventListener('message', (event) => {
-      if (event.data.event === 'integration-data') {
-        saveIntegration(event.data)
-      }
-    })
+    window.addEventListener('message', handleGithubIntegrationMessage)
+  }
+
+  const removeListenerOnMessage = () => {
+    window.removeEventListener('message', handleGithubIntegrationMessage)
   }
 
   const loadListIntegrations = async () => {
@@ -143,6 +162,10 @@
     setCountriesOptions()
     await loadListIntegrations()
     listenerOnMessage()
+  })
+
+  onBeforeUnmount(() => {
+    removeListenerOnMessage()
   })
 
   const setRegionsOptions = async (countryId) => {

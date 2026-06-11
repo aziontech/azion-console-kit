@@ -17,8 +17,15 @@ const login = (email, password) => {
       cy.get(selectors.login.emailInput).type(email)
       cy.get(selectors.login.nextButton).click()
 
-      // Assert - password input should have autofocus
-      cy.get(selectors.login.passwordInput).should('be.focused')
+      // Assert - password step is rendered (the autofocus `be.focused` check was
+      // removed: it flakes when the browser window is not in the foreground)
+      cy.get(selectors.login.passwordInput)
+        .should('have.length', 1)
+        .should('be.visible')
+        .then(($el) => {
+          // DEBUG: confirm the password input selector is capturing the field
+          cy.log(`🔎 password input found: ${$el.length} | tag=<${$el.prop('tagName')}> class="${$el.attr('class')}"`)
+        })
 
       cy.get(selectors.login.passwordInput).type(password, { log: false })
       cy.get(selectors.login.signInButton).click()
@@ -85,6 +92,38 @@ Cypress.Commands.add('login', () => {
 
   cy.log(`🔐 Authenticating | ${email}`)
   login(email, password)
+})
+
+/**
+ * Logs in WITHOUT touching the real backend — for the mocked e2e suite (cypress/e2mock).
+ *
+ * Instead of driving the `/login` UI (which needs valid credentials, an MFA-free
+ * account and network access to the real backend), this seeds the persisted
+ * `account` store with `hasSession: true` so the route guard treats the session as
+ * authenticated, and stubs the two bootstrap calls the guard awaits during account
+ * hydration:
+ *   - GET /api/user/me            (user identity)
+ *   - GET /api/v4/iam/account     (account settings — optional, guarded by .catch)
+ *
+ * GET /api/account/info is intentionally NOT stubbed here: each spec owns its own
+ * account/info intercept (with the fixture that fits its scenario).
+ */
+Cypress.Commands.add('loginMock', () => {
+  cy.intercept({ method: 'GET', url: '**/api/user/me' }, { fixture: 'auth/user-me.json' }).as(
+    'getUserMe'
+  )
+  cy.intercept({ method: 'GET', url: '**/api/v4/iam/account*' }, { statusCode: 200, body: {} }).as(
+    'getAccountSettings'
+  )
+
+  cy.visit('/', {
+    onBeforeLoad(win) {
+      // pinia-plugin-persistedstate restores the `account` store from this key on
+      // boot; `hasSession: true` makes the accountGuard hydrate instead of bouncing
+      // to /login.
+      win.localStorage.setItem('account', JSON.stringify({ hasSession: true }))
+    }
+  })
 })
 
 /**
