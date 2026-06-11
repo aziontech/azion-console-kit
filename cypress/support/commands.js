@@ -95,6 +95,38 @@ Cypress.Commands.add('login', () => {
 })
 
 /**
+ * Logs in WITHOUT touching the real backend — for the mocked e2e suite (cypress/e2mock).
+ *
+ * Instead of driving the `/login` UI (which needs valid credentials, an MFA-free
+ * account and network access to the real backend), this seeds the persisted
+ * `account` store with `hasSession: true` so the route guard treats the session as
+ * authenticated, and stubs the two bootstrap calls the guard awaits during account
+ * hydration:
+ *   - GET /api/user/me            (user identity)
+ *   - GET /api/v4/iam/account     (account settings — optional, guarded by .catch)
+ *
+ * GET /api/account/info is intentionally NOT stubbed here: each spec owns its own
+ * account/info intercept (with the fixture that fits its scenario).
+ */
+Cypress.Commands.add('loginMock', () => {
+  cy.intercept({ method: 'GET', url: '**/api/user/me' }, { fixture: 'auth/user-me.json' }).as(
+    'getUserMe'
+  )
+  cy.intercept({ method: 'GET', url: '**/api/v4/iam/account*' }, { statusCode: 200, body: {} }).as(
+    'getAccountSettings'
+  )
+
+  cy.visit('/', {
+    onBeforeLoad(win) {
+      // pinia-plugin-persistedstate restores the `account` store from this key on
+      // boot; `hasSession: true` makes the accountGuard hydrate instead of bouncing
+      // to /login.
+      win.localStorage.setItem('account', JSON.stringify({ hasSession: true }))
+    }
+  })
+})
+
+/**
  * Opens a product through the sidebar menu.
  *
  * @param {string} productName - The name of the product to open.

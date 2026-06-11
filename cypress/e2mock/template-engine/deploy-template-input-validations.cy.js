@@ -83,7 +83,7 @@ describe('Template Engine - Input card validations (mocked)', { tags: ['@dev3'] 
       { statusCode: 200, body: {} }
     ).as('loadWorkload')
 
-    cy.login()
+    cy.loginMock()
     cy.wait('@getAccountInfo')
   })
 

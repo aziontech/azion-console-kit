@@ -70,7 +70,7 @@ describe('Template Engine - Deploy Template success flow (mocked)', { tags: ['@d
       { statusCode: 200, body: {} }
     ).as('loadWorkload')
 
-    cy.login()
+    cy.loginMock()
     cy.wait('@getAccountInfo')
   })
 

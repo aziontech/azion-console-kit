@@ -71,7 +71,7 @@ describe('Template Engine - Deploy via Settings success flow (mocked)', { tags: 
       { statusCode: 200, body: {} }
     ).as('loadWorkload')
 
-    cy.login()
+    cy.loginMock()
     cy.wait('@getAccountInfo')
   })
 

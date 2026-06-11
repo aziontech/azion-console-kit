@@ -63,7 +63,7 @@ describe('Template Engine - Deploy failure flow (mocked)', { tags: ['@dev3'] }, 
       { statusCode: 200, body: vcsIntegrations }
     ).as('getVcsIntegrations')
 
-    cy.login()
+    cy.loginMock()
     cy.wait('@getAccountInfo')
   })
 
