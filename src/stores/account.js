@@ -88,9 +88,9 @@ export const useAccountStore = defineStore({
     },
     needsOnboarding(state) {
       return (
-        state.account?.first_login === true &&
         state.account?.kind === 'client' &&
-        state.account?.hasServiceOrderPlan !== true
+        state.account?.billing_type === null &&
+        state.account?.first_login !== false // TODO: temporary — skip onboarding when first_login === false
       )
     },
     accountUtcOffset(state) {
@@ -117,22 +117,8 @@ export const useAccountStore = defineStore({
     redirectToExternalBillingNeeded(state) {
       return !state.account?.status || state.accountStatuses.REGULAR === state.account?.status
     },
-    billingAccessPermitted(state) {
-      return [
-        state.accountStatuses.BLOCKED,
-        state.accountStatuses.DEFAULTING,
-        state.accountStatuses.TRIAL,
-        state.accountStatuses.ONLINE,
-        state.accountStatuses.REGULAR
-      ].includes(state.account?.status)
-    },
     showExportBilling(state) {
       return [state.accountStatuses.ONLINE, state.accountStatuses.TRIAL].includes(
-        state.account?.status
-      )
-    },
-    paymentReviewPending(state) {
-      return [state.accountStatuses.BLOCKED, state.accountStatuses.DEFAULTING].includes(
         state.account?.status
       )
     },
@@ -141,7 +127,25 @@ export const useAccountStore = defineStore({
       return account?.client_flags?.includes(flags.MARKETPLACE_PRODUCTS)
     },
     accountIsNotRegular(state) {
-      return state.account?.status !== state.accountStatuses.REGULAR
+      return (
+        state.account?.status !== state.accountStatuses.REGULAR && this.billingType !== 'custom'
+      )
+    },
+    billingType(state) {
+      return state.account?.billing_type ?? null
+    },
+    billingExperience() {
+      switch (this.billingType) {
+        case 'custom':
+          return 'custom'
+        case 'internal':
+          return 'internal'
+        case null:
+          return 'null'
+        case 'plan':
+        default:
+          return 'plan'
+      }
     },
 
     hasHideCreateOptionsFlag(state) {

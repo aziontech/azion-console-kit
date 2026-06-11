@@ -1,5 +1,19 @@
 import * as yup from 'yup'
 
+// DNS label rule: 1-63 chars, start & end alphanumeric, hyphens allowed in the middle.
+// Implemented as a multi-step check so each underlying regex is star-height 1
+// (avoids the nested-quantifier shape rejected by `security/detect-unsafe-regex`).
+const DNS_LABEL_BODY_REGEX = /^[a-zA-Z0-9-]+$/
+const DNS_LABEL_START_REGEX = /^[a-zA-Z0-9]/
+const DNS_LABEL_END_REGEX = /[a-zA-Z0-9]$/
+
+const isValidDnsLabel = (value) => {
+  if (!value || value.length > 63) return false
+  if (!DNS_LABEL_START_REGEX.test(value)) return false
+  if (value.length > 1 && !DNS_LABEL_END_REGEX.test(value)) return false
+  return DNS_LABEL_BODY_REGEX.test(value)
+}
+
 export const validationSchema = yup.object({
   name: yup
     .string()
@@ -75,9 +89,7 @@ export const validationSchema = yup.object({
             const dotCount = (value.match(/\./g) || []).length
             if (dotCount > 10) return false
             const segments = value.split('.')
-            return segments.every((segment) =>
-              /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
-            )
+            return segments.every(isValidDnsLabel)
           })
           .label('Subdomain'),
         domain: yup
@@ -97,9 +109,7 @@ export const validationSchema = yup.object({
               return false
             }
 
-            return segments.every((segment) =>
-              /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
-            )
+            return segments.every(isValidDnsLabel)
           })
           .label('Domain')
       })
@@ -135,7 +145,7 @@ export const validationSchema = yup.object({
           .required()
           .test('valid-custom-domain', 'Invalid custom domain format', function (value) {
             if (!value) return true // Allow empty hostname
-            return /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(value)
+            return isValidDnsLabel(value)
           })
     })
     .label('Custom Domain'),
