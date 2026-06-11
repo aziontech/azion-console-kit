@@ -16,6 +16,7 @@ export default {
   projectNameError: '[data-testid="field-text-privacy__error-message"]',
   // Settings step
   settingsCard: '[data-testid="template-engine__settings-card"]',
+  settingsPasswordField: '[data-testid="field-password__input"]',
   settingsPasswordInput: '[data-testid="field-password__input"] input',
   // JsonForms text settings field (wrapper carries data-testid="field-<name>")
   settingsEnvironmentField: '[data-testid="field-environment"]',

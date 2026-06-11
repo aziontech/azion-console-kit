@@ -1,0 +1,9 @@
+{
+  "status": "failed",
+  "logs": [
+    { "content": "Starting deployment", "timestamp": "2026-06-10T12:00:00.000Z" },
+    { "content": "Cloning repository...", "timestamp": "2026-06-10T12:00:02.000Z" },
+    { "content": "Installing dependencies...", "timestamp": "2026-06-10T12:00:04.000Z" },
+    { "content": "Error: Failed to provision resources", "timestamp": "2026-06-10T12:00:06.000Z" }
+  ]
+}
