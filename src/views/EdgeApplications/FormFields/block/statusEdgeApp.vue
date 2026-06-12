@@ -13,6 +13,7 @@
           :isCard="false"
           title="Active"
           subtitle=""
+          :disabled="readOnly"
           data-testid="form-horizontal-active-switch"
         />
       </div>
@@ -23,10 +24,13 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineProps({
     isDrawer: {
       type: Boolean
     }
   })
+
+  const { readOnly } = useVersionContext()
 </script>

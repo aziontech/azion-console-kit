@@ -146,6 +146,15 @@ export const queryKeys = {
         'detail',
         id
       ]
+    },
+    version: {
+      all: (parentId) => [...queryKeys.application.detail(parentId), 'versions'],
+      list: (parentId) => [...queryKeys.application.version.all(parentId), 'list'],
+      detail: (parentId, versionId) => [
+        ...queryKeys.application.version.all(parentId),
+        'detail',
+        versionId
+      ]
     }
   },
   workload: {

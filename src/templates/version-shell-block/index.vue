@@ -36,7 +36,7 @@
     }
   })
 
-  const emit = defineEmits(['updated', 'command-error'])
+  const emit = defineEmits(['updated', 'command-error', 'cancel'])
 
   // Creates this instance's unique bus and provides it to descendants.
   const bus = createVersionCommandBus()
@@ -129,6 +129,7 @@
           :available-actions="availableActions"
           :disabled-actions="disabledActions"
           @dispatch="handleDispatch"
+          @cancel="emit('cancel')"
         />
       </div>
     </template>

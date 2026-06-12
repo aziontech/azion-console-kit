@@ -222,7 +222,7 @@
         class="w-full flex flex-col gap-6"
         @submit.prevent="onSave"
       >
-        <div class="flex  gap-3">
+        <div class="flex gap-3">
           <div class="flex items-start gap-3">
             <RadioButton
               inputId="domain-type-azion"
