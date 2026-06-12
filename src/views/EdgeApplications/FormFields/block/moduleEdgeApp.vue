@@ -48,11 +48,13 @@
 </template>
 
 <script setup>
+  import { computed } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeTag from '@aziontech/webkit/prime-tag'
   import { contactSalesEdgeApplicationService } from '@/helpers'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineProps({
     isDrawer: {
@@ -60,11 +62,13 @@
     }
   })
 
+  const { readOnly } = useVersionContext()
+
   const openContactSales = () => {
     contactSalesEdgeApplicationService()
   }
 
-  const defaultModulesSwitchOptions = [
+  const defaultModules = [
     {
       title: 'Application Accelerator',
       nameField: 'applicationAcceleratorEnabled',
@@ -91,4 +95,11 @@
       subtitle: 'Enable dynamic image editing options.'
     }
   ]
+
+  const defaultModulesSwitchOptions = computed(() =>
+    defaultModules.map((item) => ({
+      ...item,
+      disabled: item.disabled || readOnly.value
+    }))
+  )
 </script>

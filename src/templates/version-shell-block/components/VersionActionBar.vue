@@ -21,14 +21,17 @@
     }
   })
 
-  const emit = defineEmits(['dispatch'])
+  // `dispatch` carries version lifecycle commands (SAVE, BUILD, ...).
+  // `cancel` is a pure navigation intent — close the edit and go back to the
+  // listing — so it deliberately bypasses the command bus / state machine.
+  const emit = defineEmits(['dispatch', 'cancel'])
 
   const PRIMARY_BY_STATE = {
     draft: { action: 'SAVE_AND_BUILD', label: 'Save and Build', severity: 'primary' },
     building: { action: 'CANCEL_BUILD', label: 'Cancel Build', severity: 'danger' },
-    ready: { action: 'NEW_DRAFT_FROM', label: 'New Draft', severity: 'primary' },
-    active: { action: 'NEW_DRAFT_FROM', label: 'New Draft', severity: 'primary' },
-    archived: { action: 'NEW_DRAFT_FROM', label: 'New Draft', severity: 'primary' },
+    ready: { action: 'NEW_DRAFT_FROM', label: 'Clone as Draft', severity: 'primary' },
+    active: { action: 'NEW_DRAFT_FROM', label: 'Clone as Draft', severity: 'primary' },
+    archived: { action: 'NEW_DRAFT_FROM', label: 'Clone as Draft', severity: 'primary' },
     cancelled: { action: 'SAVE_AND_BUILD', label: 'Save and Build', severity: 'primary' },
     failed: { action: 'SAVE_AND_BUILD', label: 'Save and Build', severity: 'primary' }
   }
@@ -37,7 +40,7 @@
     SAVE: 'Save Draft',
     SAVE_AND_BUILD: 'Save and Build',
     CANCEL_BUILD: 'Cancel Build',
-    NEW_DRAFT_FROM: 'New Draft',
+    NEW_DRAFT_FROM: 'Clone as Draft',
     ARCHIVE: 'Archive',
     DELETE: 'Delete'
   }
@@ -57,7 +60,7 @@
     },
     NEW_DRAFT_FROM: {
       required: false,
-      title: 'New Draft',
+      title: 'Clone as Draft',
       actionLabel: 'Create Draft',
       placeholder: 'Optional comment'
     }
@@ -116,6 +119,13 @@
     class="flex w-full gap-3 justify-end items-center"
     data-testid="version-action-bar"
   >
+    <PrimeButton
+      label="Cancel"
+      size="small"
+      outlined
+      data-testid="version-action-bar__cancel"
+      @click="emit('cancel')"
+    />
     <PrimeButton
       v-for="action in secondaryActions"
       :key="action"

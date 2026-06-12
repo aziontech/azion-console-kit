@@ -1,6 +1,6 @@
 import * as OriginsService from '@/services/edge-application-origins-services'
 import useEdgeApplicationServices from '@/services/edge-application-services/handleServicesByFlag'
-import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+import { hasFlagBlockApiV4, hasFlagUseV6Configurations } from '@/composables/user-flag'
 import { documentationBuildProducts } from '@/helpers/azion-documentation-catalog'
 import * as Helpers from '@/helpers'
 
@@ -57,7 +57,10 @@ export const edgeApplicationRoutes = {
     {
       path: 'edit/:id/:tab?',
       name: 'edit-application',
-      component: () => import('@views/EdgeApplications/TabsView.vue'),
+      component: () =>
+        hasFlagUseV6Configurations()
+          ? import('@views/EdgeApplications/v6/VersionsListView.vue')
+          : import('@views/EdgeApplications/TabsView.vue'),
       props: () => {
         const EdgeApplicationServices = useEdgeApplicationServices()
 
@@ -106,6 +109,33 @@ export const edgeApplicationRoutes = {
             label: 'Edit Application',
             dynamic: true,
             routeParam: 'id'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id/versions/:versionId/:tab?',
+      name: 'edit-application-version',
+      component: () => import('@views/EdgeApplications/v6/EditView.vue'),
+      meta: {
+        title: 'Edit Version',
+        flag: 'use_v6_configurations',
+        breadCrumbs: [
+          {
+            label: 'Applications',
+            to: '/applications'
+          },
+          {
+            label: 'Edit Application',
+            dynamic: true,
+            routeParam: 'id',
+            toRoute: { name: 'edit-application', params: ['id'] }
+          },
+          {
+            label: 'Version',
+            dynamic: true,
+            routeParam: 'versionId',
+            useParamValue: true
           }
         ]
       }
