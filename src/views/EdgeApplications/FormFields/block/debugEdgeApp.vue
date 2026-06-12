@@ -12,6 +12,7 @@
           name="debug"
           auto
           :value="debug"
+          :disabled="readOnly"
           :isCard="false"
           title="Active"
           subtitle="Rules that were successfully executed will be shown under the $traceback field in Data
@@ -28,6 +29,7 @@
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
 
   import { useField } from 'vee-validate'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineProps({
     isDrawer: {
@@ -36,4 +38,5 @@
   })
 
   const { value: debug } = useField('debug')
+  const { readOnly } = useVersionContext()
 </script>

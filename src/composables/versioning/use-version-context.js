@@ -1,4 +1,4 @@
-import { inject } from 'vue'
+import { inject, readonly, ref } from 'vue'
 
 /**
  * Provide/inject key used by the VersionShell to expose the current version
@@ -18,9 +18,12 @@ export const VERSION_CONTEXT_KEY = Symbol('versionContext')
  * }}
  */
 export const useVersionContext = () => {
+  // Real refs (not plain `{ value }` objects) so consumers behave identically
+  // whether mounted inside the shell (which provides actual refs) or standalone
+  // on this default — both auto-unwrap in templates and expose `.value` in scripts.
   return inject(VERSION_CONTEXT_KEY, {
-    state: { value: 'draft' },
-    readOnly: { value: false },
-    version: { value: null }
+    state: readonly(ref('draft')),
+    readOnly: readonly(ref(false)),
+    version: readonly(ref(null))
   })
 }

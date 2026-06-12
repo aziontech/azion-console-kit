@@ -12,6 +12,7 @@
         name="name"
         placeholder="My Application"
         :value="name"
+        :disabled="readOnly"
         description="Give a unique and descriptive name to identify the Application."
         data-testid="form-horizontal-general-name"
       />
@@ -24,6 +25,7 @@
   import FieldText from '@aziontech/webkit/field-text'
 
   import { useField } from 'vee-validate'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineProps({
     isDrawer: {
@@ -32,4 +34,5 @@
   })
 
   const { value: name } = useField('name')
+  const { readOnly } = useVersionContext()
 </script>
