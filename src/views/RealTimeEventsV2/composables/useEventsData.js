@@ -72,6 +72,13 @@ export function useEventsData({
 
   const buildApiFilters = () => {
     const filters = {}
+    // Collect equality clauses per field so that multiple `=` on the SAME
+    // field collapse into a single `In` list instead of overwriting each other.
+    // The events GraphQL filter is an AND-only object keyed by `${field}${Op}`,
+    // so `status = 200 OR status = 400` (two `statusEq` clauses) would otherwise
+    // clobber down to the last value. `statusIn: [200, 400]` is the API's
+    // supported way to express that OR-of-equals on one field.
+    const eqByField = {}
     if (filterData.value?.fields?.length) {
       filterData.value.fields.forEach((ff) => {
         // Defensive guard: skip clauses whose operator is missing, falsy,
@@ -83,10 +90,28 @@ export function useEventsData({
         const value = coerceFilterValue(ff.value, ff.type)
         if (ff.operator === 'In') {
           filters.in = filters.in || {}
-          filters.in[ff.valueField] = value
+          const existing = Array.isArray(filters.in[ff.valueField]) ? filters.in[ff.valueField] : []
+          filters.in[ff.valueField] = [...existing, ...(Array.isArray(value) ? value : [value])]
+        } else if (ff.operator === 'Eq') {
+          if (!eqByField[ff.valueField]) eqByField[ff.valueField] = []
+          eqByField[ff.valueField].push(value)
         } else {
           filters.and = filters.and || {}
           filters.and[ff.valueField + ff.operator] = value
+        }
+      })
+
+      // Resolve the collected equality clauses: a lone `=` stays a scalar
+      // `${field}Eq` (byte-identical to the previous behaviour); two or more on
+      // the same field merge into the `In` list for that field.
+      Object.entries(eqByField).forEach(([field, values]) => {
+        if (values.length === 1) {
+          filters.and = filters.and || {}
+          filters.and[field + 'Eq'] = values[0]
+        } else {
+          filters.in = filters.in || {}
+          const existing = Array.isArray(filters.in[field]) ? filters.in[field] : []
+          filters.in[field] = [...existing, ...values]
         }
       })
     }

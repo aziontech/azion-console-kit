@@ -44,16 +44,8 @@
 
       <!-- Action Buttons — wrap so they reflow on tight viewports -->
       <div class="flex flex-wrap gap-1 sm:flex-shrink-0 sm:ml-auto">
-        <!-- Add OR Button -->
-        <PrimeButton
-          outlined
-          icon="pi pi-plus"
-          label="OR"
-          size="small"
-          @click="$emit('add-rule', 'OR')"
-        />
-
-        <!-- Add AND Button -->
+        <!-- Add AND Button. OR is intentionally omitted: the events GraphQL
+             filter is AND-only, so an OR connector cannot be honored. -->
         <PrimeButton
           outlined
           icon="pi pi-plus"
@@ -214,21 +206,22 @@
     }
   })
 
-  // Initialize from model if editing
-  if (props.editFilter && modelValue.value.field) {
-    const field = props.fields.find(
-      ({ value }) =>
-        value.value === modelValue.value.fieldValue && value.label === modelValue.value.field
-    )
-    if (field) {
-      selectedField.value = field.value
-      const operator = selectedField.value.operator.find(
-        ({ value }) => value.value === modelValue.value.operator
-      )
-      if (operator) {
-        selectedOperator.value = operator.value
-        filterValue.value = modelValue.value.rawValue || modelValue.value.value
-      }
-    }
+  // Hydrate the row from pre-populated model data so the panel mirrors filters
+  // that were added elsewhere — typed into the AQL input, restored from a
+  // recent/saved query, or injected by a chart-legend click — instead of
+  // showing blank dropdowns. Runs for any row that already carries a field
+  // (the default "add filter" row has `field: null`, so it is skipped).
+  //
+  // Shapes (v2, flat):
+  //   props.fields item → { label, value, operator: [{ value, type, props }] }
+  //   modelValue (row)  → { field: <field.value>, operator: <op.value>, value, rawValue, ... }
+  if (modelValue.value?.field) {
+    selectedField.value = modelValue.value.field
+    // `listOperators` is reactive to `selectedField` and already decorates each
+    // operator with its display label, so the object we pick matches what the
+    // operator Dropdown renders.
+    const operator = listOperators.value.find((op) => op.value === modelValue.value.operator)
+    if (operator) selectedOperator.value = operator
+    filterValue.value = modelValue.value.rawValue ?? modelValue.value.value ?? null
   }
 </script>

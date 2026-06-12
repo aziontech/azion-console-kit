@@ -252,7 +252,9 @@
       case 'value':
         return AzionQueryLanguage.getValueSuggestions(domains.value, field)
       case 'logicOperator':
-        return [{ label: 'AND' }, { label: 'OR' }]
+        // Only AND is offered: the events GraphQL filter is AND-only (no
+        // boolean OR composition), so suggesting OR would mislead the user.
+        return [{ label: 'AND' }]
       default:
         return []
     }
