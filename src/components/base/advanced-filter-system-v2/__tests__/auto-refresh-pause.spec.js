@@ -1,3 +1,4 @@
+/* eslint-disable xss/no-mixed-html -- `template` strings here are Vue stub component templates, not HTML sinks */
 /**
  * Property P6 — Auto-refresh visibility pause + catch-up
  * ---------------------------------------------------------------------

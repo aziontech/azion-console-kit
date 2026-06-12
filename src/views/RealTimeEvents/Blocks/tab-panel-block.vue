@@ -7,7 +7,7 @@
   import * as Drawer from '@/views/RealTimeEvents/Drawer'
   import { eventsPlaygroundOpener } from '@/helpers'
   import PrimeButton from '@aziontech/webkit/button'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { useTableDefinitionsStore } from '@/stores/table-definitions'
   import { FilterMatchMode } from '@aziontech/webkit/api'

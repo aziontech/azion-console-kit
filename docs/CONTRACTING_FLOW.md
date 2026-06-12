@@ -275,7 +275,7 @@ graph TB
 
 | File                    | Purpose                                              |
 | ----------------------- | ---------------------------------------------------- |
-| `src/stores/account.js` | Account state including `hasServiceOrderPlan` getter |
+| `src/stores/account.js` | Account state including the `needsOnboarding` getter |
 
 ### Helpers
 
@@ -294,20 +294,23 @@ graph TB
 
 ## State Management
 
-### Account Store (`hasServiceOrderPlan`)
+### Account Store (`needsOnboarding`)
 
 ```javascript
 // src/stores/account.js
-hasServiceOrderPlan(state) {
-  // false = needs to purchase (redirects to additional-data)
-  // true = has contract a plan
-  // null = is old account
-  const value = state.account?.has_service_order_plan
-  return false  // Currently forces flow for all users
+needsOnboarding(state) {
+  return (
+    state.account?.first_login === true &&
+    state.account?.kind === 'client' &&
+    state.account?.hasServiceOrderPlan !== true
+  )
 }
 ```
 
-**Important:** The getter currently returns `false` unconditionally, forcing all users through the contracting flow.
+The account adapter maps the raw API field `has_service_order_plan` to the camelCase
+`hasServiceOrderPlan` (strict boolean) in `_adaptAccountInfo`.
+
+**Important:** `hasServiceOrderPlan` is the source of truth for the post-login plan gate. `false` sends the user to plan configuration; `true` skips the plan screen.
 
 ### Service Order State (useServiceOrders)
 
@@ -321,34 +324,13 @@ const isSubmitting = ref(false)
 const error = ref(null)
 
 // Actions
-loadServiceOrder(accountId) // Fetch current service order (accountId is only a local cache scope)
-createServiceOrder(payload) // Create new service order; backend resolves account from auth
-updateServiceOrder(id, payload) // Update DRAFT service order; backend resolves account from auth
+loadServiceOrder(accountId) // Fetch existing service order
+createServiceOrder(payload) // Create new service order
+updateServiceOrder(id, payload) // Update existing service order
 submitServiceOrder(params) // Create or update based on existence
-upgrade({ id, newPlanId, priceId }) // Upgrade plan or immediate same-plan monthly→yearly cycle change
-downgrade({ id, newPlanId, priceId }) // Schedule downgrade or same-plan yearly→monthly cycle change
-cancelDowngrade({ id }) // Cancel a scheduled downgrade before its effective date
 updatePlanPricing(planPricingId) // Update just the pricing
 reset() // Clear all state
 ```
-
-### Current Account Subscription State (useCurrentSubscription)
-
-Subscription state is resolved from authenticated current-account endpoints instead of inferring from the generic Service Order list and `account.has_service_order_plan`:
-
-```javascript
-// Sources
-useCurrentAccountServiceOrder(accountId) // GET /api/v1/account/service_order
-useCurrentAccountPlan(accountId)         // GET /api/v1/account/plan
-
-// Entitled statuses (treated as "has an active plan")
-const ENTITLED_STATUSES = new Set(['ACTIVE', 'PAST_DUE', 'BLOCKED'])
-
-// hasContractedPlan = there is a current SO OR the legacy onboarding flag is truthy
-// activePricing is resolved against the current account plan, not the generic plans list
-```
-
-`reloadFromBackend()` first refreshes the current SO; only if an active SO exists, it chains a refresh of the current plan.
 
 ### Plan Params State (usePlans)
 
@@ -388,28 +370,12 @@ termsAccepted: boolean
 
 **Base URL:** `/edge_api/api/v1/service_orders`
 
-| Method | Endpoint                | Purpose                                                              |
-| ------ | ----------------------- | -------------------------------------------------------------------- |
-| GET    | `/`                     | List service orders (filters: `limit`, `offset`, `status`, `type`)   |
-| GET    | `/:id`                  | Get single service order                                             |
-| POST   | `/`                     | Create service order (DRAFT)                                         |
-| PATCH  | `/:id`                  | Update DRAFT service order                                           |
-| PATCH  | `/:id/upgrade`          | Upgrade plan or immediate same-plan monthly→yearly price change      |
-| PATCH  | `/:id/downgrade`        | Schedule downgrade or same-plan yearly→monthly price change          |
-| DELETE | `/:id/cancel_downgrade` | Cancel scheduled downgrade before its effective date                 |
-
-> All Service Order requests derive the account from authentication. Public requests **must not** send `accountId` in body or query params.
-
-### Current Account Service Order API
-
-**Base URL:** `/edge_api/api/v1/account`
-
-| Method | Endpoint          | Purpose                                                                     |
-| ------ | ----------------- | --------------------------------------------------------------------------- |
-| GET    | `/service_order`  | Get the current non-terminal SO of the authenticated account (`null` if none)|
-| GET    | `/plan`           | Get the currently entitled plan of the authenticated account (`null` if none)|
-
-A `404` response on either endpoint is normalized to `{ data: null }` by the service layer; other non-2xx responses propagate as errors.
+| Method | Endpoint | Purpose                            |
+| ------ | -------- | ---------------------------------- |
+| GET    | `/`      | List service orders (with filters) |
+| GET    | `/:id`   | Get single service order           |
+| POST   | `/`      | Create service order               |
+| PATCH  | `/:id`   | Update service order               |
 
 ### Plans API
 
@@ -455,17 +421,17 @@ sequenceDiagram
     participant A as service-orders-adapter
     participant API as API Server
 
-    V->>C: submitServiceOrder({planId, planPricingId})
+    V->>C: submitServiceOrder({accountId, planId, planPricingId})
 
     alt Service Order Exists
         C->>S: updateServiceOrder(id, payload)
         S->>A: toUpdatePayload(payload)
-        A-->>S: {planId, priceId}
+        A-->>S: {accountId, planId, priceId, ...}
         S->>API: PATCH /service_orders/:id
     else No Service Order
         C->>S: createServiceOrder(payload)
         S->>A: toCreatePayload(payload)
-        A-->>S: {planId, priceId}
+        A-->>S: {accountId, planId, priceId}
         S->>API: POST /service_orders
     end
 
@@ -475,50 +441,6 @@ sequenceDiagram
     S-->>C: {success, data, payment}
     C->>C: serviceOrder.value = response.data
     C-->>V: {serviceOrder, payment}
-```
-
----
-
-## Submit Strategy: Plan and Cycle Changes
-
-`resolveSubmitStrategy({ currentSO, planId, planPricingId })` decides which endpoint to call based on the current Service Order and the target plan/pricing:
-
-| Current SO state | Target vs. current             | Action  | Endpoint                              |
-| ---------------- | ------------------------------ | ------- | ------------------------------------- |
-| none / DRAFT     | any                            | CREATE  | `POST /service_orders`                |
-| ACTIVE/entitled  | different `planId`             | UPGRADE | `PATCH /service_orders/:id/upgrade`   |
-| ACTIVE/entitled  | same plan, **monthly → yearly**| UPGRADE | `PATCH /service_orders/:id/upgrade`   |
-| ACTIVE/entitled  | same plan, **yearly → monthly**| DOWNGRADE| `PATCH /service_orders/:id/downgrade` (scheduled) |
-| ACTIVE/entitled  | same plan and same pricing     | NOOP    | —                                     |
-
-Notes:
-
-- A same-plan price change is **never** a `CREATE`. It is always routed through `upgrade` or `downgrade` so the API can keep the Service Order continuous.
-- `downgrade` (plan or yearly→monthly) is scheduled by the API and stays pending until the effective date. The current SO remains entitled until then.
-- A scheduled downgrade can be canceled via `DELETE /service_orders/:id/cancel_downgrade` before the effective date.
-
-### Cancel Scheduled Downgrade
-
-```mermaid
-sequenceDiagram
-    participant V as BillsView
-    participant C as useServiceOrders
-    participant S as service-orders-service
-    participant A as service-orders-adapter
-    participant Q as TanStack Query
-    participant API as API Server
-
-    V->>C: cancelDowngrade({ id })
-    C->>S: cancelDowngradeServiceOrder(id)
-    S->>API: DELETE /service_orders/:id/cancel_downgrade
-    API-->>S: { serviceOrder, transition }
-    S->>Q: invalidateQueries(serviceOrders.all)
-    S->>A: transformCancelDowngradeResponse(response)
-    A-->>S: { serviceOrder, transition, success }
-    S-->>C: result
-    C-->>V: result
-    V->>V: subscription.refetchUntil(so => so.metadata?.status !== 'downgrade_pending')
-    V->>V: trackBilling('downgradeCancelled')
 ```
 
 ---
@@ -683,20 +605,19 @@ export async function accountGuard({ to, accountStore, tracker }) {
     }
 
     try {
-      await loadUserAndAccountInfo()
-      sessionManager.afterLogin()
+      await loadAccountHydration()
 
-      // Check if needs service order plan
-      const needsServiceOrder = accountStore.hasServiceOrderPlan === false
+      // Check if account still needs plan configuration.
+      const needsOnboarding = accountStore.needsOnboarding
       const isAdditionalDataRoute = to.name === 'additional-data'
 
-      // If needs service order and not on additional-data route, redirect
-      if (needsServiceOrder && !isAdditionalDataRoute) {
+      // If needs plan configuration and not on additional-data route, redirect.
+      if (needsOnboarding && !isAdditionalDataRoute) {
         return { name: 'additional-data' }
       }
 
-      // If doesn't need service order and trying to access additional-data, go to home
-      if (!needsServiceOrder && isAdditionalDataRoute) {
+      // If plan configuration is already done and trying to access additional-data, go home.
+      if (!needsOnboarding && isAdditionalDataRoute) {
         return { name: 'home' }
       }
 
@@ -721,8 +642,8 @@ beforeEnter: (to, from, next) => {
 
   // Only allow access to additional-data if:
   // 1. User has active session (hasActiveUserId)
-  // 2. hasServiceOrderPlan === false (needs to complete service order)
-  if (accountStore.hasActiveUserId && accountStore.hasServiceOrderPlan === false) {
+  // 2. needsOnboarding === true (has_service_order_plan !== true)
+  if (accountStore.hasActiveUserId && accountStore.needsOnboarding) {
     next()
   } else {
     // If user doesn't need service order, redirect to home

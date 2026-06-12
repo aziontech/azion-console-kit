@@ -34,7 +34,7 @@
           </div>
           <div class="flex flex-col gap-1">
             <p class="text-[13px] font-semibold text-[var(--text-color)]">
-              Start by creating your first Deploy
+              Start by deploying your first application
             </p>
             <p class="text-xs text-[var(--text-color-secondary)]">
               Deploy your application and start delivering content through the Azion Network.
@@ -51,7 +51,7 @@
           </div>
           <div class="flex flex-col gap-1">
             <p class="text-[13px] font-semibold text-[var(--text-color)]">
-              Protect your Application
+              Protect your Applications
             </p>
             <p class="text-xs text-[var(--text-color-secondary)]">
               Enable security features to safeguard your applications, users, and data.
@@ -67,9 +67,9 @@
             <span class="font-protomono font-semibold text-xs text-white">3</span>
           </div>
           <div class="flex flex-col gap-1">
-            <p class="text-[13px] font-semibold text-[var(--text-color)]">Observe your Metrics</p>
+            <p class="text-[13px] font-semibold text-[var(--text-color)]">Monitor your Metrics</p>
             <p class="text-xs text-[var(--text-color-secondary)]">
-              Track metrics, analyze traffic in real-time, and gain insights to optimize and protect
+              Track metrics, analyze traffic in real time, and gain insights to optimize and protect
               your applications.
             </p>
           </div>
@@ -79,20 +79,20 @@
 
     <!-- CTA Button -->
     <div class="mt-5">
-      <Button
-        severity="primary"
-        class="w-full font-protomono flex items-center justify-center"
+      <ActionButton
+        kind="primary"
+        size="large"
+        label="Start deploying"
+        class="w-full"
         @click="handleStartClick"
-      >
-        Start deploying
-      </Button>
+      />
     </div>
   </div>
 </template>
 
 <script setup>
   import { computed, onMounted, inject } from 'vue'
-  import Button from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
 
   /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')

@@ -21,7 +21,7 @@
 
 <script setup>
   import PrimeSkeleton from '@aziontech/webkit/skeleton'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import { computed } from 'vue'
 
   const props = defineProps({

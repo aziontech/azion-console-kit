@@ -69,7 +69,7 @@
 <script setup>
   import { ref, computed, nextTick } from 'vue'
   import { useRouter } from 'vue-router'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import { useAccountStore } from '@/stores/account'
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeMenu from '@aziontech/webkit/menu'

@@ -1,6 +1,5 @@
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import * as Sentry from '@sentry/vue'
 import { useAccountStore } from '@/stores/account'
 import { useServiceOrdersList } from '@/composables/useServiceOrdersList'
 import { usePlansList } from '@/composables/usePlansService'
@@ -13,91 +12,45 @@ import {
   toFiniteNumber
 } from '@/composables/subscription-helpers'
 import { formatBillingPeriod, formatLastUpdate, formatNextChargeDate } from '@/utils/billing-date'
-import {
-  clearAwaitingActiveServiceOrder,
-  isAwaitingActiveServiceOrder
-} from '@/composables/post-payment-flag'
-
-const isRefetching = ref(false)
-const isPollingForActive = ref(false)
-let postPaymentPollAttempted = false
-const POST_PAYMENT_POLL_INTERVAL = 2000
-const POST_PAYMENT_POLL_MAX_ATTEMPTS = 10
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
 const isActivePopulated = (so) => Boolean(so?.priceId && so?.currentPeriodEnd)
 
+/**
+ * Subscription state derived from the cached service-orders list. All data
+ * flows through Vue Query — there is no manual polling loop or singleton
+ * tracking state. Server-side changes invalidate the cache via the SSE
+ * prefetch pipeline (see `prefetch-registrations.js`), and any mutation
+ * `onSuccess` invalidates `queryKeys.serviceOrders.all` to refresh derived
+ * computeds automatically.
+ */
 export function useCurrentSubscription() {
   const accountStore = useAccountStore()
   const { accountData } = storeToRefs(accountStore)
 
   const accountId = computed(() => accountData.value?.id ?? null)
-  const hasFinishedOnboarding = computed(() => accountData.value?.hasAccountPlan !== false)
-  const hasContractedPlan = hasFinishedOnboarding
 
   const {
     activeServiceOrder,
-    draftServiceOrder,
     currentServiceOrder,
     isLoading: isLoadingServiceOrder,
-    isFetching: isFetchingServiceOrder,
     refetch: refetchServiceOrders
   } = useServiceOrdersList(accountId)
-  const { data: plansData, isLoading: isLoadingPlans } = usePlansList()
 
-  const pollForActiveAfterPayment = async () => {
-    if (isPollingForActive.value) return
-    if (isActivePopulated(activeServiceOrder.value)) {
-      clearAwaitingActiveServiceOrder()
-      return
-    }
-    if (!activeServiceOrder.value && !draftServiceOrder.value?.priceId) {
-      clearAwaitingActiveServiceOrder()
-      return
-    }
-
-    isPollingForActive.value = true
-    try {
-      for (let attempt = 0; attempt < POST_PAYMENT_POLL_MAX_ATTEMPTS; attempt += 1) {
-        await new Promise((resolve) => setTimeout(resolve, POST_PAYMENT_POLL_INTERVAL))
-        await refetchServiceOrders().catch(Sentry.captureException)
-        if (isActivePopulated(activeServiceOrder.value)) {
-          clearAwaitingActiveServiceOrder()
-          return
-        }
-      }
-      clearAwaitingActiveServiceOrder()
-    } finally {
-      isPollingForActive.value = false
-    }
-  }
-
-  watch(
-    () => [isFetchingServiceOrder.value, accountId.value, hasFinishedOnboarding.value],
-    ([fetching, id, finishedOnboarding]) => {
-      if (postPaymentPollAttempted) return
-      if (fetching) return
-      if (!id || !finishedOnboarding) return
-      if (!isAwaitingActiveServiceOrder()) return
-      postPaymentPollAttempted = true
-      if (isActivePopulated(activeServiceOrder.value)) {
-        clearAwaitingActiveServiceOrder()
-        return
-      }
-      if (!activeServiceOrder.value && !draftServiceOrder.value?.priceId) {
-        clearAwaitingActiveServiceOrder()
-        return
-      }
-      pollForActiveAfterPayment()
-    },
-    { immediate: true }
+  const hasFinishedOnboarding = computed(
+    () => accountData.value?.first_login !== true || Boolean(activeServiceOrder.value)
   )
+  const hasContractedPlan = hasFinishedOnboarding
 
-  watch(activeServiceOrder, (active) => {
-    if (isActivePopulated(active)) clearAwaitingActiveServiceOrder()
-  })
-
-  watch(accountId, (newId, oldId) => {
-    if (newId !== oldId) postPaymentPollAttempted = false
+  // Plans are only needed to enrich the active SO with pricing/sku metadata.
+  // Gating with `enabled` keeps the catalogue request off the wire while the
+  // account is still hydrating or has no active SO yet.
+  const plansQueryEnabled = computed(
+    () => Boolean(accountId.value) && hasContractedPlan.value && Boolean(activeServiceOrder.value)
+  )
+  const { data: plansData, isLoading: isLoadingPlans } = usePlansList({
+    enabled: plansQueryEnabled
   })
 
   const planSku = computed(() => {
@@ -123,7 +76,7 @@ export function useCurrentSubscription() {
   const isHobby = computed(() => planSku.value === 'hobby')
 
   const planTitle = computed(() => (isPro.value ? 'Pro Plan' : 'Hobby'))
-  const planTag = computed(() => (isHobby.value ? 'Free Plan' : null))
+  const planTag = computed(() => (hasContractedPlan.value ? 'Current Plan' : null))
 
   const planStartDate = computed(() =>
     formatPlanStartDate(activeServiceOrder.value?.currentPeriodStart)
@@ -137,79 +90,53 @@ export function useCurrentSubscription() {
   const nextChargeDate = computed(() =>
     formatNextChargeDate(activeServiceOrder.value?.currentPeriodEnd)
   )
-  const nextChargeValue = computed(() => planChargeValue.value)
   const lastUpdate = computed(() =>
     formatLastUpdate(currentServiceOrder.value?.updatedAt ?? activeServiceOrder.value?.updatedAt)
   )
 
-  const scheduledDowngrade = computed(() => {
-    const metadata = activeServiceOrder.value?.metadata
-    if (!metadata || typeof metadata !== 'object') return null
-    if (metadata.status !== 'downgrade_pending') return null
-    return {
-      effectiveAt: metadata.effective_date ?? metadata.effectiveDate ?? null
-    }
+  const scheduledDowngrade = computed(() => activeServiceOrder.value?.downgradePending ?? null)
+
+  const scheduledDowngradePricing = computed(() => {
+    const toPriceId = scheduledDowngrade.value?.toPriceId
+    if (!toPriceId) return null
+    return findPricingById(plansData.value, toPriceId)
   })
 
-  const currentInvoiceAmountCharged = computed(() => {
-    const metadata = activeServiceOrder.value?.metadata
-    if (!metadata || typeof metadata !== 'object') return null
-    const raw = metadata.amountCharged ?? metadata.amount_charged
-    return toFiniteNumber(raw, null)
+  const nextChargeValue = computed(() => {
+    if (!hasContractedPlan.value) return 0
+    const pricing = scheduledDowngradePricing.value ?? activePricing.value
+    return toFiniteNumber(pricing?.priceValue, 0)
   })
 
-  const isDowngradePending = computed(() => Boolean(scheduledDowngrade.value))
-
-  const hasResolvedOnce = ref(false)
-  watch(
-    () => planSku.value,
-    (sku) => {
-      if (sku !== null) hasResolvedOnce.value = true
-    },
-    { immediate: true }
+  const currentInvoiceAmountCharged = computed(() =>
+    toFiniteNumber(activeServiceOrder.value?.invoiceAmountCharged, null)
   )
-  watch(accountId, (newId, oldId) => {
-    if (newId !== oldId) hasResolvedOnce.value = false
-  })
+
+  const isDowngradePending = computed(() => Boolean(scheduledDowngrade.value?.effectiveAt))
 
   const isLoading = computed(() => {
-    if (isRefetching.value) return true
     if (!accountId.value) return true
     if (!hasContractedPlan.value) return false
-    if (hasResolvedOnce.value) return false
-    return isLoadingServiceOrder.value || isLoadingPlans.value || planSku.value === null
+    return isLoadingServiceOrder.value || (plansQueryEnabled.value && isLoadingPlans.value)
   })
 
-  const reloadFromBackend = async () => {
-    await loadUserAndAccountInfo({ force: true })
-    if (accountId.value && hasContractedPlan.value) {
-      await refetchServiceOrders()
-    }
-  }
-
   const refetch = async () => {
-    isRefetching.value = true
-    try {
-      await reloadFromBackend()
-    } finally {
-      isRefetching.value = false
-    }
+    await loadUserAndAccountInfo({ force: true })
+    if (!accountId.value || !hasContractedPlan.value) return
+    queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
+    await refetchServiceOrders()
   }
 
-  const refetchUntil = async (predicate, { interval = 1500, maxAttempts = 8 } = {}) => {
-    isRefetching.value = true
-    try {
-      for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-        await reloadFromBackend()
-        if (predicate(activeServiceOrder.value)) return true
-        if (attempt < maxAttempts - 1) {
-          await new Promise((resolve) => setTimeout(resolve, interval))
-        }
-      }
-      return false
-    } finally {
-      isRefetching.value = false
+  const refetchUntil = async (predicate, { maxAttempts = 5, delayMs = 500 } = {}) => {
+    await refetch()
+    if (!predicate) return true
+    let attempt = 1
+    while (attempt < maxAttempts && !predicate(activeServiceOrder.value)) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs))
+      await refetch()
+      attempt += 1
     }
+    return Boolean(predicate(activeServiceOrder.value))
   }
 
   return {
@@ -230,6 +157,7 @@ export function useCurrentSubscription() {
     isDowngradePending,
     scheduledDowngrade,
     currentInvoiceAmountCharged,
+    isActivePopulated: computed(() => isActivePopulated(activeServiceOrder.value)),
     refetch,
     refetchUntil
   }

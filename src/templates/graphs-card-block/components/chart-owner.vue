@@ -21,7 +21,7 @@
 
 <script setup>
   import MobileLogo from '@assets/svg/mobile-logo'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
 
   defineProps({
     chartOwner: {

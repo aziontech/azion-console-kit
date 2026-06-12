@@ -43,6 +43,7 @@ const SERVICE_EXCEPTIONS = [
   // Pure-utility files colocated with a service (no HTTP, no side effects).
   // Match the file-name suffix so e.g. `service-orders-constants` is treated
   // as a utility rather than a service entry point.
+  // eslint-disable-next-line security/detect-unsafe-regex -- alternation of fixed literals followed by an optional fixed-suffix group; bounded, no nested quantifiers
   /-(constants|errors|strategy|helpers|types|contracts|adapter)(\.[jt]sx?)?$/
 ]
 

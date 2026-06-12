@@ -1,5 +1,5 @@
 <template>
-  <div class="border border-default rounded-md flex flex-col w-full sm:w-1/2">
+  <div class="border border-default rounded-md flex flex-col w-full min-[1100px]:w-1/2">
     <div
       class="rounded-t-md bg-[var(--table-header-cell-bg)] dark:bg-surface-700 border-b border-default px-4 py-1.5 h-11 flex items-center justify-between overflow-visible"
     >

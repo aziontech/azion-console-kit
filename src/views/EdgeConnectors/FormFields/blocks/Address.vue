@@ -229,7 +229,7 @@
   import { useField, useFieldArray } from 'vee-validate'
   import AccordionTab from '@aziontech/webkit/accordion-tab'
   import PrimeButton from '@aziontech/webkit/button'
-  import Tag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/prime-tag'
   import Divider from '@aziontech/webkit/divider'
   import Card from '@aziontech/webkit/card'
   import Accordion from 'primevue/accordion'

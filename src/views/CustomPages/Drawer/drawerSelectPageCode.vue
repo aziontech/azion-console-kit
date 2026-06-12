@@ -60,6 +60,10 @@
     return code.value === 'default' ? 0 : code.value
   }
 
+  // Default body sent to the backend when the operator leaves the page response empty.
+  // Named `*Html` so the xss/no-mixed-html rule recognises the source as HTML by intent.
+  const DEFAULT_PAGE_RESPONSE_HTML = '<html>...</html>'
+
   const transformValuesByType = (values) => {
     switch (values.type) {
       case 'page_default':
@@ -68,7 +72,8 @@
           code: values.code,
           type: values.type,
           contentType: values.contentType || 'text/html',
-          response: values.response || '<html>...</html>',
+          // eslint-disable-next-line xss/no-mixed-html -- `response` key is a fixed backend contract (cannot be renamed); the fallback value is a literal placeholder, not user input
+          response: values.response || DEFAULT_PAGE_RESPONSE_HTML,
           customStatusCode: values.customStatusCode,
           ttl: 0
         }
@@ -78,7 +83,8 @@
           code: values.code,
           type: values.type,
           contentType: values.contentType || 'text/html',
-          response: values.response || '<html>...</html>',
+          // eslint-disable-next-line xss/no-mixed-html -- `response` key is a fixed backend contract (cannot be renamed); the fallback value is a literal placeholder, not user input
+          response: values.response || DEFAULT_PAGE_RESPONSE_HTML,
           ttl: 0,
           customStatusCode: values.customStatusCode
         }

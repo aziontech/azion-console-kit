@@ -22,6 +22,8 @@ import { describe, it, expect } from 'vitest'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// relPath is a hardcoded repo-source path from the test cases below, not user input.
+// eslint-disable-next-line security/detect-non-literal-fs-filename
 const read = (relPath) => readFileSync(path.resolve(__dirname, '../../../', relPath), 'utf-8')
 
 describe('Property P3 — Aria-label completeness', () => {

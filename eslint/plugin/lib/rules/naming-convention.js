@@ -1,6 +1,7 @@
 const path = require('path')
 const { classifyPath } = require('../utils/path-classifier')
 
+/* eslint-disable xss/no-mixed-html -- placeholder strings (e.g., "<name>") are documentation tokens, not HTML */
 const CONVENTIONS = {
   service: {
     pattern: /^[a-z][a-z0-9-]*-service\.(js|ts)$/,
@@ -19,6 +20,7 @@ const CONVENTIONS = {
     expected: '<name>-store.js/ts'
   }
 }
+/* eslint-enable xss/no-mixed-html */
 
 module.exports = {
   meta: {

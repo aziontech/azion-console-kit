@@ -134,7 +134,7 @@
 </template>
 
 <script setup>
-  import { computed, defineModel, nextTick, onMounted, ref } from 'vue'
+  import { computed, nextTick, onMounted, ref } from 'vue'
   import QuickSelect from './quickSelect/index.vue'
   import InputDateRange from './inputDateRange/index.vue'
   import PrimeButton from '@aziontech/webkit/button'

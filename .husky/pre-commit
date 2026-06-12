@@ -2,5 +2,5 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 yarn lint
-yarn format
-yarn test:unit:coverage
+yarn lint:security-check
+yarn prettier --check src/

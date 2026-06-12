@@ -147,7 +147,10 @@
     originPath: yup
       .string()
       .test('valid', 'Use a valid origin path.', (value) => {
-        return /^(\/\.?[\w][\w.-]*)+$/.test(value) || !value
+        if (!value) return true
+        if (!value.startsWith('/')) return false
+        const segments = value.substring(1).split('/')
+        return segments.length > 0 && segments.every((segment) => /^\.?\w[\w.-]*$/.test(segment))
       })
       .label('Origin Path'),
     streamingEndpoint: yup

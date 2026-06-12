@@ -43,7 +43,7 @@ export const buildCheckoutAppearance = (themeStore) => {
   return {
     theme: isDarkTheme ? 'night' : 'stripe',
     variables: {
-      colorPrimary: '#f3652b',
+      colorPrimary: textColor,
       colorText: textColor,
       colorTextPlaceholder: placeholderColor,
       colorBackground: surfaceBackground,
@@ -119,6 +119,11 @@ export const buildCheckoutAppearance = (themeStore) => {
       },
       '.Block': {
         fontFamily: "'Sora', sans-serif"
+      },
+      '.LinkAutofillPrompt': {
+        fontFamily: "'Sora', sans-serif",
+        fontSize: '0.875rem',
+        fontWeight: '500'
       }
     }
   }

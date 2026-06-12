@@ -1,12 +1,12 @@
 name: Sync Main to Dev
 
-on:
-  workflow_run:
-    workflows: ["Deploy Console Kit (PRODUCTION)"]
-    types:
-      - completed
-    branches:
-      - main
+# on:
+#   workflow_run:
+#     workflows: ["Deploy Console Kit (PRODUCTION)"]
+#     types:
+#       - completed
+#     branches:
+#       - main
 
 permissions:
   contents: write

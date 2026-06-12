@@ -9,7 +9,7 @@
   import DataTable from '@aziontech/webkit/list-data-table'
   import advancedFilter from '@/templates/advanced-filter'
   import Dropdown from '@aziontech/webkit/dropdown'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import { useToast } from '@aziontech/webkit/use-toast'
   import PrimeButton from '@aziontech/webkit/button'

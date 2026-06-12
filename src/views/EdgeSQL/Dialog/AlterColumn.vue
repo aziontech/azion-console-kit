@@ -106,22 +106,8 @@
       .filter((segment) => segment.length > 0)
   })
   // Tokenize query strings into keyword/non-keyword parts (no v-html)
-  const KEYWORDS = [
-    'CREATE',
-    'ALTER',
-    'TRUNCATE',
-    'TABLE',
-    'BEGIN',
-    'PRAGMA',
-    'INSERT',
-    'INTO',
-    'DROP',
-    'RENAME',
-    'ON',
-    'COMMIT',
-    'OFF'
-  ]
-  const keywordRegex = new RegExp(`\\b(${KEYWORDS.join('|')})\\b`, 'gi')
+  const keywordRegex =
+    /\b(CREATE|ALTER|TRUNCATE|TABLE|BEGIN|PRAGMA|INSERT|INTO|DROP|RENAME|ON|COMMIT|OFF)\b/gi
 
   const tokenizeSql = (input) => {
     const parts = []

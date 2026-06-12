@@ -156,7 +156,7 @@
 
   defineOptions({ name: 'RealTimeEventsTabsView' })
 
-  const previewTag = { value: 'Preview', severity: 'info' }
+  const previewTag = { value: 'Preview', severity: 'secondary' }
 
   const toast = useToast()
 

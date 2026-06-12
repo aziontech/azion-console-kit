@@ -1,6 +1,83 @@
-/* eslint-disable no-console */
 import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index.js'
 import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
+
+// Each regex constant below is a pre-built literal RegExp, ordered by operator length DESC so
+// multi-char ops (`<=`, `<>`) match before single-char subsets (`<`). This lets the call sites
+// pick from a map instead of feeding dynamic strings into `new RegExp(...)`.
+const COMBINED_OPERATORS_REGEX = /<=|>=|=|<>|<|>|\blike\b|\bilike\b|\bbetween\b|\bin\b/i
+const COMBINED_OPERATORS_REGEX_GLOBAL = /\bbetween\b|\bilike\b|\blike\b|<=|>=|<>|\bin\b|=|<|>/g
+
+const OPERATOR_MATCH_REGEXES = [
+  { op: 'between', re: /\bbetween\b/i },
+  { op: 'ilike', re: /\bilike\b/i },
+  { op: 'like', re: /\blike\b/i },
+  { op: '<=', re: /<=/i },
+  { op: '>=', re: />=/i },
+  { op: '<>', re: /<>/i },
+  { op: 'in', re: /\bin\b/i },
+  { op: '=', re: /=/i },
+  { op: '<', re: /</i },
+  { op: '>', re: />/i }
+]
+
+const OPERATOR_BOUNDARY_REGEXES = new Map([
+  ['<=', /(^|\s)<=(?=\s)/i],
+  ['>=', /(^|\s)>=(?=\s)/i],
+  ['=', /(^|\s)=(?=\s)/i],
+  ['<>', /(^|\s)<>(?=\s)/i],
+  ['<', /(^|\s)<(?=\s)/i],
+  ['>', /(^|\s)>(?=\s)/i],
+  ['like', /(^|\s)like(?=\s)/i],
+  ['ilike', /(^|\s)ilike(?=\s)/i],
+  ['between', /(^|\s)between(?=\s)/i],
+  ['in', /(^|\s)in(?=\s)/i]
+])
+
+const OPERATOR_PREFIX_REGEXES = new Map([
+  ['<=', /^(.*?)\s+<=\s+/i],
+  ['>=', /^(.*?)\s+>=\s+/i],
+  ['=', /^(.*?)\s+=\s+/i],
+  ['<>', /^(.*?)\s+<>\s+/i],
+  ['<', /^(.*?)\s+<\s+/i],
+  ['>', /^(.*?)\s+>\s+/i],
+  ['like', /^(.*?)\s+like\s+/i],
+  ['ilike', /^(.*?)\s+ilike\s+/i],
+  ['between', /^(.*?)\s+between\s+/i],
+  ['in', /^(.*?)\s+in\s+/i]
+])
+
+const FIELD_OPERATOR_TRAILER_REGEX = /^\s+(=|<>|<|>|<=|>=|like|ilike|between)/i
+
+const WORD_CHAR_REGEX = /\w/
+const IN_CLAUSE_TRAILER_REGEX = /^\s+in\s*\(/i
+
+const findOperatorTypedAfterField = (query, fieldLabel) => {
+  const lowerQuery = query.toLowerCase()
+  const fieldLower = fieldLabel.toLowerCase()
+  const fieldIdx = lowerQuery.indexOf(fieldLower)
+  if (fieldIdx === -1) return null
+  const trailer = query.substring(fieldIdx + fieldLower.length)
+  const trailerMatch = trailer.match(FIELD_OPERATOR_TRAILER_REGEX)
+  return trailerMatch ? trailerMatch[1].toLowerCase() : null
+}
+
+const findFieldInClause = (lowerQuery, fieldLower) => {
+  const fieldLen = fieldLower.length
+  let cursor = 0
+  while (cursor <= lowerQuery.length - fieldLen) {
+    const fieldStart = lowerQuery.indexOf(fieldLower, cursor)
+    if (fieldStart === -1) return null
+    const prevIsBoundary = fieldStart === 0 || !WORD_CHAR_REGEX.test(lowerQuery[fieldStart - 1])
+    if (prevIsBoundary) {
+      const afterField = lowerQuery.substring(fieldStart + fieldLen)
+      if (IN_CLAUSE_TRAILER_REGEX.test(afterField)) {
+        return { index: fieldStart }
+      }
+    }
+    cursor = fieldStart + 1
+  }
+  return null
+}
 
 export default class Aql {
   constructor() {
@@ -9,12 +86,7 @@ export default class Aql {
   }
 
   buildOperatorsRegex() {
-    const patterns = this.operators.map((op) => {
-      const escaped = op.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')
-      return /^[a-zA-Z]+$/.test(op) ? `\\b${escaped}\\b` : escaped
-    })
-
-    return new RegExp(patterns.join('|'), 'i')
+    return COMBINED_OPERATORS_REGEX
   }
 
   #isDomainWorkloadField(fieldName) {
@@ -127,12 +199,8 @@ export default class Aql {
   formatDomainValues(query, domains) {
     const extractDomainClauseContent = (query) => {
       const lowerQuery = query.toLowerCase()
-      const escapedField = this.handleTextDomainWorkload.singularLabel.replace(
-        /[.*+?^${}()|[\]\\]/g,
-        '\\$&'
-      )
-      const clauseRegex = new RegExp(`\\b${escapedField}\\b\\s+in\\s*\\(`, 'i')
-      const match = clauseRegex.exec(lowerQuery)
+      const fieldLower = this.handleTextDomainWorkload.singularLabel.toLowerCase()
+      const match = findFieldInClause(lowerQuery, fieldLower)
       if (!match) return null
 
       const startIndex = query.indexOf('(', match.index)
@@ -318,12 +386,7 @@ export default class Aql {
     const matchingFields = suggestions.filter((item) =>
       item.label.toLowerCase().startsWith(tokenForMatch)
     )
-    const sortedOperators = [...this.operators].sort((left, right) => right.length - left.length)
-    let operatorFound = sortedOperators.find((op) => {
-      const escaped = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      const pattern = /^[a-zA-Z]+$/.test(op) ? `\\b${escaped}\\b` : escaped
-      return new RegExp(pattern, 'i').test(tokenForMatch)
-    })
+    let operatorFound = OPERATOR_MATCH_REGEXES.find(({ re }) => re.test(tokenForMatch))?.op
 
     const hasValueAfterOperator = operatorFound ? tokenRaw.split(operatorFound)[1] : null
 
@@ -517,12 +580,12 @@ export default class Aql {
     expressions.forEach((expression) => {
       if (!expression || !expression.endsWith(' ')) return
       const operatorFound = this.operators.find((op) =>
-        new RegExp(`(^|\\s)${op}(?=\\s)`, 'i').test(expression)
+        OPERATOR_BOUNDARY_REGEXES.get(op).test(expression)
       )
 
       let fieldPart
       if (operatorFound) {
-        const regex = new RegExp(`^(.*?)\\s+${operatorFound}\\s+`, 'i')
+        const regex = OPERATOR_PREFIX_REGEXES.get(operatorFound)
         const match = expression.match(regex)
         if (match) {
           fieldPart = match[1].trim()
@@ -600,18 +663,8 @@ export default class Aql {
     if (!expressions) return []
     const errors = []
 
-    // eslint-disable-next-line id-length
-    const sortedOperators = [...this.operators].sort((a, b) => b.length - a.length)
-    const escapedOperators = sortedOperators.map((op) => {
-      const opEscaped = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      return /^[a-zA-Z]+$/.test(op) ? `\\b${opEscaped}\\b` : opEscaped
-    })
-    const operatorPattern = escapedOperators.join('|')
-    const regex = new RegExp(operatorPattern, 'g')
-
     expressions.forEach((exp) => {
-      let match
-      while ((match = regex.exec(exp)) !== null) {
+      for (const match of exp.matchAll(COMBINED_OPERATORS_REGEX_GLOBAL)) {
         const start = match.index
         const op = match[0]
         const end = start + op.length
@@ -664,6 +717,44 @@ export default class Aql {
     })
 
     return errors
+  }
+
+  // Render the highlighted query into `element` using DOM nodes (not innerHTML), so user-supplied
+  // text always flows through `textContent` and cannot be interpreted as HTML — fixes the XSS
+  // hole the previous string-template approach had (field/operator captures were interpolated raw).
+  renderHighlightedSyntax(element, query) {
+    while (element.firstChild) element.removeChild(element.firstChild)
+
+    const makeColoredSpan = (text, cssColorVar) => {
+      const span = document.createElement('span')
+      span.style.color = cssColorVar
+      span.textContent = text
+      return span
+    }
+
+    const parts = query.split(/(\band\b)/gi)
+    for (const part of parts) {
+      if (/^\band\b$/i.test(part.trim())) {
+        element.appendChild(makeColoredSpan(part.trim(), 'var(--series-six-color)'))
+        continue
+      }
+
+      const fieldOpRegex = /((?:"[^"]+"|\S+))(\s*)(<=|>=|<>|=|<|>|like|ilike|between|\bin\b)/gi
+      let cursor = 0
+      let match
+      while ((match = fieldOpRegex.exec(part)) !== null) {
+        if (match.index > cursor) {
+          element.appendChild(document.createTextNode(part.substring(cursor, match.index)))
+        }
+        element.appendChild(makeColoredSpan(match[1], 'var(--series-three-color)'))
+        element.appendChild(document.createTextNode(' '))
+        element.appendChild(makeColoredSpan(match[3], 'var(--series-two-color)'))
+        cursor = fieldOpRegex.lastIndex
+      }
+      if (cursor < part.length) {
+        element.appendChild(document.createTextNode(part.substring(cursor)))
+      }
+    }
   }
 
   highlightQuerySyntax(query) {
@@ -765,12 +856,7 @@ export default class Aql {
     )
     if (!selectedField) return []
 
-    const fieldRegex = new RegExp(
-      `${selectedField.label}\\s+(=|<>|<|>|<=|>=|like|ilike|between)`,
-      'i'
-    )
-    const operatorMatch = query.match(fieldRegex)
-    const operatorAlreadyTyped = operatorMatch ? operatorMatch[1].toLowerCase() : null
+    const operatorAlreadyTyped = findOperatorTypedAfterField(query, selectedField.label)
 
     return selectedField.value.operator
       .filter((op) => {

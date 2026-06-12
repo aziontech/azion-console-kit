@@ -3,7 +3,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import TabView from 'primevue/tabview'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import ObjectStorageCredentialsListView from './ObjectStorageCredentials/ListView.vue'
@@ -118,7 +118,7 @@
           v-if="addButtonController.showAddButtonTab"
           class="flex ml-4 items-center"
         >
-          <PrimeButton
+          <Button
             :label="addButtonController.label"
             size="small"
             icon="pi pi-plus"

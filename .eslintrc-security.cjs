@@ -5,16 +5,28 @@
 **/
 
 /* eslint-env node */
+require('@rushstack/eslint-patch/modern-module-resolution')
+
+// Register the architecture plugin so eslint-disable directives for its rules
+// don't fail while the security-only config is running.
+const Module = require('module')
+const resolveFilename = Module._resolveFilename
+Module._resolveFilename = function (request, parent, isMain, options) {
+  if (request === 'eslint-plugin-azion-architecture') {
+    return require.resolve(`${__dirname}/eslint/plugin`)
+  }
+  return resolveFilename.call(this, request, parent, isMain, options)
+}
+
 module.exports = {
   root: true,
-  extends: [
-    'plugin:security/recommended-legacy',
-    'plugin:xss/recommended'
-  ],
+  plugins: ['azion-architecture', 'no-unsanitized'],
+  extends: ['plugin:security/recommended-legacy', 'plugin:xss/recommended'],
+  parser: 'vue-eslint-parser',
   parserOptions: {
-    ecmaVersion: 'latest'
+    ecmaVersion: 'latest',
+    sourceType: 'module'
   },
-  plugins: ['no-unsanitized'],
   rules: {
     'no-unsanitized/method': 'error',
     'no-unsanitized/property': 'error',

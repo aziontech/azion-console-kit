@@ -3,6 +3,7 @@ import process from 'process';
 import console from 'console';
 
 function checkCoverage(lcovReportPath, threshold) {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- CLI script: lcovReportPath is the operator-provided argument
   fs.readFile(lcovReportPath, 'utf8', (err, data) => {
     if (err) {
       console.error(`❌ Error reading LCOV report: ${err.message}`);
@@ -40,6 +41,7 @@ function checkCoverage(lcovReportPath, threshold) {
 }
 
 if (process.argv.length < 4) {
+  // eslint-disable-next-line xss/no-mixed-html -- "<lcov_report_path>"/"<threshold>" are CLI usage placeholders, not HTML
   console.log("Usage: node check_coverage.js <lcov_report_path> <threshold>");
   process.exit(1);
 }

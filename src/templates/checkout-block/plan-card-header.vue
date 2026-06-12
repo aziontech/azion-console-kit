@@ -1,6 +1,8 @@
 <template>
-  <div class="bg-surface flex items-center justify-between px-6 py-3 border-b border-default">
-    <span class="text-lg font-semibold text-default">{{ label }}</span>
+  <div
+    class="bg-surface flex items-center justify-between h-14 pl-6 pr-3 border-b border-[var(--border-muted)]"
+  >
+    <span class="text-base leading-none text-default">{{ label }}</span>
     <slot name="action" />
   </div>
 </template>

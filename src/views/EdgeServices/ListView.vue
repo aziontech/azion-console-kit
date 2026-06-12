@@ -82,6 +82,8 @@
     }
   ])
 
+  const frozenColumns = ['name']
+
   const actions = [
     {
       type: 'dialog',
@@ -167,6 +169,7 @@
         exportFileName="Edge Services"
         :csvMapper="csvMapper"
         :lazy="true"
+        :frozenColumns="frozenColumns"
         :emptyBlock="{
           title: 'No Edge Services yet',
           description:

@@ -37,7 +37,7 @@ export class BillingTracker {
    */
   planSelected(payload) {
     this.#trackerAdapter.addEvent({
-      eventName: 'Plan Selected',
+      eventName: 'Selected Plan',
       props: {
         plan: payload?.plan,
         billingCycle: payload?.billingCycle,

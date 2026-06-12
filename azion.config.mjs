@@ -6,6 +6,11 @@ const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env
 const environment = VITE_ENVIRONMENT || 'production'
 const domainSuffix = environment === 'production' ? 'net' : 'com'
 
+const edgeApiHost =
+  environment === 'production'
+    ? 'jkjuyhi0gza.map.azionedge.net'
+    : 'urvlgkvpxla.map.azionedge.net'
+
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
     return origin?.map(({ hostHeader, addresses, ...rest }) => {
@@ -163,8 +168,8 @@ const config = {
     {
       name: 'origin-edge-api',
       type: 'single_origin',
-      hostHeader: 'urvlgkvpxla.map.azionedge.net',
-      addresses: ['urvlgkvpxla.map.azionedge.net']
+      hostHeader: edgeApiHost,
+      addresses: [edgeApiHost]
     }
   ],
   cache: [

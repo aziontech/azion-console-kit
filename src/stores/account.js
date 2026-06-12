@@ -3,12 +3,20 @@ import { defineStore } from 'pinia'
 export const useAccountStore = defineStore({
   id: 'account',
   persist: {
-    paths: ['identifySignUpProvider', 'hasSession']
+    paths: ['identifySignUpProvider', 'hasSession', 'signupTypeFlags']
   },
   state: () => ({
     account: {},
     hasSession: false,
     identifySignUpProvider: '',
+    signupTypeFlags: {
+      login_sso_google: false,
+      login_sso_github: false,
+      login_email: false,
+      signup_sso_google: false,
+      signup_sso_github: false,
+      signup_email: false
+    },
     currentPlanSku: null,
     accountStatuses: {
       BLOCKED: 'BLOCKED',
@@ -78,11 +86,12 @@ export const useAccountStore = defineStore({
     isFirstLogin(state) {
       return state.account?.first_login
     },
-    hasAccountPlan(state) {
-      return state.account?.hasAccountPlan !== false
-    },
     needsOnboarding(state) {
-      return state.account?.first_login === true && state.account?.hasAccountPlan === false
+      return (
+        state.account?.kind === 'client' &&
+        state.account?.billing_type === null &&
+        state.account?.first_login !== false // TODO: temporary — skip onboarding when first_login === false
+      )
     },
     accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'
@@ -108,22 +117,8 @@ export const useAccountStore = defineStore({
     redirectToExternalBillingNeeded(state) {
       return !state.account?.status || state.accountStatuses.REGULAR === state.account?.status
     },
-    billingAccessPermitted(state) {
-      return [
-        state.accountStatuses.BLOCKED,
-        state.accountStatuses.DEFAULTING,
-        state.accountStatuses.TRIAL,
-        state.accountStatuses.ONLINE,
-        state.accountStatuses.REGULAR
-      ].includes(state.account?.status)
-    },
     showExportBilling(state) {
       return [state.accountStatuses.ONLINE, state.accountStatuses.TRIAL].includes(
-        state.account?.status
-      )
-    },
-    paymentReviewPending(state) {
-      return [state.accountStatuses.BLOCKED, state.accountStatuses.DEFAULTING].includes(
         state.account?.status
       )
     },
@@ -132,7 +127,25 @@ export const useAccountStore = defineStore({
       return account?.client_flags?.includes(flags.MARKETPLACE_PRODUCTS)
     },
     accountIsNotRegular(state) {
-      return state.account?.status !== state.accountStatuses.REGULAR
+      return (
+        state.account?.status !== state.accountStatuses.REGULAR && this.billingType !== 'custom'
+      )
+    },
+    billingType(state) {
+      return state.account?.billing_type ?? null
+    },
+    billingExperience() {
+      switch (this.billingType) {
+        case 'custom':
+          return 'custom'
+        case 'internal':
+          return 'internal'
+        case null:
+          return 'null'
+        case 'plan':
+        default:
+          return 'plan'
+      }
     },
 
     hasHideCreateOptionsFlag(state) {
@@ -162,6 +175,14 @@ export const useAccountStore = defineStore({
       this.account = {}
       this.hasSession = false
       this.identifySignUpProvider = ''
+      this.signupTypeFlags = {
+        login_sso_google: false,
+        login_sso_github: false,
+        login_email: false,
+        signup_sso_google: false,
+        signup_sso_github: false,
+        signup_email: false
+      }
       this.currentPlanSku = null
     },
     setSsoSignUpMethod(method) {
@@ -169,6 +190,22 @@ export const useAccountStore = defineStore({
     },
     resetSsoSignUpMethod() {
       this.identifySignUpProvider = ''
+    },
+    /**
+     * Sets a signup type flag to true.
+     * @param {string} flag - The flag name (e.g., 'signup_sso_google', 'login_email')
+     */
+    setSignupTypeFlag(flag) {
+      if (flag in this.signupTypeFlags) {
+        this.signupTypeFlags[flag] = true
+      }
+    },
+    /**
+     * Gets all signup type flags.
+     * @returns {Object} The signup type flags object
+     */
+    getSignupTypeFlags() {
+      return { ...this.signupTypeFlags }
     }
   }
 })

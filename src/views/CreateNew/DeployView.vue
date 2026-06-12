@@ -138,7 +138,7 @@
 
 <script setup>
   import { computed, onMounted, onUnmounted, ref, inject } from 'vue'
-  import Tag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/prime-tag'
   import Divider from '@aziontech/webkit/divider'
   import ContentBlock from '@/templates/content-block'
   import { useRoute, useRouter } from 'vue-router'

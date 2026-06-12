@@ -1,14 +1,14 @@
 <template>
   <CardBox
     title="Current Invoice"
-    class="w-full sm:w-1/2 current-invoice-card"
+    class="w-full min-[1100px]:w-1/2 current-invoice-card"
   >
     <template #header-action>
-      <PrimeButton
-        outlined
-        icon="pi pi-file"
+      <ActionButton
         label="Details"
-        class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
+        kind="outlined"
+        size="medium"
+        icon="pi pi-file-o"
         :disabled="!invoice.redirectId"
         @click="emitViewDetails"
       />
@@ -16,49 +16,71 @@
 
     <template #content>
       <div class="flex flex-col">
-        <div class="flex flex-col gap-4 px-6 py-4">
+        <div class="flex flex-col gap-3 px-6 py-4">
           <SubscriptionPlanRow label="Billing Period">
             <span class="text-color">{{ billingPeriodLabel }}</span>
           </SubscriptionPlanRow>
 
           <SubscriptionPlanRow label="Plan Charge">
-            <span class="text-color">
-              <span class="text-color-secondary">$</span>
-              {{ planChargeFormatted }}
-            </span>
+            <Currency
+              size="small"
+              prefix="$"
+              :value="planChargeFormatted"
+              :showSuffix="false"
+            />
+          </SubscriptionPlanRow>
+
+          <SubscriptionPlanRow label="Extra Product Charges">
+            <Currency
+              size="small"
+              prefix="$"
+              :value="extraProductCharges"
+              :showSuffix="false"
+            />
           </SubscriptionPlanRow>
 
           <SubscriptionPlanRow label="Professional Services Plan Charges">
-            <span class="text-color">
-              <span class="text-color-secondary">$</span>
-              {{ servicePlanCharges }}
-            </span>
+            <Currency
+              size="small"
+              prefix="$"
+              :value="servicePlanCharges"
+              :showSuffix="false"
+            />
           </SubscriptionPlanRow>
 
           <SubscriptionPlanRow label="Credit Balance">
-            <span class="text-color"><span class="text-color-secondary">$</span> 0</span>
+            <Currency
+              size="small"
+              prefix="$"
+              value="0"
+              :showSuffix="false"
+            />
           </SubscriptionPlanRow>
         </div>
 
-        <div
-          class="flex flex-col gap-4 px-6 py-4 border-t border-[var(--surface-border)] bg-[var(--surface-section)]"
-        >
-          <div class="flex items-center justify-between text-[13px] leading-5">
-            <span class="text-color-secondary">Credit that will be used for payment</span>
-            <span class="text-color">
-              <span class="text-color-secondary">$</span>
-              {{ creditUsedValue }}
-            </span>
-          </div>
+        <div class="flex flex-col gap-2 px-6 py-4 border-t border-[var(--surface-border)]">
+          <SubscriptionPlanRow label="Credit that will be used for payment">
+            <Currency
+              size="small"
+              prefix="$"
+              :value="creditUsedValue"
+              :showSuffix="false"
+            />
+          </SubscriptionPlanRow>
           <div class="flex items-center justify-between">
-            <div class="flex items-end gap-3">
-              <span class="text-xl font-semibold leading-8 text-color">Total</span>
-              <span class="text-[13px] leading-7 text-color-secondary">Amount Payable</span>
-            </div>
-            <span class="flex items-baseline gap-1 text-color">
-              <span class="text-[13px] text-color-secondary">$</span>
-              <span class="text-xl font-semibold leading-8">{{ totalValue }}</span>
-            </span>
+            <span class="text-lg leading-[1.4] text-color">Total</span>
+            <SkeletonBlock
+              width="5rem"
+              height="2rem"
+              :isLoaded="!isLoadingInvoice"
+            >
+              <Currency
+                size="large"
+                prefix="$"
+                :value="totalValue"
+                :showSuffix="false"
+              />
+            </SkeletonBlock>
           </div>
         </div>
       </div>
@@ -67,16 +89,40 @@
 </template>
 
 <script setup>
-  import { computed } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
-  import CardBox from '@aziontech/webkit/card-box'
+  import { computed, onMounted, ref } from 'vue'
+  import ActionButton from '@aziontech/webkit/actions/button'
+  import CardBox from '@aziontech/webkit/content/card-box'
+  import Currency from '@aziontech/webkit/content/currency'
   import SubscriptionPlanRow from './SubscriptionPlanRow.vue'
+  import SkeletonBlock from '@/templates/skeleton-block'
+  import { invoicesService } from '@/services/v2/billing/invoices-service'
 
   defineOptions({ name: 'current-invoice-card' })
 
   const props = defineProps({
     invoice: { type: Object, default: () => ({}) },
     subscription: { type: Object, default: () => ({}) }
+  })
+
+  const latestInvoiceTotal = ref(null)
+  const isLoadingInvoice = ref(true)
+
+  const extractTotal = (invoice) => {
+    if (!invoice) return null
+    const cents = typeof invoice.amount_paid === 'number' ? invoice.amount_paid : invoice.total
+    if (typeof cents !== 'number' || !Number.isFinite(cents)) return null
+    return cents / 100
+  }
+
+  onMounted(async () => {
+    try {
+      const result = await invoicesService.listAccountInvoices({ limit: 1 })
+      latestInvoiceTotal.value = extractTotal(result?.invoices?.[0])
+    } catch {
+      latestInvoiceTotal.value = null
+    } finally {
+      isLoadingInvoice.value = false
+    }
   })
 
   const emit = defineEmits(['view-details'])
@@ -112,21 +158,13 @@
   const servicePlanChargesNumeric = computed(() => toNumber(props.invoice?.servicePlan))
   const servicePlanCharges = computed(() => formatAmount(servicePlanChargesNumeric.value))
 
-  const creditUsedValue = computed(() => formatAmount(props.invoice?.creditUsedForPayment ?? 0))
+  const extraProductChargesNumeric = computed(() => toNumber(props.invoice?.extraProductCharges))
+  const extraProductCharges = computed(() => formatAmount(extraProductChargesNumeric.value))
 
-  const amountChargedNumeric = computed(() => {
-    const raw = props.subscription?.currentInvoiceAmountCharged
-    if (raw === null || raw === undefined) return null
-    const parsed = Number(raw)
-    return Number.isFinite(parsed) ? parsed : null
-  })
+  const creditUsedNumeric = computed(() => toNumber(props.invoice?.creditUsedForPayment))
+  const creditUsedValue = computed(() => formatAmount(creditUsedNumeric.value))
 
-  const totalValue = computed(() => {
-    if (amountChargedNumeric.value !== null) {
-      return formatAmount(amountChargedNumeric.value)
-    }
-    return formatAmount(planChargeNumeric.value + servicePlanChargesNumeric.value)
-  })
+  const totalValue = computed(() => formatAmount(latestInvoiceTotal.value))
 
   const emitViewDetails = () => {
     // `redirectId` is the "is the details page reachable?" flag the legacy

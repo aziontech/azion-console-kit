@@ -149,6 +149,9 @@
       type: String,
       default: ''
     },
+    scrollHeight: {
+      type: String
+    },
     /**
      * When set, renders a single inline action button per row instead of the ellipsis menu.
      * Accepts an object: { icon: 'pi pi-trash', label: 'Delete', command: fn(rowData), disabled: boolean|fn(rowData) }
@@ -321,6 +324,7 @@
       v-model:sortField="sortFieldValue"
       v-model:sortOrder="sortOrderValue"
       :rowsPerPageOptions="rowsPerPageOptions"
+      :scrollHeight="scrollHeight"
       :reorderableRows="reorderableRows"
       :emptyListMessage="emptyListMessage"
       :emptyBlock="emptyBlock"

@@ -1,13 +1,13 @@
 <template>
   <CardBox
     title="Subscription Plan"
-    class="w-full sm:w-1/2"
+    class="w-full min-[1100px]:w-1/2"
   >
     <template #header-action>
-      <PrimeButton
-        outlined
+      <ActionButton
         label="Change Plan"
-        class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
+        kind="outlined"
+        size="medium"
         @click="emit('change-plan')"
       />
     </template>
@@ -23,12 +23,11 @@
           <span class="text-sm font-semibold leading-5 text-color">{{
             subscription.planTitle
           }}</span>
-          <span
+          <Tag
             v-if="subscription.planTag"
-            class="inline-flex items-center px-2 py-1 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] text-xs font-semibold leading-4 text-color"
-          >
-            {{ subscription.planTag }}
-          </span>
+            severity="secondary"
+            :value="subscription.planTag"
+          />
         </SkeletonBlock>
 
         <SubscriptionPlanRow label="Plan Start Date">
@@ -41,60 +40,59 @@
           </SkeletonBlock>
         </SubscriptionPlanRow>
 
-        <template v-if="subscription.isPro">
-          <SubscriptionPlanRow label="Next Charge Date">
-            <SkeletonBlock
-              :isLoaded="!subscription.isLoading"
+        <SubscriptionPlanRow label="Next Charge Date">
+          <SkeletonBlock
+            :isLoaded="!subscription.isLoading"
+            class="text-color"
+            elementType="span"
+          >
+            {{ subscription.isPro ? subscription.nextChargeDate || '--' : '--' }}
+          </SkeletonBlock>
+        </SubscriptionPlanRow>
+
+        <SubscriptionPlanRow label="Next Charge Amount">
+          <SkeletonBlock
+            :isLoaded="!subscription.isLoading"
+            class="text-color"
+            elementType="span"
+          >
+            <Currency
+              v-if="subscription.isPro"
+              size="small"
+              prefix="$"
+              :value="nextChargeFormatted"
+              :showSuffix="false"
+            />
+            <span
+              v-else
               class="text-color"
-              elementType="span"
+              >--</span
             >
-              {{ subscription.nextChargeDate || '--' }}
-            </SkeletonBlock>
-          </SubscriptionPlanRow>
+          </SkeletonBlock>
+        </SubscriptionPlanRow>
 
-          <SubscriptionPlanRow label="Next Charge Value">
-            <SkeletonBlock
-              :isLoaded="!subscription.isLoading"
-              class="text-color"
-              elementType="span"
-            >
-              <span class="text-color">
-                <span class="text-color-secondary">$</span>
-                {{ nextChargeFormatted }}
-              </span>
-            </SkeletonBlock>
-          </SubscriptionPlanRow>
-
-          <SubscriptionPlanRow label="Payment Method">
-            <span class="text-color">--</span>
-          </SubscriptionPlanRow>
-        </template>
-
-        <template v-if="subscription.isHobby">
-          <SubscriptionPlanRow label="Payment Method">
-            <span class="text-color">--</span>
-          </SubscriptionPlanRow>
-
-          <SubscriptionPlanRow label="Payment Currency">
-            <span class="text-color">--</span>
-          </SubscriptionPlanRow>
-
-          <SubscriptionPlanRow label="Credit Balance">
-            <span class="text-color"><span class="text-color-secondary">$</span>0</span>
-          </SubscriptionPlanRow>
-        </template>
+        <SubscriptionPlanRow label="Payment Method">
+          <span class="inline-flex items-center gap-2 text-color">
+            <CardFlagBlock
+              v-if="paymentMethodBrand"
+              :cardFlag="paymentMethodBrand"
+            />
+            {{ paymentMethodLabel }}
+            <ActionButton
+              v-if="hasPaymentMethod"
+              kind="outlined"
+              size="small"
+              label="Change"
+              @click="emit('change-payment-method')"
+            />
+          </span>
+        </SubscriptionPlanRow>
       </div>
     </template>
 
     <template #footer>
       <p class="w-full text-xs leading-5 text-color-secondary">
-        This invoice includes all consumption up to the last day of the month. Change
-        <span
-          class="text-[var(--text-color-link)] cursor-pointer"
-          @click="emit('go-to-payment')"
-        >
-          payment method.
-        </span>
+        This invoice includes all usage up to the last day of the month.
       </p>
     </template>
   </CardBox>
@@ -102,18 +100,42 @@
 
 <script setup>
   import { computed } from 'vue'
-  import PrimeButton from '@aziontech/webkit/button'
-  import CardBox from '@aziontech/webkit/card-box'
+  import ActionButton from '@aziontech/webkit/actions/button'
+  import CardBox from '@aziontech/webkit/content/card-box'
+  import Tag from '@aziontech/webkit/tag'
+  import Currency from '@aziontech/webkit/content/currency'
   import SkeletonBlock from '@/templates/skeleton-block'
   import SubscriptionPlanRow from './SubscriptionPlanRow.vue'
+  import CardFlagBlock from '@/templates/card-flag-block'
 
   defineOptions({ name: 'subscription-plan-card' })
 
+  const SUPPORTED_FLAGS = ['visa', 'mastercard', 'amex', 'discover', 'diners', 'jcb']
+  const BRAND_ALIASES = {
+    american_express: 'amex',
+    americanexpress: 'amex',
+    diners_club: 'diners',
+    dinersclub: 'diners'
+  }
+
   const props = defineProps({
-    subscription: { type: Object, required: true }
+    subscription: { type: Object, required: true },
+    paymentMethodLabel: { type: String, default: '--' },
+    paymentMethodBrandRaw: { type: String, default: '' }
   })
 
-  const emit = defineEmits(['change-plan', 'go-to-payment'])
+  const paymentMethodBrand = computed(() => {
+    const raw = (props.paymentMethodBrandRaw || '').toLowerCase()
+    if (!raw) return null
+    const normalized = BRAND_ALIASES[raw] ?? raw
+    return SUPPORTED_FLAGS.includes(normalized) ? normalized : null
+  })
+
+  const hasPaymentMethod = computed(
+    () => Boolean(props.paymentMethodLabel) && props.paymentMethodLabel !== '--'
+  )
+
+  const emit = defineEmits(['change-plan', 'go-to-payment', 'change-payment-method'])
 
   const isTitleLoaded = computed(() => !props.subscription.isLoading)
 

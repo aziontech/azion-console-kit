@@ -45,7 +45,7 @@
     toast.actions = {
       link: {
         label: 'View Variables',
-        callback: () => response.redirectToUrl(`/variables/edit/${response.uuid}`)
+        callback: () => response.redirectToUrl(`/variables/edit/${response.id}`)
       }
     }
     response.showToastWithActions(toast)

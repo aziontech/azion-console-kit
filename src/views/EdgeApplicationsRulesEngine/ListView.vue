@@ -3,7 +3,7 @@
   import { useDialog } from '@aziontech/webkit/use-dialog'
   import { useToast } from '@aziontech/webkit/use-toast'
   import PrimeButton from '@aziontech/webkit/button'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import InputNumber from '@aziontech/webkit/inputnumber'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { storeToRefs } from 'pinia'
@@ -736,7 +736,7 @@
           @click="discardChanges"
           data-testid="review-changes-dialog-footer-cancel-button"
         />
-        <PrimeButton
+        <Button
           label="Review Changes"
           class="bg-surface"
           :badgeClass="badgeClass"

@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import cardFlagBlock from '@templates/card-flag-block'
 
   const props = defineProps({

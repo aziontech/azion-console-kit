@@ -96,19 +96,32 @@
     return str.length > maxLen ? `${str.slice(0, maxLen)}…` : str
   }
 
+  const escapeHtml = (value) =>
+    String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+
+  // Returns HTML wrapping the matched substring in <mark>. The badge value is
+  // untrusted log data, so every text segment is HTML-escaped before it is
+  // concatenated with the fixed <mark> markup; only safe markup reaches v-html.
   const highlightMatch = (text) => {
-    if (!props.searchQuery?.trim() || !text) return text
+    if (!props.searchQuery?.trim() || !text) return escapeHtml(text ?? '')
     const str = String(text)
     const needle = props.searchQuery.trim()
     const pos = str.toLowerCase().indexOf(needle.toLowerCase())
-    if (pos === -1) return str
+    if (pos === -1) return escapeHtml(str)
+    /* eslint-disable xss/no-mixed-html -- every text segment is HTML-escaped above; only fixed <mark> markup is literal */
     return (
-      str.slice(0, pos) +
+      escapeHtml(str.slice(0, pos)) +
       '<mark class="search-highlight">' +
-      str.slice(pos, pos + needle.length) +
+      escapeHtml(str.slice(pos, pos + needle.length)) +
       '</mark>' +
-      str.slice(pos + needle.length)
+      escapeHtml(str.slice(pos + needle.length))
     )
+    /* eslint-enable xss/no-mixed-html */
   }
 </script>
 

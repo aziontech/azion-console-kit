@@ -1,8 +1,4 @@
 import typography from '@tailwindcss/typography'
-import { theme } from '@aziontech/theme/tailwind/tailwind-theme'
-import semanticColors from '@aziontech/theme/tailwind/semantic-colors-plugin'
-import semanticTexts from '@aziontech/theme/tailwind/semantic-texts-plugin'
-import semanticSpacing from '@aziontech/theme/tailwind/semantic-spacing-plugin'
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -17,15 +13,12 @@ export default {
   darkMode: ['class'],
   // Merge base theme with primitives
   theme: {
-    ...theme,
     fontFamily: {
-      ...(theme.fontFamily ?? {}),
       sans: ['Sora'],
       mono: ['Proto Mono'],
       code: ['Roboto Mono']
     },
     listStyleType: {
-      ...(theme.listStyleType ?? {}),
       none: 'none',
       disc: 'disc',
       decimal: 'decimal',
@@ -35,10 +28,9 @@ export default {
     // Properly merge the theme's extend with local extend
     extend: {
       // Import colors from theme (brand, base, surface, primitives)
-      ...(theme.extend ?? {}),
+
       // Storybook-specific color extensions
       colors: {
-        ...(theme.extend?.colors ?? {}),
         header: '#111111',
         'header-button-enabled': '#ffffff32',
         'header-button-hover': '#f5f5f516',
@@ -73,7 +65,17 @@ export default {
         robotomono: ['Roboto Mono'],
         sora: ['Sora'],
         protomono: ['Proto Mono'],
-        mono: ['Proto Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'Courier New', 'monospace']
+        mono: [
+          'Proto Mono',
+          'ui-monospace',
+          'SFMono-Regular',
+          'Menlo',
+          'Monaco',
+          'Cascadia Code',
+          'Roboto Mono',
+          'Courier New',
+          'monospace'
+        ]
       },
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',
@@ -106,10 +108,5 @@ export default {
       }
     }
   },
-  plugins: [
-    typography,
-    semanticColors(),
-    semanticTexts(),
-    semanticSpacing(),
-  ]
+  plugins: [typography]
 }

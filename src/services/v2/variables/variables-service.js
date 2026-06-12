@@ -30,22 +30,6 @@ export class VariablesService extends BaseService {
     })
   }
 
-  getVariableFromCache = (id) => {
-    if (!id) return undefined
-
-    return super.getFromCache({
-      queryKey: queryKeys.variables.all,
-      id,
-      select: (item) => ({
-        id: item.id,
-        key: item.key,
-        value: item.value?.content ?? item.value,
-        secret: item.value?.isSecret ?? false
-      }),
-      listPath: 'body'
-    })
-  }
-
   load = async ({ id }) => {
     const { data } = await this.http.request({
       method: 'GET',
@@ -53,14 +37,7 @@ export class VariablesService extends BaseService {
       config: { baseURL: '/api' }
     })
 
-    const variable = VariablesAdapter.transformItem(data)
-
-    return {
-      id: variable.id,
-      key: variable.key,
-      value: variable.value?.content ?? variable.value,
-      secret: variable.value?.isSecret ?? false
-    }
+    return VariablesAdapter.transformFormItem(data)
   }
 
   create = async (payload) => {
@@ -73,14 +50,7 @@ export class VariablesService extends BaseService {
 
     this.queryClient.removeQueries({ queryKey: queryKeys.variables.all })
 
-    const variable = VariablesAdapter.transformItem(data)
-
-    return {
-      id: variable.id,
-      key: variable.key,
-      value: variable.value?.content ?? variable.value,
-      secret: variable.value?.isSecret ?? false
-    }
+    return VariablesAdapter.transformFormItem(data)
   }
 
   edit = async (payload) => {

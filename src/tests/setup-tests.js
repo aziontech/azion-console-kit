@@ -117,6 +117,7 @@ function installStoragePolyfill(propName) {
     }
   }
 }
+disableBroadcastChannelForTests()
 
 export function setupGlobalPinia() {
   const pinia = createPinia()

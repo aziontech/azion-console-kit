@@ -1,6 +1,6 @@
 <script setup>
   defineOptions({ name: 'advanced-filter' })
-  import { computed, defineModel } from 'vue'
+  import { computed } from 'vue'
   import dialogFilter from './dialog-filter.vue'
 
   import { OPERATOR_MAPPING } from '../filterRow/component'

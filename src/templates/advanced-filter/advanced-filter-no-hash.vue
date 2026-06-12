@@ -2,7 +2,7 @@
   defineOptions({ name: 'advanced-filter' })
   import { computed, ref, watch, onMounted } from 'vue'
   import dialogFilter from './dialog-filter.vue'
-  import PrimeButton from '@aziontech/webkit/button'
+  import Button from '@aziontech/webkit/button'
   import { OPERATOR_MAPPING } from './component'
   import chipsDefaultDisplay from './component/display/chips-default-display.vue'
   import chipsRangeDisplay from './component/display/chips-range-display.vue'
@@ -232,7 +232,7 @@
       </ul>
     </div>
     <div class="h-auto w-full md:max-w-fit">
-      <PrimeButton
+      <Button
         :disabled="disabledSearch"
         @click="searchFilter"
         label="Search"

@@ -9,7 +9,8 @@ const COMMUNICATIONS_TAG_NAME = 'console-communications'
 
 const isImageUrl = (url) => {
   if (!url || typeof url !== 'string') return false
-  return /\.(png|jpg|jpeg|gif|webp|svg)(\?.*)?$/i.test(url)
+  const pathPart = url.split('?')[0]
+  return /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(pathPart)
 }
 
 const parseTextWithPipe = (text) => {

@@ -51,7 +51,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
   import PrimeButton from '@aziontech/webkit/button'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import { contactSalesEdgeApplicationService } from '@/helpers'
 
   defineProps({

@@ -1,7 +1,7 @@
 <script setup>
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import { refDebounced } from '@vueuse/core'
-  import { ref, inject, defineExpose, watch, computed } from 'vue'
+  import { ref, inject, watch, computed } from 'vue'
   import FormFieldsCreateDigitalCertificates from '../FormFields/FormFieldsCreateDigitalCertificates.vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import validationSchemaHandler from '../FormFields/composables/validation'

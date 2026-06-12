@@ -6,7 +6,7 @@
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import InputNumber from '@aziontech/webkit/inputnumber'
   import MultiSelect from '@aziontech/webkit/multiselect'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'

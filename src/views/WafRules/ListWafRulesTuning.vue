@@ -17,7 +17,7 @@
   import { computed, onMounted, ref, inject } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import PrimeTag from '@aziontech/webkit/tag'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import { TEXT_DOMAIN_WORKLOAD } from '@/helpers'
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { wafService } from '@/services/v2/waf/waf-service'

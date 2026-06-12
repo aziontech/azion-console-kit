@@ -16,11 +16,11 @@
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
   const variableName = ref('Edit Variable')
-
-  const cachedVariable = variablesService.getVariableFromCache(route.params?.id) ?? {}
+  const isSecretChangeValueOnly = ref(false)
 
   const setVariableName = (variable) => {
     variableName.value = variable.key
+    isSecretChangeValueOnly.value = variable.secret === true
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, variable.key)
   }
 
@@ -66,14 +66,16 @@
         :editService="variablesService.edit"
         :loadService="variablesService.load"
         updatedRedirect="list-variables"
-        :initialValues="cachedVariable"
         :schema="validationSchema"
         @loaded-service-object="setVariableName"
         @on-edit-success="handleTrackEditEvent"
         @on-edit-fail="handleTrackFailEditEvent"
       >
-        <template #form>
-          <FormFieldsVariables />
+        <template #form="{ loading }">
+          <FormFieldsVariables
+            :disabled="loading"
+            :secretChangeValueOnly="isSecretChangeValueOnly"
+          />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate

@@ -1,6 +1,15 @@
-import { computed, ref } from 'vue'
+import { computed, effectScope, ref, watch } from 'vue'
+import { useAccountStore } from '@/stores/account'
+import {
+  readScoped,
+  writeScoped,
+  removeScoped,
+  migrateGuestTo
+} from '@/helpers/client-scoped-storage'
+import { onSwitchAccount } from '@/services/v2/base/auth/session-broadcast'
 
-const STORAGE_KEY = 'additional-data-form-state:v1'
+const BASE_KEY = 'additional-data-form-state:v1'
+
 const FIELD_KEYS = [
   'usageIntent',
   'role',
@@ -12,58 +21,85 @@ const FIELD_KEYS = [
 
 const isStorageAvailable = () => typeof window !== 'undefined' && Boolean(window.localStorage)
 
-const removePersistedState = () => {
-  if (!isStorageAvailable()) return
-  window.localStorage.removeItem(STORAGE_KEY)
-}
+const _usageIntent = ref(undefined)
+const _role = ref(undefined)
+const _companySize = ref(undefined)
+const _companyWebsite = ref(undefined)
+const _fullName = ref(undefined)
+const _termsAccepted = ref(undefined)
 
-const readPersistedState = () => {
-  if (!isStorageAvailable()) return {}
+const state = computed(() => ({
+  usageIntent: _usageIntent.value,
+  role: _role.value,
+  companySize: _companySize.value,
+  companyWebsite: _companyWebsite.value,
+  fullName: _fullName.value,
+  termsAccepted: _termsAccepted.value
+}))
 
-  try {
-    const rawValue = window.localStorage.getItem(STORAGE_KEY)
-    if (!rawValue) return {}
-
-    const parsedValue = JSON.parse(rawValue)
-    if (!parsedValue || typeof parsedValue !== 'object') {
-      removePersistedState()
-      return {}
-    }
-
-    return parsedValue
-  } catch {
-    removePersistedState()
-    return {}
-  }
-}
-
-const writePersistedState = (snapshot) => {
-  if (!isStorageAvailable()) return
-
-  const sanitizedSnapshot = FIELD_KEYS.reduce((acc, key) => {
-    const value = snapshot[key]
-    if (value !== undefined) {
-      acc[key] = value
-    }
+const sanitizeSnapshot = (snapshot) =>
+  FIELD_KEYS.reduce((acc, key) => {
+    if (snapshot[key] !== undefined) acc[key] = snapshot[key]
     return acc
   }, {})
 
-  if (!Object.keys(sanitizedSnapshot).length) {
-    removePersistedState()
+const writePersistedState = () => {
+  const sanitized = sanitizeSnapshot(state.value)
+  if (!Object.keys(sanitized).length) {
+    removeScoped(BASE_KEY)
     return
   }
-
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitizedSnapshot))
+  writeScoped(BASE_KEY, sanitized)
 }
 
-const initialState = readPersistedState()
+const applyToRefs = (data) => {
+  const snapshot = data || {}
+  _usageIntent.value = snapshot.usageIntent
+  _role.value = snapshot.role
+  _companySize.value = snapshot.companySize
+  _companyWebsite.value = snapshot.companyWebsite
+  _fullName.value = snapshot.fullName
+  _termsAccepted.value = snapshot.termsAccepted
+}
 
-const _usageIntent = ref(initialState.usageIntent)
-const _role = ref(initialState.role)
-const _companySize = ref(initialState.companySize)
-const _companyWebsite = ref(initialState.companyWebsite)
-const _fullName = ref(initialState.fullName)
-const _termsAccepted = ref(initialState.termsAccepted)
+const hydrateFromScope = () => {
+  applyToRefs(readScoped(BASE_KEY))
+}
+
+let _isSynced = false
+const _moduleScope = effectScope(true)
+
+const setupSync = () => {
+  if (_isSynced) return
+  _isSynced = true
+  if (!isStorageAvailable()) return
+
+  const accountStore = useAccountStore()
+
+  hydrateFromScope()
+
+  _moduleScope.run(() => {
+    watch(
+      () => accountStore.account?.client_id,
+      (newId, oldId) => {
+        if (newId && !oldId) {
+          migrateGuestTo(BASE_KEY, newId)
+          hydrateFromScope()
+        } else if (newId && oldId && newId !== oldId) {
+          applyToRefs(undefined)
+          hydrateFromScope()
+        } else if (!newId && oldId) {
+          applyToRefs(undefined)
+        }
+      }
+    )
+  })
+
+  onSwitchAccount(() => {
+    applyToRefs(undefined)
+    hydrateFromScope()
+  })
+}
 
 const setField = (key, value) => {
   switch (key) {
@@ -87,7 +123,7 @@ const setField = (key, value) => {
       break
   }
 
-  writePersistedState(state.value)
+  writePersistedState()
 }
 
 const hydrate = (fields = {}) => {
@@ -100,25 +136,12 @@ const hydrate = (fields = {}) => {
 }
 
 const clear = () => {
-  _usageIntent.value = undefined
-  _role.value = undefined
-  _companySize.value = undefined
-  _companyWebsite.value = undefined
-  _fullName.value = undefined
-  _termsAccepted.value = undefined
-  removePersistedState()
+  applyToRefs(undefined)
+  removeScoped(BASE_KEY)
 }
 
-const state = computed(() => ({
-  usageIntent: _usageIntent.value,
-  role: _role.value,
-  companySize: _companySize.value,
-  companyWebsite: _companyWebsite.value,
-  fullName: _fullName.value,
-  termsAccepted: _termsAccepted.value
-}))
-
 export function useAdditionalDataFormState() {
+  setupSync()
   return {
     state,
     setField,

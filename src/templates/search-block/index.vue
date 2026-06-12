@@ -70,7 +70,7 @@
   import { ref, watchEffect } from 'vue'
   import { useMagicKeys } from '@vueuse/core'
 
-  import Tag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/prime-tag'
   import InputText from '@aziontech/webkit/inputtext'
   import PrimeDialog from '@aziontech/webkit/dialog'
   import PrimeButton from '@aziontech/webkit/button'

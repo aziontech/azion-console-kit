@@ -6,6 +6,7 @@ import console from 'console';
 function checkSpecs(filePath) {
   return new Promise((resolve, reject) => {
     console.log(chalk.blue(`\n📂 Reading specs file: ${filePath}\n`));
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- CLI script: filePath is the operator-provided argument
     fs.readFile(filePath, 'utf8', (err, data) => {
       if (err) {
         console.error(chalk.red(`❌ Error reading file: ${err.message}\n`));

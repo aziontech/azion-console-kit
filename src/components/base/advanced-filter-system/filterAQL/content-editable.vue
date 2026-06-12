@@ -43,7 +43,7 @@
     updateCursorOffset()
 
     const newValue = event.target.innerText
-    editable.value.innerHTML = AzionQueryLanguage.highlightQuerySyntax(newValue)
+    AzionQueryLanguage.renderHighlightedSyntax(editable.value, newValue)
     emit('update:modelValue', newValue)
     props.handleQuery()
     restoreCursorPosition()
@@ -65,7 +65,7 @@
     () => props.modelValue,
     (newVal) => {
       if (editable.value) {
-        editable.value.innerHTML = AzionQueryLanguage.highlightQuerySyntax(newVal)
+        AzionQueryLanguage.renderHighlightedSyntax(editable.value, newVal)
       }
     }
   )

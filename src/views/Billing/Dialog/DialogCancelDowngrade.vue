@@ -4,15 +4,17 @@
     modal
     :closable="!isSubmitting"
     :draggable="false"
-    :style="{ width: '576px', maxWidth: 'calc(100vw - 32px)' }"
+    :style="{ width: 'min(90vw, 576px)' }"
     :pt="{
-      root: { class: 'overflow-hidden rounded-md border border-default' },
+      root: { class: 'overflow-hidden rounded-md border border-[var(--border-default)]' },
       header: {
-        class: 'h-14 border-b border-default bg-[var(--surface-50)] px-8'
+        class: 'h-14 border-b border-[var(--border-default)] bg-[var(--surface-50)] px-8'
       },
       title: { class: 'text-base font-semibold leading-[21px] text-default' },
       content: { class: 'bg-[var(--surface-100)] p-0' },
-      footer: { class: 'h-14 border-t border-default bg-[var(--surface-50)] px-8 m-0' }
+      footer: {
+        class: 'h-14 border-t border-[var(--border-default)] bg-[var(--surface-50)] px-8 m-0'
+      }
     }"
     header="Cancel Scheduled Downgrade"
   >
@@ -32,17 +34,18 @@
 
     <template #footer>
       <div class="flex h-14 items-center justify-end gap-2">
-        <Button
-          outlined
+        <ActionButton
+          kind="outlined"
+          size="medium"
           label="Cancel"
-          class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
           :disabled="isSubmitting"
           @click="close"
         />
-        <Button
+        <ActionButton
+          kind="primary"
+          size="medium"
           :label="error ? 'Retry' : 'Keep current plan'"
           :loading="isSubmitting"
-          class="h-8 px-4 font-protomono text-xs flex items-center justify-center"
           :disabled="isSubmitting"
           @click="confirm"
         />
@@ -54,7 +57,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import Dialog from '@aziontech/webkit/dialog'
-  import Button from '@aziontech/webkit/button'
+  import ActionButton from '@aziontech/webkit/actions/button'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
 
   defineOptions({ name: 'dialog-cancel-downgrade' })

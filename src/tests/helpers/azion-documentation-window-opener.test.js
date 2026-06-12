@@ -129,10 +129,7 @@ describe('AzionDocumentationWindowOpener', () => {
 
     sut.openShowMorePlan()
 
-    expect(openWindowSpy).toHaveBeenCalledWith(
-      'https://www.azion.com/en/professional-services&id=#plans',
-      '_blank'
-    )
+    expect(openWindowSpy).toHaveBeenCalledWith('https://www.azion.com/en/support/', '_blank')
   })
 
   it('should open a new window with Azion Integrations link', () => {
