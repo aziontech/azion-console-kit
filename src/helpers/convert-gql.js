@@ -67,7 +67,15 @@ function buildGraphQLQueryTotalRecords({ filterParameter, dataset, limit, filter
  * @param {object} options - The options object containing filterParameter, dataset, limit, orderBy, filterQuery, and fields.
  * @return {string} The constructed GraphQL query string.
  */
-function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQuery, fields }) {
+function buildGraphQLQuery({
+  filterParameter,
+  dataset,
+  limit,
+  offset,
+  orderBy,
+  filterQuery,
+  fields
+}) {
   const filter = filterQuery.map((field) => `\t\t\t${field}`).join('\n')
   return [
     `query (`,
@@ -75,6 +83,7 @@ function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQue
     `) {`,
     `\t${dataset} (`,
     `\t\tlimit: ${limit}`,
+    ...(offset ? [`\t\toffset: ${offset}`] : []),
     `\t\torderBy: [${orderBy}]`,
     `\t\tfilter: {`,
     filter,
@@ -86,10 +95,18 @@ function buildGraphQLQuery({ filterParameter, dataset, limit, orderBy, filterQue
   ].join('\n')
 }
 
+const wrapLikeValue = (rawValue) => {
+  if (typeof rawValue !== 'string') return rawValue
+  // If the user already placed any `%` wildcards, honour them byte-for-byte.
+  // Otherwise default to contains-style %value% so chip / saved-search
+  // entry points (which never type `%`) keep their existing behaviour.
+  return rawValue.includes('%') ? rawValue : `%${rawValue}%`
+}
+
 const formatValueContainOperator = (variable) => {
   for (const key in variable) {
     if (variable[key] && (key.includes('Like') || key.includes('Ilike'))) {
-      variable[key] = `%${variable[key]}%`
+      variable[key] = wrapLikeValue(variable[key])
     }
   }
   return variable
@@ -149,6 +166,7 @@ const convertGQL = (filter, table) => {
     filterParameter,
     dataset: table.dataset,
     limit: table.limit,
+    ...(table.offset && { offset: table.offset }),
     orderBy: table.orderBy,
     filterQuery: formatFilter(filterQuery, filter?.fields),
     fields: fieldsFormat

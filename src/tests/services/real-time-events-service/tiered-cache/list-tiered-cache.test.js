@@ -2,6 +2,8 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listTieredCache } from '@/services/real-time-events-service/tiered-cache'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
+import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 
 const fixtures = {
   filter: {
@@ -103,6 +105,7 @@ describe('tieredCacheServices', () => {
   })
 
   it('should parsed correctly each event', async () => {
+    localeMock()
     vi.mock('@/helpers/generate-timestamp', () => ({
       generateCurrentTimestamp: () => 'mocked-timestamp'
     }))
@@ -113,6 +116,7 @@ describe('tieredCacheServices', () => {
 
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
+    const expectedTsFormat = getCurrentTimezone(fixtures.tieredCache.ts)
 
     expect(response).toEqual({
       data: [
@@ -124,13 +128,13 @@ describe('tieredCacheServices', () => {
           summary: [
             { key: 'configurationId', value: fixtures.tieredCache.configurationId },
             { key: 'host', value: fixtures.tieredCache.host },
-            { key: 'proxyHost', value: fixtures.tieredCache.proxyHost },
             { key: 'requestMethod', value: fixtures.tieredCache.requestMethod },
             { key: 'requestUri', value: fixtures.tieredCache.requestUri },
-            { key: 'upstreamCacheStatus', value: fixtures.tieredCache.upstreamCacheStatus }
+            { key: 'upstreamCacheStatus', value: fixtures.tieredCache.upstreamCacheStatus },
+            { key: 'proxyHost', value: fixtures.tieredCache.proxyHost }
           ],
           ts: fixtures.tieredCache.ts,
-          tsFormat: 'February 23, 2024 at 06:07:25 PM'
+          tsFormat: expectedTsFormat
         }
       ]
     })

@@ -1,0 +1,20 @@
+{
+  "name": "@azion/filter-fields",
+  "version": "1.0.0",
+  "description": "Component for advanced filtering with multiple conditions",
+  "main": "index.js",
+  "types": "filterFields.d.ts",
+  "keywords": [
+    "vue",
+    "component",
+    "filter",
+    "advanced",
+    "search",
+    "query"
+  ],
+  "author": "Azion",
+  "license": "MIT",
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  }
+}
