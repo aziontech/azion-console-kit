@@ -33,12 +33,16 @@ export default class Aql {
   parse(query, suggestions, domains) {
     if (!query) return []
     const normalizedQuery = this.normalizeQuery(query)
-    const expressions = normalizedQuery.split(/and/i).map((expr) => expr.trim())
+    // Split into [clause, connector, clause, connector, ...] capturing the
+    // logical operator (AND/OR) between clauses so each parsed clause can carry
+    // its `logicalOperator`. Requiring surrounding whitespace avoids splitting
+    // inside field names/values that merely contain "and"/"or" (e.g. "brand").
+    const tokens = normalizedQuery.split(/\s+(and|or)\s+/i)
     const expressionRegex =
       /^(?:"([^"]+)"|'([^']+)'|([\w\s]+))\s+(=|>|<|>=|<=|BETWEEN|<>|LIKE|ILIKE|IN)\s+(.+)$/i
 
-    const parsedExpressions = expressions
-      .map((expr) => {
+    const parseClause = (expr) => {
+      {
         // Strip leading/trailing grouping parentheses that are not part of IN/BETWEEN values
         let cleanExpr = expr
         if (
@@ -131,8 +135,26 @@ export default class Aql {
           valueField: this.convertFieldToCamelCase(field),
           type: operatorInfo?.type || 'Int'
         }
-      })
-      .filter((item) => item !== null)
+      }
+    }
+
+    // `tokens` = [clause0, conn1, clause1, conn2, clause2, ...] — even indices
+    // are clauses, odd indices are the AND/OR connector that precedes the next
+    // clause. Stamp each parsed clause with the connector that precedes it so
+    // the logical operator round-trips to/from FilterFields. The first clause
+    // has no preceding connector and defaults to 'AND'.
+    const parsedExpressions = []
+    for (let index = 0; index < tokens.length; index += 2) {
+      const parsed = parseClause(tokens[index].trim())
+      if (!parsed) continue
+      // Only clauses with a preceding connector carry `logicalOperator`. The
+      // first clause has none, so its shape stays identical to single-clause
+      // output (no spurious key).
+      if (index > 0) {
+        parsed.logicalOperator = String(tokens[index - 1] || 'AND').toUpperCase()
+      }
+      parsedExpressions.push(parsed)
+    }
 
     return parsedExpressions
   }
@@ -494,7 +516,7 @@ export default class Aql {
   handleInicialQuery(filters, fieldsInFilter) {
     if (!filters || !filters.length || !fieldsInFilter.length) return ''
 
-    const conditions = filters.map((filter) => {
+    const buildClause = (filter) => {
       const operator = OPERATOR_MAPPING_ADVANCED_FILTER[filter.operator]?.format
       const matchedField = fieldsInFilter.find((field) => field.value === filter.valueField)
 
@@ -533,9 +555,26 @@ export default class Aql {
       }
 
       return `${formattedField} ${operator} ${filter.value}`
+    }
+
+    // Join clauses with each filter's own logical connector instead of a
+    // hardcoded AND. The connector preceding clause `i` (i >= 1) lives on
+    // `filters[i].logicalOperator` (FilterFields stores it on the row that the
+    // AND/OR button appended). Empty clauses (invalid field/operator) are
+    // skipped without leaving a dangling connector.
+    let query = ''
+    filters.forEach((filter) => {
+      const clause = buildClause(filter)
+      if (!clause) return
+      if (!query) {
+        query = clause
+      } else {
+        const connector = String(filter.logicalOperator || 'AND').toUpperCase()
+        query += ` ${connector} ${clause}`
+      }
     })
 
-    return conditions.join(' AND ')
+    return query
   }
 
   queryValidator(query, suggestions) {

@@ -34,16 +34,17 @@
   watch(selectedValue, (newValue) => emit('update:value', newValue))
 </script>
 <template>
-  <div class="w-full sm:w-1/2 sm:pr-6">
+  <div class="w-full min-w-0">
     <div class="flex flex-col w-full gap-2">
       <InputNumber
         :placeholder="props.placeholder"
         v-model="selectedValue"
         inputId="number_field"
         @input="handleChange"
-        showButtons
         :minFractionDigits="2"
         :maxFractionDigits="5"
+        class="w-full min-w-0"
+        inputClass="w-full min-w-0"
       />
 
       <small

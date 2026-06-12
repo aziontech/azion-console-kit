@@ -1137,7 +1137,7 @@ export async function loadSummaryKpis({ dataset, tsRange, filters = {}, signal }
     Object.entries(filters.and).forEach(([key, value]) => {
       const varName = `and_${key}`
       variables[varName] = value
-      extraFilterLines.push(`${key}: ${varName}`)
+      extraFilterLines.push(`${key}: $${varName}`)
     })
   }
   if (filters?.in) {
@@ -1146,7 +1146,7 @@ export async function loadSummaryKpis({ dataset, tsRange, filters = {}, signal }
       const normalized = normalizeInFilterValues(value)
       variables[varName] = normalized
       const gqlKey = key.endsWith('In') ? key : `${key}In`
-      extraFilterLines.push(`${gqlKey}: ${varName}`)
+      extraFilterLines.push(`${gqlKey}: $${varName}`)
     })
   }
 
@@ -1162,7 +1162,7 @@ export async function loadSummaryKpis({ dataset, tsRange, filters = {}, signal }
   }
 
   const paramsStr = Object.entries(variables)
-    .map(([key, value]) => `${key}: ${paramType(key, value)}`)
+    .map(([key, value]) => `$${key}: ${paramType(key, value)}`)
     .join(', ')
   const filterBlock = ['tsRange: { begin: $tsBegin, end: $tsEnd }', ...extraFilterLines].join(', ')
 

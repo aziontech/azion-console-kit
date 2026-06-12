@@ -153,7 +153,16 @@ const DETERMINISTIC_PARSE_CASES = [
     query: 'status = 200 and host like x',
     expected: [
       { field: 'status', value: 200, operator: 'Eq', valueField: 'status', type: 'Int' },
-      { field: 'host', value: 'x', operator: 'Like', valueField: 'host', type: 'String' }
+      // Clauses after the first carry the logical connector that precedes them
+      // so AND/OR round-trips between the AQL input and FilterFields.
+      {
+        field: 'host',
+        value: 'x',
+        operator: 'Like',
+        valueField: 'host',
+        type: 'String',
+        logicalOperator: 'AND'
+      }
     ]
   }
 ]

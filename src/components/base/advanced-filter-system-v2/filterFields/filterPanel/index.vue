@@ -38,7 +38,10 @@
             type="solid"
           >
             <p class="font-semibold text-color-secondary text-xs">
-              {{ filterRows[rowIndex].logicalOperator || 'OR' }}
+              <!-- The connector between row `i` and `i+1` is stored on the row
+                   that the AND/OR button appended (row `i+1`), so the divider
+                   reads from `rowIndex + 1`, not `rowIndex`. -->
+              {{ filterRows[rowIndex + 1].logicalOperator || 'AND' }}
             </p>
           </Divider>
         </div>
@@ -104,7 +107,7 @@
       field: null,
       operator: null,
       value: '',
-      logicalOperator: 'OR'
+      logicalOperator: 'AND'
     }
   ])
 
@@ -121,7 +124,7 @@
       operatorFormat: filter.format || filter.operatorFormat || null,
       value: filter.value || '',
       rawValue: filter.rawValue ?? filter.value ?? '',
-      logicalOperator: filter.logicalOperator || 'OR'
+      logicalOperator: filter.logicalOperator || 'AND'
     }))
   }
 
@@ -149,7 +152,7 @@
   })
 
   // Methods
-  const addFilterRow = (logicalOperator = 'OR') => {
+  const addFilterRow = (logicalOperator = 'AND') => {
     const newRow = {
       id: Date.now(),
       field: null,
@@ -175,7 +178,7 @@
       value: row.value,
       rawValue: row.rawValue,
       type: row.operatorType || 'String',
-      logicalOperator: row.logicalOperator || 'OR'
+      logicalOperator: row.logicalOperator || 'AND'
     }
   }
 
