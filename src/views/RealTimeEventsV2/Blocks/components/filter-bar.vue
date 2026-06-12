@@ -110,10 +110,11 @@
     border: 1px solid var(--surface-border);
     padding: 0.5rem 0.625rem;
     border-radius: var(--border-radius);
-    /* Defensive horizontal clip: any internal element that miscalculates
-       its width (PrimeVue popover anchors, contenteditable growth, etc.)
-       cannot push past the card boundary on narrow viewports. */
-    overflow-x: hidden;
+    /* No `overflow` clip here: it would also clip the AQL suggestions dropdown
+       (absolute, opens downward past the card edge) — the same reason RTE v1
+       keeps its filter card unclipped. Horizontal overflow is contained at the
+       source instead: the AQL input has its own `overflow-x: hidden` and all
+       flex children use `min-width: 0`. */
   }
 
   .filter-bar__row {
@@ -174,9 +175,23 @@
     max-height: 2rem;
     width: 100%;
     max-width: 100%;
-    display: flex;
-    align-items: center;
     box-sizing: border-box;
+    /* Center the single line vertically WITHOUT flexbox. `display: flex` turns
+       every highlighted <span> (field/operator/AND) and whitespace text node
+       into a separate flex item, which breaks the inline layout and makes the
+       query tokens look misaligned. With normal inline flow the line is only
+       centered when its line-height fills the content box. The control is 2rem
+       (border-box) and `p-inputtext` has a 1px border top+bottom, so the
+       content box is `2rem - 2px` — set line-height to match exactly and zero
+       the vertical padding so the single line sits dead-center.
+       `!important` is required: the input's `text-sm` Tailwind class ships a
+       `line-height: 1.25rem !important` (the project sets Tailwind
+       `important: true`), which would otherwise win and pin the text to the
+       top. */
+    display: block;
+    line-height: calc(2rem - 2px) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
 
   :deep(.filter-bar__dataset .p-dropdown) {
@@ -246,10 +261,11 @@
     flex: 1 1 0%;
     min-width: 0;
     max-width: 100%;
-    /* Anchor the AQL block — its internal AdvancedFilterSystem wraps to two
-       rows in mobile/tablet, so we must not let it push the icon button or
-       overflow the filter card. */
-    overflow: hidden;
+    /* Must stay unclipped (`visible`): the AQL suggestions dropdown is an
+       absolutely-positioned child that opens downward and would be cut off by
+       any `overflow: hidden` here. Width containment is handled by `min-width:
+       0` + `max-width: 100%` and the input's own `overflow-x: hidden`. */
+    overflow: visible;
   }
 
   /* AQL input respects container width via flex shrinking */

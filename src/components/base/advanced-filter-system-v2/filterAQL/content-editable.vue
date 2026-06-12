@@ -92,12 +92,18 @@
 
 <style>
   .contenteditable {
-    /* `nowrap` keeps the query on a single line.
+    /* `pre` keeps the query on a single line (no wrapping) AND preserves
+       whitespace — crucially the TRAILING space the user types after a value
+       (e.g. `status = 200 `). `innerText` is render-aware: with `nowrap`
+       (like `normal`) the browser drops that trailing space, so the AQL step
+       never advances to `logicOperator` and the AND/OR suggestions never show.
+       `pre` preserves it, matching RTE v1's `pre-wrap` behaviour while still
+       not wrapping.
        `overflow-x: hidden` clips long text that would otherwise visibly
        extend past the input boundary and cover the gap/divider/actions
        group on the right (default overflow-x is `visible`, which lets
        overflowing inline content paint outside its own box). */
-    white-space: nowrap;
+    white-space: pre;
     font-family:
       ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
     min-height: 2.25rem;

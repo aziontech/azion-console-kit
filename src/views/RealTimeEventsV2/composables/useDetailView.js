@@ -94,6 +94,17 @@ export function useDetailView(tableData) {
 
   const handleKeyDown = (event) => {
     if (!tableData.value.length) return
+    // This is a document-level listener. Ignore keystrokes that originate from
+    // an editable element (the AQL query input, the document-search field, any
+    // input/textarea/select) — otherwise arrow keys used to navigate the AQL
+    // suggestions or to move the caret would also move the table's focused row.
+    const target = event.target
+    const isEditableTarget =
+      target?.isContentEditable ||
+      target?.tagName === 'INPUT' ||
+      target?.tagName === 'TEXTAREA' ||
+      target?.tagName === 'SELECT'
+    if (isEditableTarget) return
     const { key } = event
     if (key === 'ArrowDown') {
       event.preventDefault()
