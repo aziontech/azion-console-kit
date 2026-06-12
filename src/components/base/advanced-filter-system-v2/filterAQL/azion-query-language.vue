@@ -316,12 +316,16 @@
   const scrollToHighlighted = () => {
     nextTick(() => {
       const container = listboxRef.value?.$el || listboxRef.value
-      if (container) {
-        const highlightedItem = container.querySelector('.bg-orange-base')
-        if (highlightedItem) {
-          highlightedItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
-        }
-      }
+      if (!container) return
+      // Locate the highlighted option by its indexed data-testid. The previous
+      // `.bg-orange-base` selector was stale — the highlight class is now
+      // `bg-[var(--dropdown-hover-bg)]`, so the query matched nothing and the
+      // list never scrolled to follow the keyboard cursor. `block: 'nearest'`
+      // keeps scrolling minimal across the nested scroll containers.
+      const highlightedItem = container.querySelector(
+        `[data-testid="azion-query-language-list-item${highlightedIndex.value}"]`
+      )
+      highlightedItem?.scrollIntoView({ block: 'nearest' })
     })
   }
 
