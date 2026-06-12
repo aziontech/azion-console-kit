@@ -9,7 +9,7 @@
         folder and follow the instructions.
       </p>
     </section>
-    <section class="w-full flex flex-wrap gap-2">
+    <section class="w-full flex flex-wrap gap-2 items-center">
       <p class="text-start text-sm">Didn't receive the email?</p>
       <PrimeButton
         size="small"
@@ -37,13 +37,16 @@
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeBadge from '@aziontech/webkit/badge'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import { computed, inject, ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import * as Sentry from '@sentry/vue'
 
   const SUBMIT_TIMER = 60
 
   const props = defineProps({
+    email: {
+      type: String,
+      default: ''
+    },
     resendEmailService: {
       required: true,
       type: Function
@@ -53,11 +56,9 @@
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
-  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
   const showCounter = computed(() => counter.value > 0)
 
-  const { email } = route.query
+  const email = props.email || route.query.email || ''
   if (!email) {
     router.push({ name: 'login' })
   }
@@ -67,9 +68,9 @@
     return re.test(email)
   }
 
-  const decodedEmail = decodeURIComponent(email)
+  const decodedEmail = email ? decodeURIComponent(email) : ''
   const isEmailValid = ref(validateEmail(decodedEmail))
-  if (!isEmailValid.value) {
+  if (email && !isEmailValid.value) {
     toast.add({
       severity: 'error',
       detail: 'Use a valid email format.',
@@ -79,9 +80,6 @@
 
   const resendEmail = async () => {
     disableSubmitByTimer(SUBMIT_TIMER)
-    Promise.resolve()
-      .then(() => tracker?.signUp?.emailVerificationClicked?.({ source: 'resend' })?.track?.())
-      .catch(Sentry.captureException)
     try {
       const res = await props.resendEmailService({ email: decodedEmail })
       toast.add({ severity: 'success', detail: res, summary: 'Email sent!' })

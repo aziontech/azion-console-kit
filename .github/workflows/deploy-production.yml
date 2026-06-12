@@ -12,6 +12,9 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-console-production
+      cancel-in-progress: false
     container:
       image: node:22-alpine
 
@@ -22,8 +25,8 @@ jobs:
       - name: Install SO deps
         run: apk add curl git bash jq
         
-      - name: Install dependencies
-        run: yarn install
+      - name: Install dependencies --frozen-lockfile
+        run: yarn install:lock
 
       - name: Download Azion CLI
         run: |

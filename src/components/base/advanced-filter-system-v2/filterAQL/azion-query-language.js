@@ -14,6 +14,8 @@ export default class Aql {
       return /^[a-zA-Z]+$/.test(op) ? `\\b${escaped}\\b` : escaped
     })
 
+    // Pattern is built from the fixed internal operator list (regex-escaped above), not user input.
+    // eslint-disable-next-line security/detect-non-literal-regexp
     return new RegExp(patterns.join('|'), 'i')
   }
 
@@ -161,6 +163,8 @@ export default class Aql {
         /[.*+?^${}()|[\]\\]/g,
         '\\$&'
       )
+      // escapedField is regex-escaped from a fixed internal label, not free user input.
+      // eslint-disable-next-line security/detect-non-literal-regexp
       const clauseRegex = new RegExp(`\\b${escapedField}\\b\\s+in\\s*\\(`, 'i')
       const match = clauseRegex.exec(lowerQuery)
       if (!match) return null
@@ -450,6 +454,8 @@ export default class Aql {
     let operatorFound = sortedOperators.find((op) => {
       const escaped = op.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       const pattern = /^[a-zA-Z]+$/.test(op) ? `\\b${escaped}\\b` : escaped
+      // Pattern derives from the fixed operator list (regex-escaped), not user input.
+      // eslint-disable-next-line security/detect-non-literal-regexp
       return new RegExp(pattern, 'i').test(tokenForMatch)
     })
 
@@ -744,11 +750,15 @@ export default class Aql {
       if (!cleaned) return
 
       const operatorFound = this.operators.find((op) =>
+        // op comes from the fixed internal operator list, not user input.
+        // eslint-disable-next-line security/detect-non-literal-regexp
         new RegExp(`(^|\\s)${op}(?=\\s)`, 'i').test(cleaned)
       )
 
       let fieldPart
       if (operatorFound) {
+        // operatorFound is one of the fixed internal operators, not user input.
+        // eslint-disable-next-line security/detect-non-literal-regexp
         const regex = new RegExp(`^(.*?)\\s+${operatorFound}\\s+`, 'i')
         const match = cleaned.match(regex)
         if (match) {
@@ -834,6 +844,8 @@ export default class Aql {
       return /^[a-zA-Z]+$/.test(op) ? `\\b${opEscaped}\\b` : opEscaped
     })
     const operatorPattern = escapedOperators.join('|')
+    // Pattern is built from the fixed operator list (regex-escaped above), not user input.
+    // eslint-disable-next-line security/detect-non-literal-regexp
     const regex = new RegExp(operatorPattern, 'g')
 
     expressions.forEach((exp) => {
@@ -893,25 +905,47 @@ export default class Aql {
     return errors
   }
 
+  // The output of this method is assigned to innerHTML by the content-editable
+  // wrapper, so every piece of the user-typed query MUST be HTML-escaped before
+  // it is emitted. We only ever inject our own fixed <span> markup and &nbsp;;
+  // all dynamic text (fields, operators, residual characters) is escaped.
+  #escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+  }
+
   highlightQuerySyntax(query) {
     const parts = query.split(/(\band\b)/gi)
 
     const highlightedParts = parts.map((part) => {
       if (/^\band\b$/i.test(part.trim())) {
-        return `<span style="color: var(--series-six-color);">${part.trim()}</span>`
-      } else {
-        return part.replace(
-          /((?:"[^"]+"|\S+))\s*(<=|>=|<>|=|<|>|like|ilike|between|\bin\b)\s*/gi,
-          (match, field, operator) => {
-            // Use non-breaking spaces around the operator: the browser
-            // collapses regular whitespace at the inline boundary of two
-            // adjacent spans (rendering "domain in (..." as "domainin(...")
-            // and `white-space: nowrap` does not change that behavior.
-            // `&nbsp;` is preserved literally and is visually identical.
-            return `<span style="color: var(--series-three-color);">${field}</span>&nbsp;<span style="color: var(--series-two-color);">${operator}</span>&nbsp;`
-          }
-        )
+        return `<span style="color: var(--series-six-color);">${this.#escapeHtml(part.trim())}</span>`
       }
+
+      const clauseRegex = /((?:"[^"]+"|\S+))\s*(<=|>=|<>|=|<|>|like|ilike|between|\bin\b)\s*/gi
+      let result = ''
+      let lastIndex = 0
+      let match
+      while ((match = clauseRegex.exec(part)) !== null) {
+        // Escape any text between the previous match and this one.
+        result += this.#escapeHtml(part.slice(lastIndex, match.index))
+        const field = this.#escapeHtml(match[1])
+        const operator = this.#escapeHtml(match[2])
+        // Use non-breaking spaces around the operator: the browser
+        // collapses regular whitespace at the inline boundary of two
+        // adjacent spans (rendering "domain in (..." as "domainin(...")
+        // and `white-space: nowrap` does not change that behavior.
+        // `&nbsp;` is preserved literally and is visually identical.
+        result += `<span style="color: var(--series-three-color);">${field}</span>&nbsp;<span style="color: var(--series-two-color);">${operator}</span>&nbsp;`
+        lastIndex = match.index + match[0].length
+      }
+      // Escape the trailing residual text after the last match.
+      result += this.#escapeHtml(part.slice(lastIndex))
+      return result
     })
 
     return highlightedParts.join('')
@@ -997,6 +1031,8 @@ export default class Aql {
     )
     if (!selectedField) return []
 
+    // selectedField.label comes from the field-suggestion catalog, not free user input.
+    // eslint-disable-next-line security/detect-non-literal-regexp
     const fieldRegex = new RegExp(
       `${selectedField.label}\\s+(=|<>|<|>|<=|>=|like|ilike|between)`,
       'i'

@@ -3,9 +3,9 @@
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
   import FormFieldsCreateEdgeApplications from '@/views/EdgeApplications/V3/FormFields/FormFieldsCreateEdgeApplications.vue'
-  import { ref, inject, defineExpose } from 'vue'
+  import { ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { createEdgeApplicationService } from '@/services/edge-application-services'
+  import { useEdgeApplicationV3CreateService } from '@/composables/useEdgeApplicationV3CreateService'
   import { useRoute } from 'vue-router'
 
   defineOptions({
@@ -16,6 +16,7 @@
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const route = useRoute()
+  const { createEdgeApplicationService } = useEdgeApplicationV3CreateService()
 
   const showCreateEdgeApplicationsDrawer = ref(false)
   const DEBOUNCE_TIME_IN_MS = 300

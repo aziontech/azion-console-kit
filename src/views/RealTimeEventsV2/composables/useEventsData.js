@@ -227,6 +227,9 @@ export function useEventsData({
   const loadSummaryKpisSafe = async ({ dataset, tsRange, filters, token }) => {
     try {
       const result = await loadSummaryKpis({ dataset, tsRange, filters })
+      // token is a monotonic request-supersession counter, not a secret; this
+      // is a stale-response guard, so timing-safe comparison does not apply.
+      // eslint-disable-next-line security/detect-possible-timing-attacks
       if (token !== chartLoadToken) return null
       return result
     } catch {

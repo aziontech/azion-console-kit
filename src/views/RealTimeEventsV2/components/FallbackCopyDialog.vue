@@ -43,6 +43,9 @@
    * `inputRef` is bound to the Vue component instance (with `$el`) or
    * directly to a DOM element. Returns `null` if no input is found.
    */
+  // Returns a live <input> DOM element reference (or null) for focus/select —
+  // it never produces or assigns HTML strings.
+  // eslint-disable-next-line xss/no-mixed-html
   const resolveInputElement = () => {
     const ref = inputRef.value
     if (!ref) return null

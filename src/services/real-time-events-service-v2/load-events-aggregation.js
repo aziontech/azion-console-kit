@@ -522,6 +522,8 @@ export const loadEventsChartAggregation = async ({
   if (!tsRange?.tsRangeBegin || !tsRange?.tsRangeEnd) return EMPTY_RESULT
 
   const api = resolveChartApi(tsRange.tsRangeBegin, tsRange.tsRangeEnd)
+  // `api` is an internal route selector ('events' | 'metrics'), not a secret.
+  // eslint-disable-next-line security/detect-possible-timing-attacks
   if (api === 'events')
     return loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupByField })
 
@@ -1111,6 +1113,8 @@ export async function loadSummaryKpis({ dataset, tsRange, filters = {}, signal }
 
   // Route to Metrics API for large ranges (Events API has a 2h window limit)
   const api = resolveChartApi(tsRange.tsRangeBegin, tsRange.tsRangeEnd)
+  // `api` is an internal route selector ('events' | 'metrics'), not a secret.
+  // eslint-disable-next-line security/detect-possible-timing-attacks
   if (api === 'metrics') {
     return loadSummaryKpisFromMetrics({ dataset, tsRange, filters })
   }

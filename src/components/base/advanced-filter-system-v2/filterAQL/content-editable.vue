@@ -44,6 +44,9 @@
     updateCursorOffset()
 
     const newValue = event.target.innerText
+    // highlightQuerySyntax HTML-escapes all user text and emits only fixed
+    // <span>/&nbsp; markup, so the assignment is safe.
+    // eslint-disable-next-line no-unsanitized/property, xss/no-mixed-html
     editable.value.innerHTML = AzionQueryLanguage.highlightQuerySyntax(newValue)
     isInternalUpdate.value = true
     emit('update:modelValue', newValue)
@@ -73,6 +76,9 @@
         return
       }
       if (editable.value) {
+        // highlightQuerySyntax HTML-escapes all user text and emits only fixed
+        // <span>/&nbsp; markup, so the assignment is safe.
+        // eslint-disable-next-line no-unsanitized/property, xss/no-mixed-html
         editable.value.innerHTML = AzionQueryLanguage.highlightQuerySyntax(newVal)
       }
     }

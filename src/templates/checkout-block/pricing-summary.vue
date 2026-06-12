@@ -1,55 +1,77 @@
 <template>
-  <div class="bg-surface flex flex-col gap-2 px-6 py-4 border-t border-default">
+  <div class="flex flex-col">
+    <div class="bg-surface flex flex-col gap-6 px-6 py-6">
+      <div class="flex items-center justify-between h-6">
+        <span class="text-sm leading-none text-muted">Next Charge Amount</span>
+        <Currency
+          size="small"
+          prefix="$"
+          :value="formattedNextCharge"
+          :showSuffix="false"
+        />
+      </div>
+
+      <div class="flex items-center justify-between h-6">
+        <span class="text-sm leading-none text-muted">Subtotal</span>
+        <Currency
+          size="small"
+          prefix="$"
+          :value="formattedSubtotal"
+          :suffix="`per ${billingCycleLabel}`"
+          :showSuffix="true"
+        />
+      </div>
+
+      <Transition name="annual-discount-slide">
+        <div
+          v-if="yearlyDiscount > 0"
+          class="flex items-center justify-between h-6"
+        >
+          <span class="text-sm leading-none text-muted">Yearly Discount</span>
+          <Currency
+            size="small"
+            prefix="-$"
+            :value="formattedYearlyDiscount"
+            suffix="/mo"
+            :showSuffix="true"
+          />
+        </div>
+      </Transition>
+
+      <Transition name="annual-discount-slide">
+        <div
+          v-if="currentPlanCredit > 0"
+          class="flex items-center justify-between h-6"
+        >
+          <span class="text-sm leading-none text-muted">Current Plan Credit</span>
+          <Currency
+            size="small"
+            prefix="-$"
+            :value="formattedCurrentPlanCredit"
+            :showSuffix="false"
+          />
+        </div>
+      </Transition>
+    </div>
+
     <div
-      v-if="$slots.toggle"
-      class="flex justify-end"
+      class="bg-surface border-t border-[var(--border-muted)] flex items-center justify-between px-6 py-4"
     >
-      <slot name="toggle" />
-    </div>
-
-    <div class="flex justify-between text-sm">
-      <span class="text-muted">Subtotal</span>
-      <span class="text-default">${{ formattedSubtotal }}/{{ billingCycleLabel }}</span>
-    </div>
-
-    <Transition name="annual-discount-slide">
-      <div
-        v-if="yearlyDiscount > 0"
-        class="flex justify-between text-sm"
-      >
-        <span class="text-muted">Annual Discount</span>
-        <div class="text-right">
-          <span class="text-success">-${{ formattedYearlyDiscount }}/year</span>
-          <span class="block text-xs text-muted"> Yearly Discount </span>
-        </div>
-      </div>
-    </Transition>
-
-    <Transition name="annual-discount-slide">
-      <div
-        v-if="currentPlanCredit > 0"
-        class="flex justify-between text-sm"
-      >
-        <span class="text-muted">Current Plan Credit</span>
-        <div class="text-right">
-          <span class="text-success">-${{ formattedCurrentPlanCredit }}</span>
-        </div>
-      </div>
-    </Transition>
-
-    <div class="flex justify-between text-base font-semibold">
-      <span class="text-default">Total</span>
-      <span class="text-default">
-        <span class="text-muted font-normal">$</span>
-        {{ formattedTotal }}
-        <span class="text-muted font-normal text-sm">/{{ billingCycleLabel }}</span>
-      </span>
+      <span class="text-lg leading-[1.4] text-default">Total</span>
+      <Currency
+        size="large"
+        prefix="$"
+        :value="formattedTotal"
+        :suffix="`per ${billingCycleLabel}`"
+        :showSuffix="true"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
   import { computed } from 'vue'
+  import Currency from '@aziontech/webkit/content/currency'
 
   defineOptions({ name: 'pricing-summary' })
 
@@ -67,6 +89,7 @@
   const formattedYearlyDiscount = computed(() => formatPrice(props.yearlyDiscount))
   const formattedCurrentPlanCredit = computed(() => formatPrice(props.currentPlanCredit))
   const formattedTotal = computed(() => formatPrice(props.total))
+  const formattedNextCharge = computed(() => formatPrice(props.total))
 </script>
 
 <style scoped>

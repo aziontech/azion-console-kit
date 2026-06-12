@@ -3,7 +3,7 @@
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
   import FormFieldsCreateEdgeFunctions from '../FormFields/FormFieldsCreateEdgeFunctions'
-  import { ref, inject, defineExpose, onMounted } from 'vue'
+  import { ref, inject, onMounted } from 'vue'
   import { useLoadingStore } from '@/stores/loading'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import HelloWorldSample from '@/helpers/edge-function-hello-world'

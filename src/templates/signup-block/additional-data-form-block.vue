@@ -1,7 +1,7 @@
 <template>
   <form
     class="w-full flex flex-col"
-    @submit.prevent="submitForm"
+    @submit.prevent
   >
     <div
       class="flex flex-col gap-8"
@@ -9,7 +9,7 @@
     >
       <!-- Plan Selector Card -->
       <div class="flex flex-col gap-2">
-        <label class="text-xs leading-4 text-color-secondary">Plan Selected</label>
+        <label class="text-xs leading-4 text-color-secondary">Selected Plan</label>
         <PlanSelectorCard
           :plan="plan"
           :planData="selectedPlanData"
@@ -128,6 +128,7 @@
     <!-- Plan Selection Drawer -->
     <PlanSelectionDrawer
       v-model:visible="showPlanDrawer"
+      context="signup"
       :plans="plansData"
       :currentPlan="plan"
       :billingCycle="billingCycle"
@@ -150,7 +151,7 @@
     updateAccountInfoService
   } from '@/services/signup-services'
   import { useToast } from '@aziontech/webkit/use-toast'
-  import BoxGridSelection from '@aziontech/webkit/box-grid-selection'
+  import BoxGridSelection from '@aziontech/webkit/inputs/box-grid-selection'
   import FieldText from '@aziontech/webkit/field-text'
   import Skeleton from '@aziontech/webkit/skeleton'
   import Checkbox from '@aziontech/webkit/checkbox'
@@ -161,12 +162,14 @@
   const tracker = inject('tracker')
   const toast = useToast()
   const accountStore = useAccountStore()
-  const { setField: setAdditionalDataField, hydrate: hydrateAdditionalDataForm } =
+  const { state: additionalDataFormState, setField: setAdditionalDataField } =
     useAdditionalDataFormState()
 
   defineOptions({
     name: 'additional-data-form-block'
   })
+
+  const emit = defineEmits(['plan-change', 'validity-change'])
 
   // Fetch plans from API
   const { data: plansData } = usePlansList()
@@ -195,20 +198,38 @@
       .string()
       .trim()
       .max(61, 'Your Full Name must be less than 61 characters')
-      .matches(/[A-Za-zÀ-ž.'-]+ [A-Za-zÀ-ž.'-]+/, 'Your Full Name must include first and last name')
+      .matches(
+        /[A-Za-zÀ-ž.'-]+\s+[A-Za-zÀ-ž.'-]+/,
+        'Your Full Name must include first and last name'
+      )
       .required('Your Full Name is required')
   })
 
-  const { meta } = useForm({
-    validationSchema
+  const buildInitialValues = () =>
+    Object.fromEntries(
+      Object.entries(additionalDataFormState.value).filter(([, value]) => value !== undefined)
+    )
+
+  const { meta, setFieldValue, validate } = useForm({
+    validationSchema,
+    initialValues: buildInitialValues(),
+    validateOnMount: true
   })
+
+  watch(
+    () => meta.value.valid,
+    (valid) => {
+      emit('validity-change', Boolean(valid))
+    },
+    { immediate: true }
+  )
 
   const { value: plan } = useField('plan')
   const { value: usageIntent } = useField('usageIntent')
   const { value: role } = useField('role')
   const { value: companySize } = useField('companySize')
   const { value: companyWebsite } = useField('companyWebsite')
-  const { value: fullName } = useField('fullName')
+  const { value: fullName, meta: fullNameMeta } = useField('fullName')
   const { value: termsAccepted } = useField('termsAccepted')
 
   // Initialize plans from URL/storage
@@ -220,6 +241,7 @@
   } = usePlans()
 
   // Local billing cycle state
+  const DEFAULT_BILLING_CYCLE = 'monthly'
   const billingCycle = ref('monthly')
 
   // Plan drawer state
@@ -239,9 +261,9 @@
   const usageIntentOptions = [
     { value: 'learn', description: 'Learn', ariaLabel: 'Learn usage intent' },
     {
-      value: 'personal-project',
-      description: 'Personal Project',
-      ariaLabel: 'Personal project usage intent'
+      value: 'personal-projects',
+      description: 'Personal Projects',
+      ariaLabel: 'Personal projects usage intent'
     },
     { value: 'work', description: 'Work', ariaLabel: 'Work usage intent' }
   ]
@@ -368,7 +390,7 @@
 
   const usageIntentToApiValue = {
     learn: 'Study',
-    'personal-project': 'Personal',
+    'personal-projects': 'Personal',
     work: 'Work'
   }
 
@@ -407,41 +429,28 @@
     billingCycle.value = selectedBillingCycle
     setPlanParam('plan', selectedPlan)
     setPlanParam('billingCycle', selectedBillingCycle)
+    emit('plan-change', { plan: selectedPlan, billingCycle: selectedBillingCycle })
   }
 
   // Pre-fill form fields on mount
   onMounted(async () => {
-    initializePlans()
+    initializePlans({ defaultPlan: 'hobby', defaultBillingCycle: DEFAULT_BILLING_CYCLE })
 
-    // Pre-fill plan from URL params/storage
-    if (storedPlan.value && ['hobby', 'pro'].includes(storedPlan.value)) {
-      plan.value = storedPlan.value
-    }
+    // Pre-fill plan from URL params/storage; default to Hobby when missing/invalid
+    plan.value = ['hobby', 'pro'].includes(storedPlan.value) ? storedPlan.value : 'hobby'
 
     // Pre-fill billing cycle
     if (storedBillingCycle.value) {
       billingCycle.value = storedBillingCycle.value
     }
 
-    hydrateAdditionalDataForm({
-      usageIntent,
-      role,
-      companySize,
-      companyWebsite,
-      fullName,
-      termsAccepted
-    })
-
     await nextTick()
     skipInitialExpandAnimation.value = false
 
-    // Pre-fill role from accountStore
-    const jobRole = accountStore.account?.jobRole
-    if (jobRole && !role.value) {
-      const roleTitle = jobRoleKebabToTitle(jobRole)
-      if (roleTitle) {
-        role.value = roleTitle
-      }
+    if (!role.value || role.value === 'Other') {
+      const jobRole = accountStore.account?.jobRole
+      const roleTitle = jobRole ? jobRoleKebabToTitle(jobRole) : null
+      role.value = roleTitle && roleTitle !== 'Other' ? roleTitle : 'Software Developer'
     }
   })
 
@@ -457,30 +466,56 @@
     setAdditionalDataField('companySize', value)
   })
 
-  watch(companyWebsite, (value) => {
+  watch(companyWebsite, async (value) => {
     setAdditionalDataField('companyWebsite', value)
+    await nextTick()
+    await validate()
   })
 
-  watch(fullName, (value) => {
+  watch(fullName, async (value) => {
     setAdditionalDataField('fullName', value)
+    await nextTick()
+    const result = await validate()
+    emit('validity-change', Boolean(result?.valid))
   })
 
   watch(termsAccepted, (value) => {
     setAdditionalDataField('termsAccepted', value)
   })
 
+  const capitalizeName = (name) =>
+    String(name || '')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
+
+  let autofilledOnce = false
   watch(
     () => [
       accountStore.accountData?.first_name ?? accountStore.accountData?.firstName,
       accountStore.accountData?.last_name ?? accountStore.accountData?.lastName
     ],
-    ([firstName, lastName]) => {
-      if (!fullName.value && (firstName || lastName)) {
-        fullName.value = `${firstName || ''} ${lastName || ''}`.trim()
-      }
+    async ([firstName, lastName]) => {
+      if (autofilledOnce) return
+      if (fullName.value || fullNameMeta.dirty || fullNameMeta.touched) return
+      const first = capitalizeName(firstName)
+      const last = capitalizeName(lastName)
+      if (!first || !last) return
+      autofilledOnce = true
+      setFieldValue('fullName', `${first} ${last}`)
+      await nextTick()
+      await validate()
     },
     { immediate: true }
   )
+
+  watch(isFormReady, async (ready) => {
+    if (!ready) return
+    await nextTick()
+    await validate()
+  })
 
   watch(plan, (selectedPlan) => {
     if (selectedPlan === undefined) return
@@ -500,6 +535,8 @@
     loading.value = true
 
     try {
+      const { valid } = await validate()
+      if (!valid) return
       const usersPayload = fullName.value
       const [firstName = '', ...lastNameParts] = usersPayload.split(' ')
       const lastName = lastNameParts.join(' ')

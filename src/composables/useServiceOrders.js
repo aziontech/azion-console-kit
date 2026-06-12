@@ -1,7 +1,8 @@
-import { computed, ref } from 'vue'
-import * as Sentry from '@sentry/vue'
-// eslint-disable-next-line azion-architecture/require-vue-query
+import { computed } from 'vue'
+import { useMutation } from '@tanstack/vue-query'
 import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { useAccountStore } from '@/stores/account'
 import { SO_MESSAGES, SO_STATUS } from '@/services/v2/service-orders/service-orders-constants'
 import {
@@ -11,19 +12,13 @@ import {
 import {
   useServiceOrdersList,
   ensureServiceOrdersList,
-  getCurrentServiceOrder,
-  getDraftServiceOrder
+  getCurrentServiceOrder
 } from '@/composables/useServiceOrdersList'
+import { invalidateCurrentAccountSubscription } from '@/composables/useCurrentAccountSubscriptionService'
 
-const isSubmitting = ref(false)
-
-const runSubmission = async (operation) => {
-  isSubmitting.value = true
-  try {
-    return await operation()
-  } finally {
-    isSubmitting.value = false
-  }
+const invalidateAllServiceOrderCaches = () => {
+  queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
+  invalidateCurrentAccountSubscription()
 }
 
 export function useServiceOrders() {
@@ -32,6 +27,54 @@ export function useServiceOrders() {
 
   const { activeServiceOrder, draftServiceOrder, currentServiceOrder, isLoading, refetch } =
     useServiceOrdersList(accountIdRef)
+
+  const mutationOptions = { onSuccess: invalidateAllServiceOrderCaches }
+
+  const createMutation = useMutation({
+    mutationFn: (payload) => serviceOrdersService.createServiceOrder(payload),
+    ...mutationOptions
+  })
+
+  const prepareSignupCheckoutMutation = useMutation({
+    mutationFn: (payload) => serviceOrdersService.prepareSignupCheckout(payload),
+    ...mutationOptions
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }) => serviceOrdersService.updateServiceOrder(id, payload),
+    ...mutationOptions
+  })
+
+  const upgradeMutation = useMutation({
+    mutationFn: (variables) => serviceOrdersService.upgradeServiceOrder(variables),
+    ...mutationOptions
+  })
+
+  const downgradeMutation = useMutation({
+    mutationFn: (variables) => serviceOrdersService.downgradeServiceOrder(variables),
+    ...mutationOptions
+  })
+
+  const cancelDowngradeMutation = useMutation({
+    mutationFn: (id) => serviceOrdersService.cancelDowngradeServiceOrder(id),
+    ...mutationOptions
+  })
+
+  const cancelMutation = useMutation({
+    mutationFn: (id) => serviceOrdersService.cancelServiceOrder(id),
+    ...mutationOptions
+  })
+
+  const isSubmitting = computed(
+    () =>
+      createMutation.isPending.value ||
+      prepareSignupCheckoutMutation.isPending.value ||
+      updateMutation.isPending.value ||
+      upgradeMutation.isPending.value ||
+      downgradeMutation.isPending.value ||
+      cancelDowngradeMutation.isPending.value ||
+      cancelMutation.isPending.value
+  )
 
   const loadAccountServiceOrders = async (id) => {
     const targetId = id ?? accountIdRef.value
@@ -44,81 +87,56 @@ export function useServiceOrders() {
     }
   }
 
-  const createServiceOrder = (payload) =>
-    runSubmission(() => serviceOrdersService.createServiceOrder(payload))
+  const createServiceOrder = (payload) => createMutation.mutateAsync(payload)
 
-  const updateServiceOrder = (id, payload) =>
-    runSubmission(() => serviceOrdersService.updateServiceOrder(id, payload))
+  const prepareSignupCheckout = (payload) => prepareSignupCheckoutMutation.mutateAsync(payload)
+
+  const updateServiceOrder = (id, payload) => updateMutation.mutateAsync({ id, payload })
+
+  const resolveServiceOrderId = (id, accountId) => {
+    if (id) return id
+    const targetAccountId = accountId ?? accountIdRef.value
+    return getCurrentServiceOrder(targetAccountId)?.serviceOrderId ?? null
+  }
 
   const upgrade = async ({ id, accountId, newPlanId, priceId }) => {
-    const targetAccountId = accountId ?? accountIdRef.value
-    const serviceOrderId = id || getCurrentServiceOrder(targetAccountId)?.serviceOrderId
-    if (!serviceOrderId) {
-      throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
-    }
-
-    return runSubmission(async () => {
-      const response = await serviceOrdersService.upgradeServiceOrder({
-        id: serviceOrderId,
-        payload: { newPlanId, priceId }
-      })
-
-      if (targetAccountId) {
-        try {
-          await ensureServiceOrdersList(targetAccountId)
-          const draft = getDraftServiceOrder(targetAccountId)
-          if (draft && !response?.payment?.clientSecret && draft.priceId) {
-            response.serviceOrder = draft
-          }
-        } catch (err) {
-          Sentry.captureException(err)
-        }
-      }
-
-      return response
+    const serviceOrderId = resolveServiceOrderId(id, accountId)
+    if (!serviceOrderId) throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
+    return upgradeMutation.mutateAsync({
+      id: serviceOrderId,
+      payload: { newPlanId, priceId }
     })
   }
 
   const downgrade = async ({ id, accountId, newPlanId, priceId }) => {
-    const targetAccountId = accountId ?? accountIdRef.value
-    const serviceOrderId = id || getCurrentServiceOrder(targetAccountId)?.serviceOrderId
-    if (!serviceOrderId) {
-      throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
-    }
-
-    return runSubmission(() =>
-      serviceOrdersService.downgradeServiceOrder({
-        id: serviceOrderId,
-        payload: { newPlanId, priceId }
-      })
-    )
+    const serviceOrderId = resolveServiceOrderId(id, accountId)
+    if (!serviceOrderId) throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
+    return downgradeMutation.mutateAsync({
+      id: serviceOrderId,
+      payload: { newPlanId, priceId }
+    })
   }
 
   const cancelDowngrade = async ({ id, accountId } = {}) => {
-    const targetAccountId = accountId ?? accountIdRef.value
-    const serviceOrderId = id || getCurrentServiceOrder(targetAccountId)?.serviceOrderId
-    if (!serviceOrderId) {
-      throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
-    }
+    const serviceOrderId = resolveServiceOrderId(id, accountId)
+    if (!serviceOrderId) throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
+    return cancelDowngradeMutation.mutateAsync(serviceOrderId)
+  }
 
-    return runSubmission(() => serviceOrdersService.cancelDowngradeServiceOrder(serviceOrderId))
+  const cancelServiceOrder = async ({ id, accountId } = {}) => {
+    const serviceOrderId = resolveServiceOrderId(id, accountId)
+    if (!serviceOrderId) throw new Error(SO_MESSAGES.MISSING_SERVICE_ORDER_ID)
+    return cancelMutation.mutateAsync(serviceOrderId)
   }
 
   const submitServiceOrder = async ({ accountId, planId, planPricingId }) => {
     const targetAccountId = accountId ?? accountIdRef.value
     const currentSO = getCurrentServiceOrder(targetAccountId)
-    const { action } = resolveSubmitStrategy({
-      currentSO,
-      planId,
-      planPricingId
-    })
+    const { action } = resolveSubmitStrategy({ currentSO, planId, planPricingId })
 
     switch (action) {
       case SUBMIT_ACTIONS.PATCH:
-        return updateServiceOrder(currentSO.serviceOrderId, {
-          planId,
-          planPricingId
-        })
+        return updateServiceOrder(currentSO.serviceOrderId, { planId, planPricingId })
 
       case SUBMIT_ACTIONS.UPGRADE:
         return upgrade({
@@ -133,7 +151,7 @@ export function useServiceOrders() {
 
       case SUBMIT_ACTIONS.NOOP:
       default:
-        return { success: true, data: currentSO, payment: undefined }
+        return { success: true, data: currentSO, payment: null }
     }
   }
 
@@ -154,10 +172,12 @@ export function useServiceOrders() {
     loadAccountServiceOrders,
     getServiceOrder,
     createServiceOrder,
+    prepareSignupCheckout,
     updateServiceOrder,
     submitServiceOrder,
     upgrade,
     downgrade,
-    cancelDowngrade
+    cancelDowngrade,
+    cancelServiceOrder
   }
 }

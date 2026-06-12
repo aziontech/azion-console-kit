@@ -15,7 +15,7 @@ export const billingRoutes = {
     listServiceAndProductsChangesService: BillingServices.listServiceAndProductsChangesService,
     getStripeClientService: BillingServices.getStripeClientService,
     documentPaymentMethodService: Helpers.documentationGuideProducts.paymentMethods,
-    listPaymentHistoryService: BillingServices.listPaymentHistoryService,
+    listPaymentHistoryService: BillingServices.listPaymentHistoryWithInvoicesService,
     documentPaymentHistoryService: Helpers.documentationGuideProducts.paymentHistory,
     loadYourServicePlanService: BillingServices.loadYourServicePlanService,
     openPlans: Helpers.openShowMorePlan,
@@ -24,9 +24,13 @@ export const billingRoutes = {
   },
   children: [
     {
+      path: 'payment',
+      redirect: { name: 'billing-tabs' }
+    },
+    {
       path: ':tab?',
       name: 'billing-tabs',
-      component: () => import('@views/Billing/TabsView.vue'),
+      component: () => import('@views/Billing/index.vue'),
       meta: {
         title: 'Billing',
         breadCrumbs: [

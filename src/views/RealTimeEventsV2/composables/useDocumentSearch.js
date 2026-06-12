@@ -85,21 +85,33 @@ export function useDocumentSearch(tableData) {
    * Wraps the first occurrence of the search term in a <mark> tag.
    * Uses indexOf instead of regex to avoid escaping issues.
    */
+  const escapeHtml = (value) =>
+    String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+
   const highlight = (text) => {
     const normalizedQuery = debouncedQuery.value
-    if (!normalizedQuery || !normalizedQuery.trim() || !text) return String(text)
+    if (!normalizedQuery || !normalizedQuery.trim() || !text) return escapeHtml(text)
     const str = String(text)
     const trimmedQuery = normalizedQuery.trim()
     const pos = str.toLowerCase().indexOf(trimmedQuery.toLowerCase())
-    if (pos === -1) return str
+    if (pos === -1) return escapeHtml(str)
     const len = trimmedQuery.length
+    // The wrapped text is untrusted, so each segment is HTML-escaped before it
+    // is concatenated with the fixed <mark> markup; only safe markup is returned.
+    /* eslint-disable xss/no-mixed-html -- segments are HTML-escaped above; only fixed <mark> markup is literal */
     return (
-      str.slice(0, pos) +
+      escapeHtml(str.slice(0, pos)) +
       '<mark class="search-highlight">' +
-      str.slice(pos, pos + len) +
+      escapeHtml(str.slice(pos, pos + len)) +
       '</mark>' +
-      str.slice(pos + len)
+      escapeHtml(str.slice(pos + len))
     )
+    /* eslint-enable xss/no-mixed-html */
   }
 
   return { query, debouncedQuery, filteredData, highlight }

@@ -24,13 +24,13 @@
 
 <script setup>
   import { computed } from 'vue'
-  import SegmentedButton from '@aziontech/webkit/segmented-button'
+  import SegmentedButton from '@aziontech/webkit/actions/segmented-button'
 
   defineOptions({ name: 'billing-cycle-toggle' })
 
   const CYCLE_OPTIONS = [
     { label: 'Monthly', value: 'monthly' },
-    { label: 'Yearly', value: 'yearly' }
+    { label: 'Annual', value: 'yearly' }
   ]
 
   const props = defineProps({

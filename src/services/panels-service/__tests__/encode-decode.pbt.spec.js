@@ -208,6 +208,7 @@ describe('panels-service · encodeShareState / decodeShareState roundtrip (Task 
       { tab: 'tab-1', viewState: { dataset: 'workloadEvents', label: '🚀 Production' } },
       {
         tab: null,
+        // eslint-disable-next-line xss/no-mixed-html -- test fixture string exercising encode/decode roundtrip, not an HTML sink
         viewState: { dataset: 'functionEvents', host: 'api.example.com/<script>' }
       },
       {

@@ -4,17 +4,16 @@ import { serviceOrdersService } from '@/services/v2/service-orders/service-order
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
-import { toMilliseconds } from '@/services/v2/base/query/config'
 import { SO_STATUS } from '@/services/v2/service-orders/service-orders-constants'
 
-const STALE_TIME = toMilliseconds({ seconds: 60 })
-const GC_TIME = toMilliseconds({ minutes: 5 })
+const NO_CACHE_META = { persist: false }
 
 const buildQueryConfig = (accountId) => ({
   queryKey: queryKeys.serviceOrders.list({ accountId }),
   queryFn: () => serviceOrdersService.listServiceOrders({ accountId }),
-  staleTime: STALE_TIME,
-  gcTime: GC_TIME
+  staleTime: 0,
+  gcTime: 0,
+  meta: NO_CACHE_META
 })
 
 const pickActive = (orders) => orders.find((so) => so.status === SO_STATUS.ACTIVE) ?? null
@@ -27,10 +26,11 @@ export function useServiceOrdersList(accountIdRef) {
     queryKey: computed(() => queryKeys.serviceOrders.list({ accountId: accountId.value })),
     queryFn: () => serviceOrdersService.listServiceOrders({ accountId: accountId.value }),
     enabled: computed(() => Boolean(accountId.value)),
-    staleTime: STALE_TIME,
-    gcTime: GC_TIME,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
+    meta: NO_CACHE_META
   })
 
   const orders = computed(() => query.data.value?.data ?? [])

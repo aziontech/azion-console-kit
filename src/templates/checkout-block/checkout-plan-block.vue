@@ -1,9 +1,11 @@
 <template>
-  <div class="relative flex h-full flex-col overflow-hidden pt-6 w-[600px]">
-    <div class="checkout-scroll-area flex flex-1 flex-col gap-6 px-8 overflow-y-auto">
+  <div class="relative flex flex-col pt-6 w-full lg:w-[600px]">
+    <div class="flex flex-col gap-6 px-4 lg:px-8 pb-6">
       <PricingCalculationBlock
         ref="pricingCalculationRef"
         :plan="plan"
+        :draftServiceOrderId="draftServiceOrderId"
+        context="signup"
         @update:billing-cycle="handleBillingCycleChange"
         @update:checkout-session-client-secret="handleCheckoutSessionClientSecretChange"
       />
@@ -13,6 +15,8 @@
         :stripeClientService="getStripeClientService"
         :checkoutSessionClientSecret="checkoutSessionClientSecret"
         @readiness-change="handlePaymentReadinessChange"
+        @element-ready="emit('payment-element-ready')"
+        @stale-session="handleStaleCheckoutSession"
       />
 
       <AddressInformationBlock
@@ -36,14 +40,23 @@
   import PaymentMethodBlock from './payment-method-block.vue'
   import PricingCalculationBlock from './pricing-calculation-block.vue'
   import CheckoutActionFooter from '@/templates/checkout-block/checkout-action-footer.vue'
-  import { mapStripeError } from '@/templates/checkout-block/helpers/stripe-error-mapper.js'
+  import {
+    isStaleCheckoutSessionError,
+    mapStripeError
+  } from '@/templates/checkout-block/helpers/stripe-error-mapper.js'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { useScrollToError } from '@/composables/useScrollToError'
 
   defineOptions({
     name: 'checkout-plan-block'
   })
-  const emit = defineEmits(['onBack', 'onSubmit'])
+  const emit = defineEmits([
+    'onBack',
+    'onSubmit',
+    'payment-element-ready',
+    'stale-session',
+    'checkout-session-prepared'
+  ])
   const toast = useToast()
   const { scrollToError } = useScrollToError()
 
@@ -60,6 +73,10 @@
     checkoutSessionClientSecret: {
       type: String,
       default: ''
+    },
+    draftServiceOrderId: {
+      type: [String, Number],
+      default: null
     }
   })
 
@@ -68,7 +85,7 @@
   const addressInformationRef = ref(null)
   const isSubmitting = ref(false)
   const showLoading = ref(false)
-  const billingCycle = ref('yearly')
+  const billingCycle = ref('monthly')
   const checkoutSessionClientSecret = ref(props.checkoutSessionClientSecret)
   const isPaymentFormReady = ref(false)
   const isAddressFormReady = ref(false)
@@ -88,6 +105,11 @@
 
   const handleCheckoutSessionClientSecretChange = (value) => {
     checkoutSessionClientSecret.value = value
+    if (!value) return
+    emit('checkout-session-prepared', {
+      clientSecret: value,
+      billingCycle: billingCycle.value
+    })
   }
 
   const handlePaymentReadinessChange = (isReady) => {
@@ -96,6 +118,15 @@
 
   const handleAddressReadinessChange = (isReady) => {
     isAddressFormReady.value = Boolean(isReady)
+  }
+
+  const handleStaleCheckoutSession = (payload = {}) => {
+    isPaymentFormReady.value = false
+    emit('stale-session', {
+      ...payload,
+      plan: props.plan,
+      billingCycle: billingCycle.value
+    })
   }
 
   const handleBack = () => {
@@ -156,6 +187,11 @@
 
       emit('onSubmit', checkoutData)
     } catch (error) {
+      if (isStaleCheckoutSessionError(error)) {
+        handleStaleCheckoutSession({ reason: 'no_such_checkout_session' })
+        return
+      }
+
       const detail = mapStripeError(error?.message || error)
       toast.add({
         closable: true,
@@ -180,14 +216,3 @@
     billingCycle
   })
 </script>
-
-<style scoped>
-  .checkout-scroll-area {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .checkout-scroll-area::-webkit-scrollbar {
-    display: none;
-  }
-</style>

@@ -24,6 +24,8 @@ const __dirname = path.dirname(__filename)
  */
 
 const repoRoot = path.resolve(__dirname, '../../../..')
+// relPath is a hardcoded repo-source path from the test cases below, not user input.
+// eslint-disable-next-line security/detect-non-literal-fs-filename
 const read = (relPath) => readFileSync(path.resolve(repoRoot, relPath), 'utf-8')
 
 describe('Property P5 — data-testid preservation', () => {
@@ -102,6 +104,8 @@ describe('Property P5 — data-testid preservation', () => {
       const source = read(file)
       // Match data-testid="<id>", data-testid='<id>', data-testid=`<id>`,
       // and bound forms like :data-testid="'<id>'" or :data-testid="`<id>`".
+      // testid is a hardcoded value from the test cases above, not user input.
+      // eslint-disable-next-line security/detect-non-literal-regexp
       const pattern = new RegExp(`data-testid\\s*=\\s*["'\`]${testid}["'\`]`)
       expect(source, `Missing data-testid="${testid}" in ${file}`).toMatch(pattern)
     })

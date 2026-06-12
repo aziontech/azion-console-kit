@@ -5,18 +5,22 @@
     @cancel="showCancelDowngradeDialog = true"
   />
 
-  <div class="w-full flex flex-col sm:flex-row gap-6 mt-4 items-stretch billing-cards">
+  <div class="w-full flex flex-col min-[1100px]:flex-row gap-6 mt-4 items-stretch billing-cards">
     <template v-if="cardsReady">
       <SubscriptionPlanCard
         :subscription="subscriptionState"
+        :paymentMethodLabel="paymentMethodLabel"
+        :paymentMethodBrandRaw="paymentMethodBrandRaw"
         @change-plan="showOtherPlans"
         @go-to-payment="goToPayment"
+        @change-payment-method="openChangePaymentMethod"
       />
 
       <UpgradeToProCard
         v-if="subscriptionState.isHobby"
         :loading="preparingPlan === 'pro'"
         @upgrade="openUpgradeToPro"
+        @upgrade-intent="handleUpgradeIntent"
       />
       <CurrentInvoiceCard
         v-else
@@ -32,7 +36,7 @@
     </template>
   </div>
 
-  <h2 class="text-lg font-medium line-height-1 my-8">Payment History</h2>
+  <h2 class="text-lg font-medium line-height-1 mt-6 mb-2">Payment History</h2>
 
   <div
     v-if="hasContentToList"
@@ -59,40 +63,29 @@
     title="No payment activity yet."
     description="Add a payment method and start using services and products to view your activity."
     :inTabs="true"
-    createButtonLabel="Add Credit"
     :documentationService="props.documentPaymentHistoryService"
   >
     <template #default>
       <PrimeButton
         class="max-md:w-full w-fit"
-        label="Credit"
-        icon="pi pi-plus"
-        :disabled="!defaultCardStatus.hasData"
-        @click="goToPayment"
-        outlined
-      >
-      </PrimeButton>
-      <PrimeButton
-        class="max-md:w-full w-fit"
         severity="secondary"
         icon="pi pi-plus"
         label="Payment Method"
-        @click="goToPayment"
+        @click="openChangePaymentMethod"
       />
     </template>
   </EmptyResultsBlock>
 
   <PlanSelectionDrawer
     v-model:visible="showChangePlanDrawer"
-    :plans="plansData || []"
+    context="billing"
+    :relativeLabels="true"
+    :closeOnSelect="false"
     :currentPlan="currentPlanSlug"
     :billingCycle="currentActiveCycle"
-    :closeOnSelect="false"
-    :relativeLabels="true"
+    :plans="plansData || []"
     :loadingPlan="preparingPlan"
-    context="billing"
-    @select="handlePlanSelect"
-    @billing-cycle-toggled="handleBillingCycleToggled"
+    @select="handleSelectPlan"
   />
 
   <DrawerPlanInfo
@@ -103,8 +96,10 @@
     :lockedCycle="lockedCycle"
     :initialClientSecret="checkoutSessionClientSecret"
     :getStripeClientService="props.getStripeClientService"
+    :indented="showChangePlanDrawer"
     @submit="handlePlanInfoSubmit"
     @submitCycleChange="handleCycleUpgradeSubmit"
+    @stale-session="handleStaleCheckoutSession"
   />
 
   <DialogDowngradePlan
@@ -122,38 +117,51 @@
     v-model:visible="showCancelDowngradeDialog"
     @confirm="handleCancelDowngradeConfirm"
   />
+
+  <DialogChangePaymentMethod
+    v-model:visible="showChangePaymentMethodDialog"
+    :getStripeClientService="props.getStripeClientService"
+  />
 </template>
 
 <script setup>
-  import { ref, computed, reactive, watch, inject, onBeforeUnmount, onMounted } from 'vue'
+  import { ref, computed, reactive, watch, inject, onMounted, defineAsyncComponent } from 'vue'
   import { useRouter } from 'vue-router'
   import { storeToRefs } from 'pinia'
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
+  import PrimeButton from '@aziontech/webkit/button'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
-  import PrimeButton from '@aziontech/webkit/button'
-  import PlanSelectionDrawer from '@/templates/signup-block/plan-selection-drawer.vue'
-  import DrawerPlanInfo from './Drawer/DrawerPlanInfo.vue'
   import SubscriptionPlanCard from './components/SubscriptionPlanCard.vue'
   import UpgradeToProCard from './components/UpgradeToProCard.vue'
   import CurrentInvoiceCard from './components/CurrentInvoiceCard.vue'
   import BillingCardSkeleton from './components/BillingCardSkeleton.vue'
-  import DialogDowngradePlan from './Dialog/DialogDowngradePlan.vue'
-  import DialogCancelDowngrade from './Dialog/DialogCancelDowngrade.vue'
   import DowngradePendingBanner from './components/DowngradePendingBanner.vue'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { usePlans } from '@/composables/usePlans'
   import { usePlansList } from '@/composables/usePlansService'
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
+  import { useBillingPaymentMethods } from '@/composables/useBillingPaymentMethods'
   import { useServiceOrders } from '@/composables/useServiceOrders'
   import { useCheckoutSessionPreparer } from '@/composables/useCheckoutSessionPreparer'
-  import {
-    markAwaitingActiveServiceOrder,
-    isAwaitingActiveServiceOrder,
-    clearAwaitingActiveServiceOrder
-  } from '@/composables/post-payment-flag'
+  import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
   import { useAccountStore } from '@/stores/account'
+  import { useWarmStripe } from '@/composables/useWarmStripe'
   import * as Sentry from '@sentry/vue'
+
+  // Modals/drawers are heavy (Stripe element, plan grid) and only render on
+  // user action — defer the chunks so the initial Billing render stays light.
+  const PlanSelectionDrawer = defineAsyncComponent(
+    () => import('@/templates/signup-block/plan-selection-drawer.vue')
+  )
+  const DrawerPlanInfo = defineAsyncComponent(() => import('./Drawer/DrawerPlanInfo.vue'))
+  const DialogDowngradePlan = defineAsyncComponent(() => import('./Dialog/DialogDowngradePlan.vue'))
+  const DialogCancelDowngrade = defineAsyncComponent(
+    () => import('./Dialog/DialogCancelDowngrade.vue')
+  )
+  const DialogChangePaymentMethod = defineAsyncComponent(
+    () => import('./Dialog/DialogChangePaymentMethod.vue')
+  )
 
   const router = useRouter()
   const emit = defineEmits(['changeTab'])
@@ -214,6 +222,10 @@
     },
     loadInvoiceLastUpdatedService: {
       type: Function
+    },
+    isReloading: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -266,12 +278,16 @@
 
   const showChangePlanDrawer = ref(false)
   const showPlanInfoDrawer = ref(false)
+  const showChangePaymentMethodDialog = ref(false)
   const showDowngradeDialog = ref(false)
   const showCancelDowngradeDialog = ref(false)
   const drawerMode = ref('subscribe')
   const selectedPlan = ref(null)
   const lockedCycle = ref(null)
   const checkoutSessionClientSecret = ref('')
+  const checkoutPreparationKey = ref('')
+  let checkoutPreparationVersion = 0
+  let currentCheckoutPreparationPromise = null
   const preparingPlan = ref(null)
   const downgradeTarget = ref({
     toPlan: 'hobby',
@@ -300,7 +316,8 @@
     serviceOrder,
     activeServiceOrder
   } = useServiceOrders()
-  const { prepare: prepareCheckoutSession } = useCheckoutSessionPreparer()
+  const { prepare: prepareCheckoutSession, recoverFromStaleSession } = useCheckoutSessionPreparer()
+  const { warmStripe } = useWarmStripe()
 
   const downgradeEffectiveAt = ref(null)
 
@@ -310,14 +327,79 @@
   watch(showPlanInfoDrawer, (visible) => {
     if (!visible) {
       checkoutSessionClientSecret.value = ''
+      checkoutPreparationKey.value = ''
       drawerMode.value = 'subscribe'
     }
   })
 
-  const defaultCardStatus = computed(() => ({
-    loaded: props.cardDefault?.loader,
-    hasData: !!props.cardDefault?.cardData
-  }))
+  const buildPreparationKey = (plan, cycle) => `${plan}:${cycle || 'monthly'}`
+
+  const prepareCheckoutAhead = ({ plan, preferredCycle = null, force = false } = {}) => {
+    const cycle = preferredCycle || storedBillingCycle.value || 'monthly'
+    const key = buildPreparationKey(plan, cycle)
+
+    if (
+      !force &&
+      checkoutPreparationKey.value === key &&
+      checkoutSessionClientSecret.value &&
+      !currentCheckoutPreparationPromise
+    ) {
+      return Promise.resolve(checkoutSessionClientSecret.value)
+    }
+
+    if (currentCheckoutPreparationPromise && checkoutPreparationKey.value === key) {
+      return currentCheckoutPreparationPromise
+    }
+
+    const version = ++checkoutPreparationVersion
+    checkoutPreparationKey.value = key
+    if (force) checkoutSessionClientSecret.value = ''
+
+    const promise = prepareCheckoutSession({ plan, preferredCycle: cycle })
+      .then((secret) => {
+        if (version === checkoutPreparationVersion) {
+          checkoutSessionClientSecret.value = secret
+        }
+        return secret
+      })
+      .finally(() => {
+        if (currentCheckoutPreparationPromise === promise) {
+          currentCheckoutPreparationPromise = null
+        }
+      })
+
+    currentCheckoutPreparationPromise = promise
+    return promise
+  }
+
+  const schedulePrepareForPro = (preferredCycle = null) => {
+    if (subscription.isPro.value) return
+    const cycle = preferredCycle || storedBillingCycle.value || 'monthly'
+    const key = buildPreparationKey('pro', cycle)
+    if (
+      checkoutPreparationKey.value === key &&
+      (checkoutSessionClientSecret.value || currentCheckoutPreparationPromise)
+    ) {
+      return
+    }
+    prepareCheckoutAhead({ plan: 'pro', preferredCycle: cycle }).catch(Sentry.captureException)
+  }
+
+  const { defaultPaymentMethod } = useBillingPaymentMethods()
+
+  const formatBrandName = (brand) => {
+    if (!brand) return ''
+    return brand.charAt(0).toUpperCase() + brand.slice(1)
+  }
+
+  const paymentMethodLabel = computed(() => {
+    const method = defaultPaymentMethod.value
+    if (!method?.last4) return '--'
+    const brand = formatBrandName(method.brand)
+    return [brand, method.last4].filter(Boolean).join(' •••• ') || '--'
+  })
+
+  const paymentMethodBrandRaw = computed(() => defaultPaymentMethod.value?.brand ?? '')
 
   const subscriptionState = reactive({
     planTitle: computed(() => subscription.planTitle.value),
@@ -327,7 +409,6 @@
     nextChargeDate: computed(() => subscription.nextChargeDate.value),
     nextChargeValue: computed(() => subscription.nextChargeValue.value),
     planChargeValue: computed(() => subscription.planChargeValue.value),
-    hasContractedPlan: computed(() => subscription.hasContractedPlan.value),
     isHobby: computed(() => subscription.isHobby.value),
     isPro: computed(() => subscription.isPro.value),
     isLoading: computed(() => subscription.isLoading.value),
@@ -335,69 +416,57 @@
   })
 
   const currentInvoice = ref({})
-  const INVOICE_RETRY_INTERVAL_MS = 2000
-  const INVOICE_RETRY_MAX_ATTEMPTS = 6
-  let invoiceRetryTimer = null
-  let invoiceRetryAttempt = 0
-
-  const isInvoicePopulated = (invoice) => {
-    if (!invoice) return false
-    const billId = invoice.billId
-    return Boolean(invoice.redirectId) || (Boolean(billId) && billId !== '---')
-  }
-
-  const cancelInvoiceRetry = () => {
-    if (invoiceRetryTimer) {
-      clearTimeout(invoiceRetryTimer)
-      invoiceRetryTimer = null
-    }
-    invoiceRetryAttempt = 0
-  }
 
   const loadCurrentInvoice = async () => {
     try {
-      const result = (await props.loadCurrentInvoiceService()) || {}
-      currentInvoice.value = result
-      if (!isInvoicePopulated(result) && invoiceRetryAttempt < INVOICE_RETRY_MAX_ATTEMPTS) {
-        invoiceRetryAttempt += 1
-        if (invoiceRetryTimer) clearTimeout(invoiceRetryTimer)
-        invoiceRetryTimer = setTimeout(loadCurrentInvoice, INVOICE_RETRY_INTERVAL_MS)
-      } else {
-        cancelInvoiceRetry()
-      }
+      currentInvoice.value = (await props.loadCurrentInvoiceService()) || {}
     } catch {
       currentInvoice.value = {}
-      cancelInvoiceRetry()
     }
   }
 
+  const refreshInvoiceAndHistory = async () => {
+    if (!hasContentToList.value) {
+      hasContentToList.value = true
+      await loadCurrentInvoice()
+      return
+    }
+    await Promise.allSettled([loadCurrentInvoice(), listTableRef.value?.reload?.()])
+  }
+
+  // Re-fetch the legacy invoice service whenever the subscription transitions
+  // into Pro (initial mount included). No timer/retry loop here — the
+  // post-checkout invoice freshness used to be papered over by 6×2s polling;
+  // now it relies on the SO mutation `onSuccess` invalidating subscription
+  // state and `loadCurrentInvoice` running again on this watch.
   watch(
     () => subscriptionState.isPro,
-    (isPro, wasPro) => {
-      if (isPro && !wasPro) {
-        cancelInvoiceRetry()
-        loadCurrentInvoice()
-      }
-      if (!isPro) cancelInvoiceRetry()
+    (isPro) => {
+      if (isPro) loadCurrentInvoice()
     },
     { immediate: true }
   )
 
   onMounted(async () => {
-    if (!isAwaitingActiveServiceOrder()) return
+    // Warm Stripe.js up front: the plan-info, add-payment and change-cycle
+    // drawers opened from this view all mount Stripe behind a user action, so
+    // pre-downloading the client here keeps those drawers from stalling on a
+    // cold js.stripe.com load.
+    warmStripe()
+    // Post-checkout entry refreshes once so the cards reflect the just-paid
+    // SO without depending on stale persisted cache.
     try {
-      await subscription.refetchUntil((so) => Boolean(so?.priceId && so?.currentPeriodEnd))
+      await subscription.refetch()
     } catch (err) {
       Sentry.captureException(err)
-    } finally {
-      clearAwaitingActiveServiceOrder()
-      loadCurrentInvoice()
     }
   })
 
-  onBeforeUnmount(cancelInvoiceRetry)
+  const isPostPaymentReloading = ref(false)
 
-  const cardsReady = computed(() => !subscriptionState.isLoading)
+  const cardsReady = computed(
+    () => !subscriptionState.isLoading && !props.isReloading && !isPostPaymentReloading.value
+  )
 
   const currentPlanSlug = computed(() => subscription.planSku.value || 'hobby')
 
@@ -437,13 +506,13 @@
 
   const openDrawerWithCheckoutSession = async ({ plan, preferredCycle, lockedCycle: locked }) => {
     if (preparingPlan.value) return
+    drawerMode.value = 'subscribe'
+    selectedPlan.value = plan
+    lockedCycle.value = locked
     preparingPlan.value = plan
     try {
-      const secret = await prepareCheckoutSession({ plan, preferredCycle })
+      const secret = await prepareCheckoutAhead({ plan, preferredCycle })
       checkoutSessionClientSecret.value = secret
-      drawerMode.value = 'subscribe'
-      selectedPlan.value = plan
-      lockedCycle.value = locked
       showPlanInfoDrawer.value = true
       trackBilling('checkoutStarted', {
         plan,
@@ -468,6 +537,40 @@
       })
     } finally {
       preparingPlan.value = null
+    }
+  }
+
+  const handleUpgradeIntent = () => {
+    schedulePrepareForPro('monthly')
+  }
+
+  // Stripe rejected the previously issued client secret (session expired or
+  // already consumed). Re-prepare with a fresh PATCH so the payment element
+  // re-mounts against a live session — without forcing the user to close the
+  // drawer.
+  const handleStaleCheckoutSession = async ({ plan, billingCycle: cycle } = {}) => {
+    const targetPlan = plan || selectedPlan.value
+    if (!targetPlan) return
+    const targetCycle = cycle || storedBillingCycle.value || null
+    checkoutSessionClientSecret.value = ''
+    checkoutPreparationKey.value = ''
+    try {
+      const fresh = await recoverFromStaleSession({
+        plan: targetPlan,
+        preferredCycle: targetCycle
+      })
+      checkoutSessionClientSecret.value = fresh
+      checkoutPreparationKey.value = buildPreparationKey(targetPlan, targetCycle)
+    } catch (err) {
+      Sentry.captureException(err)
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail:
+          (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
+          'Unable to refresh the checkout session.',
+        closable: true
+      })
     }
   }
 
@@ -521,55 +624,49 @@
     showDowngradeDialog.value = true
   }
 
-  const handleBillingCycleToggled = ({ fromCycle, toCycle }) => {
-    trackBilling('billingCycleToggled', { fromCycle, toCycle, context: 'billing' })
-  }
+  const handleSelectPlan = async ({ plan, billingCycle, intent, fromPlan, fromCycle }) => {
+    if (intent === 'upgrade' || intent === 'subscribe') {
+      setParam('billingCycle', billingCycle)
+      await syncToUrl()
+      trackBilling('planSelected', {
+        plan,
+        billingCycle,
+        fromPlan,
+        fromCycle,
+        isCycleOnlyChange: false
+      })
+      await openDrawerWithCheckoutSession({
+        plan,
+        preferredCycle: billingCycle,
+        lockedCycle: null
+      })
+      return
+    }
 
-  const handlePlanSelect = async ({ plan, billingCycle }) => {
-    const fromPlan = subscription.planSku.value
-    const fromCycle = subscription.billingCycle.value
-    const isCycleOnlyChange = Boolean(
-      plan === fromPlan && billingCycle && fromCycle && billingCycle !== fromCycle
-    )
-    trackBilling('planSelected', {
-      plan,
-      billingCycle,
-      fromPlan,
-      fromCycle,
-      isCycleOnlyChange
-    })
-
-    if (plan === 'hobby') {
+    if (intent === 'downgrade') {
+      trackBilling('planSelected', {
+        plan,
+        billingCycle,
+        fromPlan,
+        fromCycle,
+        isCycleOnlyChange: false
+      })
       await openPlanDowngradeDialog()
       return
     }
 
-    if (billingCycle) {
-      setParam('billingCycle', billingCycle)
-      await syncToUrl()
-    }
-
-    const currentSku = subscription.planSku.value
-    const currentCycle = subscription.billingCycle.value
-
-    const isSamePlan = plan === currentSku
-    const isCycleChange =
-      isSamePlan && billingCycle && currentCycle && billingCycle !== currentCycle
-
-    if (isCycleChange) {
+    if (intent === 'cycle-change') {
+      trackBilling('billingCycleToggled', {
+        fromCycle,
+        toCycle: billingCycle,
+        context: 'billing'
+      })
       if (billingCycle === 'yearly') {
-        openCycleReviewDrawer({ plan, targetCycle: 'yearly' })
+        openCycleReviewDrawer({ plan, targetCycle: billingCycle })
       } else {
-        await openCycleDowngradeDialog({ fromCycle: currentCycle, toCycle: 'monthly' })
+        await openCycleDowngradeDialog({ fromCycle, toCycle: billingCycle })
       }
-      return
     }
-
-    await openDrawerWithCheckoutSession({
-      plan,
-      preferredCycle: billingCycle || storedBillingCycle.value || null,
-      lockedCycle: null
-    })
   }
 
   const resolveCycleChangePayload = async ({ plan, billingCycle }) => {
@@ -627,10 +724,16 @@
       showChangePlanDrawer.value = false
       selectedPlan.value = null
       lockedCycle.value = null
-      if (targetPriceId) {
-        await subscription.refetchUntil((so) => so?.priceId === targetPriceId)
-      } else {
-        await subscription.refetch()
+      isPostPaymentReloading.value = true
+      try {
+        if (targetPriceId) {
+          await subscription.refetchUntil((so) => so?.priceId === targetPriceId)
+        } else {
+          await subscription.refetch()
+        }
+        await refreshInvoiceAndHistory()
+      } finally {
+        isPostPaymentReloading.value = false
       }
       trackBilling('planChangeCompleted', {
         plan,
@@ -684,7 +787,12 @@
         })
         done?.()
         showChangePlanDrawer.value = false
-        await subscription.refetch()
+        isPostPaymentReloading.value = true
+        try {
+          await subscription.refetch()
+        } finally {
+          isPostPaymentReloading.value = false
+        }
         return
       }
 
@@ -715,7 +823,12 @@
       })
       done?.()
       showChangePlanDrawer.value = false
-      await subscription.refetchUntil((so) => so?.metadata?.status === 'downgrade_pending')
+      isPostPaymentReloading.value = true
+      try {
+        await subscription.refetchUntil((so) => so?.downgradePending != null)
+      } finally {
+        isPostPaymentReloading.value = false
+      }
     } catch (err) {
       const detail =
         (Array.isArray(err?.message) ? err.message[0] : err?.message) || 'Unable to downgrade plan.'
@@ -739,7 +852,12 @@
 
       await cancelDowngradeServiceOrderPlan({ id: serviceOrderId })
 
-      await subscription.refetchUntil((so) => so?.metadata?.status !== 'downgrade_pending')
+      isPostPaymentReloading.value = true
+      try {
+        await subscription.refetchUntil((so) => so?.downgradePending == null)
+      } finally {
+        isPostPaymentReloading.value = false
+      }
 
       trackBilling('downgradeCancelled', {
         fromPlan,
@@ -803,10 +921,16 @@
       })
     }
 
-    if (targetPlanId) {
-      await subscription.refetchUntil((so) => so?.planId === targetPlanId)
-    } else {
-      await subscription.refetch()
+    isPostPaymentReloading.value = true
+    try {
+      if (targetPlanId) {
+        await subscription.refetchUntil((so) => so?.planId === targetPlanId)
+      } else {
+        await subscription.refetch()
+      }
+      await refreshInvoiceAndHistory()
+    } finally {
+      isPostPaymentReloading.value = false
     }
 
     trackBilling('planChangeCompleted', {
@@ -820,6 +944,15 @@
   }
 
   const goToEnvoiceDetails = (item) => {
+    const detailsUrl = typeof item === 'object' ? item?.detailsUrl : null
+    if (detailsUrl) {
+      trackBilling('invoiceViewed', {
+        status: item?.status?.content || item?.status,
+        amount: item?.amount
+      })
+      window.open(detailsUrl, '_blank')
+      return
+    }
     const billId = typeof item === 'object' ? item?.billId : item
     if (!billId) return
     const invoicePayload =
@@ -836,6 +969,10 @@
 
   const goToPayment = () => {
     emit('changeTab', 1)
+  }
+
+  const openChangePaymentMethod = () => {
+    showChangePaymentMethodDialog.value = true
   }
 
   const loaderPaymentHistoryColumns = computed(() => {
