@@ -780,15 +780,35 @@ Possible `state` values include `draft`, `building`, `ready`, `active`, `archive
 
 Create a new version by cloning an existing one. `operationId: create_application_version`.
 
+> **Contrato confirmado com o time de API (2026-06-12):** os campos da Application
+> (`name`, `active`, `debug`, `modules`) vão no **nível raiz** do body, ao lado de
+> `source_version` e `comment` — **não** há campo `override`. Omitir um campo mantém
+> o valor clonado da `source_version`.
+
 **Request body (`VersionCreateRequest`):**
+
+Clone puro (sem alterações):
 
 ```json
 {
-  "source_version": "01HZX9P3K2A7B4C5D6E7F8G9H0",
-  "comment": "Add new redirect rule",
-  "override": {
-    "active": true,
-    "debug": false
+  "source_version": "A6MIAEPU"
+}
+```
+
+Clone com alterações (campos da Application no nível raiz):
+
+```json
+{
+  "source_version": "A6MIAEPU",
+  "comment": "versao com debug habilitado",
+  "name": "app-nova-versao",
+  "active": true,
+  "debug": true,
+  "modules": {
+    "cache": { "enabled": true },
+    "functions": { "enabled": true },
+    "application_accelerator": { "enabled": false },
+    "image_processor": { "enabled": false }
   }
 }
 ```
@@ -803,7 +823,7 @@ If `source_version` is omitted, the latest `ready` version is cloned.
   "data": {
     "id": "01HZX9Q4L3B8C5D6E7F8G9H0J1",
     "state": "draft",
-    "comment": "Add new redirect rule",
+    "comment": "versao com debug habilitado",
     "created_at": "2026-06-10T12:34:56Z",
     "last_modified": "2026-06-10T12:34:56Z"
   }
@@ -816,11 +836,39 @@ Retrieve a specific version. `operationId: retrieve_application_version`. **Resp
 
 ### `PUT /v4/workspace/applications/{application_id}/versions/{version_id}`
 
-Update a draft version. `operationId: update_application_version`. **Body:** `VersionCreateRequest`. **Response 200:** envelope.
+Update a draft version (full replace). `operationId: update_application_version`. **Body:** `VersionCreateRequest`.
+
+> Os campos da Application vão no **nível raiz** (mesmo contrato do `POST`). Como é
+> um replace completo, envie o conjunto inteiro de campos editáveis do draft.
+
+**Request body:**
+
+```json
+{
+  "name": "app-atualizada",
+  "active": true,
+  "debug": false,
+  "modules": {
+    "cache": { "enabled": true },
+    "functions": { "enabled": true },
+    "application_accelerator": { "enabled": false },
+    "image_processor": { "enabled": false }
+  }
+}
+```
+
+**Response 200:** envelope.
 
 ### `PATCH /v4/workspace/applications/{application_id}/versions/{version_id}`
 
 Partially update a draft version. `operationId: partial_update_application_version`. **Body:** `PatchedVersionCreateRequest`.
+
+> Qualquer subconjunto dos campos do nível raiz. Campos omitidos permanecem
+> inalterados.
+
+```json
+{ "debug": true }
+```
 
 ```json
 { "comment": "Updated rationale" }
