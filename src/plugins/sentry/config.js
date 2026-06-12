@@ -30,13 +30,17 @@ export function getSentryConfig(options = {}) {
 
   if (!environment) return null
 
+  const config = environmentConfigs[environment === 'development' ? 'stage' : environment]
+
+  if (!config) return null
+
   const {
     dsn,
     tracesSampleRate,
     tracePropagationTargets,
     replaysSessionSampleRate,
     replaysOnErrorSampleRate
-  } = environmentConfigs[environment === 'development' ? 'stage' : environment]
+  } = config
 
   return {
     dsn,

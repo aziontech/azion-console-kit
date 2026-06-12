@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadDataStream } from '@/services/real-time-events-service-v2/data-stream'
 import { describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 
 const fixtures = {
   filter: {
@@ -64,6 +65,8 @@ describe('DataStreamingServices', () => {
       body: { data: { dataStreamedEvents: [fixtures.dataStreaming] } }
     })
 
+    const expectedTs = getCurrentTimezone(fixtures.dataStreaming.ts)
+
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
 
@@ -73,7 +76,7 @@ describe('DataStreamingServices', () => {
         content: fixtures.dataStreaming.jobName,
         severity: 'info'
       },
-      ts: 'February 23, 2024 at 06:07:25 PM',
+      ts: expectedTs,
       data: [
         { key: 'configurationId', value: fixtures.dataStreaming.configurationId },
         { key: 'dataStreamed', value: fixtures.dataStreaming.dataStreamed },
@@ -81,7 +84,7 @@ describe('DataStreamingServices', () => {
         { key: 'jobName', value: 'jobName' },
         { key: 'statusCode', value: fixtures.dataStreaming.statusCode },
         { key: 'streamedLines', value: fixtures.dataStreaming.streamedLines },
-        { key: 'ts', value: 'February 23, 2024 at 06:07:25 PM' },
+        { key: 'ts', value: expectedTs },
         { key: 'url', value: fixtures.dataStreaming.url }
       ]
     })

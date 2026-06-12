@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listDataStream } from '@/services/real-time-events-service-v2/data-stream'
 import { describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 import * as Errors from '@/services/axios/errors'
 
 const fixtures = {
@@ -113,7 +114,7 @@ describe('DataStreamingServices', () => {
             { key: 'url', value: 'http://url.com' }
           ],
           ts: fixtures.dataStreaming.ts,
-          tsFormat: 'February 23, 2024 at 06:07:25 PM'
+          tsFormat: getCurrentTimezone(fixtures.dataStreaming.ts)
         }
       ]
     })
