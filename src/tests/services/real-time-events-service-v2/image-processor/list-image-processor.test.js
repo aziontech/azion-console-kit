@@ -2,6 +2,8 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listImageProcessor } from '@/services/real-time-events-service-v2/image-processor'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
+import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 
 vi.mock('@/modules/filter-loaders/dataset-fields-loader', () => ({
   loadDatasetFields: vi.fn().mockResolvedValue([]),
@@ -73,6 +75,7 @@ describe('ImageProcessorServices', () => {
   })
 
   it('should parsed correctly each event', async () => {
+    localeMock()
     vi.mock('@/helpers/generate-timestamp', () => ({
       generateCurrentTimestamp: () => 'mocked-timestamp'
     }))
@@ -101,7 +104,7 @@ describe('ImageProcessorServices', () => {
             { key: 'bytesSent', value: fixtures.imageProcessor.bytesSent }
           ],
           ts: fixtures.imageProcessor.ts,
-          tsFormat: 'February 23, 2024 at 06:07:25 PM'
+          tsFormat: getCurrentTimezone(fixtures.imageProcessor.ts)
         }
       ]
     })

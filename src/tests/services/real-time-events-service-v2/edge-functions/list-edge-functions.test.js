@@ -2,6 +2,8 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listEdgeFunctions } from '@/services/real-time-events-service-v2/edge-functions'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
+import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 
 vi.mock('@/modules/filter-loaders/dataset-fields-loader', () => ({
   loadDatasetFields: vi.fn().mockResolvedValue([]),
@@ -70,6 +72,7 @@ describe('EdgeFunctionsServices', () => {
   })
 
   it('should parsed correctly each event', async () => {
+    localeMock()
     vi.mock('@/helpers/generate-timestamp', () => ({
       generateCurrentTimestamp: () => 'mocked-timestamp'
     }))
@@ -97,7 +100,7 @@ describe('EdgeFunctionsServices', () => {
             { key: 'functionLanguage', value: fixtures.edgeFunction.functionLanguage }
           ],
           ts: fixtures.edgeFunction.ts,
-          tsFormat: 'February 23, 2024 at 06:07:25 PM'
+          tsFormat: getCurrentTimezone(fixtures.edgeFunction.ts)
         }
       ]
     })

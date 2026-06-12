@@ -8,6 +8,29 @@ function disableBroadcastChannelForTests() {
 }
 
 /**
+ * jsdom does not implement ResizeObserver, so components that instantiate one
+ * on mount (e.g. log-field-badges.vue) throw `ResizeObserver is not defined`.
+ * Install a no-op stub on every global the test may reference.
+ */
+function installResizeObserverPolyfill() {
+  class ResizeObserverStub {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+
+  const targets = []
+  if (typeof globalThis !== 'undefined') targets.push(globalThis)
+  if (typeof window !== 'undefined' && window !== globalThis) targets.push(window)
+
+  for (const target of targets) {
+    if (typeof target.ResizeObserver === 'undefined') {
+      target.ResizeObserver = ResizeObserverStub
+    }
+  }
+}
+
+/**
  * Provide a localStorage / sessionStorage polyfill for the test environment.
  *
  * Node 22+ ships with a built-in (experimental) `globalThis.localStorage`
@@ -103,6 +126,7 @@ export function setupGlobalPinia() {
 // Install storage polyfills once, up front, so every test sees them.
 installStoragePolyfill('localStorage')
 installStoragePolyfill('sessionStorage')
+installResizeObserverPolyfill()
 
 function clearStorageSafely(propName) {
   // The polyfill installed above is a plain object — not a real Storage
