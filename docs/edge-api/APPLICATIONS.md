@@ -42,7 +42,7 @@ Todos os endpoints exigem autenticação via `TokenAuth` ou `BearerAuth` no head
 
 ## Applications
 
-### `GET /edge_application/api/applications`
+### `GET /v4/workspace/applications`
 
 List all Applications owned by your account. `operationId: list_applications`.
 
@@ -113,7 +113,7 @@ List all Applications owned by your account. `operationId: list_applications`.
 }
 ```
 
-### `POST /edge_application/api/applications`
+### `POST /v4/workspace/applications`
 
 Create a new Application. `operationId: create_application`.
 
@@ -159,7 +159,7 @@ Create a new Application. `operationId: create_application`.
 }
 ```
 
-### `GET /edge_application/api/applications/{application_id}`
+### `GET /v4/workspace/applications/{application_id}`
 
 Retrieve a specific Application. `operationId: retrieve_application`.
 
@@ -167,7 +167,7 @@ Retrieve a specific Application. `operationId: retrieve_application`.
 
 **Response 200:** Same envelope as the create response.
 
-### `PUT /edge_application/api/applications/{application_id}`
+### `PUT /v4/workspace/applications/{application_id}`
 
 Replace an existing Application (full update). `operationId: update_application`.
 
@@ -175,7 +175,7 @@ Replace an existing Application (full update). `operationId: update_application`
 
 **Response 200:** `ApplicationResponse` envelope.
 
-### `PATCH /edge_application/api/applications/{application_id}`
+### `PATCH /v4/workspace/applications/{application_id}`
 
 Partially update an Application. `operationId: partial_update_application`.
 
@@ -190,7 +190,7 @@ Partially update an Application. `operationId: partial_update_application`.
 
 **Response 200:** `ApplicationResponse` envelope.
 
-### `DELETE /edge_application/api/applications/{application_id}`
+### `DELETE /v4/workspace/applications/{application_id}`
 
 Delete an Application. `operationId: destroy_application`.
 
@@ -200,7 +200,7 @@ Delete an Application. `operationId: destroy_application`.
 
 ## Clone
 
-### `POST /edge_application/api/applications/{application_id}/clone`
+### `POST /v4/workspace/applications/{application_id}/clone`
 
 Deep-copy an existing Application (Cache Settings, Origins, Error Responses, Function Instances, Rules Engine). `operationId: clone_application`.
 
@@ -218,7 +218,7 @@ Deep-copy an existing Application (Cache Settings, Origins, Error Responses, Fun
 
 ## Cache Settings
 
-### `GET /edge_application/api/applications/{application_id}/cache_settings`
+### `GET /v4/workspace/applications/{application_id}/cache_settings`
 
 List Cache Settings. `operationId: list_cache_settings`.
 
@@ -260,7 +260,7 @@ List Cache Settings. `operationId: list_cache_settings`.
 }
 ```
 
-### `POST /edge_application/api/applications/{application_id}/cache_settings`
+### `POST /v4/workspace/applications/{application_id}/cache_settings`
 
 Create a Cache Setting. `operationId: create_cache_setting`.
 
@@ -302,17 +302,17 @@ Create a Cache Setting. `operationId: create_cache_setting`.
 }
 ```
 
-### `GET /edge_application/api/applications/{application_id}/cache_settings/{cache_setting_id}`
+### `GET /v4/workspace/applications/{application_id}/cache_settings/{cache_setting_id}`
 
 Retrieve a Cache Setting. `operationId: retrieve_cache_setting`.
 
 **Response 200:** Same `CacheSettingResponse` envelope.
 
-### `PUT /edge_application/api/applications/{application_id}/cache_settings/{cache_setting_id}`
+### `PUT /v4/workspace/applications/{application_id}/cache_settings/{cache_setting_id}`
 
 Replace a Cache Setting. `operationId: update_cache_setting`. **Request body:** `CacheSettingRequest`. **Response 200:** envelope.
 
-### `PATCH /edge_application/api/applications/{application_id}/cache_settings/{cache_setting_id}`
+### `PATCH /v4/workspace/applications/{application_id}/cache_settings/{cache_setting_id}`
 
 Partially update a Cache Setting. `operationId: partial_update_cache_setting`.
 
@@ -322,7 +322,7 @@ Partially update a Cache Setting. `operationId: partial_update_cache_setting`.
 
 **Response 200:** envelope.
 
-### `DELETE /edge_application/api/applications/{application_id}/cache_settings/{cache_setting_id}`
+### `DELETE /v4/workspace/applications/{application_id}/cache_settings/{cache_setting_id}`
 
 Delete a Cache Setting. `operationId: destroy_cache_setting`. **Response 204:** No content.
 
@@ -330,7 +330,7 @@ Delete a Cache Setting. `operationId: destroy_cache_setting`. **Response 204:** 
 
 ## Device Groups
 
-### `GET /edge_application/api/applications/{application_id}/device_groups`
+### `GET /v4/workspace/applications/{application_id}/device_groups`
 
 List Device Groups. `operationId: list_device_groups`.
 
@@ -357,7 +357,7 @@ List Device Groups. `operationId: list_device_groups`.
 }
 ```
 
-### `POST /edge_application/api/applications/{application_id}/device_groups`
+### `POST /v4/workspace/applications/{application_id}/device_groups`
 
 Create a Device Group. `operationId: create_device_group`.
 
@@ -384,15 +384,15 @@ Create a Device Group. `operationId: create_device_group`.
 }
 ```
 
-### `GET /edge_application/api/applications/{application_id}/device_groups/{device_group_id}`
+### `GET /v4/workspace/applications/{application_id}/device_groups/{device_group_id}`
 
 Retrieve a Device Group. `operationId: retrieve_device_group`. **Response 200:** `DeviceGroupResponse` envelope.
 
-### `PUT /edge_application/api/applications/{application_id}/device_groups/{device_group_id}`
+### `PUT /v4/workspace/applications/{application_id}/device_groups/{device_group_id}`
 
 Replace a Device Group. `operationId: update_device_group`. **Body:** `DeviceGroupRequest`. **Response 200:** envelope.
 
-### `PATCH /edge_application/api/applications/{application_id}/device_groups/{device_group_id}`
+### `PATCH /v4/workspace/applications/{application_id}/device_groups/{device_group_id}`
 
 Partially update a Device Group. `operationId: partial_update_device_group`.
 
@@ -402,7 +402,7 @@ Partially update a Device Group. `operationId: partial_update_device_group`.
 
 **Response 200:** envelope.
 
-### `DELETE /edge_application/api/applications/{application_id}/device_groups/{device_group_id}`
+### `DELETE /v4/workspace/applications/{application_id}/device_groups/{device_group_id}`
 
 Delete a Device Group. `operationId: destroy_device_group`. **Response 204:** No content.
 
@@ -412,7 +412,7 @@ Delete a Device Group. `operationId: destroy_device_group`. **Response 204:** No
 
 Manages Function Instances (instances of Edge Functions attached to an Application).
 
-### `GET /edge_application/api/applications/{application_id}/functions`
+### `GET /v4/workspace/applications/{application_id}/functions`
 
 List Function Instances. `operationId: list_application_functions`.
 
@@ -444,7 +444,7 @@ List Function Instances. `operationId: list_application_functions`.
 }
 ```
 
-### `POST /edge_application/api/applications/{application_id}/functions`
+### `POST /v4/workspace/applications/{application_id}/functions`
 
 Create a Function Instance. `operationId: create_application_function`.
 
@@ -477,15 +477,15 @@ Create a Function Instance. `operationId: create_application_function`.
 }
 ```
 
-### `GET /edge_application/api/applications/{application_id}/functions/{function_id}`
+### `GET /v4/workspace/applications/{application_id}/functions/{function_id}`
 
 Retrieve a Function Instance. `operationId: retrieve_application_function`. **Response 200:** `FunctionInstanceResponse` envelope.
 
-### `PUT /edge_application/api/applications/{application_id}/functions/{function_id}`
+### `PUT /v4/workspace/applications/{application_id}/functions/{function_id}`
 
 Replace a Function Instance. `operationId: update_application_function`. **Body:** `FunctionInstanceRequest`. **Response 200:** envelope.
 
-### `PATCH /edge_application/api/applications/{application_id}/functions/{function_id}`
+### `PATCH /v4/workspace/applications/{application_id}/functions/{function_id}`
 
 Partially update a Function Instance. `operationId: partial_update_application_function`.
 
@@ -495,7 +495,7 @@ Partially update a Function Instance. `operationId: partial_update_application_f
 
 **Response 200:** envelope.
 
-### `DELETE /edge_application/api/applications/{application_id}/functions/{function_id}`
+### `DELETE /v4/workspace/applications/{application_id}/functions/{function_id}`
 
 Delete a Function Instance. `operationId: destroy_application_function`. **Response 204:** No content.
 
@@ -505,7 +505,7 @@ Delete a Function Instance. `operationId: destroy_application_function`. **Respo
 
 Rules Engine for the request phase.
 
-### `GET /edge_application/api/applications/{application_id}/request_rules`
+### `GET /v4/workspace/applications/{application_id}/request_rules`
 
 List Request Phase Rules. `operationId: list_application_request_rules`.
 
@@ -552,7 +552,7 @@ List Request Phase Rules. `operationId: list_application_request_rules`.
 }
 ```
 
-### `POST /edge_application/api/applications/{application_id}/request_rules`
+### `POST /v4/workspace/applications/{application_id}/request_rules`
 
 Create a Request Phase Rule. `operationId: create_application_request_rule`.
 
@@ -586,15 +586,15 @@ Common behavior `type` values: `deny`, `no_content`, `deliver`, `finish_request_
 
 **Response 201:** `RequestPhaseRuleResponse` envelope.
 
-### `GET /edge_application/api/applications/{application_id}/request_rules/{request_rule_id}`
+### `GET /v4/workspace/applications/{application_id}/request_rules/{request_rule_id}`
 
 Retrieve a Request Phase Rule. `operationId: retrieve_application_request_rule`. **Response 200:** envelope.
 
-### `PUT /edge_application/api/applications/{application_id}/request_rules/{request_rule_id}`
+### `PUT /v4/workspace/applications/{application_id}/request_rules/{request_rule_id}`
 
 Replace a Request Phase Rule. `operationId: update_application_request_rule`. **Body:** `RequestPhaseRuleRequest`. **Response 200:** envelope.
 
-### `PATCH /edge_application/api/applications/{application_id}/request_rules/{request_rule_id}`
+### `PATCH /v4/workspace/applications/{application_id}/request_rules/{request_rule_id}`
 
 Partially update a Request Phase Rule. `operationId: partial_update_application_request_rule`.
 
@@ -604,11 +604,11 @@ Partially update a Request Phase Rule. `operationId: partial_update_application_
 
 **Response 200:** envelope.
 
-### `DELETE /edge_application/api/applications/{application_id}/request_rules/{request_rule_id}`
+### `DELETE /v4/workspace/applications/{application_id}/request_rules/{request_rule_id}`
 
 Delete a Request Phase Rule. `operationId: destroy_application_request_rule`. **Response 204:** No content.
 
-### `PUT /edge_application/api/applications/{application_id}/request_rules/order`
+### `PUT /v4/workspace/applications/{application_id}/request_rules/order`
 
 Reorder all Request Rules. `operationId: update_application_request_rules_order`.
 
@@ -628,7 +628,7 @@ The array sequence defines the new execution order. **Response 200:** Paginated 
 
 Rules Engine for the response phase. The structure mirrors Request Rules.
 
-### `GET /edge_application/api/applications/{application_id}/response_rules`
+### `GET /v4/workspace/applications/{application_id}/response_rules`
 
 List Response Phase Rules. `operationId: list_application_response_rules`. Same query params as request rules. **Response 200:** Paginated `ResponsePhaseRule` list.
 
@@ -671,7 +671,7 @@ List Response Phase Rules. `operationId: list_application_response_rules`. Same 
 }
 ```
 
-### `POST /edge_application/api/applications/{application_id}/response_rules`
+### `POST /v4/workspace/applications/{application_id}/response_rules`
 
 Create a Response Phase Rule. `operationId: create_application_response_rule`.
 
@@ -703,23 +703,23 @@ Create a Response Phase Rule. `operationId: create_application_response_rule`.
 
 **Response 201:** `ResponsePhaseRuleResponse` envelope.
 
-### `GET /edge_application/api/applications/{application_id}/response_rules/{response_rule_id}`
+### `GET /v4/workspace/applications/{application_id}/response_rules/{response_rule_id}`
 
 Retrieve a Response Phase Rule. `operationId: retrieve_application_response_rule`. **Response 200:** envelope.
 
-### `PUT /edge_application/api/applications/{application_id}/response_rules/{response_rule_id}`
+### `PUT /v4/workspace/applications/{application_id}/response_rules/{response_rule_id}`
 
 Replace a Response Phase Rule. `operationId: update_application_response_rule`. **Body:** `ResponsePhaseRuleRequest`. **Response 200:** envelope.
 
-### `PATCH /edge_application/api/applications/{application_id}/response_rules/{response_rule_id}`
+### `PATCH /v4/workspace/applications/{application_id}/response_rules/{response_rule_id}`
 
 Partially update a Response Phase Rule. `operationId: partial_update_application_response_rule`. **Response 200:** envelope.
 
-### `DELETE /edge_application/api/applications/{application_id}/response_rules/{response_rule_id}`
+### `DELETE /v4/workspace/applications/{application_id}/response_rules/{response_rule_id}`
 
 Delete a Response Phase Rule. `operationId: destroy_application_response_rule`. **Response 204:** No content.
 
-### `PUT /edge_application/api/applications/{application_id}/response_rules/order`
+### `PUT /v4/workspace/applications/{application_id}/response_rules/order`
 
 Reorder Response Rules. `operationId: update_application_response_rules_order`.
 
@@ -739,7 +739,7 @@ Reorder Response Rules. `operationId: update_application_response_rules_order`.
 
 Application Versions allow staged changes through a clone, edit, build, ready/active lifecycle. Each version has a ULID `version_id`.
 
-### `GET /edge_application/api/applications/{application_id}/versions`
+### `GET /v4/workspace/applications/{application_id}/versions`
 
 List versions of an Application. `operationId: list_application_versions`.
 
@@ -776,7 +776,7 @@ List versions of an Application. `operationId: list_application_versions`.
 
 Possible `state` values include `draft`, `building`, `ready`, `active`, `archived`, `cancelled`, `failed`.
 
-### `POST /edge_application/api/applications/{application_id}/versions`
+### `POST /v4/workspace/applications/{application_id}/versions`
 
 Create a new version by cloning an existing one. `operationId: create_application_version`.
 
@@ -810,15 +810,15 @@ If `source_version` is omitted, the latest `ready` version is cloned.
 }
 ```
 
-### `GET /edge_application/api/applications/{application_id}/versions/{version_id}`
+### `GET /v4/workspace/applications/{application_id}/versions/{version_id}`
 
 Retrieve a specific version. `operationId: retrieve_application_version`. **Response 200:** version object envelope.
 
-### `PUT /edge_application/api/applications/{application_id}/versions/{version_id}`
+### `PUT /v4/workspace/applications/{application_id}/versions/{version_id}`
 
 Update a draft version. `operationId: update_application_version`. **Body:** `VersionCreateRequest`. **Response 200:** envelope.
 
-### `PATCH /edge_application/api/applications/{application_id}/versions/{version_id}`
+### `PATCH /v4/workspace/applications/{application_id}/versions/{version_id}`
 
 Partially update a draft version. `operationId: partial_update_application_version`. **Body:** `PatchedVersionCreateRequest`.
 
@@ -828,7 +828,7 @@ Partially update a draft version. `operationId: partial_update_application_versi
 
 **Response 200:** envelope.
 
-### `DELETE /edge_application/api/applications/{application_id}/versions/{version_id}`
+### `DELETE /v4/workspace/applications/{application_id}/versions/{version_id}`
 
 Delete a version. `operationId: delete_application_version`. **Response 202:** Accepted (asynchronous delete).
 
@@ -838,7 +838,7 @@ Delete a version. `operationId: delete_application_version`. **Response 202:** A
 
 Action endpoints respond `202 Accepted` because operations run asynchronously.
 
-### `POST /edge_application/api/applications/{application_id}/versions/{version_id}/archive`
+### `POST /v4/workspace/applications/{application_id}/versions/{version_id}/archive`
 
 Archive a `ready` version (soft-delete). `operationId: archive_application_version`.
 
@@ -852,7 +852,7 @@ Archive a `ready` version (soft-delete). `operationId: archive_application_versi
 
 **Response 202:** No body. The version transitions to `archived`.
 
-### `POST /edge_application/api/applications/{application_id}/versions/{version_id}/build`
+### `POST /v4/workspace/applications/{application_id}/versions/{version_id}/build`
 
 Trigger a build for a draft version. `operationId: build_application_version`.
 
@@ -867,7 +867,7 @@ Trigger a build for a draft version. `operationId: build_application_version`.
 
 **Response 202:** No body. The version transitions to `building`, then `ready` (or `failed`).
 
-### `POST /edge_application/api/applications/{application_id}/versions/{version_id}/cancel`
+### `POST /v4/workspace/applications/{application_id}/versions/{version_id}/cancel`
 
 Cancel a queued or in-progress build. `operationId: cancel_application_version_build`.
 
@@ -887,7 +887,7 @@ Cancel a queued or in-progress build. `operationId: cancel_application_version_b
 
 The same sub-resource operations available at the Application level (cache settings, device groups, functions, request rules, response rules) are also exposed under a specific version. They operate on the draft/ready version's snapshot rather than on the live Application.
 
-Path pattern: `/edge_application/api/applications/{application_id}/versions/{version_id}/<sub_resource>`.
+Path pattern: `/v4/workspace/applications/{application_id}/versions/{version_id}/<sub_resource>`.
 
 Request and response schemas are identical to the unversioned counterparts described above. Only the path parameter `version_id` (ULID string) is additionally required.
 
