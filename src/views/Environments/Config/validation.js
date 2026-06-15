@@ -5,7 +5,7 @@ const keyRegex = /^[A-Z0-9_]+$/
 export const validationSchema = yup.object({
   name: yup.string().required().label('Name'),
   description: yup.string().nullable().default(''),
-  deployment_version_policy: yup
+  deployment_policy: yup
     .string()
     .required()
     .oneOf(['single_version', 'versioned_urls'])
@@ -32,6 +32,6 @@ export const validationSchema = yup.object({
 export const initialValues = {
   name: '',
   description: '',
-  deployment_version_policy: 'single_version',
+  deployment_policy: 'single_version',
   environmentVariables: {}
 }

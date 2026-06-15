@@ -16,6 +16,8 @@ const getConfig = () => {
   const DomainSuffix = IS_PROD ? 'net' : 'com'
   const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && !IS_PROD
   const BEHOLDER_URL = env.VITE_BEHOLDER_URL
+  const deploymentApiUrl = IS_PROD ? 'https://deployment-api.azion.app' : 'https://deployment-api-stage.azion.app'
+  const environmentApiUrl = IS_PROD ? 'https://environment-api.azion.app' : 'https://environment-api-stage.azion.app'
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
     target,
@@ -142,11 +144,11 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/edge_api/, '')
         }),
         '/deployment-api': createProxyConfig({
-          target: `https://deployment-api.azion.app`,
+          target: deploymentApiUrl,
           rewrite: (path) => path.replace(/^\/deployment-api/, '')
         }),
         '/environment-api': createProxyConfig({
-          target: `https://environment-api-stage.azion.app`,
+          target: environmentApiUrl,
           rewrite: (path) => path.replace(/^\/environment-api/, '')
         })
       }

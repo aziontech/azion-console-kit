@@ -43,12 +43,12 @@ export const normalizeEnvironmentVariables = (environmentVariables) => {
 }
 
 const normalizePayloadToEnvironmentContract = (payload) => {
-  const deploymentVersionPolicy = getDeploymentVersionPolicyValue(payload.deployment_version_policy)
+  const deploymentVersionPolicy = getDeploymentVersionPolicyValue(payload.deployment_policy)
 
   return {
     name: payload.name,
     description: payload.description ?? '',
-    deployment_version_policy: deploymentVersionPolicy
+    deployment_policy: deploymentVersionPolicy
   }
 }
 
@@ -170,9 +170,7 @@ export const loadEnvironmentByIdAdapter = async ({ id }) => {
   const base = {
     name: response.data.name,
     description: response.data.description ?? '',
-    deployment_version_policy: getDeploymentVersionPolicyValue(
-      response.data.deployment_version_policy
-    ),
+    deployment_policy: getDeploymentVersionPolicyValue(response.data.deployment_policy),
     environmentVariables: normalizeEnvironmentVariables(response.data.environmentVariables)
   }
 

@@ -28,7 +28,7 @@
     value: deploymentVersionPolicy,
     setValue: setDeploymentVersionPolicy,
     errorMessage: deploymentVersionPolicyError
-  } = useField('deployment_version_policy')
+  } = useField('deployment_policy')
   const { value: strategyCanaryEnabled } = useField('strategy_canary_enabled')
   const { value: strategyCanaryDefaultPercentage } = useField('strategy_canary_default_percentage')
   const { value: strategySkewEnabled } = useField('strategy_skew_enabled')
@@ -153,7 +153,7 @@
             >
               <RadioButton
                 :inputId="`deployment-version-policy-${option.value}`"
-                name="deployment_version_policy"
+                name="deployment_policy"
                 :value="option.value"
                 :modelValue="deploymentVersionPolicy"
                 :disabled="props.isEdit"

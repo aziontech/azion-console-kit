@@ -65,7 +65,7 @@ const normalizeEnvironment = (environment) => {
     id: source.id ?? null,
     name: source.name ?? '',
     description: source.description ?? null,
-    deployment_version_policy: source.deployment_version_policy,
+    deployment_policy: source.deployment_policy,
     log_verbosity: typeof source.log_verbosity === 'string' ? source.log_verbosity : 'normal',
     robots_policy: typeof source.robots_policy === 'string' ? source.robots_policy : 'index',
     protection: normalizeProtection(source.protection),
@@ -116,7 +116,7 @@ export const EnvironmentAdapter = {
     return pickDefined({
       name: payload.name,
       description: payload.description,
-      deployment_version_policy: payload.deployment_version_policy,
+      deployment_policy: payload.deployment_policy,
       log_verbosity: payload.log_verbosity,
       robots_policy: payload.robots_policy,
       protection: payload.protection,
@@ -128,7 +128,7 @@ export const EnvironmentAdapter = {
     return pickDefined({
       name: payload.name,
       description: payload.description,
-      deployment_version_policy: payload.deployment_version_policy,
+      deployment_policy: payload.deployment_policy,
       log_verbosity: payload.log_verbosity,
       robots_policy: payload.robots_policy,
       protection: payload.protection,

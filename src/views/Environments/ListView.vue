@@ -65,10 +65,10 @@
         filterPath: 'name'
       },
       {
-        field: 'deployment_version_policy',
+        field: 'deployment_policy',
         header: 'Configuration',
-        sortField: 'deployment_version_policy',
-        filterPath: 'deployment_version_policy',
+        sortField: 'deployment_policy',
+        filterPath: 'deployment_policy',
         type: 'component',
         component: (columnData) => {
           return columnBuilder({

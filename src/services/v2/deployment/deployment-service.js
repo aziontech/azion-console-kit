@@ -51,7 +51,7 @@ const buildApiListParams = (params = {}) => {
 }
 
 export class DeploymentService extends BaseService {
-  #baseURL = '/deployment-api/v1/deployments'
+  #baseURL = '/deployment-api/v4/deployments'
 
   #fetchList = async (params = {}) => {
     const { data } = await this.http.request({

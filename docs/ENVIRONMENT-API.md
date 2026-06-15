@@ -84,7 +84,7 @@ Internal GraphQL endpoint for service-to-service state lookups (environment + ve
 **Base-row vs version-row resolution:**
 - `GET /v4/environments/:id` on a base-row → resolves to **latest READY version** (fallback latest if none ready). On version/legacy rows → returns as-is.
 - `GET /v4/environments` → filters version-rows out; each base-row resolves to its latest READY (fallback latest).
-- `PATCH /v4/environments/:id` on a base-row → creates a new **DRAFT** (clone of latest READY + patch applied) and returns it with `meta`. On version/legacy rows → mutates in place. `deployment_version_policy` is **immutable**: matching value → 200 no-op; mismatch → 409.
+- `PATCH /v4/environments/:id` on a base-row → creates a new **DRAFT** (clone of latest READY + patch applied) and returns it with `meta`. On version/legacy rows → mutates in place. `deployment_policy` is **immutable**: matching value → 200 no-op; mismatch → 409.
 
 Draft cap: `MAX_VERSIONING_DRAFTS_PER_RESOURCE` (default 20) per base.
 
@@ -92,7 +92,7 @@ Draft cap: `MAX_VERSIONING_DRAFTS_PER_RESOURCE` (default 20) per base.
 
 ### POST /v4/environments
 
-Creates a new environment. Returns 201. Minimum body: `{ "name": "...", "deployment_version_policy": "single_version" }`. All other fields default (`log_verbosity: "normal"`, `robots_policy: "index"`, protection off, `branch_tracking: null`).
+Creates a new environment. Returns 201. Minimum body: `{ "name": "...", "deployment_policy": "single_version" }`. All other fields default (`log_verbosity: "normal"`, `robots_policy: "index"`, protection off, `branch_tracking: null`).
 
 **Request**
 
@@ -100,7 +100,7 @@ Creates a new environment. Returns 201. Minimum body: `{ "name": "...", "deploym
 {
   "name": "production",
   "description": "Customer-facing prod traffic",
-  "deployment_version_policy": "single_version",
+  "deployment_policy": "single_version",
   "log_verbosity": "normal",
   "robots_policy": "index",
   "protection": {
@@ -126,7 +126,7 @@ Creates a new environment. Returns 201. Minimum body: `{ "name": "...", "deploym
     "id": "AENV1234",
     "name": "production",
     "description": "Customer-facing prod traffic",
-    "deployment_version_policy": "single_version",
+    "deployment_policy": "single_version",
     "log_verbosity": "normal",
     "robots_policy": "index",
     "protection": {
@@ -174,7 +174,7 @@ Paginated list. Filters version-rows; each base-row resolves to latest READY (fa
       "id": "AENV1234",
       "name": "production",
       "description": "Customer-facing prod traffic",
-      "deployment_version_policy": "single_version",
+      "deployment_policy": "single_version",
       "log_verbosity": "normal",
       "robots_policy": "index",
       "protection": {
@@ -196,7 +196,7 @@ Paginated list. Filters version-rows; each base-row resolves to latest READY (fa
       "id": "AENV5678",
       "name": "staging",
       "description": null,
-      "deployment_version_policy": "versioned_urls",
+      "deployment_policy": "versioned_urls",
       "log_verbosity": "verbose",
       "robots_policy": "noindex",
       "protection": {
@@ -235,7 +235,7 @@ Returns a single environment. Base-rows resolve to their latest READY (fallback 
     "id": "AENV1234",
     "name": "production",
     "description": "Customer-facing prod traffic",
-    "deployment_version_policy": "single_version",
+    "deployment_policy": "single_version",
     "log_verbosity": "normal",
     "robots_policy": "index",
     "protection": {
@@ -288,7 +288,7 @@ Partial update. On a base-row → creates a new DRAFT and returns it with `meta`
     "id": "AENV1234",
     "name": "production-eu",
     "description": "EU prod traffic",
-    "deployment_version_policy": "single_version",
+    "deployment_policy": "single_version",
     "log_verbosity": "verbose",
     "robots_policy": "noindex",
     "protection": {
@@ -318,7 +318,7 @@ Partial update. On a base-row → creates a new DRAFT and returns it with `meta`
     "id": "AENVD001",
     "name": "production-eu",
     "description": "EU prod traffic",
-    "deployment_version_policy": "single_version",
+    "deployment_policy": "single_version",
     "log_verbosity": "verbose",
     "robots_policy": "noindex",
     "protection": {
@@ -354,7 +354,7 @@ Partial update. On a base-row → creates a new DRAFT and returns it with `meta`
 ```
 
 - **404** — not found
-- **409** — `deployment_version_policy` mismatch (immutable)
+- **409** — `deployment_policy` mismatch (immutable)
 - **422** — domain validation (`meta.source.pointer` = `/<field>`)
 
 ---
@@ -410,7 +410,7 @@ Lists version-rows for a base. Query: `page` (1–1000, default 1), `page_size` 
       "id": "AENVR007",
       "name": "production",
       "description": "Customer-facing prod traffic",
-      "deployment_version_policy": "single_version",
+      "deployment_policy": "single_version",
       "log_verbosity": "normal",
       "robots_policy": "index",
       "protection": {
@@ -446,7 +446,7 @@ Lists version-rows for a base. Query: `page` (1–1000, default 1), `page_size` 
       "id": "AENVD001",
       "name": "production-eu",
       "description": "EU prod traffic",
-      "deployment_version_policy": "single_version",
+      "deployment_policy": "single_version",
       "log_verbosity": "verbose",
       "robots_policy": "noindex",
       "protection": {
@@ -508,7 +508,7 @@ Creates a new DRAFT by cloning the latest READY version (or an explicit `source_
     "id": "AENVD002",
     "name": "production",
     "description": "Customer-facing prod traffic",
-    "deployment_version_policy": "single_version",
+    "deployment_policy": "single_version",
     "log_verbosity": "normal",
     "robots_policy": "index",
     "protection": {
@@ -561,7 +561,7 @@ Returns a single version-row (entity + meta).
     "id": "AENVR007",
     "name": "production",
     "description": "Customer-facing prod traffic",
-    "deployment_version_policy": "single_version",
+    "deployment_policy": "single_version",
     "log_verbosity": "normal",
     "robots_policy": "index",
     "protection": {
@@ -602,7 +602,7 @@ Returns a single version-row (entity + meta).
 
 ### PATCH /v4/environments/:id/versions/:version_id
 
-Replaces patchable fields on a DRAFT. Same body shape as PATCH on the base resource. `deployment_version_policy` is immutable.
+Replaces patchable fields on a DRAFT. Same body shape as PATCH on the base resource. `deployment_policy` is immutable.
 
 **Request**
 
@@ -626,7 +626,7 @@ Replaces patchable fields on a DRAFT. Same body shape as PATCH on the base resou
     "id": "AENVD002",
     "name": "production-eu",
     "description": "EU prod traffic",
-    "deployment_version_policy": "single_version",
+    "deployment_policy": "single_version",
     "log_verbosity": "verbose",
     "robots_policy": "index",
     "protection": {

@@ -54,7 +54,7 @@
       if (env?.id != null) {
         environmentMap.value[env.id] = {
           name: env.name,
-          deployment_version_policy: env.deployment_version_policy
+          deployment_policy: env.deployment_policy
         }
       }
     } catch {
@@ -65,7 +65,7 @@
   const environmentName = (envId) => environmentMap.value[envId]?.name ?? ''
 
   const isUrlVersionedEnv = (envId) => {
-    return environmentMap.value[envId]?.deployment_version_policy === 'versioned_urls'
+    return environmentMap.value[envId]?.deployment_policy === 'versioned_urls'
   }
 
   const buildAzionDomain = (name) => {
@@ -196,7 +196,7 @@
       if (production?.id != null) {
         environmentMap.value[production.id] = {
           name: production.name,
-          deployment_version_policy: production.deployment_version_policy
+          deployment_policy: production.deployment_policy
         }
       }
 
