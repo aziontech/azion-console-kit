@@ -431,15 +431,17 @@ export default class Aql {
     switch (step) {
       case 'field': {
         const formattedField = formatField(suggestionLabel)
-        if (query && query.toLowerCase().includes(' and ')) {
-          const parts = query.split(/\s+and\s+/i)
-          parts[parts.length - 1] = formattedField
-          const newQuery = parts.join(' and ') + ' '
-          return { query: newQuery, nextStep: 'operator', label: suggestionLabel }
-        } else {
-          const newQuery = `${formattedField} `
+        // Replace only the trailing (partial) field token, preserving the
+        // prefix up to and including the last AND/OR connector verbatim. The
+        // previous split-on-`and`/join-on-`and` approach ignored OR (so the
+        // whole clause was wiped) and would also rewrite OR connectors as AND.
+        const connectorMatch = query?.match(/^(.*\s(?:and|or)\s+)/i)
+        if (connectorMatch) {
+          const newQuery = `${connectorMatch[1]}${formattedField} `
           return { query: newQuery, nextStep: 'operator', label: suggestionLabel }
         }
+        const newQuery = `${formattedField} `
+        return { query: newQuery, nextStep: 'operator', label: suggestionLabel }
       }
       case 'operator': {
         const newQuery = `${query.trimEnd()} ${suggestionLabel} `
@@ -464,7 +466,11 @@ export default class Aql {
   }
 
   handleInputMatching(query, suggestions) {
-    const parts = query.split(/\s+and\s+/i)
+    // Split on BOTH connectors so the trailing token after an OR is isolated
+    // the same way as after an AND — otherwise a clause following `OR` is read
+    // as part of the previous (complete) clause and the step wrongly stays at
+    // `logicOperator` instead of advancing to `field`.
+    const parts = query.split(/\s+(?:and|or)\s+/i)
     const tokenRaw = parts.pop().trim()
     const tokenForMatch = tokenRaw.replace(/^["']|["']$/g, '').toLowerCase()
     const fieldComplete = query.endsWith(' ')
@@ -1117,7 +1123,10 @@ export default class Aql {
   }
 
   getFieldSuggestions(query, suggestions) {
-    const parts = query.split(/\s+and\s+/i)
+    // Split on both connectors so the field token after an OR is matched the
+    // same as after an AND (otherwise the prior clause leaks into the search
+    // term and no field matches).
+    const parts = query.split(/\s+(?:and|or)\s+/i)
     const currentFieldToken = parts.pop().trim().replace(/["']/g, '')
 
     const searchTerm = currentFieldToken.toLowerCase()
