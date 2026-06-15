@@ -365,6 +365,10 @@
   }
 
   const executeQuery = () => {
+    // Do nothing while the query isn't ready (e.g. it ends with a dangling
+    // `AND`/`OR`, or any other validation error). Pressing Enter on an
+    // incomplete query is a no-op rather than sending a malformed request.
+    if (handleErrorsQuery.value.length) return
     const filter = AzionQueryLanguage.parse(query.value, suggestionsData.value, domains.value)
     props.searchAdvancedFilter(filter)
     emit('dirty', false)
