@@ -32,7 +32,7 @@
   const { isMobile } = useResize()
   const { value: name } = useField('name')
   const { value: description } = useField('description')
-  const { value: deploymentVersionPolicy } = useField('deployment_version_policy')
+  const { value: deploymentVersionPolicy } = useField('deployment_policy')
   const { value: environmentVariables, errorMessage: environmentVariablesError } =
     useField('environmentVariables')
 
@@ -574,7 +574,7 @@
       <div class="flex flex-col sm:max-w-lg w-full gap-2">
         <FieldDropdown
           label="Deployment Version Policy"
-          name="deployment_version_policy"
+          name="deployment_policy"
           required
           :options="deploymentVersionPolicyOptions"
           :value="deploymentVersionPolicy"
