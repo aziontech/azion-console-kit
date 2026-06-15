@@ -15,9 +15,7 @@ export class UserService extends BaseService {
 
   async getUserInfo() {
     const queryKey = queryKeys.user.info()
-    return await this.useEnsureQueryData(queryKey, async () => this.fetchUserInfo(), {
-      meta: { skipCache: true, persist: false }
-    })
+    return await this.useEnsureQueryData(queryKey, async () => this.fetchUserInfo())
   }
 }
 

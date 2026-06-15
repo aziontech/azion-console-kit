@@ -51,7 +51,7 @@
     "@mdi/font": "^7.4.47",
     "@sentry/vite-plugin": "^5.1.1",
     "@sentry/vue": "^10.42.0",
-    "@stripe/stripe-js": "9.4.0",
+    "@stripe/stripe-js": "^4.10.0",
     "@tanstack/query-broadcast-client-experimental": "^5.90.10",
     "@tanstack/query-persist-client-core": "^5.91.4",
     "@tanstack/vue-query": "^5.90.3",
