@@ -2,6 +2,7 @@ import { ref, shallowRef, triggerRef } from 'vue'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import { loadSummaryKpis } from '@/services/real-time-events-service-v2/load-events-aggregation'
+import { buildFilterParts } from '@/services/real-time-events-service-v2/_shared/build-filter-parts'
 
 const MAX_LIST_RANGE_MS = 2 * 60 * 60 * 1000
 
@@ -70,52 +71,48 @@ export function useEventsData({
     return rawValue
   }
 
-  const buildApiFilters = () => {
-    const filters = {}
-    // Collect equality clauses per field so that multiple `=` on the SAME
-    // field collapse into a single `In` list instead of overwriting each other.
-    // The events GraphQL filter is an AND-only object keyed by `${field}${Op}`,
-    // so `status = 200 OR status = 400` (two `statusEq` clauses) would otherwise
-    // clobber down to the last value. `statusIn: [200, 400]` is the API's
-    // supported way to express that OR-of-equals on one field.
-    const eqByField = {}
-    if (filterData.value?.fields?.length) {
-      filterData.value.fields.forEach((ff) => {
-        // Defensive guard: skip clauses whose operator is missing, falsy,
-        // or non-string. This prevents emitting malformed GraphQL filter
-        // keys like `${valueField}undefined` when the parser (or any other
-        // upstream source) hands us a clause without a resolved operator.
-        // See spec: realtime-events-filter-operator-bug — Requirement 2.3, 2.4.
-        if (typeof ff.operator !== 'string' || ff.operator.length === 0) return
-        const value = coerceFilterValue(ff.value, ff.type)
-        if (ff.operator === 'In') {
-          filters.in = filters.in || {}
-          const existing = Array.isArray(filters.in[ff.valueField]) ? filters.in[ff.valueField] : []
-          filters.in[ff.valueField] = [...existing, ...(Array.isArray(value) ? value : [value])]
-        } else if (ff.operator === 'Eq') {
-          if (!eqByField[ff.valueField]) eqByField[ff.valueField] = []
-          eqByField[ff.valueField].push(value)
-        } else {
-          filters.and = filters.and || {}
-          filters.and[ff.valueField + ff.operator] = value
-        }
-      })
+  // Builds one AND-group object ({ and, in }) from a list of clauses.
+  const buildFilterGroup = (clauses) => {
+    const group = {}
+    clauses.forEach((ff) => {
+      // Defensive guard: skip clauses whose operator is missing, falsy,
+      // or non-string. This prevents emitting malformed GraphQL filter
+      // keys like `${valueField}undefined` when the parser (or any other
+      // upstream source) hands us a clause without a resolved operator.
+      // See spec: realtime-events-filter-operator-bug — Requirement 2.3, 2.4.
+      if (typeof ff.operator !== 'string' || ff.operator.length === 0) return
+      const value = coerceFilterValue(ff.value, ff.type)
+      if (ff.operator === 'In') {
+        group.in = group.in || {}
+        const existing = Array.isArray(group.in[ff.valueField]) ? group.in[ff.valueField] : []
+        group.in[ff.valueField] = [...existing, ...(Array.isArray(value) ? value : [value])]
+      } else {
+        group.and = group.and || {}
+        group.and[ff.valueField + ff.operator] = value
+      }
+    })
+    return group
+  }
 
-      // Resolve the collected equality clauses: a lone `=` stays a scalar
-      // `${field}Eq` (byte-identical to the previous behaviour); two or more on
-      // the same field merge into the `In` list for that field.
-      Object.entries(eqByField).forEach(([field, values]) => {
-        if (values.length === 1) {
-          filters.and = filters.and || {}
-          filters.and[field + 'Eq'] = values[0]
-        } else {
-          filters.in = filters.in || {}
-          const existing = Array.isArray(filters.in[field]) ? filters.in[field] : []
-          filters.in[field] = [...existing, ...values]
-        }
-      })
-    }
-    return filters
+  // Produces the filter shape consumed by the query builders:
+  //   - no OR connector → flat AND-only filter `{ and, in }`
+  //   - any OR connector → `{ or: [ { and, in }, ... ] }`, splitting clauses
+  //     into AND-groups at each OR boundary (SQL precedence: AND binds tighter
+  //     than OR, so `a AND b OR c` ⇒ `(a AND b) OR c`). The events GraphQL
+  //     filter supports nested `or`, verified against the live schema.
+  const buildApiFilters = () => {
+    const fields = filterData.value?.fields
+    if (!Array.isArray(fields) || !fields.length) return {}
+
+    const hasOr = fields.some((ff) => String(ff?.logicalOperator).toUpperCase() === 'OR')
+    if (!hasOr) return buildFilterGroup(fields)
+
+    const groups = []
+    fields.forEach((ff) => {
+      if (!groups.length || String(ff?.logicalOperator).toUpperCase() === 'OR') groups.push([])
+      groups[groups.length - 1].push(ff)
+    })
+    return { or: groups.map(buildFilterGroup) }
   }
 
   const resolveStackField = () => {
@@ -130,7 +127,11 @@ export function useEventsData({
 
   const hasActiveFilters = () => {
     const af = buildApiFilters()
-    return Object.keys(af?.and || {}).length > 0 || Object.keys(af?.in || {}).length > 0
+    return (
+      Object.keys(af?.and || {}).length > 0 ||
+      Object.keys(af?.in || {}).length > 0 ||
+      (Array.isArray(af?.or) && af.or.length > 0)
+    )
   }
 
   // ── Count (only when filters are active) ─────────────────────────────
@@ -145,32 +146,13 @@ export function useEventsData({
     const endMs = new Date(filterData.value.tsRange.tsRangeEnd).getTime()
     const filters = buildApiFilters()
 
-    const extraVarDefs = {}
-    const extraFilterParts = []
-    Object.entries(filters?.and || {}).forEach(([key, val]) => {
-      const varName = 'f_' + key
-      extraVarDefs[varName] = val
-      extraFilterParts.push(key + ': $' + varName)
-    })
-    Object.entries(filters?.in || {}).forEach(([key, val]) => {
-      const varName = 'i_' + key
-      extraVarDefs[varName] = Array.isArray(val)
-        ? val.map((item) => String(item?.value !== undefined ? item.value : item))
-        : val
-      extraFilterParts.push((key.endsWith('In') ? key : key + 'In') + ': $' + varName)
-    })
-    const paramType = (key, value) => {
-      if (key === 'tsBegin' || key === 'tsEnd') return 'DateTime!'
-      if (Array.isArray(value)) return '[String]'
-      if (typeof value === 'number') return Number.isInteger(value) ? 'Int' : 'Float'
-      return 'String'
-    }
+    // Render the extra filter (and/in/or) via the shared helper so OR groups
+    // produce a nested `or: [ ... ]` fragment consistent with the list query.
+    const { fragments, declarations, variables: filterVars } = buildFilterParts(filters, 'f')
     const buildBody = (tsBegin, tsEnd) => {
-      const vars = { tsBegin: tsBegin, tsEnd: tsEnd, ...extraVarDefs }
-      const pStr = Object.entries(vars)
-        .map(([key, value]) => '$' + key + ': ' + paramType(key, value))
-        .join(', ')
-      const fStr = ['tsRange: { begin: $tsBegin, end: $tsEnd }', ...extraFilterParts].join(', ')
+      const vars = { tsBegin: tsBegin, tsEnd: tsEnd, ...filterVars }
+      const pStr = ['$tsBegin: DateTime!', '$tsEnd: DateTime!', ...declarations].join(', ')
+      const fStr = ['tsRange: { begin: $tsBegin, end: $tsEnd }', ...fragments].join(', ')
       return JSON.stringify({
         query:
           'query (' +

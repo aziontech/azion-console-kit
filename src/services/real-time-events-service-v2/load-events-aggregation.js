@@ -5,6 +5,7 @@ import { makeRealTimeEventsBaseUrl } from './make-real-time-events-service'
 import { makeBeholderBaseUrl } from '../real-time-metrics-services/make-beholder-base-url'
 import * as Errors from '@/services/axios/errors'
 import { resolveChartApi } from './chart-api-router'
+import { buildFilterParts } from './_shared/build-filter-parts'
 
 function inferArrayType(arr) {
   if (!Array.isArray(arr) || !arr.length) return '[String]'
@@ -19,6 +20,17 @@ function normalizeInFilterValues(values) {
     const raw = item?.value !== undefined ? item.value : item
     return String(raw)
   })
+}
+
+// True when any clause in the filter (across `and`, `in`, or any `or` group)
+// targets a key starting with `fieldPrefix` (e.g. "status"). Handles both the
+// flat AND-only shape and the nested `{ or: [ { and, in }, ... ] }` shape.
+function filterMentionsField(filters, fieldPrefix) {
+  const groupHits = (group) =>
+    Object.keys(group?.and || {}).some((key) => key.startsWith(fieldPrefix)) ||
+    Object.keys(group?.in || {}).some((key) => key.startsWith(fieldPrefix))
+  if (Array.isArray(filters?.or)) return filters.or.some(groupHits)
+  return groupHits(filters)
 }
 
 export const loadEventsAggregation = async ({
@@ -820,10 +832,7 @@ async function loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupBy
         : String(tsRange.tsRangeEnd)
   }
   const isHttpLike = HTTP_LIKE_DATASETS.has(dataset)
-  const hasExplicitStatusFilter = !!(
-    Object.keys(filters?.and || {}).some((key) => key.startsWith('status')) ||
-    Object.keys(filters?.in || {}).some((key) => key.startsWith('status'))
-  )
+  const hasExplicitStatusFilter = filterMentionsField(filters, 'status')
   // Task 10.3 — defense-in-depth: re-check at query-build time. If anything
   // between the entry guard and this point reassigned `effectiveGroupByField`
   // (refactor risk), we still drop the unsupported field before assembling
@@ -834,36 +843,13 @@ async function loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupBy
   const chartGroupBy =
     effectiveGroupByField && !isBucketedStatusStack ? ['ts', effectiveGroupByField] : ['ts']
   const variables = { tsBegin: normalizedTsRange.tsRangeBegin, tsEnd: normalizedTsRange.tsRangeEnd }
-  const extraFilterLines = []
-  if (filters?.and) {
-    Object.entries(filters.and).forEach(([key, value]) => {
-      const varName = `and_${key}`
-      variables[varName] = value
-      extraFilterLines.push(`${key}: $${varName}`)
-    })
-  }
-  if (filters?.in) {
-    Object.entries(filters.in).forEach(([key, value]) => {
-      const varName = `in_${key}`
-      const normalized = normalizeInFilterValues(value)
-      variables[varName] = normalized
-      const gqlKey = key.endsWith('In') ? key : `${key}In`
-      extraFilterLines.push(`${gqlKey}: $${varName}`)
-    })
-  }
-  const paramType = (key, value) => {
-    if (key === 'tsBegin' || key === 'tsEnd') return 'DateTime!'
-    if (Array.isArray(value)) {
-      const sample = value[0]
-      if (typeof sample === 'number') return Number.isInteger(sample) ? '[Int]' : '[Float]'
-      return '[String]'
-    }
-    if (typeof value === 'number') return Number.isInteger(value) ? 'Int' : 'Float'
-    return 'String'
-  }
-  const paramsStr = Object.entries(variables)
-    .map(([key, value]) => `$${key}: ${paramType(key, value)}`)
-    .join(', ')
+  const {
+    fragments: extraFilterLines,
+    declarations: extraParamDecls,
+    variables: filterVars
+  } = buildFilterParts(filters, 'flt')
+  Object.assign(variables, filterVars)
+  const paramsStr = ['$tsBegin: DateTime!', '$tsEnd: DateTime!', ...extraParamDecls].join(', ')
   const filterBlock = ['tsRange: { begin: $tsBegin, end: $tsEnd }', ...extraFilterLines].join(', ')
   const chartAlias = isBucketedStatusStack
     ? STATUS_CHART_ALIASES.map(
@@ -1131,39 +1117,14 @@ export async function loadSummaryKpis({ dataset, tsRange, filters = {}, signal }
   }
 
   const variables = { tsBegin: normalizedTsRange.tsRangeBegin, tsEnd: normalizedTsRange.tsRangeEnd }
-  const extraFilterLines = []
+  const {
+    fragments: extraFilterLines,
+    declarations: extraParamDecls,
+    variables: filterVars
+  } = buildFilterParts(filters, 'flt')
+  Object.assign(variables, filterVars)
 
-  if (filters?.and) {
-    Object.entries(filters.and).forEach(([key, value]) => {
-      const varName = `and_${key}`
-      variables[varName] = value
-      extraFilterLines.push(`${key}: $${varName}`)
-    })
-  }
-  if (filters?.in) {
-    Object.entries(filters.in).forEach(([key, value]) => {
-      const varName = `in_${key}`
-      const normalized = normalizeInFilterValues(value)
-      variables[varName] = normalized
-      const gqlKey = key.endsWith('In') ? key : `${key}In`
-      extraFilterLines.push(`${gqlKey}: $${varName}`)
-    })
-  }
-
-  const paramType = (key, value) => {
-    if (key === 'tsBegin' || key === 'tsEnd') return 'DateTime!'
-    if (Array.isArray(value)) {
-      const sample = value[0]
-      if (typeof sample === 'number') return Number.isInteger(sample) ? '[Int]' : '[Float]'
-      return '[String]'
-    }
-    if (typeof value === 'number') return Number.isInteger(value) ? 'Int' : 'Float'
-    return 'String'
-  }
-
-  const paramsStr = Object.entries(variables)
-    .map(([key, value]) => `$${key}: ${paramType(key, value)}`)
-    .join(', ')
+  const paramsStr = ['$tsBegin: DateTime!', '$tsEnd: DateTime!', ...extraParamDecls].join(', ')
   const filterBlock = ['tsRange: { begin: $tsBegin, end: $tsEnd }', ...extraFilterLines].join(', ')
 
   const { kpiStatusAlias, kpiAvgAlias } = buildKpiAliases({ dataset, filterBlock })
