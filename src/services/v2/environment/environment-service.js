@@ -60,7 +60,7 @@ export class EnvironmentService extends BaseService {
       id: env.id,
       name: env.name,
       value: env.id,
-      deployment_version_policy: env.deployment_version_policy
+      deployment_policy: env.deployment_policy
     }))
 
     return { body, count }
@@ -80,7 +80,7 @@ export class EnvironmentService extends BaseService {
       id: data.id,
       name: data.name,
       value: data.id,
-      deployment_version_policy: data.deployment_version_policy
+      deployment_policy: data.deployment_policy
     }
   }
 

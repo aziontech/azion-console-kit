@@ -4,7 +4,7 @@ export const validationSchema = yup.object({
   name: yup.string().required().min(3).max(255).label('Name'),
   description: yup.string().nullable().default(''),
   binding_policy: yup.string().required().oneOf(['STRICT', 'FLEXIBLE']).label('Binding Policy'),
-  deployment_version_policy: yup
+  deployment_policy: yup
     .string()
     .required()
     .oneOf(['single_version', 'versioned_urls'])
@@ -34,7 +34,7 @@ export const initialValues = {
   name: '',
   description: '',
   binding_policy: 'STRICT',
-  deployment_version_policy: 'single_version',
+  deployment_policy: 'single_version',
   strategy_canary_enabled: false,
   strategy_canary_default_percentage: 10,
   strategy_skew_enabled: false,

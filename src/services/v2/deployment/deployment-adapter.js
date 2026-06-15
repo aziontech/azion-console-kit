@@ -105,7 +105,7 @@ const normalizeDeployment = (deployment) => {
     name: source.name ?? '',
     description: source.description ?? null,
     binding_policy: source.binding_policy ?? null,
-    deployment_version_policy: source.deployment_version_policy ?? null,
+    deployment_policy: source.deployment_policy ?? null,
     strategy_defaults: normalizeStrategyDefaults(source.strategy_defaults),
     state: source.state ?? null,
     state_detail: source.state_detail ?? null,
@@ -127,8 +127,8 @@ export const DeploymentAdapter = {
       return {
         ...normalized,
         status: mapStateToStatus(normalized.state),
-        policy: normalized.deployment_version_policy,
-        policyLabel: mapPolicyToLabel(normalized.deployment_version_policy),
+        policy: normalized.deployment_policy,
+        policyLabel: mapPolicyToLabel(normalized.deployment_policy),
         lastEditor,
         lastModified: normalized.updated_at || normalized.created_at || '-'
       }
@@ -145,7 +145,7 @@ export const DeploymentAdapter = {
       name: payload.name,
       description: payload.description,
       binding_policy: payload.binding_policy,
-      deployment_version_policy: payload.deployment_version_policy,
+      deployment_policy: payload.deployment_policy,
       strategy_defaults: payload.strategy_defaults
     })
   },
@@ -155,7 +155,7 @@ export const DeploymentAdapter = {
       name: payload.name,
       description: payload.description,
       binding_policy: payload.binding_policy,
-      deployment_version_policy: payload.deployment_version_policy,
+      deployment_policy: payload.deployment_policy,
       strategy_defaults: payload.strategy_defaults
     })
   }

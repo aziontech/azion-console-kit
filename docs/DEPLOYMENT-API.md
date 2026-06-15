@@ -10,7 +10,7 @@ This document describes all implemented API endpoints. It reflects the actual im
 | IDs | Bare 26-char Crockford-base32 ULIDs (no prefix) |
 | Multi-tenant | Every entity carries `client_id` (sourced from auth `clientId`) |
 | Routing model | `traffic_role` (`ACTIVE \| CANDIDATE \| VALID_URL \| INACTIVE`) is a **column on `deployment_versions`** — there is no pivot table |
-| Deployment ↔ Environment | **Decoupled.** Migration `0010` dropped `deployments.environment_id`. `deployment_version_policy` is now a column on `deployments` (immutable at the application layer). Environments still exist as a CRUD entity but are never consulted by version/routing flows. |
+| Deployment ↔ Environment | **Decoupled.** Migration `0010` dropped `deployments.environment_id`. `deployment_policy` is now a column on `deployments` (immutable at the application layer). Environments still exist as a CRUD entity but are never consulted by version/routing flows. |
 | Version lifecycle | New versions are born as **`state='draft'`** via `POST /versions`. Drafts are mutable (`resources`/`strategy`/`origin` via `PATCH`), do not invoke the catalog, and emit no outbox. `POST /:vid/deploy` runs catalog validation and transitions `draft → queued` with `INSTALL` outbox. |
 | Promote semantics | Promote **clones** the version into the target deployment (new ULID, copied `resource_versions`, `origin` stamped) — it does **not** insert a routing row |
 | `resource_versions` | Relational mirror; assembled into the `resources: ResourceRef[]` projection at read time via two-step batch query (fetch version rows, then `inArray` on `resource_versions` grouped into a `Map`). Each row carries `resource_type`, `resource_id`, `resource_version` (nullable while in draft), `product_version`, `client_id`, and `name` (caller-supplied display name, nullable for legacy rows). While in `state='draft'`, `resource_version`/`product_version`/`client_id` stay `NULL` — enriched on `/deploy`. `name` is set on draft create/patch and preserved on enrich/clone. |
@@ -336,7 +336,7 @@ query Q($input: [ResourceStateInput!]!) {
 
 #### POST /v1/deployments
 
-Create a new deployment stream. The deployment owns its routing policy (`deployment_version_policy`) and is no longer bound to an environment — see migration `0010`.
+Create a new deployment stream. The deployment owns its routing policy (`deployment_policy`) and is no longer bound to an environment — see migration `0010`.
 
 **Request**
 ```json
@@ -344,7 +344,7 @@ Create a new deployment stream. The deployment owns its routing policy (`deploym
   "name": "magalu-storefront",
   "description": "Canal logico de deploy",
   "binding_policy": "STRICT",
-  "deployment_version_policy": "single_version",
+  "deployment_policy": "single_version",
   "allowed_resource_types": [
     "application",
     "firewall",
@@ -369,7 +369,7 @@ Create a new deployment stream. The deployment owns its routing policy (`deploym
 - `name` (required): 3-255 characters
 - `description` (optional): nullable string
 - `binding_policy` (required): `STRICT` | `FLEXIBLE`
-- `deployment_version_policy` (optional, default `single_version`): `single_version` | `versioned_urls`. **Immutable after creation** (matching value via PATCH → 200 no-op; different value → 409 with pointer `/deployment_version_policy`).
+- `deployment_policy` (optional, default `single_version`): `single_version` | `versioned_urls`. **Immutable after creation** (matching value via PATCH → 200 no-op; different value → 409 with pointer `/deployment_policy`).
 - `allowed_resource_types` (required): non-empty array of resource type strings
 - `strategy_defaults` (optional): canary and skew_protection defaults
 
@@ -382,7 +382,7 @@ Create a new deployment stream. The deployment owns its routing policy (`deploym
     "name": "magalu-storefront",
     "description": "Canal logico de deploy",
     "binding_policy": "STRICT",
-    "deployment_version_policy": "single_version",
+    "deployment_policy": "single_version",
     "allowed_resource_types": ["application", "firewall"],
     "strategy_defaults": {
       "canary": { "enabled": false, "default_percentage": 10 },
@@ -457,7 +457,7 @@ Update a deployment. All fields are optional.
 
 **Rules**
 - `binding_policy` can transition `STRICT` → `FLEXIBLE`, but not the reverse if versions with different resource_ids exist.
-- `deployment_version_policy` is **immutable**: matching value → 200 no-op, different value → 409 `AZN-DEPLOYMENT-CONFLICT-001` with pointer `/deployment_version_policy`.
+- `deployment_policy` is **immutable**: matching value → 200 no-op, different value → 409 `AZN-DEPLOYMENT-CONFLICT-001` with pointer `/deployment_policy`.
 - Sending `state` or `client_id` is rejected by Zod `.strict()`.
 
 **Response 200**: single envelope with the full updated `DeploymentResource` (`updated_at` bumps; `last_modified_by` reflects the caller).
@@ -705,7 +705,7 @@ Delete a version.
 
 #### POST /v1/deployments/{deployment_id}/versions/{version_id}/activate
 
-Activate a `ready` version. Routing branch is decided by `deployments.deployment_version_policy`.
+Activate a `ready` version. Routing branch is decided by `deployments.deployment_policy`.
 
 **Request** (`strategy` optional — when present, full-replace on the row)
 ```json
@@ -984,18 +984,18 @@ Each entry in `redeployed` is a freshly created `deployment_version` in `state='
 
 ### Environments
 
-An environment is a CRUD entity that holds the protection profile and edge-surface metadata (log verbosity, robots policy, branch tracking, etc.). Post env-detach (migration `0010`), **environments are not referenced by deployments** — the routing policy moved onto `deployments.deployment_version_policy` and `environment_id` was dropped. The `deployment_version_policy` field on environments is kept for historical reasons but no longer governs routing.
+An environment is a CRUD entity that holds the protection profile and edge-surface metadata (log verbosity, robots policy, branch tracking, etc.). Post env-detach (migration `0010`), **environments are not referenced by deployments** — the routing policy moved onto `deployments.deployment_policy` and `environment_id` was dropped. The `deployment_policy` field on environments is kept for historical reasons but no longer governs routing.
 
 #### POST /v1/environments
 
-Create a new environment. `deployment_version_policy` is fixed at creation and cannot be changed afterwards (see PATCH rule below).
+Create a new environment. `deployment_policy` is fixed at creation and cannot be changed afterwards (see PATCH rule below).
 
 **Request**
 ```json
 {
   "name": "Production storefront",
   "description": "Public-facing routing surface",
-  "deployment_version_policy": "single_version",
+  "deployment_policy": "single_version",
   "log_verbosity": "normal",
   "robots_policy": "index",
   "protection": {
@@ -1025,7 +1025,7 @@ Create a new environment. `deployment_version_policy` is fixed at creation and c
 **Fields**
 - `name` (required): 3-255 characters
 - `description` (optional): nullable string
-- `deployment_version_policy` (required): `single_version` | `versioned_urls`. Stored on the row for historical reasons; routing now reads the policy from the deployment, not the environment.
+- `deployment_policy` (required): `single_version` | `versioned_urls`. Stored on the row for historical reasons; routing now reads the policy from the deployment, not the environment.
 - `log_verbosity` (optional): `normal` | `verbose` (default `normal`)
 - `robots_policy` (optional): `index` | `noindex` (default `index`)
 - `protection` (optional): four sub-shapes documented below; missing keys default to `enabled: false`
@@ -1047,7 +1047,7 @@ Create a new environment. `deployment_version_policy` is fixed at creation and c
     "id": "01HRXENVPRD0000000000000000",
     "name": "Production storefront",
     "description": "Public-facing routing surface",
-    "deployment_version_policy": "single_version",
+    "deployment_policy": "single_version",
     "log_verbosity": "normal",
     "robots_policy": "index",
     "protection": {
@@ -1133,7 +1133,7 @@ Update an environment. All fields are optional; only present fields are applied.
 ```
 
 **Rules**
-- `deployment_version_policy` is still **immutable on the environment row**: same value → 200 no-op, different value → 409 `AZN-DEPLOYMENT-CONFLICT-001`. (The same enforcement now also lives on `deployments` — see PATCH /v1/deployments.)
+- `deployment_policy` is still **immutable on the environment row**: same value → 200 no-op, different value → 409 `AZN-DEPLOYMENT-CONFLICT-001`. (The same enforcement now also lives on `deployments` — see PATCH /v1/deployments.)
 - `client_id` and `state` are not accepted (Zod `.strict()` rejects them with 400).
 - `protection` accepts partial sub-shapes — only present keys are merged over the current value.
 
@@ -1220,7 +1220,7 @@ All errors use `AZN-DEPLOYMENT-{CATEGORY}-{NNN}` codes:
 | Code | Category | Example |
 |------|----------|---------|
 | `AZN-DEPLOYMENT-NOT_FOUND-001` | NotFound | Deployment, Environment, Version not found (cross-account access also surfaces as not-found) |
-| `AZN-DEPLOYMENT-CONFLICT-001` | Conflict | Immutable field (incl. `deployment_version_policy`), state transition (incl. `PATCH /:vid` on non-draft), policy violation |
+| `AZN-DEPLOYMENT-CONFLICT-001` | Conflict | Immutable field (incl. `deployment_policy`), state transition (incl. `PATCH /:vid` on non-draft), policy violation |
 | `AZN-DEPLOYMENT-VALIDATION-001` | Validation | Field validation failure (incl. unknown resource_type and resource-not-found surfacing at `/deploy`) |
 | `AZN-DEPLOYMENT-VALIDATION-002` | Validation | Invalid enum value / resource_type not in `allowed_resource_types` |
 | `AZN-DEPLOYMENT-LIMIT-001` | Limit | `versioned_urls` cap exceeded (per-deployment) |

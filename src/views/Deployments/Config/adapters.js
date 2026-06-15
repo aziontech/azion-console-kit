@@ -26,7 +26,7 @@ export const createDeploymentAdapter = async (payload) => {
     name: payload.name,
     description: sanitizeDescription(payload.description),
     binding_policy: payload.binding_policy,
-    deployment_version_policy: payload.deployment_version_policy,
+    deployment_policy: payload.deployment_policy,
     strategy_defaults: buildStrategyDefaults(payload)
   })
 
@@ -44,7 +44,7 @@ export const loadDeploymentByIdAdapter = async ({ id }) => {
     name: deployment.name ?? '',
     description: deployment.description ?? '',
     binding_policy: deployment.binding_policy ?? 'STRICT',
-    deployment_version_policy: deployment.deployment_version_policy ?? 'single_version',
+    deployment_policy: deployment.deployment_policy ?? 'single_version',
     strategy_canary_enabled: !!canary?.enabled,
     strategy_canary_default_percentage: canary?.default_percentage ?? 10,
     strategy_skew_enabled: !!skew?.enabled,
@@ -57,7 +57,7 @@ export const updateDeploymentAdapter = async (id, payload) => {
     name: payload.name,
     description: sanitizeDescription(payload.description),
     binding_policy: payload.binding_policy,
-    deployment_version_policy: payload.deployment_version_policy,
+    deployment_policy: payload.deployment_policy,
     strategy_defaults: buildStrategyDefaults(payload, { alwaysEmit: true })
   })
 
