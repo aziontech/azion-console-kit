@@ -588,6 +588,7 @@ export default class Aql {
       normalizedQuery,
       suggestions
     )
+    const hasErrorDanglingOperator = this.queryValidatorDanglingOperator(normalizedQuery)
 
     const erros = [
       ...hasErrorInCompoundFields,
@@ -595,7 +596,8 @@ export default class Aql {
       ...hasErrorInOperatorIn,
       ...hasErrorNotSpace,
       ...hasErrorBetweenOperator,
-      ...hasErrorUnsupportedFieldOperator
+      ...hasErrorUnsupportedFieldOperator,
+      ...hasErrorDanglingOperator
     ]
 
     const errorMessages = {
@@ -617,7 +619,9 @@ export default class Aql {
       'between-operator-error-equal-values':
         'The two values for the BETWEEN operator must be different. For example: status between (200, 300).',
       'unsupported-operator-for-field-error': ({ field, operator }) =>
-        `the operator '${operator}' is not supported for the field '${field}'.`
+        `the operator '${operator}' is not supported for the field '${field}'.`,
+      'incomplete-query-error':
+        'complete the expression after the logical operator (AND/OR), or remove it.'
     }
 
     return erros
@@ -627,6 +631,19 @@ export default class Aql {
         return typeof template === 'function' ? template(entry) : undefined
       })
       .filter((msg) => !!msg)
+  }
+
+  /**
+   * Flags a query that ends with a dangling logical connector (`... AND` /
+   * `... OR`) with no clause after it. The query is "not ready" — executing it
+   * would feed an incomplete clause to the parser. Returning an error here both
+   * blocks Enter (the input guards on validation errors) and disables the
+   * Refresh/Update button, so an incomplete query simply does nothing.
+   */
+  queryValidatorDanglingOperator(query) {
+    const trimmed = (query || '').trim()
+    if (!trimmed) return []
+    return /(?:^|\s)(and|or)\s*$/i.test(trimmed) ? ['incomplete-query-error'] : []
   }
 
   queryValidationForUnsupportedFieldOperator(query, suggestions) {
