@@ -44,8 +44,16 @@
 
       <!-- Action Buttons — wrap so they reflow on tight viewports -->
       <div class="flex flex-wrap gap-1 sm:flex-shrink-0 sm:ml-auto">
-        <!-- Add AND Button. OR is intentionally omitted: the events GraphQL
-             filter is AND-only, so an OR connector cannot be honored. -->
+        <!-- Add OR Button -->
+        <PrimeButton
+          outlined
+          icon="pi pi-plus"
+          label="OR"
+          size="small"
+          @click="$emit('add-rule', 'OR')"
+        />
+
+        <!-- Add AND Button -->
         <PrimeButton
           outlined
           icon="pi pi-plus"

@@ -192,9 +192,19 @@ const buildFilterQuery = (filter, variables) => {
   let filterQueries = []
 
   if (filter.fields) {
-    const separatedObjects = separateFieldsByType(filter.fields)
-    mergeFieldsIntoFilter(separatedObjects.others, filter)
-    filterQueries.push(...buildRangeQueries(separatedObjects.range, variables))
+    // When any clause is joined by OR, the flat AND-only filter object can't
+    // express it — emit a nested `or: [ ... ]` instead. Additive: with no OR
+    // connector this branch is skipped and the output is byte-identical.
+    const hasOr = filter.fields.some(
+      (field) => String(field?.logicalOperator).toUpperCase() === 'OR'
+    )
+    if (hasOr) {
+      filterQueries.push(...buildOrFilterQuery(filter.fields, variables))
+    } else {
+      const separatedObjects = separateFieldsByType(filter.fields)
+      mergeFieldsIntoFilter(separatedObjects.others, filter)
+      filterQueries.push(...buildRangeQueries(separatedObjects.range, variables))
+    }
   }
 
   if (filter.tsRange) {
@@ -210,6 +220,53 @@ const buildFilterQuery = (filter, variables) => {
   }
 
   return filterQueries
+}
+
+const ensureArrayValues = (value) =>
+  Array.isArray(value)
+    ? value.map((item) => `${item?.value !== undefined ? item.value : item}`)
+    : value
+
+/**
+ * Build a nested `or: [ { ... }, { ... } ]` filter fragment from clauses that
+ * carry a logical connector. Clauses are split into AND-groups at each `OR`
+ * boundary (SQL precedence: AND binds tighter than OR), so
+ * `a AND b OR c AND d` becomes `or: [ { a, b }, { c, d } ]`.
+ *
+ * Variables are namespaced per group (`or<groupIndex>_<key>`) so the same
+ * field can appear in multiple groups without colliding.
+ *
+ * @param {Array} fields - filter clauses (each may carry `logicalOperator`)
+ * @param {Object} variables - variables object to populate
+ * @returns {Array<String>} a single-element array with the `or:` fragment
+ */
+const buildOrFilterQuery = (fields, variables) => {
+  const groups = []
+  fields.forEach((field) => {
+    if (!groups.length || String(field?.logicalOperator).toUpperCase() === 'OR') {
+      groups.push([])
+    }
+    groups[groups.length - 1].push(field)
+  })
+
+  const groupFragments = groups.map((group, groupIdx) => {
+    const parts = group.map(({ operator, valueField, value }) => {
+      if (operator === 'Range') {
+        const beginVar = `or${groupIdx}_${valueField}Range_begin`
+        const endVar = `or${groupIdx}_${valueField}Range_end`
+        variables[beginVar] = value?.begin
+        variables[endVar] = value?.end
+        return `${valueField}Range: { begin: $${beginVar}, end: $${endVar} }`
+      }
+      const gqlKey = `${valueField}${operator}`
+      const varName = `or${groupIdx}_${gqlKey}`
+      variables[varName] = operator === 'In' ? ensureArrayValues(value) : value
+      return `${gqlKey}: $${varName}`
+    })
+    return `{ ${parts.join(', ')} }`
+  })
+
+  return [`or: [ ${groupFragments.join(', ')} ]`]
 }
 
 /**
@@ -298,12 +355,25 @@ const buildFilterQueriesWithPrefix = (filter, variables, prefix) => {
 const formatFilterParameter = (variables, fields) => {
   return Object.keys(variables).map((key) => {
     let type
+    const orMatch = key.match(/^or\d+_(.+)$/)
     if (key.startsWith('and_')) {
       const fieldKey = key.replace('and_', '')
       const field = fields.find(
         ({ valueField, operator }) => `${valueField}${operator}` === fieldKey
       )
       type = field && field?.type ? field.type : getGraphQLType(variables[key])
+    } else if (orMatch) {
+      // OR-group variable (`or<idx>_<valueField><Operator>`). Mirror the `and_`
+      // typing: use the field's declared type for scalar clauses (so a numeric
+      // status comes through as `Int`, not `String`), but fall back to the
+      // value-inferred type for IN lists and Range begin/end bounds.
+      const fieldKey = orMatch[1]
+      const isRangeBound = fieldKey.endsWith('Range_begin') || fieldKey.endsWith('Range_end')
+      const field = isRangeBound
+        ? null
+        : fields.find(({ valueField, operator }) => `${valueField}${operator}` === fieldKey)
+      type =
+        field && field.operator !== 'In' && field.type ? field.type : getGraphQLType(variables[key])
     } else {
       type = getGraphQLType(variables[key])
     }
