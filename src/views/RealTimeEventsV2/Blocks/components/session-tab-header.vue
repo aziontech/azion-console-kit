@@ -86,7 +86,9 @@
       class="session-tab-header__rename-input"
       :aria-label="`Rename tab ${displayLabel()}`"
       data-testid="session-tab-rename-input"
-      @keydown="handleRenameKeydown"
+      @keydown.stop="handleRenameKeydown"
+      @keyup.stop
+      @keypress.stop
       @blur="commitRename"
       @click.stop
     />
