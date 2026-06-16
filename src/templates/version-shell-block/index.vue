@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, provide } from 'vue'
+  import { computed, provide, ref, readonly, onMounted } from 'vue'
   import ProgressSpinner from '@aziontech/webkit/progressspinner'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { useVersionShell } from './use-version-shell'
@@ -58,8 +58,6 @@
     bus
   })
 
-  provide(VERSION_CONTEXT_KEY, { state, readOnly, version })
-
   // A command error never propagates as a rejection — the caller decides the UI (toast) via `command-error`.
   // Success delivers `{ action, result }` (e.g. draft created by NEW_DRAFT_FROM for navigation).
   const handleDispatch = async (action, payload) => {
@@ -71,6 +69,21 @@
     }
   }
 
+  // `dispatch: handleDispatch` (not the raw dispatch) so a teleported-out heading
+  // action still routes success/error through the shell's `updated`/`command-error`
+  // events; availableActions/disabledActions let descendants gate from the shell's
+  // single source of truth.
+  provide(VERSION_CONTEXT_KEY, {
+    state,
+    readOnly,
+    version,
+    availableActions,
+    disabledActions,
+    // Lets shared tabs/forms drop layout the shell already provides (see useVersionContext).
+    isVersioned: readonly(ref(true)),
+    dispatch: handleDispatch
+  })
+
   const overlayCanCancel = computed(() =>
     availableActions.value.includes(VERSION_ACTIONS.CANCEL_BUILD)
   )
@@ -78,6 +91,13 @@
   const handleOverlayCancel = () => handleDispatch(VERSION_ACTIONS.CANCEL_BUILD, {})
 
   const showOverlay = computed(() => isProcessing(state.value))
+
+  // Teleport target (#action-bar) lives in ContentBlock and only exists in the
+  // DOM after mount — same guard the non-versioned ActionBarWithTeleport uses.
+  const isMounted = ref(false)
+  onMounted(() => {
+    isMounted.value = true
+  })
 </script>
 
 <template>
@@ -120,18 +140,20 @@
         <slot />
       </div>
 
-      <div
-        class="mt-4"
-        data-testid="version-shell__footer"
+      <teleport
+        to="#action-bar"
+        v-if="isMounted"
       >
-        <VersionActionBar
-          :state="state"
-          :available-actions="availableActions"
-          :disabled-actions="disabledActions"
-          @dispatch="handleDispatch"
-          @cancel="emit('cancel')"
-        />
-      </div>
+        <div data-testid="version-shell__footer">
+          <VersionActionBar
+            :state="state"
+            :available-actions="availableActions"
+            :disabled-actions="disabledActions"
+            @dispatch="handleDispatch"
+            @cancel="emit('cancel')"
+          />
+        </div>
+      </teleport>
     </template>
   </div>
 </template>

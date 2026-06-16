@@ -26,6 +26,21 @@
     placeholder: {
       type: String,
       default: 'Add a comment...'
+    },
+    // Optional descriptive copy shown above the body (e.g. Delete confirmations).
+    message: {
+      type: String,
+      default: ''
+    },
+    // When false the comment field is hidden — a pure confirmation dialog.
+    showComment: {
+      type: Boolean,
+      default: true
+    },
+    // Confirm button severity; destructive actions (Delete) pass `danger`.
+    confirmSeverity: {
+      type: String,
+      default: 'primary'
     }
   })
 
@@ -41,6 +56,8 @@
   )
 
   const isConfirmDisabled = computed(() => {
+    // Pure confirmation (no comment field) is always enabled.
+    if (!props.showComment) return false
     if (!props.requireComment) return false
     return comment.value.trim().length === 0
   })
@@ -69,7 +86,15 @@
       <h5 class="text-lg not-italic font-medium leading-5">{{ title }}</h5>
     </template>
     <div class="flex flex-col gap-2">
+      <p
+        v-if="message"
+        class="text-sm"
+        data-testid="version-action-dialog__message"
+      >
+        {{ message }}
+      </p>
       <TextArea
+        v-if="showComment"
         v-model="comment"
         rows="5"
         cols="60"
@@ -87,7 +112,7 @@
         @click="handleCancel"
       />
       <PrimeButton
-        severity="primary"
+        :severity="confirmSeverity"
         size="small"
         :label="actionLabel"
         :disabled="isConfirmDisabled"

@@ -22,7 +22,7 @@
     active: { severity: 'success', label: 'Active' },
     archived: { severity: 'secondary', label: 'Archived' },
     cancelled: { severity: 'warning', label: 'Cancelled' },
-    failed: { severity: 'danger', label: 'Failed' }
+    error: { severity: 'danger', label: 'Error' }
   }
 </script>
 
