@@ -110,6 +110,12 @@ export const WorkloadAdapter = {
 
     let domains
     let tls
+    // v6: the workload binds to an existing environment + deployment (option A —
+    // a single environment_id/deployment_id pair on the workload itself). Both ids
+    // come from the form: the primary domain's `environment` and the deployment
+    // linked to it in `environmentDeployments`.
+    let environmentId = null
+    let deploymentId = null
 
     if (isV6) {
       domains = payload.domains
@@ -127,6 +133,12 @@ export const WorkloadAdapter = {
           certificate: payload.domains?.[0]?.certificate ?? null
         })
       }
+
+      environmentId = payload.domains?.find((item) => item?.environment)?.environment ?? null
+      deploymentId =
+        environmentId != null
+          ? (payload.environmentDeployments?.[environmentId]?.deploymentId ?? null)
+          : null
 
       tls = handleTls(payload)
     } else {
@@ -174,6 +186,11 @@ export const WorkloadAdapter = {
     if (payloadResquest.tls === null) {
       delete payloadResquest.tls
       delete payloadResquest.protocols.http.https_ports
+    }
+
+    if (isV6) {
+      payloadResquest.environment_id = environmentId
+      payloadResquest.deployment_id = deploymentId
     }
 
     return payloadResquest
@@ -273,6 +290,14 @@ export const WorkloadAdapter = {
       }
     }
 
+    // v6: round-trip the environment↔deployment binding so the edit form pre-selects
+    // the linked deployment and the shared create-payload adapter re-derives the same
+    // environment_id/deployment_id on a subsequent PUT.
+    const environmentDeployments =
+      isV6 && workload.environment_id != null && workload.deployment_id != null
+        ? { [workload.environment_id]: { deploymentId: workload.deployment_id } }
+        : {}
+
     return {
       id: workload.id,
       name: workload.name,
@@ -282,6 +307,7 @@ export const WorkloadAdapter = {
       application: workloadDeployment?.application,
       firewall: workloadDeployment?.firewall,
       customPage: workloadDeployment?.customPage,
+      environmentDeployments,
       initialDomains: workload.domains,
       domains: cleanDomains,
       customDomain: azionAppSubdomains,
