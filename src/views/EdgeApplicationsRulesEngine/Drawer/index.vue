@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, inject, onMounted, watch } from 'vue'
+  import { ref, computed, inject, onMounted, watch } from 'vue'
   import * as yup from 'yup'
   import { useToast } from '@aziontech/webkit/use-toast'
 
@@ -50,6 +50,17 @@
       type: String,
       required: false,
       default: 'request'
+    },
+    // Versioned Rules Engine service (v6) — a drop-in for the singleton
+    // `rulesEngineService` (same signatures, version-scoped URLs); null in legacy.
+    service: {
+      type: Object,
+      default: null
+    },
+    // Version id (v6 only).
+    versionId: {
+      type: String,
+      default: null
     }
   })
 
@@ -67,6 +78,9 @@
   const selectedRulesEngineToEdit = ref({})
   const cacheSettingsOptions = ref([])
   const originsOptions = ref([])
+
+  // Versioned service (v6) is a drop-in for the singleton; legacy passes nothing.
+  const rulesSvc = computed(() => props.service ?? rulesEngineService)
   const initialPhase = ref(props.currentPhase)
 
   const initialValues = ref({
@@ -143,7 +157,7 @@
   }
 
   const createService = async (payload) => {
-    return await rulesEngineService.createRulesEngine({
+    return await rulesSvc.value.createRulesEngine({
       ...payload,
       edgeApplicationId: props.edgeApplicationId
     })
@@ -151,7 +165,7 @@
 
   const editService = async (payload) => {
     const payloadEdit = { phase: props.currentPhase, ...payload }
-    return await rulesEngineService.editRulesEngine({
+    return await rulesSvc.value.editRulesEngine({
       payload: payloadEdit,
       edgeApplicationId: props.edgeApplicationId
     })
@@ -191,7 +205,7 @@
   }
 
   const loadService = async () => {
-    return await rulesEngineService.loadRulesEngine({
+    return await rulesSvc.value.loadRulesEngine({
       ...selectedRulesEngineToEdit.value,
       edgeApplicationId: props.edgeApplicationId,
       phase: initialPhase.value

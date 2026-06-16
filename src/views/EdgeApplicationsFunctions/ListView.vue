@@ -5,6 +5,7 @@
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
   import DrawerFunction from './Drawer'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -20,8 +21,24 @@
     documentationService: {
       required: true,
       type: Function
+    },
+    // Optional facade bound to appId + versionId for the versioned (v6) flow,
+    // shaped `{ list, load, create, edit, remove }`; null in the legacy flow (the
+    // singleton `edgeApplicationFunctionService` decorators are used instead).
+    service: {
+      type: Object,
+      default: null
+    },
+    // Version id forwarded to the Drawer in the versioned (v6) flow.
+    versionId: {
+      type: String,
+      default: null
     }
   })
+
+  // Read-only comes from the VersionShell (v6); defaults to false outside it,
+  // so the legacy flow keeps full CRUD.
+  const { readOnly, isVersioned } = useVersionContext()
 
   const router = useRouter()
   const route = useRoute()
@@ -78,6 +95,9 @@
   })
 
   const listEdgeApplicationFunctions = async (query) => {
+    if (props.service) {
+      return await props.service.list(query)
+    }
     return await edgeApplicationFunctionService.listEdgeApplicationFunctions(
       props.edgeApplicationId,
       query
@@ -85,6 +105,9 @@
   }
 
   const deleteFunctionsWithDecorator = async (functionId) => {
+    if (props.service) {
+      return await props.service.remove(functionId)
+    }
     return await edgeApplicationFunctionService.deleteEdgeApplicationFunction(
       functionId,
       props.edgeApplicationId
@@ -113,15 +136,22 @@
     drawerFunctionRef.value.openDrawerEdit(data.id)
   }
 
-  const actions = [
-    {
-      label: 'Delete',
-      type: 'delete',
-      title: 'function instance',
-      icon: 'pi pi-trash',
-      service: deleteFunctionsWithDecorator
+  const actions = computed(() => {
+    if (readOnly.value) {
+      return []
     }
-  ]
+    return [
+      {
+        label: 'Delete',
+        type: 'delete',
+        title: 'function instance',
+        icon: 'pi pi-trash',
+        service: deleteFunctionsWithDecorator
+      }
+    ]
+  })
+
+  const editInDrawer = computed(() => (readOnly.value ? undefined : openEditFunctionDrawer))
 
   const handleTrackClickToCreate = () => {
     tracker.product
@@ -159,19 +189,21 @@
   <DrawerFunction
     ref="drawerFunctionRef"
     :edgeApplicationId="edgeApplicationId"
+    :service="service"
+    :versionId="versionId"
     @onSuccess="reloadList"
   />
   <ListTable
     ref="listTableRef"
     :listService="listEdgeApplicationFunctions"
     :columns="getColumns"
-    :editInDrawer="openEditFunctionDrawer"
+    :editInDrawer="editInDrawer"
     :actions="actions"
     defaultOrderingFieldName="name"
     :apiFields="FUNCTIONS_API_FIELDS"
     exportFileName="Application Function Instances"
     :lazy="true"
-    :isTabs="true"
+    :isTabs="!isVersioned"
     :emptyBlock="{
       title: 'No Functions have been instantiated',
       description: 'Click the button below to instantiate your first Function.',
@@ -183,6 +215,7 @@
   >
     <template #emptyBlockButton>
       <PrimeButton
+        v-if="!readOnly"
         icon="pi pi-plus"
         data-testid="functions-instance__create-button"
         severity="secondary"

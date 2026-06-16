@@ -95,6 +95,9 @@ const normalizeVersion = (raw) => {
     comment: meta?.description ?? raw.comment ?? '',
     createdAt: meta?.created_at ?? raw.created_at,
     lastModified: meta?.last_modified ?? raw.last_modified,
+    // Raw last-editor value (or `null`); the `azion@azion.com` fallback is a
+    // render-time concern, not applied here.
+    lastEditor: meta?.last_editor ?? raw.last_editor ?? null,
     config: normalizeConfig(raw)
   }
 }

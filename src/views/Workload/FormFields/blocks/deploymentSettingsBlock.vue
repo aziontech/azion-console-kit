@@ -1,16 +1,15 @@
 <script setup>
-  import { ref, computed, watch } from 'vue'
+  import { ref, computed, watch, onMounted } from 'vue'
   import { useField } from 'vee-validate'
   import { useRouter } from 'vue-router'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import CollapsibleCard from '@/components/CollapsibleCard'
   import MessageCard from '@/components/MessageCard'
-  import LinkDeploymentDrawer from '../components/LinkDeploymentDrawer.vue'
+  import Dropdown from '@aziontech/webkit/dropdown'
   import PrimeButton from '@aziontech/webkit/button'
+  import Tag from '@aziontech/webkit/tag'
   import { environmentService } from '@/services/v2/environment/environment-service'
   import { deploymentService } from '@/services/v2/deployment/deployment-service'
-  import { resourcePackTypeMeta, RESOURCE_PACK_DEFAULT_KEYS } from '@/helpers/deployment-status'
-  import { useResourceOptions } from '../helpers/resource-options'
+  import { mapPolicyToLabel } from '@/services/v2/deployment/deployment-adapter'
 
   defineOptions({ name: 'deployment-settings-block' })
 
@@ -21,10 +20,6 @@
 
   const router = useRouter()
 
-  const META_BY_KEY = Object.fromEntries(resourcePackTypeMeta.map((meta) => [meta.key, meta]))
-
-  const { optionsForResource, ensureResourceOptions } = useResourceOptions()
-
   const { value: domainsValue } = useField('domains')
   const { value: environmentDeployments, setValue: setEnvironmentDeployments } =
     useField('environmentDeployments')
@@ -32,15 +27,25 @@
   const domainList = computed(() => (Array.isArray(domainsValue.value) ? domainsValue.value : []))
   const envDeploymentsState = computed(() => environmentDeployments.value ?? {})
 
-  const environmentNameMap = ref({})
+  // Per-environment metadata cache (id → { name, policy, policyLabel }).
+  const environmentMap = ref({})
 
-  const ensureEnvironmentName = async (envId) => {
-    if (!envId || environmentNameMap.value[envId]) return
+  const ensureEnvironment = async (envId) => {
+    if (!envId || environmentMap.value[envId]) return
     try {
       const env = await environmentService.loadEnvironmentService({ id: envId })
-      if (env?.id != null) environmentNameMap.value[env.id] = env.name
+      if (env?.id != null) {
+        environmentMap.value = {
+          ...environmentMap.value,
+          [env.id]: {
+            name: env.name,
+            policy: env.deployment_policy ?? null,
+            policyLabel: mapPolicyToLabel(env.deployment_policy)
+          }
+        }
+      }
     } catch {
-      // intentionally swallowed: env label is non-blocking UX
+      // intentionally swallowed: env metadata is non-blocking UX
     }
   }
 
@@ -50,7 +55,7 @@
       const envId = domain?.environment
       if (envId == null) continue
       if (!seen.has(envId)) {
-        seen.set(envId, { id: envId, name: environmentNameMap.value[envId] || 'Environment' })
+        seen.set(envId, { id: envId, name: environmentMap.value[envId]?.name || 'Environment' })
       }
     }
     return Array.from(seen.values())
@@ -61,135 +66,82 @@
     async (rows) => {
       for (const row of rows || []) {
         const envId = row?.environment
-        if (envId) await ensureEnvironmentName(envId)
+        if (envId) await ensureEnvironment(envId)
       }
     },
     { immediate: true, deep: true }
   )
 
-  // Deployment metadata cache (id → { id, name, resourceKeys }).
-  const deploymentCache = ref({})
-  const deploymentLoading = ref({})
+  // Deployment options for the inline dropdown. The shared QueryClient defaults to
+  // `enabled: false` (queries are driven imperatively across the app), so a reactive
+  // useQuery here would never fetch. We call the service directly — it still caches
+  // through vue-query's ensureQueryData under the hood.
+  const deploymentOptions = ref([])
+  const isLoadingDeployments = ref(false)
 
-  const ensureDeploymentData = async (deploymentId) => {
-    if (deploymentId == null) return
-    if (deploymentCache.value[deploymentId] || deploymentLoading.value[deploymentId]) return
-    deploymentLoading.value = { ...deploymentLoading.value, [deploymentId]: true }
+  const loadDeployments = async () => {
+    isLoadingDeployments.value = true
     try {
-      const response = await deploymentService.getDeploymentByIdService(deploymentId)
-      const data = response?.data
-      if (data?.id != null) {
-        deploymentCache.value = {
-          ...deploymentCache.value,
-          [data.id]: {
-            id: data.id,
-            name: data.name,
-            resourceKeys: [...RESOURCE_PACK_DEFAULT_KEYS]
-          }
-        }
-      }
-    } catch {
-      // non-blocking: card body will show fallback values
+      const { body } = await deploymentService.listDeploymentsService()
+      deploymentOptions.value = Array.isArray(body) ? body : []
     } finally {
-      deploymentLoading.value = { ...deploymentLoading.value, [deploymentId]: false }
+      isLoadingDeployments.value = false
     }
   }
 
-  const deploymentDataFor = (envId) => {
-    const deploymentId = envDeploymentsState.value[envId]?.deploymentId ?? null
-    if (deploymentId == null) return null
-    return deploymentCache.value[deploymentId] ?? null
+  onMounted(loadDeployments)
+
+  const policyLabelFor = (envId) => environmentMap.value[envId]?.policyLabel || ''
+
+  const policyFor = (envId) => environmentMap.value[envId]?.policy ?? null
+
+  // A deployment is compatible only when it shares the environment's deployment policy
+  // (single_version ↔ single_version, versioned_urls ↔ versioned_urls). While the
+  // environment policy is still unknown, nothing is blocked.
+  const isDeploymentCompatible = (envId, deployment) => {
+    const policy = policyFor(envId)
+    if (!policy) return true
+    return deployment?.deployment_policy === policy
   }
 
-  // Whenever envDeploymentsState changes, ensure each unique deploymentId is cached
-  // and pre-warm resource option lists used by their selected resources.
-  watch(
-    envDeploymentsState,
-    (state) => {
-      const seen = new Set()
-      for (const envId of Object.keys(state || {})) {
-        const entry = state[envId]
-        const deploymentId = entry?.deploymentId
-        if (deploymentId != null && !seen.has(deploymentId)) {
-          seen.add(deploymentId)
-          ensureDeploymentData(deploymentId)
-        }
-        const resources = entry?.resources || {}
-        for (const key of Object.keys(resources)) {
-          ensureResourceOptions(key)
-        }
-      }
-    },
-    { immediate: true, deep: true }
-  )
+  // PrimeVue calls optionDisabled with each option object — curry the env to keep it pure.
+  const isOptionDisabledFor = (envId) => (deployment) => !isDeploymentCompatible(envId, deployment)
+
+  const compatibleCountFor = (envId) =>
+    deploymentOptions.value.filter((deployment) => isDeploymentCompatible(envId, deployment)).length
+
+  const compatibilityNoteFor = (envId) => {
+    const label = policyLabelFor(envId)
+    const total = deploymentOptions.value.length
+    const compatible = compatibleCountFor(envId)
+    const disabled = total - compatible
+
+    if (!label) {
+      return `${total} deployment${total === 1 ? '' : 's'} available`
+    }
+
+    if (disabled > 0) {
+      return `Only ${label} deployments can be linked — ${compatible} compatible, ${disabled} disabled.`
+    }
+
+    return `Only ${label} deployments can be linked — ${compatible} compatible.`
+  }
 
   const hasMissingDeployment = computed(() =>
     environmentsInUse.value.some((env) => !envDeploymentsState.value[env.id]?.deploymentId)
   )
 
-  const resourceLabel = (key) => META_BY_KEY[key]?.label ?? key
-  const resourceIcon = (key) => META_BY_KEY[key]?.icon ?? ''
+  const deploymentIdFor = (envId) => envDeploymentsState.value[envId]?.deploymentId ?? null
 
-  const resourceNameFor = (envId, key) => {
-    const entry = envDeploymentsState.value[envId]?.resources?.[key]
-    if (!entry || entry.id == null) return '--'
-    const options = optionsForResource(key)
-    const match = options.find((option) => option?.id === entry.id)
-    return match?.name ?? '--'
-  }
-
-  const resourceVersionFor = (envId, key) => {
-    const entry = envDeploymentsState.value[envId]?.resources?.[key]
-    if (!entry) return 'Latest'
-    return entry.version ?? 'Latest'
-  }
-
-  // ---- Link drawer state ----
-  const drawerVisible = ref(false)
-  const drawerTargetEnvId = ref(null)
-  const drawerTargetEnvName = ref('')
-
-  const drawerInitialDeploymentId = computed(() => {
-    if (drawerTargetEnvId.value == null) return null
-    return envDeploymentsState.value[drawerTargetEnvId.value]?.deploymentId ?? null
-  })
-
-  const drawerInitialResources = computed(() => {
-    if (drawerTargetEnvId.value == null) return {}
-    return envDeploymentsState.value[drawerTargetEnvId.value]?.resources ?? {}
-  })
-
-  const updateEnvState = (envId, updater) => {
-    const current = envDeploymentsState.value[envId] || { deploymentId: null, resources: {} }
-    const next = updater({ ...current, resources: { ...(current.resources || {}) } })
+  const setDeployment = (envId, deploymentId) => {
+    const current = envDeploymentsState.value[envId] || {}
     setEnvironmentDeployments({
       ...envDeploymentsState.value,
-      [envId]: next
+      [envId]: { ...current, deploymentId }
     })
   }
 
-  const openLinkDrawer = (envId) => {
-    const env = environmentsInUse.value.find((item) => item.id === envId)
-    drawerTargetEnvId.value = envId
-    drawerTargetEnvName.value = env?.name ?? ''
-    drawerVisible.value = true
-  }
-
-  const onLinkSaved = ({ deploymentId, resources }) => {
-    const envId = drawerTargetEnvId.value
-    if (envId == null) return
-    updateEnvState(envId, (state) => ({
-      ...state,
-      deploymentId,
-      resources: { ...(resources || {}) }
-    }))
-    // Pre-warm option lists for the resources just linked so the card body shows names quickly.
-    for (const key of Object.keys(resources || {})) {
-      ensureResourceOptions(key)
-    }
-    if (deploymentId != null) ensureDeploymentData(deploymentId)
-    drawerVisible.value = false
-  }
+  const clearSelection = (envId) => setDeployment(envId, null)
 
   const navigateToDeployments = () => {
     router.push('/deployments')
@@ -240,113 +192,70 @@
           Add at least one domain to configure a deployment per environment.
         </div>
 
-        <!-- One CollapsibleCard per environment in use -->
-        <template
+        <!-- One card per environment in use -->
+        <div
           v-for="env in environmentsInUse"
           :key="env.id"
+          class="flex flex-col gap-3 p-4 rounded surface-section border surface-border"
+          :data-testid="`deployment-settings__card-${env.id}`"
         >
-          <!-- Empty (not yet linked) state -->
-          <CollapsibleCard
-            v-if="!envDeploymentsState[env.id]?.deploymentId"
-            :disableToggle="true"
-            :dataTestid="`deployment-settings__card-${env.id}`"
-          >
-            <template #header>
-              <div class="flex items-center gap-4 flex-1 min-w-0">
-                <div class="flex flex-col gap-1 flex-1 min-w-0 items-start">
-                  <p class="text-xs text-color-secondary m-0">Environment</p>
-                  <p class="text-sm text-color m-0 truncate">{{ env.name }}</p>
-                </div>
-                <div class="flex flex-col gap-1 flex-1 min-w-0 items-start">
-                  <p class="text-xs text-color-secondary m-0">Deployment Settings</p>
-                  <p class="text-sm text-color m-0">--</p>
-                </div>
-              </div>
-            </template>
-            <template #header-actions>
-              <PrimeButton
-                outlined
-                size="small"
-                icon="pi pi-plus"
-                label="Link Settings"
-                :data-testid="`deployment-settings__link-${env.id}`"
-                @click="openLinkDrawer(env.id)"
-              />
-            </template>
-          </CollapsibleCard>
+          <!-- Header: icon · environment · policy badge · clear action -->
+          <div class="flex items-center gap-2">
+            <i class="pi pi-box text-color-secondary" />
+            <span class="text-sm font-medium text-color truncate">{{ env.name }}</span>
+            <Tag
+              v-if="policyLabelFor(env.id)"
+              severity="secondary"
+              :value="policyLabelFor(env.id)"
+              :data-testid="`deployment-settings__policy-${env.id}`"
+            />
+            <PrimeButton
+              text
+              rounded
+              size="small"
+              icon="pi pi-times"
+              class="ml-auto"
+              aria-label="Clear deployment"
+              :data-testid="`deployment-settings__clear-${env.id}`"
+              @click="clearSelection(env.id)"
+            />
+          </div>
 
-          <!-- Configured state -->
-          <CollapsibleCard
-            v-else
-            :disableToggle="false"
-            :defaultExpanded="true"
-            :dataTestid="`deployment-settings__card-${env.id}`"
-          >
-            <template #header>
-              <div class="flex items-center gap-4 flex-1 min-w-0">
-                <div class="flex flex-col gap-1 flex-1 min-w-0 items-start">
-                  <p class="text-xs text-color-secondary m-0">Environment</p>
-                  <p class="text-sm text-color m-0 truncate">{{ env.name }}</p>
-                </div>
-                <div class="flex flex-col gap-1 flex-1 min-w-0 items-start">
-                  <p class="text-xs text-color-secondary m-0">Deployment Settings</p>
-                  <p class="text-sm text-color m-0 truncate">
-                    {{ deploymentDataFor(env.id)?.name ?? '--' }}
-                  </p>
-                </div>
-              </div>
-            </template>
-            <template #header-actions>
-              <PrimeButton
-                size="small"
-                icon="pi pi-pencil"
-                outlined
-                :data-testid="`deployment-settings__edit-${env.id}`"
-                @click.stop="openLinkDrawer(env.id)"
-              />
-            </template>
+          <!-- Compatibility note -->
+          <MessageCard
+            type="info"
+            :description="compatibilityNoteFor(env.id)"
+            :dataTestid="`deployment-settings__compat-${env.id}`"
+          />
 
-            <div
-              v-if="deploymentDataFor(env.id)?.resourceKeys?.length"
-              class="flex flex-wrap gap-2 p-2 border-t surface-border"
-            >
-              <div
-                v-for="key in deploymentDataFor(env.id).resourceKeys"
-                :key="key"
-                class="flex flex-col gap-1 p-3 flex-1 basis-[calc(33.333%-0.5rem)] min-w-[140px]"
-              >
-                <span
-                  class="text-[10px] font-medium uppercase tracking-wider text-color-secondary leading-none"
-                >
-                  {{ resourceLabel(key) }}
-                </span>
-                <div class="flex items-center gap-2">
-                  <i
-                    v-if="resourceIcon(key)"
-                    :class="resourceIcon(key)"
-                    class="text-xs text-color-secondary"
-                  />
-                  <span class="text-sm text-color truncate">
-                    {{ resourceNameFor(env.id, key) }}
-                  </span>
-                  <span class="text-xs text-color-secondary shrink-0">
-                    · {{ resourceVersionFor(env.id, key) }}
-                  </span>
-                </div>
+          <!-- Inline deployment selector -->
+          <Dropdown
+            :inputId="`deployment-settings__dropdown-${env.id}`"
+            :modelValue="deploymentIdFor(env.id)"
+            :options="deploymentOptions"
+            optionLabel="name"
+            optionValue="id"
+            :optionDisabled="isOptionDisabledFor(env.id)"
+            :loading="isLoadingDeployments"
+            placeholder="Select a Deployment"
+            emptyMessage="No deployments available"
+            appendTo="self"
+            :data-testid="`deployment-settings__dropdown-${env.id}`"
+            @update:modelValue="setDeployment(env.id, $event)"
+          >
+            <template #option="{ option }">
+              <div class="flex items-center justify-between gap-2 w-full">
+                <span class="truncate">{{ option.name }}</span>
+                <Tag
+                  v-if="option.policyLabel"
+                  severity="secondary"
+                  :value="option.policyLabel"
+                />
               </div>
-            </div>
-          </CollapsibleCard>
-        </template>
+            </template>
+          </Dropdown>
+        </div>
       </div>
-
-      <LinkDeploymentDrawer
-        v-model:visible="drawerVisible"
-        :envId="drawerTargetEnvId"
-        :envName="drawerTargetEnvName"
-        :initialDeploymentId="drawerInitialDeploymentId"
-        :initialResources="drawerInitialResources"
-        @save="onLinkSaved"
-      />
     </template>
   </form-horizontal>
 </template>

@@ -5,6 +5,7 @@
   import ListTable from '@/components/list-table/ListTable.vue'
   import Drawer from './Drawer'
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -25,8 +26,22 @@
     isTieredCacheEnabled: {
       type: Boolean,
       required: true
+    },
+    // Optional facade pre-bound to appId + versionId for the versioned (v6) flow,
+    // shaped `{ list, load, create, edit, remove }`; null in the legacy flow
+    // (the singleton `cacheSettingsService` is used instead).
+    service: {
+      type: Object,
+      default: null
+    },
+    // Pass-through version identifier for the versioned flow.
+    versionId: {
+      type: String,
+      default: null
     }
   })
+
+  const { readOnly, isVersioned } = useVersionContext()
 
   const drawerRef = ref('')
   const listTableRef = ref(null)
@@ -34,26 +49,53 @@
   //TODO: Fill this when API "fields" query parameter are fixed (id, name, modules)
   const CACHE_SETTING_API_FIELDS = []
 
+  // Use the injected facade (v6) when present, else the singleton service (legacy).
+  const listFn = props.service
+    ? props.service.list
+    : (query) => cacheSettingsService.listCacheSettingsService(props.edgeApplicationId, query)
+
+  const deleteFn = props.service
+    ? props.service.remove
+    : (cacheSettingsId) =>
+        cacheSettingsService.deleteCacheSettingService(props.edgeApplicationId, cacheSettingsId)
+
+  const createDrawerService = props.service
+    ? props.service.create
+    : cacheSettingsService.createCacheSettingsService
+
+  const loadDrawerService = props.service
+    ? props.service.load
+    : cacheSettingsService.loadCacheSettingsService
+
+  const editDrawerService = props.service
+    ? props.service.edit
+    : cacheSettingsService.editCacheSettingsService
+
   const listCacheSettingsServiceWithDecorator = async (query) => {
-    return await cacheSettingsService.listCacheSettingsService(props.edgeApplicationId, query)
+    return await listFn(query)
   }
 
   const deleteCacheSettingsServiceWithDecorator = async (cacheSettingsId) => {
-    return await cacheSettingsService.deleteCacheSettingService(
-      props.edgeApplicationId,
-      cacheSettingsId
-    )
+    return await deleteFn(cacheSettingsId)
   }
 
-  const actions = [
-    {
-      label: 'Delete',
-      type: 'delete',
-      title: 'cache setting',
-      icon: 'pi pi-trash',
-      service: deleteCacheSettingsServiceWithDecorator
+  const actions = computed(() => {
+    if (readOnly.value) {
+      return []
     }
-  ]
+
+    return [
+      {
+        label: 'Delete',
+        type: 'delete',
+        title: 'cache setting',
+        icon: 'pi pi-trash',
+        service: deleteCacheSettingsServiceWithDecorator
+      }
+    ]
+  })
+
+  const editInDrawerHandler = computed(() => (readOnly.value ? undefined : openEditDrawer))
 
   const openCreateDrawer = () => {
     handleTrackClickToCreate()
@@ -129,9 +171,9 @@
     :isOverlapped="true"
     :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
     :edgeApplicationId="edgeApplicationId"
-    :createService="cacheSettingsService.createCacheSettingsService"
-    :loadService="cacheSettingsService.loadCacheSettingsService"
-    :editService="cacheSettingsService.editCacheSettingsService"
+    :createService="createDrawerService"
+    :loadService="loadDrawerService"
+    :editService="editDrawerService"
     :showTieredCache="isTieredCacheEnabled"
     @onSuccess="reloadList"
   />
@@ -141,12 +183,12 @@
     :listService="listCacheSettingsServiceWithDecorator"
     :columns="getColumns"
     :frozenColumns="['name']"
-    :editInDrawer="openEditDrawer"
+    :editInDrawer="editInDrawerHandler"
     :actions="actions"
     :apiFields="CACHE_SETTING_API_FIELDS"
     exportFileName="Application Cache Settings"
     :lazy="true"
-    :isTabs="true"
+    :isTabs="!isVersioned"
     :hideLastModifiedColumn="true"
     emptyListMessage="No cache settings found."
     :emptyBlock="{
@@ -162,6 +204,7 @@
   >
     <template #emptyBlockButton>
       <PrimeButton
+        v-if="!readOnly"
         icon="pi pi-plus"
         severity="secondary"
         label="Cache Setting"

@@ -72,6 +72,17 @@ export class DeploymentService extends BaseService {
     return this.usePrefetchQuery(queryKeys.deployments.list(params), () => this.#fetchList(params))
   }
 
+  /**
+   * Reactive deployments listing for the deploy drawer. Mirrors
+   * `edgeAppVersionService.useListVersionsQuery`: `enabled` (a ref/getter) gates
+   * fetching to the drawer's open state; reopens reuse the vue-query cache.
+   */
+  useDeploymentsListQuery = ({ enabled, params = { page: 1, pageSize: 100 } } = {}) =>
+    this.useQuery(queryKeys.deployments.list(params), () => this.#fetchList(params), {
+      persist: false,
+      enabled
+    })
+
   listDeploymentsService = async (params = {}) => {
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
