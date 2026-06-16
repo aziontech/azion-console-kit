@@ -159,44 +159,44 @@ const UNIT_ABBREVIATIONS = {
  * Returns both the Intl-compatible unit name and the unit abbreviation for manual formatting
  */
 function calculateValueAndUnit(data, unit) {
-  if (data > CHART_RULES.DATA_VOLUME.yotta) {
+  if (data >= CHART_RULES.DATA_VOLUME.yotta) {
     return {
       value: data / CHART_RULES.DATA_VOLUME.yotta,
       intlUnit: null,
       unitAbbr: UNIT_ABBREVIATIONS[unit]?.yotta || 'YB'
     }
   }
-  if (data > CHART_RULES.DATA_VOLUME.zetta) {
+  if (data >= CHART_RULES.DATA_VOLUME.zetta) {
     return {
       value: data / CHART_RULES.DATA_VOLUME.zetta,
       intlUnit: null,
       unitAbbr: UNIT_ABBREVIATIONS[unit]?.zetta || 'ZB'
     }
   }
-  if (data > CHART_RULES.DATA_VOLUME.exa) {
+  if (data >= CHART_RULES.DATA_VOLUME.exa) {
     return {
       value: data / CHART_RULES.DATA_VOLUME.exa,
       intlUnit: null,
       unitAbbr: UNIT_ABBREVIATIONS[unit]?.exa || 'EB'
     }
   }
-  if (data > CHART_RULES.DATA_VOLUME.peta) {
+  if (data >= CHART_RULES.DATA_VOLUME.peta) {
     return {
       value: data / CHART_RULES.DATA_VOLUME.peta,
       intlUnit: null,
       unitAbbr: UNIT_ABBREVIATIONS[unit]?.peta || 'PB'
     }
   }
-  if (data > CHART_RULES.DATA_VOLUME.tera) {
+  if (data >= CHART_RULES.DATA_VOLUME.tera) {
     return { value: data / CHART_RULES.DATA_VOLUME.tera, intlUnit: `tera${unit}`, unitAbbr: null }
   }
-  if (data > CHART_RULES.DATA_VOLUME.giga) {
+  if (data >= CHART_RULES.DATA_VOLUME.giga) {
     return { value: data / CHART_RULES.DATA_VOLUME.giga, intlUnit: `giga${unit}`, unitAbbr: null }
   }
-  if (data > CHART_RULES.DATA_VOLUME.mega) {
+  if (data >= CHART_RULES.DATA_VOLUME.mega) {
     return { value: data / CHART_RULES.DATA_VOLUME.mega, intlUnit: `mega${unit}`, unitAbbr: null }
   }
-  if (data > CHART_RULES.DATA_VOLUME.kilo) {
+  if (data >= CHART_RULES.DATA_VOLUME.kilo) {
     return { value: data / CHART_RULES.DATA_VOLUME.kilo, intlUnit: `kilo${unit}`, unitAbbr: null }
   }
   return { value: data, intlUnit: unit, unitAbbr: null }
