@@ -15,6 +15,7 @@
   import DataTable from '@aziontech/webkit/list-data-table'
   import { useDataTable } from '@/composables/useDataTable'
   import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -22,12 +23,28 @@
   const toast = useToast()
   const { currentTheme } = storeToRefs(useThemeStore())
 
+  // Outside the VersionShell (legacy flow) this defaults to readOnly/isVersioned
+  // false, so the legacy behavior is unchanged.
+  const { readOnly, isVersioned } = useVersionContext()
+
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
 
   const props = defineProps({
     edgeApplicationId: {
       required: true,
       type: String
+    },
+    // Versioned Rules Engine service injected by the v6 flow — a drop-in for the
+    // singleton `rulesEngineService` (same method names, version-scoped URLs);
+    // null in the legacy flow. Request and Response rules share one table.
+    service: {
+      type: Object,
+      default: null
+    },
+    // Version id (v6 only). Forwarded to the Drawer for context/telemetry.
+    versionId: {
+      type: String,
+      default: null
     },
     documentationService: {
       required: true,
@@ -77,6 +94,10 @@
   const selectedPhase = ref('Request phase')
   const currentPhase = ref('request')
   const hasContentToList = ref(true)
+
+  // Versioned service (v6) is a drop-in for the singleton; legacy passes nothing.
+  const rulesSvc = computed(() => props.service ?? rulesEngineService)
+  const isReadOnly = computed(() => readOnly.value)
 
   const emit = defineEmits([
     'on-load-data',
@@ -138,15 +159,20 @@
     ]
   })
 
-  const actions = computed(() => [
-    {
-      label: 'Delete',
-      type: 'delete',
-      title: 'rule',
-      icon: 'pi pi-trash',
-      service: deleteRulesEngineWithDecorator
-    }
-  ])
+  const actions = computed(() => {
+    // Read-only versions expose no row actions (no delete).
+    if (isReadOnly.value) return []
+
+    return [
+      {
+        label: 'Delete',
+        type: 'delete',
+        title: 'rule',
+        icon: 'pi pi-trash',
+        service: deleteRulesEngineWithDecorator
+      }
+    ]
+  })
 
   // --- useDataTable integration ---
   const tableProps = {
@@ -160,7 +186,6 @@
     isEdgeApplicationRulesEngine: true,
     expandedRowGroups: ['Default', 'Request', 'Response'],
     groupColumn: 'phase.content',
-    isTabs: true,
     orderableRows: true,
     expandableRowGroups: true,
     showContrastInactiveLine: false,
@@ -386,7 +411,7 @@
   }
 
   function listRulesEngineWithDecorator(params) {
-    return rulesEngineService.listRulesEngineRequestAndResponsePhase({
+    return rulesSvc.value.listRulesEngineRequestAndResponsePhase({
       edgeApplicationId: props.edgeApplicationId,
       params
     })
@@ -395,7 +420,7 @@
   const deleteRulesEngineWithDecorator = async (ruleId, ruleData) => {
     const phase = ruleData.phase?.content.toLowerCase()
 
-    return await rulesEngineService.deleteRulesEngine({
+    return await rulesSvc.value.deleteRulesEngine({
       edgeApplicationId: props.edgeApplicationId,
       ruleId,
       phase
@@ -403,11 +428,14 @@
   }
 
   const openCreateRulesEngineDrawerByPhase = () => {
+    if (isReadOnly.value) return
     handleCreateTrackEvent()
-    drawerRulesEngineRef.value.openDrawerCreate(PARSE_PHASE[selectedPhase.value])
+    const phase = PARSE_PHASE[selectedPhase.value]
+    drawerRulesEngineRef.value.openDrawerCreate(phase)
   }
 
   function openEditRulesEngineDrawer(item) {
+    if (isReadOnly.value) return
     currentPhase.value = item.phase.content.toLowerCase()
     drawerRulesEngineRef.value.openDrawerEdit(item)
   }
@@ -417,7 +445,7 @@
   const reorderDecoratorService = async (rulesData, reloadFn) => {
     isLoadingButtonOrder.value = true
     try {
-      await rulesEngineService.reorderRulesEngine(rulesData, props.edgeApplicationId)
+      await rulesSvc.value.reorderRulesEngine(rulesData, props.edgeApplicationId)
       toast.add({
         closable: true,
         severity: 'success',
@@ -487,13 +515,15 @@
     :hideApplicationAcceleratorInDescription="hideApplicationAcceleratorInDescription"
     :isEdgeFunctionEnabled="isEdgeFunctionEnabled"
     :currentPhase="currentPhase"
+    :service="service"
+    :versionId="versionId"
     @onSuccess="reload()"
     data-testid="rules-engine-drawer"
     @navigate-to-main-settings="handleNavigateToMainSettings"
   />
 
   <div
-    class="max-w-full mt-4"
+    :class="['max-w-full', { 'mt-4': !isVersioned }]"
     data-testid="data-table-container"
   >
     <DataTable
@@ -516,10 +546,10 @@
       emptyListMessage="No rules found."
       :columns="selectedColumns"
       :expandableRowGroups="true"
-      :rowGroupMode="'subheader'"
-      :groupRowsBy="'phase.content'"
-      :sortField="'phase.content'"
-      :sortMode="'single'"
+      rowGroupMode="subheader"
+      groupRowsBy="phase.content"
+      sortField="phase.content"
+      sortMode="single"
       :rowClass="stateClassRules"
       @rowReorder="onRowReorder"
       @row-click="(event) => editItemSelected(event, event.data)"
@@ -565,6 +595,7 @@
       </template>
 
       <DataTable.Column
+        v-if="!isReadOnly"
         rowReorder
         headerStyle="width: 3rem"
         data-testid="data-table-reorder-column"
@@ -714,6 +745,7 @@
       </template>
       <template #emptyBlockButton>
         <PrimeButton
+          v-if="!isReadOnly"
           icon="pi pi-plus"
           severity="secondary"
           label="Rule"
@@ -725,7 +757,7 @@
 
     <teleport
       to="#action-bar"
-      v-if="columnOrderAltered && !isLoading"
+      v-if="columnOrderAltered && !isLoading && !isReadOnly"
     >
       <div
         class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"

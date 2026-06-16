@@ -154,7 +154,79 @@ export const queryKeys = {
         ...queryKeys.application.version.all(parentId),
         'detail',
         versionId
-      ]
+      ],
+      cacheSettings: {
+        all: (parentId, versionId) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'cache-settings'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'cache-settings',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'cache-settings',
+          'detail',
+          id
+        ]
+      },
+      deviceGroups: {
+        all: (parentId, versionId) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'device-groups'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'device-groups',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'device-groups',
+          'detail',
+          id
+        ]
+      },
+      functions: {
+        all: (parentId, versionId) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'functions'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'functions',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'functions',
+          'detail',
+          id
+        ]
+      },
+      rulesEngine: {
+        all: (parentId, versionId) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'rules-engine'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'rules-engine',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'rules-engine',
+          'detail',
+          id
+        ]
+      }
     }
   },
   workload: {

@@ -57,14 +57,10 @@
 
   // DELETE is pulled out of the secondary group so it can render right after
   // Cancel (see template), instead of in availableActions order.
-  const deleteAction = computed(() =>
-    props.availableActions.includes('DELETE') ? 'DELETE' : null
-  )
+  const deleteAction = computed(() => (props.availableActions.includes('DELETE') ? 'DELETE' : null))
 
   const secondaryActions = computed(() =>
-    props.availableActions.filter(
-      (action) => action !== 'DELETE' && !primarySet.value.has(action)
-    )
+    props.availableActions.filter((action) => action !== 'DELETE' && !primarySet.value.has(action))
   )
 
   const severityFor = (action, emphasis) => {

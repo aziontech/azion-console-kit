@@ -6,7 +6,6 @@
   import GenericDataView from '@/components/GenericDataView'
   import ResourcePackCell from '@/components/ResourcePackCell'
   import StatusTag from '@/components/StatusTag'
-  import EnvironmentTag from '@/components/EnvironmentTag'
   import CurrentBadge from '@/components/CurrentBadge'
   import {
     getDeploymentStatus,
@@ -364,7 +363,10 @@
     </template>
 
     <template #cell-environment="{ item: version }">
-      <EnvironmentTag :environment="version.environment" />
+      <Tag
+        severity="info"
+        :value="formatEnvironment(version.environment)"
+      />
     </template>
 
     <template #cell-status="{ item: version }">

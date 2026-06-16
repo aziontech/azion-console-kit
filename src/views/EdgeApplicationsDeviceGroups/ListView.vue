@@ -3,6 +3,7 @@
   import ListTable from '@/components/list-table/ListTable.vue'
   import DrawerDeviceGroups from '@/views/EdgeApplicationsDeviceGroups/Drawer'
   import { deviceGroupService } from '@/services/v2/edge-app/edge-app-device-group-service'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
   import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref, inject } from 'vue'
 
@@ -19,8 +20,23 @@
     documentationService: {
       required: true,
       type: Function
+    },
+    // Optional facade pre-bound to appId + versionId for the versioned (v6) flow,
+    // shaped `{ list, load, create, edit, remove }`; null in the legacy flow (the
+    // singleton `deviceGroupService` is used instead). create/load/edit keep the
+    // singleton `(edgeApplicationId, ...)` signature so the Drawer stays unchanged.
+    service: {
+      type: Object,
+      default: null
+    },
+    // Pass-through version identifier for the versioned flow.
+    versionId: {
+      type: String,
+      default: null
     }
   })
+
+  const { readOnly, isVersioned } = useVersionContext()
 
   const drawerDeviceGroups = ref('')
   const listTableRef = ref(null)
@@ -83,23 +99,54 @@
     drawerDeviceGroups.value.openDrawerEdit(item.id)
   }
 
+  // Use the injected facade (v6) when present, else the singleton service (legacy).
+  const listFn = props.service
+    ? props.service.list
+    : (params) => deviceGroupService.listDeviceGroupService(props.edgeApplicationId, params)
+
+  const deleteFn = props.service
+    ? props.service.remove
+    : (id) => deviceGroupService.deleteDeviceGroupService(props.edgeApplicationId, id)
+
+  const createDrawerService = props.service
+    ? props.service.create
+    : deviceGroupService.createDeviceGroupService
+
+  const loadDrawerService = props.service
+    ? props.service.load
+    : deviceGroupService.loadDeviceGroupService
+
+  const editDrawerService = props.service
+    ? props.service.edit
+    : deviceGroupService.editDeviceGroupService
+
   const listDeviceGroupsWithDecorator = async (params) => {
-    return await deviceGroupService.listDeviceGroupService(props.edgeApplicationId, params)
+    return await listFn(params)
   }
 
   const deleteDeviceGroupsWithDecorator = async (id) => {
-    return await deviceGroupService.deleteDeviceGroupService(props.edgeApplicationId, id)
+    return await deleteFn(id)
   }
 
-  const actions = [
-    {
-      label: 'Delete',
-      type: 'delete',
-      title: 'device group',
-      icon: 'pi pi-trash',
-      service: deleteDeviceGroupsWithDecorator
+  const actions = computed(() => {
+    if (readOnly.value) {
+      return []
     }
-  ]
+
+    return [
+      {
+        label: 'Delete',
+        type: 'delete',
+        title: 'device group',
+        icon: 'pi pi-trash',
+        service: deleteDeviceGroupsWithDecorator
+      }
+    ]
+  })
+
+  const editInDrawerHandler = computed(() =>
+    readOnly.value ? undefined : openEditDeviceGroupDrawer
+  )
 
   const handleTrackClickToCreate = () => {
     tracker.product
@@ -134,22 +181,22 @@
     ref="drawerDeviceGroups"
     @onSuccess="handleSuccess"
     :edgeApplicationId="edgeApplicationId"
-    :createDeviceGroupService="deviceGroupService.createDeviceGroupService"
-    :loadDeviceGroupService="deviceGroupService.loadDeviceGroupService"
-    :editDeviceGroupService="deviceGroupService.editDeviceGroupService"
+    :createDeviceGroupService="createDrawerService"
+    :loadDeviceGroupService="loadDrawerService"
+    :editDeviceGroupService="editDrawerService"
   />
   <ListTable
     ref="listTableRef"
     :listService="listDeviceGroupsWithDecorator"
     :columns="getColumns"
     :frozenColumns="['name']"
-    :editInDrawer="openEditDeviceGroupDrawer"
+    :editInDrawer="editInDrawerHandler"
     :actions="actions"
     defaultOrderingFieldName="name"
     :apiFields="DEVICE_GROUP_API_FIELDS"
     exportFileName="Application Device Groups"
     :lazy="true"
-    :isTabs="true"
+    :isTabs="!isVersioned"
     :hideLastModifiedColumn="true"
     emptyListMessage="No device groups found."
     :emptyBlock="{
@@ -164,6 +211,7 @@
   >
     <template #emptyBlockButton>
       <PrimeButton
+        v-if="!readOnly"
         class="max-md:w-full w-fit"
         data-testid="create-device-group-button"
         @click="openCreateDeviceGroupDrawer"

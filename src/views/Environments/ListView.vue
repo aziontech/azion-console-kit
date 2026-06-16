@@ -22,16 +22,6 @@
   const createPath = '/environments/create'
   const editPagePath = '/environments/edit'
 
-  const formatDeploymentPolicyTag = (policy = 'single_version') => {
-    const policyValue = typeof policy === 'string' ? policy.toLowerCase() : 'single_version'
-
-    if (policyValue === 'versioned_urls') {
-      return { content: 'Versioned URL', severity: 'secondary' }
-    }
-
-    return { content: 'Single Version', severity: 'primary' }
-  }
-
   const handleNavigateToCreate = () => {
     router.push(createPath)
   }
@@ -72,7 +62,10 @@
         type: 'component',
         component: (columnData) => {
           return columnBuilder({
-            data: formatDeploymentPolicyTag(columnData),
+            data: {
+              content: columnData,
+              severity: 'info'
+            },
             columnAppearance: 'tag'
           })
         }

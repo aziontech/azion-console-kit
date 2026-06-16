@@ -2,7 +2,7 @@
   <CreateDrawerBlock
     v-if="loadCreateFunctionDrawer"
     v-model:visible="showCreateFunctionDrawer"
-    :createService="edgeApplicationFunctionService.createEdgeApplicationFunction"
+    :createService="createService"
     drawerId="create-function-instance-drawer"
     :schema="validationSchema"
     :initialValues="initialValues"
@@ -84,8 +84,23 @@
     allowedRuntime: {
       type: String,
       default: null // null = all, 'azion_lua' = only Lua
+    },
+    // Optional facade bound to appId + versionId for the versioned (v6) flow,
+    // shaped `{ list, load, create, edit, remove }`; null in the legacy flow.
+    service: {
+      type: Object,
+      default: null
+    },
+    versionId: {
+      type: String,
+      default: null
     }
   })
+
+  // create service handed to CreateDrawerBlock: facade when versioned, else singleton.
+  const createService = props.service
+    ? (payload) => props.service.create(payload)
+    : edgeApplicationFunctionService.createEdgeApplicationFunction
 
   const showCreateFunctionDrawer = ref(false)
   const showEditFunctionDrawer = ref(false)
@@ -205,6 +220,12 @@
   })
 
   const editService = async (payload) => {
+    if (props.service) {
+      return await props.service.edit({
+        ...payload,
+        edgeApplicationID: props.edgeApplicationId
+      })
+    }
     return await edgeApplicationFunctionService.editEdgeApplicationFunction({
       ...payload,
       edgeApplicationID: props.edgeApplicationId
@@ -212,6 +233,12 @@
   }
 
   const loadService = async () => {
+    if (props.service) {
+      return await props.service.load({
+        edgeApplicationID: props.edgeApplicationId,
+        functionID: selectedFunctionToEdit.value
+      })
+    }
     const functions = await edgeApplicationFunctionService.loadEdgeApplicationFunction({
       edgeApplicationID: props.edgeApplicationId,
       functionID: selectedFunctionToEdit.value

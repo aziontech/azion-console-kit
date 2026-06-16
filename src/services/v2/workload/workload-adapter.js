@@ -202,7 +202,10 @@ export const WorkloadAdapter = {
         workloadHostname: {
           content: workload.workload_domain
         },
-        domains: workload.domains
+        domains: workload.domains,
+        // Deploy drawer derives environment/deployment cards from these bindings
+        // (design §5.0). The API field is still being finalized; degrade to [].
+        bindings: workload.bindings ?? []
       }
     })
   },
