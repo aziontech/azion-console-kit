@@ -158,5 +158,28 @@ export const DeploymentAdapter = {
       deployment_policy: payload.deployment_policy,
       strategy_defaults: payload.strategy_defaults
     })
+  },
+
+  /**
+   * Builds the `build_and_activate` request body from the drawer's resource
+   * context and the selected version id. Emits a single-item `resources` array,
+   * dropping any undefined key so the API only receives populated fields.
+   * `strategy`/`origin` are intentionally out of scope for this delivery.
+   *
+   * @param {{ resourceId: number, resourceType: string, resourceName: string }} resourceContext
+   * @param {string} versionId - `version_id` (ULID) sent as `resource_version`.
+   * @returns {{ resources: Array<object> }}
+   */
+  transformBuildAndActivatePayload(resourceContext = {}, versionId) {
+    return {
+      resources: [
+        pickDefined({
+          resource_id: resourceContext.resourceId,
+          resource_version: versionId,
+          resource_type: resourceContext.resourceType,
+          name: resourceContext.resourceName
+        })
+      ]
+    }
   }
 }

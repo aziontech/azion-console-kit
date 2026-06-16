@@ -1,20 +1,29 @@
 <script setup>
-  import { computed, ref, watch } from 'vue'
+  /**
+   * v6 EditView — the Application screen, gated by `use_v6_configurations`.
+   * Two outer tabs: Versions (the listing) and Settings (Main Settings of the
+   * latest version; editable when `draft`, read-only otherwise).
+   *
+   * The flag check stays centralized in the router (req 10.1) — this view never
+   * imports user-flag. Lifecycle commands bubble up from MainSettingsTab; this
+   * view owns the toast + tab/route navigation.
+   */
+  import { computed, ref, watch, provide } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from '@aziontech/webkit/use-toast'
   import ProgressSpinner from '@aziontech/webkit/progressspinner'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import PrimeButton from '@aziontech/webkit/button'
   import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
 
-  import { VERSION_ACTIONS } from '@/composables/versioning/version-machine'
+  import { VERSION_ACTIONS, VERSION_STATES } from '@/composables/versioning/version-machine'
 
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import VersionShell from '@/templates/version-shell-block/index.vue'
-  import ApplicationVersionBadge from '@/views/EdgeApplications/v6/ApplicationVersionBadge.vue'
-  import ApplicationVersionAdapter from '@/views/EdgeApplications/v6/ApplicationVersionAdapter.vue'
-  import FormFieldsEditEdgeApplications from '@/views/EdgeApplications/FormFields/FormFieldsEditEdgeApplications.vue'
+  import VersionsTab from '@/views/EdgeApplications/v6/tabs/VersionsTab.vue'
+  import MainSettingsTab from '@/views/EdgeApplications/v6/tabs/MainSettingsTab.vue'
+  import DeployDrawerBlock from '@/templates/deploy-drawer-block'
 
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
@@ -25,31 +34,28 @@
   const router = useRouter()
   const toast = useToast()
 
-  const edgeApplicationId = computed(() => String(route.params.id))
-  const versionId = computed(() => (route.params.versionId ? String(route.params.versionId) : null))
+  const TAB = { VERSIONS: 0, SETTINGS: 1 }
 
-  // Guard req 4.4: without versionId there is no version to edit. Redirects to
-  // the versions list (route `edit-application`, which under the v6 flag renders
-  // VersionsListView). The redirect runs in setup; the `v-if="versionId"` in the
-  // template prevents the shell/badge/query from mounting in this transient state.
-  if (!versionId.value) {
-    router.replace({ name: 'edit-application', params: { id: edgeApplicationId.value } })
-  }
+  const edgeApplicationId = computed(() => String(route.params.id))
+
   const application = ref(null)
   const isLoadingApplication = ref(true)
   const loadError = ref(null)
 
+  // Origins Drawer (mounted inside the Main Settings form, when present) injects
+  // `edgeApplication` to gate the "Load Balancer" origin type. The v6 flow bypasses
+  // the legacy TabsView, so we reproduce the provide here.
+  provide('edgeApplication', application)
+
   const loadApplication = async () => {
-    // Global spinner only on initial load: on re-loads (e.g. post-SAVE, to
-    // reflect the new name in the title) the screen stays mounted — tearing down
-    // the ContentBlock would unmount shell/form and lose the tabs state.
+    // Global spinner only on initial load: on re-loads (e.g. post-SAVE, to reflect
+    // the new name in the title) the screen stays mounted so the tabs state holds.
     if (!application.value) isLoadingApplication.value = true
     loadError.value = null
     try {
-      const result = await edgeAppService.loadEdgeApplicationService({
+      application.value = await edgeAppService.loadEdgeApplicationService({
         id: edgeApplicationId.value
       })
-      application.value = result
     } catch (err) {
       loadError.value = err
       application.value = null
@@ -60,53 +66,78 @@
 
   watch(edgeApplicationId, loadApplication, { immediate: true })
 
-  const activeTabIndex = ref(0)
+  // Versions of this Application. Deduped by queryKey with VersionsTab's own query,
+  // so listing in both places issues a single request. Used to resolve the
+  // "latest created" version the Settings tab edits.
+  const versionsQuery = edgeAppVersionService.useListVersionsQuery(edgeApplicationId.value)
+  const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
 
-  const applicationTabs = computed(() => {
-    if (!application.value || !versionId.value) return []
-
-    return [
-      {
-        key: 'main-settings',
-        label: 'Main Settings',
-        // v4 workspace form: fields connected via useField to the useForm in
-        // ApplicationVersionAdapter. Default `handleBlock: ['full']` renders
-        // all blocks — without legacy V3 delivery/TLS props.
-        component: FormFieldsEditEdgeApplications,
-        props: {}
-      }
-    ]
+  // "Latest created" = most recent `createdAt`. The list is small; a copy-sort
+  // keeps it pure. Missing dates coerce to '' so the ordering stays stable.
+  const latestVersionId = computed(() => {
+    const list = rawVersions.value
+    if (!list.length) return null
+    const sorted = [...list].sort((left, right) =>
+      String(right.createdAt || '').localeCompare(String(left.createdAt || ''))
+    )
+    return sorted[0]?.id ?? null
   })
 
-  const applicationTitle = computed(() => {
-    const name = application.value?.name ?? ''
-    const vid = versionId.value
-    if (!name || !vid) return name
-    return `${name} — Version ${vid}`
-  })
+  const activeTab = ref(TAB.VERSIONS)
 
-  // Action → success toast summary map (constants, never loose strings).
+  // Deploy drawer. The heading "Deploy" action only toggles it.
+  const isDeployDrawerOpen = ref(false)
+  const openDeployDrawer = () => {
+    isDeployDrawerOpen.value = true
+  }
+
+  // Version options offered by the drawer: only `ready` versions are deployable,
+  // mapped to the reusable block's `{ label, value }` shape where `value` is the
+  // version_id (ULID). Comment is the human label; we fall back to `Version <id>`
+  // when a version carries no comment.
+  const readyVersionOptions = computed(() =>
+    rawVersions.value
+      .filter((version) => version.state === VERSION_STATES.READY)
+      .map((version) => ({
+        label: version.comment || `Version ${version.id}`,
+        value: version.id
+      }))
+  )
+
+  // Triggered from the Versions listing context → no source version: the version
+  // field starts EMPTY for manual selection (req 4.3). `resourceId` is the numeric
+  // Application id; `resourceName` feeds `resources[].name` in the release payload.
+  const deployResourceContext = computed(() => ({
+    resourceType: 'application',
+    resourceId: Number(edgeApplicationId.value),
+    resourceName: application.value?.name ?? '',
+    version: null,
+    versions: readyVersionOptions.value
+  }))
+
+  const applicationTitle = computed(() => application.value?.name ?? '')
+  const pageDescription =
+    "Each version is an isolated snapshot of this Application's configuration. Edit a draft, then build it to publish an immutable version to the Edge."
+
   const SUCCESS_SUMMARY = {
     [VERSION_ACTIONS.SAVE]: 'Version saved',
     [VERSION_ACTIONS.SAVE_AND_BUILD]: 'Build started',
     [VERSION_ACTIONS.CANCEL_BUILD]: 'Build cancelled',
     [VERSION_ACTIONS.NEW_DRAFT_FROM]: 'Draft created',
     [VERSION_ACTIONS.ARCHIVE]: 'Version archived',
-    [VERSION_ACTIONS.DELETE]: 'Version deleted'
+    [VERSION_ACTIONS.DELETE]: 'Version deleted',
+    [VERSION_ACTIONS.DEPLOY]: 'Deploy triggered'
   }
 
-  // Versions list of this Application (route `edit-application`, which under the
-  // v6 flag renders VersionsListView). Used by Cancel and by the actions that
-  // leave the edit screen (DELETE, SAVE_AND_BUILD).
-  const goToVersionsList = () =>
-    router.push({ name: 'edit-application', params: { id: edgeApplicationId.value } })
+  // Returns to the Versions tab. The Settings tab targets the latest version, with
+  // no versionId in the URL, so this is a pure tab switch (no navigation).
+  const goToVersionsList = () => {
+    activeTab.value = TAB.VERSIONS
+  }
 
-  // Cancel emitted by VersionShell: discards the edit and returns to the listing.
-  // It is not a lifecycle command, so there is no toast and no cache mutation.
   const handleCancel = () => goToVersionsList()
 
-  // Command success emitted by VersionShell (`{ action, result }`).
-  // Shows toast and decides navigation/reload per action.
+  // Command success emitted by MainSettingsTab (`{ action, result }`): toast + nav.
   const handleCommandSuccess = ({ action, result }) => {
     toast.add({
       closable: true,
@@ -115,35 +146,30 @@
     })
 
     switch (action) {
-      // DELETE removes the version — goes back to the versions list (req 4.1).
+      // The version is gone — back to the listing (req 4.1).
       case VERSION_ACTIONS.DELETE:
         goToVersionsList()
         return
-      // SAVE_AND_BUILD does no polling here: the build progress can be
-      // checked in the versions list, so we navigate there (req 4.5).
+      // No polling here: build progress is visible in the listing (req 4.5).
       case VERSION_ACTIONS.SAVE_AND_BUILD:
         goToVersionsList()
         return
-      // NEW_DRAFT_FROM creates a new draft — opens the edit screen for that new version (req 4.2).
+      // A new draft was forked — open its FULL editor (req 4.2).
       case VERSION_ACTIONS.NEW_DRAFT_FROM:
         router.push({
           name: 'edit-application-version',
           params: { id: edgeApplicationId.value, versionId: result.id }
         })
         return
-      // SAVE stays on the screen; the name may have changed and feeds the title,
-      // so it reloads the Application (the view stays mounted — req 4.3).
+      // Name may have changed and feeds the title — reload, staying here (req 4.3).
       case VERSION_ACTIONS.SAVE:
         loadApplication()
         return
-      // Other actions (e.g. ARCHIVE/CANCEL_BUILD) stay on the screen without reload (req 4.3).
+      // ARCHIVE / CANCEL_BUILD / DEPLOY stay on the screen without reload (req 4.3).
       default:
     }
   }
 
-  // Command failure emitted by VersionShell (`{ action, error }`).
-  // Extracts the message following the repo pattern (error.showErrors when
-  // available; otherwise message/string; generic fallback).
   const handleCommandError = ({ error }) => {
     if (error && typeof error.showErrors === 'function') {
       error.showErrors(toast)
@@ -159,12 +185,6 @@
       detail
     })
   }
-
-  // Factory passed to VersionShell. Defined in setup (not inline in the template)
-  // because, inside template function literals, refs are not auto-unwrapped
-  // — they require an explicit `.value`.
-  const useVersionQuery = () =>
-    edgeAppVersionService.useLoadVersionQuery(edgeApplicationId.value, versionId.value)
 </script>
 
 <template>
@@ -195,62 +215,95 @@
     <template #heading>
       <PageHeadingBlock
         :pageTitle="applicationTitle"
+        :description="pageDescription"
         :entityName="application?.name"
       >
         <template #default>
           <div class="flex items-center gap-3">
-            <!-- Keyed by versionId: the canonical query uses a static queryKey,
-                 so an in-place version switch requires remounting the badge. -->
-            <ApplicationVersionBadge
-              v-if="versionId"
-              :key="versionId"
-              :resource-id="edgeApplicationId"
-              :version-id="versionId"
+            <!-- Deploy belongs to the listing context; the Settings tab surfaces
+                 the version's own Build/Deploy via VersionHeadingActions. -->
+            <PrimeButton
+              v-if="activeTab === TAB.VERSIONS"
+              label="Deploy"
+              icon="pi pi-cloud-upload"
+              size="small"
+              data-testid="edge-applications-v6-edit__deploy"
+              @click="openDeployDrawer"
+            />
+            <!-- Teleport target for the version's status + lifecycle action on the
+                 Settings tab (Build when draft / Deploy when ready). -->
+            <div
+              id="version-lifecycle-action"
+              class="flex items-center"
             />
           </div>
         </template>
       </PageHeadingBlock>
     </template>
     <template #content>
-      <!-- Keyed by versionId: the shell calls the query factory only once
-           in setup and useVersionShell captures resourceId/versionId by value.
-           In-place navigation to another version (post-NEW_DRAFT_FROM) needs to
-           remount shell + adapter to renew query, ctx and form. -->
-      <VersionShell
-        v-if="versionId"
-        :key="versionId"
-        :use-version-query="useVersionQuery"
-        :resource-id="edgeApplicationId"
-        :version-id="versionId"
-        data-testid="edge-applications-v6-edit__shell"
-        @updated="handleCommandSuccess"
-        @command-error="handleCommandError"
-        @cancel="handleCancel"
+      <!-- flex-column gap spaces the tab selector from the panel content. -->
+      <TabView
+        v-model:activeIndex="activeTab"
+        :pt="{ root: { class: 'flex flex-col gap-4' } }"
       >
-        <ApplicationVersionAdapter
-          :application="application"
-          :resource-id="edgeApplicationId"
-          :version-id="versionId"
+        <TabPanel
+          header="Versions"
+          :pt="{ root: { 'data-testid': 'edge-applications-v6-edit__tab__versions' } }"
         >
-          <TabView v-model:activeIndex="activeTabIndex">
-            <TabPanel
-              v-for="tab in applicationTabs"
-              :key="tab.key"
-              :header="tab.label"
-              :pt="{
-                root: { 'data-testid': `edge-applications-v6-edit__tab-panel__${tab.key}` }
-              }"
+          <VersionsTab
+            v-if="activeTab === TAB.VERSIONS"
+            :application-id="edgeApplicationId"
+          />
+        </TabPanel>
+        <TabPanel
+          header="Settings"
+          :pt="{ root: { 'data-testid': 'edge-applications-v6-edit__tab__settings' } }"
+        >
+          <!-- v-if gates mounting to the active tab so the shell (and its teleported
+               heading/footer actions) only exist while Settings is open. -->
+          <template v-if="activeTab === TAB.SETTINGS">
+            <!-- Keyed by versionId: the shell captures resourceId/versionId by
+                 value, so a version switch remounts shell + adapter + form. -->
+            <MainSettingsTab
+              v-if="latestVersionId"
+              :key="latestVersionId"
+              :application="application"
+              :resource-id="edgeApplicationId"
+              :version-id="latestVersionId"
+              @command-success="handleCommandSuccess"
+              @command-error="handleCommandError"
+              @cancel="handleCancel"
+            />
+            <!-- No version to edit: the canonical create CTA lives on the Versions
+                 tab (with the full empty state), so route the user there. -->
+            <div
+              v-else
+              class="flex w-full flex-col items-center justify-center gap-3 rounded-md border border-dashed border-[var(--surface-border)] bg-[var(--surface-section)] px-6 py-16 text-center text-[var(--text-color-secondary)]"
+              data-testid="edge-applications-v6-edit__settings-empty"
             >
-              <div class="flex flex-col gap-4 mt-4">
-                <component
-                  :is="tab.component"
-                  v-bind="tab.props ?? {}"
-                />
-              </div>
-            </TabPanel>
-          </TabView>
-        </ApplicationVersionAdapter>
-      </VersionShell>
+              <i class="pi pi-file-edit text-2xl text-[var(--text-color-secondary)]" />
+              <h3 class="m-0 text-base font-semibold leading-6 text-[var(--text-color)]">
+                No version to edit yet
+              </h3>
+              <p class="m-0 max-w-md text-sm leading-6">
+                Create a version on the Versions tab to start configuring this Application.
+              </p>
+              <PrimeButton
+                label="New Version"
+                icon="pi pi-plus"
+                size="small"
+                data-testid="edge-applications-v6-edit__settings-empty__cta"
+                @click="activeTab = TAB.VERSIONS"
+              />
+            </div>
+          </template>
+        </TabPanel>
+      </TabView>
+
+      <DeployDrawerBlock
+        v-model:visible="isDeployDrawerOpen"
+        :resource-context="deployResourceContext"
+      />
     </template>
   </ContentBlock>
 </template>

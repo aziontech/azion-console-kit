@@ -59,7 +59,7 @@ export const edgeApplicationRoutes = {
       name: 'edit-application',
       component: () =>
         hasFlagUseV6Configurations()
-          ? import('@views/EdgeApplications/v6/VersionsListView.vue')
+          ? import('@views/EdgeApplications/v6/EditView.vue')
           : import('@views/EdgeApplications/TabsView.vue'),
       props: () => {
         const EdgeApplicationServices = useEdgeApplicationServices()
@@ -116,7 +116,12 @@ export const edgeApplicationRoutes = {
     {
       path: 'edit/:id/versions/:versionId/:tab?',
       name: 'edit-application-version',
-      component: () => import('@views/EdgeApplications/v6/EditView.vue'),
+      component: () => import('@views/EdgeApplications/v6/VersionEditView.vue'),
+      props: () => ({
+        // Legacy origins service injected here (router-level) so the v6 full editor
+        // stays free of direct HTTP imports; consumed by the versioned Rules tab.
+        listOriginsService: OriginsService.listOriginsService
+      }),
       meta: {
         title: 'Edit Version',
         flag: 'use_v6_configurations',

@@ -1,3 +1,4 @@
+import { toValue } from 'vue'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { EdgeAppVersionAdapter } from './edge-app-version-adapter'
@@ -53,10 +54,17 @@ export class EdgeAppVersionService extends BaseService {
       { persist: false, enabled: true }
     )
 
+  /**
+   * Loads a single version's detail. Accepts plain values OR reactive sources
+   * (refs/getters) for `resourceId`/`versionId`: when reactive, the query key
+   * embeds them so vue-query refetches on an in-place version switch (e.g.
+   * post-`NEW_DRAFT_FROM`) instead of serving the original version's cache. The
+   * fetcher unwraps via `toValue`, so plain strings keep the previous behavior.
+   */
   useLoadVersionQuery = (resourceId, versionId) =>
     this.useQuery(
       queryKeys.application.version.detail(resourceId, versionId),
-      () => this.#fetchOne(resourceId, versionId),
+      () => this.#fetchOne(toValue(resourceId), toValue(versionId)),
       { persist: false, enabled: true }
     )
 

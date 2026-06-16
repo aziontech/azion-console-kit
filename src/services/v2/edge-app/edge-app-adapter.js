@@ -23,6 +23,7 @@ const transformMap = {
   id: (value) => value.id,
   active: (value) => parseStatusData(value.active),
   name: (value) => parseName(value),
+  versionId: (value) => ({ content: value.version_id ?? '-', severity: 'info' }),
   lastEditor: (value) => value.last_editor,
   lastModify: (value) => convertToRelativeTime(value.last_modified),
   lastModified: (value) => formatDateToDayMonthYearHour(value.last_modified),
