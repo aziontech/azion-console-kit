@@ -9,7 +9,7 @@
         folder and follow the instructions.
       </p>
     </section>
-    <section class="w-full flex flex-wrap gap-2 items-center">
+    <section class="w-full flex flex-wrap gap-2">
       <p class="text-start text-sm">Didn't receive the email?</p>
       <PrimeButton
         size="small"
@@ -43,10 +43,6 @@
   const SUBMIT_TIMER = 60
 
   const props = defineProps({
-    email: {
-      type: String,
-      default: ''
-    },
     resendEmailService: {
       required: true,
       type: Function
@@ -58,7 +54,7 @@
   const toast = useToast()
   const showCounter = computed(() => counter.value > 0)
 
-  const email = props.email || route.query.email || ''
+  const { email } = route.query
   if (!email) {
     router.push({ name: 'login' })
   }
@@ -68,9 +64,9 @@
     return re.test(email)
   }
 
-  const decodedEmail = email ? decodeURIComponent(email) : ''
+  const decodedEmail = decodeURIComponent(email)
   const isEmailValid = ref(validateEmail(decodedEmail))
-  if (email && !isEmailValid.value) {
+  if (!isEmailValid.value) {
     toast.add({
       severity: 'error',
       detail: 'Use a valid email format.',

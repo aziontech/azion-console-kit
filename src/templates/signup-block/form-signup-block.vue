@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-md md:min-w-[448px]">
     <div v-if="showActivation">
-      <div class="flex surface-border border rounded-md p-6 surface-card">
+      <div class="flex surface-border border rounded-md p-6">
         <div class="w-full flex flex-col gap-8 animate-fadeIn">
           <form
             class="flex flex-col gap-8"
@@ -9,7 +9,10 @@
             @submit.prevent
           >
             <div class="gap-2 flex flex-col">
-              <h1 class="text-start text-xl lg:text-2xl font-medium">{{ signupHeading }}</h1>
+              <h1 class="text-start text-xl lg:text-2xl font-medium">Sign Up for a Free Account</h1>
+              <p class="text-sm text-start text-color-secondary">
+                US$ 300 credit to use over 12 months, no credit card is required.
+              </p>
             </div>
 
             <div>
@@ -66,7 +69,6 @@
     </div>
     <AccountActivation
       v-else
-      :email="activationEmail"
       :resendEmailService="props.resendEmailService"
     />
   </div>
@@ -79,8 +81,7 @@
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeDivider from '@aziontech/webkit/divider'
   import LoginWithEmailBlock from '@/templates/signup-block/login-with-email-block'
-  import { usePlans } from '@/composables/usePlans'
-  import { computed, ref } from 'vue'
+  import { ref } from 'vue'
   import { useRouter } from 'vue-router'
 
   const props = defineProps({
@@ -89,19 +90,10 @@
   })
 
   const router = useRouter()
-  const { plan, initialize: initializePlans } = usePlans()
-  initializePlans({ defaultPlan: 'hobby' })
-
   const showLoginFromEmail = ref(true)
   const showActivation = ref(true)
-  const activationEmail = ref('')
 
-  const signupHeading = computed(() =>
-    plan.value === 'pro' ? 'Sign Up for the Pro Plan' : 'Sign Up for a Free Account'
-  )
-
-  const showActivationEmail = (email) => {
-    activationEmail.value = email
+  const showActivationEmail = () => {
     showActivation.value = false
   }
 

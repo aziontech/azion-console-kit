@@ -44,10 +44,10 @@ export class AccountHandler {
   async switchAndReturnAccountPage(clientId) {
     await sessionManager.switchAccount()
     const accountId = await this.searchAccount(clientId)
-    await this.switchAccountService(accountId)
+    const { firstLogin } = await this.switchAccountService(accountId)
     useAccountStore().setHasSession(true)
     sessionManager.notifySwitchAccountComplete()
-    return { name: 'home' }
+    return { name: firstLogin ? 'additional-data' : 'home' }
   }
 
   /**
@@ -56,9 +56,15 @@ export class AccountHandler {
    */
   async switchAccountAndRedirect(accountId) {
     await sessionManager.switchAccount()
-    await this.switchAccountService(accountId)
+    const { firstLogin } = await this.switchAccountService(accountId)
     useAccountStore().setHasSession(true)
     sessionManager.notifySwitchAccountComplete()
+
+    if (firstLogin) {
+      window.location = '/signup/additional-data'
+      return
+    }
+
     window.location.replace('/')
   }
 
