@@ -99,18 +99,18 @@ const applyMockHistoryParams = (items, params = {}) => {
     const field = desc ? params.ordering.slice(1) : params.ordering
     const selector = ORDERING_FIELD_MAP[field]
     if (selector) {
-      filtered = [...filtered].sort((a, b) => {
-        const av = selector(a)
-        const bv = selector(b)
+      filtered = [...filtered].sort((itemA, itemB) => {
+        const av = selector(itemA)
+        const bv = selector(itemB)
         if (av === bv) return 0
         return (av < bv ? -1 : 1) * (desc ? -1 : 1)
       })
     }
   } else {
     // Default: newest first by created_at
-    filtered = [...filtered].sort((a, b) => {
-      const av = a?.created_at ?? ''
-      const bv = b?.created_at ?? ''
+    filtered = [...filtered].sort((itemA, itemB) => {
+      const av = itemA?.created_at ?? ''
+      const bv = itemB?.created_at ?? ''
       if (av === bv) return 0
       return av < bv ? 1 : -1
     })

@@ -1,12 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { DeploymentAdapter } from '@/services/v2/deployment/deployment-adapter'
-import { deploymentListMockResponse } from '@/services/v2/deployment/deployment-list-mock'
-
-// MOCK: temporary toggle. Set to false once the API is available; the mock
-// branch below mimics page/search/ordering/filter so the Overview tab behaves
-// the same against fixture data and the real endpoint.
-const USE_LIST_MOCK = true
 
 const parseListResponse = (data) => {
   if (Array.isArray(data)) {
@@ -36,105 +30,34 @@ const parseItemResponse = (data) => {
   return data
 }
 
-const includesNormalized = (value, needle) => {
-  if (needle == null || needle === '') return true
-  return String(value ?? '')
-    .toLowerCase()
-    .includes(String(needle).toLowerCase())
-}
+const buildApiListParams = (params = {}) => {
+  const page = Number(params.page) > 0 ? Number(params.page) : 1
 
-const matchEquals = (value, expected) => {
-  if (expected == null || expected === '') return true
-  return String(value ?? '').toLowerCase() === String(expected).toLowerCase()
-}
+  const rawPageSize = params.pageSize ?? params.page_size
+  const pageSize = Number(rawPageSize) > 0 ? Math.min(Number(rawPageSize), 100) : 20
 
-const editorOf = (item) =>
-  item?.last_modified_by?.email || item?.last_modified_by?.user_id || ''
+  const nameFilter =
+    typeof params.name === 'string' && params.name.trim().length > 0
+      ? params.name.trim()
+      : typeof params.search === 'string' && params.search.trim().length > 0
+        ? params.search.trim()
+        : undefined
 
-const ORDERING_FIELD_MAP = {
-  name: (item) => String(item?.name ?? ''),
-  last_modified: (item) => item?.updated_at ?? '',
-  active: (item) => String(item?.state ?? ''),
-  last_editor: (item) => editorOf(item),
-  id: (item) => String(item?.id ?? '')
-}
-
-const applyMockListParams = (items, params = {}) => {
-  let filtered = items
-
-  const search = params.search
-  if (search) {
-    filtered = filtered.filter((item) => {
-      const haystack = [
-        item.id,
-        item.name,
-        item.deployment_version_policy,
-        item.state,
-        editorOf(item),
-        ...(Array.isArray(item.allowed_resource_types) ? item.allowed_resource_types : [])
-      ]
-      return haystack.some((value) => includesNormalized(value, search))
-    })
+  return {
+    page,
+    page_size: pageSize,
+    ...(nameFilter ? { name: nameFilter } : {})
   }
-
-  if (params.name) {
-    filtered = filtered.filter((item) => includesNormalized(item.name, params.name))
-  }
-  if (params.id) {
-    filtered = filtered.filter((item) => includesNormalized(item.id, params.id))
-  }
-  if (params.policy) {
-    filtered = filtered.filter((item) =>
-      matchEquals(item.deployment_version_policy, params.policy)
-    )
-  }
-  if (params.state) {
-    filtered = filtered.filter((item) => matchEquals(item.state, params.state))
-  }
-  if (params.last_editor) {
-    filtered = filtered.filter((item) => includesNormalized(editorOf(item), params.last_editor))
-  }
-
-  if (params.ordering) {
-    const desc = params.ordering.startsWith('-')
-    const field = desc ? params.ordering.slice(1) : params.ordering
-    const selector = ORDERING_FIELD_MAP[field]
-    if (selector) {
-      filtered = [...filtered].sort((a, b) => {
-        const av = selector(a)
-        const bv = selector(b)
-        if (av === bv) return 0
-        return (av < bv ? -1 : 1) * (desc ? -1 : 1)
-      })
-    }
-  }
-
-  const total = filtered.length
-  const page = Math.max(1, Number(params.page) || 1)
-  const pageSize = Math.max(1, Number(params.pageSize) || total || 1)
-  const start = (page - 1) * pageSize
-  const paged = filtered.slice(start, start + pageSize)
-
-  return { results: paged, count: total }
 }
 
 export class DeploymentService extends BaseService {
   #baseURL = '/deployment-api/v1/deployments'
 
   #fetchList = async (params = {}) => {
-    if (USE_LIST_MOCK) {
-      const { results } = parseListResponse(deploymentListMockResponse)
-      const { results: paged, count } = applyMockListParams(results, params)
-      return {
-        body: DeploymentAdapter.transformList(paged),
-        count
-      }
-    }
-
     const { data } = await this.http.request({
       method: 'GET',
       url: this.#baseURL,
-      params
+      params: buildApiListParams(params)
     })
 
     const { results, count } = parseListResponse(data)
