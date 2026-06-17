@@ -184,6 +184,29 @@ export function useFilterActions({
     reloadListTableWithHash()
   }
 
+  // ── Drop filters that don't exist in the current dataset ──
+  // When the dataset changes (e.g. HTTP Request → Functions) the active
+  // filters may reference fields that the new dataset doesn't expose (e.g.
+  // `status`). The filter tags hide those chips, but the underlying
+  // `filterData.fields` still carries them, so they leak into both the
+  // encoded `filters=` URL param and the API request — which then fails.
+  // Prune them against the current `filterFields` catalogue so the URL and
+  // the request stay consistent with what the dataset actually supports.
+  // Returns true when at least one filter was removed.
+  const pruneIncompatibleFilters = () => {
+    const fields = filterData.value?.fields
+    if (!Array.isArray(fields) || fields.length === 0) return false
+    const available = filterFields.value
+    // Skip while the catalogue hasn't loaded yet — an empty catalogue would
+    // wipe still-valid filters during the brief async load gap.
+    if (!Array.isArray(available) || available.length === 0) return false
+    const validValueFields = new Set(available.map((filterField) => filterField.value))
+    const kept = fields.filter((filterField) => validValueFields.has(filterField.valueField))
+    if (kept.length === fields.length) return false
+    filterData.value = { ...filterData.value, fields: kept }
+    return true
+  }
+
   // ── Query history display helpers ──
   const getHistoryParts = (entry) => {
     if (entry.filterFields?.length) {
@@ -224,6 +247,7 @@ export function useFilterActions({
     handleAddRangeFilter,
     handleExcludeFilter,
     handleRemoveFilter,
+    pruneIncompatibleFilters,
     getHistoryParts
   }
 }
