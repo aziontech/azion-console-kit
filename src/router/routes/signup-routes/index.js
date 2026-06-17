@@ -1,4 +1,5 @@
 import * as SignupService from '@/services/signup-services'
+import { inject } from 'vue'
 import { useAccountStore } from '@/stores/account'
 import SignupView from '@/views/Signup/SignupView.vue'
 
@@ -26,13 +27,27 @@ export const signupRoutes = {
       path: 'additional-data',
       name: 'additional-data',
       component: () => import('@views/Signup/AdditionalDataView.vue'),
+      props: {
+        postAdditionalDataService: SignupService.postAdditionalDataService,
+        patchFullnameService: SignupService.patchFullnameService,
+        updateAccountInfoService: SignupService.updateAccountInfoService
+      },
       meta: {
         hideNavigation: true
       },
-      beforeEnter: (to, from, next) => {
+      beforeEnter: (__, ___, next) => {
         const accountStore = useAccountStore()
+        const isFirstLogin = accountStore.isFirstLogin
 
-        if (accountStore.hasActiveUserId && accountStore.needsOnboarding) {
+        if (isFirstLogin && accountStore.ssoSignUpMethod) {
+          /** @type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+          const tracker = inject('tracker')
+          const signUpMethod = { method: accountStore.ssoSignUpMethod }
+
+          tracker.signUp.userSignedUp(signUpMethod).signUp.userAuthorizedSso(signUpMethod)
+        }
+
+        if (isFirstLogin) {
           next()
         } else {
           next({ name: 'home' })
