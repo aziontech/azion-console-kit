@@ -7,7 +7,7 @@
   import BlocksDomains from './blocks/domainsBlock.vue'
   import BlocksDeploymentSettings from './blocks/deploymentSettingsBlock.vue'
   import BlocksProtocolSettings from './blocks/protocolSettingsBlock.vue'
-  import BlocksInfrastructure from './blocks/infrastructureBlock.vue'
+  // import BlocksInfrastructure from './blocks/infrastructureBlock.vue'
   import BlocksMutualAuthenticationSettings from './blocks/mutualAuthenticationSettingsBlock.vue'
   import BlocksGeneral from './blocks/generalBlock.vue'
 
@@ -38,11 +38,11 @@
     :noBorder="props.noBorder"
   />
 
-  <BlocksInfrastructure
+  <!-- <BlocksInfrastructure
     :isEdit="props.isEdit"
     :isDrawer="props.isDrawer"
     :noBorder="props.noBorder"
-  />
+  /> -->
 
   <BlocksDomains
     :isEdit="props.isEdit"

@@ -38,9 +38,9 @@ export const workloadRoutes = {
       }
     },
     {
-      path: 'edit/:id',
+      path: 'edit/:id/:tab?',
       name: `edit-workload`,
-      component: () => import('@views/Workload/EditView.vue'),
+      component: () => import('@views/Workload/TabsView.vue'),
       props: {
         updatedRedirect: `list-workloads`
       },

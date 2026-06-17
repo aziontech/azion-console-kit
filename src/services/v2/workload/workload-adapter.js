@@ -16,18 +16,22 @@ function extractAzionAppSubdomain(fullDomains, zones = []) {
   const cleanDomains = []
   let azionAppSubdomains = ''
 
-  fullDomains.forEach((full) => {
-    const { domain, subdomain } = getPrimaryDomain(full, zones)
+  fullDomains.forEach((entry) => {
+    const name = typeof entry === 'string' ? entry : entry?.name
+    const environment = typeof entry === 'string' ? null : (entry?.environment ?? null)
+    const { domain, subdomain } = getPrimaryDomain(name, zones)
 
     if (domain === 'azion.app') {
       azionAppSubdomains = subdomain
     } else {
-      cleanDomains.push({ subdomain: subdomain ?? '', domain })
+      cleanDomains.push({ subdomain: subdomain ?? '', domain, environment })
     }
   })
 
   return {
-    cleanDomains: cleanDomains.length ? cleanDomains : [{ subdomain: '', domain: '' }],
+    cleanDomains: cleanDomains.length
+      ? cleanDomains
+      : [{ subdomain: '', domain: '', environment: null }],
     azionAppSubdomains
   }
 }
@@ -67,10 +71,16 @@ export const WorkloadAdapter = {
   transformCreateWorkload(payload) {
     let domains = payload.domains
       .filter(({ subdomain, domain }) => subdomain || domain)
-      .map(({ subdomain, domain }) => (subdomain ? `${subdomain}.${domain}` : domain))
+      .map(({ subdomain, domain, environment }) => ({
+        name: subdomain ? `${subdomain}.${domain}` : domain,
+        environment: environment ?? null
+      }))
 
     if (payload.useCustomDomain) {
-      domains.unshift(`${payload.customDomain}.azion.app`)
+      domains.unshift({
+        name: `${payload.customDomain}.azion.app`,
+        environment: payload.domains?.[0]?.environment ?? null
+      })
     }
 
     const payloadResquest = {

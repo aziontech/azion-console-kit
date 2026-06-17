@@ -4,14 +4,17 @@
   import InputText from '@aziontech/webkit/inputtext'
   import LabelBlock from '@aziontech/webkit/label'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import FieldInputGroup from '@aziontech/webkit/field-input-group'
   import CopyBlock from '@aziontech/webkit/button-copy'
+  import PrimeTag from '@aziontech/webkit/tag'
 
   import PrimeButton from '@aziontech/webkit/button'
   import { useFieldArray, useField } from 'vee-validate'
   import { ref, watch, computed } from 'vue'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
+  import { environmentService } from '@/services/v2/environment/environment-service'
 
   const props = defineProps({
     isDrawer: {
@@ -40,12 +43,55 @@
   const { setValue: setCommonName } = useField('letEncrypt.commonName')
   const { setValue: setAlternativeNames } = useField('letEncrypt.alternativeNames')
   const domainsOptions = ref([])
+  const environmentPolicies = ref({})
 
   const addNewDomain = () => {
     pushDomain({
       subdomain: '',
-      domain: ''
+      domain: '',
+      environment: null
     })
+  }
+
+  const listEnvironmentsDecorator = async (queryParams) => {
+    const response = await environmentService.listEnvironmentsServiceDropdown({
+      ...queryParams,
+      fields: ['id', 'name', 'deployment_version_policy']
+    })
+
+    response.body.forEach((env) => {
+      if (env?.id != null) {
+        environmentPolicies.value[env.id] = env.deployment_version_policy
+      }
+    })
+
+    return response
+  }
+
+  const ensureEnvironmentPolicy = async (envId) => {
+    if (!envId || environmentPolicies.value[envId]) return
+    try {
+      const env = await environmentService.loadEnvironmentService({ id: envId })
+      if (env?.id != null) {
+        environmentPolicies.value[env.id] = env.deployment_version_policy
+      }
+    } catch {
+      // intentionally swallowed: policy tag is non-blocking UX
+    }
+  }
+
+  const onEnvironmentSelected = (index, value) => {
+    const envId = value?.value ?? value
+    ensureEnvironmentPolicy(envId)
+  }
+
+  const policyTag = (envId) => {
+    const policy = environmentPolicies.value[envId]
+    if (!policy) return null
+    if (policy === 'single_version') {
+      return { value: 'Single Version', severity: 'info', icon: 'pi pi-lock' }
+    }
+    return { value: 'Versioned URLs', severity: 'warn', icon: 'pi pi-sitemap' }
   }
 
   const removeDomain = (domainId) => {
@@ -82,16 +128,6 @@
     }
   }
 
-  const stagingInfrastructure = '2'
-
-  const disabledCustomDomain = computed(() => infrastructure.value === stagingInfrastructure)
-
-  watch(disabledCustomDomain, (isDisabled) => {
-    if (isDisabled) {
-      useCustomDomain.value = false
-    }
-  })
-
   const hasMultipleDomains = computed(() => domainsList.value.length !== 1)
 
   const checkHasDomain = () => {
@@ -123,6 +159,20 @@
   }
 
   sugestionDomains()
+
+  watch(
+    domainsList,
+    async (rows) => {
+      if (!Array.isArray(rows)) return
+      for (const row of rows) {
+        const envId = row?.value?.environment ?? row?.environment ?? null
+        if (envId) {
+          await ensureEnvironmentPolicy(envId)
+        }
+      }
+    },
+    { immediate: true, deep: false }
+  )
 </script>
 <template>
   <form-horizontal
@@ -158,86 +208,138 @@
       </div>
       <div class="flex flex-col gap-3">
         <div class="flex flex-col gap-2 max-sm:gap-6">
-          <div class="flex max-w-lg gap-2 w-full max-sm:hidden">
-            <div class="flex w-1/2">
+          <div class="flex max-w-3xl gap-2 w-full max-sm:hidden">
+            <div class="flex flex-1">
               <LabelBlock label="Subdomain" />
             </div>
-            <div class="flex w-1/2">
+            <div class="flex flex-1">
               <LabelBlock
                 label="Domain"
                 name="domains"
               />
             </div>
+            <div class="flex flex-1">
+              <LabelBlock label="Environment" />
+            </div>
           </div>
           <div
             v-for="(domain, index) in domains"
             :key="index"
-            class="flex gap-4 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3 items-start"
+            class="flex flex-col gap-2"
           >
-            <div class="flex flex-col sm:flex-row sm:max-w-lg w-full gap-2">
-              <div class="flex flex-col w-full gap-2 sm:w-1/2">
-                <LabelBlock
-                  class="sm:hidden"
-                  label="Domains"
-                />
-                <FieldText
-                  :name="`domains[${index}].subdomain`"
-                  class="max-sm:text-left sm:text-right"
-                  :class="{ 'p-invalid': domainsErrorMessage }"
-                  :value="domain.subdomain"
-                  @blur="handleLetEncrypt"
-                  @input="updateDomainSubdomain(index, $event)"
-                  data-testid="domains-form__subdomain-field"
-                />
+            <div
+              class="flex gap-4 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3 items-start"
+            >
+              <div class="flex flex-col sm:flex-row sm:max-w-3xl w-full gap-2">
+                <div class="flex flex-col w-full gap-2 sm:flex-1">
+                  <LabelBlock
+                    class="sm:hidden"
+                    label="Subdomain"
+                  />
+                  <FieldText
+                    :name="`domains[${index}].subdomain`"
+                    :class="{ 'p-invalid': domainsErrorMessage }"
+                    :value="domain.subdomain"
+                    @blur="handleLetEncrypt"
+                    @input="updateDomainSubdomain(index, $event)"
+                    data-testid="domains-form__subdomain-field"
+                  />
+                </div>
+
+                <div class="flex flex-col w-full gap-2 sm:flex-1">
+                  <LabelBlock
+                    class="sm:hidden"
+                    label="Domain"
+                  />
+                  <FieldDropdown
+                    editable
+                    :focusOnHover="false"
+                    :name="`domains[${index}].domain`"
+                    :options="domainsOptions"
+                    optionLabel="label"
+                    optionValue="label"
+                    placeholder="example.net"
+                    emptyMessage="No domains available"
+                    :value="domain.domain"
+                    @blur="handleLetEncrypt"
+                    :class="{ 'p-invalid': domainsErrorMessage }"
+                    @change="updateDomainType(index, $event.value)"
+                    data-testid="domains-form__domain-dropdown"
+                  />
+                </div>
+
+                <div class="flex flex-col w-full gap-2 sm:flex-1">
+                  <LabelBlock
+                    class="sm:hidden"
+                    label="Environment"
+                  />
+                  <FieldDropdownLazyLoader
+                    :name="`domains[${index}].environment`"
+                    :service="listEnvironmentsDecorator"
+                    :loadService="environmentService.loadEnvironmentService"
+                    optionLabel="name"
+                    optionValue="value"
+                    :value="domain.environment"
+                    appendTo="self"
+                    placeholder="Select an environment"
+                    @change="onEnvironmentSelected(index, $event)"
+                    :data-testid="`domains-form__environment-dropdown-${index}`"
+                  />
+                </div>
               </div>
 
-              <div class="flex flex-col w-full gap-2 sm:w-1/2">
-                <FieldDropdown
-                  editable
-                  :focusOnHover="false"
-                  :name="`domains[${index}].domain`"
-                  :options="domainsOptions"
-                  optionLabel="label"
-                  optionValue="label"
-                  placeholder="example.net"
-                  emptyMessage="No domains available"
-                  :value="domain.domain"
-                  @blur="handleLetEncrypt"
-                  :class="{ 'p-invalid': domainsErrorMessage }"
-                  @change="updateDomainType(index, $event.value)"
-                  data-testid="domains-form__domain-dropdown"
-                />
-              </div>
+              <PrimeButton
+                v-if="hasMultipleDomains"
+                @click="removeDomain(index)"
+                icon="pi pi-trash"
+                class="p-button-outlined p-button-sm p-button-danger"
+                data-testid="domains-form__remove-domain-button"
+                title="Remove domain"
+              />
             </div>
 
-            <PrimeButton
-              v-if="hasMultipleDomains"
-              @click="removeDomain(index)"
-              icon="pi pi-trash"
-              class="p-button-outlined p-button-sm p-button-danger"
-              data-testid="domains-form__remove-domain-button"
-              title="Remove domain"
-            />
-          </div>
-          <div class="max-w-lg">
-            <div class="!w-1/2">
+            <div
+              v-if="
+                policyTag(domain.environment) ||
+                (props.isEdit && !domain.environment && (domain.subdomain || domain.domain))
+              "
+              class="flex max-w-3xl w-full"
+            >
+              <PrimeTag
+                v-if="policyTag(domain.environment)"
+                v-bind="policyTag(domain.environment)"
+                class="self-start"
+              />
               <small
-                v-if="domainsErrorMessage"
+                v-if="props.isEdit && !domain.environment && (domain.subdomain || domain.domain)"
                 class="p-error text-xs font-normal leading-tight"
               >
-                {{ domainsErrorMessage }}
+                This domain has no environment. Select one to keep routing consistent.
               </small>
             </div>
           </div>
-          <div class="flex max-w-lg gap-2 w-full max-sm:hidden">
-            <div class="flex w-1/2">
+          <div class="max-w-3xl">
+            <small
+              v-if="domainsErrorMessage"
+              class="p-error text-xs font-normal leading-tight"
+            >
+              {{ domainsErrorMessage }}
+            </small>
+          </div>
+          <div class="flex max-w-3xl gap-2 w-full max-sm:hidden">
+            <div class="flex flex-1">
               <small class="text-xs text-color-secondary font-normal leading-5">
                 (e.g., www, app, leave blank for root)
               </small>
             </div>
-            <div class="flex w-1/2">
+            <div class="flex flex-1">
               <small class="text-xs text-color-secondary font-normal leading-5">
                 Type your domain or select from Edge DNS.
+              </small>
+            </div>
+            <div class="flex flex-1">
+              <small class="text-xs text-color-secondary font-normal leading-5">
+                The environment routing this domain.
               </small>
             </div>
           </div>

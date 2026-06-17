@@ -27,6 +27,7 @@
     disabledFields: { type: Boolean, default: false },
     isEdit: { type: Boolean, default: false },
     readonly: { type: Boolean, default: false },
+    lockedEntries: { type: Boolean, default: false },
     status: { type: Object, default: () => ({ content: 'Draft', severity: 'info' }) },
     audit: { type: Object, default: () => null }
   })
@@ -215,6 +216,8 @@
 
   const allFieldsDisabled = computed(() => props.disabledFields || props.readonly)
 
+  const entrySelectionLocked = computed(() => allFieldsDisabled.value || props.lockedEntries)
+
   const statusLabel = computed(() => props.status?.content || 'Unknown')
 
   const buildTriggerIcon = computed(() => {
@@ -311,7 +314,7 @@
             placeholder="Resource type"
             appendTo="self"
             class="w-full"
-            :disabled="allFieldsDisabled"
+            :disabled="entrySelectionLocked"
             :optionDisabled="(option) => isResourceTypeOptionDisabled(option, entry.kind)"
             @update:modelValue="(value) => handleKindChange(index, value)"
             :data-testid="`deployment-version-form__resource-kind-${index}`"
@@ -362,7 +365,7 @@
             "
             :loading="isResourcesLoading(entry.kind)"
             :disabled="
-              allFieldsDisabled ||
+              entrySelectionLocked ||
               !entry.kind ||
               !hasResourceListing(entry.kind) ||
               isResourcesLoading(entry.kind)
@@ -406,6 +409,7 @@
           />
 
           <PrimeButton
+            v-if="!props.lockedEntries"
             icon="pi pi-trash"
             type="button"
             outlined
@@ -418,7 +422,7 @@
           />
         </div>
 
-        <div>
+        <div v-if="!props.lockedEntries">
           <PrimeButton
             label="Add resource"
             icon="pi pi-plus"
