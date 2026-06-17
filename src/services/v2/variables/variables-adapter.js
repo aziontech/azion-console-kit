@@ -2,7 +2,7 @@ import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/c
 import { adaptServiceDataResponse } from '@/services/v2/utils/adaptServiceDataResponse'
 
 const transformMap = {
-  id: (value) => value.uuid,
+  id: (value) => value.variable_id ?? value.uuid,
   key: (value) => value.key,
   value: (value) => ({
     isSecret: value.secret,
@@ -10,7 +10,11 @@ const transformMap = {
   }),
   lastEditor: (value) => value.last_editor,
   lastModified: (value) => formatDateToDayMonthYearHour(value.updated_at),
-  lastModify: (value) => convertToRelativeTime(value.updated_at)
+  lastModify: (value) => convertToRelativeTime(value.updated_at),
+  scope: (value) => value.scope,
+  source: (value) => value.source,
+  versionId: (value) => value.version_id,
+  state: (value) => value.state ?? value.source
 }
 
 const transformItem = (data) => {
@@ -48,5 +52,23 @@ export const VariablesAdapter = {
       value: payload.value,
       secret: payload.secret
     }
+  },
+
+  transformPayloadV6(payload) {
+    return {
+      key: payload.key,
+      value: payload.value,
+      secret: payload.secret,
+      scope: VariablesAdapter.transformScopePayload(payload.scope)
+    }
+  },
+
+  transformScopePayload(scope) {
+    if (!Array.isArray(scope)) return []
+    return scope.map((item) => {
+      if (item.type === 'global') return { type: 'global' }
+      const idKey = `${item.type}_id`
+      return { type: item.type, [idKey]: item[idKey] }
+    })
   }
 }
