@@ -91,6 +91,7 @@ export class AccountHandler {
    * @return {string | object} The URL string or object to redirect to.
    */
   async switchAccountFromSocialIdp(verifyService, refreshService, EnableSocialLogin) {
+    await sessionManager.switchAccount()
     try {
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verifyService()
 

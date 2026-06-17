@@ -107,7 +107,7 @@
     <template #heading>
       <PageHeadingBlock
         :pageTitle="title"
-        description="Configure a SQL Database instance that can be accessed by Applications, Functions, and APIs."
+        description="Configure a SQL database instance that can be accessed by Applications, Functions, and APIs."
         :loadedItemLabel="title"
       />
     </template>

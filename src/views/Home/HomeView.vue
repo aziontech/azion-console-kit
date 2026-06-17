@@ -4,7 +4,6 @@
   import PrimeButton from '@aziontech/webkit/button'
   import { usersService } from '@/services/v2/users/users-service'
   import { teamsService } from '@/services/v2/teams/teams-service'
-  import { useAccountStore } from '@/stores/account'
   import InviteSession from '@/helpers/invite-session'
   import ContentBlock from '@/templates/content-block'
   import InviteUserDialog from '@/views/Home/Dialog/InviteUserDialog.vue'
@@ -20,15 +19,9 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const router = useRouter()
-  const { accountData } = useAccountStore()
   const { BREAKPOINTS } = useResize()
   defineOptions({ name: 'home-view' })
 
-  const user = accountData
-  const welcomeName = computed(() => {
-    const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim()
-    return fullName || user.name
-  })
   const showInviteDialog = ref(false)
 
   const homeSection = ref(null)

@@ -1,8 +1,8 @@
 <script setup>
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
-  import { useField, useFormContext } from 'vee-validate'
-  import { computed, nextTick, onMounted, ref, watch } from 'vue'
+  import { useField } from 'vee-validate'
+  import { computed, ref, watch } from 'vue'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldPhoneNumber from '@aziontech/webkit/field-phone-number'
@@ -57,22 +57,8 @@
   const { value: language } = useField('language')
   const { value: email } = useField('email')
   const { value: countryCallCode } = useField('countryCallCode')
-  const { value: mobile } = useField('mobile')
   const { value: isAccountOwner } = useField('isAccountOwner')
   const { value: teamsIds, errorMessage: errorTeamsIds } = useField('teamsIds')
-
-  const formCtx = useFormContext()
-  const loadedMobile = props.isEditForm ? formCtx?.values?.mobile : undefined
-  const loadedCountryCallCode = props.isEditForm ? formCtx?.values?.countryCallCode : undefined
-
-  onMounted(async () => {
-    if (!props.isEditForm) return
-    await nextTick()
-    if (loadedMobile && !mobile.value) mobile.value = loadedMobile
-    if (loadedCountryCallCode && !countryCallCode.value) {
-      countryCallCode.value = loadedCountryCallCode
-    }
-  })
 
   const disabledUserTeams = computed(() => isAccountOwner.value || !optionsTeams.value.length)
 

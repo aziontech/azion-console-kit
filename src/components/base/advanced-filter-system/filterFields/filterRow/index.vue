@@ -66,7 +66,6 @@
           severity="danger"
           outlined
           size="small"
-          aria-label="button"
           :disabled="props.rowIndex === 0"
           @click="$emit('remove', props.rowIndex)"
         />

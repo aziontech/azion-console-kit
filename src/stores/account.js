@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const useAccountStore = defineStore({
   id: 'account',
   persist: {
-    paths: ['identifySignUpProvider', 'hasSession', 'signupTypeFlags']
+    paths: ['identifySignUpProvider', 'hasSession']
   },
   state: () => ({
     account: {},
@@ -168,22 +168,6 @@ export const useAccountStore = defineStore({
     },
     resetSsoSignUpMethod() {
       this.identifySignUpProvider = ''
-    },
-    /**
-     * Sets a signup type flag to true.
-     * @param {string} flag - The flag name (e.g., 'signup_sso_google', 'login_email')
-     */
-    setSignupTypeFlag(flag) {
-      if (flag in this.signupTypeFlags) {
-        this.signupTypeFlags[flag] = true
-      }
-    },
-    /**
-     * Gets all signup type flags.
-     * @returns {Object} The signup type flags object
-     */
-    getSignupTypeFlags() {
-      return { ...this.signupTypeFlags }
     }
   }
 })

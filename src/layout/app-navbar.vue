@@ -141,7 +141,7 @@
         @click="redirectToRoute"
       />
 
-      <Button
+      <PrimeButton
         label="Documentation"
         v-if="route.meta.showDocumentButton"
         :pt="{
@@ -164,7 +164,7 @@
 
   import { ref, provide, watch } from 'vue'
   import Skeleton from '@aziontech/webkit/skeleton'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useRouter, useRoute } from 'vue-router'
   import { useWindowSize } from '@vueuse/core'
 

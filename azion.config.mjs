@@ -6,11 +6,6 @@ const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env
 const environment = VITE_ENVIRONMENT || 'production'
 const domainSuffix = environment === 'production' ? 'net' : 'com'
 
-const edgeApiHost =
-  environment === 'production'
-    ? 'jkjuyhi0gza.map.azionedge.net'
-    : 'urvlgkvpxla.map.azionedge.net'
-
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
     return origin?.map(({ hostHeader, addresses, ...rest }) => {
@@ -164,12 +159,6 @@ const config = {
       type: 'single_origin',
       hostHeader: 'storage.googleapis.com',
       addresses: ['storage.googleapis.com']
-    },
-    {
-      name: 'origin-edge-api',
-      type: 'single_origin',
-      hostHeader: edgeApiHost,
-      addresses: [edgeApiHost]
     }
   ],
   cache: [
@@ -347,12 +336,6 @@ const config = {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
-            inputValue: '^/edge_api'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
             inputValue:
               '^(?!.*workspace/storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
           }
@@ -519,25 +502,6 @@ const config = {
           },
           rewrite: `/iam/api/%{captured[1]}`
         }
-      },
-      {
-        name: 'Route Edge API Requests',
-        description:
-          'Routes /edge_api requests to the edge API origin, stripping the /edge_api prefix before forwarding.',
-        match: '^/edge_api',
-        behavior: {
-          forwardCookies: true,
-          setOrigin: {
-            name: 'origin-edge-api',
-            type: 'single_origin'
-          },
-          capture: {
-            match: '/edge_api/(.*)',
-            captured: 'captured',
-            subject: 'request_uri'
-          },
-          rewrite: `/%{captured[1]}`
-        }
       }
     ],
     response: [
@@ -634,12 +598,6 @@ const config = {
             conditional: 'and',
             operator: 'does_not_match',
             inputValue: '^/sse'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/edge_api'
           }
         ],
         behavior: {

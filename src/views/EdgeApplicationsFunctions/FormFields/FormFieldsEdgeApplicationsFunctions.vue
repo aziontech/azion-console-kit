@@ -19,13 +19,6 @@
 
   const emit = defineEmits(['toggleDrawer', 'additionalErrors'])
 
-  const props = defineProps({
-    allowedRuntime: {
-      type: String,
-      default: null // null = all, 'azion_lua' = only Lua
-    }
-  })
-
   const renderers = markRaw([...vanillaRenderers])
 
   const { value: name } = useField('name')
@@ -74,12 +67,9 @@
   }
 
   const listEdgeFunctionsServiceDecorator = async (queryParams) => {
-    const runtimeParams = props.allowedRuntime ? { runtime: props.allowedRuntime } : {}
-
     const result = await edgeFunctionService.listEdgeFunctionsDropdown({
       executionEnvironment: 'application',
-      fields: ['id', 'name', 'default_args', 'azion_form', 'execution_environment', 'runtime'],
-      ...runtimeParams,
+      fields: ['id', 'name', 'default_args', 'azion_form', 'execution_environment'],
       ...queryParams
     })
 

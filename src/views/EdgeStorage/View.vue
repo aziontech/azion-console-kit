@@ -8,7 +8,7 @@
   import CredentialsView from './CredentialsView.vue'
   import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { computed, ref, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from '@aziontech/webkit/use-toast'
@@ -135,13 +135,6 @@
   }
 
   const loadService = ({ id }) => {
-    const cachedBucket = edgeStorageService.getBucketFromCache(id)
-    if (cachedBucket) {
-      return {
-        name: cachedBucket.name,
-        workloads_access: cachedBucket.workloadsAccess
-      }
-    }
     const bucket = findBucketById(id)
 
     return {
@@ -232,7 +225,7 @@
             v-if="addButtonController.showAddButtonTab"
             class="flex ml-4 items-center"
           >
-            <Button
+            <PrimeButton
               :label="addButtonController.label"
               size="small"
               icon="pi pi-plus"

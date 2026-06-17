@@ -77,10 +77,7 @@
               </Divider>
             </div>
 
-            <SocialIdpsBlock
-              v-model:showSocialIdps="showSocialIdps"
-              context="login"
-            />
+            <SocialIdpsBlock v-model:showSocialIdps="showSocialIdps" />
           </div>
 
           <!-- Password step -->
@@ -164,14 +161,11 @@
   import { useField, useForm } from 'vee-validate'
   import { ref, inject, onMounted, computed, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useAccountStore } from '@/stores/account'
-
   import Divider from '@aziontech/webkit/divider'
   import * as yup from 'yup'
   import { useToast } from '@aziontech/webkit/use-toast'
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-  const accountStore = useAccountStore()
 
   defineOptions({ name: 'signInBlock' })
 
@@ -281,7 +275,7 @@
 
       await props.authenticationLoginService(loginData)
       const { twoFactor, trustedDevice, user_tracking_info: userInfo } = await verify()
-
+      tracker.signIn.userSignedIn()
       if (twoFactor) {
         const mfaRoute = trustedDevice ? 'authentication' : 'setup'
         router.push(`/mfa/${mfaRoute}`)
@@ -296,8 +290,7 @@
       })
       await switchClientAccount(userInfo.props)
     } catch {
-      const signupTypeFlags = accountStore.getSignupTypeFlags()
-      tracker.signIn.userFailedSignIn({ method: 'email', signupTypeFlags }).track()
+      tracker.signIn.userFailedSignIn().track()
       hasRequestErrorMessage.value = new UserNotFoundError().message
       isButtonLoading.value = false
     }

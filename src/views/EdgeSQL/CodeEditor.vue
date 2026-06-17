@@ -36,8 +36,6 @@
             >
               <PrimeButton
                 :label="labelRunQuery"
-                :loading="isExecutingQuery || isLoadingQuery"
-                kind="primary"
                 icon="pi pi-play"
                 size="small"
                 severity="primary"
@@ -72,10 +70,10 @@
             <div class="flex-1 min-h-0 min-w-0 border-1 surface-border">
               <vue-monaco-editor
                 :key="`editor-${panelSizes[0]}`"
-                :theme="monacoTheme"
-                :options="{ ...editorMonacoOptions, readOnly: isExecutingQuery }"
                 v-model:value="sqlQueryText"
                 language="sql"
+                :theme="monacoTheme"
+                :options="{ ...editorMonacoOptions, readOnly: isExecutingQuery }"
                 class="w-full h-full"
               />
             </div>

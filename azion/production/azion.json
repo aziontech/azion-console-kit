@@ -88,16 +88,6 @@
       "origin-id": 249764,
       "origin-key": "6ac11a1c-cd32-4702-b610-af5e09b7af11",
       "name": "origin-help-center"
-    },
-    {
-      "origin-id": 262195,
-      "origin-key": "dbbccbca-fffe-4ee4-a22e-cef7e73d2dfd",
-      "name": "origin-edge-api"
-    },
-    {
-      "origin-id": 257880,
-      "origin-key": "efea9f31-424a-4c14-b868-3b99a961f154",
-      "name": "console-to-beholder"
     }
   ],
   "rules-engine": {
@@ -232,21 +222,6 @@
         "id": 500742,
         "name": "Set Origin for Help Center",
         "phase": "request"
-      },
-      {
-        "id": 570856,
-        "name": "Route Edge API Requests",
-        "phase": "request"
-      },
-      {
-        "id": 537351,
-        "name": "Run Function SSE - to - SSE Beholder Proxy |",
-        "phase": "request"
-      },
-      {
-        "id": 498020,
-        "name": "Debug",
-        "phase": "response"
       }
     ]
   },

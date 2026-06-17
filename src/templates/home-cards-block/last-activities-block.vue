@@ -125,7 +125,7 @@
 <template>
   <div class="flex flex-col gap-3 w-full">
     <div class="flex gap-3 items-center h-7">
-      <span class="text-base font-semibold">Recent Activity</span>
+      <span class="text-base font-semibold">Last Activities</span>
     </div>
     <ListTableSimple
       :data="displayData"
@@ -133,7 +133,7 @@
       :loading="false"
       :rowsLimit="ROWS_LIMIT"
       viewAllLink="/activity-history"
-      viewAllLabel="View all Activity..."
+      viewAllLabel="View all Activities..."
       :emptyBlock="{
         title: 'No activities yet',
         description: 'Your recent activities will appear here.'

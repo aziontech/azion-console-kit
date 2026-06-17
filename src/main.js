@@ -1,4 +1,3 @@
-import '@aziontech/theme/globals.css'
 import 'primeflex/primeflex.css'
 import '@assets/main.css'
 import '@assets/c3.scss'
@@ -7,8 +6,12 @@ import '@aziontech/theme'
 import '@aziontech/icons'
 import '@aziontech/webkit/styles/country-flags'
 
+// Inject CSS variables for semantic tokens
+import { injectCssVars } from '@aziontech/theme/tokens'
+injectCssVars()
+
 import { createApp } from 'vue'
-import { createPinia, setActivePinia } from 'pinia'
+import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { WebkitPlugin } from '@aziontech/webkit/plugin'
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
@@ -29,7 +32,6 @@ const app = createApp(App)
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
-setActivePinia(pinia)
 
 app.config.globalProperties.HelpCenterServices = HelpCenterServices
 app.use(WebkitPlugin)

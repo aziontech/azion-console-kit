@@ -1,4 +1,4 @@
-name: Package Audit
+name: Security Linter
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -11,7 +11,7 @@ on:
 env:
   HUSKY: 0
 jobs:
-  package-audit:
+  security-linter:
     runs-on: ubuntu-latest
     container:
       image: node:22-alpine
@@ -22,5 +22,5 @@ jobs:
         run: apk add curl bash git
       - name: Install dependencies
         run: yarn ci
-      - name: Run package-auditor
-        run: yarn package-audit
+      - name: Run security-linter
+        run: yarn security-check

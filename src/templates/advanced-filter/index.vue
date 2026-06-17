@@ -2,7 +2,7 @@
   defineOptions({ name: 'advanced-filter' })
   import { computed, onMounted, ref, watch } from 'vue'
   import dialogFilter from './dialog-filter.vue'
-  import Button from '@aziontech/webkit/button'
+  import PrimeButton from '@aziontech/webkit/button'
   import { useRoute, useRouter } from 'vue-router'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { OPERATOR_MAPPING } from './component'
@@ -331,7 +331,7 @@
     </div>
 
     <div class="h-auto w-full md:max-w-fit">
-      <Button
+      <PrimeButton
         :disabled="disabledSearch"
         @click="searchFilter"
         label="Search"

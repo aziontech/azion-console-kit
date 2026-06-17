@@ -33,11 +33,11 @@
         <!-- QR Code -->
         <div class="flex flex-wrap justify-center items-center">
           <Skeleton
-            v-if="!qrCode.url"
+            v-show="!qrCode.url"
             class="w-[10rem] h-[10rem] sm:w-[12.5rem] sm:h-[12.5rem]"
           />
           <QrcodeVue
-            v-else-if="qrCode.url"
+            v-show="qrCode.url"
             :value="qrCode?.url"
             level="H"
             :size="250"
@@ -92,12 +92,8 @@
   import Skeleton from '@aziontech/webkit/skeleton'
   import QrcodeVue from 'qrcode.vue'
 
-  import { ref, onMounted, inject } from 'vue'
+  import { ref, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
-  import { trackSignInSafely } from '@/helpers/track-auth-event'
-
-  /** @type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
-  const tracker = inject('tracker')
 
   const props = defineProps({
     generateQrCodeMfaService: {
@@ -220,7 +216,6 @@
       const mfaToken = joinDigitsMfa()
       await props.validateMfaCodeService(mfaToken)
       const { user_tracking_info: userInfo } = await verifyUserData()
-      await trackSignInSafely({ tracker, method: 'email', userTrackingInfo: userInfo })
       const redirect = await props.accountHandler.switchAndReturnAccountPage(
         userInfo.props.account_id
       )

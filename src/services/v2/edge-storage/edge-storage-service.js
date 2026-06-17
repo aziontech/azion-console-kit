@@ -67,7 +67,7 @@ export class EdgeStorageService extends BaseService {
       body
     })
 
-    this.queryClient.invalidateQueries({ queryKey: queryKeys.edgeStorage.buckets.all() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.buckets.all() })
 
     return data
   }
@@ -99,23 +99,7 @@ export class EdgeStorageService extends BaseService {
       body: { workloads_access: bucket.workloads_access }
     })
 
-    // Update cache with new value from API response
-    this.queryClient.setQueriesData({ queryKey: queryKeys.edgeStorage.buckets.all() }, (cached) => {
-      if (!cached?.body) return cached
-      return {
-        ...cached,
-        body: cached.body.map((cachedBucket) =>
-          cachedBucket.name === bucket.name
-            ? { ...cachedBucket, workloadsAccess: bucket.workloads_access }
-            : cachedBucket
-        )
-      }
-    })
-
-    // Invalidate to trigger refetch if needed
-    this.queryClient.invalidateQueries({
-      queryKey: queryKeys.edgeStorage.buckets.all()
-    })
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.buckets.all() })
 
     return data
   }
@@ -126,7 +110,7 @@ export class EdgeStorageService extends BaseService {
       url: `${this.baseURL}/buckets/${bucketName}`
     })
 
-    await this.queryClient.invalidateQueries({ queryKey: queryKeys.edgeStorage.buckets.all() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.buckets.all() })
 
     return `Bucket "${bucketName}" has been deleted successfully`
   }
@@ -400,15 +384,6 @@ export class EdgeStorageService extends BaseService {
       { persist: firstPage && !skipCache, skipCache }
     )
   }
-
-  getBucketFromCache = (bucketName) => {
-    return super.getFromCache({
-      queryKey: queryKeys.edgeStorage.buckets.all(),
-      id: bucketName,
-      fieldName: 'name',
-      listPath: 'body'
-    })
-  }
   createCredential = async (credential = {}) => {
     const body = this.adapter?.transformCreateEdgeStorageCredential?.(credential)
     const { data } = await this.http.request({
@@ -417,7 +392,7 @@ export class EdgeStorageService extends BaseService {
       body
     })
 
-    this.queryClient.invalidateQueries({ queryKey: queryKeys.edgeStorage.credentials.all() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.credentials.all() })
 
     return data
   }
@@ -427,7 +402,7 @@ export class EdgeStorageService extends BaseService {
       url: `${this.baseURL}/credentials/${credentialId}`
     })
 
-    this.queryClient.invalidateQueries({ queryKey: queryKeys.edgeStorage.credentials.all() })
+    this.queryClient.removeQueries({ queryKey: queryKeys.edgeStorage.credentials.all() })
   }
 }
 export const edgeStorageService = new EdgeStorageService()

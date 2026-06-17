@@ -97,24 +97,10 @@ export const sessionManager = {
       startCacheSync()
     }
   },
-  /**
-   * Prepares the current tab for an account switch by clearing local session data
-   * (cache, persisted queries, account store). Does NOT broadcast to other tabs —
-   * the caller MUST invoke `notifySwitchAccountComplete()` after the switch API
-   * call succeeds. Splitting these prevents a race where other tabs reload with
-   * stale credentials before the new session is ready, causing 401 → logout.
-   */
   async switchAccount() {
     hasPrefetched = false
     resetCacheSync()
     await clearAllData()
-  },
-  /**
-   * Notifies other tabs that the account switch completed successfully so they
-   * can reload into the new session. MUST be called only after the switch API
-   * has returned successfully and the new session is established.
-   */
-  notifySwitchAccountComplete() {
     sendSwitchAccountBroadcast()
   },
   async logout() {
