@@ -4,24 +4,33 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsVariables from './FormFields/FormFieldsVariables.vue'
+  import { scopeArraySchema } from './FormFields/scope-schema'
   import * as yup from 'yup'
   import { inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { variablesService } from '@/services/v2/variables'
+  import { hasFlagUseV6Configurations } from '@/composables/user-flag'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const keyRegex = /^[A-Z0-9_]*$/
+  const isV6 = hasFlagUseV6Configurations()
 
-  const validationSchema = yup.object({
+  const baseSchema = {
     key: yup
       .string()
       .test('key', 'Invalid key format', (value) => keyRegex.test(value))
       .required(),
     value: yup.string().required(),
     secret: yup.boolean().required().default(false)
-  })
+  }
+
+  const validationSchema = yup.object(
+    isV6 ? { ...baseSchema, scope: scopeArraySchema } : baseSchema
+  )
+
+  const initialValues = isV6 ? { scope: [{ type: 'global' }] } : {}
 
   const handleResponse = (response) => {
     tracker.product.productCreated({
@@ -76,6 +85,7 @@
       <CreateFormBlock
         :createService="variablesService.create"
         :schema="validationSchema"
+        :initialValues="initialValues"
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
         disableToast

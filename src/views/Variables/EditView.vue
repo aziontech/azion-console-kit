@@ -4,36 +4,43 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import FormFieldsVariables from './FormFields/FormFieldsVariables.vue'
+  import { scopeArraySchema } from './FormFields/scope-schema'
   import * as yup from 'yup'
   import { inject, ref } from 'vue'
   import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { variablesService } from '@/services/v2/variables'
+  import { hasFlagUseV6Configurations } from '@/composables/user-flag'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
   const route = useRoute()
   const breadcrumbs = useBreadcrumbs()
   const variableName = ref('Edit Variable')
-  const isSecretChangeValueOnly = ref(false)
+  const isV6 = hasFlagUseV6Configurations()
+
+  const cachedVariable = variablesService.getVariableFromCache(route.params?.id) ?? {}
 
   const setVariableName = (variable) => {
     variableName.value = variable.key
-    isSecretChangeValueOnly.value = variable.secret === true
     breadcrumbs.update(route.meta.breadCrumbs ?? [], route, variable.key)
   }
 
   const keyRegex = /^[A-Z0-9_]*$/
 
-  const validationSchema = yup.object({
+  const baseSchema = {
     key: yup
       .string()
       .test('key', 'Invalid key format', (value) => keyRegex.test(value))
       .required(),
     value: yup.string().required(),
     secret: yup.boolean().required().default(false)
-  })
+  }
+
+  const validationSchema = yup.object(
+    isV6 ? { ...baseSchema, scope: scopeArraySchema } : baseSchema
+  )
 
   const handleTrackEditEvent = () => {
     tracker.product.productEdited({
@@ -66,16 +73,14 @@
         :editService="variablesService.edit"
         :loadService="variablesService.load"
         updatedRedirect="list-variables"
+        :initialValues="cachedVariable"
         :schema="validationSchema"
         @loaded-service-object="setVariableName"
         @on-edit-success="handleTrackEditEvent"
         @on-edit-fail="handleTrackFailEditEvent"
       >
-        <template #form="{ loading }">
-          <FormFieldsVariables
-            :disabled="loading"
-            :secretChangeValueOnly="isSecretChangeValueOnly"
-          />
+        <template #form>
+          <FormFieldsVariables />
         </template>
         <template #action-bar="{ onSubmit, onCancel, loading }">
           <ActionBarTemplate
