@@ -28,7 +28,6 @@
   const searchTerm = ref('')
   const filterValues = ref({ status: 'all', environment: 'all' })
   const dateRange = ref(null)
-  const sortBy = ref('lastModified')
 
   const rowMenuRef = ref(null)
   const rowMenuItems = ref([])
@@ -107,18 +106,6 @@
     ]
   })
 
-  const sortFieldMap = {
-    deployment: 'id',
-    lastModified: 'created_at',
-    status: 'state',
-    lastEditor: 'last_editor'
-  }
-
-  const buildOrdering = () => {
-    const backendField = sortFieldMap[sortBy.value] || 'created_at'
-    return `-${backendField}`
-  }
-
   const matchesDateRange = (version) => {
     const [from, to] = Array.isArray(dateRange.value) ? dateRange.value : []
     if (!from && !to) return true
@@ -138,16 +125,12 @@
     try {
       const status = filterValues.value.status
       const environment = filterValues.value.environment
-      const hasFilter = status !== 'all' || environment !== 'all'
       const result = await deploymentHistoryService.listGlobalHistoryService({
         page: Math.floor(paginatorFirst.value / paginatorRows.value) + 1,
         pageSize: paginatorRows.value,
         search: searchTerm.value?.trim() || undefined,
         state: status !== 'all' ? status : undefined,
-        environment: environment !== 'all' ? environment : undefined,
-        ordering: buildOrdering(),
-        hasFilter,
-        skipCache: hasFilter || !!searchTerm.value?.trim()
+        environment: environment !== 'all' ? environment : undefined
       })
       versions.value = Array.isArray(result?.body) ? result.body : []
       totalRecords.value = typeof result?.count === 'number' ? result.count : versions.value.length
@@ -261,7 +244,7 @@
   }
 
   watch(
-    [searchTerm, filterValues, dateRange, sortBy],
+    [searchTerm, filterValues, dateRange],
     () => {
       paginatorFirst.value = 0
     },
@@ -270,7 +253,7 @@
 
   watchDebounced([searchTerm], () => loadVersions(), { debounce: 350, deep: true })
 
-  watch([filterValues, sortBy, paginatorFirst, paginatorRows], () => loadVersions(), { deep: true })
+  watch([filterValues, paginatorFirst, paginatorRows], () => loadVersions(), { deep: true })
 
   onMounted(loadVersions)
 </script>

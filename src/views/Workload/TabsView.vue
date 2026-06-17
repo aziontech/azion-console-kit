@@ -7,10 +7,12 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
+  import { DataTableActionsButtons } from '@/components/list-table'
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import EditView from './EditView.vue'
   import OverviewTab from './Tabs/OverviewTab.vue'
   import DeploymentsListSection from './Tabs/sections/DeploymentsListSection.vue'
+  import CreateDeploymentVersionDrawer from './FormFields/components/CreateDeploymentVersionDrawer.vue'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
@@ -107,6 +109,16 @@
 
   const workloadName = computed(() => workload.value?.name || '')
 
+  const createDrawerVisible = ref(false)
+  const deploymentsRefreshKey = ref(0)
+
+  const onVersionCreated = () => {
+    deploymentsRefreshKey.value += 1
+    if (activeTab.value !== TAB_TO_INDEX['deployment']) {
+      changeTab(TAB_TO_INDEX['deployment'])
+    }
+  }
+
   fetchWorkload()
 </script>
 
@@ -119,6 +131,14 @@
         :entityName="workloadName"
         description="Configure domains, protocols, certificates, and select the security and application settings executed by this Workload."
       >
+        <template #default>
+          <DataTableActionsButtons
+            size="small"
+            label="Deploy"
+            data-testid="workload-tabs__deploy-button"
+            @click="createDrawerVisible = true"
+          />
+        </template>
       </PageHeadingBlock>
     </template>
     <template #content>
@@ -149,7 +169,9 @@
         >
           <DeploymentsListSection
             v-if="activeTab === TAB_TO_INDEX['deployment']"
+            :key="deploymentsRefreshKey"
             :workloadId="workloadId"
+            :workloadDeploymentId="workload?.workloadDeploymentId"
             class="mt-4"
           />
         </TabPanel>
@@ -165,6 +187,13 @@
           />
         </TabPanel>
       </TabView>
+
+      <CreateDeploymentVersionDrawer
+        v-model:visible="createDrawerVisible"
+        :workload="workload"
+        :workloadDeploymentId="workload?.workloadDeploymentId"
+        @save="onVersionCreated"
+      />
     </template>
   </ContentBlock>
 </template>

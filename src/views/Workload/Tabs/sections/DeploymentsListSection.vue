@@ -1,140 +1,105 @@
 <script setup>
-  import { ref, computed } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
+  import { watchDebounced } from '@vueuse/core'
+  import { useToast } from '@aziontech/webkit/use-toast'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import Calendar from '@aziontech/webkit/calendar'
   import GenericDataView from '@/components/GenericDataView'
   import StatusTag from '@/components/StatusTag'
   import CurrentBadge from '@/components/CurrentBadge'
-  import Dropdown from '@aziontech/webkit/dropdown'
-  import {
-    MOCK_DEPLOYMENTS,
-    STATUS_TAG,
-    statusTag
-  } from '@/views/Workload/Tabs/sections/deployments.mock'
+  import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
 
   defineOptions({ name: 'deployments-list-section' })
 
   const props = defineProps({
-    workloadId: { type: [String, Number], required: true }
+    workloadId: { type: [String, Number], required: true },
+    workloadDeploymentId: { type: [String, Number], default: null }
   })
 
   const router = useRouter()
+  const toast = useToast()
 
-  const goToDetails = (item) =>
-    router.push({
-      name: 'workload-deployment-details',
-      params: { id: props.workloadId, deploymentId: item.id }
-    })
+  const versions = ref([])
+  const totalRecords = ref(0)
+  const loading = ref(false)
 
-  const ALL = 'all'
-  const dateOptions = [
-    { label: 'All time', value: ALL },
-    { label: 'Last 7 days', value: '7d' },
-    { label: 'Last 30 days', value: '30d' }
-  ]
-
-  const searchTerm = ref('')
-  const filterValues = ref({
-    status: ALL,
-    author: ALL,
-    date: ALL
-  })
   const paginatorFirst = ref(0)
   const paginatorRows = ref(10)
+  const searchTerm = ref('')
+  const filterValues = ref({ state: 'all' })
+  const dateRange = ref(null)
 
-  const normalize = (value) =>
-    String(value ?? '')
-      .toLowerCase()
-      .trim()
+  const statusAllOption = { label: 'Status', value: 'all' }
+
+  const goToDetails = (version) =>
+    router.push({
+      name: 'workload-deployment-details',
+      params: { id: props.workloadId, versionId: version.id }
+    })
+
+  const matchesDateRange = (version) => {
+    const [from, to] = Array.isArray(dateRange.value) ? dateRange.value : []
+    if (!from && !to) return true
+
+    const reference = version.created_at ? new Date(version.created_at) : null
+    if (!reference || Number.isNaN(reference.getTime())) return false
+
+    if (from && reference < new Date(new Date(from).setHours(0, 0, 0, 0))) return false
+    if (to && reference > new Date(new Date(to).setHours(23, 59, 59, 999))) return false
+    return true
+  }
+
+  const filteredVersions = computed(() => versions.value.filter(matchesDateRange))
 
   const statusOptions = computed(() => {
     const statuses = Array.from(
-      new Set(MOCK_DEPLOYMENTS.map((item) => item.status).filter(Boolean))
+      new Set(versions.value.map((version) => version.status?.content).filter(Boolean))
     )
+
     return [
-      { label: 'All statuses', value: ALL },
+      statusAllOption,
       ...statuses.map((status) => ({
-        label: STATUS_TAG[status]?.content || status,
+        label: status,
         value: status
       }))
     ]
   })
 
-  const authorOptions = computed(() => {
-    const authors = Array.from(new Set(MOCK_DEPLOYMENTS.map((item) => item.author).filter(Boolean)))
-    return [
-      { label: 'All authors', value: ALL },
-      ...authors.map((author) => ({ label: author, value: author }))
-    ]
-  })
-
-  const filters = computed(() => [
-    {
-      key: 'status',
-      field: 'status',
-      placeholder: 'Status',
-      options: statusOptions.value,
-      optionLabel: 'label',
-      optionValue: 'value',
-      defaultValue: ALL,
-      allValue: ALL
-    },
-    {
-      key: 'author',
-      field: 'author',
-      placeholder: 'Authors',
-      options: authorOptions.value,
-      optionLabel: 'label',
-      optionValue: 'value',
-      defaultValue: ALL,
-      allValue: ALL
-    },
-    {
-      key: 'date',
-      field: 'createdAt',
-      placeholder: 'Select a Date',
-      options: dateOptions,
-      optionLabel: 'label',
-      optionValue: 'value',
-      defaultValue: ALL,
-      allValue: ALL,
-      matcher: (itemValue, selectedValue) => {
-        if (selectedValue === ALL) return true
-        if (!itemValue) return false
-        const days = selectedValue === '7d' ? 7 : 30
-        const cutoff = Date.now() - days * 24 * 60 * 60 * 1000
-        return new Date(itemValue).getTime() >= cutoff
-      }
+  const loadVersions = async () => {
+    if (!props.workloadDeploymentId) {
+      versions.value = []
+      totalRecords.value = 0
+      return
     }
-  ])
 
-  const matchesFilters = (item) => {
-    return filters.value.every((filter) => {
-      const selectedValue = filterValues.value?.[filter.key] ?? filter.defaultValue
-      if (selectedValue === filter.allValue) return true
-
-      const itemValue = item?.[filter.field]
-      if (typeof filter.matcher === 'function') {
-        return filter.matcher(itemValue, selectedValue, item)
-      }
-      return normalize(itemValue) === normalize(selectedValue)
-    })
+    loading.value = true
+    try {
+      const state = filterValues.value.state
+      const result = await deploymentVersionService.listVersionsService(
+        props.workloadDeploymentId,
+        {
+          page: Math.floor(paginatorFirst.value / paginatorRows.value) + 1,
+          pageSize: paginatorRows.value,
+          search: searchTerm.value?.trim() || undefined,
+          state: state !== 'all' ? state : undefined
+        }
+      )
+      versions.value = Array.isArray(result?.body) ? result.body : []
+      totalRecords.value = typeof result?.count === 'number' ? result.count : versions.value.length
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail: error?.message || 'Failed to load deployments'
+      })
+      versions.value = []
+      totalRecords.value = 0
+    } finally {
+      loading.value = false
+    }
   }
-
-  const filteredItems = computed(() => {
-    const search = normalize(searchTerm.value)
-    return MOCK_DEPLOYMENTS.filter((item) => {
-      const searchable = [item.deploymentId, item.environment, item.status, item.author]
-      const matchesSearch = !search || searchable.some((value) => normalize(value).includes(search))
-      return matchesSearch && matchesFilters(item)
-    })
-  })
-
-  const columns = [
-    { key: 'deployment', label: 'Deployment', cellClass: 'flex-1 min-w-0' },
-    { key: 'status', label: 'Status', cellClass: 'flex-1 min-w-0' },
-    { key: 'createdAt', label: 'Date', cellClass: 'flex-1 min-w-0' },
-    { key: 'author', label: 'Author', cellClass: 'flex-1 min-w-0' }
-  ]
 
   const dateFormatter = new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -155,6 +120,13 @@
     }
   }
 
+  const columns = [
+    { key: 'deployment', label: 'Deployment', cellClass: 'flex-1 min-w-0' },
+    { key: 'status', label: 'Status', cellClass: 'flex-1 min-w-0' },
+    { key: 'createdAt', label: 'Date', cellClass: 'flex-1 min-w-0' },
+    { key: 'author', label: 'Author', cellClass: 'flex-1 min-w-0' }
+  ]
+
   const onPage = (event) => {
     paginatorFirst.value = event.first
     paginatorRows.value = event.rows
@@ -165,42 +137,66 @@
     item: { class: 'dataview-dropdown-item' }
   }
 
-  const onFilterChange = (key, value) => {
-    filterValues.value = { ...filterValues.value, [key]: value }
-  }
+  watch(
+    [searchTerm, filterValues, dateRange],
+    () => {
+      paginatorFirst.value = 0
+    },
+    { deep: true }
+  )
+
+  watchDebounced([searchTerm], () => loadVersions(), { debounce: 350, deep: true })
+
+  watch(
+    [filterValues, paginatorFirst, paginatorRows, () => props.workloadDeploymentId],
+    () => loadVersions(),
+    { deep: true }
+  )
+
+  onMounted(loadVersions)
 </script>
 
 <template>
   <GenericDataView
-    :items="filteredItems"
-    :hasDeployments="true"
+    :items="filteredVersions"
+    :hasDeployments="Boolean(versions.length)"
+    :loading="loading"
     :columns="columns"
     v-model:searchTerm="searchTerm"
-    v-model:filterValues="filterValues"
     :paginatorFirst="paginatorFirst"
     :paginatorRows="paginatorRows"
+    :lazy="true"
+    :totalRecords="totalRecords"
     toolbarMode="compact"
     searchPlaceholder="Search Deployments"
     emptyTitle="No deployments yet"
     emptyDescription="Deployments will appear here when triggered for this Workload."
     filteredEmptyTitle="No deployments found"
     filteredEmptyDescription="Try changing your search or filters."
+    @refresh="loadVersions"
     @page="onPage"
   >
     <template #toolbar-extras>
       <Dropdown
-        v-for="filter in filters"
-        :key="filter.key"
-        :modelValue="filterValues[filter.key] ?? filter.defaultValue"
-        :options="filter.options"
+        v-model="filterValues.state"
+        :options="statusOptions"
         :pt="dropdownPt"
-        :optionLabel="filter.optionLabel"
-        :optionValue="filter.optionValue"
-        :placeholder="filter.placeholder"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Status"
         class="dataview-control dataview-dropdown min-w-0 w-full sm:w-auto sm:min-w-[9.5rem]"
-        @update:modelValue="onFilterChange(filter.key, $event)"
+      />
+      <Calendar
+        v-model="dateRange"
+        selectionMode="range"
+        placeholder="Select a Date"
+        showIcon
+        icon="pi pi-chevron-down"
+        :manualInput="false"
+        class="dataview-control dataview-dropdown min-w-0 w-full sm:w-auto sm:min-w-[12rem]"
       />
     </template>
+
     <template #cell-deployment="{ item }">
       <div class="flex flex-col gap-0.5 min-w-0">
         <button
@@ -209,13 +205,17 @@
           :data-testid="`workload-deployments__row__id-${item.id}`"
           @click="goToDetails(item)"
         >
-          {{ item.deploymentId }}
+          {{ item.name || item.id }}
         </button>
         <div class="flex items-center gap-2 min-w-0">
-          <span class="text-xs text-color-secondary truncate">{{ item.environment }}</span>
+          <span
+            v-if="item.environmentLabel"
+            class="text-xs text-color-secondary truncate"
+            >{{ item.environmentLabel }}</span
+          >
           <i
-            v-if="item.isRollback"
-            class="pi pi-history text-color-secondary text-xs"
+            v-if="item.environmentIcon"
+            :class="[item.environmentIcon, 'text-color-secondary text-xs']"
             title="Rollback"
           />
           <CurrentBadge v-if="item.isCurrent" />
@@ -225,7 +225,7 @@
 
     <template #cell-status="{ item }">
       <div class="flex flex-col gap-0.5 min-w-0">
-        <StatusTag :status="statusTag(item.status)" />
+        <StatusTag :status="item.status" />
         <span
           v-if="item.duration"
           class="text-xs text-color-secondary pl-4"
@@ -236,11 +236,11 @@
     </template>
 
     <template #cell-createdAt="{ item }">
-      <span class="text-sm truncate">{{ formatDate(item.createdAt) }}</span>
+      <span class="text-sm truncate">{{ formatDate(item.created_at) }}</span>
     </template>
 
     <template #cell-author="{ item }">
-      <span class="text-sm truncate">{{ item.author }}</span>
+      <span class="text-sm truncate">{{ item.lastEditor || '--' }}</span>
     </template>
   </GenericDataView>
 </template>
@@ -252,5 +252,73 @@
     padding: 0;
     cursor: pointer;
     font: inherit;
+  }
+
+  :deep(.dataview-control.p-calendar) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 0.375rem;
+    background: var(--surface-section);
+    box-shadow: none;
+    overflow: hidden;
+  }
+
+  :deep(.dataview-control.p-calendar:hover) {
+    border-color: var(--surface-border);
+    background: var(--surface-ground);
+  }
+
+  :deep(.dataview-control.p-calendar:focus-within) {
+    border-color: var(--primary-color);
+  }
+
+  :deep(.dataview-control.p-calendar .p-inputtext) {
+    flex: 1;
+    width: 100%;
+    min-height: auto;
+    border: 0;
+    background: transparent;
+    color: var(--text-color);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    box-shadow: none;
+    padding-block: 0.5rem;
+  }
+
+  :deep(.dataview-control.p-calendar .p-inputtext:hover),
+  :deep(.dataview-control.p-calendar .p-inputtext:enabled:focus) {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  :deep(.dataview-control.p-calendar .p-inputtext::placeholder) {
+    color: var(--text-color-secondary);
+  }
+
+  :deep(.dataview-control.p-calendar .p-datepicker-trigger),
+  :deep(.dataview-control.p-calendar > button) {
+    flex-shrink: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    color: var(--text-color-secondary);
+    padding: 0 0.75rem;
+    width: auto;
+    min-width: 0;
+    height: 100%;
+  }
+
+  :deep(.dataview-control.p-calendar .p-datepicker-trigger:hover),
+  :deep(.dataview-control.p-calendar > button:hover) {
+    background: transparent;
+    color: var(--text-color-secondary);
+  }
+
+  :deep(.dataview-control.p-calendar .p-datepicker-trigger:focus) {
+    outline: none;
+    box-shadow: none;
   }
 </style>
