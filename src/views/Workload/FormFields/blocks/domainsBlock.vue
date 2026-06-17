@@ -4,8 +4,6 @@
   import LabelBlock from '@aziontech/webkit/label'
   import CopyBlock from '@aziontech/webkit/button-copy'
   import PrimeButton from '@aziontech/webkit/button'
-  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  import MessageCard from '@/components/MessageCard'
   import CollapsibleCard from '@/components/CollapsibleCard'
   import DomainRow from '../components/DomainRow.vue'
   import DomainDrawer from '../components/DomainDrawer.vue'
@@ -36,9 +34,6 @@
   const { value: workloadName } = useField('name')
   const { value: useCustomDomain, setValue: setUseCustomDomain } = useField('useCustomDomain')
   const { value: customDomain, setValue: setCustomDomain } = useField('customDomain')
-  const { value: workloadHostnameAllowAccess, setValue: setWorkloadHostnameAllowAccess } = useField(
-    'workloadHostnameAllowAccess'
-  )
   const { value: useHttps } = useField('protocols.http.useHttps')
 
   const domainsOptions = ref([])
@@ -128,20 +123,6 @@
 
   const domainList = computed(() => (Array.isArray(domains.value) ? domains.value : []))
   const hasMultipleDomains = computed(() => domainList.value.length > 1)
-
-  const hasSingleVersionEnv = computed(() =>
-    domainList.value.some(
-      (item) =>
-        item?.environment &&
-        environmentMap.value[item.environment]?.deployment_version_policy === 'single_version'
-    )
-  )
-
-  watch(hasSingleVersionEnv, (eligible) => {
-    if (!eligible && workloadHostnameAllowAccess.value) {
-      setWorkloadHostnameAllowAccess(false)
-    }
-  })
 
   const openCreateDrawer = () => {
     drawerMode.value = 'create'
@@ -349,25 +330,6 @@
         >
           {{ domainsErrorMessage }}
         </small>
-      </div>
-
-      <div class="flex flex-col gap-2 max-w-3xl w-full">
-        <FieldSwitchBlock
-          name="workloadHostnameAllowAccess"
-          nameField="workloadHostnameAllowAccess"
-          auto
-          :isCard="false"
-          :disabled="!hasSingleVersionEnv"
-          title="Workload Domain Allow Access"
-          subtitle="Allow direct access to the default workload domain generated after workload creation (*.map.azionedge.net)."
-          data-testid="domains-form__workload-allow-access-field"
-        />
-        <MessageCard
-          v-if="!hasSingleVersionEnv"
-          type="info"
-          description="This option is only available when at least one domain uses an environment with the Single Version policy (typically Production). Add or select such an environment to enable it."
-          data-testid="domains-form__workload-allow-access-disabled-warning"
-        />
       </div>
 
       <DomainDrawer

@@ -69,7 +69,7 @@
         @tab-click="handleTabClick"
       >
         <TabPanel
-          header="Overview"
+          header="Settings"
           :pt="{ root: { 'data-testid': 'deployments-tabs__tab__overview' } }"
         >
           <OverviewTab v-if="activeTab === TAB_TO_INDEX.overview" />
