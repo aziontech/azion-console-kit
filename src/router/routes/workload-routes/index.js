@@ -61,7 +61,7 @@ export const workloadRoutes = {
       }
     },
     {
-      path: 'edit/:id/deployment/:deploymentId',
+      path: 'edit/:id/deployment/:versionId',
       name: 'workload-deployment-details',
       component: () => import('@views/Workload/DeploymentDetailsView.vue'),
       meta: {
