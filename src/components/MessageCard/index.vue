@@ -60,10 +60,7 @@
 
 <template>
   <div
-    :class="[
-      'flex items-start gap-2 rounded-md px-3 py-3 shadow-sm w-full',
-      style.containerClass
-    ]"
+    :class="['flex items-start gap-2 rounded-md px-3 py-3 shadow-sm w-full', style.containerClass]"
     :data-testid="dataTestid"
     role="status"
   >

@@ -202,7 +202,7 @@ export class WorkloadService extends BaseService {
   #initialFqdnSet = () => {
     return new Set(
       (this.initialDomains || [])
-        .map((d) => (typeof d === 'string' ? d : d?.name))
+        .map((domain) => (typeof domain === 'string' ? domain : domain?.name))
         .filter(Boolean)
     )
   }

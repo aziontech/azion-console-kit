@@ -197,9 +197,9 @@ export const WorkloadAdapter = {
     const { azionAppSubdomains, cleanDomains } = extractAzionAppSubdomain(workload.domains, zones)
     const legacyCertificate = workload.tls?.certificate ?? null
     if (legacyCertificate !== null) {
-      cleanDomains.forEach((d) => {
-        if (d.certificate === null || d.certificate === undefined) {
-          d.certificate = legacyCertificate
+      cleanDomains.forEach((domain) => {
+        if (domain.certificate === null || domain.certificate === undefined) {
+          domain.certificate = legacyCertificate
         }
       })
     }

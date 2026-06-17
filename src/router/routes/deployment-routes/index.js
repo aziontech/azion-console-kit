@@ -10,6 +10,42 @@ export const deploymentRoutes = {
       redirect: { name: 'deployments-list', params: { tab: 'overview' } }
     },
     {
+      path: 'create',
+      name: 'deployments-create',
+      component: () => import('@views/Deployments/CreateView.vue'),
+      meta: {
+        title: 'Create Deployment',
+        breadCrumbs: [
+          {
+            label: 'Deployments',
+            to: '/deployments'
+          },
+          {
+            label: 'Create'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id',
+      name: 'deployments-edit',
+      component: () => import('@views/Deployments/EditView.vue'),
+      meta: {
+        title: 'Edit Deployment',
+        breadCrumbs: [
+          {
+            label: 'Deployments',
+            to: '/deployments'
+          },
+          {
+            label: 'Edit Deployment',
+            dynamic: true,
+            routeParam: 'id'
+          }
+        ]
+      }
+    },
+    {
       path: ':tab(overview|history)',
       name: 'deployments-list',
       component: () => import('@views/Deployments/TabsView.vue'),

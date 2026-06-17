@@ -62,10 +62,7 @@
 
   const drawerSchema = yup.object({
     name: yup.string().required('Name is required').label('Name'),
-    resourceTypes: yup
-      .array()
-      .of(yup.string())
-      .min(1, 'Select at least one resource type'),
+    resourceTypes: yup.array().of(yup.string()).min(1, 'Select at least one resource type'),
     resources: yup.object().default({})
   })
 
