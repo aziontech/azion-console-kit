@@ -1,3 +1,5 @@
+import { hasFlagUseV6Configurations } from '@/composables/user-flag'
+
 /** @type {import('vue-router').RouteRecordRaw} */
 export const workloadRoutes = {
   path: `/workloads`,
@@ -10,37 +12,32 @@ export const workloadRoutes = {
       meta: {
         title: 'Workloads',
         flag: 'checkout_access_without_flag',
-        breadCrumbs: [
-          {
-            label: `Workloads`,
-            to: `/workloads`
-          }
-        ]
+        breadCrumbs: [{ label: `Workloads`, to: `/workloads` }]
       }
     },
     {
       path: 'create',
       name: 'create-workload',
-      component: () => import('@views/Workload/CreateView.vue'),
+      component: () =>
+        hasFlagUseV6Configurations()
+          ? import('@views/Workload/CreateView.vue')
+          : import('@views/Workload/legacy/CreateView.vue'),
       meta: {
         title: 'Create Workload',
         flag: 'checkout_access_without_flag',
         breadCrumbs: [
-          {
-            label: `Workloads`,
-            to: `/workloads`
-          },
-          {
-            label: `Create`,
-            to: `/workloads/create`
-          }
+          { label: `Workloads`, to: `/workloads` },
+          { label: `Create`, to: `/workloads/create` }
         ]
       }
     },
     {
       path: 'edit/:id/:tab?',
       name: `edit-workload`,
-      component: () => import('@views/Workload/EditDispatcher.vue'),
+      component: () =>
+        hasFlagUseV6Configurations()
+          ? import('@views/Workload/TabsView.vue')
+          : import('@views/Workload/legacy/EditView.vue'),
       props: {
         updatedRedirect: `list-workloads`
       },
@@ -48,15 +45,8 @@ export const workloadRoutes = {
         title: 'Edit Workload',
         flag: 'checkout_access_without_flag',
         breadCrumbs: [
-          {
-            label: `Workloads`,
-            to: `/workloads`
-          },
-          {
-            label: `Edit Workload`,
-            dynamic: true,
-            routeParam: 'id'
-          }
+          { label: `Workloads`, to: `/workloads` },
+          { label: `Edit Workload`, dynamic: true, routeParam: 'id' }
         ]
       }
     },

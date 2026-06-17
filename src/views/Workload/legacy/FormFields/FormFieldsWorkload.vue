@@ -5,11 +5,12 @@
   import { INFORMATION_TEXTS } from '@/helpers'
   import { computed } from 'vue'
 
-  import BlocksGeneral from './blocks/generalBlock.vue'
-  import BlocksMutualAuthenticationSettings from './blocks/mutualAuthenticationSettingsBlock.vue'
-  import BlocksDomains from './blocks/domainsBlock.vue'
-  import BlocksDeploymentSettings from './blocks/deploymentSettingsBlock.vue'
-  import BlocksProtocolSettings from './blocks/protocolSettingsBlock.vue'
+  import BlocksGeneral from '../../FormFields/blocks/generalBlock.vue'
+  import BlocksMutualAuthenticationSettings from '../../FormFields/blocks/mutualAuthenticationSettingsBlock.vue'
+  import BlocksInfrastructure from '../../FormFields/blocks/infrastructureBlock.vue'
+  import BlocksDomains from '../blocks/domainsBlock.vue'
+  import BlocksDeploymentSettings from '../blocks/deploymentSettingsBlock.vue'
+  import BlocksProtocolSettings from '../blocks/protocolSettingsBlock.vue'
 
   const props = defineProps({
     isEdit: { type: Boolean, default: false },
@@ -32,6 +33,12 @@
   </InlineMessage>
 
   <BlocksGeneral
+    :isEdit="props.isEdit"
+    :isDrawer="props.isDrawer"
+    :noBorder="props.noBorder"
+  />
+
+  <BlocksInfrastructure
     :isEdit="props.isEdit"
     :isDrawer="props.isDrawer"
     :noBorder="props.noBorder"

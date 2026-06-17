@@ -41,7 +41,7 @@
   import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { buildV6Schema } from './Config/validation'
+  import { buildLegacySchema } from '../Config/validation'
   import { clipboardWrite } from '@/helpers/clipboard'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -88,8 +88,8 @@
       .track()
   }
 
-  const validationSchema = buildV6Schema()
-  const createWorkload = (payload) => workloadService.createWorkload(payload, true)
+  const validationSchema = buildLegacySchema()
+  const createWorkload = (payload) => workloadService.createWorkload(payload, false)
 
   const initialValues = {
     name: '',
@@ -115,8 +115,7 @@
     useCustomDomain: false,
     customDomain: '',
     workloadHostnameAllowAccess: true,
-    tls: { ciphers: 7, minimumVersion: 'tls_1_3' },
-    domains: [],
-    environmentDeployments: {}
+    tls: { certificate: 0, ciphers: 7, minimumVersion: 'tls_1_3' },
+    domains: [{ subdomain: '', domain: '' }]
   }
 </script>
