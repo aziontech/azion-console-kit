@@ -142,7 +142,7 @@ const getConfig = () => {
           rewrite: (path) => path.replace(/^\/edge_api/, '')
         }),
         '/deployment-api': createProxyConfig({
-          target: `https://i29crxkxxva.map.azionedge.net`,
+          target: `https://deployment-api.azion.app`,
           rewrite: (path) => path.replace(/^\/deployment-api/, '')
         }),
         '/environment-api': createProxyConfig({
