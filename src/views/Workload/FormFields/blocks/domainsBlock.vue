@@ -117,9 +117,10 @@
   }
 
   const certificateLabel = (id) => {
-    if (!id || id === 0) return ''
+    if (id == null) return ''
     const found = certificateOptions.value.find((option) => option.value === id)
     if (found) return found.label
+    if (id === 0) return 'Azion (SAN)'
     if (id === 1) return "Let's Encrypt (new)"
     if (id === 2) return "Let's Encrypt (reuse)"
     return `#${id}`

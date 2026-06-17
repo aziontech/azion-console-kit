@@ -74,11 +74,11 @@
   <div class="flex flex-col gap-4 mt-4">
     <WorkloadMetricsSection :workloadId="workloadId" />
 
-    <div class="grid grid-cols-1 xl:grid-cols-4 gap-4">
-      <div class="xl:col-span-3 min-w-0">
+    <div class="flex flex-col xl:flex-row gap-4">
+      <div class="xl:flex-[3] min-w-0">
         <DeploymentsListSection :workloadId="workloadId" />
       </div>
-      <div class="xl:col-span-1 flex flex-col gap-4 min-w-0">
+      <div class="xl:flex-1 flex flex-col gap-4 min-w-0">
         <ResourcesSection :workload="workload" />
         <section
           class="border surface-border rounded-md p-4 flex flex-col gap-4"
