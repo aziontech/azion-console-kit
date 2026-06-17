@@ -24,14 +24,14 @@ const COLUMN_NAMES_FIELD = {
 }
 
 const DATA_VOLUME = {
-  yotta: Math.pow(1024, 8), // 1,208,925,819,614,629,174,706,176
-  zetta: Math.pow(1024, 7), // 1,180,591,620,717,411,303,424
-  exa: Math.pow(1024, 6), // 1,152,921,504,606,846,976
-  peta: Math.pow(1024, 5), // 1,125,899,906,842,624
-  tera: Math.pow(1024, 4), // 1,099,511,627,776
-  giga: Math.pow(1024, 3), // 1,073,741,824
-  mega: Math.pow(1024, 2), // 1,048,576
-  kilo: 1024
+  yotta: Math.pow(1000, 8),
+  zetta: Math.pow(1000, 7),
+  exa: Math.pow(1000, 6),
+  peta: Math.pow(1000, 5),
+  tera: Math.pow(1000, 4),
+  giga: Math.pow(1000, 3),
+  mega: Math.pow(1000, 2),
+  kilo: 1000
 }
 
 const C3_TYPES = {

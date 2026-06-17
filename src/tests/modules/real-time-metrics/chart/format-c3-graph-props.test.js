@@ -1,5 +1,5 @@
 /* eslint-disable id-length */
-import { FormatC3GraphProps } from '@modules/real-time-metrics/chart'
+import { FormatC3GraphProps, formatYAxisLabels } from '@modules/real-time-metrics/chart'
 import { describe, expect, it } from 'vitest'
 import * as FIXTURES from './chart-fixtures'
 
@@ -237,19 +237,19 @@ describe('RealTimeMetricsModule', () => {
           type: 'spline',
           xFormat: '%Y-%m-%dT%H:%M:%SZ',
           names: {
-            serieTest1: 'Serie Test 1 - 5.4Pb/s',
-            serieTest2: 'Serie Test 2 - 591.2Tb/s',
-            serieTest3: 'Serie Test 3 - 55.5Tb/s',
-            serieTest4: 'Serie Test 4 - 6.0Tb/s',
-            serieTest5: 'Serie Test 5 - 568.1Gb/s',
-            serieTest6: 'Serie Test 6 - 60.5Gb/s',
-            serieTest7: 'Serie Test 7 - 572.2Mb/s',
-            serieTest8: 'Serie Test 8 - 62.0Mb/s',
-            serieTest9: 'Serie Test 9 - 6.0Mb/s',
-            serieTest10: 'Serie Test 10 - 634.8kb/s',
-            serieTest11: 'Serie Test 11 - 58.6kb/s',
-            serieTest12: 'Serie Test 12 - 64.5kb/s',
-            serieTest13: 'Serie Test 13 - 6.3kb/s',
+            serieTest1: 'Serie Test 1 - 6.1Pb/s',
+            serieTest2: 'Serie Test 2 - 650.0Tb/s',
+            serieTest3: 'Serie Test 3 - 61.0Tb/s',
+            serieTest4: 'Serie Test 4 - 6.6Tb/s',
+            serieTest5: 'Serie Test 5 - 610.0Gb/s',
+            serieTest6: 'Serie Test 6 - 65.0Gb/s',
+            serieTest7: 'Serie Test 7 - 600.0Mb/s',
+            serieTest8: 'Serie Test 8 - 65.0Mb/s',
+            serieTest9: 'Serie Test 9 - 6.3Mb/s',
+            serieTest10: 'Serie Test 10 - 650.0kb/s',
+            serieTest11: 'Serie Test 11 - 60.0kb/s',
+            serieTest12: 'Serie Test 12 - 66.0kb/s',
+            serieTest13: 'Serie Test 13 - 6.5kb/s',
             serieTest14: 'Serie Test 14 - 650.0bit/s',
             serieTest15: 'Serie Test 15 - 6.1bit/s',
             serieTest16: 'Serie Test 16 - 0.7bit/s'
@@ -307,6 +307,20 @@ describe('RealTimeMetricsModule', () => {
       })
 
       expect(JSON.stringify(result)).toEqual(JSON.stringify(expected))
+    })
+
+    it('should format byte labels with decimal SI prefixes', () => {
+      const chartData = { dataUnit: 'bytes' }
+
+      expect(formatYAxisLabels(1_500_000, chartData)).toBe('1.5MB')
+      expect(formatYAxisLabels(1_500_000_000, chartData)).toBe('1.5GB')
+    })
+
+    it('should format bandwidth labels with decimal SI prefixes', () => {
+      const chartData = { dataUnit: 'bitsPerSecond' }
+
+      expect(formatYAxisLabels(1_500_000, chartData)).toBe('1.5Mb/s')
+      expect(formatYAxisLabels(1_500_000_000, chartData)).toBe('1.5Gb/s')
     })
   })
 })

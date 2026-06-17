@@ -48,28 +48,28 @@ export function formatDataUnit(data, chartData) {
   const unitType = chartData.dataUnit === 'bitsPerSecond' ? 'bit-per-second' : 'byte'
   const abbreviations = UNIT_ABBREVIATIONS[unitType]
 
-  if (data > CHART_RULES.DATA_VOLUME.yotta) {
+  if (data >= CHART_RULES.DATA_VOLUME.yotta) {
     value = data / CHART_RULES.DATA_VOLUME.yotta
     unit = abbreviations?.yotta || 'YB'
-  } else if (data > CHART_RULES.DATA_VOLUME.zetta) {
+  } else if (data >= CHART_RULES.DATA_VOLUME.zetta) {
     value = data / CHART_RULES.DATA_VOLUME.zetta
     unit = abbreviations?.zetta || 'ZB'
-  } else if (data > CHART_RULES.DATA_VOLUME.exa) {
+  } else if (data >= CHART_RULES.DATA_VOLUME.exa) {
     value = data / CHART_RULES.DATA_VOLUME.exa
     unit = abbreviations?.exa || 'EB'
-  } else if (data > CHART_RULES.DATA_VOLUME.peta) {
+  } else if (data >= CHART_RULES.DATA_VOLUME.peta) {
     value = data / CHART_RULES.DATA_VOLUME.peta
     unit = abbreviations?.peta || 'PB'
-  } else if (data > CHART_RULES.DATA_VOLUME.tera) {
+  } else if (data >= CHART_RULES.DATA_VOLUME.tera) {
     value = data / CHART_RULES.DATA_VOLUME.tera
     unit = abbreviations?.tera || 'TB'
-  } else if (data > CHART_RULES.DATA_VOLUME.giga) {
+  } else if (data >= CHART_RULES.DATA_VOLUME.giga) {
     value = data / CHART_RULES.DATA_VOLUME.giga
     unit = abbreviations?.giga || 'GB'
-  } else if (data > CHART_RULES.DATA_VOLUME.mega) {
+  } else if (data >= CHART_RULES.DATA_VOLUME.mega) {
     value = data / CHART_RULES.DATA_VOLUME.mega
     unit = abbreviations?.mega || 'MB'
-  } else if (data > CHART_RULES.DATA_VOLUME.kilo) {
+  } else if (data >= CHART_RULES.DATA_VOLUME.kilo) {
     value = data / CHART_RULES.DATA_VOLUME.kilo
     unit = abbreviations?.kilo || 'KB'
   }
