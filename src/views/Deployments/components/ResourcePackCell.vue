@@ -1,6 +1,7 @@
 <script setup>
   import { ref } from 'vue'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'
+  import Tag from '@aziontech/webkit/tag'
 
   defineOptions({ name: 'resource-pack-cell' })
 
@@ -61,17 +62,17 @@
         <span class="text-xs leading-6 text-[var(--text-color-secondary)]">Other resources:</span>
       </div>
       <div class="flex gap-2 w-full justify-start">
-        <span
-          class="resource-overflow-tag inline-flex w-fit cursor-default items-center rounded border border-[var(--surface-border)] px-1.5 py-px text-[0.6875rem] font-medium leading-6 text-[var(--text-color-secondary)]"
+        <Tag
+          severity="secondary"
+          :value="`+${display.overflowCount}`"
+          class="cursor-default"
+          tabindex="0"
+          aria-label="Show remaining resources"
           @mouseenter="showOverflowPanel"
           @mouseleave="hideOverflowPanel"
           @focus="showOverflowPanel"
           @blur="hideOverflowPanel"
-          tabindex="0"
-          aria-label="Show remaining resources"
-        >
-          +{{ display.overflowCount }}
-        </span>
+        />
         <OverlayPanel
           ref="overflowPanelRef"
           :pt="{
@@ -120,10 +121,6 @@
 </template>
 
 <style scoped>
-  .resource-overflow-tag {
-    background: var(--surface-ground);
-  }
-
   :deep(.resource-overflow-panel) {
     border: 1px solid var(--surface-border);
     border-radius: 0.5rem;

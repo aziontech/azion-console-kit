@@ -5,12 +5,13 @@
   import Menu from '@aziontech/webkit/menu'
   import GenericDataView from '@/views/Deployments/components/GenericDataView.vue'
   import ResourcePackCell from '@/views/Deployments/components/ResourcePackCell.vue'
+  import StatusTag from '@/views/Deployments/components/StatusTag.vue'
+  import EnvironmentTag from '@/views/Deployments/components/EnvironmentTag.vue'
+  import CurrentBadge from '@/views/Deployments/components/CurrentBadge.vue'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { DataTableActionsButtons } from '@/components/list-table'
   import DeploymentsDrawer from '@/views/Deployments/Drawer'
   import {
-    getStatusIcon,
-    getStatusClass,
     getDeploymentStatus,
     getResourcePackRows,
     getResourcePackDisplay,
@@ -657,35 +658,17 @@
               >
                 {{ deployment.name || '--' }}
               </button>
-              <span
-                v-if="deployment.isCurrent"
-                class="bg-blue-500/10 text-blue-500 inline-flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-xs font-medium leading-6"
-              >
-                <i class="pi pi-arrow-up" />
-                Current
-              </span>
+              <CurrentBadge v-if="deployment.isCurrent" />
             </div>
           </div>
         </template>
 
         <template #cell-environment="{ item: deployment }">
-          <span
-            class="environment-tag inline-flex items-center whitespace-nowrap rounded border border-[var(--surface-border)] px-2 py-0.5 text-xs font-medium leading-6 text-[var(--text-color)]"
-          >
-            {{ formatEnvironment(deployment.environment) }}
-          </span>
+          <EnvironmentTag :environment="deployment.environment" />
         </template>
 
         <template #cell-status="{ item: deployment }">
-          <span
-            :class="[
-              'inline-flex w-fit items-center gap-1.5 rounded px-2 py-0.5 text-xs font-medium leading-6',
-              getStatusClass(deployment)
-            ]"
-          >
-            <i :class="[getStatusIcon(deployment.status?.content), 'text-xs']" />
-            {{ deployment.status?.content || 'Unknown' }}
-          </span>
+          <StatusTag :status="deployment.status" />
         </template>
 
         <template #cell-resource-pack="{ item: deployment }">
@@ -720,10 +703,6 @@
 </template>
 
 <style scoped>
-  .environment-tag {
-    background: var(--surface-ground);
-  }
-
   .deployment-name-button {
     background: transparent;
     border: 0;
