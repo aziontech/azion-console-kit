@@ -44,7 +44,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
 
 ## Functions
 
-### `GET /edge_functions/api/functions`
+### `GET /v4/workspace/functions`
 
 - **operationId**: `list_functions`
 - **Summary**: List Functions
@@ -73,7 +73,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
 ```json
 {
   "count": 2,
-  "next": "https://api.azion.com/edge_functions/api/functions?page=2",
+  "next": "https://api.azion.com/v4/workspace/functions?page=2",
   "previous": null,
   "results": [
     {
@@ -90,8 +90,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
       "reference_count": 3,
       "version": "1.0.0",
       "vendor": "azion",
-      "is_versioned": true,
-      "version_state": "ready",
+      "state": "ready",
       "version_id": "01HZX9K8E6Q2A7N4T1Y5R3W8P0"
     },
     {
@@ -108,8 +107,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
       "reference_count": 0,
       "version": "1.0.0",
       "vendor": "azion",
-      "is_versioned": false,
-      "version_state": null,
+      "state": null,
       "version_id": null
     }
   ]
@@ -118,7 +116,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
 
 ---
 
-### `POST /edge_functions/api/functions`
+### `POST /v4/workspace/functions`
 
 - **operationId**: `create_function`
 - **Summary**: Create a Function
@@ -173,8 +171,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
     "reference_count": 0,
     "version": "1.0.0",
     "vendor": "azion",
-    "is_versioned": false,
-    "version_state": null,
+    "state": null,
     "version_id": null,
     "code": "async function handleRequest(event) {\n  const args = JSON.parse(event.args || '{}');\n  const body = `${args.greeting || 'Hello'}, ${args.target || 'World'}!`;\n  return new Response(body, { status: 200, headers: { 'content-type': 'text/plain' } });\n}\n\naddEventListener('fetch', (event) => event.respondWith(handleRequest(event)));"
   }
@@ -183,7 +180,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
 
 ---
 
-### `GET /edge_functions/api/functions/{function_id}`
+### `GET /v4/workspace/functions/{function_id}`
 
 - **operationId**: `retrieve_function`
 - **Summary**: Retrieve details of a Function
@@ -220,8 +217,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
     "reference_count": 1,
     "version": "1.0.0",
     "vendor": "azion",
-    "is_versioned": true,
-    "version_state": "ready",
+    "state": "ready",
     "version_id": "01HZX9K8E6Q2A7N4T1Y5R3W8P0",
     "code": "addEventListener('fetch', (event) => event.respondWith(new Response('ok')));"
   }
@@ -230,7 +226,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
 
 ---
 
-### `PUT /edge_functions/api/functions/{function_id}`
+### `PUT /v4/workspace/functions/{function_id}`
 
 - **operationId**: `update_function`
 - **Summary**: Update a Function
@@ -278,8 +274,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
     "reference_count": 1,
     "version": "1.0.0",
     "vendor": "azion",
-    "is_versioned": true,
-    "version_state": "draft",
+    "state": "draft",
     "version_id": "01HZX9M2A8B7C6D5E4F3G2H1I0",
     "code": "addEventListener('fetch', (event) => {\n  event.respondWith(new Response('Hi, Edge!', { status: 200 }));\n});"
   }
@@ -288,7 +283,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
 
 ---
 
-### `PATCH /edge_functions/api/functions/{function_id}`
+### `PATCH /v4/workspace/functions/{function_id}`
 
 - **operationId**: `partial_update_function`
 - **Summary**: Partially update a Function
@@ -330,8 +325,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
     "reference_count": 1,
     "version": "1.0.0",
     "vendor": "azion",
-    "is_versioned": true,
-    "version_state": "draft",
+    "state": "draft",
     "version_id": "01HZX9M2A8B7C6D5E4F3G2H1I0",
     "code": "addEventListener('fetch', (event) => event.respondWith(new Response('ok')));"
   }
@@ -340,7 +334,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
 
 ---
 
-### `DELETE /edge_functions/api/functions/{function_id}`
+### `DELETE /v4/workspace/functions/{function_id}`
 
 - **operationId**: `delete_function`
 - **Summary**: Delete a Function
@@ -367,7 +361,7 @@ Todos os endpoints retornam `JSONAPIErrorResponse` para os status `400`, `401`, 
 
 Endpoints para gerenciar versões de uma Edge Function. Os `version_id` são identificadores opacos (string, geralmente ULID/UUID-like).
 
-### `GET /edge_functions/api/functions/{function_id}/versions`
+### `GET /v4/workspace/functions/{function_id}/versions`
 
 - **operationId**: `list_function_versions`
 - **Summary**: List Function versions
@@ -411,7 +405,7 @@ Endpoints para gerenciar versões de uma Edge Function. Os `version_id` são ide
 
 ---
 
-### `POST /edge_functions/api/functions/{function_id}/versions`
+### `POST /v4/workspace/functions/{function_id}/versions`
 
 - **operationId**: `create_function_version`
 - **Summary**: Create a new Function version
@@ -459,7 +453,7 @@ Endpoints para gerenciar versões de uma Edge Function. Os `version_id` são ide
 
 ---
 
-### `GET /edge_functions/api/functions/{function_id}/versions/{version_id}`
+### `GET /v4/workspace/functions/{function_id}/versions/{version_id}`
 
 - **operationId**: `retrieve_function_version`
 - **Summary**: Retrieve a Function version
@@ -501,7 +495,7 @@ Endpoints para gerenciar versões de uma Edge Function. Os `version_id` são ide
 
 ---
 
-### `PUT /edge_functions/api/functions/{function_id}/versions/{version_id}`
+### `PUT /v4/workspace/functions/{function_id}/versions/{version_id}`
 
 - **operationId**: `update_function_version`
 - **Summary**: Update a Function version
@@ -514,15 +508,16 @@ Endpoints para gerenciar versões de uma Edge Function. Os `version_id` são ide
 | `function_id` | integer | ID da Function. |
 | `version_id` | string | Identificador da versão. |
 
-#### Request body (`VersionCreateRequest`)
+#### Request body (`EdgeFunctionsRequest` — mesma forma do PUT do recurso base)
 
 ```json
 {
-  "comment": "Updated canary payload",
-  "override": {
-    "default_args": { "greeting": "Bonjour", "target": "Edge" },
-    "code": "addEventListener('fetch', (event) => event.respondWith(new Response('Bonjour, Edge!')));"
-  }
+  "name": "greeter-canary",
+  "runtime": "azion_js",
+  "execution_environment": "application",
+  "default_args": { "greeting": "Bonjour", "target": "Edge" },
+  "code": "addEventListener('fetch', (event) => event.respondWith(new Response('Bonjour, Edge!')));",
+  "active": true
 }
 ```
 
@@ -532,14 +527,14 @@ Endpoints para gerenciar versões de uma Edge Function. Os `version_id` são ide
 {
   "version_id": "01HZY1P3F4G5H6J7K8L9M0N1B2",
   "state": "draft",
-  "comment": "Updated canary payload",
+  "name": "greeter-canary",
   "last_modified": "2026-06-10T16:00:11Z"
 }
 ```
 
 ---
 
-### `PATCH /edge_functions/api/functions/{function_id}/versions/{version_id}`
+### `PATCH /v4/workspace/functions/{function_id}/versions/{version_id}`
 
 - **operationId**: `partial_update_function_version`
 - **Summary**: Partially update a Function version
@@ -552,11 +547,11 @@ Endpoints para gerenciar versões de uma Edge Function. Os `version_id` são ide
 | `function_id` | integer | ID da Function. |
 | `version_id` | string | Identificador da versão. |
 
-#### Request body (`PatchedVersionCreateRequest`) - todos os campos opcionais
+#### Request body (`PatchedEdgeFunctionsRequest`) - qualquer subconjunto dos campos do recurso
 
 ```json
 {
-  "comment": "Adjust comment only"
+  "default_args": { "greeting": "Hola" }
 }
 ```
 
@@ -573,7 +568,7 @@ Endpoints para gerenciar versões de uma Edge Function. Os `version_id` são ide
 
 ---
 
-### `DELETE /edge_functions/api/functions/{function_id}/versions/{version_id}`
+### `DELETE /v4/workspace/functions/{function_id}/versions/{version_id}`
 
 - **operationId**: `delete_function_version`
 - **Summary**: Delete a Function version
@@ -596,7 +591,7 @@ Sem corpo de resposta. A exclusão é processada de forma assíncrona.
 
 Operações de transição de estado em versões. Todas retornam `202 Accepted` indicando que a ação foi enfileirada para processamento assíncrono.
 
-### `POST /edge_functions/api/functions/{function_id}/versions/{version_id}/archive`
+### `POST /v4/workspace/functions/{function_id}/versions/{version_id}/archive`
 
 - **operationId**: `archive_function_version`
 - **Summary**: Archive a Function version
@@ -627,7 +622,7 @@ Sem corpo. A versão é movida para o estado `archived` de forma assíncrona.
 
 ---
 
-### `POST /edge_functions/api/functions/{function_id}/versions/{version_id}/build`
+### `POST /v4/workspace/functions/{function_id}/versions/{version_id}/build`
 
 - **operationId**: `build_function_version`
 - **Summary**: Build a Function version
@@ -660,7 +655,7 @@ Sem corpo. O build é enfileirado. Consulte o endpoint de retrieve para acompanh
 
 ---
 
-### `POST /edge_functions/api/functions/{function_id}/versions/{version_id}/cancel`
+### `POST /v4/workspace/functions/{function_id}/versions/{version_id}/cancel`
 
 - **operationId**: `cancel_function_version_build`
 - **Summary**: Cancel a Function version build

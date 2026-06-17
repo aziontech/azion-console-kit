@@ -4,24 +4,24 @@
 
 Todos os endpoints exigem autenticação via `TokenAuth` ou `BearerAuth`.
 
-Base path: `/workspace/api`
+Base path: `/v4`
 
 ## Sumário
 
 - [Custom Pages](#custom-pages)
-  - [GET /workspace/api/custom_pages](#get-workspaceapicustom_pages)
-  - [POST /workspace/api/custom_pages](#post-workspaceapicustom_pages)
-  - [GET /workspace/api/custom_pages/{custom_page_id}](#get-workspaceapicustom_pagescustom_page_id)
-  - [PUT /workspace/api/custom_pages/{custom_page_id}](#put-workspaceapicustom_pagescustom_page_id)
-  - [PATCH /workspace/api/custom_pages/{custom_page_id}](#patch-workspaceapicustom_pagescustom_page_id)
-  - [DELETE /workspace/api/custom_pages/{custom_page_id}](#delete-workspaceapicustom_pagescustom_page_id)
+  - [GET /v4/workspace/custom_pages](#get-workspaceapicustom_pages)
+  - [POST /v4/workspace/custom_pages](#post-workspaceapicustom_pages)
+  - [GET /v4/workspace/custom_pages/{custom_page_id}](#get-workspaceapicustom_pagescustom_page_id)
+  - [PUT /v4/workspace/custom_pages/{custom_page_id}](#put-workspaceapicustom_pagescustom_page_id)
+  - [PATCH /v4/workspace/custom_pages/{custom_page_id}](#patch-workspaceapicustom_pagescustom_page_id)
+  - [DELETE /v4/workspace/custom_pages/{custom_page_id}](#delete-workspaceapicustom_pagescustom_page_id)
 - [Versions (versionamento)](#versions-versionamento)
-  - [GET /workspace/api/custom_pages/{custom_page_id}/versions](#get-workspaceapicustom_pagescustom_page_idversions)
-  - [POST /workspace/api/custom_pages/{custom_page_id}/versions](#post-workspaceapicustom_pagescustom_page_idversions)
-  - [GET /workspace/api/custom_pages/{custom_page_id}/versions/{version_id}](#get-workspaceapicustom_pagescustom_page_idversionsversion_id)
-  - [PUT /workspace/api/custom_pages/{custom_page_id}/versions/{version_id}](#put-workspaceapicustom_pagescustom_page_idversionsversion_id)
-  - [PATCH /workspace/api/custom_pages/{custom_page_id}/versions/{version_id}](#patch-workspaceapicustom_pagescustom_page_idversionsversion_id)
-  - [DELETE /workspace/api/custom_pages/{custom_page_id}/versions/{version_id}](#delete-workspaceapicustom_pagescustom_page_idversionsversion_id)
+  - [GET /v4/workspace/custom_pages/{custom_page_id}/versions](#get-workspaceapicustom_pagescustom_page_idversions)
+  - [POST /v4/workspace/custom_pages/{custom_page_id}/versions](#post-workspaceapicustom_pagescustom_page_idversions)
+  - [GET /v4/workspace/custom_pages/{custom_page_id}/versions/{version_id}](#get-workspaceapicustom_pagescustom_page_idversionsversion_id)
+  - [PUT /v4/workspace/custom_pages/{custom_page_id}/versions/{version_id}](#put-workspaceapicustom_pagescustom_page_idversionsversion_id)
+  - [PATCH /v4/workspace/custom_pages/{custom_page_id}/versions/{version_id}](#patch-workspaceapicustom_pagescustom_page_idversionsversion_id)
+  - [DELETE /v4/workspace/custom_pages/{custom_page_id}/versions/{version_id}](#delete-workspaceapicustom_pagescustom_page_idversionsversion_id)
 - [Version Actions](#version-actions)
   - [POST .../versions/{version_id}/archive](#post-workspaceapicustom_pagescustom_page_idversionsversion_idarchive)
   - [POST .../versions/{version_id}/build](#post-workspaceapicustom_pagescustom_page_idversionsversion_idbuild)
@@ -31,7 +31,7 @@ Base path: `/workspace/api`
 
 ## Custom Pages
 
-### `GET /workspace/api/custom_pages`
+### `GET /v4/workspace/custom_pages`
 
 - **operationId:** `list_custom_pages`
 - **Summary:** List Custom Pages
@@ -87,8 +87,7 @@ Lista todas as Custom Pages da conta.
           }
         }
       ],
-      "is_versioned": true,
-      "version_state": "ready",
+      "state": "ready",
       "version_id": "v_01HZX9Q8K7C8D5"
     },
     {
@@ -113,8 +112,7 @@ Lista todas as Custom Pages da conta.
           }
         }
       ],
-      "is_versioned": false,
-      "version_state": null,
+      "state": null,
       "version_id": null
     }
   ]
@@ -125,7 +123,7 @@ Lista todas as Custom Pages da conta.
 
 ---
 
-### `POST /workspace/api/custom_pages`
+### `POST /v4/workspace/custom_pages`
 
 - **operationId:** `create_custom_page`
 - **Summary:** Create a Custom Page
@@ -194,8 +192,7 @@ Notas sobre campos:
         }
       }
     ],
-    "is_versioned": false,
-    "version_state": null,
+    "state": null,
     "version_id": null
   }
 }
@@ -205,7 +202,7 @@ Notas sobre campos:
 
 ---
 
-### `GET /workspace/api/custom_pages/{custom_page_id}`
+### `GET /v4/workspace/custom_pages/{custom_page_id}`
 
 - **operationId:** `retrieve_custom_page`
 - **Summary:** Retrieve details of a Custom Page
@@ -251,8 +248,7 @@ Retorna detalhes de uma Custom Page específica.
         }
       }
     ],
-    "is_versioned": true,
-    "version_state": "ready",
+    "state": "ready",
     "version_id": "v_01HZX9Q8K7C8D5"
   }
 }
@@ -262,7 +258,7 @@ Retorna detalhes de uma Custom Page específica.
 
 ---
 
-### `PUT /workspace/api/custom_pages/{custom_page_id}`
+### `PUT /v4/workspace/custom_pages/{custom_page_id}`
 
 - **operationId:** `update_custom_page`
 - **Summary:** Update a Custom Page
@@ -321,8 +317,7 @@ Substitui completamente a Custom Page com os dados informados.
         }
       }
     ],
-    "is_versioned": true,
-    "version_state": "draft",
+    "state": "draft",
     "version_id": "v_01HZX9Q8K7C8D6"
   }
 }
@@ -332,7 +327,7 @@ Substitui completamente a Custom Page com os dados informados.
 
 ---
 
-### `PATCH /workspace/api/custom_pages/{custom_page_id}`
+### `PATCH /v4/workspace/custom_pages/{custom_page_id}`
 
 - **operationId:** `partial_update_custom_page`
 - **Summary:** Partially update a Custom Page
@@ -403,8 +398,7 @@ Outros exemplos:
         }
       }
     ],
-    "is_versioned": true,
-    "version_state": "draft",
+    "state": "draft",
     "version_id": "v_01HZX9Q8K7C8D7"
   }
 }
@@ -414,7 +408,7 @@ Outros exemplos:
 
 ---
 
-### `DELETE /workspace/api/custom_pages/{custom_page_id}`
+### `DELETE /v4/workspace/custom_pages/{custom_page_id}`
 
 - **operationId:** `delete_custom_page`
 - **Summary:** Delete a Custom Page
@@ -439,7 +433,7 @@ Remove uma Custom Page específica.
 
 Endpoints para gerenciar versões (drafts, ready, archived) de uma Custom Page. Uma Custom Page pode estar versionada (`is_versioned: true`), e cada versão é identificada por um `version_id` string.
 
-### `GET /workspace/api/custom_pages/{custom_page_id}/versions`
+### `GET /v4/workspace/custom_pages/{custom_page_id}/versions`
 
 - **operationId:** `list_custom_page_versions`
 - **Summary:** List Custom Page versions
@@ -479,7 +473,7 @@ Lista todas as versões de uma Custom Page.
 
 ---
 
-### `POST /workspace/api/custom_pages/{custom_page_id}/versions`
+### `POST /v4/workspace/custom_pages/{custom_page_id}/versions`
 
 - **operationId:** `create_custom_page_version`
 - **Summary:** Create a new Custom Page version
@@ -536,7 +530,7 @@ Campos:
 
 ---
 
-### `GET /workspace/api/custom_pages/{custom_page_id}/versions/{version_id}`
+### `GET /v4/workspace/custom_pages/{custom_page_id}/versions/{version_id}`
 
 - **operationId:** `retrieve_custom_page_version`
 - **Summary:** Retrieve a Custom Page version
@@ -590,7 +584,7 @@ Retorna detalhes de uma versão específica.
 
 ---
 
-### `PUT /workspace/api/custom_pages/{custom_page_id}/versions/{version_id}`
+### `PUT /v4/workspace/custom_pages/{custom_page_id}/versions/{version_id}`
 
 - **operationId:** `update_custom_page_version`
 - **Summary:** Update a Custom Page version
@@ -599,16 +593,26 @@ Atualiza completamente uma versão em estado `draft`. Não pode ser usado em ver
 
 **Path params:** `custom_page_id` (integer), `version_id` (string).
 
-**Request body** (`VersionCreateRequest`):
+**Request body** (`CustomPageRequest` — mesma forma do PUT do recurso base):
 
 ```json
 {
-  "source_version": "v_01HZX9Q8K7C8D5",
-  "comment": "Reset draft from latest ready",
-  "override": {
-    "name": "Default 404 Page (draft)",
-    "active": true
-  }
+  "name": "Default 404 Page (draft)",
+  "active": true,
+  "pages": [
+    {
+      "code": "default",
+      "page": {
+        "type": "page_connector",
+        "attributes": {
+          "connector": 4321,
+          "ttl": 60,
+          "uri": "/errors/404.html",
+          "custom_status_code": 404
+        }
+      }
+    }
+  ]
 }
 ```
 
@@ -616,7 +620,7 @@ Atualiza completamente uma versão em estado `draft`. Não pode ser usado em ver
 
 ---
 
-### `PATCH /workspace/api/custom_pages/{custom_page_id}/versions/{version_id}`
+### `PATCH /v4/workspace/custom_pages/{custom_page_id}/versions/{version_id}`
 
 - **operationId:** `partial_update_custom_page_version`
 - **Summary:** Partially update a Custom Page version
@@ -625,19 +629,11 @@ Atualiza parcialmente uma versão em `draft`.
 
 **Path params:** `custom_page_id` (integer), `version_id` (string).
 
-**Request body** (`PatchedVersionCreateRequest`) — todos os campos opcionais:
+**Request body** (`PatchedCustomPageRequest` — qualquer subconjunto dos campos do recurso):
 
 ```json
 {
-  "comment": "Updated comment only"
-}
-```
-
-```json
-{
-  "override": {
-    "active": false
-  }
+  "active": false
 }
 ```
 
@@ -645,7 +641,7 @@ Atualiza parcialmente uma versão em `draft`.
 
 ---
 
-### `DELETE /workspace/api/custom_pages/{custom_page_id}/versions/{version_id}`
+### `DELETE /v4/workspace/custom_pages/{custom_page_id}/versions/{version_id}`
 
 - **operationId:** `delete_custom_page_version`
 - **Summary:** Delete a Custom Page version
@@ -662,7 +658,7 @@ Remove uma versão específica. Operação assíncrona.
 
 Ações sobre versões. Todas retornam `202 Accepted` (processamento assíncrono) e aceitam um body opcional para metadata.
 
-### `POST /workspace/api/custom_pages/{custom_page_id}/versions/{version_id}/archive`
+### `POST /v4/workspace/custom_pages/{custom_page_id}/versions/{version_id}/archive`
 
 - **operationId:** `archive_custom_page_version`
 - **Summary:** Archive a Custom Page version
@@ -683,7 +679,7 @@ Arquiva (soft-delete) uma versão `ready`. A versão deixa de ser elegível para
 
 ---
 
-### `POST /workspace/api/custom_pages/{custom_page_id}/versions/{version_id}/build`
+### `POST /v4/workspace/custom_pages/{custom_page_id}/versions/{version_id}/build`
 
 - **operationId:** `build_custom_page_version`
 - **Summary:** Build a Custom Page version
@@ -710,7 +706,7 @@ Campos:
 
 ---
 
-### `POST /workspace/api/custom_pages/{custom_page_id}/versions/{version_id}/cancel`
+### `POST /v4/workspace/custom_pages/{custom_page_id}/versions/{version_id}/cancel`
 
 - **operationId:** `cancel_custom_page_version_build`
 - **Summary:** Cancel a Custom Page version build

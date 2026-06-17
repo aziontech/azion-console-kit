@@ -10,7 +10,7 @@
 
 ## Purge
 
-### `POST /workspace/api/purge/{purge_type}`
+### `POST /v4/workspace/purge/{purge_type}`
 
 Cria uma nova requisição de purga (purge request) na sua conta. O purge invalida o conteúdo armazenado em cache no edge, forçando que a próxima requisição busque o conteúdo atualizado a partir da origem (ou da camada superior do cache, conforme o `layer` informado).
 

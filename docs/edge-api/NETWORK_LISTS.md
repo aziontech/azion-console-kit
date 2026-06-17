@@ -5,19 +5,19 @@
 ## Sumário
 
 - [Network Lists](#network-lists)
-  - [GET /workspace/api/network_lists](#get-workspaceapinetwork_lists)
-  - [POST /workspace/api/network_lists](#post-workspaceapinetwork_lists)
-  - [GET /workspace/api/network_lists/{network_list_id}](#get-workspaceapinetwork_listsnetwork_list_id)
-  - [PUT /workspace/api/network_lists/{network_list_id}](#put-workspaceapinetwork_listsnetwork_list_id)
-  - [PATCH /workspace/api/network_lists/{network_list_id}](#patch-workspaceapinetwork_listsnetwork_list_id)
-  - [DELETE /workspace/api/network_lists/{network_list_id}](#delete-workspaceapinetwork_listsnetwork_list_id)
+  - [GET /v4/workspace/network_lists](#get-workspaceapinetwork_lists)
+  - [POST /v4/workspace/network_lists](#post-workspaceapinetwork_lists)
+  - [GET /v4/workspace/network_lists/{network_list_id}](#get-workspaceapinetwork_listsnetwork_list_id)
+  - [PUT /v4/workspace/network_lists/{network_list_id}](#put-workspaceapinetwork_listsnetwork_list_id)
+  - [PATCH /v4/workspace/network_lists/{network_list_id}](#patch-workspaceapinetwork_listsnetwork_list_id)
+  - [DELETE /v4/workspace/network_lists/{network_list_id}](#delete-workspaceapinetwork_listsnetwork_list_id)
 - [Versions (versionamento)](#versions-versionamento)
-  - [GET /workspace/api/network_lists/{network_list_id}/versions](#get-workspaceapinetwork_listsnetwork_list_idversions)
-  - [POST /workspace/api/network_lists/{network_list_id}/versions](#post-workspaceapinetwork_listsnetwork_list_idversions)
-  - [GET /workspace/api/network_lists/{network_list_id}/versions/{version_id}](#get-workspaceapinetwork_listsnetwork_list_idversionsversion_id)
-  - [PUT /workspace/api/network_lists/{network_list_id}/versions/{version_id}](#put-workspaceapinetwork_listsnetwork_list_idversionsversion_id)
-  - [PATCH /workspace/api/network_lists/{network_list_id}/versions/{version_id}](#patch-workspaceapinetwork_listsnetwork_list_idversionsversion_id)
-  - [DELETE /workspace/api/network_lists/{network_list_id}/versions/{version_id}](#delete-workspaceapinetwork_listsnetwork_list_idversionsversion_id)
+  - [GET /v4/workspace/network_lists/{network_list_id}/versions](#get-workspaceapinetwork_listsnetwork_list_idversions)
+  - [POST /v4/workspace/network_lists/{network_list_id}/versions](#post-workspaceapinetwork_listsnetwork_list_idversions)
+  - [GET /v4/workspace/network_lists/{network_list_id}/versions/{version_id}](#get-workspaceapinetwork_listsnetwork_list_idversionsversion_id)
+  - [PUT /v4/workspace/network_lists/{network_list_id}/versions/{version_id}](#put-workspaceapinetwork_listsnetwork_list_idversionsversion_id)
+  - [PATCH /v4/workspace/network_lists/{network_list_id}/versions/{version_id}](#patch-workspaceapinetwork_listsnetwork_list_idversionsversion_id)
+  - [DELETE /v4/workspace/network_lists/{network_list_id}/versions/{version_id}](#delete-workspaceapinetwork_listsnetwork_list_idversionsversion_id)
 - [Version Actions](#version-actions)
   - [POST .../archive](#post-workspaceapinetwork_listsnetwork_list_idversionsversion_idarchive)
   - [POST .../build](#post-workspaceapinetwork_listsnetwork_list_idversionsversion_idbuild)
@@ -95,7 +95,7 @@ Exemplo de payload de erro:
 
 ## Network Lists
 
-### `GET /workspace/api/network_lists`
+### `GET /v4/workspace/network_lists`
 
 - **operationId:** `list_network_lists`
 - **Summary:** List Network Lists
@@ -136,8 +136,7 @@ Exemplo de payload de erro:
       "last_modified": "2026-06-09T18:32:11Z",
       "created_at": "2026-05-12T10:00:00Z",
       "active": true,
-      "is_versioned": true,
-      "version_state": "ready",
+      "state": "ready",
       "version_id": "01HZX9F7K3M8YQ4N2P6R5VT8AB"
     },
     {
@@ -148,8 +147,7 @@ Exemplo de payload de erro:
       "last_modified": "2026-06-08T14:20:00Z",
       "created_at": "2026-04-01T09:00:00Z",
       "active": true,
-      "is_versioned": false,
-      "version_state": null,
+      "state": null,
       "version_id": null
     }
   ]
@@ -158,7 +156,7 @@ Exemplo de payload de erro:
 
 ---
 
-### `POST /workspace/api/network_lists`
+### `POST /v4/workspace/network_lists`
 
 - **operationId:** `create_network_list`
 - **Summary:** Create a Network List
@@ -236,7 +234,7 @@ Exemplo de payload de erro:
 
 ---
 
-### `GET /workspace/api/network_lists/{network_list_id}`
+### `GET /v4/workspace/network_lists/{network_list_id}`
 
 - **operationId:** `retrieve_network_list`
 - **Summary:** Retrieve details of a Network List
@@ -279,7 +277,7 @@ Exemplo de payload de erro:
 
 ---
 
-### `PUT /workspace/api/network_lists/{network_list_id}`
+### `PUT /v4/workspace/network_lists/{network_list_id}`
 
 - **operationId:** `update_network_list`
 - **Summary:** Update a Network List
@@ -328,7 +326,7 @@ Exemplo de payload de erro:
 
 ---
 
-### `PATCH /workspace/api/network_lists/{network_list_id}`
+### `PATCH /v4/workspace/network_lists/{network_list_id}`
 
 - **operationId:** `partial_update_network_list`
 - **Summary:** Partially update a Network List
@@ -370,7 +368,7 @@ Exemplo de payload de erro:
 
 ---
 
-### `DELETE /workspace/api/network_lists/{network_list_id}`
+### `DELETE /v4/workspace/network_lists/{network_list_id}`
 
 - **operationId:** `delete_network_list`
 - **Summary:** Delete a Network List
@@ -406,7 +404,7 @@ Versionamento de Network Lists permite criar revisões imutáveis ("snapshots") 
 
 ---
 
-### `GET /workspace/api/network_lists/{network_list_id}/versions`
+### `GET /v4/workspace/network_lists/{network_list_id}/versions`
 
 - **operationId:** `list_network_list_versions`
 - **Summary:** List Network List versions
@@ -462,7 +460,7 @@ Versionamento de Network Lists permite criar revisões imutáveis ("snapshots") 
 
 ---
 
-### `POST /workspace/api/network_lists/{network_list_id}/versions`
+### `POST /v4/workspace/network_lists/{network_list_id}/versions`
 
 - **operationId:** `create_network_list_version`
 - **Summary:** Create a new Network List version
@@ -521,7 +519,7 @@ Versionamento de Network Lists permite criar revisões imutáveis ("snapshots") 
 
 ---
 
-### `GET /workspace/api/network_lists/{network_list_id}/versions/{version_id}`
+### `GET /v4/workspace/network_lists/{network_list_id}/versions/{version_id}`
 
 - **operationId:** `retrieve_network_list_version`
 - **Summary:** Retrieve a Network List version
@@ -561,7 +559,7 @@ Versionamento de Network Lists permite criar revisões imutáveis ("snapshots") 
 
 ---
 
-### `PUT /workspace/api/network_lists/{network_list_id}/versions/{version_id}`
+### `PUT /v4/workspace/network_lists/{network_list_id}/versions/{version_id}`
 
 - **operationId:** `update_network_list_version`
 - **Summary:** Update a Network List version
@@ -569,17 +567,17 @@ Versionamento de Network Lists permite criar revisões imutáveis ("snapshots") 
 
 **Path parameters:** `network_list_id`, `version_id`.
 
-**Request body** (`VersionCreateRequest`):
+**Request body** (`NetworkListRequest` — mesma forma do PUT do recurso base):
 
 ```json
 {
-  "comment": "Updated draft with corrected ranges",
-  "override": {
-    "items": [
-      "192.168.1.0/24",
-      "172.16.0.0/12"
-    ]
-  }
+  "name": "office-allowlist",
+  "list_type": "ip_cidr",
+  "items_values": [
+    "192.168.1.0/24",
+    "172.16.0.0/12"
+  ],
+  "active": true
 }
 ```
 
@@ -592,8 +590,8 @@ Versionamento de Network Lists permite criar revisões imutáveis ("snapshots") 
     "version_id": "01J2A4B6C8D0E2F4G6H8J0K2LM",
     "network_list_id": 1842,
     "state": "draft",
-    "comment": "Updated draft with corrected ranges",
-    "items": [
+    "name": "office-allowlist",
+    "items_values": [
       "192.168.1.0/24",
       "172.16.0.0/12"
     ],
@@ -605,7 +603,7 @@ Versionamento de Network Lists permite criar revisões imutáveis ("snapshots") 
 
 ---
 
-### `PATCH /workspace/api/network_lists/{network_list_id}/versions/{version_id}`
+### `PATCH /v4/workspace/network_lists/{network_list_id}/versions/{version_id}`
 
 - **operationId:** `partial_update_network_list_version`
 - **Summary:** Partially update a Network List version
@@ -613,11 +611,11 @@ Versionamento de Network Lists permite criar revisões imutáveis ("snapshots") 
 
 **Path parameters:** `network_list_id`, `version_id`.
 
-**Request body** (`PatchedVersionCreateRequest`): todos os campos opcionais.
+**Request body** (`PatchedNetworkListRequest` — qualquer subconjunto dos campos do recurso):
 
 ```json
 {
-  "comment": "Adjusted comment only"
+  "items_values": ["10.0.0.0/8"]
 }
 ```
 
@@ -639,7 +637,7 @@ Versionamento de Network Lists permite criar revisões imutáveis ("snapshots") 
 
 ---
 
-### `DELETE /workspace/api/network_lists/{network_list_id}/versions/{version_id}`
+### `DELETE /v4/workspace/network_lists/{network_list_id}/versions/{version_id}`
 
 - **operationId:** `delete_network_list_version`
 - **Summary:** Delete a Network List version
@@ -655,7 +653,7 @@ Versionamento de Network Lists permite criar revisões imutáveis ("snapshots") 
 
 Ações sobre o ciclo de vida da versão. Todas retornam **`202 Accepted`** sem corpo, pois o efeito é assíncrono (worker/queue).
 
-### `POST /workspace/api/network_lists/{network_list_id}/versions/{version_id}/archive`
+### `POST /v4/workspace/network_lists/{network_list_id}/versions/{version_id}/archive`
 
 - **operationId:** `archive_network_list_version`
 - **Summary:** Archive a Network List version
@@ -681,7 +679,7 @@ Ações sobre o ciclo de vida da versão. Todas retornam **`202 Accepted`** sem 
 
 ---
 
-### `POST /workspace/api/network_lists/{network_list_id}/versions/{version_id}/build`
+### `POST /v4/workspace/network_lists/{network_list_id}/versions/{version_id}/build`
 
 - **operationId:** `build_network_list_version`
 - **Summary:** Build a Network List version
@@ -709,7 +707,7 @@ Ações sobre o ciclo de vida da versão. Todas retornam **`202 Accepted`** sem 
 
 ---
 
-### `POST /workspace/api/network_lists/{network_list_id}/versions/{version_id}/cancel`
+### `POST /v4/workspace/network_lists/{network_list_id}/versions/{version_id}/cancel`
 
 - **operationId:** `cancel_network_list_version_build`
 - **Summary:** Cancel a Network List version build
