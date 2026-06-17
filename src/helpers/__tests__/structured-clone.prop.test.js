@@ -97,4 +97,18 @@ describe('Feature: real-time-events-refactor, Property 9: structuredClone type p
       { numRuns: 100 }
     )
   })
+
+  // Regression: structuredClone throws DataCloneError on Proxy objects, which
+  // is what Vue's reactive()/ref() wrap state in. Cloning filterData.value for
+  // the share link must not throw — it must fall back to the JSON round-trip.
+  it('clones Proxy-wrapped objects (Vue reactive) without throwing', () => {
+    fc.assert(
+      fc.property(arbPlainObject, (obj) => {
+        const proxy = new Proxy(obj, {})
+        expect(() => safeStructuredClone(proxy)).not.toThrow()
+        expect(safeStructuredClone(proxy)).toEqual(obj)
+      }),
+      { numRuns: 100 }
+    )
+  })
 })
