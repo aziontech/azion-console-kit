@@ -118,6 +118,13 @@ Cypress.Commands.add('loginMock', () => {
 
   cy.visit('/', {
     onBeforeLoad(win) {
+      // Vue Query persists GLOBAL queries (including account/info) to the `azion`
+      // IndexedDB. With testIsolation disabled that cache survives between tests,
+      // so boot would restore a still-fresh account/info entry and never hit the
+      // network — making cy.wait('@getAccountInfo') time out. Drop the persisted
+      // cache so each test re-fetches and the intercept reliably fires.
+      win.indexedDB.deleteDatabase('azion')
+
       // pinia-plugin-persistedstate restores the `account` store from this key on
       // boot; `hasSession: true` makes the accountGuard hydrate instead of bouncing
       // to /login.
