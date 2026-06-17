@@ -8,7 +8,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="workloadService.createWorkload"
+        :createService="createWorkload"
         disableToast
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
@@ -41,7 +41,8 @@
   import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { validationSchema } from './Config/validation'
+  import { buildValidationSchema } from './Config/validation'
+  import { hasFlagUseV6Configurations } from '@/composables/user-flag'
   import { clipboardWrite } from '@/helpers/clipboard'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -93,16 +94,17 @@
       .track()
   }
 
-  const initialValues = {
+  const isV6 = hasFlagUseV6Configurations()
+  const validationSchema = buildValidationSchema(isV6)
+
+  const createWorkload = (payload) => workloadService.createWorkload(payload, isV6)
+
+  const baseInitialValues = {
     name: '',
     application: null,
     active: true,
     infrastructure: '1',
     firewall: null,
-    tls: {
-      ciphers: 7,
-      minimumVersion: 'tls_1_3'
-    },
     protocols: {
       http: {
         useHttps: true,
@@ -118,10 +120,21 @@
       certificate: null,
       crl: []
     },
-    domains: [],
     useCustomDomain: false,
     customDomain: '',
-    workloadHostnameAllowAccess: true,
-    environmentDeployments: {}
+    workloadHostnameAllowAccess: true
   }
+
+  const initialValues = isV6
+    ? {
+        ...baseInitialValues,
+        tls: { ciphers: 7, minimumVersion: 'tls_1_3' },
+        domains: [],
+        environmentDeployments: {}
+      }
+    : {
+        ...baseInitialValues,
+        tls: { certificate: 0, ciphers: 7, minimumVersion: 'tls_1_3' },
+        domains: [{ subdomain: '', domain: '' }]
+      }
 </script>

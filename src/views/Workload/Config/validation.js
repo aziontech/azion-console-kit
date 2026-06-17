@@ -1,42 +1,91 @@
 import * as yup from 'yup'
 
-// DNS label rule: 1-63 chars, start & end alphanumeric, hyphens allowed in the middle.
-// Implemented as a multi-step check so each underlying regex is star-height 1
-// (avoids the nested-quantifier shape rejected by `security/detect-unsafe-regex`).
-const DNS_LABEL_BODY_REGEX = /^[a-zA-Z0-9-]+$/
-const DNS_LABEL_START_REGEX = /^[a-zA-Z0-9]/
-const DNS_LABEL_END_REGEX = /[a-zA-Z0-9]$/
+const subdomainSchema = yup
+  .string()
+  .test('valid-subdomain', 'Invalid Subdomain format', function (value) {
+    if (!value) return true
 
-const isValidDnsLabel = (value) => {
-  if (!value || value.length > 63) return false
-  if (!DNS_LABEL_START_REGEX.test(value)) return false
-  if (value.length > 1 && !DNS_LABEL_END_REGEX.test(value)) return false
-  return DNS_LABEL_BODY_REGEX.test(value)
-}
+    if (value === '*') return true
 
-export const validationSchema = yup.object({
-  name: yup
-    .string()
-    .label('Name')
-    .required()
-    .test(
-      'only-ascii',
-      'Invalid characters. Use letters, numbers, and standard symbols, with no accents.',
-      function (value) {
-        const nameRegex = /^[\x20-\x21\x23-\x7E]+$/
-        return nameRegex.test(value)
-      }
-    ),
-  application: yup.number().required().label('Application'),
+    if (value.endsWith('.')) return false
+
+    const dotCount = (value.match(/\./g) || []).length
+    if (dotCount > 10) return false
+    const segments = value.split('.')
+    return segments.every((segment) =>
+      /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
+    )
+  })
+  .label('Subdomain')
+
+const domainSchema = yup
+  .string()
+  .test('valid-domain', 'Invalid Domain format ', function (value) {
+    if (!value) {
+      return true
+    }
+
+    if (value.endsWith('.')) {
+      return false
+    }
+
+    const segments = value.split('.')
+    const dotCount = segments.length - 1
+    if (dotCount < 1 || dotCount > 10) {
+      return false
+    }
+
+    return segments.every((segment) =>
+      /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
+    )
+  })
+  .label('Domain')
+
+const environmentSchema = yup
+  .string()
+  .nullable()
+  .when(['subdomain', 'domain'], {
+    is: (subdomain, domain) => !!(subdomain || domain),
+    then: (schema) => schema.required('Environment is required for this domain.'),
+    otherwise: (schema) => schema.nullable()
+  })
+  .label('Environment')
+
+// v6: each domain carries its own environment + certificate.
+export const domainItemSchema = yup.object({
+  id: yup.number(),
+  subdomain: subdomainSchema,
+  domain: domainSchema,
+  environment: environmentSchema,
+  certificate: yup.mixed().nullable().notRequired().label('Digital Certificate')
+})
+
+// legacy: domains are simple subdomain/domain rows (no environment, no per-domain certificate).
+const legacyDomainItemSchema = yup.object({
+  id: yup.number(),
+  subdomain: subdomainSchema,
+  domain: domainSchema
+})
+
+const nameSchema = yup
+  .string()
+  .label('Name')
+  .required()
+  .test(
+    'only-ascii',
+    'Invalid characters. Use letters, numbers, and standard symbols, with no accents.',
+    function (value) {
+      const nameRegex = /^[\x20-\x21\x23-\x7E]+$/
+      return nameRegex.test(value)
+    }
+  )
+
+// Keys shared by both account types (v6 and legacy).
+const baseSchema = {
+  name: nameSchema,
   active: yup.boolean(),
   networkMap: yup.string(),
   firewall: yup.number().label('Firewall').nullable(),
-  tls: yup.object({
-    isEnabled: yup.boolean(),
-    certificate: yup.string(),
-    ciphers: yup.string(),
-    minimumVersion: yup.string()
-  }),
   protocols: yup.object({
     http: yup.object({
       useHttps: yup.boolean(),
@@ -72,48 +121,73 @@ export const validationSchema = yup.object({
       .label('Trusted CA Certificate'),
     crl: yup.array().label('Certificate Revocation List').nullable()
   }),
+  workloadHostnameAllowAccess: yup.boolean(),
+  letEncrypt: yup.object({
+    commonName: yup.string(),
+    alternativeNames: yup.array()
+  })
+}
+
+// v6-only schema fragments.
+const v6Extras = {
+  // application/firewall flat fields are kept for adapter/deployment compatibility.
+  // The per-environment configuration lives in `environmentDeployments`.
+  application: yup.number().nullable().notRequired().label('Application'),
+  environmentDeployments: yup
+    .object()
+    .default({})
+    .test(
+      'all-envs-have-deployment',
+      'Each environment in use needs a Deployment Settings linked.',
+      function (value) {
+        const domains = this.parent.domains || []
+        const envIds = [...new Set(domains.map((domain) => domain?.environment).filter(Boolean))]
+        return envIds.every((id) => value?.[id]?.deploymentId != null)
+      }
+    ),
+  tls: yup.object({
+    isEnabled: yup.boolean(),
+    ciphers: yup.string(),
+    minimumVersion: yup.string()
+  }),
   domains: yup
     .array()
-    .of(
-      yup.object({
-        id: yup.number(),
-        subdomain: yup
-          .string()
-          .test('valid-subdomain', 'Invalid Subdomain format', function (value) {
-            if (!value) return true
+    .of(domainItemSchema)
+    .when('workloadHostnameAllowAccess', {
+      is: false,
+      then: (schema) =>
+        schema.test(
+          'has-filled-domain',
+          'When "Workload Domain Allow Access" switch is off at least one domain is required.',
+          (value) => value?.some((domain) => domain.subdomain || domain.domain)
+        )
+    })
+    .when('protocols.http.useHttps', {
+      is: true,
+      then: (schema) =>
+        schema.test(
+          'cert-when-https',
+          'Each domain needs a certificate when HTTPS is enabled.',
+          (rows) =>
+            (rows || []).every(
+              (domain) => domain?.certificate !== undefined && domain?.certificate !== null
+            )
+        )
+    })
+}
 
-            if (value === '*') return true
-
-            if (value.endsWith('.')) return false
-
-            const dotCount = (value.match(/\./g) || []).length
-            if (dotCount > 10) return false
-            const segments = value.split('.')
-            return segments.every(isValidDnsLabel)
-          })
-          .label('Subdomain'),
-        domain: yup
-          .string()
-          .test('valid-domain', 'Invalid Domain format ', function (value) {
-            if (!value) {
-              return true
-            }
-
-            if (value.endsWith('.')) {
-              return false
-            }
-
-            const segments = value.split('.')
-            const dotCount = segments.length - 1
-            if (dotCount < 1 || dotCount > 10) {
-              return false
-            }
-
-            return segments.every(isValidDnsLabel)
-          })
-          .label('Domain')
-      })
-    )
+// legacy-only schema fragments (mirrors the previous flat form on `dev`).
+const legacyExtras = {
+  application: yup.number().required().label('Application'),
+  tls: yup.object({
+    isEnabled: yup.boolean(),
+    certificate: yup.string(),
+    ciphers: yup.string(),
+    minimumVersion: yup.string()
+  }),
+  domains: yup
+    .array()
+    .of(legacyDomainItemSchema)
     .when(['workloadHostnameAllowAccess', 'useCustomDomain'], {
       is: (workloadHostnameAllowAccess, useCustomDomain) =>
         workloadHostnameAllowAccess === false && useCustomDomain === false,
@@ -145,15 +219,14 @@ export const validationSchema = yup.object({
           .required()
           .test('valid-custom-domain', 'Invalid custom domain format', function (value) {
             if (!value) return true // Allow empty hostname
-            return isValidDnsLabel(value)
+            return /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(value)
           })
     })
     .label('Custom Domain'),
-  workloadHostnameAllowAccess: yup.boolean(),
-  letEncrypt: yup.object({
-    commonName: yup.string(),
-    alternativeNames: yup.array()
-  }),
   authorityCertificate: yup.string().nullable(),
   subjectNameCertificate: yup.array().nullable()
-})
+}
+
+export const buildV6Schema = () => yup.object({ ...baseSchema, ...v6Extras })
+
+export const buildLegacySchema = () => yup.object({ ...baseSchema, ...legacyExtras })

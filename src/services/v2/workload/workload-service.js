@@ -2,11 +2,14 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { WorkloadAdapter } from './workload-adapter'
 import { workloadDeploymentService } from './workload-deployments-service'
 import { digitalCertificatesService } from '../digital-certificates/digital-certificates-service'
+import { DigitalCertificatesAdapter } from '../digital-certificates/digital-certificates-adapter'
+import { hasAnyFieldChanged } from '../utils/hasAnyFieldChanged'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { edgeDNSService } from '../edge-dns/edge-dns-service'
 
 const LE_CREATE_NEW = 1
 const LE_REUSE = 2
+const keysToCheck = ['common_name', 'alternative_names']
 
 const buildFqdn = (domain) =>
   `${domain.subdomain ? `${domain.subdomain}.` : ''}${domain.domain || ''}`
@@ -21,9 +24,14 @@ export class WorkloadService extends BaseService {
 
     this.workloadDeployment = workloadDeploymentService
     this.digitalCertificate = digitalCertificatesService
+    this.digitalCertificateAdapter = DigitalCertificatesAdapter
     this.edgeDNS = edgeDNSService
 
+    // v6: one Let's Encrypt certificate per domain/FQDN.
     this._certificateIds = new Map()
+    // legacy: a single global Let's Encrypt certificate.
+    this._certificateId = null
+    this._objLetEncrypt = null
     this._workloadData = null
     this.initialDomains = null
   }
@@ -95,13 +103,41 @@ export class WorkloadService extends BaseService {
     return id
   }
 
-  #ensureCertificate = async (payload) => {
+  // v6: ensure a Let's Encrypt certificate per domain/FQDN.
+  #ensureCertificateV6 = async (payload) => {
     if (!Array.isArray(payload.domains) || !payload.domains.length) return
 
     for (const domain of payload.domains) {
       if (!isLetsEncryptSentinel(domain.certificate)) continue
       await this.#createDomainLetEncrypt(payload, domain)
     }
+  }
+
+  // legacy: ensure a single global Let's Encrypt certificate (tls.certificate sentinel).
+  #ensureCertificateLegacy = async (payload) => {
+    if (
+      !payload.tls ||
+      (payload.tls.certificate !== LE_CREATE_NEW && payload.tls.certificate !== LE_REUSE)
+    )
+      return
+    const shouldCreate =
+      this._certificateId == null ||
+      hasAnyFieldChanged(this.digitalCertificateAdapter, this._objLetEncrypt, payload, keysToCheck)
+
+    if (!shouldCreate) {
+      payload.tls.certificate = this._certificateId
+      return
+    }
+
+    const { id } = await this.digitalCertificate.createDigitalCertificateLetEncrypt(
+      payload,
+      this._certificateId
+    )
+
+    payload.tls.certificate = id
+    this._certificateId = id
+    this._objLetEncrypt =
+      this.digitalCertificateAdapter.transformCreateDigitalCertificateLetEncrypt?.(payload)
   }
 
   #ensureWorkload = async (payload) => {
@@ -142,8 +178,12 @@ export class WorkloadService extends BaseService {
     this._workloadData = null
   }
 
-  createWorkload = async (payload) => {
-    await this.#ensureCertificate(payload)
+  createWorkload = async (payload, isV6 = false) => {
+    if (isV6) {
+      await this.#ensureCertificateV6(payload)
+    } else {
+      await this.#ensureCertificateLegacy(payload)
+    }
     const workload = await this.#ensureWorkload(payload)
     await this.#ensureDeployment(payload, workload.id)
 
@@ -185,8 +225,12 @@ export class WorkloadService extends BaseService {
     return workload
   }
 
-  editWorkload = async (payload) => {
-    await this.#ensureCertificateForEdit(payload)
+  editWorkload = async (payload, isV6 = false) => {
+    if (isV6) {
+      await this.#ensureCertificateForEditV6(payload)
+    } else {
+      await this.#ensureCertificateForEditLegacy(payload)
+    }
     await this.#updateWorkload(payload)
     if (payload.workloadDeploymentId) {
       await this.#updateDeployment(payload)
@@ -257,7 +301,8 @@ export class WorkloadService extends BaseService {
     return this.#hasUncoveredHostnamesForWildcard(subjctName, hostnames)
   }
 
-  #ensureCertificateForEdit = async (payload) => {
+  // v6: per-domain certificate reconciliation on edit.
+  #ensureCertificateForEditV6 = async (payload) => {
     if (!Array.isArray(payload.domains) || !payload.domains.length) return
 
     const initialFqdns = this.#initialFqdnSet()
@@ -287,6 +332,76 @@ export class WorkloadService extends BaseService {
 
       await this.#createDomainLetEncrypt(payload, domain)
     }
+  }
+
+  #dropFirstAzion = (domains) => {
+    return domains.filter((domain, index) => !(index === 0 && domain.endsWith('.azion.app')))
+  }
+
+  #handleDomains = (payload) => {
+    const [first, ...rest] = payload.domains
+
+    const commonName = `${first.subdomain ? `${first.subdomain}.` : ''}${first.domain}`
+    const alternativeNames = rest
+      .map(({ subdomain, domain }) => `${subdomain ? `${subdomain}.` : ''}${domain}`)
+      .filter((name) => name.trim() !== '.')
+    payload.letEncrypt.commonName = commonName
+    payload.letEncrypt.alternativeNames = alternativeNames.filter((name) => name !== '')
+  }
+
+  // legacy: single global certificate reconciliation on edit.
+  #ensureCertificateForEditLegacy = async (payload) => {
+    const isNewCertificate = payload.tls.certificate === LE_CREATE_NEW
+    const isLetsEncrypt = payload.authorityCertificate === 'lets_encrypt'
+
+    const [commonName, ...alternativeNames] = this.#dropFirstAzion(this.initialDomains)
+
+    const letEncryptBase = {
+      common_name: commonName || '',
+      alternative_names: alternativeNames
+    }
+
+    let shouldCreate = false
+
+    if (isNewCertificate) {
+      shouldCreate = true
+      this.#handleDomains(payload)
+    } else if (isLetsEncrypt) {
+      this.#handleDomains(payload)
+      const changed = hasAnyFieldChanged(
+        this.digitalCertificateAdapter,
+        letEncryptBase,
+        payload,
+        keysToCheck
+      )
+
+      const hostnames = [payload.letEncrypt.commonName, ...payload.letEncrypt.alternativeNames]
+      const skipRecreation = this.#shouldSkipLetsEncryptRecreation({
+        changed,
+        subjctName: payload.subjctName,
+        hostnames
+      })
+
+      if (skipRecreation) {
+        return
+      }
+      shouldCreate = changed
+    }
+
+    if (!shouldCreate) {
+      return
+    }
+
+    const opts = isNewCertificate ? null : payload.tls.certificate
+    const certificate = await this.digitalCertificate.createDigitalCertificateLetEncrypt(
+      payload,
+      opts
+    )
+
+    payload.tls.certificate = certificate.id
+    this._certificateId = certificate.id
+    this._objLetEncrypt =
+      this.digitalCertificateAdapter.transformCreateDigitalCertificateLetEncrypt?.(payload)
   }
 
   #updateWorkload = async (payload) => {

@@ -1,6 +1,6 @@
 <template>
   <EditFormBlock
-    :editService="workloadService.editWorkload"
+    :editService="editWorkload"
     :loadService="workloadService.loadWorkload"
     :schema="validationSchema"
     :updatedRedirect="updatedRedirect"
@@ -40,7 +40,7 @@
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { validationSchema } from './Config/validation'
+  import { buildValidationSchema } from './Config/validation'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -55,6 +55,9 @@
   defineEmits(['loaded-service-object'])
 
   const cachedWorkload = workloadService.getWorkloadFromCache(route.params.id) ?? {}
+  const validationSchema = buildValidationSchema(true)
+
+  const editWorkload = (payload) => workloadService.editWorkload(payload, true)
 
   const handleTrackEditEvent = () => {
     tracker.product.productEdited({
