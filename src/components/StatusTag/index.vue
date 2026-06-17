@@ -1,6 +1,6 @@
 <script setup>
   import { computed } from 'vue'
-  import { normalizeText } from '@/views/DeploymentVersions/helpers/deployment-status'
+  import { normalizeText } from '@/helpers/deployment-status'
 
   defineOptions({ name: 'deployment-status-tag' })
 

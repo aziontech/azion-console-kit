@@ -28,15 +28,6 @@ function createDeploymentsItem() {
   }
 }
 
-function createDeploymentVersionsItem() {
-  return {
-    label: 'Deployments Versions',
-    icon: 'ai ai-deploy-pillar',
-    to: '/deployment-versions',
-    id: 'deployment-versions'
-  }
-}
-
 function createDomainsItem() {
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   const menuOption = {
@@ -233,7 +224,6 @@ export function getMenuItens(showMarketplaceProductsItens) {
     createHomeItem(),
     createMarketplaceItem(),
     createDeploymentsItem(),
-    createDeploymentVersionsItem(),
     {
       label: 'Build',
       items: createBuildItems()

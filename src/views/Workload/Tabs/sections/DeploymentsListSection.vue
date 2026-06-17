@@ -1,8 +1,8 @@
 <script setup>
   import { ref, computed } from 'vue'
-  import GenericDataView from '@/views/DeploymentVersions/components/GenericDataView.vue'
-  import StatusTag from '@/views/Deployments/components/StatusTag.vue'
-  import CurrentBadge from '@/views/Deployments/components/CurrentBadge.vue'
+  import GenericDataView from '@/components/GenericDataView'
+  import StatusTag from '@/components/StatusTag'
+  import CurrentBadge from '@/components/CurrentBadge'
   import Dropdown from '@aziontech/webkit/dropdown'
 
   defineOptions({ name: 'deployments-list-section' })
