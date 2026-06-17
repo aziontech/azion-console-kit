@@ -8,8 +8,8 @@
   import {
     resourcePackTypeMeta,
     getResourcePackRows
-  } from '@/views/DeploymentVersions/helpers/deployment-status'
-  import CurrentBadge from '@/views/DeploymentVersions/components/CurrentBadge.vue'
+  } from '@/helpers/deployment-status'
+  import CurrentBadge from '@/components/CurrentBadge'
   import { getWorkloadEnvironmentsService } from '@/services/v2/workload/workload-versions-mock'
   import { clipboardWrite } from '@/helpers/clipboard'
 

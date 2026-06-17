@@ -9,7 +9,7 @@
 
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import GenericDataView from '@/views/DeploymentVersions/components/GenericDataView.vue'
+  import GenericDataView from '@/components/GenericDataView'
   import { DataTableActionsButtons } from '@/components/list-table'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
 

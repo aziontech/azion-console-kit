@@ -11,7 +11,7 @@ export const getDeploymentVersionPolicyValue = (deploymentVersionPolicy) => {
 
   const normalized = value.trim().toLowerCase()
 
-  if (normalized === 'versioned_url' || normalized === 'versioned_urls') {
+  if (normalized === 'versioned_urls' || normalized === 'versioned_urls') {
     return 'versioned_urls'
   }
 

@@ -3,16 +3,16 @@
   import Menu from '@aziontech/webkit/menu'
   import { useToast } from '@aziontech/webkit/use-toast'
   import Tag from '@aziontech/webkit/prime-tag'
-  import GenericDataView from '@/views/DeploymentVersions/components/GenericDataView.vue'
-  import ResourcePackCell from '@/views/DeploymentVersions/components/ResourcePackCell.vue'
-  import StatusTag from '@/views/DeploymentVersions/components/StatusTag.vue'
-  import EnvironmentTag from '@/views/DeploymentVersions/components/EnvironmentTag.vue'
-  import CurrentBadge from '@/views/DeploymentVersions/components/CurrentBadge.vue'
+  import GenericDataView from '@/components/GenericDataView'
+  import ResourcePackCell from '@/components/ResourcePackCell'
+  import StatusTag from '@/components/StatusTag'
+  import EnvironmentTag from '@/components/EnvironmentTag'
+  import CurrentBadge from '@/components/CurrentBadge'
   import {
     getDeploymentStatus,
     getResourcePackDisplay,
     normalizeText
-  } from '@/views/DeploymentVersions/helpers/deployment-status'
+  } from '@/helpers/deployment-status'
   import { listWorkloadVersionsService } from '@/services/v2/workload/workload-versions-mock'
 
   defineOptions({ name: 'workload-version-history-section' })

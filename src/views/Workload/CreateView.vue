@@ -100,7 +100,6 @@
     infrastructure: '1',
     firewall: null,
     tls: {
-      certificate: 0,
       ciphers: 7,
       minimumVersion: 'tls_1_3'
     },
@@ -119,13 +118,10 @@
       certificate: null,
       crl: []
     },
-    domains: [
-      {
-        subdomain: '',
-        domain: '',
-        environment: null
-      }
-    ],
-    workloadHostnameAllowAccess: true
+    domains: [],
+    useCustomDomain: false,
+    customDomain: '',
+    workloadHostnameAllowAccess: true,
+    environmentDeployments: {}
   }
 </script>

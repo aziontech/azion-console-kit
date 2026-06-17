@@ -119,6 +119,10 @@
     overflowMenuAriaLabel: {
       type: String,
       default: 'More actions'
+    },
+    showHeader: {
+      type: Boolean,
+      default: true
     }
   })
 
@@ -366,6 +370,7 @@
       ]"
     >
       <div
+        v-if="showHeader"
         class="deployment-header hidden items-center gap-3 border-b border-[var(--surface-border)] px-4 py-3 text-[14px] font-normal leading-6 tracking-[0.0625rem] text-[var(--text-color-secondary)] lg:flex"
       >
         <span

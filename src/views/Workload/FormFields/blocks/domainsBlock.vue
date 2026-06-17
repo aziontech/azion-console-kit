@@ -1,20 +1,19 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import FieldText from '@aziontech/webkit/field-text'
   import InputText from '@aziontech/webkit/inputtext'
   import LabelBlock from '@aziontech/webkit/label'
-  import FieldDropdown from '@aziontech/webkit/field-dropdown'
-  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
-  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  import FieldInputGroup from '@aziontech/webkit/field-input-group'
   import CopyBlock from '@aziontech/webkit/button-copy'
-  import PrimeTag from '@aziontech/webkit/tag'
-
   import PrimeButton from '@aziontech/webkit/button'
+  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import CollapsibleCard from '@/components/CollapsibleCard'
+  import DomainRow from '../components/DomainRow.vue'
+  import DomainDrawer from '../components/DomainDrawer.vue'
   import { useFieldArray, useField } from 'vee-validate'
-  import { ref, watch, computed } from 'vue'
+  import { ref, computed, onMounted, watch } from 'vue'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import { environmentService } from '@/services/v2/environment/environment-service'
+  import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 
   const props = defineProps({
     isDrawer: {
@@ -32,147 +31,241 @@
   })
 
   const { errorMessage: domainsErrorMessage, value: domains } = useField('domains')
-  const { fields: domainsList, push: pushDomain, remove } = useFieldArray('domains')
+  const { push: pushDomain, remove, update: updateDomain } = useFieldArray('domains')
   const { value: workloadHostname } = useField('workloadHostname')
-  const { value: useCustomDomain } = useField('useCustomDomain')
-  // eslint-disable-next-line no-unused-vars
-  const { value: customDomain, errorMessage: customDomainErrorMessage } = useField('customDomain')
-  const { value: tls } = useField('tls')
+  const { value: workloadName } = useField('name')
+  const { value: useCustomDomain, setValue: setUseCustomDomain } = useField('useCustomDomain')
+  const { value: customDomain, setValue: setCustomDomain } = useField('customDomain')
+  const { value: workloadHostnameAllowAccess, setValue: setWorkloadHostnameAllowAccess } = useField(
+    'workloadHostnameAllowAccess'
+  )
+  const { value: useHttps } = useField('protocols.http.useHttps')
 
-  const { setValue: setCommonName } = useField('letEncrypt.commonName')
-  const { setValue: setAlternativeNames } = useField('letEncrypt.alternativeNames')
   const domainsOptions = ref([])
-  const environmentPolicies = ref({})
+  const certificateOptions = ref([])
+  const certificateLoading = ref(true)
+  const environmentMap = ref({})
 
-  const addNewDomain = () => {
-    pushDomain({
-      subdomain: '',
-      domain: '',
-      environment: null
-    })
-  }
+  const drawerVisible = ref(false)
+  const drawerMode = ref('create')
+  const editingIndex = ref(null)
+  const drawerInitialData = ref(null)
+  const firstDomainTouched = ref(false)
 
-  const listEnvironmentsDecorator = async (queryParams) => {
-    const response = await environmentService.listEnvironmentsServiceDropdown({
-      ...queryParams,
-      fields: ['id', 'name', 'deployment_version_policy']
-    })
-
-    response.body.forEach((env) => {
-      if (env?.id != null) {
-        environmentPolicies.value[env.id] = env.deployment_version_policy
-      }
-    })
-
-    return response
-  }
-
-  const ensureEnvironmentPolicy = async (envId) => {
-    if (!envId || environmentPolicies.value[envId]) return
+  const ensureEnvironmentInfo = async (envId) => {
+    if (!envId || environmentMap.value[envId]) return
     try {
       const env = await environmentService.loadEnvironmentService({ id: envId })
       if (env?.id != null) {
-        environmentPolicies.value[env.id] = env.deployment_version_policy
+        environmentMap.value[env.id] = {
+          name: env.name,
+          deployment_version_policy: env.deployment_version_policy
+        }
       }
     } catch {
-      // intentionally swallowed: policy tag is non-blocking UX
+      // intentionally swallowed: env label is non-blocking UX
     }
   }
 
-  const onEnvironmentSelected = (index, value) => {
-    const envId = value?.value ?? value
-    ensureEnvironmentPolicy(envId)
+  const environmentName = (envId) => environmentMap.value[envId]?.name ?? ''
+
+  const isUrlVersionedEnv = (envId) => {
+    return environmentMap.value[envId]?.deployment_version_policy === 'versioned_urls'
   }
 
-  const policyTag = (envId) => {
-    const policy = environmentPolicies.value[envId]
-    if (!policy) return null
-    if (policy === 'single_version') {
-      return { value: 'Single Version', severity: 'info', icon: 'pi pi-lock' }
-    }
-    return { value: 'Versioned URLs', severity: 'warn', icon: 'pi pi-sitemap' }
-  }
-
-  const removeDomain = (domainId) => {
-    if (domainsList.value.length > 1) {
-      remove(domainId)
-    }
-    handleLetEncrypt()
+  const buildAzionDomain = (name) => {
+    const sanitized = (name ?? '').replace(/\s+/g, '')
+    return sanitized ? `${sanitized}.azion.app` : ''
   }
 
   const sugestionDomains = async () => {
-    const domains = await edgeDNSService.listEdgeDNSService({
+    const domainsRes = await edgeDNSService.listEdgeDNSService({
       fields: ['id', 'domain'],
       active: 'True' //To-Do: replace with true (boolean type) once API is fixed
     })
-    domainsOptions.value = domains.body.map((domain) => {
-      return {
-        label: domain.domain.content,
-        value: domain.id
+    domainsOptions.value = domainsRes.body.map((domain) => ({
+      label: domain.domain.content,
+      value: domain.id
+    }))
+  }
+
+  const fetchCertificates = async () => {
+    certificateLoading.value = true
+    try {
+      const response = await digitalCertificatesService.listDigitalCertificatesDropdown({
+        type: 'edge_certificate',
+        fields: ['id,name,status,authority,type,subject_name'],
+        pageSize: 100,
+        page: 1,
+        ordering: 'name'
+      })
+
+      certificateOptions.value = response.body.flatMap((group) =>
+        (group.items || []).map((item) => ({
+          label: item.name,
+          value: item.id,
+          authority: item.authority,
+          status: item.status,
+          subjectName: item.subjectName,
+          icon: item.icon,
+          group: group.label
+        }))
+      )
+    } finally {
+      certificateLoading.value = false
+    }
+  }
+
+  const certificateLabel = (id) => {
+    if (!id || id === 0) return ''
+    const found = certificateOptions.value.find((option) => option.value === id)
+    if (found) return found.label
+    if (id === 1) return "Let's Encrypt (new)"
+    if (id === 2) return "Let's Encrypt (reuse)"
+    return `#${id}`
+  }
+
+  const domainList = computed(() => (Array.isArray(domains.value) ? domains.value : []))
+  const hasMultipleDomains = computed(() => domainList.value.length > 1)
+
+  const hasSingleVersionEnv = computed(() =>
+    domainList.value.some(
+      (item) =>
+        item?.environment &&
+        environmentMap.value[item.environment]?.deployment_version_policy === 'single_version'
+    )
+  )
+
+  watch(hasSingleVersionEnv, (eligible) => {
+    if (!eligible && workloadHostnameAllowAccess.value) {
+      setWorkloadHostnameAllowAccess(false)
+    }
+  })
+
+  const openCreateDrawer = () => {
+    drawerMode.value = 'create'
+    editingIndex.value = null
+    drawerInitialData.value = {
+      subdomain: '',
+      domain: '',
+      environment: null,
+      useCustomDomain: useCustomDomain.value ?? false,
+      customDomain: customDomain.value ?? '',
+      certificate: 0
+    }
+    drawerVisible.value = true
+  }
+
+  const openEditDrawer = (index) => {
+    drawerMode.value = 'edit'
+    editingIndex.value = index
+    const item = domains.value[index] || {}
+    drawerInitialData.value = {
+      subdomain: item.subdomain ?? '',
+      domain: item.domain ?? '',
+      environment: item.environment ?? null,
+      useCustomDomain: useCustomDomain.value ?? false,
+      customDomain: customDomain.value ?? '',
+      certificate: item.certificate ?? 0
+    }
+    drawerVisible.value = true
+  }
+
+  const handleDrawerSave = (payload) => {
+    setUseCustomDomain(payload.useCustomDomain)
+    setCustomDomain(payload.customDomain ?? '')
+
+    const domainPayload = {
+      subdomain: payload.subdomain ?? '',
+      domain: payload.domain ?? '',
+      environment: payload.environment ?? null,
+      certificate: payload.certificate ?? 0
+    }
+
+    if (drawerMode.value === 'edit' && editingIndex.value !== null) {
+      const current = domains.value[editingIndex.value] || {}
+      updateDomain(editingIndex.value, { ...current, ...domainPayload })
+      if (editingIndex.value === 0) firstDomainTouched.value = true
+    } else {
+      pushDomain(domainPayload)
+    }
+
+    ensureEnvironmentInfo(domainPayload.environment)
+  }
+
+  const removeDomain = (index) => {
+    if ((domains.value?.length || 0) <= 1) return
+    remove(index)
+  }
+
+  const seedInitialDomain = async () => {
+    if (props.isEdit) return
+    if (
+      (domains.value?.length || 0) > 0 &&
+      domains.value.some((item) => item.domain || item.environment)
+    ) {
+      return
+    }
+
+    try {
+      const { body } = await environmentService.listEnvironmentsService()
+      const production = body?.find((env) => env.name === 'Production')
+
+      if (production?.id != null) {
+        environmentMap.value[production.id] = {
+          name: production.name,
+          deployment_version_policy: production.deployment_version_policy
+        }
       }
-    })
-  }
 
-  const updateDomainSubdomain = (domainId, value) => {
-    const domain = domainsList.value[domainId]
-    if (domain) {
-      domain.subdomain = value
-    }
-  }
-
-  const updateDomainType = (index, value) => {
-    const domain = domainsList.value[index]
-    if (domain) {
-      domain.domain = value
-    }
-  }
-
-  const hasMultipleDomains = computed(() => domainsList.value.length !== 1)
-
-  const checkHasDomain = () => {
-    let hasDomain = false
-    domains.value.forEach((domain) => {
-      if (domain.domain) {
-        hasDomain = true
+      const seed = {
+        subdomain: '',
+        domain: buildAzionDomain(workloadName.value),
+        environment: production?.id ?? null,
+        certificate: 0
       }
-    })
 
-    if (hasDomain && tls.value.certificate === 0) {
-      tls.value.certificate = 1
+      if ((domains.value?.length || 0) === 0) {
+        pushDomain(seed)
+      } else {
+        const current = domains.value[0] || {}
+        updateDomain(0, { ...current, ...seed })
+      }
+    } catch {
+      // intentionally swallowed: seeding is non-blocking
     }
   }
-  const handleLetEncrypt = () => {
+
+  watch(workloadName, (newName) => {
+    if (props.isEdit) return
+    if (firstDomainTouched.value) return
     if (!domains.value?.length) return
 
-    const [first, ...rest] = domains.value
-
-    const commonName = `${first.subdomain ? `${first.subdomain}.` : ''}${first.domain}`
-    const alternativeNames = rest
-      .map(({ subdomain, domain }) => `${subdomain ? `${subdomain}.` : ''}${domain}`)
-      .filter((name) => name.trim() !== '.')
-
-    alternativeNames.filter((name) => name !== '')
-    setAlternativeNames(alternativeNames)
-    setCommonName(commonName)
-    checkHasDomain()
-  }
-
-  sugestionDomains()
+    const current = domains.value[0] || {}
+    updateDomain(0, { ...current, domain: buildAzionDomain(newName) })
+  })
 
   watch(
-    domainsList,
+    domains,
     async (rows) => {
       if (!Array.isArray(rows)) return
       for (const row of rows) {
-        const envId = row?.value?.environment ?? row?.environment ?? null
+        const envId = row?.environment ?? null
         if (envId) {
-          await ensureEnvironmentPolicy(envId)
+          await ensureEnvironmentInfo(envId)
         }
       }
     },
-    { immediate: true, deep: false }
+    { immediate: true, deep: true }
   )
+
+  onMounted(() => {
+    sugestionDomains()
+    fetchCertificates()
+    seedInitialDomain()
+  })
 </script>
+
 <template>
   <form-horizontal
     title="Domains"
@@ -205,205 +298,90 @@
         </div>
         <copyBlock :value="workloadHostname" />
       </div>
-      <div class="flex flex-col gap-3">
-        <div class="flex flex-col gap-2 max-sm:gap-6">
-          <div class="flex max-w-3xl gap-2 w-full max-sm:hidden">
-            <div class="flex flex-1">
-              <LabelBlock label="Subdomain" />
-            </div>
-            <div class="flex flex-1">
-              <LabelBlock
-                label="Domain"
-                name="domains"
-              />
-            </div>
-            <div class="flex flex-1">
-              <LabelBlock label="Environment" />
-            </div>
-          </div>
-          <div
-            v-for="(domain, index) in domains"
-            :key="index"
-            class="flex flex-col gap-2"
-          >
-            <div
-              class="flex gap-4 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3 items-start"
-            >
-              <div class="flex flex-col sm:flex-row sm:max-w-3xl w-full gap-2">
-                <div class="flex flex-col w-full gap-2 sm:flex-1">
-                  <LabelBlock
-                    class="sm:hidden"
-                    label="Subdomain"
-                  />
-                  <FieldText
-                    :name="`domains[${index}].subdomain`"
-                    :class="{ 'p-invalid': domainsErrorMessage }"
-                    :value="domain.subdomain"
-                    @blur="handleLetEncrypt"
-                    @input="updateDomainSubdomain(index, $event)"
-                    data-testid="domains-form__subdomain-field"
-                  />
-                </div>
 
-                <div class="flex flex-col w-full gap-2 sm:flex-1">
-                  <LabelBlock
-                    class="sm:hidden"
-                    label="Domain"
-                  />
-                  <FieldDropdown
-                    editable
-                    :focusOnHover="false"
-                    :name="`domains[${index}].domain`"
-                    :options="domainsOptions"
-                    optionLabel="label"
-                    optionValue="label"
-                    placeholder="example.net"
-                    emptyMessage="No domains available"
-                    :value="domain.domain"
-                    @blur="handleLetEncrypt"
-                    :class="{ 'p-invalid': domainsErrorMessage }"
-                    @change="updateDomainType(index, $event.value)"
-                    data-testid="domains-form__domain-dropdown"
-                  />
-                </div>
-
-                <div class="flex flex-col w-full gap-2 sm:flex-1">
-                  <LabelBlock
-                    class="sm:hidden"
-                    label="Environment"
-                  />
-                  <FieldDropdownLazyLoader
-                    :name="`domains[${index}].environment`"
-                    :service="listEnvironmentsDecorator"
-                    :loadService="environmentService.loadEnvironmentService"
-                    optionLabel="name"
-                    optionValue="value"
-                    :value="domain.environment"
-                    appendTo="self"
-                    placeholder="Select an environment"
-                    @change="onEnvironmentSelected(index, $event)"
-                    :data-testid="`domains-form__environment-dropdown-${index}`"
-                  />
-                </div>
-              </div>
-
-              <PrimeButton
-                v-if="hasMultipleDomains"
-                @click="removeDomain(index)"
-                icon="pi pi-trash"
-                class="p-button-outlined p-button-sm p-button-danger"
-                data-testid="domains-form__remove-domain-button"
-                title="Remove domain"
-              />
-            </div>
-
-            <div
-              v-if="
-                policyTag(domain.environment) ||
-                (props.isEdit && !domain.environment && (domain.subdomain || domain.domain))
-              "
-              class="flex max-w-3xl w-full"
-            >
-              <PrimeTag
-                v-if="policyTag(domain.environment)"
-                v-bind="policyTag(domain.environment)"
-                class="self-start"
-              />
-              <small
-                v-if="props.isEdit && !domain.environment && (domain.subdomain || domain.domain)"
-                class="p-error text-xs font-normal leading-tight"
-              >
-                This domain has no environment. Select one to keep routing consistent.
-              </small>
-            </div>
-          </div>
-          <div class="max-w-3xl">
-            <small
-              v-if="domainsErrorMessage"
-              class="p-error text-xs font-normal leading-tight"
-            >
-              {{ domainsErrorMessage }}
-            </small>
-          </div>
-          <div class="flex max-w-3xl gap-2 w-full max-sm:hidden">
-            <div class="flex flex-1">
-              <small class="text-xs text-color-secondary font-normal leading-5">
-                (e.g., www, app, leave blank for root)
-              </small>
-            </div>
-            <div class="flex flex-1">
-              <small class="text-xs text-color-secondary font-normal leading-5">
-                Type your domain or select from Edge DNS.
-              </small>
-            </div>
-            <div class="flex flex-1">
-              <small class="text-xs text-color-secondary font-normal leading-5">
-                The environment routing this domain.
-              </small>
-            </div>
-          </div>
-        </div>
-        <div class="flex mt-1">
-          <PrimeButton
-            @click="addNewDomain"
-            label="Add Domain"
-            icon="pi pi-plus-circle"
-            outlined
-            size="small"
-            data-testid="domains-form__add-domain-button"
-            title="Add Domain"
-          />
-        </div>
-      </div>
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
-        <FieldSwitchBlock
-          data-testid="domains-form__custom-domain-field"
-          nameField="useCustomDomain"
-          name="useCustomDomain"
-          :disabled="disabledCustomDomain"
-          auto
-          :isCard="false"
-          title="Custom Domain"
-          subtitle="You can use an free azion.app domain."
-        />
-        <div
-          v-if="useCustomDomain"
-          class="flex sm:max-w-lg w-full gap-2 flex-col sm:flex-row"
-          :class="{ 'items-center': customDomainErrorMessage }"
+      <div class="flex flex-col gap-3 max-w-3xl w-full">
+        <CollapsibleCard
+          title="Domain"
+          :count="domainList.length"
+          :defaultExpanded="true"
+          dataTestid="domains-form__card"
         >
-          <div class="flex flex-col sm:max-w-lg w-full gap-2">
-            <FieldInputGroup
-              placeholder="my-custom-name"
-              label="Azion Custom Domain"
-              required
-              :value="customDomain"
-              name="customDomain"
-              data-testid="workload-custom-domain-field"
+          <template
+            v-for="(domain, index) in domainList"
+            :key="index"
+          >
+            <DomainRow
+              :domain="domain.domain"
+              :subdomain="domain.subdomain"
+              :environmentLabel="environmentName(domain.environment)"
+              :certificateLabel="certificateLabel(domain.certificate)"
+              :isUrlVersioned="isUrlVersionedEnv(domain.environment)"
+              :disableRemove="!hasMultipleDomains"
+              :dataTestid="`domains-form__row-${index}`"
+              @edit="openEditDrawer(index)"
+              @remove="removeDomain(index)"
+            />
+            <small
+              v-if="props.isEdit && !domain.environment && (domain.subdomain || domain.domain)"
+              class="p-error text-xs font-normal leading-tight px-4 pb-2"
             >
-              <template #button>
-                <PrimeButton
-                  label=".azion.app"
-                  size="small"
-                  class="rounded-md rounded-l-none select-none focus:outline-none focus:ring-0"
-                  outlined
-                />
-              </template>
-            </FieldInputGroup>
-          </div>
-        </div>
+              This domain has no environment. Select one to keep routing consistent.
+            </small>
+          </template>
+
+          <template #footer>
+            <PrimeButton
+              label="Add new Domain"
+              icon="pi pi-plus"
+              size="small"
+              outlined
+              data-testid="domains-form__add-domain-button"
+              title="Add new Domain"
+              @click="openCreateDrawer"
+            />
+          </template>
+        </CollapsibleCard>
+
+        <small
+          v-if="domainsErrorMessage"
+          class="p-error text-xs font-normal leading-tight"
+        >
+          {{ domainsErrorMessage }}
+        </small>
       </div>
 
-      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+      <div class="flex flex-col gap-2 max-w-3xl w-full">
         <FieldSwitchBlock
-          data-testid="domains-form__workload-domain-allow-access-field"
-          nameField="workloadHostnameAllowAccess"
           name="workloadHostnameAllowAccess"
+          nameField="workloadHostnameAllowAccess"
           auto
           :isCard="false"
+          :disabled="!hasSingleVersionEnv"
           title="Workload Domain Allow Access"
-          subtitle="Allow direct access to the default Workload domain generated after Workload creation (e.g id.map.azionedge.net)."
+          subtitle="Allow direct access to the default workload domain generated after workload creation (*.map.azionedge.net)."
+          data-testid="domains-form__workload-allow-access-field"
         />
+        <InlineMessage
+          v-if="!hasSingleVersionEnv"
+          severity="info"
+          data-testid="domains-form__workload-allow-access-disabled-warning"
+        >
+          This option is only available when at least one domain uses an environment with the Single
+          Version policy (typically Production). Add or select such an environment to enable it.
+        </InlineMessage>
       </div>
+
+      <DomainDrawer
+        v-model:visible="drawerVisible"
+        :mode="drawerMode"
+        :initialData="drawerInitialData"
+        :domainsOptions="domainsOptions"
+        :certificateOptions="certificateOptions"
+        :certificateLoading="certificateLoading"
+        :useHttps="!!useHttps"
+        @save="handleDrawerSave"
+        @certificateCreated="fetchCertificates"
+      />
     </template>
   </form-horizontal>
 </template>

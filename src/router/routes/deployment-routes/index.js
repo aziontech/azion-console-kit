@@ -7,8 +7,12 @@ export const deploymentRoutes = {
   children: [
     {
       path: '',
+      redirect: { name: 'deployments-list', params: { tab: 'overview' } }
+    },
+    {
+      path: ':tab(overview|history)',
       name: 'deployments-list',
-      component: () => import('@views/Deployments/ListView.vue'),
+      component: () => import('@views/Deployments/TabsView.vue'),
       meta: {
         title: 'Deployments',
         breadCrumbs: [

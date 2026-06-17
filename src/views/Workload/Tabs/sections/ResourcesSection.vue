@@ -1,6 +1,6 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
-  import { resourcePackTypeMeta } from '@/views/DeploymentVersions/helpers/deployment-status'
+  import { resourcePackTypeMeta } from '@/helpers/deployment-status'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import { customPageService } from '@/services/v2/custom-page/custom-page-service'

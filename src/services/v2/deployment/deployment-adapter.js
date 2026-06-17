@@ -35,23 +35,44 @@ export const mapStateToStatus = (state) => {
   return STATE_TO_STATUS[key] || { content: String(state), severity: 'secondary' }
 }
 
-const snakeToCamel = (segment) => segment.replace(/_([a-z])/g, (match, char) => char.toUpperCase())
-
-const apiResourceTypeToUiKey = (apiType) => {
-  if (!apiType) return ''
-  const lower = String(apiType).toLowerCase()
-  const stripped = lower.startsWith('edge_') ? lower.slice(5) : lower
-  return snakeToCamel(stripped)
+const POLICY_LABELS = {
+  single_version: 'Single Version',
+  versioned_urls: 'Versioned URLs'
 }
 
-const buildResourcePack = (allowedResourceTypes) => {
-  if (!Array.isArray(allowedResourceTypes)) return {}
-  return allowedResourceTypes.reduce((acc, type) => {
-    const key = apiResourceTypeToUiKey(type)
-    if (!key) return acc
-    acc[key] = { name: type, hash: '' }
-    return acc
-  }, {})
+export const mapPolicyToLabel = (policy) => {
+  if (!policy) return ''
+  return POLICY_LABELS[policy] ?? String(policy)
+}
+
+const RESOURCE_TYPE_META = {
+  application: { label: 'Application', icon: 'ai ai-edge-application' },
+  firewall: { label: 'Firewall', icon: 'ai ai-edge-firewall' },
+  custom_page: { label: 'Custom Page', icon: 'ai ai-custom-pages' },
+  function: { label: 'Function', icon: 'ai ai-edge-functions' },
+  network_list: { label: 'Network List', icon: 'ai ai-network-list' }
+}
+
+const snakeToTitle = (value) =>
+  String(value)
+    .split('_')
+    .filter(Boolean)
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(' ')
+
+const mapResourceTypes = (allowedResourceTypes) => {
+  if (!Array.isArray(allowedResourceTypes)) return []
+  return allowedResourceTypes
+    .map((type) => {
+      if (!type) return null
+      const meta = RESOURCE_TYPE_META[type]
+      return {
+        type,
+        label: meta?.label ?? snakeToTitle(type),
+        icon: meta?.icon ?? 'pi pi-box'
+      }
+    })
+    .filter(Boolean)
 }
 
 const normalizeCanary = (canary) => {
@@ -82,7 +103,8 @@ const normalizeAuditActor = (actor) => {
   if (!isObject(actor)) return null
   return {
     user_id: actor.user_id ?? null,
-    trigger: actor.trigger ?? null
+    trigger: actor.trigger ?? null,
+    email: actor.email ?? null
   }
 }
 
@@ -91,13 +113,8 @@ const normalizeDeployment = (deployment) => {
 
   return {
     id: source.id ?? null,
-    environment_id: source.environment_id ?? null,
-    environment: source.environment ?? '',
     name: source.name ?? '',
     description: source.description ?? null,
-    active: Boolean(source.active),
-    is_current: Boolean(source.is_current),
-    duration_seconds: source.duration_seconds ?? null,
     binding_policy: source.binding_policy ?? null,
     deployment_version_policy: source.deployment_version_policy ?? null,
     allowed_resource_types: toStringArray(source.allowed_resource_types),
@@ -112,33 +129,23 @@ const normalizeDeployment = (deployment) => {
   }
 }
 
-const formatDuration = (durationSeconds) => {
-  if (durationSeconds == null) return ''
-  const total = Number(durationSeconds)
-  if (!Number.isFinite(total) || total < 0) return ''
-  if (total < 60) return `${Math.round(total)}s`
-  const minutes = Math.floor(total / 60)
-  const seconds = Math.round(total % 60)
-  return seconds ? `${minutes}m ${seconds}s` : `${minutes}m`
-}
-
 export const DeploymentAdapter = {
   transformList(data) {
     if (!Array.isArray(data)) return []
     return data.map((item) => {
       const normalized = normalizeDeployment(item)
+      const lastEditor =
+        normalized.last_modified_by?.email || normalized.last_modified_by?.user_id || ''
       return {
         ...normalized,
         status: mapStateToStatus(normalized.state),
-        resourcePack: buildResourcePack(normalized.allowed_resource_types),
-        lastEditor: normalized.last_modified_by?.user_id ?? '',
+        policy: normalized.deployment_version_policy,
+        policyLabel: mapPolicyToLabel(normalized.deployment_version_policy),
+        resourceTypes: mapResourceTypes(normalized.allowed_resource_types),
+        lastEditor,
         lastModified: normalized.updated_at
           ? formatDateToDayMonthYearHour(normalized.updated_at)
-          : '-',
-        duration: formatDuration(normalized.duration_seconds),
-        hash: '',
-        environment: normalized.environment ?? '',
-        isCurrent: Boolean(normalized.is_current)
+          : '-'
       }
     })
   },
