@@ -13,7 +13,7 @@ const subdomainSchema = yup
     if (dotCount > 10) return false
     const segments = value.split('.')
     return segments.every((segment) =>
-      /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
+      /^[a-zA-Z0-9]$|^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$/.test(segment)
     )
   })
   .label('Subdomain')
@@ -36,7 +36,7 @@ const domainSchema = yup
     }
 
     return segments.every((segment) =>
-      /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
+      /^[a-zA-Z0-9]$|^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$/.test(segment)
     )
   })
   .label('Domain')
@@ -219,7 +219,7 @@ const legacyExtras = {
           .required()
           .test('valid-custom-domain', 'Invalid custom domain format', function (value) {
             if (!value) return true // Allow empty hostname
-            return /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(value)
+            return /^[a-zA-Z0-9]$|^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$/.test(value)
           })
     })
     .label('Custom Domain'),

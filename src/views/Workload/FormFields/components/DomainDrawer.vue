@@ -97,7 +97,7 @@
         const segments = value.split('.')
         if (segments.length > 11) return false
         return segments.every((segment) =>
-          /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test(segment)
+          /^[a-zA-Z0-9]$|^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$/.test(segment)
         )
       })
       .label('Domain'),
