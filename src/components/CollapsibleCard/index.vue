@@ -24,6 +24,10 @@
     dataTestid: {
       type: String,
       default: 'collapsible-card'
+    },
+    disableToggle: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -49,6 +53,7 @@
   )
 
   const toggle = () => {
+    if (props.disableToggle) return
     isExpanded.value = !isExpanded.value
     emit('toggle', isExpanded.value)
   }
@@ -56,30 +61,47 @@
 
 <template>
   <div
-    class="border surface-border rounded-md p-[2px] surface-section"
+    class="border surface-border rounded-md surface-section"
     :data-testid="dataTestid"
   >
     <button
       type="button"
-      class="flex items-center gap-2 h-10 px-4 w-full rounded surface-ground border surface-border"
+      class="flex items-center gap-2 px-6 py-4 w-full rounded surface-ground surface-border"
+      :class="{ 'cursor-default pointer-events-none': disableToggle }"
+      :tabindex="disableToggle ? -1 : undefined"
       @click="toggle"
-      :aria-expanded="isExpanded"
+      :aria-expanded="disableToggle ? undefined : isExpanded"
       :data-testid="`${dataTestid}__toggle`"
     >
-      <span class="text-xs text-color-secondary flex-1 text-left">{{ title }}</span>
-      <PrimeBadge
-        v-if="count !== null && count !== undefined"
-        :value="String(count)"
-        severity="secondary"
-      />
-      <slot name="header-extra" />
+      <template v-if="slots.header">
+        <slot name="header" />
+      </template>
+      <template v-else>
+        <div class="flex items-center gap-2 flex-1">
+          <span class="text-xs text-color-secondary flex-1 text-left">{{ title }}</span>
+          <PrimeBadge
+            v-if="count !== null && count !== undefined"
+            :value="String(count)"
+            severity="secondary"
+          />
+          <slot name="header-extra" />
+        </div>
+      </template>
+      <span
+        v-if="slots['header-actions']"
+        class="pointer-events-auto inline-flex items-center"
+      >
+        <slot name="header-actions" />
+      </span>
       <i
+        v-if="!disableToggle"
         class="pi pi-chevron-down text-xs transition-transform"
         :class="{ 'rotate-180': !isExpanded }"
       />
     </button>
 
     <div
+      v-if="!disableToggle"
       class="collapsible-panel"
       :class="{ 'is-expanded': isExpanded }"
       :aria-hidden="!isExpanded"
