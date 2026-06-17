@@ -4,7 +4,7 @@
 
 Autenticação: `TokenAuth` (header `Authorization: Token <token>`) ou `BearerAuth` (`Authorization: Bearer <token>`).
 
-Base path: `/edge_connector/api`
+Base path: `/v4`
 
 Tipos de connector suportados (campo `type`):
 - `http` - origem HTTP/HTTPS
@@ -36,7 +36,7 @@ Tipos de connector suportados (campo `type`):
 
 ## Connectors
 
-### `GET /edge_connector/api/connectors`
+### `GET /v4/workspace/connectors`
 
 - **operationId**: `list_connectors`
 - **Summary**: List Connectors
@@ -64,7 +64,7 @@ Tipos de connector suportados (campo `type`):
 ```json
 {
   "count": 2,
-  "next": "https://api.azion.com/edge_connector/api/connectors?page=2",
+  "next": "https://api.azion.com/v4/workspace/connectors?page=2",
   "previous": null,
   "results": [
     {
@@ -76,8 +76,7 @@ Tipos de connector suportados (campo `type`):
       "active": true,
       "product_version": "1.0",
       "type": "http",
-      "is_versioned": true,
-      "version_state": "ready",
+      "state": "ready",
       "version_id": "v_01HZK4M9QF3T2X",
       "attributes": {
         "addresses": [
@@ -118,8 +117,7 @@ Tipos de connector suportados (campo `type`):
       "active": true,
       "product_version": "1.0",
       "type": "storage",
-      "is_versioned": true,
-      "version_state": "ready",
+      "state": "ready",
       "version_id": "v_01HZQ8N2RA4PWB",
       "attributes": {
         "bucket": "static-assets-prod",
@@ -132,7 +130,7 @@ Tipos de connector suportados (campo `type`):
 
 ---
 
-### `POST /edge_connector/api/connectors`
+### `POST /v4/workspace/connectors`
 
 - **operationId**: `create_connector`
 - **Summary**: Create a Connector
@@ -215,8 +213,7 @@ Exemplo para `type: live_ingest`:
     "active": true,
     "product_version": "1.0",
     "type": "http",
-    "is_versioned": true,
-    "version_state": "draft",
+    "state": "draft",
     "version_id": "v_01J0AB7XF5N9QK",
     "attributes": {
       "addresses": [
@@ -250,7 +247,7 @@ Exemplo para `type: live_ingest`:
 
 ---
 
-### `GET /edge_connector/api/connectors/{connector_id}`
+### `GET /v4/workspace/connectors/{connector_id}`
 
 - **operationId**: `retrieve_connector`
 - **Summary**: Retrieve details of a Connector
@@ -282,8 +279,7 @@ Exemplo para `type: live_ingest`:
     "active": true,
     "product_version": "1.0",
     "type": "http",
-    "is_versioned": true,
-    "version_state": "ready",
+    "state": "ready",
     "version_id": "v_01HZK4M9QF3T2X",
     "attributes": {
       "addresses": [
@@ -317,7 +313,7 @@ Exemplo para `type: live_ingest`:
 
 ---
 
-### `PUT /edge_connector/api/connectors/{connector_id}`
+### `PUT /v4/workspace/connectors/{connector_id}`
 
 - **operationId**: `update_connector`
 - **Summary**: Update a Connector
@@ -375,8 +371,7 @@ Exemplo para `type: live_ingest`:
     "active": true,
     "product_version": "1.0",
     "type": "http",
-    "is_versioned": true,
-    "version_state": "draft",
+    "state": "draft",
     "version_id": "v_01J0AB7XF5N9QK",
     "attributes": {
       "addresses": [
@@ -410,7 +405,7 @@ Exemplo para `type: live_ingest`:
 
 ---
 
-### `PATCH /edge_connector/api/connectors/{connector_id}`
+### `PATCH /v4/workspace/connectors/{connector_id}`
 
 - **operationId**: `partial_update_connector`
 - **Summary**: Partially update a Connector
@@ -445,8 +440,7 @@ Exemplo para `type: live_ingest`:
     "active": false,
     "product_version": "1.0",
     "type": "http",
-    "is_versioned": true,
-    "version_state": "draft",
+    "state": "draft",
     "version_id": "v_01J0AB7XF5N9QK",
     "attributes": {
       "addresses": [
@@ -480,7 +474,7 @@ Exemplo para `type: live_ingest`:
 
 ---
 
-### `DELETE /edge_connector/api/connectors/{connector_id}`
+### `DELETE /v4/workspace/connectors/{connector_id}`
 
 - **operationId**: `delete_connector`
 - **Summary**: Delete a Connector
@@ -506,7 +500,7 @@ Exemplo para `type: live_ingest`:
 
 Cada Connector pode possuir múltiplas versões. Versões fluem por estados como `draft`, `building`, `ready`, `archived`. Ações específicas (`build`, `cancel`, `archive`) controlam transições. Identificadores de versão são strings (ex.: `v_01J0AB7XF5N9QK`).
 
-### `GET /edge_connector/api/connectors/{connector_id}/versions`
+### `GET /v4/workspace/connectors/{connector_id}/versions`
 
 - **operationId**: `list_connector_versions`
 - **Summary**: List Connector versions
@@ -532,7 +526,7 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
   "results": [
     {
       "version_id": "v_01HZK4M9QF3T2X",
-      "version_state": "ready",
+      "state": "ready",
       "type": "http",
       "name": "origin-http-prod",
       "last_modified": "2026-05-22T14:31:09Z",
@@ -541,7 +535,7 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
     },
     {
       "version_id": "v_01J0AB7XF5N9QK",
-      "version_state": "draft",
+      "state": "draft",
       "type": "http",
       "name": "origin-http-prod",
       "last_modified": "2026-06-10T13:22:08Z",
@@ -554,7 +548,7 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
 
 ---
 
-### `POST /edge_connector/api/connectors/{connector_id}/versions`
+### `POST /v4/workspace/connectors/{connector_id}/versions`
 
 - **operationId**: `create_connector_version`
 - **Summary**: Create a new Connector version
@@ -590,7 +584,7 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
   "state": "executed",
   "data": {
     "version_id": "v_01J0AB7XF5N9QK",
-    "version_state": "draft",
+    "state": "draft",
     "type": "http",
     "name": "origin-http-prod-v2",
     "last_modified": "2026-06-10T13:40:01Z",
@@ -602,7 +596,7 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
 
 ---
 
-### `GET /edge_connector/api/connectors/{connector_id}/versions/{version_id}`
+### `GET /v4/workspace/connectors/{connector_id}/versions/{version_id}`
 
 - **operationId**: `retrieve_connector_version`
 - **Summary**: Retrieve a Connector version
@@ -628,7 +622,7 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
   "state": "executed",
   "data": {
     "version_id": "v_01J0AB7XF5N9QK",
-    "version_state": "ready",
+    "state": "ready",
     "type": "http",
     "name": "origin-http-prod-v2",
     "active": true,
@@ -664,7 +658,7 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
 
 ---
 
-### `PUT /edge_connector/api/connectors/{connector_id}/versions/{version_id}`
+### `PUT /v4/workspace/connectors/{connector_id}/versions/{version_id}`
 
 - **operationId**: `update_connector_version`
 - **Summary**: Update a Connector version
@@ -677,17 +671,26 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
 | `connector_id` | integer | ID do Connector. |
 | `version_id` | string | Identificador da versão. |
 
-**Request body** - `VersionCreateRequest`
+**Request body** - `ConnectorPolymorphicRequest` (same shape as updating the base resource)
 
 ```json
 {
-  "comment": "Ajuste de configuração antes de build",
-  "override": {
-    "active": true,
-    "attributes": {
-      "connection_options": {
-        "following_redirect": true
-      }
+  "name": "origin-http-prod-v2",
+  "type": "http",
+  "active": true,
+  "attributes": {
+    "addresses": [
+      { "active": true, "address": "origin.example.com" }
+    ],
+    "connection_options": {
+      "dns_resolution": "preserve",
+      "transport_policy": "preserve",
+      "http_version_policy": "http1_1",
+      "host": "origin.example.com",
+      "path_prefix": "",
+      "following_redirect": true,
+      "real_ip_header": "X-Real-IP",
+      "real_port_header": "X-Real-PORT"
     }
   }
 }
@@ -700,7 +703,7 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
   "state": "executed",
   "data": {
     "version_id": "v_01J0AB7XF5N9QK",
-    "version_state": "draft",
+    "state": "draft",
     "type": "http",
     "name": "origin-http-prod-v2",
     "last_modified": "2026-06-10T13:48:22Z"
@@ -710,7 +713,7 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
 
 ---
 
-### `PATCH /edge_connector/api/connectors/{connector_id}/versions/{version_id}`
+### `PATCH /v4/workspace/connectors/{connector_id}/versions/{version_id}`
 
 - **operationId**: `partial_update_connector_version`
 - **Summary**: Partially update a Connector version
@@ -723,11 +726,11 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
 | `connector_id` | integer | ID do Connector. |
 | `version_id` | string | Identificador da versão. |
 
-**Request body** - `PatchedVersionCreateRequest`
+**Request body** - `PatchedConnectorPolymorphicRequest` (any subset of resource fields)
 
 ```json
 {
-  "comment": "Apenas atualiza descrição"
+  "active": false
 }
 ```
 
@@ -738,7 +741,7 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
   "state": "executed",
   "data": {
     "version_id": "v_01J0AB7XF5N9QK",
-    "version_state": "draft",
+    "state": "draft",
     "last_modified": "2026-06-10T13:50:00Z"
   }
 }
@@ -746,7 +749,7 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
 
 ---
 
-### `DELETE /edge_connector/api/connectors/{connector_id}/versions/{version_id}`
+### `DELETE /v4/workspace/connectors/{connector_id}/versions/{version_id}`
 
 - **operationId**: `delete_connector_version`
 - **Summary**: Delete a Connector version
@@ -773,7 +776,7 @@ Cada Connector pode possuir múltiplas versões. Versões fluem por estados como
 
 Ações disparam transições de estado e tipicamente são assíncronas (status `202 Accepted`). Use `GET /versions/{version_id}` para acompanhar `version_state`.
 
-### `POST /edge_connector/api/connectors/{connector_id}/versions/{version_id}/archive`
+### `POST /v4/workspace/connectors/{connector_id}/versions/{version_id}/archive`
 
 - **operationId**: `archive_connector_version`
 - **Summary**: Archive a Connector version
@@ -804,7 +807,7 @@ Ações disparam transições de estado e tipicamente são assíncronas (status 
 
 ---
 
-### `POST /edge_connector/api/connectors/{connector_id}/versions/{version_id}/build`
+### `POST /v4/workspace/connectors/{connector_id}/versions/{version_id}/build`
 
 - **operationId**: `build_connector_version`
 - **Summary**: Build a Connector version
@@ -836,7 +839,7 @@ Ações disparam transições de estado e tipicamente são assíncronas (status 
 
 ---
 
-### `POST /edge_connector/api/connectors/{connector_id}/versions/{version_id}/cancel`
+### `POST /v4/workspace/connectors/{connector_id}/versions/{version_id}/cancel`
 
 - **operationId**: `cancel_connector_version_build`
 - **Summary**: Cancel a Connector version build

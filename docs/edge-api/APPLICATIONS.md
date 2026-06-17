@@ -87,8 +87,7 @@ List all Applications owned by your account. `operationId: list_applications`.
       "active": true,
       "debug": false,
       "product_version": "2.0",
-      "is_versioned": true,
-      "version_state": "ready",
+      "state": "ready",
       "version_id": "01HZX9P3K2A7B4C5D6E7F8G9H0"
     },
     {
@@ -105,8 +104,7 @@ List all Applications owned by your account. `operationId: list_applications`.
       "active": true,
       "debug": true,
       "product_version": "2.0",
-      "is_versioned": false,
-      "version_state": null,
+      "state": null,
       "version_id": null
     }
   ]
@@ -152,8 +150,7 @@ Create a new Application. `operationId: create_application`.
     "active": true,
     "debug": false,
     "product_version": "2.0",
-    "is_versioned": false,
-    "version_state": null,
+    "state": null,
     "version_id": null
   }
 }
@@ -780,35 +777,15 @@ Possible `state` values include `draft`, `building`, `ready`, `active`, `archive
 
 Create a new version by cloning an existing one. `operationId: create_application_version`.
 
-> **Contrato confirmado com o time de API (2026-06-12):** os campos da Application
-> (`name`, `active`, `debug`, `modules`) vão no **nível raiz** do body, ao lado de
-> `source_version` e `comment` — **não** há campo `override`. Omitir um campo mantém
-> o valor clonado da `source_version`.
-
 **Request body (`VersionCreateRequest`):**
 
-Clone puro (sem alterações):
-
 ```json
 {
-  "source_version": "A6MIAEPU"
-}
-```
-
-Clone com alterações (campos da Application no nível raiz):
-
-```json
-{
-  "source_version": "A6MIAEPU",
-  "comment": "versao com debug habilitado",
-  "name": "app-nova-versao",
-  "active": true,
-  "debug": true,
-  "modules": {
-    "cache": { "enabled": true },
-    "functions": { "enabled": true },
-    "application_accelerator": { "enabled": false },
-    "image_processor": { "enabled": false }
+  "source_version": "01HZX9P3K2A7B4C5D6E7F8G9H0",
+  "comment": "Add new redirect rule",
+  "override": {
+    "active": true,
+    "debug": false
   }
 }
 ```
@@ -823,7 +800,7 @@ If `source_version` is omitted, the latest `ready` version is cloned.
   "data": {
     "id": "01HZX9Q4L3B8C5D6E7F8G9H0J1",
     "state": "draft",
-    "comment": "versao com debug habilitado",
+    "comment": "Add new redirect rule",
     "created_at": "2026-06-10T12:34:56Z",
     "last_modified": "2026-06-10T12:34:56Z"
   }
@@ -836,24 +813,19 @@ Retrieve a specific version. `operationId: retrieve_application_version`. **Resp
 
 ### `PUT /v4/workspace/applications/{application_id}/versions/{version_id}`
 
-Update a draft version (full replace). `operationId: update_application_version`. **Body:** `VersionCreateRequest`.
-
-> Os campos da Application vão no **nível raiz** (mesmo contrato do `POST`). Como é
-> um replace completo, envie o conjunto inteiro de campos editáveis do draft.
-
-**Request body:**
+Update a draft version. `operationId: update_application_version`. **Body:** `ApplicationRequest` (same shape as updating the base resource).
 
 ```json
 {
-  "name": "app-atualizada",
-  "active": true,
-  "debug": false,
+  "name": "My Application v2",
   "modules": {
     "cache": { "enabled": true },
     "functions": { "enabled": true },
-    "application_accelerator": { "enabled": false },
+    "application_accelerator": { "enabled": true },
     "image_processor": { "enabled": false }
-  }
+  },
+  "active": true,
+  "debug": false
 }
 ```
 
@@ -861,17 +833,15 @@ Update a draft version (full replace). `operationId: update_application_version`
 
 ### `PATCH /v4/workspace/applications/{application_id}/versions/{version_id}`
 
-Partially update a draft version. `operationId: partial_update_application_version`. **Body:** `PatchedVersionCreateRequest`.
-
-> Qualquer subconjunto dos campos do nível raiz. Campos omitidos permanecem
-> inalterados.
+Partially update a draft version. `operationId: partial_update_application_version`. **Body:** `PatchedApplicationRequest` (any subset of the resource fields).
 
 ```json
-{ "debug": true }
-```
-
-```json
-{ "comment": "Updated rationale" }
+{
+  "debug": true,
+  "modules": {
+    "application_accelerator": { "enabled": true }
+  }
+}
 ```
 
 **Response 200:** envelope.
@@ -1021,5 +991,7 @@ Order body example:
 | `FunctionInstance` / `FunctionInstanceRequest` / `FunctionInstanceResponse` / `PaginatedFunctionInstanceList` / `PatchedFunctionInstanceRequest` | `functions` |
 | `RequestPhaseRule` / `RequestPhaseRuleRequest` / `RequestPhaseRuleResponse` / `PaginatedRequestPhaseRuleList` / `PatchedRequestPhaseRuleRequest` / `ApplicationRequestPhaseRuleEngineOrderRequest` | `request_rules` |
 | `ResponsePhaseRule` / `ResponsePhaseRuleRequest` / `ResponsePhaseRuleResponse` / `PaginatedResponsePhaseRuleList` / `PatchedResponsePhaseRuleRequest` / `ApplicationResponsePhaseRuleEngineOrderRequest` | `response_rules` |
-| `VersionCreateRequest` / `PatchedVersionCreateRequest` / `VersionArchiveRequest` / `VersionBuildRequest` / `VersionCancelRequest` | `versions` (and actions) |
+| `VersionCreateRequest` | `POST /versions` (create) |
+| `ApplicationRequest` / `PatchedApplicationRequest` | `PUT/PATCH /versions/{id}` (update reuses the resource serializer) |
+| `VersionArchiveRequest` / `VersionBuildRequest` / `VersionCancelRequest` | `archive` / `build` / `cancel` actions |
 | `JSONAPIErrorResponse` | All error responses |
