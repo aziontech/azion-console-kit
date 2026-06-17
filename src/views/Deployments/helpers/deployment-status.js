@@ -1,20 +1,3 @@
-export const statusIconMap = {
-  ready: 'pi pi-check-circle',
-  building: 'pi pi-spinner',
-  draft: 'pi pi-clock',
-  error: 'pi pi-times-circle',
-  canceled: 'pi pi-ban'
-}
-
-export const statusSeverityClassMap = {
-  success: 'bg-green-500/10 text-green-500',
-  warning: 'bg-yellow-500/10 text-yellow-500',
-  danger: 'bg-red-500/10 text-red-500',
-  info: 'bg-blue-500/10 text-blue-500',
-  secondary:
-    'bg-[color-mix(in_srgb,var(--text-color-secondary)_12%,transparent)] text-[var(--text-color-secondary)]'
-}
-
 export const resourcePackTypeMeta = [
   { key: 'workload', label: 'Workload', icon: 'ai ai-workloads' },
   { key: 'application', label: 'Application', icon: 'ai ai-edge-application' },
@@ -54,8 +37,7 @@ const sortKeysByPriority = (keys) => {
     const idx = RESOURCE_PACK_PRIORITY_KEYS.indexOf(key)
     return idx === -1 ? Number.POSITIVE_INFINITY : idx
   }
-  const metaIndex = (key) =>
-    resourcePackTypeMeta.findIndex((meta) => meta.key === key)
+  const metaIndex = (key) => resourcePackTypeMeta.findIndex((meta) => meta.key === key)
 
   return [...keys].sort((keyA, keyB) => {
     const priorityA = priorityIndex(keyA)
@@ -69,19 +51,6 @@ export const normalizeText = (value) =>
   String(value || '')
     .trim()
     .toLowerCase()
-
-export const getStatusIcon = (status) => {
-  const normalizedStatus = normalizeText(status)
-  const baseIcon = statusIconMap[normalizedStatus] || 'pi pi-info-circle'
-
-  return normalizedStatus === 'building' ? `${baseIcon} animate-spin` : baseIcon
-}
-
-export const getStatusClass = (deployment) => {
-  const severity = deployment?.status?.severity || 'secondary'
-
-  return statusSeverityClassMap[severity] || statusSeverityClassMap.secondary
-}
 
 export const getDeploymentStatus = (deployment) => normalizeText(deployment?.status?.content)
 

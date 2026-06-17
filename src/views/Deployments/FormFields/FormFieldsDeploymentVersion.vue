@@ -16,11 +16,10 @@
     hasResourceListing
   } from '@/views/Deployments/helpers/deployment-resource-registry'
   import {
-    getStatusIcon,
-    statusSeverityClassMap,
     resourcePackTypeMeta,
     normalizeText
   } from '@/views/Deployments/helpers/deployment-status'
+  import StatusTag from '@/views/Deployments/components/StatusTag.vue'
 
   defineOptions({ name: 'form-fields-deployment-version' })
 
@@ -216,11 +215,6 @@
 
   const allFieldsDisabled = computed(() => props.disabledFields || props.readonly)
 
-  const statusIcon = computed(() => getStatusIcon(props.status?.content))
-  const statusClass = computed(() => {
-    const severity = props.status?.severity || 'secondary'
-    return statusSeverityClassMap[severity] || statusSeverityClassMap.secondary
-  })
   const statusLabel = computed(() => props.status?.content || 'Unknown')
 
   const buildTriggerIcon = computed(() => {
@@ -473,16 +467,10 @@
             class="flex flex-col gap-2.5"
           >
             <LabelBlock label="Status" />
-            <span
-              :class="[
-                'inline-flex w-fit items-center gap-1.5 rounded px-2 py-0.5 text-xs font-medium leading-6',
-                statusClass
-              ]"
+            <StatusTag
+              :status="props.status"
               data-testid="deployment-version-form__status-badge"
-            >
-              <i :class="[statusIcon, 'text-xs']" />
-              {{ statusLabel }}
-            </span>
+            />
           </div>
         </div>
       </div>
