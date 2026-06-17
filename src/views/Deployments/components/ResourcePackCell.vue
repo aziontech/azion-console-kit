@@ -63,7 +63,7 @@
       </div>
       <div class="flex gap-2 w-full justify-start">
         <Tag
-          severity="secondary"
+          severity="info"
           :value="`+${display.overflowCount}`"
           class="cursor-default"
           tabindex="0"

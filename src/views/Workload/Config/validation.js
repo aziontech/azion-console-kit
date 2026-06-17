@@ -111,12 +111,20 @@ export const validationSchema = yup.object({
 
             return segments.every(isValidDnsLabel)
           })
-          .label('Domain')
+          .label('Domain'),
+        environment: yup
+          .string()
+          .nullable()
+          .when(['subdomain', 'domain'], {
+            is: (subdomain, domain) => !!(subdomain || domain),
+            then: (schema) => schema.required('Environment is required for this domain.'),
+            otherwise: (schema) => schema.nullable()
+          })
+          .label('Environment')
       })
     )
-    .when(['workloadHostnameAllowAccess', 'useCustomDomain'], {
-      is: (workloadHostnameAllowAccess, useCustomDomain) =>
-        workloadHostnameAllowAccess === false && useCustomDomain === false,
+    .when('workloadHostnameAllowAccess', {
+      is: false,
       then: (schema) =>
         schema.test(
           'has-filled-domain',
