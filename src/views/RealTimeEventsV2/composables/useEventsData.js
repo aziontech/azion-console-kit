@@ -321,8 +321,20 @@ export function useEventsData({
       // payload is either a { query, variables } object (from convertGQL)
       // or a JSON string — handle both.
       const parsed = typeof payload === 'string' ? JSON.parse(payload) : payload
-      if (parsed?.query)
-        graphqlStore.setQuery({ query: parsed.query, variables: parsed.variables ?? {} })
+      if (!parsed?.query) return
+      const variables = { ...(parsed.variables ?? {}) }
+      // For ranges longer than MAX_LIST_RANGE_MS the list is fetched in narrow
+      // time windows (see getWindowFilter) as an internal pagination strategy.
+      // That window leaks into the captured variables, so the GraphQL playground
+      // would reproduce a ~2h slice instead of the user-selected range (e.g.
+      // "this week"). Restore the full tsRange so the stored query matches what
+      // the user actually selected.
+      const fullRange = filterData.value?.tsRange
+      if (fullRange?.tsRangeBegin && fullRange?.tsRangeEnd && 'tsRange_begin' in variables) {
+        variables.tsRange_begin = fullRange.tsRangeBegin
+        variables.tsRange_end = fullRange.tsRangeEnd
+      }
+      graphqlStore.setQuery({ query: parsed.query, variables })
     } catch {
       /* ignore */
     }
@@ -383,9 +395,16 @@ export function useEventsData({
       loadTotalCount().catch(() => {})
       const originalBegin = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
       const originalEnd = new Date(filterData.value.tsRange.tsRangeEnd).getTime()
-      currentWindowEnd = originalEnd
+      // Calendar presets like "this week" / "today" end at the end of the
+      // current day, i.e. in the future. The list is fetched newest→oldest in
+      // MAX_LIST_RANGE_MS windows and stops at the first empty window, so a
+      // future range end would make the first window land entirely in the
+      // future, come back empty, and abort the walk before reaching any real
+      // data. Clamp the starting window edge to "now" so the list walks back
+      // from the present exactly like a "last N days" relative range does.
+      currentWindowEnd = Math.min(originalEnd, Date.now())
       currentWindowOffset = 0
-      isShortRange = originalEnd - originalBegin <= MAX_LIST_RANGE_MS
+      isShortRange = currentWindowEnd - originalBegin <= MAX_LIST_RANGE_MS
       const records = await fetchPage(pageSize.value)
       if (callId !== loadCallId) return
       tableData.value = records
