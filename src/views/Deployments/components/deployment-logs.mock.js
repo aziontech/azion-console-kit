@@ -64,6 +64,7 @@ export const deploymentLogsMock = [
   {
     timestamp: '13:47:52',
     level: 'error',
+    // eslint-disable-next-line xss/no-mixed-html
     content: '    at Object.<anonymous> (src/main.js:8:1)'
   },
   {
