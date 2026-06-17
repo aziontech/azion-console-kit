@@ -59,6 +59,7 @@ hooks/
 
 # AI
 CLAUDE.md
+AGENTS.md
 .opencode/
 .claude/
 AGENTS.md
