@@ -46,12 +46,12 @@
   import EditFormBlock from '@/templates/edit-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsWorkload from '../FormFields/FormFieldsWorkload.vue'
+  import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
   import FormSkeleton from '../components/FormSkeleton.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { buildValidationSchema } from '../Config/validation'
+  import { buildLegacySchema } from '../Config/validation'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -65,7 +65,7 @@
   })
 
   const cachedWorkload = workloadService.getWorkloadFromCache(route.params.id) ?? {}
-  const validationSchema = buildValidationSchema(false)
+  const validationSchema = buildLegacySchema()
   const editWorkload = (payload) => workloadService.editWorkload(payload, false)
   const workloadName = ref(cachedWorkload?.name)
 
