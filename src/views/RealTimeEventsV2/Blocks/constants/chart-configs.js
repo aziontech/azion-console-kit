@@ -1,0 +1,350 @@
+/**
+ * Chart configurations for Real-Time Events tabs.
+ * Note: Events API uses 'ts' for time grouping. Status grouping may not be available.
+ */
+
+/**
+ * Default color palette
+ */
+const DEFAULT_COLORS = [
+  'var(--series-one-color)',
+  'var(--series-two-color)',
+  'var(--series-three-color)',
+  'var(--series-four-color)',
+  'var(--series-five-color)',
+  'var(--series-six-color)',
+  'var(--series-seven-color)',
+  'var(--series-eight-color)'
+]
+
+/**
+ * Chart configurations per event type.
+ * Using simple time-series grouping (ts only) for Events API.
+ */
+const CHART_CONFIGS = {
+  httpRequests: {
+    dataset: 'workloadEvents',
+    aggregation: { count: 'rows' },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: DEFAULT_COLORS
+  },
+
+  edgeFunctions: {
+    dataset: 'functionEvents',
+    aggregation: { count: 'rows' },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: DEFAULT_COLORS
+  },
+
+  edgeFunctionsConsole: {
+    dataset: 'functionConsoleEvents',
+    aggregation: { count: 'rows' },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: DEFAULT_COLORS
+  },
+
+  imageProcessor: {
+    dataset: 'imagesProcessedEvents',
+    aggregation: { count: 'rows' },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: DEFAULT_COLORS
+  },
+
+  tieredCache: {
+    dataset: 'tieredCacheEvents',
+    aggregation: { count: 'rows' },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: DEFAULT_COLORS
+  },
+
+  edgeDNS: {
+    dataset: 'edgeDnsQueriesEvents',
+    aggregation: { count: 'rows' },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: DEFAULT_COLORS
+  },
+
+  dataStream: {
+    dataset: 'dataStreamedEvents',
+    aggregation: { count: 'rows' },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: DEFAULT_COLORS
+  },
+
+  activityHistory: {
+    dataset: 'activityHistoryEvents',
+    aggregation: { count: 'rows' },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'bar',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: DEFAULT_COLORS
+  },
+
+  // ── WAF metrics charts ──
+  wafThreats: {
+    dataset: 'httpMetrics',
+    aggregation: { sum: ['wafRequestsAllowed', 'wafRequestsThreat', 'wafRequestsBlocked'] },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'spline',
+    splineInterpolation: 'monotone',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    seriesOrder: ['wafRequestsAllowed', 'wafRequestsThreat', 'wafRequestsBlocked'],
+    seriesLabels: {
+      wafRequestsAllowed: 'Allowed',
+      wafRequestsThreat: 'Threats',
+      wafRequestsBlocked: 'Blocked'
+    },
+    seriesColors: {
+      wafRequestsAllowed: '#22c55e',
+      wafRequestsThreat: '#eab308',
+      wafRequestsBlocked: '#ef4444'
+    },
+    colors: ['#22c55e', '#eab308', '#ef4444']
+  },
+
+  wafXss: {
+    dataset: 'httpMetrics',
+    aggregation: { sum: ['wafRequestsXssAttacks'] },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'spline',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: ['#ef4444']
+  },
+
+  wafRfi: {
+    dataset: 'httpMetrics',
+    aggregation: { sum: ['wafRequestsRfiAttacks'] },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'spline',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: ['#ef4444']
+  },
+
+  wafSql: {
+    dataset: 'httpMetrics',
+    aggregation: { sum: ['wafRequestsSqlAttacks'] },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'spline',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: ['#ef4444']
+  },
+
+  wafOther: {
+    dataset: 'httpMetrics',
+    aggregation: { sum: ['wafRequestsOthersAttacks'] },
+    groupBy: ['ts'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'spline',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: ['#ef4444']
+  },
+
+  wafThreatsByHost: {
+    dataset: 'httpMetrics',
+    aggregation: { sum: ['requests'] },
+    groupBy: ['ts', 'host'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'spline',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    colors: DEFAULT_COLORS
+  },
+
+  // ── Bot Manager metrics charts ──
+  botTraffic: {
+    dataset: 'botManagerMetrics',
+    aggregation: { sum: ['requests'] },
+    groupBy: ['ts', 'classified'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'spline',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    // Backend `classified` values are lowercase (confirmed by the Real-Time
+    // Metrics reports at src/modules/real-time-metrics/constants/reports.js):
+    // 'bad bot', 'good bot', 'legitimate', 'under evaluation'. Keeping the
+    // casing aligned prevents `useChartBuilder` from filtering seriesOrder
+    // down to an empty set and rendering a blank chart.
+    seriesOrder: ['bad bot', 'good bot', 'legitimate', 'under evaluation'],
+    seriesColors: {
+      'bad bot': '#ef4444',
+      'good bot': '#eab308',
+      legitimate: '#22c55e',
+      'under evaluation': '#6b7280'
+    },
+    colors: ['#ef4444', '#eab308', '#22c55e', '#6b7280']
+  },
+
+  botCaptcha: {
+    dataset: 'botManagerMetrics',
+    aggregation: { sum: ['requests'] },
+    groupBy: ['ts', 'challengeSolved'],
+    limit: 10000,
+    orderBy: 'ts_ASC',
+    chartType: 'spline',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    seriesOrder: ['Resolved', 'Unresolved'],
+    seriesColors: {
+      Resolved: '#22c55e',
+      Unresolved: '#ef4444'
+    },
+    colors: ['#22c55e', '#ef4444']
+  },
+
+  // ── Performance metrics charts ──
+
+  cacheHitMiss: {
+    chartType: 'spline',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    seriesOrder: ['HIT', 'MISS', 'EXPIRED', 'BYPASS', 'STALE'],
+    seriesColors: {
+      HIT: '#22c55e',
+      MISS: '#ef4444',
+      EXPIRED: '#eab308',
+      BYPASS: '#6b7280',
+      STALE: '#f97316'
+    },
+    colors: ['#22c55e', '#ef4444', '#eab308', '#6b7280', '#f97316']
+  },
+
+  tieredCacheHitMiss: {
+    chartType: 'spline',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    seriesOrder: ['HIT', 'MISS', 'EXPIRED', 'BYPASS', 'STALE'],
+    seriesColors: {
+      HIT: '#22c55e',
+      MISS: '#ef4444',
+      EXPIRED: '#eab308',
+      BYPASS: '#6b7280',
+      STALE: '#f97316'
+    },
+    colors: ['#22c55e', '#ef4444', '#eab308', '#6b7280', '#f97316']
+  },
+
+  cacheHitRate: {
+    chartType: 'spline',
+    dataUnit: 'percentage',
+    xAxis: 'ts',
+    maxYAxis: 100,
+    colors: ['var(--series-two-color)']
+  },
+
+  avgRequestTime: {
+    chartType: 'spline',
+    dataUnit: 'milliseconds',
+    xAxis: 'ts',
+    colors: ['var(--series-three-color)']
+  },
+
+  avgUpstreamResponseTime: {
+    chartType: 'spline',
+    dataUnit: 'milliseconds',
+    xAxis: 'ts',
+    colors: ['var(--series-four-color)']
+  },
+
+  avgConnectTime: {
+    chartType: 'spline',
+    dataUnit: 'milliseconds',
+    xAxis: 'ts',
+    colors: ['var(--series-five-color)']
+  },
+
+  bandwidthSavedMissed: {
+    chartType: 'spline',
+    splineInterpolation: 'monotone',
+    dataUnit: 'bytes',
+    xAxis: 'ts',
+    seriesOrder: ['bandwidthSavedData', 'bandwidthMissedData'],
+    seriesLabels: {
+      bandwidthSavedData: 'Saved',
+      bandwidthMissedData: 'Missed'
+    },
+    seriesColors: {
+      bandwidthSavedData: '#22c55e',
+      bandwidthMissedData: '#ef4444'
+    },
+    colors: ['#22c55e', '#ef4444']
+  },
+
+  requestsSavedMissed: {
+    chartType: 'spline',
+    dataUnit: 'count',
+    xAxis: 'ts',
+    seriesOrder: ['savedRequests', 'missedRequests'],
+    seriesLabels: {
+      savedRequests: 'Saved',
+      missedRequests: 'Missed'
+    },
+    seriesColors: {
+      savedRequests: '#22c55e',
+      missedRequests: '#ef4444'
+    },
+    colors: ['#22c55e', '#ef4444']
+  }
+}
+
+/**
+ * Get chart configuration for a tab
+ */
+const getChartConfig = (tabKey) => {
+  return CHART_CONFIGS[tabKey] || null
+}
+
+export { CHART_CONFIGS, getChartConfig, DEFAULT_COLORS }

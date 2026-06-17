@@ -25,6 +25,7 @@
         <AdvancedFilterSystem
           v-model:filterData="advancedFilterModel"
           :fieldsInFilter="filterFields"
+          :dataset="currentDashboard?.dataset || ''"
           :filterDateRangeMaxDays="730"
           :isLoadingFilters="isLoadingFilters"
           @updatedFilter="applyAdvancedFilter"
@@ -54,9 +55,7 @@
   import DashboardPanelBlock from './blocks/dashboard-panel-block.vue'
   import TabsPageBlock from './blocks/tabs-page-block'
 
-  import { MAP_SERVICE_OPERATION } from '@modules/real-time-metrics/constants'
-  import { GetRelevantField } from '@/modules/real-time-metrics/filters'
-  import { FILTERS_RULES } from '@/helpers'
+  import { buildFilterFields } from '@/modules/filter-loaders'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -171,29 +170,7 @@
 
     if (!options.length || !infoOptions) return []
 
-    const { dataset } = currentDashboard.value
-
-    const newOptions = options.map(({ label, operator, value }) => {
-      const info = infoOptions[dataset][value]
-      const mostRelevant = GetRelevantField(label, dataset)
-      return {
-        label,
-        value,
-        mostRelevant,
-        description: info?.description,
-        operator: operator.map((op) => ({
-          value: op.value,
-          type: op.type,
-          props: {
-            placeholder: info?.placeholder,
-            services: MAP_SERVICE_OPERATION[`${value}${op.value}`] || []
-          }
-        }))
-      }
-    })
-
-    FILTERS_RULES().sortFields(newOptions)
-    return newOptions
+    return buildFilterFields(options, infoOptions, currentDashboard.value.dataset)
   })
 
   const decodeFilter = (filters) => {
