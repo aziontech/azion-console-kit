@@ -40,7 +40,7 @@ export const workloadRoutes = {
     {
       path: 'edit/:id/:tab?',
       name: `edit-workload`,
-      component: () => import('@views/Workload/TabsView.vue'),
+      component: () => import('@views/Workload/EditDispatcher.vue'),
       props: {
         updatedRedirect: `list-workloads`
       },
@@ -66,7 +66,7 @@ export const workloadRoutes = {
       component: () => import('@views/Workload/DeploymentDetailsView.vue'),
       meta: {
         title: 'Deployment Details',
-        flag: 'checkout_access_without_flag'
+        flag: 'use_v6_configurations'
       }
     }
   ]

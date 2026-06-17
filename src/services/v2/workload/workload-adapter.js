@@ -7,11 +7,13 @@ import {
 } from '@/helpers'
 import { getPrimaryDomain } from '@/services/v2/utils/adapter/domainAdapter'
 import { convertToRelativeTime, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { hasFlagUseV6Configurations } from '@/composables/user-flag'
 
 const convertPortsArrayToIntegers = (ports) => {
   return ports.map((port) => parseInt(port.value))
 }
 
+// v6: domain entries may be strings or objects carrying environment/certificate.
 function extractAzionAppSubdomain(fullDomains, zones = []) {
   const cleanDomains = []
   let azionAppSubdomains = ''
@@ -37,6 +39,27 @@ function extractAzionAppSubdomain(fullDomains, zones = []) {
   }
 }
 
+// legacy: domain entries are plain strings.
+function extractAzionAppSubdomainLegacy(fullDomains, zones = []) {
+  const cleanDomains = []
+  let azionAppSubdomains = ''
+
+  fullDomains.forEach((full) => {
+    const { domain, subdomain } = getPrimaryDomain(full, zones)
+
+    if (domain === 'azion.app') {
+      azionAppSubdomains = subdomain
+    } else {
+      cleanDomains.push({ subdomain: subdomain ?? '', domain })
+    }
+  })
+
+  return {
+    cleanDomains: cleanDomains.length ? cleanDomains : [{ subdomain: '', domain: '' }],
+    azionAppSubdomains
+  }
+}
+
 const LOCKED_VALUE = 'custom'
 
 const isLocked = (version) => version === LOCKED_VALUE
@@ -56,6 +79,7 @@ const parseName = ({ name, product_version }) => {
   return nameProps
 }
 
+// v6: TLS no longer carries a global certificate (it is per-domain).
 const handleTls = (payload) => {
   if (payload.protocols.http.useHttps) {
     return {
@@ -67,29 +91,61 @@ const handleTls = (payload) => {
   return null
 }
 
+// legacy: TLS carries a single global certificate.
+const handleTlsLegacy = (payload) => {
+  if (payload.protocols.http.useHttps) {
+    return {
+      minimum_version: payload.tls.minimumVersion || null,
+      ciphers: payload.tls.ciphers || null,
+      certificate: payload.tls.certificate || null
+    }
+  }
+
+  return null
+}
+
 export const WorkloadAdapter = {
   transformCreateWorkload(payload) {
-    let domains = payload.domains
-      .filter(({ subdomain, domain }) => subdomain || domain)
-      .map(({ subdomain, domain, environment, certificate }) => ({
-        name: subdomain ? `${subdomain}.${domain}` : domain,
-        environment: environment ?? null,
-        certificate: certificate ?? null
-      }))
+    const isV6 = hasFlagUseV6Configurations()
 
-    if (payload.useCustomDomain) {
-      domains.unshift({
-        name: `${payload.customDomain}.azion.app`,
-        environment: payload.domains?.[0]?.environment ?? null,
-        certificate: payload.domains?.[0]?.certificate ?? null
-      })
+    let domains
+    let tls
+
+    if (isV6) {
+      domains = payload.domains
+        .filter(({ subdomain, domain }) => subdomain || domain)
+        .map(({ subdomain, domain, environment, certificate }) => ({
+          name: subdomain ? `${subdomain}.${domain}` : domain,
+          environment: environment ?? null,
+          certificate: certificate ?? null
+        }))
+
+      if (payload.useCustomDomain) {
+        domains.unshift({
+          name: `${payload.customDomain}.azion.app`,
+          environment: payload.domains?.[0]?.environment ?? null,
+          certificate: payload.domains?.[0]?.certificate ?? null
+        })
+      }
+
+      tls = handleTls(payload)
+    } else {
+      domains = payload.domains
+        .filter(({ subdomain, domain }) => subdomain || domain)
+        .map(({ subdomain, domain }) => (subdomain ? `${subdomain}.${domain}` : domain))
+
+      if (payload.useCustomDomain) {
+        domains.unshift(`${payload.customDomain}.azion.app`)
+      }
+
+      tls = handleTlsLegacy(payload)
     }
 
     const payloadResquest = {
       name: payload.name,
       active: payload.active,
       infrastructure: payload.infrastructure,
-      tls: handleTls(payload),
+      tls,
       protocols: {
         http: {
           versions: payload.protocols.http.useHttp3
@@ -151,6 +207,8 @@ export const WorkloadAdapter = {
     })
   },
   transformCachedWorkloadToEdit(item) {
+    const isV6 = hasFlagUseV6Configurations()
+
     return {
       id: item.id,
       name: item.name?.text ?? item.name,
@@ -163,7 +221,8 @@ export const WorkloadAdapter = {
       tls: item.tls
         ? {
             minimumVersion: item.tls.minimum_version,
-            ciphers: item.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value
+            ciphers: item.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value,
+            ...(isV6 ? {} : { certificate: item.tls.certificate || 0 })
           }
         : undefined,
       protocols: item.protocols?.http
@@ -194,15 +253,23 @@ export const WorkloadAdapter = {
     }
   },
   transformLoadWorkload({ data: workload }, workloadDeployment, zones = []) {
-    const { azionAppSubdomains, cleanDomains } = extractAzionAppSubdomain(workload.domains, zones)
-    const legacyCertificate = workload.tls?.certificate ?? null
-    if (legacyCertificate !== null) {
-      cleanDomains.forEach((domain) => {
-        if (domain.certificate === null || domain.certificate === undefined) {
-          domain.certificate = legacyCertificate
-        }
-      })
+    const isV6 = hasFlagUseV6Configurations()
+
+    const { azionAppSubdomains, cleanDomains } = isV6
+      ? extractAzionAppSubdomain(workload.domains, zones)
+      : extractAzionAppSubdomainLegacy(workload.domains, zones)
+
+    if (isV6) {
+      const legacyCertificate = workload.tls?.certificate ?? null
+      if (legacyCertificate !== null) {
+        cleanDomains.forEach((domain) => {
+          if (domain.certificate === null || domain.certificate === undefined) {
+            domain.certificate = legacyCertificate
+          }
+        })
+      }
     }
+
     return {
       id: workload.id,
       name: workload.name,
@@ -220,7 +287,8 @@ export const WorkloadAdapter = {
       workloadHostnameAllowAccess: workload.workload_domain_allow_access,
       tls: {
         minimumVersion: workload.tls.minimum_version,
-        ciphers: workload.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value
+        ciphers: workload.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value,
+        ...(isV6 ? {} : { certificate: workload.tls.certificate || 0 })
       },
       protocols: {
         http: {
