@@ -140,6 +140,10 @@ const getConfig = () => {
             ? 'https://jkjuyhi0gza.map.azionedge.net'
             : 'https://urvlgkvpxla.map.azionedge.net',
           rewrite: (path) => path.replace(/^\/edge_api/, '')
+        }),
+        '/deployment-api': createProxyConfig({
+          target: `https://i29crxkxxva.map.azionedge.net`,
+          rewrite: (path) => path.replace(/^\/deployment-api/, '')
         })
       }
     }
