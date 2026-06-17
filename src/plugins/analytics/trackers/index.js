@@ -4,7 +4,6 @@ import { CreateTracker } from './CreateTracker'
 import { ProductTracker } from './ProductTracker'
 import { WafRulesTracker } from './WafRulesTracker'
 import { RealTimeMetricsTracker } from './RealTimeMetricsTracker'
-import { BillingTracker } from './BillingTracker'
 
 export {
   SignUpTracker,
@@ -12,6 +11,5 @@ export {
   CreateTracker,
   ProductTracker,
   WafRulesTracker,
-  RealTimeMetricsTracker,
-  BillingTracker
+  RealTimeMetricsTracker
 }
