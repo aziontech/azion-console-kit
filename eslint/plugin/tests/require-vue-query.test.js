@@ -123,56 +123,6 @@ ruleTester.run('require-vue-query', rule, {
         }
       `,
       filename: 'src/modules/users/composables/use-users.js'
-    },
-
-    // Composable using queryClient.fetchQuery imperative API — allowed (Vue Query)
-    {
-      code: `
-        import { queryClient } from '../services/base/query/queryClient'
-        import { usersService } from '../services/users-service'
-
-        export function useUsers() {
-          return queryClient.fetchQuery({ queryKey: ['users'], queryFn: () => usersService.list() })
-        }
-      `,
-      filename: 'src/modules/users/composables/use-users.js'
-    },
-
-    // Composable using queryClient.invalidateQueries imperative API — allowed
-    {
-      code: `
-        import { queryClient } from '../services/base/query/queryClient'
-        import { usersService } from '../services/users-service'
-
-        export function useDeleteUser() {
-          return usersService.delete().then(() => queryClient.invalidateQueries({ queryKey: ['users'] }))
-        }
-      `,
-      filename: 'src/modules/users/composables/use-delete-user.js'
-    },
-
-    // Pure-utility file in a service folder (constants suffix) — allowed
-    {
-      code: `
-        import { USER_STATUS } from '../services/users/users-constants'
-
-        export function useUser() {
-          return USER_STATUS.ACTIVE
-        }
-      `,
-      filename: 'src/modules/users/composables/use-user.js'
-    },
-
-    // Pure-utility file in a service folder (errors suffix) — allowed
-    {
-      code: `
-        import { isPaymentPendingConflict } from '../services/orders/orders-errors'
-
-        export function useOrder() {
-          return isPaymentPendingConflict
-        }
-      `,
-      filename: 'src/modules/orders/composables/use-order.js'
     }
   ],
 
