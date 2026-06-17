@@ -394,6 +394,10 @@
   const showProfile = ref(false)
   const profileMenuDefault = [
     {
+      label: 'Environments',
+      to: '/environment'
+    },
+    {
       label: 'Account Settings',
       to: '/account/settings'
     },
