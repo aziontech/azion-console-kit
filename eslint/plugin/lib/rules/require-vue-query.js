@@ -50,12 +50,23 @@ module.exports = {
       },
 
       // Detect usage of classes that extend BaseService (they have useQuery/useMutation internally)
+      // AND direct usage of the queryClient imperative API (fetchQuery, invalidateQueries, etc.) —
+      // both are official Vue Query surfaces.
       MemberExpression(node) {
+        const name = node.property.name
         if (
-          node.property.name === 'useQuery' ||
-          node.property.name === 'useMutation' ||
-          node.property.name === 'useEnsureQueryData' ||
-          node.property.name === 'usePrefetchQuery'
+          name === 'useQuery' ||
+          name === 'useMutation' ||
+          name === 'useEnsureQueryData' ||
+          name === 'usePrefetchQuery' ||
+          name === 'fetchQuery' ||
+          name === 'prefetchQuery' ||
+          name === 'ensureQueryData' ||
+          name === 'invalidateQueries' ||
+          name === 'setQueryData' ||
+          name === 'getQueryData' ||
+          name === 'removeQueries' ||
+          name === 'cancelQueries'
         ) {
           hasBaseServiceUsage = true
         }
@@ -66,7 +77,8 @@ module.exports = {
         if (hasServiceImport && !hasVueQueryImport && !hasBaseServiceUsage) {
           // Find the service import node to report on
           const serviceImportNode = node.body.find(
-            (bodyNode) => bodyNode.type === 'ImportDeclaration' && isServiceImport(bodyNode.source.value)
+            (bodyNode) =>
+              bodyNode.type === 'ImportDeclaration' && isServiceImport(bodyNode.source.value)
           )
 
           if (serviceImportNode) {
