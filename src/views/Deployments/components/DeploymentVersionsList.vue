@@ -6,7 +6,7 @@
   import Calendar from '@aziontech/webkit/calendar'
   import Dropdown from '@aziontech/webkit/dropdown'
   import GenericDataView from '@/components/GenericDataView'
-  import { listDeploymentVersionsMock } from '@/services/v2/deployment/deployment-version-mock'
+  import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
   import InlineTag from '@/components/InlineTag'
   import StatusTag from '@/components/StatusTag'
   import EditorAvatarCell from '@/views/Deployments/components/EditorAvatarCell.vue'
@@ -108,7 +108,7 @@
     try {
       const status = filterValues.value.status
       const environment = filterValues.value.environment
-      const result = await listDeploymentVersionsMock(props.deploymentId, {
+      const result = await deploymentVersionService.listVersionsService(props.deploymentId, {
         page: Math.floor(paginatorFirst.value / paginatorRows.value) + 1,
         pageSize: paginatorRows.value,
         search: searchTerm.value?.trim() || undefined,
@@ -330,10 +330,6 @@
     font: inherit;
   }
 
-  /* Match the Dropdown layout: the *wrapper* carries the border + background;
-     the inner input and the trigger button are borderless and share the
-     wrapper's chrome. Replicated from GenericDataView's scoped `dataview-*`
-     rules, which don't reach slotted content authored here. */
   :deep(.dataview-control.p-calendar) {
     display: inline-flex;
     align-items: center;
@@ -378,8 +374,6 @@
     color: var(--text-color-secondary);
   }
 
-  /* Trigger button (default `iconDisplay="button"`) — strip its chrome and
-     just keep the chevron icon, matching `.p-dropdown-trigger`. */
   :deep(.dataview-control.p-calendar .p-datepicker-trigger),
   :deep(.dataview-control.p-calendar > button) {
     flex-shrink: 0;

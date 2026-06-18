@@ -88,13 +88,10 @@ const normalizeStrategyDefaults = (strategyDefaults) => {
   }
 }
 
-const normalizeAuditActor = (actor) => {
-  if (!isObject(actor)) return null
-  return {
-    user_id: actor.user_id ?? null,
-    trigger: actor.trigger ?? null,
-    email: actor.email ?? null
-  }
+const normalizeAuditEmail = (actor) => {
+  if (typeof actor === 'string') return actor
+  if (isObject(actor)) return actor.email ?? null
+  return null
 }
 
 const normalizeDeployment = (deployment) => {
@@ -102,6 +99,7 @@ const normalizeDeployment = (deployment) => {
 
   return {
     id: source.id ?? null,
+    version_id: source.version_id ?? null,
     name: source.name ?? '',
     description: source.description ?? null,
     binding_policy: source.binding_policy ?? null,
@@ -112,8 +110,8 @@ const normalizeDeployment = (deployment) => {
     client_id: source.client_id ?? null,
     created_at: formatDateToDayMonthYearHour(source.created_at) ?? null,
     updated_at: formatDateToDayMonthYearHour(source.updated_at) ?? null,
-    created_by: normalizeAuditActor(source.created_by),
-    last_modified_by: normalizeAuditActor(source.last_modified_by)
+    created_by: normalizeAuditEmail(source.created_by),
+    last_modified_by: normalizeAuditEmail(source.last_modified_by)
   }
 }
 
@@ -122,8 +120,7 @@ export const DeploymentAdapter = {
     if (!Array.isArray(data)) return []
     return data.map((item) => {
       const normalized = normalizeDeployment(item)
-      const lastEditor =
-        normalized.last_modified_by?.email || normalized.last_modified_by?.user_id || ''
+      const lastEditor = normalized.last_modified_by || normalized.created_by || ''
       return {
         ...normalized,
         status: mapStateToStatus(normalized.state),
@@ -137,7 +134,8 @@ export const DeploymentAdapter = {
 
   transformItem(data) {
     if (!data) return null
-    return normalizeDeployment(data)
+    const resource = isObject(data) && isObject(data.data) ? data.data : data
+    return normalizeDeployment(resource)
   },
 
   transformCreatePayload(payload = {}) {
@@ -160,24 +158,17 @@ export const DeploymentAdapter = {
     })
   },
 
-  /**
-   * Builds the `build_and_activate` request body from the drawer's resource
-   * context and the selected version id. Emits a single-item `resources` array,
-   * dropping any undefined key so the API only receives populated fields.
-   * `strategy`/`origin` are intentionally out of scope for this delivery.
-   *
-   * @param {{ resourceId: number, resourceType: string, resourceName: string }} resourceContext
-   * @param {string} versionId - `version_id` (ULID) sent as `resource_version`.
-   * @returns {{ resources: Array<object> }}
-   */
   transformBuildAndActivatePayload(resourceContext = {}, versionId) {
+    const { resourceType, resourceId } = resourceContext
+    const idField =
+      resourceType === 'application' ? { global_id: resourceId } : { resource_id: resourceId }
+
     return {
       resources: [
         pickDefined({
-          resource_id: resourceContext.resourceId,
-          resource_version: versionId,
-          resource_type: resourceContext.resourceType,
-          name: resourceContext.resourceName
+          ...idField,
+          resource_type: resourceType,
+          version_id: versionId
         })
       ]
     }

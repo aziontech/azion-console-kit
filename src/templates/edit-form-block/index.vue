@@ -167,7 +167,9 @@
         unsaved.disable()
       }
 
-      goBackToList()
+      if (!props.isTabs) {
+        goBackToList()
+      }
     } finally {
       isLoadingData.value = false
       await Promise.all(asyncChildPromises)

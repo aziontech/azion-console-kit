@@ -101,21 +101,12 @@ const handleTlsLegacy = (payload) => {
 }
 
 const buildV6DomainEntries = (payload) => {
-  const entries = payload.domains
+  return payload.domains
     .filter(({ subdomain, domain }) => subdomain || domain)
     .map(({ subdomain, domain, environment }) => ({
       name: subdomain ? `${subdomain}.${domain}` : domain,
       environment: environment ?? null
     }))
-
-  if (payload.useCustomDomain) {
-    entries.unshift({
-      name: `${payload.customDomain}.azion.app`,
-      environment: payload.domains?.[0]?.environment ?? null
-    })
-  }
-
-  return entries
 }
 
 const buildV6Bindings = (entries, environmentDeployments = {}) => {
