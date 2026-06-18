@@ -117,6 +117,19 @@
   const REPOSITORY_FIELD_NAMES = ['platform_feature__vcs_integration__uuid', 'az_name']
 
   /**
+   * Check if the schema has any repository field (VCS integration or az_name).
+   * When false, the template has no Git source: all fields are rendered inside the
+   * Repository card and the Deploy button is shown directly (no Settings step).
+   */
+  const hasRepositoryFields = computed(() => {
+    const allFields = [
+      ...(inputSchema.value.fields || []),
+      ...(inputSchema.value.groups || []).flatMap((group) => group.fields || [])
+    ]
+    return allFields.some((field) => REPOSITORY_FIELD_NAMES.includes(field.name))
+  })
+
+  /**
    * Check if VCS integration field is present in the schema
    */
   const hasIntegrations = computed(() => {
@@ -152,6 +165,8 @@
     return allFields.filter((field) => {
       if (field.hidden || !field.attrs?.required) return false
       if (field.name === vcsIntegrationFieldName.value) return false
+      // No repository field: every field belongs to the repository step
+      if (!hasRepositoryFields.value) return step === 'repository'
       const isRepoField = REPOSITORY_FIELD_NAMES.includes(field.name)
       return step === 'repository' ? isRepoField : !isRepoField
     })
@@ -211,18 +226,23 @@
 
   /**
    * Computed property for repository groups
-   * Returns groups containing only fields with name "platform_feature__vcs_integration__uuid" or "az_name"
+   * Returns groups containing only fields with name "platform_feature__vcs_integration__uuid" or "az_name".
+   * When the schema has no repository field, returns all groups so every field is rendered
+   * inside the Repository card (Deploy button shown directly, no Settings step).
    */
   const repositoryGroups = computed(() => {
     const groups = inputSchema.value.groups || []
+    if (!hasRepositoryFields.value) return groups
     return groups.map((group) => filterGroupFields(group, REPOSITORY_FIELD_NAMES)).filter(Boolean)
   })
 
   /**
    * Computed property for settings groups
-   * Returns groups containing only fields that are NOT "platform_feature__vcs_integration__uuid" or "az_name"
+   * Returns groups containing only fields that are NOT "platform_feature__vcs_integration__uuid" or "az_name".
+   * When the schema has no repository field, there is no Settings step (all fields live in Repository).
    */
   const settingsGroups = computed(() => {
+    if (!hasRepositoryFields.value) return []
     const groups = inputSchema.value.groups || []
     return groups
       .map((group) =>
@@ -518,9 +538,14 @@
     const allFields = (inputSchema.value.groups || []).flatMap((group) => group.fields || [])
 
     if (step === 'repository') {
-      // Repository step: validate fields with specific names
+      // Repository step: validate the repository fields, or every field when the
+      // schema has no repository field (all fields live in the Repository card).
       fieldNamesToValidate = allFields
-        .filter((field) => REPOSITORY_FIELD_NAMES.includes(field.name) && !field.hidden)
+        .filter(
+          (field) =>
+            !field.hidden &&
+            (!hasRepositoryFields.value || REPOSITORY_FIELD_NAMES.includes(field.name))
+        )
         .map((field) => field.name)
       // Also include top-level fields (not in groups)
       const topLevelFields = (inputSchema.value.fields || [])
@@ -1270,7 +1295,7 @@
                     <!-- Regular field in single group -->
                     <FieldInputTextPrivacy
                       v-if="field.info === 'Edge Application Name'"
-                      class=""
+                      class="w-full sm:w-1/2"
                       :class="{
                         '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
                       }"
@@ -1293,7 +1318,7 @@
                     />
                     <div
                       v-else-if="isHandleField(field.name)"
-                      class="flex flex-col gap-2"
+                      class="flex flex-col gap-2 w-full sm:w-1/2"
                     >
                       <LabelBlock
                         :for="field.name"
