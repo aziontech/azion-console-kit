@@ -91,6 +91,43 @@
   const filterBarRef = ref(null)
   const stackByField = ref('none')
 
+  /* ── Deferred table columns (perf) ── */
+  // Columns rendered by the data table mirror `selectedFields`, but interactive
+  // toggles are applied one extra frame later so the sidebar checkbox repaints
+  // instantly instead of waiting for the (heavy) table column re-render in the
+  // same flush. `selectedFields` stays the source of truth (sidebar v-model,
+  // export and share state read it directly). The lifecycle wiring lives in the
+  // Lifecycle section below.
+  const tableSelectedFields = ref([])
+  let deferTableSync = false
+  let tableSyncRaf1 = null
+  let tableSyncRaf2 = null
+
+  const cancelTableSync = () => {
+    if (tableSyncRaf1) cancelAnimationFrame(tableSyncRaf1)
+    if (tableSyncRaf2) cancelAnimationFrame(tableSyncRaf2)
+    tableSyncRaf1 = null
+    tableSyncRaf2 = null
+  }
+
+  const syncTableSelectedFields = () => {
+    const apply = () => {
+      tableSelectedFields.value = [...selectedFields.value]
+    }
+    // Sync synchronously until mounted (so the table renders with the right
+    // columns on first paint) and when rAF is unavailable (tests/SSR).
+    if (!deferTableSync || typeof requestAnimationFrame !== 'function') {
+      apply()
+      return
+    }
+    cancelTableSync()
+    tableSyncRaf1 = requestAnimationFrame(() => {
+      tableSyncRaf2 = requestAnimationFrame(apply)
+    })
+  }
+
+  watch(selectedFields, syncTableSelectedFields, { immediate: true })
+
   const allDatasets = Object.values(TABS_EVENTS)
   const accountTimezone = computed(() => {
     try {
@@ -492,12 +529,15 @@
     refreshFilterData()
   })
   onMounted(async () => {
+    // From now on, defer table-column syncs by a frame (see syncTableSelectedFields).
+    deferTableSync = true
     document.addEventListener('keydown', onKeyDown)
     await nextTick()
     filterBarRef.value?.filterSystemRef?.applyFilters()
     loadData()
   })
   onBeforeUnmount(() => {
+    cancelTableSync()
     document.removeEventListener('keydown', onKeyDown)
     resetSeriesOrderCache()
   })
@@ -578,7 +618,6 @@
           :minSize="[15, 50]"
           :maxSize="[30, 90]"
           :class="{ 'splitter--sidebar-collapsed': !sidebarVisible }"
-          :key="String(sidebarVisible)"
         >
           <template #panel-a>
             <FieldSidebar
@@ -646,7 +685,7 @@
                 <DiscoverDataTable
                   ref="discoverDataTableRef"
                   :data="filteredTableData"
-                  :selectedFields="selectedFields"
+                  :selectedFields="tableSelectedFields"
                   :expandedRows="expandedRows"
                   @update:expandedRows="expandedRows = $event"
                   :detailViewMode="detailViewMode"
