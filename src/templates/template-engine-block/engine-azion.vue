@@ -115,18 +115,37 @@
   })
 
   const REPOSITORY_FIELD_NAMES = ['platform_feature__vcs_integration__uuid', 'az_name']
+  // Used as the repository "name" field when the schema has no az_name
+  const FALLBACK_NAME_FIELD = 'application_name'
 
   /**
-   * Check if the schema has any repository field (VCS integration or az_name).
-   * When false, the template has no Git source: all fields are rendered inside the
-   * Repository card and the Deploy button is shown directly (no Settings step).
+   * Effective repository field names for the current schema.
+   * The repository card always groups the VCS integration and az_name fields. When the
+   * schema has no az_name, application_name takes its place as the repository name field
+   * (rendered as a plain text field, without the privacy toggle).
+   */
+  const repositoryFieldNames = computed(() => {
+    const allFields = [
+      ...(inputSchema.value.fields || []),
+      ...(inputSchema.value.groups || []).flatMap((group) => group.fields || [])
+    ]
+    const hasAzName = allFields.some((field) => field.name === 'az_name')
+    if (hasAzName) return REPOSITORY_FIELD_NAMES
+    return ['platform_feature__vcs_integration__uuid', FALLBACK_NAME_FIELD]
+  })
+
+  /**
+   * Check if the schema has any repository field (VCS integration, az_name or the
+   * application_name fallback). When false, the template has no Git source: all fields
+   * are rendered inside the Repository card and the Deploy button is shown directly
+   * (no Settings step).
    */
   const hasRepositoryFields = computed(() => {
     const allFields = [
       ...(inputSchema.value.fields || []),
       ...(inputSchema.value.groups || []).flatMap((group) => group.fields || [])
     ]
-    return allFields.some((field) => REPOSITORY_FIELD_NAMES.includes(field.name))
+    return allFields.some((field) => repositoryFieldNames.value.includes(field.name))
   })
 
   /**
@@ -167,7 +186,7 @@
       if (field.name === vcsIntegrationFieldName.value) return false
       // No repository field: every field belongs to the repository step
       if (!hasRepositoryFields.value) return step === 'repository'
-      const isRepoField = REPOSITORY_FIELD_NAMES.includes(field.name)
+      const isRepoField = repositoryFieldNames.value.includes(field.name)
       return step === 'repository' ? isRepoField : !isRepoField
     })
   }
@@ -233,7 +252,9 @@
   const repositoryGroups = computed(() => {
     const groups = inputSchema.value.groups || []
     if (!hasRepositoryFields.value) return groups
-    return groups.map((group) => filterGroupFields(group, REPOSITORY_FIELD_NAMES)).filter(Boolean)
+    return groups
+      .map((group) => filterGroupFields(group, repositoryFieldNames.value))
+      .filter(Boolean)
   })
 
   /**
@@ -250,7 +271,7 @@
           group,
           (group.fields || [])
             .map((field) => field.name)
-            .filter((name) => !REPOSITORY_FIELD_NAMES.includes(name))
+            .filter((name) => !repositoryFieldNames.value.includes(name))
         )
       )
       .filter((group) => group && group.fields.length > 0)
@@ -544,7 +565,7 @@
         .filter(
           (field) =>
             !field.hidden &&
-            (!hasRepositoryFields.value || REPOSITORY_FIELD_NAMES.includes(field.name))
+            (!hasRepositoryFields.value || repositoryFieldNames.value.includes(field.name))
         )
         .map((field) => field.name)
       // Also include top-level fields (not in groups)
@@ -555,7 +576,7 @@
     } else if (step === 'settings') {
       // Settings step: validate fields that are NOT repository fields
       fieldNamesToValidate = allFields
-        .filter((field) => !REPOSITORY_FIELD_NAMES.includes(field.name) && !field.hidden)
+        .filter((field) => !repositoryFieldNames.value.includes(field.name) && !field.hidden)
         .map((field) => field.name)
     }
 
@@ -604,7 +625,7 @@
       })
 
       // For Edge Application Name (privacy field), capture vcs_repo_is_public to add first
-      if (field.info === 'Edge Application Name') {
+      if (field.name === 'az_name') {
         vcsRepoIsPublic = {
           field: 'vcs_repo_is_public',
           value: isEdgeAppNamePublic.value,
@@ -972,7 +993,7 @@
                 </FieldDropdown>
               </div>
               <FieldInputTextPrivacy
-                v-else-if="isHandleField(field.name) && field.info === 'Edge Application Name'"
+                v-else-if="isHandleField(field.name) && field.name === 'az_name'"
                 class="w-full sm:w-1/2"
                 :class="{
                   '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
@@ -1140,7 +1161,7 @@
 
                       <!-- Regular field in group -->
                       <FieldInputTextPrivacy
-                        v-if="field.info === 'Edge Application Name'"
+                        v-if="field.name === 'az_name'"
                         :class="{
                           '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
                         }"
@@ -1294,7 +1315,7 @@
 
                     <!-- Regular field in single group -->
                     <FieldInputTextPrivacy
-                      v-if="field.info === 'Edge Application Name'"
+                      v-if="field.name === 'az_name'"
                       class="w-full sm:w-1/2"
                       :class="{
                         '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
@@ -1396,7 +1417,7 @@
                     >
                       <!-- Regular field in group -->
                       <FieldInputTextPrivacy
-                        v-if="field.info === 'Edge Application Name'"
+                        v-if="field.name === 'az_name'"
                         :class="{
                           '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
                         }"
@@ -1481,7 +1502,7 @@
                   >
                     <!-- Regular field in single group -->
                     <FieldInputTextPrivacy
-                      v-if="field.info === 'Edge Application Name'"
+                      v-if="field.name === 'az_name'"
                       class="w-full sm:w-1/2"
                       :class="{
                         '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
