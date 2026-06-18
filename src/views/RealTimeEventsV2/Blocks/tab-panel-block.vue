@@ -578,7 +578,6 @@
           :minSize="[15, 50]"
           :maxSize="[30, 90]"
           :class="{ 'splitter--sidebar-collapsed': !sidebarVisible }"
-          :key="String(sidebarVisible)"
         >
           <template #panel-a>
             <FieldSidebar
