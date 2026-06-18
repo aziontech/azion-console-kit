@@ -22,22 +22,16 @@
       required: true,
       type: Function
     },
-    // Optional facade bound to appId + versionId for the versioned (v6) flow,
-    // shaped `{ list, load, create, edit, remove }`; null in the legacy flow (the
-    // singleton `edgeApplicationFunctionService` decorators are used instead).
     service: {
       type: Object,
       default: null
     },
-    // Version id forwarded to the Drawer in the versioned (v6) flow.
     versionId: {
       type: String,
       default: null
     }
   })
 
-  // Read-only comes from the VersionShell (v6); defaults to false outside it,
-  // so the legacy flow keeps full CRUD.
   const { readOnly, isVersioned } = useVersionContext()
 
   const router = useRouter()

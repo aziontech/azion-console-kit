@@ -48,8 +48,6 @@ const normalizeConfig = (raw) => {
   const ui = {}
   const modules = raw.modules ?? {}
 
-  // `!= null` (and not `!== undefined`): the API may return keys with `null`;
-  // null in the merge would wipe valid form fields.
   if (raw.name != null) ui.name = raw.name
   if (modules.cache?.enabled != null) ui.edgeCacheEnabled = modules.cache.enabled
   if (modules.functions?.enabled != null) ui.edgeFunctionsEnabled = modules.functions.enabled
@@ -71,32 +69,14 @@ const normalizeConfig = (raw) => {
 const normalizeVersion = (raw) => {
   if (!raw || typeof raw !== 'object') return raw
 
-  // v6 version endpoints (create/clone/retrieve) wrap the version fields under
-  // `meta`, e.g. `{ id: <numeric DB id>, version: 6, meta: { version_id, state, ... } }`.
-  // Older/list payloads are flat. When the envelope exists, `meta.*` wins;
-  // otherwise we fall back to the flat keys (where `version_state` precedes `state`).
   const meta = raw.meta && typeof raw.meta === 'object' ? raw.meta : null
 
-  // `config` carries the Application fields the form initializes from (merged
-  // over the parent Application by the version adapter component). Empty `{}`
-  // when the response carries metadata only.
   return {
-    // Canonical identifier is the ULID/hash `version_id` of THIS version — it is
-    // what goes in the URL, queryKey and payloads. Never navigate with the numeric
-    // DB `id` nor `source_version_id` (the version it was cloned from): both open
-    // the wrong/non-existent version. This is why a clone landed on the source.
     id: meta?.version_id ?? raw.version_id ?? raw.id,
-    // The lifecycle state drives the whole VersionShell (editability, available
-    // actions). v6 exposes it as `meta.state`; flat payloads use `version_state`
-    // or `state`. Reading the wrong key makes `state` undefined, which downstream
-    // defaults to `draft` and wrongly enables SAVE / SAVE_AND_BUILD on immutable
-    // versions (e.g. `ready`).
     state: meta?.state ?? raw.version_state ?? raw.state,
     comment: meta?.description ?? raw.comment ?? '',
     createdAt: meta?.created_at ?? raw.created_at,
     lastModified: meta?.last_modified ?? raw.last_modified,
-    // Raw last-editor value (or `null`); the `azion@azion.com` fallback is a
-    // render-time concern, not applied here.
     lastEditor: meta?.last_editor ?? raw.last_editor ?? null,
     config: normalizeConfig(raw)
   }
@@ -148,9 +128,6 @@ export const EdgeAppVersionAdapter = {
       payload.comment = body.comment
     }
 
-    // Clone-with-changes: Application fields (name, modules, active, debug)
-    // mapped at the root via EdgeAppAdapter.transformPayload (DRY), stripping
-    // `undefined` so absent fields keep the cloned value.
     const appFields = stripUndefinedDeep(EdgeAppAdapter.transformPayload(body))
     if (appFields !== undefined) {
       Object.assign(payload, appFields)

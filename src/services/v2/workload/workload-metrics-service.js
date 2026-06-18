@@ -78,10 +78,6 @@ const buildMetrics = (workloadId, range) => {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export class WorkloadMetricsService extends BaseService {
-  // TODO: replace mock with real GraphQL call once endpoint is ready.
-  // Should mirror fetchAllWorkloadMetrics but include `configurationIdIn: [workloadId]`
-  // in the filter so metrics are scoped to a single Workload.
-  // Reference: src/services/home-metrics-service/fetch-home-metrics.js
   #fetchMetrics = async (workloadId, params = {}) => {
     await sleep(220)
     const range = RANGE_PRESETS[params.range] ? params.range : '24h'

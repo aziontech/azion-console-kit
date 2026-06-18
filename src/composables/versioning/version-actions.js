@@ -91,11 +91,6 @@ const ROW_ELIGIBLE = new Set([
  */
 export const getRowActions = (state) => {
   const base = getAvailableActions(state).filter((action) => ROW_ELIGIBLE.has(action))
-  // A draft can be built straight from the list. The shell builds via
-  // SAVE_AND_BUILD (which first persists the open form); from the list the draft
-  // is already saved, so we offer a plain BUILD of the saved snapshot. BUILD is
-  // not part of the editing state machine, so it is added here as a list-only
-  // affordance for the draft state.
   if (state === VERSION_STATES.DRAFT) return ['BUILD', ...base]
   return base
 }

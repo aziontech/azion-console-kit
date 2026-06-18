@@ -35,8 +35,6 @@ import { DeploymentAdapter, mapPolicyToLabel } from '@/services/v2/deployment/de
  * @param {{ visible: import('vue').MaybeRefOrGetter<boolean> }} options
  */
 export function useDeployDrawer(resourceContext, { visible } = {}) {
-  // `enabled` gates fetching to the drawer's open state (req 1.1, 1.5): closed
-  // drawer never fetches, reopen reuses the vue-query cache.
   const enabled = computed(() => Boolean(toValue(visible)))
 
   const workloadsQuery = workloadService.useWorkloadsListQuery({ enabled })
@@ -45,7 +43,6 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
 
   const queries = [workloadsQuery, environmentsQuery, deploymentsQuery]
 
-  // Aggregated loading/error across the three listings (req 1.2, 1.4).
   const isLoading = computed(() => queries.some((query) => query.isLoading.value))
   const hasError = computed(() => queries.some((query) => query.isError.value))
 
@@ -53,14 +50,10 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
     queries.forEach((query) => query.refetch())
   }
 
-  // --- Step 1: workload selection -----------------------------------------
-
   const workloadsBody = computed(() => workloadsQuery.data.value?.body ?? [])
   const environmentsBody = computed(() => environmentsQuery.data.value?.body ?? [])
   const deploymentsBody = computed(() => deploymentsQuery.data.value?.body ?? [])
 
-  // `name` comes from the workload adapter as `{ text, tagProps }`; fall back to
-  // a plain string for resilience (req 2.1).
   const workloadOptions = computed(() =>
     workloadsBody.value.map((workload) => ({
       label: workload.name?.text ?? workload.name,
@@ -74,17 +67,10 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
     () => workloadsBody.value.find((workload) => workload.id === selectedWorkloadId.value) ?? null
   )
 
-  // `bindings` is the seam onto environment/deployment derivation (design §5.0).
-  // Absent/empty bindings block the flow (req 2.4).
   const workloadBindings = computed(() => selectedWorkload.value?.bindings ?? [])
 
   const workloadHasBindings = computed(() => workloadBindings.value.length > 0)
 
-  // --- Step 2: environment selection --------------------------------------
-
-  // One card per binding (req 2.2, 3.1, 3.3). The listings only enrich the card
-  // (name, policy, deployment name); a binding whose env/deployment is missing
-  // from the listing degrades to its short_id and still allows dispatch (§7.5).
   const environmentCards = computed(() => {
     if (!workloadHasBindings.value) return []
 
@@ -108,26 +94,17 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
     () => environmentCards.value.find((card) => card.id === selectedEnvironmentId.value) ?? null
   )
 
-  // Target deployment short_id used directly in the build_and_activate URL (req 3.4).
   const targetDeploymentId = computed(() => selectedEnvironmentCard.value?.deploymentId ?? null)
-
-  // --- Step 3: resource + version -----------------------------------------
 
   const resourceName = computed(() => toValue(resourceContext)?.resourceName ?? '')
 
-  // Version options and prefill come from the origin resource, not the workload
-  // (req 4.1–4.3).
   const versionOptions = computed(() => toValue(resourceContext)?.versions ?? [])
 
   const selectedVersionId = ref(toValue(resourceContext)?.version?.id ?? null)
 
-  // Switching workload invalidates the environment selection (req 2.5). The
-  // version is the resource's, not the workload's — it is intentionally kept.
   watch(selectedWorkloadId, () => {
     selectedEnvironmentId.value = null
   })
-
-  // --- Dispatch ------------------------------------------------------------
 
   const isDeploying = ref(false)
   const deployError = ref(null)

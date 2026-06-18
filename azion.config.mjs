@@ -11,7 +11,6 @@ const edgeApiHost =
     ? 'jkjuyhi0gza.map.azionedge.net'
     : 'urvlgkvpxla.map.azionedge.net'
 
-// New deployment and environment APIs. Stage-only while the migration is in progress.
 const deploymentApiHost = 'deployment-api.azion.app'
 const environmentApiHost = 'environment-api-stage.azion.app'
 

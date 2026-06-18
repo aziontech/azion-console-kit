@@ -11,35 +11,50 @@
     }
   })
 
-  // Palette mirrors @aziontech/webkit/azion-system-status so this wrapper
-  // can be swapped for the webkit component once it accepts props.
-  const SEVERITY_COLOR = {
-    success: '#8bc249',
-    warning: '#fec111',
-    danger: '#ff4141',
-    info: '#6e7cf7',
-    secondary: 'var(--text-color-secondary)'
+  const SEVERITY_DOT_COLOR = {
+    success: 'text-[var(--success-contrast,#52e086)]',
+    info: 'text-[var(--info-contrast,#66adff)]',
+    warning: 'text-[var(--warning-contrast,#f7bd08)]',
+    danger: 'text-[var(--danger-contrast,#ed7878)]',
+    alt: 'text-[var(--primary,#f3652b)]',
+    secondary: 'text-[var(--text-muted,#999999)]'
   }
 
+  const MUTED_COLOR = 'text-[var(--text-muted,#999999)]'
+
   const severity = computed(() => props.status?.severity || 'secondary')
-  const color = computed(() => SEVERITY_COLOR[severity.value] || SEVERITY_COLOR.secondary)
   const label = computed(() => props.status?.content || 'Unknown')
 
-  const isBuilding = computed(() => normalizeText(props.status?.content) === 'building')
-  const icon = computed(() =>
-    isBuilding.value ? 'pi pi-spinner animate-spin' : 'pi pi-circle-fill'
+  const isLoading = computed(() => normalizeText(props.status?.content) === 'building')
+
+  const dotColorClass = computed(() =>
+    isLoading.value
+      ? MUTED_COLOR
+      : SEVERITY_DOT_COLOR[severity.value] || SEVERITY_DOT_COLOR.secondary
   )
-  const iconStyle = computed(() => ({ color: color.value }))
+  const dotIcon = computed(() =>
+    isLoading.value ? 'pi pi-spinner animate-spin' : 'pi pi-circle-fill'
+  )
+  const labelColorClass = computed(() =>
+    isLoading.value ? MUTED_COLOR : 'text-[var(--text-default,#fafafa)]'
+  )
 </script>
 
 <template>
-  <span class="inline-flex items-center gap-2 whitespace-nowrap">
+  <span class="inline-flex items-center gap-1 whitespace-nowrap">
     <i
-      :class="[icon, 'text-[10px]']"
-      :style="iconStyle"
+      :class="[dotIcon, dotColorClass, 'text-[10px] leading-none']"
+      aria-hidden="true"
     />
-    <span class="font-mono text-xs leading-relaxed text-[var(--text-color)]">
+    <span :class="['text-xs leading-none', labelColorClass]">
       {{ label }}
+    </span>
+    <span
+      v-if="isLoading"
+      :class="['text-xs leading-none', labelColorClass]"
+      aria-hidden="true"
+    >
+      ...
     </span>
   </span>
 </template>

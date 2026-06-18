@@ -45,7 +45,6 @@
 
   const emit = defineEmits(['update:visible', 'deployed'])
 
-  // `v-model:visible` over the drawer, mirroring the placeholder contract.
   const isVisible = computed({
     get: () => props.visible,
     set: (value) => emit('update:visible', value)
@@ -53,8 +52,6 @@
 
   const toast = useToast()
 
-  // The composable owns the whole data flow; `visible` gates fetching so the
-  // closed drawer never fetches and reopen reuses the vue-query cache (req 1.5).
   const {
     isLoading,
     hasError,
@@ -73,15 +70,9 @@
     deploy
   } = useDeployDrawer(() => props.resourceContext, { visible: isVisible })
 
-  // Required-version signal: flips on a confirm attempt with no version chosen
-  // (req 4.5). Clearing happens implicitly once a version is selected and the
-  // user retries.
   const versionInvalid = ref(false)
 
   const surfaceDeployError = (error) => {
-    // Mirror EditView.handleCommandError: prefer the API's own error renderer,
-    // else fall back to a generic error toast (req 5.5). The drawer stays open
-    // and all selections are preserved — the composable does not reset state.
     if (error && typeof error.showErrors === 'function') {
       error.showErrors(toast)
       return
@@ -115,7 +106,6 @@
       emit('deployed')
       isVisible.value = false
     } catch (error) {
-      // Keep the drawer open and preserve the configuration (req 5.5).
       surfaceDeployError(deployError.value ?? error)
     }
   }
@@ -128,7 +118,6 @@
     data-testid="deploy-drawer"
   >
     <template #content>
-      <!-- 1. Initial load: block interaction with the dependent fields (req 1.2). -->
       <div
         v-if="isLoading"
         class="flex w-full items-center justify-center py-16"
@@ -140,7 +129,6 @@
         />
       </div>
 
-      <!-- 2. Load failure: actionable error + retry, without closing (req 1.4). -->
       <div
         v-else-if="hasError"
         class="flex w-full flex-col items-start gap-3"
@@ -162,19 +150,16 @@
         />
       </div>
 
-      <!-- 3. Progressive reveal of the configuration steps. -->
       <div
         v-else
         class="flex w-full flex-col gap-6"
         data-testid="deploy-drawer__content"
       >
-        <!-- Step 1: workload (req 2.1). -->
         <WorkloadSelectField
           v-model="selectedWorkloadId"
           :options="workloadOptions"
         />
 
-        <!-- Guard: a workload without deployable bindings blocks the flow (req 2.4). -->
         <InlineMessage
           v-if="selectedWorkloadId && !workloadHasBindings"
           class="w-full"
@@ -184,14 +169,12 @@
           This workload has no deployable environments.
         </InlineMessage>
 
-        <!-- Step 2: environment selection (req 3.1). -->
         <EnvironmentSelectionInput
           v-if="selectedWorkloadId && workloadHasBindings"
           v-model="selectedEnvironmentId"
           :environments="environmentCards"
         />
 
-        <!-- Step 3: resource + version (req 4.1–4.5). -->
         <ResourceVersionField
           v-if="selectedEnvironmentId"
           v-model="selectedVersionId"

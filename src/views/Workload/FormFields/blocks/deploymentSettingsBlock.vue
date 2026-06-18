@@ -27,7 +27,6 @@
   const domainList = computed(() => (Array.isArray(domainsValue.value) ? domainsValue.value : []))
   const envDeploymentsState = computed(() => environmentDeployments.value ?? {})
 
-  // Per-environment metadata cache (id → { name, policy, policyLabel }).
   const environmentMap = ref({})
 
   const ensureEnvironment = async (envId) => {
@@ -72,10 +71,6 @@
     { immediate: true, deep: true }
   )
 
-  // Deployment options for the inline dropdown. The shared QueryClient defaults to
-  // `enabled: false` (queries are driven imperatively across the app), so a reactive
-  // useQuery here would never fetch. We call the service directly — it still caches
-  // through vue-query's ensureQueryData under the hood.
   const deploymentOptions = ref([])
   const isLoadingDeployments = ref(false)
 
@@ -95,16 +90,12 @@
 
   const policyFor = (envId) => environmentMap.value[envId]?.policy ?? null
 
-  // A deployment is compatible only when it shares the environment's deployment policy
-  // (single_version ↔ single_version, versioned_urls ↔ versioned_urls). While the
-  // environment policy is still unknown, nothing is blocked.
   const isDeploymentCompatible = (envId, deployment) => {
     const policy = policyFor(envId)
     if (!policy) return true
     return deployment?.deployment_policy === policy
   }
 
-  // PrimeVue calls optionDisabled with each option object — curry the env to keep it pure.
   const isOptionDisabledFor = (envId) => (deployment) => !isDeploymentCompatible(envId, deployment)
 
   const compatibleCountFor = (envId) =>
@@ -157,7 +148,6 @@
   >
     <template #inputs>
       <div class="flex flex-col gap-3 max-w-3xl w-full">
-        <!-- Info banner: always visible -->
         <MessageCard
           type="info"
           title="Start with Deployment Settings"
@@ -175,7 +165,6 @@
           </template>
         </MessageCard>
 
-        <!-- Warning banner: only when any env is missing a deployment -->
         <MessageCard
           v-if="hasMissingDeployment"
           type="warning"
@@ -183,7 +172,6 @@
           dataTestid="deployment-settings__warning-banner"
         />
 
-        <!-- Empty state when no env is in use yet -->
         <div
           v-if="!environmentsInUse.length"
           class="text-color-secondary text-xs"
@@ -192,14 +180,12 @@
           Add at least one domain to configure a deployment per environment.
         </div>
 
-        <!-- One card per environment in use -->
         <div
           v-for="env in environmentsInUse"
           :key="env.id"
           class="flex flex-col gap-3 p-4 rounded surface-section border surface-border"
           :data-testid="`deployment-settings__card-${env.id}`"
         >
-          <!-- Header: icon · environment · policy badge · clear action -->
           <div class="flex items-center gap-2">
             <i class="pi pi-box text-color-secondary" />
             <span class="text-sm font-medium text-color truncate">{{ env.name }}</span>
@@ -221,14 +207,12 @@
             />
           </div>
 
-          <!-- Compatibility note -->
           <MessageCard
             type="info"
             :description="compatibilityNoteFor(env.id)"
             :dataTestid="`deployment-settings__compat-${env.id}`"
           />
 
-          <!-- Inline deployment selector -->
           <Dropdown
             :inputId="`deployment-settings__dropdown-${env.id}`"
             :modelValue="deploymentIdFor(env.id)"

@@ -149,8 +149,6 @@
     item: { class: 'dataview-dropdown-item' }
   }
 
-  // An optional column with no slot and no data on any item is dropped from
-  // both the header and the rows; non-optional columns always render.
   const columnHasData = (column) => {
     const path = column?.field || column?.key
     return props.items.some((item) => {
@@ -246,10 +244,6 @@
   const runErrorAction = () => props.errorState?.buttonAction?.()
   const runEmptyAction = () => props.emptyState?.buttonAction?.()
 
-  // Per-row action menu. Items come from the shared state machine
-  // (`getRowActions(state)`), so the list and the shell action bar stay in sync.
-  // The component only emits the chosen intent (`row-action`) — execution
-  // (service calls, dialogs) is the consuming view's responsibility.
   const ICON_FOR = {
     BUILD: 'pi pi-cog',
     NEW_DRAFT_FROM: 'pi pi-copy',
@@ -323,7 +317,6 @@
       </div>
     </div>
 
-    <!-- 1. Loading -->
     <div
       v-if="loading"
       class="flex flex-col gap-2"
@@ -337,7 +330,6 @@
       </div>
     </div>
 
-    <!-- 2. Error -->
     <div
       v-else-if="isError"
       class="error-state flex flex-col items-center justify-center gap-3 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-6 py-12 text-center text-[var(--text-color-secondary)]"
@@ -359,7 +351,6 @@
       />
     </div>
 
-    <!-- 3. Empty (resource has no versions at all) -->
     <template v-else-if="!hasVersions">
       <EmptyResultsBlock
         :title="emptyState.title || 'No versions yet'"
@@ -388,7 +379,6 @@
       </EmptyResultsBlock>
     </template>
 
-    <!-- 4. Filtered empty (has versions, but filters/search hide them all) -->
     <div
       v-else-if="!items.length"
       class="filtered-empty-state rounded-md border border-[var(--surface-border)] px-6 py-6 text-center text-[var(--text-color-secondary)]"
@@ -400,7 +390,6 @@
       <p class="m-0 mt-2 text-sm leading-6">{{ filteredEmptyDescription }}</p>
     </div>
 
-    <!-- 5. Table -->
     <div
       v-else
       class="table-surface overflow-hidden rounded-md border border-[var(--surface-border)]"
@@ -465,7 +454,6 @@
                       :isPrimary="isPrimaryColumn(column)"
                       :onPrimaryClick="() => triggerRowClick(version)"
                     >
-                      <!-- Default cell: version (primary, mono hash + state + current + comment) -->
                       <button
                         v-if="column.key === 'version'"
                         type="button"
@@ -491,7 +479,6 @@
                         </span>
                       </button>
 
-                      <!-- Default cell: status (state badge in its own column) -->
                       <button
                         v-else-if="column.key === 'status'"
                         type="button"
@@ -501,7 +488,6 @@
                         <StatusTag :status="mapVersionStateToStatus(version.state)" />
                       </button>
 
-                      <!-- Default cell: created (date + masked author) -->
                       <button
                         v-else-if="column.key === 'created'"
                         type="button"
@@ -525,7 +511,6 @@
                         </span>
                       </button>
 
-                      <!-- Default cell: any other column -->
                       <span
                         v-else
                         class="cell-default"
@@ -696,8 +681,6 @@
     color: var(--text-color-secondary);
   }
 
-  /* Match the search/dropdown control height (2.5rem) so the icon button
-     aligns with the rest of the toolbar instead of rendering smaller. */
   :deep(.dataview-toolbar-action.p-button) {
     width: 2.5rem !important;
     height: 2.5rem !important;

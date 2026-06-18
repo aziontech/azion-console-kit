@@ -1,7 +1,6 @@
 import * as yup from 'yup'
 import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
 
-// TODO: confirm valid rollout_mode values with backend. Assumed INSTANT / GRADUAL.
 export const ROLLOUT_MODE_OPTIONS = [
   { label: 'Instant', value: 'INSTANT' },
   { label: 'Gradual', value: 'GRADUAL' }
