@@ -1314,29 +1314,35 @@
                     </div>
 
                     <!-- Regular field in single group -->
-                    <FieldInputTextPrivacy
+                    <!-- Wrapper fixes the flex item at 50%; FieldInputTextPrivacy forwards
+                         its `class` prop to the inner input, so width must live on the wrapper
+                         to keep the field from resizing with the error message. -->
+                    <div
                       v-if="field.name === 'az_name'"
                       class="w-full sm:w-1/2"
-                      :class="{
-                        '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
-                      }"
-                      :name="field.name"
-                      :label="field.label"
-                      :value="field.value"
-                      :isPublic="isEdgeAppNamePublic"
-                      @update:isPublic="handlePrivacyToggle"
-                      @input="(val) => updateValueOnChange(field.name, val)"
-                      @blur="formTools.validateField?.(field.name)"
-                      :description="field.description"
-                      :data-testid="`field-${field.name}`"
-                      :required="field.attrs?.required"
-                      :disabled="isRepositoryDisabled"
-                      :aditionalError="
-                        getDisplayError(field.name)
-                          ? unescapeErrorMessage(getDisplayError(field.name))
-                          : ''
-                      "
-                    />
+                    >
+                      <FieldInputTextPrivacy
+                        :class="{
+                          '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
+                        }"
+                        :name="field.name"
+                        :label="field.label"
+                        :value="field.value"
+                        :isPublic="isEdgeAppNamePublic"
+                        @update:isPublic="handlePrivacyToggle"
+                        @input="(val) => updateValueOnChange(field.name, val)"
+                        @blur="formTools.validateField?.(field.name)"
+                        :description="field.description"
+                        :data-testid="`field-${field.name}`"
+                        :required="field.attrs?.required"
+                        :disabled="isRepositoryDisabled"
+                        :aditionalError="
+                          getDisplayError(field.name)
+                            ? unescapeErrorMessage(getDisplayError(field.name))
+                            : ''
+                        "
+                      />
+                    </div>
                     <div
                       v-else-if="isHandleField(field.name)"
                       class="flex flex-col gap-2 w-full sm:w-1/2"
