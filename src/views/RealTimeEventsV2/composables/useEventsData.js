@@ -6,6 +6,14 @@ import { buildFilterParts } from '@/services/real-time-events-service-v2/_shared
 
 const MAX_LIST_RANGE_MS = 2 * 60 * 60 * 1000
 
+// When the chart's first request reports a non-partial total at or below this,
+// the data is sparse enough that the list can be fetched with a single
+// newest→oldest query over the whole range (the API skips the empty periods
+// between "now" and the data internally) instead of walking it 2h window by
+// 2h window. Above it the range is dense, so windowing keeps each request's
+// scan bounded. Mirrors the aggregate `limit: 10000` used by the count query.
+const SINGLE_QUERY_MAX_TOTAL = 10000
+
 export function useEventsData({
   filterData,
   listService,
@@ -34,6 +42,18 @@ export function useEventsData({
   let chartLoadToken = 0
   let countToken = 0
   let hasAccurateCount = false
+  // Total number of records known to exist in the current range+filter, taken
+  // from loadTotalCount. Used to bound the windowed list walk so it stops once
+  // every record has been collected instead of bailing on the first empty
+  // window (sparse/filtered data has gaps between populated windows). null
+  // until the count resolves.
+  let knownTotalCount = null
+  // Resolver for the in-flight chart-summary deferred. load() installs it right
+  // before calling loadChart(); loadChart() resolves it with { total,
+  // partialFilter } as soon as the chart's FIRST request returns — i.e. before
+  // the optional KPI fallback — so the list loader can pick its fetch strategy
+  // without waiting on that second request.
+  let onChartSummary = null
 
   const getWindowFilter = (windowEnd) => {
     const filter = filterData.value
@@ -138,6 +158,7 @@ export function useEventsData({
   const loadTotalCount = async () => {
     const myToken = ++countToken
     hasAccurateCount = false
+    knownTotalCount = null
     const dataset = tabSelected.value?.dataset
     if (!dataset || !filterData.value?.tsRange) return
     if (!hasActiveFilters()) return
@@ -186,6 +207,7 @@ export function useEventsData({
       if (myToken !== countToken) return
       if (total != null) {
         hasAccurateCount = true
+        knownTotalCount = total
         recordsFound.value = new Intl.NumberFormat(locale).format(total)
         return
       }
@@ -194,7 +216,12 @@ export function useEventsData({
     }
     if (myToken !== countToken) return
 
-    // 2) Fallback: 24h chunks, 2 at a time, newest→oldest, stop on first 0
+    // 2) Fallback: 24h chunks, 2 at a time, newest→oldest, summing the whole
+    // range. We must NOT stop on the first empty chunk: a specific filter
+    // (e.g. one domain) can have empty chunks sitting between populated ones,
+    // and bailing early would undercount — which in turn would let the list
+    // walk stop short. A null chunk means the per-chunk request itself failed
+    // (system limit); skip it rather than treating it as "no more data".
     const CHUNK_MS = 24 * 60 * 60 * 1000
     let grandTotal = 0
     let cursor = endMs
@@ -210,17 +237,12 @@ export function useEventsData({
         batch.map((ch) => doReq(buildBody(ch.begin, ch.end)).catch(() => 0))
       )
       if (myToken !== countToken) return
-      let hitZero = false
       for (const cnt of results) {
-        if (cnt === null || cnt === 0) {
-          hitZero = true
-          break
-        }
-        grandTotal += cnt
+        if (cnt != null) grandTotal += cnt
       }
       hasAccurateCount = true
+      knownTotalCount = grandTotal
       recordsFound.value = new Intl.NumberFormat(locale).format(grandTotal)
-      if (hitZero) break
     }
   }
 
@@ -244,10 +266,34 @@ export function useEventsData({
     }
   }
 
+  /**
+   * Loads the chart aggregation (the feature's first request) and returns a
+   * compact summary the list loader uses to choose its fetch strategy:
+   *   { total: number|null, partialFilter: boolean }
+   * `total` is the event count the chart observed for the current range+filter
+   * (null when unknown, e.g. the array/stacked form). `partialFilter` is true
+   * when the Metrics API dropped unsupported filter fields, so the total does
+   * NOT reflect every active filter and must not be trusted for bounding.
+   * Returns null when there is no chart, the request was superseded, or it
+   * failed. The KPI fallback runs fire-and-forget so it never blocks the list.
+   */
   const loadChart = async () => {
+    // Claim the summary resolver for this run (set by load() just before the
+    // call). Settle it at most once, defaulting to null so a no-op/failed run
+    // never leaves the list loader awaiting forever.
+    const resolveSummary = onChartSummary
+    onChartSummary = null
+    let summarySettled = false
+    const settleSummary = (summary) => {
+      if (summarySettled) return
+      summarySettled = true
+      if (resolveSummary) resolveSummary(summary)
+    }
+
     if (!hasChartConfig.value || !loadChartAggregation.value) {
       isChartLoading.value = false
-      return
+      settleSummary(null)
+      return null
     }
     const myToken = ++chartLoadToken
     isChartLoading.value = true
@@ -258,46 +304,58 @@ export function useEventsData({
         filters: buildApiFilters(),
         groupByField: resolveStackField()
       })
-      if (myToken !== chartLoadToken) return
+      if (myToken !== chartLoadToken) {
+        settleSummary(null)
+        return null
+      }
       isChartLoading.value = false
       if (Array.isArray(result)) {
         chartData.value = result
         kpis.value = null
-      } else {
-        chartData.value = result?.chartData || []
-        const rk = result?.kpis || null
-        if (rk && result?.partialFilter) rk.partialFilter = true
-        kpis.value = rk
+        const summary = { total: null, partialFilter: false }
+        settleSummary(summary)
+        return summary
+      }
+      chartData.value = result?.chartData || []
+      const rk = result?.kpis || null
+      if (rk && result?.partialFilter) rk.partialFilter = true
+      kpis.value = rk
 
-        // KPI fallback: when the chart path (Metrics API) did not attach KPIs,
-        // OR attached incomplete KPIs (missing status breakdown / avg request time),
-        // issue a dedicated Events-API KPI request (Requirement 6.1, 6.5, 6.6)
-        const needsKpiFallback =
-          (tabSelected.value?.showSummary ?? false) &&
-          (rk === null ||
-            rk === undefined ||
-            !rk.supportsStatusBreakdown ||
-            !rk.supportsRequestTime)
-        if (needsKpiFallback) {
-          const fallback = await loadSummaryKpisSafe({
-            dataset: tabSelected.value?.dataset,
-            tsRange: filterData.value?.tsRange,
-            filters: buildApiFilters(),
-            token: myToken
-          })
-          if (myToken !== chartLoadToken) return
-          if (fallback) {
-            // Merge: chart-provided total preserved, fallback adds breakdown/avg
-            kpis.value = {
-              ...rk,
-              ...fallback,
-              partialFilter: !!result?.partialFilter
-            }
+      // Hand the list loader the total/partial summary now — before the
+      // optional KPI fallback request — so it never waits on that second call.
+      const summary = {
+        total: typeof rk?.total === 'number' ? rk.total : null,
+        partialFilter: !!result?.partialFilter
+      }
+      settleSummary(summary)
+
+      // KPI fallback: when the chart path (Metrics API) did not attach KPIs,
+      // OR attached incomplete KPIs (missing status breakdown / avg request time),
+      // issue a dedicated Events-API KPI request (Requirement 6.1, 6.5, 6.6).
+      const needsKpiFallback =
+        (tabSelected.value?.showSummary ?? false) &&
+        (rk === null || rk === undefined || !rk.supportsStatusBreakdown || !rk.supportsRequestTime)
+      if (needsKpiFallback) {
+        const fallback = await loadSummaryKpisSafe({
+          dataset: tabSelected.value?.dataset,
+          tsRange: filterData.value?.tsRange,
+          filters: buildApiFilters(),
+          token: myToken
+        })
+        if (myToken !== chartLoadToken) return summary
+        if (fallback) {
+          // Merge: chart-provided total preserved, fallback adds breakdown/avg
+          kpis.value = {
+            ...rk,
+            ...fallback,
+            partialFilter: !!result?.partialFilter
           }
         }
       }
+      return summary
     } catch (err) {
-      if (myToken !== chartLoadToken) return
+      settleSummary(null)
+      if (myToken !== chartLoadToken) return null
       isChartLoading.value = false
       chartData.value = []
       kpis.value = null
@@ -311,6 +369,7 @@ export function useEventsData({
         detail: 'Please try again or contact support',
         life: 5000
       })
+      return null
     }
   }
 
@@ -344,8 +403,20 @@ export function useEventsData({
     const originalBegin = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
     let records = []
     if (isShortRange) {
+      // Single query over the whole range, newest→oldest, with offset paging.
+      // currentWindowEnd is the range end already clamped to "now", so a future
+      // preset end (e.g. "this week") never leaks into the query. tsRangeBegin
+      // stays the full range begin — the API returns the newest `target` rows
+      // and skips any empty span between "now" and the data on its own.
+      const clamped = {
+        ...filterData.value,
+        tsRange: {
+          ...filterData.value.tsRange,
+          tsRangeEnd: new Date(currentWindowEnd).toISOString()
+        }
+      }
       const res = await listService.value(
-        { ...filterData.value, pageSize: target, offset: currentWindowOffset },
+        { ...clamped, pageSize: target, offset: currentWindowOffset },
         { onQuery }
       )
       records = res.data || []
@@ -362,11 +433,17 @@ export function useEventsData({
       const batch = res.data || []
       records = [...records, ...batch]
       if (batch.length < remaining) {
-        // Window exhausted or empty — move to next window
+        // Window exhausted or empty — move to the next (older) window.
         currentWindowEnd = new Date(windowFilter.tsRange.tsRangeBegin).getTime()
         currentWindowOffset = 0
-        // If this window returned nothing, stop — older windows won't have data either
-        if (batch.length === 0) break
+        // Stop only once we've collected every record known to exist in the
+        // range. An empty window must NOT abort the walk on its own: sparse or
+        // heavily-filtered data (e.g. a single domain over "this week") often
+        // has empty windows between populated ones, so bailing on the first
+        // gap would return an empty list even though data exists further back.
+        // While the count is still resolving (knownTotalCount === null) we keep
+        // walking; the loop is bounded by currentWindowEnd > originalBegin.
+        if (knownTotalCount != null && records.length >= knownTotalCount) break
       } else {
         currentWindowOffset += batch.length
       }
@@ -391,20 +468,47 @@ export function useEventsData({
       chartData.value = []
       recordsFound.value = '—'
       hasAccurateCount = false
-      loadChart()
+      // Install the summary deferred, then kick off the chart. loadChart()
+      // resolves chartSummaryPromise as soon as its first request returns
+      // (before the optional KPI fallback) and finishes the rest in the
+      // background, so we get the total without blocking on a second request.
+      const chartSummaryPromise = new Promise((resolve) => {
+        onChartSummary = resolve
+      })
+      loadChart().catch(() => {})
       loadTotalCount().catch(() => {})
       const originalBegin = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
       const originalEnd = new Date(filterData.value.tsRange.tsRangeEnd).getTime()
       // Calendar presets like "this week" / "today" end at the end of the
-      // current day, i.e. in the future. The list is fetched newest→oldest in
-      // MAX_LIST_RANGE_MS windows and stops at the first empty window, so a
-      // future range end would make the first window land entirely in the
-      // future, come back empty, and abort the walk before reaching any real
-      // data. Clamp the starting window edge to "now" so the list walks back
-      // from the present exactly like a "last N days" relative range does.
+      // current day, i.e. in the future. Clamp the range end to "now" so a
+      // future end never leaks into the query (the future has no data and would
+      // otherwise be probed first).
       currentWindowEnd = Math.min(originalEnd, Date.now())
       currentWindowOffset = 0
-      isShortRange = currentWindowEnd - originalBegin <= MAX_LIST_RANGE_MS
+
+      // Reuse the chart's first request (already in flight above) to pick the
+      // list fetch strategy instead of blindly walking the range window by
+      // window from "now". When the chart reports a small, fully-applied
+      // (non-partial) total, the data is sparse: a single newest→oldest query
+      // over the whole range returns it directly and the API skips the empty
+      // span between "now" and the data — so for the common "one domain over
+      // this week" case we issue one request, not dozens. A zero total proves
+      // the list is empty up front, so we skip the list request entirely.
+      let singleQuery = false
+      const chartSummary = await chartSummaryPromise
+      if (callId !== loadCallId) return
+      if (chartSummary && !chartSummary.partialFilter && typeof chartSummary.total === 'number') {
+        knownTotalCount = chartSummary.total
+        if (chartSummary.total === 0) {
+          tableData.value = []
+          recordsFound.value = new Intl.NumberFormat(locale).format(0)
+          hasMoreData.value = false
+          return
+        }
+        singleQuery = chartSummary.total <= SINGLE_QUERY_MAX_TOTAL
+      }
+
+      isShortRange = singleQuery || currentWindowEnd - originalBegin <= MAX_LIST_RANGE_MS
       const records = await fetchPage(pageSize.value)
       if (callId !== loadCallId) return
       tableData.value = records
@@ -414,9 +518,11 @@ export function useEventsData({
           : parseInt(String(recordsFound.value).replace(/\D/g, ''), 10)
       hasMoreData.value =
         records.length > 0 &&
-        (isShortRange
-          ? isNaN(totalNum) || records.length < totalNum
-          : currentWindowEnd > originalBegin || records.length >= pageSize.value)
+        (knownTotalCount != null
+          ? records.length < knownTotalCount
+          : isShortRange
+            ? isNaN(totalNum) || records.length < totalNum
+            : currentWindowEnd > originalBegin || records.length >= pageSize.value)
     } catch (error) {
       onError({ closable: true, severity: 'error', summary: 'Error', detail: error })
       recordsFound.value = '—'
@@ -444,9 +550,11 @@ export function useEventsData({
       const originalBegin = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
       hasMoreData.value =
         newRecords.length > 0 &&
-        (isShortRange
-          ? newRecords.length >= pageSize.value
-          : currentWindowEnd > originalBegin || newRecords.length >= pageSize.value)
+        (knownTotalCount != null
+          ? tableData.value.length < knownTotalCount
+          : isShortRange
+            ? newRecords.length >= pageSize.value
+            : currentWindowEnd > originalBegin || newRecords.length >= pageSize.value)
     } catch (error) {
       onError({ closable: true, severity: 'error', summary: 'Error loading more', detail: error })
     } finally {
