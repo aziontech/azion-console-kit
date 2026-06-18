@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue'
   import { useForm, useField } from 'vee-validate'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import * as yup from 'yup'
   import { variablesService } from '@/services/v2/variables'
   import { vulcanService } from '@/services/v2/vulcan'
@@ -62,6 +62,7 @@
   const loadingStore = useLoadingStore()
   const deployStore = useDeploy()
   const route = useRoute()
+  const router = useRouter()
   const toast = useToast()
 
   // Step Navigation State
@@ -462,6 +463,8 @@
         query.formVariables = JSON.stringify(formValues.newVariables)
       }
     }
+    // Apply the new query to the URL so the deploy state survives a reload
+    router.replace({ query })
   }
 
   const goToDeploying = () => {
@@ -511,6 +514,12 @@
     try {
       const response = await props.getResultsService(executionId.value)
       results.value = response.result
+      // Use the real edge domain (e.g. jvr7kusqip.map.azionedge.net) for the success link,
+      // not the application name set optimistically at deploy time.
+      const domainUrl = response.result?.domain?.url
+      if (domainUrl) {
+        appUrl.value = domainUrl.startsWith('http') ? domainUrl : `https://${domainUrl}`
+      }
       // Update route query to success state with executionId and application name
       updateRouteQuery('success', executionId.value, deployedApplicationName.value)
       goToSuccess()
@@ -678,9 +687,12 @@
           // Use application name from query params if available, otherwise from results
           deployedApplicationName.value =
             routeApplicationName || response.result?.edgeApplication?.name || ''
-          appUrl.value =
-            response.result?.domain?.url ||
-            (routeApplicationName ? `https://${routeApplicationName}` : '')
+          const domainUrl = response.result?.domain?.url
+          if (domainUrl) {
+            appUrl.value = domainUrl.startsWith('http') ? domainUrl : `https://${domainUrl}`
+          } else if (routeApplicationName) {
+            appUrl.value = `https://${routeApplicationName}`
+          }
           currentStep.value = 'success'
         } catch (error) {
           // If we can't restore success state, fall back to deploying
