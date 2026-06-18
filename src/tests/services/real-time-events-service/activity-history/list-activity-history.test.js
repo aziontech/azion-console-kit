@@ -2,6 +2,8 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { listActivityHistory } from '@/services/real-time-events-service/activity-history'
 import { describe, expect, it, vi } from 'vitest'
 import * as Errors from '@/services/axios/errors'
+import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 
 const fixtures = {
   filter: {
@@ -88,6 +90,7 @@ describe('ActivityHistoryServices', () => {
   })
 
   it('should parsed correctly each event', async () => {
+    localeMock()
     vi.mock('@/helpers/generate-timestamp', () => ({
       generateCurrentTimestamp: () => 'mocked-timestamp'
     }))
@@ -98,6 +101,7 @@ describe('ActivityHistoryServices', () => {
 
     const { sut } = makeSut()
     const response = await sut(fixtures.filter)
+    const expectedTsFormat = getCurrentTimezone(fixtures.activityHistory.ts)
 
     expect(response).toEqual({
       data: [
@@ -131,7 +135,7 @@ describe('ActivityHistoryServices', () => {
           ],
           ts: fixtures.activityHistory.ts,
           userId: fixtures.activityHistory.userId,
-          tsFormat: 'February 23, 2024 at 06:07:25 PM'
+          tsFormat: expectedTsFormat
         }
       ]
     })

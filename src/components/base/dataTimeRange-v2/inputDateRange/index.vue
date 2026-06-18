@@ -1,0 +1,643 @@
+<script setup>
+  import { ref, computed, defineModel, onMounted } from 'vue'
+  import PrimeButton from '@aziontech/webkit/button'
+  import Calendar from '@aziontech/webkit/calendar'
+  import Dropdown from '@aziontech/webkit/dropdown'
+  import InputText from '@aziontech/webkit/inputtext'
+  import InputNumber from '@aziontech/webkit/inputnumber'
+  import {
+    formatDateSimple,
+    parseDateSimple,
+    createRelativeRange,
+    createStartOfDay,
+    createEndOfDay,
+    MONTHS,
+    RELATIVE_UNITS,
+    RELATIVE_DIRECTIONS,
+    TIME_SLOTS,
+    getCurrentHourAndMinute,
+    getCurrentMonthLabel
+  } from '@utils/date.js'
+  import { formatPillDateCompact } from '@/views/RealTimeEventsV2/helpers/format-timestamp'
+
+  defineOptions({ name: 'InputDateRange' })
+
+  const emit = defineEmits(['select', 'open', 'close'])
+
+  const props = defineProps({
+    maxDays: {
+      type: Number,
+      default: 0
+    },
+    panelOnly: {
+      type: Boolean,
+      default: false
+    },
+    mode: {
+      type: String,
+      default: 'absolute'
+    },
+    editingField: {
+      type: String,
+      default: 'start'
+    },
+    isOverlayOpen: {
+      type: Boolean,
+      default: false
+    }
+  })
+
+  const model = defineModel({
+    type: Object,
+    default: () => ({})
+  })
+
+  // Refs
+  const selectedDate = ref(new Date())
+  const selectedTime = ref('')
+  const hasChanges = ref(false)
+  const tempInputValue = ref('')
+  const hasInitializedAbsoluteRange = ref(false)
+  const selectedMonth = ref(new Date().getMonth())
+  const selectedYear = ref(new Date().getFullYear())
+
+  const relativeValue = ref(5)
+  const relativeUnit = ref('minutes')
+  const relativeDirection = ref('last')
+  const relativePreset = ref(getCurrentMonthLabel().toLowerCase())
+
+  const currentYear = new Date().getFullYear()
+  const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
+
+  const maxDate = computed(() => {
+    if (!props.maxDays || props.maxDays <= 0) return null
+    return new Date()
+  })
+  const minDate = computed(() => {
+    if (!props.maxDays || props.maxDays <= 0) return null
+    const now = new Date()
+    return new Date(now.getTime() - props.maxDays * 24 * 60 * 60 * 1000)
+  })
+
+  const inputValue = computed({
+    get: () => {
+      return hasChanges.value
+        ? tempInputValue.value
+        : props.editingField === 'start'
+          ? formatDateSimple(model.value.startDate)
+          : formatDateSimple(model.value.endDate)
+    },
+    set: (value) => {
+      model.value.label = ''
+      if (props.editingField === 'start') {
+        model.value.labelStart = ''
+      } else {
+        model.value.labelEnd = ''
+      }
+      tempInputValue.value = value
+      hasChanges.value = true
+    }
+  })
+
+  const startDateInput = computed(() => {
+    return formatDateSimple(model.value.startDate)
+  })
+
+  const endDateInput = computed(() => {
+    return formatDateSimple(model.value.endDate)
+  })
+
+  // Compact display: "May 10 @ 04:43:00" — keeps seconds and drops the year.
+  // Delegates to formatPillDateCompact so the regex lives in one place.
+  const formatCompactDate = formatPillDateCompact
+
+  const startDisplayInput = computed(() => {
+    const raw = model.value.labelStart || startDateInput.value
+    return formatCompactDate(raw)
+  })
+
+  const endDisplayInput = computed(() => {
+    const raw = model.value.labelEnd || endDateInput.value
+    return formatCompactDate(raw)
+  })
+
+  const isInvalidRange = computed(() => {
+    const start = model.value?.startDate
+    const end = model.value?.endDate
+
+    const labelStart =
+      typeof model.value?.labelStart === 'string' ? model.value.labelStart.trim() : ''
+    const labelEnd = typeof model.value?.labelEnd === 'string' ? model.value.labelEnd.trim() : ''
+    if (labelStart.toLowerCase() === 'now' && labelEnd.toLowerCase() === 'now') return true
+
+    if (!start || !end) return false
+
+    return new Date(start).getTime() > new Date(end).getTime()
+  })
+
+  const emitSelectIfValid = () => {
+    if (isInvalidRange.value) return
+    emit('select', model.value)
+  }
+
+  const sizeInput = (value) => {
+    if (!value) return 7
+    return value.length
+  }
+
+  const clampToBounds = (date) => {
+    if (!date) return date
+    const parsed = new Date(date)
+    if (!props.maxDays || props.maxDays <= 0) return parsed
+
+    const min = minDate.value
+    const max = maxDate.value
+
+    if (min && parsed < min) return new Date(min)
+    if (max && parsed > max) return new Date(max)
+    return parsed
+  }
+
+  const openStart = (event) => {
+    selectedTime.value = ''
+    hasChanges.value = false
+    emit('open', { event, field: 'start' })
+  }
+
+  const openEnd = (event) => {
+    selectedTime.value = ''
+    hasChanges.value = false
+    emit('open', { event, field: 'end' })
+  }
+
+  const onDateSelect = (date) => {
+    model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
+
+    const label = typeof model.value?.label === 'string' ? model.value.label.trim() : ''
+    const labelStart =
+      typeof model.value?.labelStart === 'string' ? model.value.labelStart.trim() : ''
+    const labelEnd = typeof model.value?.labelEnd === 'string' ? model.value.labelEnd.trim() : ''
+
+    const hasNonAbsoluteState =
+      Boolean(label) ||
+      Boolean(labelStart) ||
+      Boolean(labelEnd) ||
+      Boolean(model.value?.relative) ||
+      Boolean(model.value?.relativeStart) ||
+      Boolean(model.value?.relativeEnd) ||
+      labelStart.toLowerCase() === 'now' ||
+      labelEnd.toLowerCase() === 'now'
+
+    const shouldInitializeClickedDayRange =
+      props.mode === 'absolute' &&
+      date &&
+      (hasNonAbsoluteState || !hasInitializedAbsoluteRange.value)
+
+    if (shouldInitializeClickedDayRange) {
+      if (props.editingField === 'start') {
+        model.value.startDate = createStartOfDay(date)
+        model.value.labelStart = ''
+        model.value.relativeStart = null
+      } else {
+        model.value.endDate = createEndOfDay(date)
+        model.value.labelEnd = ''
+        model.value.relativeEnd = null
+      }
+      hasInitializedAbsoluteRange.value = true
+      selectedDate.value = date
+      selectedTime.value = ''
+      hasChanges.value = false
+      emitSelectIfValid()
+      return
+    }
+
+    selectedDate.value = date
+    updateSelectedDateTime()
+    hasChanges.value = false
+    emitSelectIfValid()
+  }
+
+  const onMonthChange = () => {
+    model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
+    const newDate = clampToBounds(new Date(selectedYear.value, selectedMonth.value, 1))
+    selectedDate.value = newDate
+    selectedMonth.value = newDate.getMonth()
+    selectedYear.value = newDate.getFullYear()
+    updateSelectedDateTime()
+    hasChanges.value = false
+    emitSelectIfValid()
+  }
+
+  const onYearChange = () => {
+    model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
+    const newDate = new Date(selectedYear.value, selectedMonth.value, 1)
+    selectedDate.value = newDate
+    updateSelectedDateTime()
+    hasChanges.value = false
+    emitSelectIfValid()
+  }
+
+  const previousMonth = () => {
+    model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
+    if (selectedMonth.value === 0) {
+      selectedMonth.value = 11
+      selectedYear.value--
+    } else {
+      selectedMonth.value--
+    }
+    onMonthChange()
+    hasChanges.value = false
+    emitSelectIfValid()
+  }
+
+  const nextMonth = () => {
+    model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
+    if (selectedMonth.value === 11) {
+      selectedMonth.value = 0
+      selectedYear.value++
+    } else {
+      selectedMonth.value++
+    }
+    onMonthChange()
+    emitSelectIfValid()
+  }
+
+  const selectTime = (time) => {
+    model.value.label = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
+    selectedTime.value = time
+    updateSelectedDateTime()
+    hasChanges.value = false
+    emitSelectIfValid()
+  }
+
+  const updateSelectedDateTime = () => {
+    const time = selectedTime.value || getCurrentHourAndMinute()
+    if (props.mode === 'absolute' && selectedDate.value && time) {
+      const [hours, minutes] = time.split(':')
+      const newDate = new Date(selectedDate.value)
+      newDate.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+      const boundedDate = clampToBounds(newDate)
+
+      if (props.editingField === 'start') {
+        model.value.startDate = boundedDate
+        model.value.labelStart = ''
+        model.value.relativeStart = null
+        hasInitializedAbsoluteRange.value = true
+        const currentEndDate = model.value.endDate ? new Date(model.value.endDate) : null
+
+        const isSameHourAndMinuteAsEnd =
+          Boolean(currentEndDate) &&
+          newDate.getFullYear() === currentEndDate.getFullYear() &&
+          newDate.getMonth() === currentEndDate.getMonth() &&
+          newDate.getDate() === currentEndDate.getDate() &&
+          newDate.getHours() === currentEndDate.getHours() &&
+          newDate.getMinutes() === currentEndDate.getMinutes()
+
+        if (isSameHourAndMinuteAsEnd) {
+          model.value.startDate = clampToBounds(new Date(boundedDate.getTime() - 5 * 60 * 1000))
+        }
+      } else {
+        model.value.endDate = newDate
+        model.value.labelEnd = ''
+        model.value.relativeEnd = null
+      }
+    }
+  }
+
+  const updateRelativeRange = () => {
+    if (props.mode === 'relative') {
+      const now = new Date()
+      const { startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
+        relativeValue.value,
+        relativeUnit.value,
+        relativeDirection.value,
+        now
+      )
+
+      const boundedStart = clampToBounds(newStartDate)
+      const boundedEnd = clampToBounds(newEndDate)
+
+      model.value.relative = {
+        direction: relativeDirection.value,
+        value: relativeValue.value,
+        unit: relativeUnit.value,
+        preset: model.value?.relative?.preset
+      }
+
+      if (props.editingField === 'start') {
+        model.value.startDate = relativeDirection.value === 'last' ? boundedStart : boundedEnd
+        model.value.labelStart = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
+        model.value.relativeStart = {
+          direction: relativeDirection.value,
+          value: relativeValue.value,
+          unit: relativeUnit.value,
+          preset: model.value?.relative?.preset
+        }
+
+        model.value.endDate = now
+        model.value.labelEnd = 'now'
+        model.value.label = ''
+      } else {
+        model.value.endDate = relativeDirection.value === 'last' ? boundedStart : boundedEnd
+        model.value.labelEnd = `${relativeDirection.value} ${relativeValue.value} ${relativeUnit.value}`
+        model.value.relativeEnd = {
+          direction: relativeDirection.value,
+          value: relativeValue.value,
+          unit: relativeUnit.value,
+          preset: model.value?.relative?.preset
+        }
+      }
+
+      hasChanges.value = false
+      tempInputValue.value = ''
+      emitSelectIfValid()
+    }
+  }
+
+  const updateRange = () => {
+    const parsedDate = parseDateSimple(tempInputValue.value)
+
+    if (parsedDate) {
+      const boundedParsedDate = clampToBounds(parsedDate)
+      if (props.editingField === 'start') {
+        model.value.startDate = boundedParsedDate
+        model.value.labelStart = ''
+        if (props.mode === 'absolute') {
+          hasInitializedAbsoluteRange.value = true
+        }
+        // Ensure end date is not before start date
+        if (model.value.endDate && boundedParsedDate > model.value.endDate) {
+          model.value.endDate = boundedParsedDate
+          model.value.labelEnd = ''
+        }
+      } else {
+        model.value.endDate = boundedParsedDate
+        model.value.labelEnd = ''
+        if (props.mode === 'absolute') {
+          hasInitializedAbsoluteRange.value = true
+        }
+        // Ensure start date is not after end date
+        if (model.value.startDate && boundedParsedDate < model.value.startDate) {
+          model.value.startDate = boundedParsedDate
+          model.value.labelStart = ''
+        }
+      }
+    }
+
+    hasChanges.value = false
+    tempInputValue.value = ''
+    if (props.editingField === 'start') {
+      model.value.labelStart = ''
+    } else {
+      model.value.labelEnd = ''
+    }
+    emitSelectIfValid()
+  }
+
+  if (model.value.startDate) {
+    model.value.startDate = new Date(model.value.startDate)
+  }
+  if (model.value.endDate) {
+    model.value.endDate = new Date(model.value.endDate)
+  }
+
+  onMounted(() => {
+    if (props.mode === 'relative') {
+      const rel =
+        model.value?.relative ||
+        (props.editingField === 'start' ? model.value?.relativeStart : model.value?.relativeEnd)
+
+      if (rel?.value && rel?.unit) {
+        relativeDirection.value = rel.direction || 'last'
+        relativeValue.value = rel.value
+        relativeUnit.value = rel.unit
+      }
+
+      updateRelativeRange()
+    }
+  })
+
+  defineExpose({})
+</script>
+<template>
+  <template v-if="!panelOnly">
+    <InputText
+      v-if="model.label"
+      :value="model.label"
+      class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
+      :class="[
+        isInvalidRange ? 'p-invalid text-[var(--error-color)]' : '',
+        isOverlayOpen ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+      ]"
+      @click="openStart"
+      readonly
+    />
+
+    <div
+      v-else
+      class="flex flex-col sm:flex-row items-center gap-2 bg-[var(--surface-300)] rounded-lg rounded-l-none"
+    >
+      <InputText
+        class="cursor-pointer ml-[2.5px]"
+        :class="[
+          isInvalidRange
+            ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
+            : 'border-none',
+          isOverlayOpen && editingField === 'start' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+        ]"
+        :style="{
+          width: `${sizeInput(startDisplayInput)}ch`
+        }"
+        :value="startDisplayInput"
+        readonly
+        @click="openStart"
+      />
+      <div
+        class="flex items-center text-color-secondary text-sm"
+        :class="isInvalidRange ? 'text-[var(--error-color)]' : ''"
+      >
+        <i class="pi text-xs pi-arrow-right hidden sm:inline"></i>
+        <i class="pi text-xs pi-arrow-down inline sm:hidden"></i>
+      </div>
+      <InputText
+        class="cursor-pointer ml-[2.5px]"
+        :class="[
+          isInvalidRange
+            ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
+            : 'border-none',
+          isOverlayOpen && editingField === 'end' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+        ]"
+        :style="{
+          width: `${sizeInput(endDisplayInput)}ch`
+        }"
+        :value="endDisplayInput"
+        readonly
+        @click="openEnd"
+      />
+    </div>
+  </template>
+
+  <template v-else>
+    <template v-if="mode === 'absolute'">
+      <div class="flex justify-center">
+        <div class="flex items-center gap-3">
+          <PrimeButton
+            icon="pi pi-chevron-left"
+            size="small"
+            outlined
+            @click="previousMonth"
+          />
+          <div class="flex items-center gap-2">
+            <Dropdown
+              v-model="selectedMonth"
+              :options="MONTHS"
+              optionLabel="label"
+              optionValue="value"
+              class="min-w-[120px]"
+              @change="onMonthChange"
+            />
+            <Dropdown
+              v-model="selectedYear"
+              :options="years"
+              class="min-w-[100px]"
+              @change="onYearChange"
+            />
+          </div>
+          <PrimeButton
+            icon="pi pi-chevron-right"
+            size="small"
+            outlined
+            @click="nextMonth"
+          />
+        </div>
+      </div>
+
+      <div class="flex items-start gap-2 mt-2">
+        <Calendar
+          v-model="selectedDate"
+          :inline="true"
+          :showIcon="false"
+          :showButtonBar="false"
+          :showWeek="false"
+          :dateFormat="'dd/mm/yy'"
+          :minDate="minDate"
+          :maxDate="maxDate"
+          class="flex-1 min-w-0"
+          @date-select="onDateSelect"
+          :pt="{
+            header: { class: 'hidden' },
+            weekDay: {
+              style:
+                'width: 28px !important; height: 28px !important; margin: 2px !important; font-size: 0.75rem !important; font-weight: 500 !important;'
+            },
+            dayLabel: {
+              style:
+                'width: 28px !important; height: 28px !important; margin: 2px !important; font-size: 0.75rem !important;'
+            }
+          }"
+        />
+
+        <!-- Time selector -->
+        <div class="border surface-border rounded-lg p-1 w-min">
+          <div class="max-h-[240px] overflow-y-auto overflow-x-hidden space-y-1">
+            <PrimeButton
+              :label="timeSlot"
+              v-for="timeSlot in TIME_SLOTS"
+              :key="timeSlot"
+              class="m-1"
+              severity="secondary"
+              size="small"
+              :outlined="selectedTime !== timeSlot"
+              @click="selectTime(timeSlot)"
+              :pt="{
+                label: { class: 'text-xs font-normal' }
+              }"
+            />
+          </div>
+        </div>
+      </div>
+    </template>
+    <template v-else>
+      <!-- implement relative range -->
+      <div class="flex flex-col gap-4">
+        <InputNumber
+          v-model="relativeValue"
+          @update:modelValue="updateRelativeRange"
+          @value-change="updateRelativeRange"
+          :min="1"
+          showButtons
+        />
+        <Dropdown
+          v-model="relativeUnit"
+          :options="RELATIVE_UNITS"
+          optionLabel="label"
+          optionValue="value"
+          @update:modelValue="updateRelativeRange"
+        />
+        <Dropdown
+          v-model="relativePreset"
+          :options="RELATIVE_DIRECTIONS"
+          @update:modelValue="updateRelativeRange"
+          optionLabel="label"
+          optionValue="value"
+          disabled
+        />
+      </div>
+    </template>
+
+    <div class="mt-4 pt-4 border-t surface-border">
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-color">
+          {{ props.editingField === 'start' ? 'Start date' : 'End date' }}
+        </label>
+        <div class="flex items-center gap-2">
+          <InputText
+            v-model="inputValue"
+            :placeholder="props.editingField === 'start' ? startDateInput : endDateInput"
+            class="w-full"
+            :readonly="mode !== 'absolute'"
+            @keydown.enter="updateRange"
+          />
+          <PrimeButton
+            label="Apply"
+            @click="updateRange"
+            outlined
+            :disabled="mode !== 'absolute'"
+            class="whitespace-nowrap w-20"
+            size="small"
+          />
+        </div>
+      </div>
+    </div>
+  </template>
+</template>

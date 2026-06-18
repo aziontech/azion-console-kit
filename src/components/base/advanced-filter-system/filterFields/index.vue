@@ -13,9 +13,11 @@
       appendTo="body"
       aria-haspopup="true"
       aria-controls="overlay_panel"
-      class="max-h-[600px] h-[280px] max-w-[900px] overflow-y-auto"
+      class="overflow-y-auto"
       :pt="{
-        root: { class: 'p-0 max-sm:w-full max-w-[900px] ' },
+        root: {
+          class: 'p-0 w-[min(90vw,56rem)] max-h-[80vh]'
+        },
         content: { class: 'p-0' }
       }"
     >
