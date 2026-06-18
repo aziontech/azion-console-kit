@@ -87,11 +87,17 @@
 
   const filterData = ref(null)
   const selectedFields = ref([])
+  const sidebarVisible = ref(typeof window !== 'undefined' ? window.innerWidth > 768 : true)
+  const filterBarRef = ref(null)
+  const stackByField = ref('none')
+
+  /* ── Deferred table columns (perf) ── */
   // Columns rendered by the data table mirror `selectedFields`, but interactive
   // toggles are applied one extra frame later so the sidebar checkbox repaints
   // instantly instead of waiting for the (heavy) table column re-render in the
   // same flush. `selectedFields` stays the source of truth (sidebar v-model,
-  // export and share state read it directly).
+  // export and share state read it directly). The lifecycle wiring lives in the
+  // Lifecycle section below.
   const tableSelectedFields = ref([])
   let deferTableSync = false
   let tableSyncRaf1 = null
@@ -121,14 +127,6 @@
   }
 
   watch(selectedFields, syncTableSelectedFields, { immediate: true })
-  onMounted(() => {
-    deferTableSync = true
-  })
-  onBeforeUnmount(cancelTableSync)
-
-  const sidebarVisible = ref(typeof window !== 'undefined' ? window.innerWidth > 768 : true)
-  const filterBarRef = ref(null)
-  const stackByField = ref('none')
 
   const allDatasets = Object.values(TABS_EVENTS)
   const accountTimezone = computed(() => {
@@ -531,12 +529,15 @@
     refreshFilterData()
   })
   onMounted(async () => {
+    // From now on, defer table-column syncs by a frame (see syncTableSelectedFields).
+    deferTableSync = true
     document.addEventListener('keydown', onKeyDown)
     await nextTick()
     filterBarRef.value?.filterSystemRef?.applyFilters()
     loadData()
   })
   onBeforeUnmount(() => {
+    cancelTableSync()
     document.removeEventListener('keydown', onKeyDown)
     resetSeriesOrderCache()
   })
