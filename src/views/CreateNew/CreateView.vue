@@ -15,6 +15,7 @@
   import { useSolutionStore } from '@/stores/solution-create'
   import { scriptRunnerService } from '@/services/v2/script-runner'
   import { getTemplate, instantiateTemplate } from '@/services/template-engine-services'
+  import { loadSolutionService } from '@/services/marketplace-services'
 
   import ConsoleFeedback from '@/layout/components/navbar/feedback'
 
@@ -32,10 +33,6 @@
   const store = useLoadingStore()
 
   const props = defineProps({
-    loadSolutionService: {
-      type: Function,
-      required: true
-    },
     windowOpen: {
       type: Function,
       required: true
@@ -49,7 +46,7 @@
       store.startLoading()
       isLoading.value = true
 
-      solution.value = await props.loadSolutionService({
+      solution.value = await loadSolutionService({
         vendor: route.params.vendor,
         solution: route.params.solution
       })

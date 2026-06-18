@@ -20,7 +20,13 @@
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { useVcsOAuth } from '@/composables/useVcsOAuth'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { getScriptRunnerLogsService } from '@/services/script-runner-service'
+  import {
+    getScriptRunnerLogsService,
+    loadScriptRunnerExecutionResultsService
+  } from '@/services/script-runner-service'
+  import { frameworkDetectorService } from '@/services/github-services'
+  import { instantiateTemplate } from '@/services/template-engine-services'
+  import { loadSolutionService } from '@/services/marketplace-services'
   import DeploySuccessCard from '@/templates/deploy-template/DeploySuccessCard.vue'
   import CardBox from '@aziontech/webkit/content/card-box'
   import Skeleton from 'primevue/skeleton'
@@ -38,22 +44,6 @@
     loading: {
       type: Boolean,
       default: false
-    },
-    frameworkDetectorService: {
-      type: Function,
-      required: true
-    },
-    instantiateTemplateService: {
-      type: Function,
-      required: true
-    },
-    loadSolutionService: {
-      type: Function,
-      required: true
-    },
-    getResultsService: {
-      type: Function,
-      required: true
     }
   })
 
@@ -420,7 +410,7 @@
 
   const detectAndSetFrameworkPreset = async (accountName, repoName) => {
     try {
-      const result = await props.frameworkDetectorService({
+      const result = await frameworkDetectorService({
         accountName,
         repositoryName: repoName
       })
@@ -512,7 +502,7 @@
     }
 
     try {
-      const response = await props.getResultsService(executionId.value)
+      const response = await loadScriptRunnerExecutionResultsService(executionId.value)
       results.value = response.result
       // Use the real edge domain (e.g. jvr7kusqip.map.azionedge.net) for the success link,
       // not the application name set optimistically at deploy time.
@@ -621,7 +611,7 @@
 
     let response
     try {
-      response = await props.instantiateTemplateService(templateId.value, inputSchema)
+      response = await instantiateTemplate(templateId.value, inputSchema)
     } catch (error) {
       showErrorToast('Deploy error', error)
       isDeploying.value = false
@@ -648,7 +638,7 @@
   const loadSolutionByVendor = async () => {
     try {
       loadingStore.startLoading()
-      const solution = await props.loadSolutionService({
+      const solution = await loadSolutionService({
         vendor: route.params.vendor,
         solution: route.params.solution
       })
@@ -682,7 +672,7 @@
         // For success state, we need to fetch the results
         try {
           loadingStore.startLoading()
-          const response = await props.getResultsService(routeExecutionId)
+          const response = await loadScriptRunnerExecutionResultsService(routeExecutionId)
           results.value = response.result
           // Use application name from query params if available, otherwise from results
           deployedApplicationName.value =

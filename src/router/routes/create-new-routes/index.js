@@ -1,5 +1,3 @@
-import * as MarketplaceService from '@/services/marketplace-services'
-import * as ScriptRunnerService from '@/services/script-runner-service'
 import { windowOpen } from '@/helpers/window-open'
 
 /** @type {import('vue-router').RouteRecordRaw} */
@@ -12,7 +10,6 @@ export const createNewRoutes = {
       name: 'create-something-new',
       component: () => import('@views/CreateNew/CreateView.vue'),
       props: {
-        loadSolutionService: MarketplaceService.loadSolutionService,
         windowOpen
       },
       meta: {
@@ -29,8 +26,6 @@ export const createNewRoutes = {
       name: 'creation-deploy',
       component: () => import('@/views/CreateNew/DeployView.vue'),
       props: {
-        getLogsService: ScriptRunnerService.getScriptRunnerLogsService,
-        getResultsService: ScriptRunnerService.loadScriptRunnerExecutionResultsService,
         windowOpen
       },
       meta: {
@@ -45,10 +40,6 @@ export const createNewRoutes = {
     {
       path: 'templates',
       component: () => import('@/views/CreateNew/CreateViewTemplates.vue'),
-      props: {
-        getTemplatesService: MarketplaceService.getTemplatesService,
-        windowOpen
-      },
       meta: {
         breadCrumbs: [
           {
