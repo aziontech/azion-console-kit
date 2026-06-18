@@ -10,12 +10,20 @@ export const getScriptRunnerLogsService = async (executionId) => {
   return parseHttpResponse(httpResponse)
 }
 
-const formatLog = (log) => ({
+const detectLogType = (content) => {
+  if (content?.includes('Error')) return 'error'
+  if (content?.toLowerCase().includes('warning')) return 'warning'
+  return 'info'
+}
+
+const formatLog = (log, index) => ({
+  id: `log-${index}-${Date.now()}`,
   content: log?.content,
   timeStamp: Intl.DateTimeFormat('us', {
     timeStyle: 'medium',
     hourCycle: 'h23'
-  }).format(new Date(log.timestamp))
+  }).format(new Date(log.timestamp)),
+  type: detectLogType(log?.content)
 })
 
 const adapt = (httpResponse) => {

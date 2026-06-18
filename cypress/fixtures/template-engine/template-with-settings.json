@@ -1,0 +1,60 @@
+{
+  "template_type": "script-runner",
+  "uuid": "fd52edef-5034-4eb5-9378-64c11faa4435",
+  "name": "[V4] Template With Settings",
+  "instantiation_data": {
+    "description": "Deploy a sample application that requires a settings step.",
+    "repository_url": "https://github.com/aziontech/azion-samples",
+    "preview_url": "https://example.azion.app/",
+    "preview_image": "",
+    "envs": [
+      { "key": "VCS_REPO_IS_PUBLIC", "value": "" },
+      { "key": "AZ_NAME", "value": "" },
+      { "key": "ENVIRONMENT", "value": "" }
+    ]
+  },
+  "input_schema": {
+    "type": "object",
+    "title": "Template With Settings",
+    "required": ["platform_feature__vcs_integration__uuid", "az_name", "environment"],
+    "properties": {
+      "platform_feature__vcs_integration__uuid": {
+        "type": "string",
+        "label": "Git Scope",
+        "maxLength": 100,
+        "description": "Select the scope for this template.",
+        "placeholder": "",
+        "isSettingField": false,
+        "instantiation_data_path": ""
+      },
+      "az_name": {
+        "type": "string",
+        "label": "Application Name",
+        "format": "privacy",
+        "maxLength": 100,
+        "validators": [
+          {
+            "regex": "(^(?![aA][zZ][iI][oO][nN]|[bB]2)[A-Za-z0-9\\-]{6,}$)",
+            "errorMessage": "At least 6 characters. Letters, numbers, and hyphens only. No spaces or reserved words like \"Azion\"."
+          }
+        ],
+        "description": "Give a unique and easy-to-remember name to the application.",
+        "placeholder": "Enter a name for your new Edge Application.",
+        "isSettingField": false,
+        "instantiation_data_path": "envs.[1].value"
+      },
+      "environment": {
+        "type": "string",
+        "label": "Environment",
+        "description": "Target environment for this deployment.",
+        "placeholder": "e.g. production",
+        "isSettingField": true,
+        "instantiation_data_path": "envs.[2].value"
+      }
+    }
+  },
+  "is_active": true,
+  "created_at": "2026-04-30T12:09:02.185095Z",
+  "updated_at": "2026-05-18T17:56:54.424630Z",
+  "features": [1]
+}

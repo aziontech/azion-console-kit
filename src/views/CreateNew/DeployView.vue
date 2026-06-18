@@ -47,7 +47,7 @@
               </div>
               <ScriptRunnerBlock
                 title="Deploy Log"
-                :getLogsService="props.getLogsService"
+                :getLogsService="getScriptRunnerLogsService"
                 :executionId="executionId"
                 @onFinish.once="handleFinish"
               />
@@ -152,16 +152,12 @@
   const tracker = inject('tracker')
   import { useDeploy } from '@/stores/deploy'
   import { hasFlagBlockApiV4 } from '@/composables/user-flag'
+  import {
+    getScriptRunnerLogsService,
+    loadScriptRunnerExecutionResultsService
+  } from '@/services/script-runner-service'
 
   const props = defineProps({
-    getLogsService: {
-      type: Function,
-      required: true
-    },
-    getResultsService: {
-      type: Function,
-      required: true
-    },
     windowOpen: {
       type: Function,
       required: true
@@ -205,7 +201,7 @@
 
   const handleFinish = async () => {
     try {
-      const response = await props.getResultsService(route.params.id)
+      const response = await loadScriptRunnerExecutionResultsService(route.params.id)
       results.value = response.result
       toast.add({
         closable: true,

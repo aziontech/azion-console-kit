@@ -1,0 +1,12 @@
+{
+  "result": {
+    "domain": {
+      "id": 98765,
+      "url": "meu-projeto-e2e.azionedge.net"
+    },
+    "edge_application": {
+      "id": 12345,
+      "name": "meu-projeto-e2e"
+    }
+  }
+}

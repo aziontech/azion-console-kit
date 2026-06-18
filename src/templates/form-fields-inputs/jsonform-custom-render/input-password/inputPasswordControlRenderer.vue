@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, inject } from 'vue'
   import { useJsonFormsControl, rendererProps } from '@jsonforms/vue'
   import fieldPassword from '@aziontech/webkit/field-password'
 
@@ -7,29 +7,66 @@
   const props = defineProps(rendererProps())
 
   const { control, handleChange } = useJsonFormsControl(props)
-  const isChanged = ref(false)
+  const isBlurred = ref(false)
+  // Store the error at blur time to prevent updates during typing
+  const blurredError = ref('')
+  // Inject validationAttempted to show errors when validation is triggered
+  const validationAttempted = inject('validationAttempted', ref(false))
+  // Inject function to check if field is required and empty
+  const isFieldRequiredAndEmpty = inject('isFieldRequiredAndEmpty', () => false)
+
   const description = computed(() => control.value.description)
   const label = computed(() => control.value.schema.label)
   const path = computed(() => control.value.path)
   const required = computed(() => control.value.required)
-  const error = computed(() => (control.value.errors ? control.value.schema.error : ''))
-  const errorMessage = computed(() => (!error.value || !isChanged.value ? '' : error.value))
+  // Use custom error from schema if available, otherwise use the JSON Forms validation error
+  const error = computed(() => {
+    if (!control.value.errors) return ''
+    return control.value.schema.error || control.value.errors
+  })
+  // Check if this field is required and empty (for showing "Required" message)
+  const isRequiredAndEmpty = computed(() => {
+    const fieldName = path.value
+    return isFieldRequiredAndEmpty(fieldName)
+  })
+  // Show error only after blur or validation attempted - use stored blurredError to prevent updates during typing
+  const errorMessage = computed(() => {
+    // If validation was attempted (e.g., form submit), show current error
+    if (validationAttempted.value) {
+      if (isRequiredAndEmpty.value) return 'Required'
+      return error.value
+    }
+    // If field was blurred, show the stored error from blur time
+    if (isBlurred.value) {
+      return blurredError.value
+    }
+    return ''
+  })
 
   const onChange = (value) => {
-    isChanged.value = true
     handleChange(path.value, value)
     emit('change', value)
   }
 
   const onBlur = (event) => {
+    isBlurred.value = true
     const value = event.target?.value
     handleChange(path.value, value)
+    // Capture the error at blur time to prevent it from updating during typing
+    if (isRequiredAndEmpty.value) {
+      blurredError.value = 'Required'
+    } else {
+      blurredError.value = error.value
+    }
     emit('blur', value)
   }
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
+  <div
+    class="flex flex-col gap-2"
+    :class="{ '[&_small.p-error]:hidden': errorMessage === 'Required' }"
+  >
     <fieldPassword
       :name="path"
       :label="label"

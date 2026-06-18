@@ -1,0 +1,14 @@
+{
+  "results": {
+    "id": 7777,
+    "email": "e2e@azion.com",
+    "first_name": "Paulo",
+    "last_name": "Ferreira",
+    "is_account_owner": true,
+    "client_id": "22692",
+    "timezone": "America/Sao_Paulo",
+    "utc_offset": "-0300",
+    "two_factor_enabled": false,
+    "permissions": []
+  }
+}
