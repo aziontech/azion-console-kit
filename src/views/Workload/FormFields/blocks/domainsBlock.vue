@@ -69,7 +69,7 @@
   }
 
   const buildAzionDomain = (name) => {
-    const sanitized = (name ?? '').replace(/\s+/g, '')
+    const sanitized = (name ?? '').replace(/\s+/g, '').toLowerCase()
     return sanitized ? `${sanitized}.azion.app` : ''
   }
 

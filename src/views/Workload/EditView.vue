@@ -21,7 +21,7 @@
         </div>
       </div>
     </template>
-    <template #action-bar="{ onCancel }">
+    <template #action-bar="{ onSubmit, onCancel, loading }">
       <Teleport
         to="#action-bar"
         v-if="isMounted"
@@ -32,6 +32,7 @@
             type="button"
             label="Cancel"
             class="max-md:min-w-max"
+            :disabled="loading"
             data-testid="workload-settings__cancel"
             @click="onCancel"
           />
@@ -39,12 +40,16 @@
             outlined
             type="button"
             label="Save as Draft"
+            :loading="loading"
             data-testid="workload-settings__save-draft"
+            @click="onSubmit"
           />
           <PrimeButton
             type="button"
             label="Save and Deploy"
+            :loading="loading"
             data-testid="workload-settings__save-deploy"
+            @click="onSubmit"
           />
         </ActionBarBlock>
       </Teleport>

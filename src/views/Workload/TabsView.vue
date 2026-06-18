@@ -7,11 +7,10 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
-  // import { DataTableActionsButtons } from '@/components/list-table'
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import EditView from './EditView.vue'
   import OverviewTab from './Tabs/OverviewTab.vue'
-  import DeploymentsListSection from './Tabs/sections/DeploymentsListSection.vue'
+  import WorkloadReleasesSection from './Tabs/sections/WorkloadReleasesSection.vue'
   import CreateDeploymentVersionDrawer from './FormFields/components/CreateDeploymentVersionDrawer.vue'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
@@ -23,7 +22,7 @@
     updatedRedirect: { type: String, required: true }
   })
 
-  const TAB_ORDER = ['overview', 'deployment', 'settings']
+  const TAB_ORDER = ['overview', 'versions', 'settings']
   const TAB_TO_INDEX = TAB_ORDER.reduce((acc, name, index) => {
     acc[name] = index
     return acc
@@ -110,12 +109,12 @@
   const workloadName = computed(() => workload.value?.name || '')
 
   const createDrawerVisible = ref(false)
-  const deploymentsRefreshKey = ref(0)
+  const versionsRefreshKey = ref(0)
 
   const onVersionCreated = () => {
-    deploymentsRefreshKey.value += 1
-    if (activeTab.value !== TAB_TO_INDEX['deployment']) {
-      changeTab(TAB_TO_INDEX['deployment'])
+    versionsRefreshKey.value += 1
+    if (activeTab.value !== TAB_TO_INDEX['versions']) {
+      changeTab(TAB_TO_INDEX['versions'])
     }
   }
 
@@ -131,14 +130,7 @@
         :entityName="workloadName"
         description="Configure domains, protocols, certificates, and select the security and application settings executed by this Workload."
       >
-        <template #default>
-          <!-- <DataTableActionsButtons
-            size="small"
-            label="Deploy"
-            data-testid="workload-tabs__deploy-button"
-            @click="createDrawerVisible = true"
-          /> -->
-        </template>
+        <template #default> </template>
       </PageHeadingBlock>
     </template>
     <template #content>
@@ -164,15 +156,15 @@
           />
         </TabPanel>
         <TabPanel
-          header="Deployment"
-          :pt="{ root: { 'data-testid': 'workload-tabs__tab__deployment' } }"
+          header="Versions"
+          :pt="{ root: { 'data-testid': 'workload-tabs__tab__versions' } }"
         >
           <div class="mt-4">
-            <DeploymentsListSection
-              v-if="activeTab === TAB_TO_INDEX['deployment']"
-              :key="deploymentsRefreshKey"
+            <WorkloadReleasesSection
+              v-if="activeTab === TAB_TO_INDEX['versions']"
+              :key="versionsRefreshKey"
               :workloadId="workloadId"
-              :workloadDeploymentId="workload?.workloadDeploymentId"
+              :workload="workload"
             />
           </div>
         </TabPanel>
