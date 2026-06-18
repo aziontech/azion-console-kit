@@ -145,7 +145,8 @@ export class DeploymentService extends BaseService {
     this.queryClient.removeQueries({ queryKey: queryKeys.deployments.all })
 
     return {
-      data: DeploymentAdapter.transformItem(parseItemResponse(data))
+      data: DeploymentAdapter.transformItem(parseItemResponse(data)),
+      meta: data?.meta ?? null
     }
   }
 

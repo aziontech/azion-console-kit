@@ -20,12 +20,6 @@ export const VERSION_COMMAND_BUS_KEY = Symbol('versionCommandBus')
  * }}
  */
 export const createVersionCommandBus = () => {
-  // shallowRef, NEVER ref: ref() would turn the Map into a reactive proxy, and
-  // reactive proxies unwrap refs on property access — `entry.ready` would
-  // become the boolean (not the ref) when iterating, and `entry.ready.value`
-  // would be undefined, inverting the disabled gate in the shell. With
-  // shallowRef the Map and its entries stay raw; reactivity comes from
-  // replacing the whole Map on each register/unregister.
   const registered = shallowRef(new Map())
 
   const register = (command, { execute, ready = null }) => {
@@ -51,7 +45,5 @@ export const createVersionCommandBus = () => {
     return entry.execute(ctx)
   }
 
-  // shallowReadonly (not readonly): blocks external reassignment of .value
-  // without wrapping the Map/entries in proxies (which would unwrap `ready`).
   return { register, emit, registered: shallowReadonly(registered) }
 }

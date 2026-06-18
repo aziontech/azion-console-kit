@@ -1,4 +1,3 @@
-// Versioned Cache Settings service (scoped to appId + versionId).
 import { createVersionedSubResourceService } from '@/services/v2/edge-app/versioned/create-versioned-sub-resource-service'
 import { CacheSettingsAdapter } from '@/services/v2/edge-app/edge-app-cache-settings-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'

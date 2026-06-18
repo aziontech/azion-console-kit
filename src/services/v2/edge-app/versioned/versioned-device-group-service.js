@@ -1,4 +1,3 @@
-// Versioned Edge Application device-groups service (scoped to appId + versionId).
 import { createVersionedSubResourceService } from './create-versioned-sub-resource-service'
 import { DeviceGroupAdapter } from '@/services/v2/edge-app/edge-app-device-group-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'

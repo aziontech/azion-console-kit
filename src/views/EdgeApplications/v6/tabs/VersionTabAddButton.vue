@@ -17,12 +17,10 @@
   defineOptions({ name: 'version-tab-add-button' })
 
   const props = defineProps({
-    // Active tab descriptor; only `canCreate` and `addButtonLabel` are consumed.
     tab: {
       type: Object,
       default: null
     },
-    // Resolved active-tab component instance (exposes `openCreateDrawer`).
     activeComponent: {
       type: Object,
       default: null

@@ -22,13 +22,8 @@
     }
   })
 
-  // `dispatch` carries version lifecycle commands (SAVE, BUILD, ...).
-  // `cancel` is a pure navigation intent — close the edit and go back to the
-  // listing — so it deliberately bypasses the command bus / state machine.
   const emit = defineEmits(['dispatch', 'cancel'])
 
-  // Which available actions render as PRIMARY per state (a list, so a state can
-  // promote more than one). Anything available but unlisted renders secondary.
   const PRIMARY_ACTIONS_BY_STATE = {
     draft: ['SAVE_AND_BUILD'],
     building: ['CANCEL_BUILD'],
@@ -41,7 +36,6 @@
 
   const isDisabled = (action) => props.disabledActions.includes(action)
 
-  // Only promote to primary actions that are actually available in this state.
   const primarySet = computed(
     () =>
       new Set(
@@ -55,8 +49,6 @@
     props.availableActions.filter((action) => primarySet.value.has(action))
   )
 
-  // DELETE is pulled out of the secondary group so it can render right after
-  // Cancel (see template), instead of in availableActions order.
   const deleteAction = computed(() => (props.availableActions.includes('DELETE') ? 'DELETE' : null))
 
   const secondaryActions = computed(() =>

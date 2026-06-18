@@ -6,6 +6,7 @@ import { DigitalCertificatesAdapter } from '../digital-certificates/digital-cert
 import { hasAnyFieldChanged } from '../utils/hasAnyFieldChanged'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { edgeDNSService } from '../edge-dns/edge-dns-service'
+import { hasFlagUseV6Configurations } from '@/composables/user-flag'
 
 const LE_CREATE_NEW = 1
 const LE_REUSE = 2
@@ -27,9 +28,7 @@ export class WorkloadService extends BaseService {
     this.digitalCertificateAdapter = DigitalCertificatesAdapter
     this.edgeDNS = edgeDNSService
 
-    // v6: one Let's Encrypt certificate per domain/FQDN.
     this._certificateIds = new Map()
-    // legacy: a single global Let's Encrypt certificate.
     this._certificateId = null
     this._objLetEncrypt = null
     this._workloadData = null
@@ -50,8 +49,10 @@ export class WorkloadService extends BaseService {
   }
 
   #fetchOne = async ({ id }) => {
+    const isV6 = hasFlagUseV6Configurations()
+
     const [workloadDeployment, zonesResponse, workloadResponse] = await Promise.all([
-      this.workloadDeployment.listWorkloadDeployment(id),
+      isV6 ? Promise.resolve(null) : this.workloadDeployment.listWorkloadDeployment(id),
       this.edgeDNS
         .listEdgeDNSService({ fields: ['domain'], active: 'True' })
         .catch(() => ({ body: [] })),
@@ -61,8 +62,11 @@ export class WorkloadService extends BaseService {
     const zones = (zonesResponse?.body || []).map((zone) => zone.domain?.content ?? zone.domain)
 
     return (
-      this.adapter?.transformLoadWorkload?.(workloadResponse.data, workloadDeployment[0], zones) ??
-      workloadResponse.data
+      this.adapter?.transformLoadWorkload?.(
+        workloadResponse.data,
+        workloadDeployment?.[0],
+        zones
+      ) ?? workloadResponse.data
     )
   }
 
@@ -117,7 +121,6 @@ export class WorkloadService extends BaseService {
     return id
   }
 
-  // v6: ensure a Let's Encrypt certificate per domain/FQDN.
   #ensureCertificateV6 = async (payload) => {
     if (!Array.isArray(payload.domains) || !payload.domains.length) return
 
@@ -127,7 +130,6 @@ export class WorkloadService extends BaseService {
     }
   }
 
-  // legacy: ensure a single global Let's Encrypt certificate (tls.certificate sentinel).
   #ensureCertificateLegacy = async (payload) => {
     if (
       !payload.tls ||
@@ -199,7 +201,9 @@ export class WorkloadService extends BaseService {
       await this.#ensureCertificateLegacy(payload)
     }
     const workload = await this.#ensureWorkload(payload)
-    await this.#ensureDeployment(payload, workload.id)
+    if (!isV6) {
+      await this.#ensureDeployment(payload, workload.id)
+    }
 
     this.queryClient.invalidateQueries({ queryKey: queryKeys.workload.all })
     this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
@@ -315,7 +319,6 @@ export class WorkloadService extends BaseService {
     return this.#hasUncoveredHostnamesForWildcard(subjctName, hostnames)
   }
 
-  // v6: per-domain certificate reconciliation on edit.
   #ensureCertificateForEditV6 = async (payload) => {
     if (!Array.isArray(payload.domains) || !payload.domains.length) return
 
@@ -363,7 +366,6 @@ export class WorkloadService extends BaseService {
     payload.letEncrypt.alternativeNames = alternativeNames.filter((name) => name !== '')
   }
 
-  // legacy: single global certificate reconciliation on edit.
   #ensureCertificateForEditLegacy = async (payload) => {
     const isNewCertificate = payload.tls.certificate === LE_CREATE_NEW
     const isLetsEncrypt = payload.authorityCertificate === 'lets_encrypt'

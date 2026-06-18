@@ -41,10 +41,6 @@
   const route = useRoute()
   const { state, version, disabledActions, dispatch } = useVersionContext()
 
-  // Origin resource for the deploy drawer. EditView (our ancestor) already
-  // `provide`s the loaded Application ref; the route id is a fallback for mounts
-  // where the provide is absent (e.g. stories). `resourceId` is the numeric
-  // Application id; `resourceName` feeds `resources[].name` in the release payload.
   const edgeApplication = inject('edgeApplication', ref(null))
   const resourceId = computed(() => Number(edgeApplication.value?.id ?? route.params.id))
   const resourceName = computed(() => edgeApplication.value?.name ?? '')
@@ -54,8 +50,6 @@
   const showBuild = computed(() => state.value === VERSION_STATES.DRAFT)
   const showDeploy = computed(() => state.value === VERSION_STATES.READY)
 
-  // SAVE_AND_BUILD is gated by form validity: the shell flags it in `disabledActions`
-  // (the handler's `ready` ref) whenever the Main Settings form is invalid.
   const isBuildDisabled = computed(() =>
     disabledActions.value.includes(VERSION_ACTIONS.SAVE_AND_BUILD)
   )
@@ -67,10 +61,6 @@
     isDeployDrawerOpen.value = true
   }
 
-  // Deployable versions for the drawer. Reuses the same `useListVersionsQuery`
-  // (deduped by queryKey with EditView/VersionsTab) so the user can switch the
-  // pre-filled version (req 4.4). Only `ready` versions are deployable, mapped to
-  // the block's `{ label, value }` shape where `value` is the version_id (ULID).
   const versionsQuery = edgeAppVersionService.useListVersionsQuery(resourceId.value)
   const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
   const readyVersionOptions = computed(() =>
@@ -82,9 +72,6 @@
       }))
   )
 
-  // The current version is always a valid option (it is `ready` to reach Deploy).
-  // Fall back to a single-item list when the query has not resolved yet, so the
-  // pre-filled version still renders without the full listing.
   const versionOptions = computed(() => {
     if (readyVersionOptions.value.length) return readyVersionOptions.value
     if (!version.value?.id) return []
@@ -96,9 +83,6 @@
     ]
   })
 
-  // Triggered from editing a `ready` version → pre-fill that version (req 4.1, 4.2).
-  // `version` carries the version_id (ULID) as `id`; the drawer reads
-  // `resourceContext.version.id` for the prefill.
   const deployResourceContext = computed(() => ({
     resourceType: 'application',
     resourceId: resourceId.value,
@@ -107,9 +91,6 @@
     versions: versionOptions.value
   }))
 
-  // "Created Jun 10, 2026 · by guilherme.santana@azion.com". `createdAt`/`lastEditor`
-  // come from the version adapter; there is no dedicated "creator" field, so we use
-  // the same `lastEditor || azion@azion.com` fallback the versions list uses.
   const createdAtLabel = computed(() =>
     version.value?.createdAt ? formatExhibitionDate(version.value.createdAt, 'medium') : null
   )

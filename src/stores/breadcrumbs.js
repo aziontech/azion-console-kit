@@ -13,9 +13,6 @@ export const useBreadcrumbs = defineStore({
       }
 
       this.items = items.map((item) => {
-        // A crumb can declare a parameterized destination (`toRoute`) resolved
-        // from the current route params — e.g. the application crumb linking
-        // back to its versions list, which needs the `:id` from the route.
         const to =
           item.toRoute && route
             ? {
@@ -56,10 +53,6 @@ export const useBreadcrumbs = defineStore({
           }
         }
 
-        // Opt-in: render the raw route param value (e.g. a version id) instead
-        // of the loaded entity name. Checked before the entityName branch so
-        // routes with more than one dynamic item (application + version) don't
-        // collapse both into the same entity name.
         if (item.dynamic && item.routeParam && item.useParamValue) {
           const paramValue = route.params[item.routeParam]
           return {

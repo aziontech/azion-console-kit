@@ -26,7 +26,6 @@
   defineOptions({ name: 'edge-applications-v6-main-settings-tab' })
 
   const props = defineProps({
-    // Parent Application — the form's base values; merged under the version config.
     application: {
       type: Object,
       required: true
@@ -43,15 +42,11 @@
 
   const emit = defineEmits(['command-success', 'command-error', 'cancel'])
 
-  // Factory passed to VersionShell. Defined in setup (not inline in the template)
-  // because, inside template function literals, refs are not auto-unwrapped.
   const useVersionQuery = () =>
     edgeAppVersionService.useLoadVersionQuery(props.resourceId, props.versionId)
 </script>
 
 <template>
-  <!-- Keyed by versionId at the parent: the shell captures resourceId/versionId by
-       value, so a version switch remounts shell + adapter + form. -->
   <VersionShell
     :use-version-query="useVersionQuery"
     :resource-id="resourceId"
@@ -68,8 +63,6 @@
     >
       <div class="relative">
         <FormFieldsEditEdgeApplications class="flex gap-4" />
-        <!-- Shell-slot-resident + Teleported to the heading (#version-lifecycle-action):
-             the version's status + primary action (Build when draft / Deploy when ready). -->
         <VersionHeadingActions />
       </div>
     </ApplicationVersionAdapter>

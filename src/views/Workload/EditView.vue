@@ -69,8 +69,6 @@
 
   const route = useRoute()
 
-  // Teleport target (#action-bar) lives in the page shell (content-block); only
-  // teleport once it exists after mount, mirroring action-bar-with-teleport.
   const isMounted = ref(false)
   onMounted(() => {
     isMounted.value = true

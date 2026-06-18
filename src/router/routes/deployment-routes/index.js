@@ -1,5 +1,3 @@
-// src/router/routes/deployment-routes/index.js
-
 /** @type {import('vue-router').RouteRecordRaw} */
 export const deploymentRoutes = {
   path: '/deployments',

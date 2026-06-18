@@ -119,18 +119,6 @@
         }
       },
       {
-        field: 'versionId',
-        header: 'Last Version',
-        disableSort: true,
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: { content: columnData?.content || '-', severity: 'info' },
-            columnAppearance: 'tag'
-          })
-        }
-      },
-      {
         field: 'lastEditor',
         header: 'Last Editor',
         sortField: 'last_editor',
