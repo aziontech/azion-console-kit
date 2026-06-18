@@ -87,6 +87,45 @@
 
   const filterData = ref(null)
   const selectedFields = ref([])
+  // Columns rendered by the data table mirror `selectedFields`, but interactive
+  // toggles are applied one extra frame later so the sidebar checkbox repaints
+  // instantly instead of waiting for the (heavy) table column re-render in the
+  // same flush. `selectedFields` stays the source of truth (sidebar v-model,
+  // export and share state read it directly).
+  const tableSelectedFields = ref([])
+  let deferTableSync = false
+  let tableSyncRaf1 = null
+  let tableSyncRaf2 = null
+
+  const cancelTableSync = () => {
+    if (tableSyncRaf1) cancelAnimationFrame(tableSyncRaf1)
+    if (tableSyncRaf2) cancelAnimationFrame(tableSyncRaf2)
+    tableSyncRaf1 = null
+    tableSyncRaf2 = null
+  }
+
+  const syncTableSelectedFields = () => {
+    const apply = () => {
+      tableSelectedFields.value = [...selectedFields.value]
+    }
+    // Sync synchronously until mounted (so the table renders with the right
+    // columns on first paint) and when rAF is unavailable (tests/SSR).
+    if (!deferTableSync || typeof requestAnimationFrame !== 'function') {
+      apply()
+      return
+    }
+    cancelTableSync()
+    tableSyncRaf1 = requestAnimationFrame(() => {
+      tableSyncRaf2 = requestAnimationFrame(apply)
+    })
+  }
+
+  watch(selectedFields, syncTableSelectedFields, { immediate: true })
+  onMounted(() => {
+    deferTableSync = true
+  })
+  onBeforeUnmount(cancelTableSync)
+
   const sidebarVisible = ref(typeof window !== 'undefined' ? window.innerWidth > 768 : true)
   const filterBarRef = ref(null)
   const stackByField = ref('none')
@@ -645,7 +684,7 @@
                 <DiscoverDataTable
                   ref="discoverDataTableRef"
                   :data="filteredTableData"
-                  :selectedFields="selectedFields"
+                  :selectedFields="tableSelectedFields"
                   :expandedRows="expandedRows"
                   @update:expandedRows="expandedRows = $event"
                   :detailViewMode="detailViewMode"
