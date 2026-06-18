@@ -234,13 +234,8 @@
         "phase": "request"
       },
       {
-        "id": 570856,
+        "id": 598120,
         "name": "Route Edge API Requests",
-        "phase": "request"
-      },
-      {
-        "id": 537351,
-        "name": "Run Function SSE - to - SSE Beholder Proxy |",
         "phase": "request"
       },
       {
