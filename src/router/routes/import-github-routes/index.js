@@ -1,8 +1,3 @@
-import * as VulcanService from '@/services/vulcan-services'
-import * as GitHubServices from '@/services/github-services'
-import * as TemplateEngineService from '@/services/template-engine-services'
-import * as MarketplaceService from '@/services/marketplace-services'
-
 /** @type {import('vue-router').RouteRecordRaw} */
 export const importGithubRoutes = {
   path: '/github',
@@ -12,12 +7,6 @@ export const importGithubRoutes = {
       path: ':vendor/:solution',
       name: 'github-repository-import',
       component: () => import('@/views/ImportGitHub/ImportGithubView.vue'),
-      props: {
-        listVulcanPresetsService: VulcanService.listVulcanPresetsService,
-        frameworkDetectorService: GitHubServices.frameworkDetectorService,
-        instantiateTemplateService: TemplateEngineService.instantiateTemplate,
-        loadSolutionService: MarketplaceService.loadSolutionService
-      },
       meta: {
         title: 'Import from GitHub',
         breadCrumbs: [

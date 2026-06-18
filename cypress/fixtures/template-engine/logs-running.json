@@ -1,0 +1,7 @@
+{
+  "status": "running",
+  "logs": [
+    { "content": "Cloning repository from GitHub...", "timestamp": "2026-06-10T12:00:00.000Z" },
+    { "content": "Installing dependencies...", "timestamp": "2026-06-10T12:00:03.000Z" }
+  ]
+}

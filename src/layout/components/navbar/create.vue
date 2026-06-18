@@ -5,6 +5,7 @@
     :label="currentLabel"
     class="h-8 w-8 md:w-fit text-white border-header"
     size="small"
+    data-testid="navbar__create-button"
     :pt="{
       label: { class: 'text-white' },
       icon: { class: 'text-white' }
@@ -130,15 +131,15 @@
   }
 
   const solutions = computed(() => ({
-    recommended: recommendedQuery.value.data || [],
-    templates: templatesQuery.value.data || [],
-    githubImport: githubImportQuery.value.data || []
+    recommended: recommendedQuery.value?.data || [],
+    templates: templatesQuery.value?.data || [],
+    githubImport: githubImportQuery.value?.data || []
   }))
 
   const loading = computed(() => ({
-    recommended: !accountData.value.jobRole || recommendedQuery.value.isLoading,
-    templates: templatesQuery.value.isLoading,
-    githubImport: githubImportQuery.value.isLoading
+    recommended: !accountData.value.jobRole || recommendedQuery.value?.isLoading,
+    templates: templatesQuery.value?.isLoading,
+    githubImport: githubImportQuery.value?.isLoading
   }))
 
   const openCreateModalToggle = () => {
