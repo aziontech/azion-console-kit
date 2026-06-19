@@ -103,5 +103,15 @@ export const WorkloadVersionAdapter = {
     const payload = {}
     if (comment != null) payload.comment = comment
     return payload
+  },
+
+  // The inherited cancelBuild/archive (VersionServiceBase) read these; for a
+  // Workload both carry only an optional comment, same as transformActionPayload.
+  transformBuildPayload({ comment } = {}) {
+    return comment != null ? { comment } : {}
+  },
+
+  transformArchivePayload({ comment } = {}) {
+    return comment != null ? { comment } : {}
   }
 }
