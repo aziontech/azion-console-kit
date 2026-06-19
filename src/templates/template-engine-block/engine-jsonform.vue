@@ -965,7 +965,7 @@
 
       <!-- Settings Step - Settings Inputs Slot with 2-column layout -->
       <template #settings-inputs>
-        <div class="settings-jsonform-grid flex flex-wrap w-full gap-2">
+        <div class="settings-jsonform-grid grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 w-full">
           <JsonForms
             v-if="hasSettingsFormProperties && shouldRenderSettingsForm"
             style="display: contents"
@@ -984,20 +984,14 @@
 <style scoped>
   /*
    * JsonForms vue-vanilla wraps fields in a VerticalLayout (.vertical-layout / .vertical-layout-item)
-   * which stacks them as blocks. To get a 2-per-row 50%-each layout in the settings step we
-   * promote the layout root to `display: contents` so each item becomes a direct flex child of
-   * the outer container, then size each item at half the row minus half the gap (gap-2 = 0.5rem).
+   * which stacks them as blocks. We promote both the JsonForms root (style="display: contents")
+   * and the `.vertical-layout` to `display: contents` so each `.vertical-layout-item` becomes a
+   * direct grid item of `.settings-jsonform-grid`, which lays them out 2 per row.
    */
   .settings-jsonform-grid :deep(.vertical-layout) {
     display: contents;
   }
   .settings-jsonform-grid :deep(.vertical-layout-item) {
-    width: 100%;
     min-width: 0;
-  }
-  @media (min-width: 640px) {
-    .settings-jsonform-grid :deep(.vertical-layout-item) {
-      width: calc(50% - 0.25rem);
-    }
   }
 </style>

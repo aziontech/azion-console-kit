@@ -21,6 +21,15 @@ export default {
   // JsonForms text settings field (wrapper carries data-testid="field-<name>")
   settingsEnvironmentField: '[data-testid="field-environment"]',
   settingsEnvironmentInput: '[data-testid="field-environment"] input',
+  // JsonForms settings layout fields (multi-settings fixture) - wrappers laid out 2 per row
+  settingsRegionField: '[data-testid="field-region"]',
+  settingsTierField: '[data-testid="field-tier"]',
+
+  // Azion engine (groups-based schema) repository / settings
+  azionGitScopeDropdown: '[data-testid="field-dropdown__dropdown"]',
+  azionSettingOneInput: 'input[name="setting_one"]',
+  azionSettingTwoInput: 'input[name="setting_two"]',
+  azionSettingThreeInput: 'input[name="setting_three"]',
 
   // Footer / settings actions
   nextButton: '[data-testid="template-engine__next-button"]',

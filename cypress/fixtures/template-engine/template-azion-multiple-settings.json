@@ -1,0 +1,85 @@
+{
+  "template_type": "script-runner",
+  "uuid": "fd52edef-5034-4eb5-9378-64c11faa4435",
+  "name": "[V4] Azion Template With Multiple Settings",
+  "instantiation_data": {
+    "description": "Deploy a sample application (Azion engine) that requires several settings.",
+    "repository_url": "https://github.com/aziontech/azion-samples",
+    "preview_url": "https://example.azion.app/",
+    "preview_image": "",
+    "envs": [
+      { "key": "VCS_REPO_IS_PUBLIC", "value": "" },
+      { "key": "AZ_NAME", "value": "" },
+      { "key": "SETTING_ONE", "value": "" },
+      { "key": "SETTING_TWO", "value": "" },
+      { "key": "SETTING_THREE", "value": "" }
+    ]
+  },
+  "input_schema": {
+    "title": "Azion Template With Multiple Settings",
+    "groups": [
+      {
+        "name": "repository",
+        "label": "Repository",
+        "fields": [
+          {
+            "name": "platform_feature__vcs_integration__uuid",
+            "label": "Git Scope",
+            "type": "text",
+            "attrs": { "required": true },
+            "description": "Select the scope for this template.",
+            "instantiation_data_path": ""
+          },
+          {
+            "name": "az_name",
+            "label": "Application Name",
+            "type": "text",
+            "attrs": { "required": true, "maxLength": 100 },
+            "validators": [
+              {
+                "regex": "(^(?![aA][zZ][iI][oO][nN]|[bB]2)[A-Za-z0-9\\-]{6,}$)",
+                "errorMessage": "At least 6 characters. Letters, numbers, and hyphens only. No spaces or reserved words like \"Azion\"."
+              }
+            ],
+            "description": "Give a unique and easy-to-remember name to the application.",
+            "instantiation_data_path": "envs.[1].value"
+          }
+        ]
+      },
+      {
+        "name": "settings",
+        "label": "Settings",
+        "fields": [
+          {
+            "name": "setting_one",
+            "label": "Setting One",
+            "type": "text",
+            "attrs": {},
+            "description": "First setting field.",
+            "instantiation_data_path": "envs.[2].value"
+          },
+          {
+            "name": "setting_two",
+            "label": "Setting Two",
+            "type": "text",
+            "attrs": {},
+            "description": "Second setting field.",
+            "instantiation_data_path": "envs.[3].value"
+          },
+          {
+            "name": "setting_three",
+            "label": "Setting Three",
+            "type": "text",
+            "attrs": {},
+            "description": "Third setting field.",
+            "instantiation_data_path": "envs.[4].value"
+          }
+        ]
+      }
+    ]
+  },
+  "is_active": true,
+  "created_at": "2026-04-30T12:09:02.185095Z",
+  "updated_at": "2026-05-18T17:56:54.424630Z",
+  "features": [1]
+}

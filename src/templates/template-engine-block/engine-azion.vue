@@ -1496,12 +1496,12 @@
                 </template>
               </div>
 
-              <!-- Single: 1 group in full width -->
+              <!-- Single: 1 group, fields laid out 2 per row -->
               <div
                 v-else
                 class="flex flex-col gap-4 w-full"
               >
-                <div class="flex flex-wrap sm:flex-nowrap gap-x-6 gap-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                   <template
                     v-for="field in removeHiddenFields(row.groups[0].fields)"
                     :key="field.name"
@@ -1509,7 +1509,7 @@
                     <!-- Regular field in single group -->
                     <FieldInputTextPrivacy
                       v-if="field.name === 'az_name'"
-                      class="w-full sm:w-1/2"
+                      class="w-full"
                       :class="{
                         '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
                       }"
@@ -1532,7 +1532,7 @@
                     />
                     <div
                       v-else-if="isHandleField(field.name)"
-                      class="flex flex-col gap-2 w-full sm:w-1/2"
+                      class="flex flex-col gap-2 w-full"
                     >
                       <LabelBlock
                         :for="field.name"
