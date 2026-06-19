@@ -17,11 +17,12 @@
    */
   const STATE_VISUAL = {
     draft: { severity: 'warning', label: 'Draft' },
+    queued: { severity: 'info', label: 'Queued' },
     building: { severity: 'info', label: 'Building' },
     ready: { severity: 'success', label: 'Ready' },
     active: { severity: 'success', label: 'Active' },
     archived: { severity: 'secondary', label: 'Archived' },
-    cancelled: { severity: 'warning', label: 'Cancelled' },
+    canceled: { severity: 'warning', label: 'Canceled' },
     error: { severity: 'danger', label: 'Error' }
   }
 </script>

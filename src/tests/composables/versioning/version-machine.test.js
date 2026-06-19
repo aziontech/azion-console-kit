@@ -12,7 +12,7 @@ describe('version-machine getAvailableActions — DEPLOY availability (Property 
     expect(getAvailableActions('active')).toContain(DEPLOY)
   })
 
-  it.each(['draft', 'building', 'cancelled', 'error', 'archived', 'totally-unknown'])(
+  it.each(['draft', 'queued', 'building', 'canceled', 'error', 'archived', 'totally-unknown'])(
     'does NOT expose DEPLOY in the `%s` state',
     (state) => {
       expect(getAvailableActions(state)).not.toContain(DEPLOY)

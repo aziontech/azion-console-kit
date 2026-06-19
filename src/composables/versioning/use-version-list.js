@@ -18,11 +18,12 @@ import { VERSION_STATES } from '@/composables/versioning/version-machine'
  */
 const STATE_LABELS = {
   [VERSION_STATES.DRAFT]: 'Draft',
+  [VERSION_STATES.QUEUED]: 'Queued',
   [VERSION_STATES.BUILDING]: 'Building',
   [VERSION_STATES.READY]: 'Ready',
   [VERSION_STATES.ACTIVE]: 'Active',
   [VERSION_STATES.ARCHIVED]: 'Archived',
-  [VERSION_STATES.CANCELLED]: 'Cancelled',
+  [VERSION_STATES.CANCELED]: 'Canceled',
   [VERSION_STATES.ERROR]: 'Error'
 }
 

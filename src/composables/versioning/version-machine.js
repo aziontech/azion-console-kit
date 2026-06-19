@@ -9,7 +9,7 @@ export const VERSION_STATES = {
   READY: 'ready',
   ACTIVE: 'active',
   ARCHIVED: 'archived',
-  CANCELLED: 'cancelled',
+  CANCELED: 'canceled',
   ERROR: 'error'
 }
 
@@ -24,7 +24,7 @@ const STATE_STATUS = {
   [VERSION_STATES.READY]: { content: 'Ready', severity: 'success' },
   [VERSION_STATES.ACTIVE]: { content: 'Active', severity: 'success' },
   [VERSION_STATES.ARCHIVED]: { content: 'Archived', severity: 'secondary' },
-  [VERSION_STATES.CANCELLED]: { content: 'Cancelled', severity: 'warning' },
+  [VERSION_STATES.CANCELED]: { content: 'Canceled', severity: 'warning' },
   [VERSION_STATES.ERROR]: { content: 'Error', severity: 'danger' }
 }
 
@@ -37,10 +37,10 @@ export const mapVersionStateToStatus = (state) =>
 
 /**
  * A version is editable when the user can mutate its payload.
- * `draft` is the natural editing state; `cancelled` and `error` are
+ * `draft` is the natural editing state; `canceled` and `error` are
  * recoverable terminal states where the user resumes work on the same draft.
  */
-export const isEditable = (state) => ['draft', 'cancelled', 'error'].includes(state)
+export const isEditable = (state) => ['draft', 'canceled', 'error'].includes(state)
 
 /**
  * Version is queued or being built by the platform — the UI locks writes.
@@ -81,7 +81,7 @@ export const VERSION_ACTIONS = {
  * - `active` inherits the same set as `ready` (both are immutable and built;
  *   the only difference is serving traffic, which does not change what the
  *   user can do through the shell).
- * - `cancelled` and `error` inherit the same set as `draft` because they are
+ * - `canceled` and `error` inherit the same set as `draft` because they are
  *   recoverable states (the user resumes the draft).
  * - `queued`/`building` are transient locks — the only way out is CANCEL_BUILD.
  * - `archived` cannot be edited; only fork a new draft or delete.
@@ -93,7 +93,7 @@ export const STATE_ACTIONS = {
   ready: ['NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE', 'DEPLOY'],
   active: ['NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE', 'DEPLOY'],
   archived: ['NEW_DRAFT_FROM', 'DELETE'],
-  cancelled: ['NEW_DRAFT_FROM', 'DELETE'],
+  canceled: ['NEW_DRAFT_FROM', 'DELETE'],
   error: ['DELETE', 'NEW_DRAFT_FROM']
 }
 
