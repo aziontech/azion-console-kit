@@ -9,7 +9,7 @@
   import PageHeadingBlock from '@/templates/page-heading-block'
   import DeploymentVersionDetails from '@/views/Deployments/components/DeploymentVersionDetails.vue'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
+  import { deploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   defineOptions({ name: 'workload-deployment-details' })
@@ -45,7 +45,7 @@
       { label: 'Workloads', to: '/workloads' },
       {
         label: workloadName.value || null,
-        to: `/workloads/edit/${workloadId}/deployment`,
+        to: `/workloads/edit/${workloadId}/versions`,
         isLoading: !workloadName.value
       },
       { label: 'Deployment Details' }
@@ -76,7 +76,7 @@
 
     isLoadingVersion.value = true
     try {
-      const { data } = await deploymentVersionService.getVersionByIdService(
+      const { data } = await deploymentReleaseService.getReleaseByIdService(
         workloadDeploymentId.value,
         versionId
       )
@@ -131,12 +131,12 @@
     confirmDialog.value.loading = true
     try {
       if (action === 'rollback') {
-        await deploymentVersionService.rollbackVersionService(
+        await deploymentReleaseService.rollbackReleaseService(
           workloadDeploymentId.value,
           version.value.id
         )
       } else {
-        await deploymentVersionService.activateVersionService(
+        await deploymentReleaseService.activateReleaseService(
           workloadDeploymentId.value,
           version.value.id
         )
@@ -237,7 +237,7 @@
         <button
           type="button"
           class="ml-2 text-[var(--primary-color)] hover:underline"
-          @click="router.push(`/workloads/edit/${workloadId}/deployment`)"
+          @click="router.push(`/workloads/edit/${workloadId}/versions`)"
         >
           Back to list
         </button>

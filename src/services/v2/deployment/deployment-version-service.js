@@ -31,7 +31,7 @@ const parseItemResponse = (data) => {
 }
 
 export class DeploymentVersionService extends BaseService {
-  #baseURL = '/deployment-api/v1/deployments'
+  #baseURL = '/deployment-api/v4/deployments'
 
   #invalidateVersions = (deploymentId) => {
     this.queryClient.invalidateQueries({
@@ -144,77 +144,6 @@ export class DeploymentVersionService extends BaseService {
     return { success: true }
   }
 
-  activateVersionService = async (deploymentId, versionId, payload = {}) => {
-    const body = DeploymentVersionAdapter.transformActivatePayload(payload)
-
-    const { data } = await this.http.request({
-      method: 'POST',
-      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/activate`,
-      body
-    })
-
-    this.#invalidateVersions(deploymentId)
-    this.#invalidateDeploymentDetail(deploymentId)
-
-    return {
-      data: DeploymentVersionAdapter.transformItem(parseItemResponse(data))
-    }
-  }
-
-  rollbackVersionService = async (deploymentId, versionId, payload = {}) => {
-    const body = DeploymentVersionAdapter.transformRollbackPayload(payload)
-
-    const { data } = await this.http.request({
-      method: 'POST',
-      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/rollback`,
-      body
-    })
-
-    this.#invalidateVersions(deploymentId)
-    this.#invalidateDeploymentDetail(deploymentId)
-
-    return {
-      data: DeploymentVersionAdapter.transformItem(parseItemResponse(data))
-    }
-  }
-
-  promoteVersionService = async (deploymentId, versionId, payload = {}) => {
-    const body = DeploymentVersionAdapter.transformPromotePayload(payload)
-
-    const { data } = await this.http.request({
-      method: 'POST',
-      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/promote`,
-      body
-    })
-
-    if (body.target_deployment_id) {
-      this.#invalidateVersions(body.target_deployment_id)
-    }
-
-    return {
-      data: DeploymentVersionAdapter.transformItem(parseItemResponse(data))
-    }
-  }
-
-  patchVersionStrategyService = async (deploymentId, versionId, payload = {}) => {
-    const body = DeploymentVersionAdapter.transformStrategyPayload(payload)
-
-    const { data } = await this.http.request({
-      method: 'PATCH',
-      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/strategy`,
-      body
-    })
-
-    this.queryClient.invalidateQueries({
-      queryKey: queryKeys.deployments.versions.detail(deploymentId, versionId)
-    })
-    this.#invalidateVersions(deploymentId)
-
-    return {
-      data: parseItemResponse(data)
-    }
-  }
-
   editDraftVersionService = async (deploymentId, versionId, payload = {}) => {
     const body = DeploymentVersionAdapter.transformEditDraftPayload(payload)
 
@@ -231,10 +160,10 @@ export class DeploymentVersionService extends BaseService {
     }
   }
 
-  deployDraftVersionService = async (deploymentId, versionId) => {
+  buildVersionService = async (deploymentId, versionId) => {
     const { data } = await this.http.request({
       method: 'POST',
-      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/deploy`
+      url: `${this.#baseURL}/${deploymentId}/versions/${versionId}/build`
     })
 
     this.#invalidateVersions(deploymentId)

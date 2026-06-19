@@ -8,8 +8,8 @@
   import PrimeDialog from '@aziontech/webkit/dialog'
   import PrimeButton from '@aziontech/webkit/button'
   import GenericDataView from '@/components/GenericDataView'
-  import { listGlobalDeploymentVersionsMock } from '@/services/v2/deployment/deployment-version-mock'
-  import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
+  import { deploymentService } from '@/services/v2/deployment/deployment-service'
+  import { deploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
   import InlineTag from '@/components/InlineTag'
   import StatusTag from '@/components/StatusTag'
   import EditorAvatarCell from '@/views/Deployments/components/EditorAvatarCell.vue'
@@ -18,6 +18,10 @@
   defineOptions({ name: 'deployments-history-tab' })
 
   const toast = useToast()
+
+  const deployments = ref([])
+  const selectedDeploymentId = ref(null)
+  const deploymentsLoading = ref(false)
 
   const versions = ref([])
   const totalRecords = ref(0)
@@ -92,6 +96,13 @@
     ]
   })
 
+  const deploymentOptions = computed(() =>
+    deployments.value.map((deployment) => ({
+      label: deployment.name || deployment.id,
+      value: deployment.id
+    }))
+  )
+
   const matchesDateRange = (version) => {
     const [from, to] = Array.isArray(dateRange.value) ? dateRange.value : []
     if (!from && !to) return true
@@ -104,20 +115,56 @@
     return true
   }
 
-  const filteredVersions = computed(() => versions.value.filter(matchesDateRange))
+  const matchesEnvironment = (version) => {
+    const environment = filterValues.value.environment
+    if (environment === 'all') return true
+    return version.environmentLabel === environment
+  }
+
+  const filteredVersions = computed(() =>
+    versions.value.filter((version) => matchesDateRange(version) && matchesEnvironment(version))
+  )
+
+  const loadDeployments = async () => {
+    deploymentsLoading.value = true
+    try {
+      const result = await deploymentService.listDeploymentsService({ page: 1, pageSize: 100 })
+      deployments.value = Array.isArray(result?.body) ? result.body : []
+      if (!selectedDeploymentId.value && deployments.value.length) {
+        selectedDeploymentId.value = deployments.value[0].id
+      }
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail: error?.message || 'Failed to load deployments'
+      })
+      deployments.value = []
+    } finally {
+      deploymentsLoading.value = false
+    }
+  }
 
   const loadVersions = async () => {
+    if (!selectedDeploymentId.value) {
+      versions.value = []
+      totalRecords.value = 0
+      return
+    }
+
     loading.value = true
     try {
       const status = filterValues.value.status
-      const environment = filterValues.value.environment
-      const result = await listGlobalDeploymentVersionsMock({
-        page: Math.floor(paginatorFirst.value / paginatorRows.value) + 1,
-        pageSize: paginatorRows.value,
-        search: searchTerm.value?.trim() || undefined,
-        state: status !== 'all' ? status : undefined,
-        environment: environment !== 'all' ? environment : undefined
-      })
+      const result = await deploymentReleaseService.listReleasesService(
+        selectedDeploymentId.value,
+        {
+          page: Math.floor(paginatorFirst.value / paginatorRows.value) + 1,
+          pageSize: paginatorRows.value,
+          search: searchTerm.value?.trim() || undefined,
+          state: status !== 'all' ? status : undefined
+        }
+      )
       versions.value = Array.isArray(result?.body) ? result.body : []
       totalRecords.value = typeof result?.count === 'number' ? result.count : versions.value.length
     } catch (error) {
@@ -194,9 +241,9 @@
     confirmDialog.value.loading = true
     try {
       if (action === 'rollback') {
-        await deploymentVersionService.rollbackVersionService(version.deployment_id, version.id)
+        await deploymentReleaseService.rollbackReleaseService(version.deployment_id, version.id)
       } else {
-        await deploymentVersionService.activateVersionService(version.deployment_id, version.id)
+        await deploymentReleaseService.activateReleaseService(version.deployment_id, version.id)
       }
       toast.add({
         closable: true,
@@ -230,7 +277,7 @@
   }
 
   watch(
-    [searchTerm, filterValues, dateRange],
+    [searchTerm, filterValues, dateRange, selectedDeploymentId],
     () => {
       paginatorFirst.value = 0
     },
@@ -239,9 +286,11 @@
 
   watchDebounced([searchTerm], () => loadVersions(), { debounce: 350, deep: true })
 
-  watch([filterValues, paginatorFirst, paginatorRows], () => loadVersions(), { deep: true })
+  watch([filterValues, paginatorFirst, paginatorRows, selectedDeploymentId], () => loadVersions(), {
+    deep: true
+  })
 
-  onMounted(loadVersions)
+  onMounted(loadDeployments)
 </script>
 
 <template>
@@ -270,6 +319,15 @@
       @open-row-menu="({ event, deployment }) => openRowMenu({ event, version: deployment })"
     >
       <template #toolbar-extras>
+        <Dropdown
+          v-model="selectedDeploymentId"
+          :options="deploymentOptions"
+          :loading="deploymentsLoading"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Deployment"
+          class="dataview-control dataview-dropdown min-w-0 flex-1 sm:min-w-[12rem]"
+        />
         <Dropdown
           v-model="filterValues.status"
           :options="statusOptions"
@@ -406,10 +464,6 @@
     font: inherit;
   }
 
-  /* Match the Dropdown layout: the *wrapper* carries the border + background;
-     the inner input and the trigger button are borderless and share the
-     wrapper's chrome. Replicated from GenericDataView's scoped `dataview-*`
-     rules, which don't reach slotted content authored here. */
   :deep(.dataview-control.p-calendar) {
     display: inline-flex;
     align-items: center;
@@ -454,8 +508,6 @@
     color: var(--text-color-secondary);
   }
 
-  /* Trigger button (default `iconDisplay="button"`) — strip its chrome and
-     just keep the chevron icon, matching `.p-dropdown-trigger`. */
   :deep(.dataview-control.p-calendar .p-datepicker-trigger),
   :deep(.dataview-control.p-calendar > button) {
     flex-shrink: 0;

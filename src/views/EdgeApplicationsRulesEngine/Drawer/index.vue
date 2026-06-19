@@ -51,13 +51,10 @@
       required: false,
       default: 'request'
     },
-    // Versioned Rules Engine service (v6) — a drop-in for the singleton
-    // `rulesEngineService` (same signatures, version-scoped URLs); null in legacy.
     service: {
       type: Object,
       default: null
     },
-    // Version id (v6 only).
     versionId: {
       type: String,
       default: null
@@ -79,7 +76,6 @@
   const cacheSettingsOptions = ref([])
   const originsOptions = ref([])
 
-  // Versioned service (v6) is a drop-in for the singleton; legacy passes nothing.
   const rulesSvc = computed(() => props.service ?? rulesEngineService)
   const initialPhase = ref(props.currentPhase)
 

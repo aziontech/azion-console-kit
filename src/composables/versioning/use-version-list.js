@@ -64,8 +64,6 @@ export function useVersionList(rawVersions, options = {}) {
     { label: 'Status', value: 'state-asc' }
   ]
 
-  // Dropdown-toolbar contract: one entry per filter control. Currently only the
-  // status filter; sort is driven separately via `sort`/`sortOptions`.
   const filters = computed(() => [
     {
       key: 'state',

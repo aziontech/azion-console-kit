@@ -23,8 +23,6 @@
   const toast = useToast()
   const { currentTheme } = storeToRefs(useThemeStore())
 
-  // Outside the VersionShell (legacy flow) this defaults to readOnly/isVersioned
-  // false, so the legacy behavior is unchanged.
   const { readOnly, isVersioned } = useVersionContext()
 
   defineOptions({ name: 'list-edge-applications-device-groups-tab' })
@@ -34,14 +32,10 @@
       required: true,
       type: String
     },
-    // Versioned Rules Engine service injected by the v6 flow — a drop-in for the
-    // singleton `rulesEngineService` (same method names, version-scoped URLs);
-    // null in the legacy flow. Request and Response rules share one table.
     service: {
       type: Object,
       default: null
     },
-    // Version id (v6 only). Forwarded to the Drawer for context/telemetry.
     versionId: {
       type: String,
       default: null
@@ -95,7 +89,6 @@
   const currentPhase = ref('request')
   const hasContentToList = ref(true)
 
-  // Versioned service (v6) is a drop-in for the singleton; legacy passes nothing.
   const rulesSvc = computed(() => props.service ?? rulesEngineService)
   const isReadOnly = computed(() => readOnly.value)
 
@@ -160,7 +153,6 @@
   })
 
   const actions = computed(() => {
-    // Read-only versions expose no row actions (no delete).
     if (isReadOnly.value) return []
 
     return [

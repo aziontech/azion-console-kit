@@ -38,7 +38,6 @@
 
   const emit = defineEmits(['updated', 'command-error', 'cancel'])
 
-  // Creates this instance's unique bus and provides it to descendants.
   const bus = createVersionCommandBus()
   provide(VERSION_COMMAND_BUS_KEY, bus)
 
@@ -58,8 +57,6 @@
     bus
   })
 
-  // A command error never propagates as a rejection — the caller decides the UI (toast) via `command-error`.
-  // Success delivers `{ action, result }` (e.g. draft created by NEW_DRAFT_FROM for navigation).
   const handleDispatch = async (action, payload) => {
     try {
       const result = await dispatch(action, payload)
@@ -69,17 +66,12 @@
     }
   }
 
-  // `dispatch: handleDispatch` (not the raw dispatch) so a teleported-out heading
-  // action still routes success/error through the shell's `updated`/`command-error`
-  // events; availableActions/disabledActions let descendants gate from the shell's
-  // single source of truth.
   provide(VERSION_CONTEXT_KEY, {
     state,
     readOnly,
     version,
     availableActions,
     disabledActions,
-    // Lets shared tabs/forms drop layout the shell already provides (see useVersionContext).
     isVersioned: readonly(ref(true)),
     dispatch: handleDispatch
   })
@@ -92,8 +84,6 @@
 
   const showOverlay = computed(() => isProcessing(state.value))
 
-  // Teleport target (#action-bar) lives in ContentBlock and only exists in the
-  // DOM after mount — same guard the non-versioned ActionBarWithTeleport uses.
   const isMounted = ref(false)
   onMounted(() => {
     isMounted.value = true

@@ -1,7 +1,7 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
   import WorkloadMetricsSection from './sections/WorkloadMetricsSection.vue'
-  import DeploymentsListSection from './sections/DeploymentsListSection.vue'
+  import WorkloadReleasesSection from './sections/WorkloadReleasesSection.vue'
   import ResourcesSection from './sections/ResourcesSection.vue'
   import GroupedList from '@/components/GroupedList'
   import { environmentService } from '@/services/v2/environment/environment-service'
@@ -76,7 +76,10 @@
 
     <div class="flex flex-col xl:flex-row gap-4">
       <div class="xl:flex-[3] min-w-0">
-        <DeploymentsListSection :workloadId="workloadId" />
+        <WorkloadReleasesSection
+          :workloadId="workloadId"
+          :workload="workload"
+        />
       </div>
       <div class="xl:flex-1 flex flex-col gap-4 min-w-0">
         <ResourcesSection :workload="workload" />

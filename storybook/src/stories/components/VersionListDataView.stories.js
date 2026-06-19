@@ -100,7 +100,6 @@ const columns = [
   { key: 'created', label: 'Created', size: 'minmax(180px, 1.2fr)' }
 ];
 
-// Varied states, comments, dates; some items carry lastEditor, one omits it.
 const sampleVersions = [
   {
     id: 'v-1042',

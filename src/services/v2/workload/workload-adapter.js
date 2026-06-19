@@ -13,7 +13,6 @@ const convertPortsArrayToIntegers = (ports) => {
   return ports.map((port) => parseInt(port.value))
 }
 
-// v6: domain entries may be strings or objects carrying environment/certificate.
 function extractAzionAppSubdomain(fullDomains, zones = []) {
   const cleanDomains = []
   let azionAppSubdomains = ''
@@ -40,7 +39,6 @@ function extractAzionAppSubdomain(fullDomains, zones = []) {
   }
 }
 
-// legacy: domain entries are plain strings.
 function extractAzionAppSubdomainLegacy(fullDomains, zones = []) {
   const cleanDomains = []
   let azionAppSubdomains = ''
@@ -80,7 +78,6 @@ const parseName = ({ name, product_version }) => {
   return nameProps
 }
 
-// v6: TLS no longer carries a global certificate (it is per-domain).
 const handleTls = (payload) => {
   if (payload.protocols.http.useHttps) {
     return {
@@ -92,7 +89,6 @@ const handleTls = (payload) => {
   return null
 }
 
-// legacy: TLS carries a single global certificate.
 const handleTlsLegacy = (payload) => {
   if (payload.protocols.http.useHttps) {
     return {
@@ -105,29 +101,45 @@ const handleTlsLegacy = (payload) => {
   return null
 }
 
+const buildV6DomainEntries = (payload) => {
+  return payload.domains
+    .filter(({ subdomain, domain }) => subdomain || domain)
+    .map(({ subdomain, domain, environment }) => ({
+      name: subdomain ? `${subdomain}.${domain}` : domain,
+      environment: environment ?? null
+    }))
+}
+
+const buildV6Bindings = (entries, environmentDeployments = {}) => {
+  const domainsByEnvironment = new Map()
+
+  for (const { name, environment } of entries) {
+    if (environment == null) continue
+    if (!domainsByEnvironment.has(environment)) {
+      domainsByEnvironment.set(environment, [])
+    }
+    domainsByEnvironment.get(environment).push(name)
+  }
+
+  return Array.from(domainsByEnvironment, ([environment, domains]) => ({
+    environment_id: environment,
+    deployment_id: environmentDeployments?.[environment]?.deploymentId ?? null,
+    domains
+  }))
+}
+
 export const WorkloadAdapter = {
   transformCreateWorkload(payload) {
     const isV6 = hasFlagUseV6Configurations()
 
     let domains
     let tls
+    let bindings
 
     if (isV6) {
-      domains = payload.domains
-        .filter(({ subdomain, domain }) => subdomain || domain)
-        .map(({ subdomain, domain, environment, certificate }) => ({
-          name: subdomain ? `${subdomain}.${domain}` : domain,
-          environment: environment ?? null,
-          certificate: certificate ?? null
-        }))
-
-      if (payload.useCustomDomain) {
-        domains.unshift({
-          name: `${payload.customDomain}.azion.app`,
-          environment: payload.domains?.[0]?.environment ?? null,
-          certificate: payload.domains?.[0]?.certificate ?? null
-        })
-      }
+      const domainEntries = buildV6DomainEntries(payload)
+      // domains = domainEntries.map((entry) => entry.name)
+      bindings = buildV6Bindings(domainEntries, payload.environmentDeployments)
 
       tls = handleTls(payload)
     } else {
@@ -172,6 +184,9 @@ export const WorkloadAdapter = {
       domains,
       workload_domain_allow_access: payload.workloadHostnameAllowAccess
     }
+    if (isV6) {
+      payloadResquest.bindings = bindings
+    }
     if (payloadResquest.tls === null) {
       delete payloadResquest.tls
       delete payloadResquest.protocols.http.https_ports
@@ -204,8 +219,6 @@ export const WorkloadAdapter = {
           content: workload.workload_domain
         },
         domains: workload.domains,
-        // Deploy drawer derives environment/deployment cards from these bindings
-        // (design §5.0). The API field is still being finalized; degrade to [].
         bindings: workload.bindings ?? []
       }
     })
@@ -315,7 +328,8 @@ export const WorkloadAdapter = {
         certificate: workload.mtls.config.certificate,
         crl: workload.mtls.config.crl
       },
-      isLocked: isLocked(workload.product_version)
+      isLocked: isLocked(workload.product_version),
+      bindings: workload.bindings ?? []
     }
   }
 }

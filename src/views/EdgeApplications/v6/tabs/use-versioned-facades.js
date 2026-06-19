@@ -16,9 +16,6 @@ import { versionedRulesEngineService } from '@/services/v2/edge-app/versioned/ve
  * @returns {{ cacheSettings: object, deviceGroups: object, functions: object, rulesEngine: object }}
  */
 export const useVersionedFacades = (resourceId, versionId) => {
-  // Shared base for the leading-appId Drawers (Cache Settings, Device Groups):
-  // load/edit receive a leading edgeApplicationId that we drop. `create` is not
-  // uniform across the two and is overridden per-resource (see deviceGroups).
   const buildAppIdLeadingFacade = (svc) => ({
     list: (query) => svc.list(resourceId, versionId, query),
     load: (_edgeApplicationId, id) => svc.load(resourceId, versionId, id),
@@ -27,8 +24,6 @@ export const useVersionedFacades = (resourceId, versionId) => {
     remove: (id) => svc.remove(resourceId, versionId, id)
   })
 
-  // Combined request + response, a drop-in for the non-versioned
-  // `rulesEngineService`; only threads `versionId` into each call.
   const rulesEngine = {
     listRulesEngineRequestAndResponsePhase: ({ edgeApplicationId, params }) =>
       versionedRulesEngineService.listRulesEngineRequestAndResponsePhase({
@@ -69,13 +64,9 @@ export const useVersionedFacades = (resourceId, versionId) => {
 
     deviceGroups: {
       ...buildAppIdLeadingFacade(versionedDeviceGroupService),
-      // Device Groups' Drawer hands create straight to CreateDrawerBlock, which
-      // calls it single-arg (`values`) — unlike the shared `(appId, payload)` shape.
       create: (payload) => versionedDeviceGroupService.create(resourceId, versionId, payload)
     },
 
-    // Functions Drawer uses object args: load reads `functionID`; edit relies on
-    // `payload.id` (preserved by the load adapter) to drive the URL.
     functions: {
       list: (query) => versionedFunctionService.list(resourceId, versionId, query),
       load: ({ functionID }) => versionedFunctionService.load(resourceId, versionId, functionID),

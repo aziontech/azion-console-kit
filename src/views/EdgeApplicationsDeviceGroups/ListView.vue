@@ -21,15 +21,10 @@
       required: true,
       type: Function
     },
-    // Optional facade pre-bound to appId + versionId for the versioned (v6) flow,
-    // shaped `{ list, load, create, edit, remove }`; null in the legacy flow (the
-    // singleton `deviceGroupService` is used instead). create/load/edit keep the
-    // singleton `(edgeApplicationId, ...)` signature so the Drawer stays unchanged.
     service: {
       type: Object,
       default: null
     },
-    // Pass-through version identifier for the versioned flow.
     versionId: {
       type: String,
       default: null
@@ -99,7 +94,6 @@
     drawerDeviceGroups.value.openDrawerEdit(item.id)
   }
 
-  // Use the injected facade (v6) when present, else the singleton service (legacy).
   const listFn = props.service
     ? props.service.list
     : (params) => deviceGroupService.listDeviceGroupService(props.edgeApplicationId, params)

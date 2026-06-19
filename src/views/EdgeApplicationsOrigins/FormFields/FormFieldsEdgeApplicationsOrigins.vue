@@ -12,8 +12,6 @@
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch, inject } from 'vue'
 
-  // Null-ref default so the form is safe without an `edgeApplication` provider
-  // (e.g. embedded in the Rules Engine form under the v6 flow); usages read `.value?`.
   const edgeApplication = inject('edgeApplication', ref(null))
 
   const props = defineProps({

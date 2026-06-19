@@ -11,7 +11,7 @@ Error codes referenced below come from [`ERRORS.md`](./ERRORS.md). Outbox event 
 | State of a single deployment | **GraphQL** | `getResourceState([{resourceType:'deployment', resourceId:<did>}])` |
 | State of a single release | **GraphQL** | `getResourceState([{resourceType:'release', resourceId:<did>, resourceVersion:<rid>}])` |
 | Batch state lookup (N resources, mixed types) | **GraphQL** | `getResourceState([...])` |
-| Paginated release listing for a deployment | **HTTP REST** | `GET /v4/deployments/{did}/releases` (with optional `?state=` filter) |
+| Paginated release listing for a deployment | **HTTP REST** | `GET /v4/deployments/{did}/releases` (filters: `?state=`, `?traffic_role=active`) |
 | Paginated release history of a deployment (state-only) | **GraphQL** | `getDeploymentHistory(clientId, deploymentId, page, pageSize)` |
 | Full resource (not just state) | **HTTP REST** | `GET /v4/deployments/{id}` or `GET /v4/deployments/{did}/releases/{rid}` |
 
@@ -190,7 +190,7 @@ curl -X POST -H 'X-Secret: <secret>' -H 'Content-Type: application/json' \
 
 ### POST /v4/deployments
 
-Creates a new deployment (base row). **Does not emit an outbox event** — the edge first hears about a deployment when its first release is activated.
+Creates a deployment (base row + a v1 version-row in `state='draft'`). **Does not emit an outbox event** and has **no effect on the edge** — by design, a deployment stays purely local until its first release becomes ACTIVE (via `/build_and_activate` or `POST /releases/:rid/activate`). Mirrors the env-api / edge-api convention: drafts are local, only the activation of a release publishes the deployment to the edge.
 
 **Request**
 
@@ -215,7 +215,7 @@ Creates a new deployment (base row). **Does not emit an outbox event** — the e
     "binding_policy": "FLEXIBLE",
     "deployment_policy": "single_version",
     "strategy_defaults": {},
-    "state": "queued",
+    "state": "draft",
     "state_detail": null,
     "client_id": "1234567",
     "created_at": "2026-06-08T14:22:01.812Z",
@@ -255,7 +255,7 @@ Reads a deployment. **Resolves a base-row to its latest READY version** (fallbac
 
 ### PATCH /v4/deployments/{id}
 
-Updates a deployment. Clones the latest READY into a new DRAFT and returns the draft with `meta`. Accepts `name`, `description`, `binding_policy`, `deployment_policy` (idempotent), `strategy_defaults`.
+Updates a deployment. **State-aware**: if the latest `deployment_versions` row is in `state='draft'`, PATCH refines that row in place (no clone). If the latest row is in any other state (`ready`/`error`/`queued`/`building`/`archiving`/`archived`/`canceled`), PATCH **clones** the latest into a new draft and applies the patch there — the existing row is preserved. Successive PATCHes against a deployment whose head is `draft` keep editing the same row; the first PATCH after a finalized version forks a new draft. Returns the draft with `meta`. Accepts `name`, `description`, `binding_policy`, `deployment_policy` (idempotent), `strategy_defaults`.
 
 **Request**
 
@@ -284,7 +284,7 @@ Powered by the external lib `@azion/versioning` mounted under `/v4/deployments`.
 
 ### GET /v4/deployments/{id}/versions
 
-Lists version-rows of a deployment with their `versioning_resource_meta` lifecycle state. Pagination + `?fields=` sparse fieldset.
+Lists version-rows of a deployment with their lifecycle state (now carried directly on the `deployment_versions` row). Pagination + `?fields=` sparse fieldset.
 
 ### POST /v4/deployments/{id}/versions
 
@@ -298,26 +298,13 @@ Creates a new DRAFT by cloning the latest READY version-row. Limit: `MAX_VERSION
 
 ### GET /v4/deployments/{id}/versions/{vid}
 
-Reads a specific version-row by `meta.version_id` (or row id). Response wraps the deployment resource + `meta` object.
+Reads a specific version-row by `:version_id` (the `deployment_versions.id`). Response wraps the deployment resource + a `meta` object carrying the lifecycle fields (incl. `version_id` = the version-row id) — **no `resource_type`** as of lib v2.
 
 ### PATCH /v4/deployments/{id}/versions/{vid}
 
-Edits a DRAFT version-row's build-config fields. Only valid while `meta.state='draft'`.
+Edits a DRAFT version-row's build-config fields. Only valid while the version row's `state='draft'`.
 
 - **409** — version is not a draft
-
-### POST /v4/deployments/{id}/versions/{vid}/build
-
-**Finalize**: transitions DRAFT → QUEUED and emits an INSTALL outbox event. The worker advances `queued → building → ready` via `outbox.status`; the `sync_outbox_to_version_meta` trigger mirrors onto `meta.state`. Mirrors edge-api's `/build` verb.
-
-**Response 202**
-
-```json
-{ "data": { "id": "ADEPVRD1", "state": "queued" } }
-```
-
-- **409** — invalid state transition
-- **422** — catalog validation failed
 
 ### POST /v4/deployments/{id}/versions/{vid}/cancel
 
@@ -344,14 +331,17 @@ Creates a draft release, validates the catalog, transitions to QUEUED, and emits
 ```json
 {
   "resources": [
-    { "resource_id": 521846, "resource_version": "AAPV0001", "resource_type": "application", "name": "my-app" }
+    { "global_id": 521846 }
   ],
-  "strategy": { /* optional */ },
-  "origin":   { /* optional */ }
+  "strategy":              { /* optional */ },
+  "origin":                { /* optional */ },
+  "deployment_version_id": "ADEPVTGT"  /* optional — see below */
 }
 ```
 
-Both ids come from the client at draft time. `resource_id` is the upstream entity id (positive integer, e.g. an Application or Connector row id). `resource_version` is the meta short_id pinned by the upstream catalog when the resource was last published. The /build catalog round-trip only validates state for the pair; it no longer resolves a version on the client's behalf.
+The client supplies only `global_id` per resource — the external REST identity of the upstream entity (positive integer, e.g. an Application or Connector row id). At CREATE the API resolves each `global_id` to its `resource_type` / `resource_id` / `resource_version` via the edge-api `getResourceState(globalIds)` query, then validates composition (exactly one `application`, at-most-one singletons) on the resolved types. `resource_id` / `resource_version` are internal — never accepted in the request, never echoed in the response (which exposes only `global_id` + the resolved `resource_type`), and never surfaced in the outbox payload to the client. A `global_id` the catalog can't resolve → **404**; an unresolvable/invalid type or composition → **422**.
+
+`deployment_version_id` (optional) lets the caller pick **which** `deployment_versions` draft becomes the activated row when the auto-activate trigger fires. Default behavior is "pick the head" (highest `version_number`). With multiple drafts on a deployment, the head may not be the one the caller wants to ship — supply this field to target a specific draft. Validated server-side: the row must belong to `:id` AND be in `state='draft'` (else 422). The use case persists it on `outbox.target_deployment_version_id`; the trigger reads the column and reuses that row instead of the head.
 
 **Response 202**
 
@@ -374,36 +364,48 @@ Operations on the `releases` table — the URL says **releases**, the table stay
 
 ### POST /v4/deployments/{did}/releases
 
-Creates a release in `state="draft"`. Drafts are local — no catalog call, no outbox event. Refine via PATCH; finalize via POST on `/releases/:rid/build`. Limit: `DRAFT_LIMIT_PER_DEPLOYMENT` per `(client_id, deployment_id)` (default 20).
+Creates a release in `state="draft"`. The API resolves each `global_id` against the edge-api catalog at CREATE and validates composition, then persists the draft (resolved `resource_id`/`resource_version` are stored internally). No outbox event is emitted at draft time. Refine via PATCH; finalize via POST on `/releases/:rid/build`. Limit: `DRAFT_LIMIT_PER_DEPLOYMENT` per `(client_id, deployment_id)` (default 20).
 
 **Request**
 
 ```json
 {
   "resources": [
-    { "resource_id": 521846, "resource_version": "AAPV0001", "resource_type": "application", "name": "my-app" }
+    { "global_id": 521846 }
   ],
   "strategy": { /* optional */ },
   "origin":   { /* optional */ }
 }
 ```
 
+Resources are supplied by `global_id` only (see Build-and-Activate above for the full resolution contract).
+
 **Response 202** — `{ "data": { "id": "ARELDRF1", "state": "draft" } }`
 
-- **404** — deployment not found
-- **422** — `43003 DRAFT_LIMIT_EXCEEDED`
+- **400** — `global_id` missing / not a positive integer / unknown key (strict)
+- **404** — deployment not found, or a `global_id` the catalog can't resolve
+- **422** — composition invalid / unknown resource type (`43002`), or `43003 DRAFT_LIMIT_EXCEEDED`
 
 ### GET /v4/deployments/{did}/releases
 
-Lists releases for a deployment. Pagination + `?state` filter.
+Lists releases for a deployment. Pagination + optional filters:
+
+- `?state=<lifecycle>` — exact match on `releases.state` (`draft`/`queued`/`building`/`ready`/`error`/`canceled`/`archiving`/`archived`).
+- `?traffic_role=active` — **semantic** filter: returns only what is currently serving traffic. Set depends on the deployment's `deployment_policy`:
+    - `single_version` → `ACTIVE` + `CANDIDATE` (CANDIDATE only present during a gradual rollout in progress).
+    - `versioned_urls` → `ACTIVE` + `VALID_URL` (every slot serves traffic via its versioned hostname).
+
+Both filters can be combined and intersect (e.g. `?state=ready&traffic_role=active`). Only the literal `'active'` is accepted on `traffic_role` — the raw enum is intentionally not exposed (the contextual policy-aware meaning is the useful one).
+
+- **404** — `?traffic_role=active` requires a deployment lookup; unknown `:did` returns `43000 DEPLOYMENT_NOT_FOUND`. Without `traffic_role=active` the list returns an empty page for unknown ids (current behavior).
 
 ### GET /v4/deployments/{did}/releases/{rid}
 
-Reads a single release. Response includes `resources`, `strategy`, `urls`, `kivo`, `origin`, `audit`, `traffic_role`, `state`, etc.
+Reads a single release. Response includes `resources` (each `{ global_id, resource_type }` — `resource_id`/`resource_version` stay internal), `strategy`, `urls`, `kivo`, `origin`, `audit`, `traffic_role`, `state`, etc.
 
 ### PATCH /v4/deployments/{did}/releases/{rid}
 
-Full-replace patch over a release in `draft` **or** `error` (`resources`, `strategy`, `origin`). Body must carry ≥1 of the three. The row stays in its source state — PATCH never transitions to `queued`; the subsequent `/build` does. Admitting `error` here lets a failed release be edited and rebuilt in place without going through delete + recreate. Other states (`canceled`, `queued`, `building`, `ready`, `archived`, `archiving`) are rejected with 409.
+Full-replace patch over a release in `draft` **or** `error` (`resources` as `[{ global_id }]`, `strategy`, `origin`). Body must carry ≥1 of the three. Replacing `resources` re-resolves the `global_id`s against the catalog and re-validates composition. The row stays in its source state — PATCH never transitions to `queued`; the subsequent `/build` does. Admitting `error` here lets a failed release be edited and rebuilt in place without going through delete + recreate. Other states (`canceled`, `queued`, `building`, `ready`, `archived`, `archiving`) are rejected with 409.
 
 - **409** — release is not in `draft` nor `error`
 
@@ -420,7 +422,16 @@ Full-replace patch over a release in `draft` **or** `error` (`resources`, `strat
 
 ### DELETE /v4/deployments/{did}/releases/{rid}
 
-Deletes a release. Allowed only for draft/canceled/error/archived states; blocked otherwise.
+Hard-deletes a release on the Control Plane. Non-draft deletes also emit a `release / delete` outbox row so the worker reclaims the Data Plane artifacts (Kivo, edge build cache).
+
+**Gating** — a release can be deleted in any state **except** the intermediate worker-driven states (`queued`/`building`/`archiving`), and only when it isn't currently routing traffic. Concretely:
+
+- `draft` → always allowed; no outbox emitted.
+- `ready`, `error`, `canceled`, `archived` → allowed when `traffic_role === 'INACTIVE'`. Outbox emitted (`release / delete`).
+- `queued`/`building`/`archiving` → **409 `VersionInProcessing`** (call `/cancel` first).
+- `traffic_role !== 'INACTIVE'` (ACTIVE / CANDIDATE / VALID_URL) → **409 `VersionStillReferenced`** (demote first via `/activate` of another release, `/rollback`, etc.).
+
+The previous "must `/archive` first when state is `ready`" rule was dropped — a ready release already demoted out of routing is deletable directly.
 
 ---
 
@@ -461,16 +472,19 @@ Routes traffic to this release. `single_version` deployments swap `ACTIVE` insta
 
 In addition to the routing update, every INSTANT activate (and `versioned_urls` slot append) snapshots the deployment build-config into a new (or reused) deployment version-row carrying `activated_release_id = <rid>`. The rule:
 
-- If the latest deployment version-row's `meta.state = 'draft'` (a pending PATCH or POST /versions draft) → that draft is **promoted to `ready`** + stamped with `activated_release_id`. No new row created.
-- Otherwise → the latest READY version-row (fallback latest, fallback base) is cloned into a new version-row directly in `state='ready'`, with `activated_release_id` set + a fresh `versioning_resource_meta` row in `state='ready'`.
+- If `deployment_version_id` is supplied and points at a draft on this deployment → **that draft** is promoted to `ready` + stamped with `activated_release_id`. No new row created. Same override the trigger consumes for `/build_and_activate`.
+- Else if the latest deployment version-row's `state = 'draft'` (a pending PATCH or POST /versions draft) → the head draft is **promoted to `ready`** + stamped with `activated_release_id`. No new row created.
+- Otherwise → the latest READY version-row (fallback latest, fallback base) is cloned into a new version-row directly in `state='ready'`, with `activated_release_id` set (the lifecycle is on the row itself — no separate meta).
 
 GRADUAL activations (CANDIDATE only) skip the snapshot — it fires when the candidate is later promoted to ACTIVE.
 
 The same logic applies to the `/build_and_activate` auto-activate path inside trigger `trg_outbox_auto_activate_on_success`.
 
-**Request** — `{ "strategy": { /* optional override */ } }`
-- **202** — `{ "data": { "id": "ARELACT1", "state": "routed" } }`
-- **422** — `VERSIONED_URLS_ACTIVE_LIMIT` exceeded
+**Request** — `{ "strategy": { /* optional override */ }, "deployment_version_id": "ADEPVTGT" /* optional */ }`
+
+When omitted, the head (highest `version_number`) is used. When provided, must reference a `deployment_versions` row of `:did` in `state='draft'` (else 422 Validation). For the sync `/activate` path the failure is loud (the request fails); the async `/build_and_activate` trigger silently falls back to the head when an override is stale (so a long-running build doesn't fail because the targeted draft was already promoted by a concurrent activate).
+- **202** — `{ "data": { "id": "ARELACT1", "state": "ready" } }`
+- **422** — `VERSIONED_URLS_ACTIVE_LIMIT` exceeded, or `deployment_version_id` is unknown / belongs to another deployment / is not `draft`
 
 ### POST /v4/deployments/{did}/releases/{rid}/rollback
 
@@ -490,7 +504,7 @@ Mutates `releases.strategy` for the ACTIVE release (`single_version` only). Part
 
 ## State machine
 
-The 10-state enum applies to `releases.state` and `versioning_resource_meta.state` (lifecycle of base+version rows):
+The 10-state enum applies to `releases.state` and `deployment_versions.state` (lifecycle of base+version rows):
 
 ```
 draft → queued → building → ready
@@ -501,7 +515,7 @@ ready → deleting → deleted
 draft/error/canceled → archived | deleted    (direct, no outbox)
 ```
 
-API-driven transitions: `create draft`, `finalize` (POST on `:vid/build` or `:rid/build`), `cancel`, `archive`, `delete`, `activate`, `rollback`, `promote`. Worker drives `queued → building → ready` (and `archiving → archived`, `deleting → deleted`) via `outbox.status` updates; the `sync_outbox_to_version_meta` trigger (vendored from `azion-api-libs/azion-versioning`) mirrors onto `versioning_resource_meta.state`.
+API-driven transitions: `create draft`, `finalize` (POST on `:vid/build` or `:rid/build`), `cancel`, `archive`, `delete`, `activate`, `rollback`, `promote`. Worker drives `queued → building → ready` (and `archiving → archived`, `deleting → deleted`) via `outbox.status` updates; the `sync_outbox_to_version_meta` trigger (vendored from `azion-api-libs/azion-versioning`) mirrors onto `deployment_versions.state`.
 
 For `releases`, `traffic_role` is orthogonal to `state` and controls routing. The partial UNIQUE index `idx_unique_active_version` enforces **one `ACTIVE` per `deployment_id`**.
 

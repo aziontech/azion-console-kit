@@ -119,8 +119,6 @@ export const edgeApplicationRoutes = {
       name: 'edit-application-version',
       component: () => import('@views/EdgeApplications/v6/VersionEditView.vue'),
       props: () => ({
-        // Legacy origins service injected here (router-level) so the v6 full editor
-        // stays free of direct HTTP imports; consumed by the versioned Rules tab.
         listOriginsService: OriginsService.listOriginsService
       }),
       meta: {

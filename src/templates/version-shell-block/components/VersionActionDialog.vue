@@ -27,17 +27,14 @@
       type: String,
       default: 'Add a comment...'
     },
-    // Optional descriptive copy shown above the body (e.g. Delete confirmations).
     message: {
       type: String,
       default: ''
     },
-    // When false the comment field is hidden — a pure confirmation dialog.
     showComment: {
       type: Boolean,
       default: true
     },
-    // Confirm button severity; destructive actions (Delete) pass `danger`.
     confirmSeverity: {
       type: String,
       default: 'primary'
@@ -56,7 +53,6 @@
   )
 
   const isConfirmDisabled = computed(() => {
-    // Pure confirmation (no comment field) is always enabled.
     if (!props.showComment) return false
     if (!props.requireComment) return false
     return comment.value.trim().length === 0

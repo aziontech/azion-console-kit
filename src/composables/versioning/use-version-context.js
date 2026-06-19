@@ -26,15 +26,12 @@ export const VERSION_CONTEXT_KEY = Symbol('versionContext')
  * }}
  */
 export const useVersionContext = () => {
-  // Real refs (not plain `{ value }`) so consumers behave identically whether the
-  // shell provides them or they fall back to this default.
   return inject(VERSION_CONTEXT_KEY, {
     state: readonly(ref('draft')),
     readOnly: readonly(ref(false)),
     version: readonly(ref(null)),
     availableActions: readonly(ref([])),
     disabledActions: readonly(ref([])),
-    // Default = standalone/legacy mount: no version shell above us.
     isVersioned: readonly(ref(false)),
     dispatch: async () => {}
   })

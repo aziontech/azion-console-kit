@@ -6,7 +6,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import { DataTableActionsButtons } from '@/components/list-table'
-  import OverviewTab from '@/views/Deployments/tabs/OverviewTab.vue'
+  import SettingsTab from '@/views/Deployments/tabs/SettingsTab.vue'
   import DeploymentHistoryTab from '@/views/Deployments/tabs/DeploymentHistoryTab.vue'
 
   defineOptions({ name: 'tabs-deployments' })
@@ -72,7 +72,7 @@
           header="Settings"
           :pt="{ root: { 'data-testid': 'deployments-tabs__tab__overview' } }"
         >
-          <OverviewTab v-if="activeTab === TAB_TO_INDEX.overview" />
+          <SettingsTab v-if="activeTab === TAB_TO_INDEX.overview" />
         </TabPanel>
         <TabPanel
           header="Deployment History"
