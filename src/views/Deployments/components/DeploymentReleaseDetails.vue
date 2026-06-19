@@ -2,15 +2,14 @@
   import { computed } from 'vue'
   import StatusTag from '@/components/StatusTag'
   import InlineTag from '@/components/InlineTag'
-  import EditorAvatarCell from '@/views/Deployments/components/EditorAvatarCell.vue'
   import DeploymentLogsAccordion from '@/views/Deployments/components/DeploymentLogsAccordion.vue'
   import { deploymentLogsMock } from '@/views/Deployments/components/deployment-logs.mock'
   import { convertToRelativeTime } from '@/helpers/convert-date'
 
-  defineOptions({ name: 'deployment-version-details' })
+  defineOptions({ name: 'deployment-release-details' })
 
   const props = defineProps({
-    version: {
+    release: {
       type: Object,
       required: true
     },
@@ -20,39 +19,37 @@
     }
   })
 
-  const resources = computed(() => props.version?.resources ?? [])
+  const resources = computed(() => props.release?.resources ?? [])
 
   const createdRelative = computed(() =>
-    props.version?.created_at ? convertToRelativeTime(props.version.created_at) : ''
+    props.release?.created_at ? convertToRelativeTime(props.release.created_at) : ''
   )
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <div
-      class="rounded-md border border-[var(--surface-border)] overflow-hidden bg-[var(--surface-section)]"
-    >
-      <div class="flex flex-wrap">
+    <div class="rounded-md border border-[var(--surface-border)] overflow-hidden">
+      <div class="flex flex-wrap gap-px bg-[var(--surface-border)]">
         <div
-          class="flex flex-col items-start p-3 basis-full sm:basis-1/2 md:basis-1/3 border-b border-[var(--surface-border)] md:border-r"
+          class="flex flex-col items-start p-3 bg-[var(--surface-section)] grow basis-full sm:basis-[calc((100%_-_1px)/2)] md:basis-[calc((100%_-_2px)/3)] min-w-0"
         >
           <div class="flex items-center h-6">
             <span class="text-xs text-[var(--text-color-secondary)]">Environment</span>
           </div>
-          <div class="flex items-center gap-1 h-6">
+          <div class="flex items-center gap-1 h-6 w-full min-w-0">
             <span
-              v-if="version.environmentLabel"
+              v-if="release.environmentLabel"
               class="text-sm text-[var(--text-color)]"
             >
-              {{ version.environmentLabel }}
+              {{ release.environmentLabel }}
             </span>
             <i
-              v-if="version.environmentIcon"
-              :class="[version.environmentIcon, 'text-xs text-[var(--text-color-secondary)]']"
+              v-if="release.environmentIcon"
+              :class="[release.environmentIcon, 'text-xs text-[var(--text-color-secondary)]']"
               aria-hidden="true"
             />
             <InlineTag
-              v-if="version.isCurrent"
+              v-if="release.isCurrent"
               text="Current"
               type="info"
               icon="pi pi-arrow-circle-up"
@@ -61,33 +58,39 @@
         </div>
 
         <div
-          class="flex flex-col items-start p-3 basis-full sm:basis-1/2 md:basis-1/3 border-b border-[var(--surface-border)] md:border-r"
+          class="flex flex-col items-start p-3 bg-[var(--surface-section)] grow basis-full sm:basis-[calc((100%_-_1px)/2)] md:basis-[calc((100%_-_2px)/3)] min-w-0"
         >
           <div class="flex items-center h-6">
             <span class="text-xs text-[var(--text-color-secondary)]">Status</span>
           </div>
-          <div class="flex items-center gap-2 h-6">
-            <StatusTag :status="version.status" />
+          <div class="flex items-center gap-2 h-6 w-full min-w-0">
+            <StatusTag :status="release.status" />
             <span
-              v-if="version.duration"
+              v-if="release.duration"
               class="text-xs text-[var(--text-color-secondary)] whitespace-nowrap"
             >
-              {{ version.duration }}
+              {{ release.duration }}
             </span>
           </div>
         </div>
 
         <div
-          class="flex flex-col items-start p-3 basis-full sm:basis-1/2 md:basis-1/3 border-b border-[var(--surface-border)]"
+          class="flex flex-col items-start p-3 bg-[var(--surface-section)] grow basis-full sm:basis-[calc((100%_-_1px)/2)] md:basis-[calc((100%_-_2px)/3)] min-w-0"
         >
           <div class="flex items-center h-6">
             <span class="text-xs text-[var(--text-color-secondary)]">Created</span>
           </div>
-          <div class="flex items-center gap-1 h-6">
-            <EditorAvatarCell :email="version.lastEditor" />
+          <div class="flex items-center gap-2 h-6 w-full min-w-0">
+            <span
+              v-if="release.lastEditor"
+              class="text-sm text-[var(--text-color)] truncate"
+              data-sentry-mask
+            >
+              {{ release.lastEditor }}
+            </span>
             <span
               v-if="createdRelative"
-              class="text-xs text-[var(--text-color-secondary)] whitespace-nowrap"
+              class="text-xs text-[var(--text-color-secondary)] whitespace-nowrap shrink-0"
             >
               {{ createdRelative }}
             </span>
@@ -97,15 +100,15 @@
         <div
           v-for="(resource, index) in resources"
           :key="resource.id || `${resource.type}-${index}`"
-          class="flex flex-col items-start p-3 basis-full sm:basis-1/2 md:basis-1/3 border-b border-[var(--surface-border)] last:border-b-0 [&:not(:nth-child(3n))]:md:border-r"
+          class="flex flex-col items-start p-3 bg-[var(--surface-section)] grow basis-full sm:basis-[calc((100%_-_1px)/2)] md:basis-[calc((100%_-_2px)/3)] min-w-0"
         >
           <div class="flex items-center h-6">
             <span class="text-xs text-[var(--text-color-secondary)]">{{ resource.label }}</span>
           </div>
-          <div class="flex items-center gap-1 h-6">
-            <div class="flex items-center gap-3 p-1">
+          <div class="flex items-center gap-1 h-6 w-full min-w-0">
+            <div class="flex items-center gap-3 p-1 min-w-0">
               <i
-                :class="[resource.icon, 'text-xs text-[var(--text-color-secondary)]']"
+                :class="[resource.icon, 'text-xs text-[var(--text-color-secondary)] shrink-0']"
                 aria-hidden="true"
               />
               <span class="text-sm text-[var(--text-color)] truncate">{{
@@ -113,10 +116,10 @@
               }}</span>
             </div>
             <span
-              v-if="resource.versionId"
-              class="text-xs text-[var(--text-color-secondary)] whitespace-nowrap"
+              v-if="resource.versionName || resource.versionId"
+              class="text-xs text-[var(--text-color-secondary)] whitespace-nowrap shrink-0"
             >
-              {{ resource.versionId }}
+              {{ resource.versionName || resource.versionId }}
             </span>
           </div>
         </div>

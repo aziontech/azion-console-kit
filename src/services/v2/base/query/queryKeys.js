@@ -269,6 +269,10 @@ export const queryKeys = {
         'detail',
         id
       ]
+    },
+    version: {
+      all: (parentId) => [...queryKeys.firewall.detail(parentId), 'versions'],
+      list: (parentId) => [...queryKeys.firewall.detail(parentId), 'versions', 'list']
     }
   },
   teams: {

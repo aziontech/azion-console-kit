@@ -1,8 +1,5 @@
 <script setup>
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import InputText from '@aziontech/webkit/inputtext'
-  import LabelBlock from '@aziontech/webkit/label'
-  import CopyBlock from '@aziontech/webkit/button-copy'
   import PrimeButton from '@aziontech/webkit/button'
   import CollapsibleCard from '@/components/CollapsibleCard'
   import DomainRow from '../components/DomainRow.vue'
@@ -11,6 +8,7 @@
   import { ref, computed, onMounted, watch } from 'vue'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import { environmentService } from '@/services/v2/environment/environment-service'
+  import { mapPolicyToLabel } from '@/services/v2/environment/environment-adapter'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 
   const props = defineProps({
@@ -30,7 +28,6 @@
 
   const { errorMessage: domainsErrorMessage, value: domains } = useField('domains')
   const { push: pushDomain, remove, update: updateDomain } = useFieldArray('domains')
-  const { value: workloadHostname } = useField('workloadHostname')
   const { value: workloadName } = useField('name')
   const { value: useCustomDomain, setValue: setUseCustomDomain } = useField('useCustomDomain')
   const { value: customDomain, setValue: setCustomDomain } = useField('customDomain')
@@ -47,25 +44,29 @@
   const drawerInitialData = ref(null)
   const firstDomainTouched = ref(false)
 
-  const ensureEnvironmentInfo = async (envId) => {
-    if (!envId || environmentMap.value[envId]) return
+  const loadEnvironments = async () => {
     try {
-      const env = await environmentService.loadEnvironmentService({ id: envId })
-      if (env?.id != null) {
-        environmentMap.value[env.id] = {
+      const { body } = await environmentService.listEnvironmentsService()
+      const map = {}
+      for (const env of body ?? []) {
+        if (env?.id == null) continue
+        map[String(env.id)] = {
           name: env.name,
           deployment_policy: env.deployment_policy
         }
       }
+      environmentMap.value = map
     } catch {
-      // intentionally swallowed: env label is non-blocking UX
+      // intentionally swallowed: env labels are non-blocking UX
     }
   }
 
-  const environmentName = (envId) => environmentMap.value[envId]?.name ?? ''
+  const environmentName = (envId) => environmentMap.value[String(envId)]?.name ?? ''
 
   const isUrlVersionedEnv = (envId) => {
-    return environmentMap.value[envId]?.deployment_policy === 'versioned_urls'
+    return (
+      environmentMap.value[String(envId)]?.deployment_policy === mapPolicyToLabel('versioned_urls')
+    )
   }
 
   const buildAzionDomain = (name) => {
@@ -171,8 +172,6 @@
     } else {
       pushDomain(domainPayload)
     }
-
-    ensureEnvironmentInfo(domainPayload.environment)
   }
 
   const removeDomain = (index) => {
@@ -192,13 +191,6 @@
     try {
       const { body } = await environmentService.listEnvironmentsService()
       const production = body?.find((env) => env.name === 'Production')
-
-      if (production?.id != null) {
-        environmentMap.value[production.id] = {
-          name: production.name,
-          deployment_policy: production.deployment_policy
-        }
-      }
 
       const seed = {
         subdomain: '',
@@ -227,21 +219,8 @@
     updateDomain(0, { ...current, domain: buildAzionDomain(newName) })
   })
 
-  watch(
-    domains,
-    async (rows) => {
-      if (!Array.isArray(rows)) return
-      for (const row of rows) {
-        const envId = row?.environment ?? null
-        if (envId) {
-          await ensureEnvironmentInfo(envId)
-        }
-      }
-    },
-    { immediate: true, deep: true }
-  )
-
   onMounted(() => {
+    loadEnvironments()
     sugestionDomains()
     fetchCertificates()
     seedInitialDomain()
@@ -256,31 +235,6 @@
     :noBorder="props.noBorder"
   >
     <template #inputs>
-      <div
-        v-if="props.isEdit"
-        class="flex gap-2 md:align-items-center max-sm:flex-col max-sm:align-items-top max-sm:gap-3"
-      >
-        <div class="flex flex-col sm:max-w-lg w-full gap-2">
-          <LabelBlock label="Workload Domain" />
-          <span class="p-input-icon-right w-full flex max-w-lg flex-col items-start gap-2">
-            <i class="pi pi-lock" />
-            <InputText
-              id="workloadHostname"
-              data-testid="edit-domains-form__domain-field__input"
-              v-model="workloadHostname"
-              type="text"
-              class="flex flex-col w-full"
-              :feedback="false"
-              disabled
-            />
-          </span>
-          <small class="text-xs text-color-secondary font-normal leading-5">
-            The default domain used to route traffic to your Workload.
-          </small>
-        </div>
-        <copyBlock :value="workloadHostname" />
-      </div>
-
       <div class="flex flex-col gap-3 max-w-3xl w-full">
         <CollapsibleCard
           title="Domain"
