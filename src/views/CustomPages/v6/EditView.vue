@@ -84,7 +84,7 @@
     rawVersions.value
       .filter((version) => version.state === VERSION_STATES.READY)
       .map((version) => ({
-        label: version.comment || `Versão ${version.id}`,
+        label: version.comment || `Version ${version.id}`,
         value: version.id
       }))
   )
@@ -102,15 +102,15 @@
 
   const customPageTitle = computed(() => customPage.value?.name ?? '')
   const pageDescription =
-    'Cada versão é um snapshot isolado da configuração desta Custom Page. Edite um rascunho e construa-o para publicar uma versão imutável.'
+    "Each version is an isolated snapshot of this custom page's configuration. Edit a draft, then build it to publish an immutable version."
 
   const SUCCESS_SUMMARY = {
-    [VERSION_ACTIONS.SAVE]: 'Versão salva',
-    [VERSION_ACTIONS.SAVE_AND_BUILD]: 'Build iniciado',
-    [VERSION_ACTIONS.CANCEL_BUILD]: 'Build cancelado',
-    [VERSION_ACTIONS.NEW_DRAFT_FROM]: 'Rascunho criado',
-    [VERSION_ACTIONS.ARCHIVE]: 'Versão arquivada',
-    [VERSION_ACTIONS.DELETE]: 'Versão excluída'
+    [VERSION_ACTIONS.SAVE]: 'Version saved',
+    [VERSION_ACTIONS.SAVE_AND_BUILD]: 'Build started',
+    [VERSION_ACTIONS.CANCEL_BUILD]: 'Build cancelled',
+    [VERSION_ACTIONS.NEW_DRAFT_FROM]: 'Draft created',
+    [VERSION_ACTIONS.ARCHIVE]: 'Version archived',
+    [VERSION_ACTIONS.DELETE]: 'Version deleted'
   }
 
   const goToVersionsList = () => {
@@ -128,7 +128,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: SUCCESS_SUMMARY[action] ?? 'Concluído'
+      summary: SUCCESS_SUMMARY[action] ?? 'Done'
     })
 
     switch (action) {
@@ -157,12 +157,12 @@
       return
     }
 
-    const detail = error?.message ?? (typeof error === 'string' ? error : 'Algo deu errado')
+    const detail = error?.message ?? (typeof error === 'string' ? error : 'Something went wrong')
 
     toast.add({
       closable: true,
       severity: 'error',
-      summary: 'Erro',
+      summary: 'Error',
       detail
     })
   }
@@ -186,7 +186,7 @@
     severity="error"
     data-testid="custom-pages-v6-edit__error"
   >
-    Falha ao carregar a Custom Page. Tente atualizar a página.
+    Failed to load custom page. Try refreshing the page.
   </InlineMessage>
 
   <ContentBlock
@@ -245,13 +245,13 @@
             >
               <i class="pi pi-file-edit text-2xl text-[var(--text-color-secondary)]" />
               <h3 class="m-0 text-base font-semibold leading-6 text-[var(--text-color)]">
-                Nenhuma versão para editar ainda
+                No version to edit yet
               </h3>
               <p class="m-0 max-w-md text-sm leading-6">
-                Crie uma versão na aba Versions para começar a configurar esta Custom Page.
+                Create a version in the Versions tab to start configuring this custom page.
               </p>
               <PrimeButton
-                label="Nova Versão"
+                label="New Version"
                 icon="pi pi-plus"
                 size="small"
                 data-testid="custom-pages-v6-edit__settings-empty__cta"

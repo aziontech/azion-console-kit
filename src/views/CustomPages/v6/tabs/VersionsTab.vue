@@ -74,7 +74,7 @@
           closable: true,
           severity: 'error',
           summary: 'Error',
-          detail: err?.message ?? 'Falha ao criar uma nova versão. Tente novamente.'
+          detail: err?.message ?? 'Failed to create a new version. Try again.'
         })
       }
     } finally {
@@ -98,22 +98,22 @@
       :sort-options="sortOptions"
       :show-row-actions="true"
       :paginator-rows="10"
-      search-placeholder="Buscar versões"
+      search-placeholder="Search versions"
       :empty-state="{
-        title: 'Esta Custom Page ainda não tem versões',
+        title: 'This custom page has no versions yet',
         description:
-          'Crie a primeira versão para começar a configurar esta Custom Page com o fluxo de versionamento v6.',
-        buttonLabel: 'Nova Versão',
+          'Create the first version to start configuring this custom page with the v6 versioning workflow.',
+        buttonLabel: 'New Version',
         buttonAction: createDraft
       }"
       :error-state="{
-        title: 'Falha ao carregar versões',
-        description: 'Algo deu errado ao carregar as versões desta Custom Page. Tente novamente.',
-        buttonLabel: 'Tentar novamente',
+        title: 'Failed to load versions',
+        description: 'Something went wrong loading this custom page versions. Try again.',
+        buttonLabel: 'Retry',
         buttonAction: () => versionsQuery.refetch?.()
       }"
-      filtered-empty-title="Nenhuma versão corresponde aos filtros"
-      filtered-empty-description="Tente outro termo de busca ou filtro de status."
+      filtered-empty-title="No versions match your filters"
+      filtered-empty-description="Try a different search term or status filter."
       data-testid="custom-pages-v6-versions__table"
       @update:search-term="searchTerm = $event"
       @update:filter-values="filterValues = $event"
@@ -125,7 +125,7 @@
       <template #toolbar-actions>
         <PrimeButton
           v-if="rawVersions.length > 0"
-          label="Nova Versão"
+          label="New Version"
           icon="pi pi-plus"
           size="small"
           :loading="isCreatingDraft"

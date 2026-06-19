@@ -17,7 +17,11 @@
   const toast = useToast()
 
   const workloadId = computed(() => String(route.params.id))
-  const versionId = computed(() => String(route.params.versionId))
+  const versionId = computed(() => (route.params.versionId ? String(route.params.versionId) : null))
+
+  if (!versionId.value) {
+    router.replace({ name: 'edit-workload', params: { id: workloadId.value, tab: 'versions' } })
+  }
 
   const workload = ref(null)
   const isLoading = ref(true)
@@ -44,19 +48,19 @@
     router.push({ name: 'edit-workload', params: { id: workloadId.value, tab: 'versions' } })
 
   const SUCCESS_SUMMARY = {
-    [VERSION_ACTIONS.SAVE]: 'Versão salva',
-    [VERSION_ACTIONS.SAVE_AND_BUILD]: 'Build iniciado',
-    [VERSION_ACTIONS.CANCEL_BUILD]: 'Build cancelado',
-    [VERSION_ACTIONS.NEW_DRAFT_FROM]: 'Rascunho criado',
-    [VERSION_ACTIONS.ARCHIVE]: 'Versão arquivada',
-    [VERSION_ACTIONS.DELETE]: 'Versão excluída'
+    [VERSION_ACTIONS.SAVE]: 'Version saved',
+    [VERSION_ACTIONS.SAVE_AND_BUILD]: 'Build started',
+    [VERSION_ACTIONS.CANCEL_BUILD]: 'Build cancelled',
+    [VERSION_ACTIONS.NEW_DRAFT_FROM]: 'Draft created',
+    [VERSION_ACTIONS.ARCHIVE]: 'Version archived',
+    [VERSION_ACTIONS.DELETE]: 'Version deleted'
   }
 
   const handleCommandSuccess = ({ action, result }) => {
     toast.add({
       closable: true,
       severity: 'success',
-      summary: SUCCESS_SUMMARY[action] ?? 'Concluído'
+      summary: SUCCESS_SUMMARY[action] ?? 'Done'
     })
 
     switch (action) {
@@ -129,7 +133,7 @@
     </template>
     <template #content>
       <WorkloadSettingsTab
-        v-if="workload"
+        v-if="workload && versionId"
         :key="versionId"
         :workload="workload"
         :resource-id="workloadId"
