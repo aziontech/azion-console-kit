@@ -39,7 +39,8 @@
   const { resourceContext } = useDeployResourceContext({
     resourceType: 'firewall',
     injectionKey: 'edgeFirewall',
-    versionService: edgeFirewallVersionService
+    versionService: edgeFirewallVersionService,
+    currentVersionId: () => props.versionId
   })
 </script>
 

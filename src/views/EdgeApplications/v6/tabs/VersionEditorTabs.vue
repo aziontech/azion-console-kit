@@ -199,7 +199,8 @@
   const { resourceContext } = useDeployResourceContext({
     resourceType: 'application',
     injectionKey: 'edgeApplication',
-    versionService: edgeAppVersionService
+    versionService: edgeAppVersionService,
+    currentVersionId: () => props.versionId
   })
 
   // Forward the editor shell's openDeployDrawer so VersionEditView can open the
