@@ -94,6 +94,7 @@
     applicationReadOnly,
     activeReleaseApplication,
     applicationName,
+    isResolvingApplicationName,
     applicationOptions,
     isLoadingApplications,
     selectedApplicationId,
@@ -101,6 +102,7 @@
     isLoadingApplicationVersions,
     selectedApplicationVersionId,
     readOnlyResources,
+    isResolvingReadOnlyNames,
     setCanaryEnabled,
     setCanaryForm,
     canDeploy,
@@ -244,6 +246,8 @@
           :version-options="versionOptions"
           :selected-version-id="selectedVersionId"
           :read-only-resources="readOnlyResources"
+          :is-resolving-application-name="isResolvingApplicationName"
+          :is-resolving-read-only-names="isResolvingReadOnlyNames"
           :invalid="versionInvalid"
           @update:selected-application-id="selectedApplicationId = $event"
           @update:selected-application-version-id="selectedApplicationVersionId = $event"

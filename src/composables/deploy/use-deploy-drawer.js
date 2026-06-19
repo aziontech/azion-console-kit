@@ -271,6 +271,8 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
   // version): release name → catalog by id → direct fetch by id (authoritative,
   // no pagination limit) → match the bound version against the catalog.
   const liveApplicationName = ref(null)
+  const isResolvingApplicationName = ref(false)
+  let applicationNameSeq = 0
 
   const resolveLiveApplicationName = async (application) => {
     if (!application) return null
@@ -298,7 +300,19 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
   watch(
     [activeReleaseApplication, applicationReadOnly, applicationsList],
     async ([application, readOnly]) => {
-      liveApplicationName.value = readOnly ? await resolveLiveApplicationName(application) : null
+      const seq = ++applicationNameSeq
+      if (!readOnly) {
+        liveApplicationName.value = null
+        isResolvingApplicationName.value = false
+        return
+      }
+      // Resolving from id/version → show a skeleton (not the raw id) until the name
+      // lands. The seq guards against a stale async write on rapid re-triggers.
+      isResolvingApplicationName.value = true
+      const name = await resolveLiveApplicationName(application)
+      if (seq !== applicationNameSeq) return
+      liveApplicationName.value = name
+      isResolvingApplicationName.value = false
     },
     { immediate: true }
   )
@@ -424,21 +438,32 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
   // Read-only resource NAMES, resolved by type + id (the release returns ids
   // only). Keyed `${type}:${id}`; resolution degrades to the id on miss.
   const readOnlyResourceNames = ref({})
+  const isResolvingReadOnlyNames = ref(false)
 
   watch(
     () => releaseParts.value.readOnlyResources,
     async (list) => {
-      for (const entry of list ?? []) {
+      const pending = (list ?? []).filter(
+        (entry) =>
+          !entry.resourceName &&
+          entry.resourceId != null &&
+          !readOnlyResourceNames.value[`${entry.resourceType}:${entry.resourceId}`]
+      )
+      if (!pending.length) {
+        isResolvingReadOnlyNames.value = false
+        return
+      }
+      // Show a skeleton (not the raw id) while the names resolve.
+      isResolvingReadOnlyNames.value = true
+      for (const entry of pending) {
         const key = `${entry.resourceType}:${entry.resourceId}`
-        if (entry.resourceName || entry.resourceId == null || readOnlyResourceNames.value[key]) {
-          continue
-        }
         const name = await deployDrawerService.resolveResourceName(
           entry.resourceType,
           entry.resourceId
         )
         if (name) readOnlyResourceNames.value = { ...readOnlyResourceNames.value, [key]: name }
       }
+      isResolvingReadOnlyNames.value = false
     },
     { immediate: true }
   )
@@ -574,6 +599,7 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
     activeRelease,
     activeReleaseApplication,
     applicationName,
+    isResolvingApplicationName,
     applicationReadOnly,
     applicationsList,
     applicationOptions,
@@ -584,6 +610,7 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
     selectedApplicationVersionId,
     composition,
     readOnlyResources,
+    isResolvingReadOnlyNames,
     noApplication,
     isLoadingComposition,
     compositionError,

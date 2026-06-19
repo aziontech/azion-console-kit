@@ -8,6 +8,7 @@
    */
   import LabelBlock from '@aziontech/webkit/label'
   import PrimeButton from '@aziontech/webkit/button'
+  import Skeleton from '@aziontech/webkit/skeleton'
 
   import ResourceVersionField from '@/templates/deploy-drawer-block/components/ResourceVersionField.vue'
   import ResourceSelectField from '@/templates/deploy-drawer-block/components/ResourceSelectField.vue'
@@ -85,6 +86,14 @@
       default: () => []
     },
     invalid: {
+      type: Boolean,
+      default: false
+    },
+    isResolvingApplicationName: {
+      type: Boolean,
+      default: false
+    },
+    isResolvingReadOnlyNames: {
       type: Boolean,
       default: false
     }
@@ -179,7 +188,15 @@
       <div
         class="flex items-center justify-between gap-3 rounded-md border border-[var(--surface-border)] bg-[var(--surface-ground)] px-3 py-2"
       >
-        <span class="text-sm text-[var(--text-color)] truncate">
+        <Skeleton
+          v-if="isResolvingApplicationName && !applicationName"
+          width="10rem"
+          height="1rem"
+        />
+        <span
+          v-else
+          class="text-sm text-[var(--text-color)] truncate"
+        >
           {{ applicationName ?? activeReleaseApplication?.resourceVersion ?? '—' }}
         </span>
         <span
@@ -272,7 +289,15 @@
       <div
         class="flex items-center justify-between gap-3 rounded-md border border-[var(--surface-border)] bg-[var(--surface-ground)] px-3 py-2"
       >
-        <span class="text-sm text-[var(--text-color)] truncate">
+        <Skeleton
+          v-if="isResolvingReadOnlyNames && !entry.resourceName"
+          width="10rem"
+          height="1rem"
+        />
+        <span
+          v-else
+          class="text-sm text-[var(--text-color)] truncate"
+        >
           {{ entry.resourceName ?? entry.resourceId }}
         </span>
         <span class="font-mono text-xs text-[var(--text-color-secondary)] shrink-0">
