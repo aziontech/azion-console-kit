@@ -35,7 +35,8 @@
   const { resourceContext } = useDeployResourceContext({
     resourceType: 'custom_page',
     injectionKey: 'customPage',
-    versionService: customPageVersionService
+    versionService: customPageVersionService,
+    currentVersionId: () => props.versionId
   })
 </script>
 

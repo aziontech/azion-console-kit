@@ -34,7 +34,8 @@
   const { resourceContext } = useDeployResourceContext({
     resourceType: 'custom_page',
     injectionKey: 'customPage',
-    versionService: customPageVersionService
+    versionService: customPageVersionService,
+    currentVersionId: () => props.versionId
   })
 
   // Atomic resource: a single Main Settings tab, no "+ Add".
