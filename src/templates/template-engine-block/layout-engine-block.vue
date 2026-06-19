@@ -5,8 +5,8 @@
   import { vcsService } from '@/services/v2/vcs/vcs-service'
   import { getScriptRunnerLogsService } from '@/services/script-runner-service'
   import PrimeButton from 'primevue/button'
-  import Skeleton from 'primevue/skeleton'
   import CardBox from '@aziontech/webkit/content/card-box'
+  import FormLoading from './form-loading.vue'
   import TemplateSettingsCard from '../deploy-template/TemplateSettingsCard.vue'
   import DeployStatusCard from '../deploy-template/DeployStatusCard.vue'
   import DeploySuccessCard from '../deploy-template/DeploySuccessCard.vue'
@@ -655,25 +655,10 @@
       </DeploySuccessCard>
     </div>
 
-    <!-- Skeleton loading state -->
-    <CardBox
-      v-if="currentStep !== 'success' && !props.loaded"
-      :title="props.title || 'Start from Template'"
-    >
-      <template #content>
-        <div class="p-4 sm:p-6 flex flex-col gap-6">
-          <div class="flex flex-col gap-4">
-            <Skeleton class="h-4 w-full" />
-            <Skeleton class="h-4 w-3/4" />
-            <Skeleton class="h-4 w-5/6" />
-          </div>
-          <div class="flex flex-col gap-4">
-            <Skeleton class="h-10 w-full" />
-            <Skeleton class="h-10 w-2/3" />
-          </div>
-        </div>
-      </template>
-    </CardBox>
+    <!-- Skeleton loading state - reuses the initial FormLoading skeleton so the
+         transition from "loading template" to "loading inputs/integrations" stays
+         seamless (same layout) until everything is ready. -->
+    <FormLoading v-if="currentStep !== 'success' && !props.loaded" />
 
     <CardBox
       v-if="currentStep !== 'success' && props.loaded"

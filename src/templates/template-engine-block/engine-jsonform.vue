@@ -107,6 +107,9 @@
   const privacyFieldsState = ref({})
   // Track if validation has been attempted - used to show errors on untouched fields
   const validationAttempted = ref(false)
+  // Tracks the initial load (schema + VCS integrations) so the skeleton stays
+  // visible until inputs are fully ready (not just the schema).
+  const isInitialLoadComplete = ref(false)
 
   // Provide a function for privacy renderers to register their isPublic state
   const updatePrivacyFieldState = (fieldName, isPublic) => {
@@ -521,8 +524,12 @@
     deployStartTime: props.deployStartTime,
     // Results for DeploySuccessCard
     results: props.results,
-    // Only show card when schema is loaded
-    loaded: !!props.schema && Object.keys(props.schema?.properties || {}).length > 0
+    // Only show card once schema AND the initial VCS integrations load have finished,
+    // so the skeleton stays until the inputs (incl. Git Scope) are ready.
+    loaded:
+      !!props.schema &&
+      Object.keys(props.schema?.properties || {}).length > 0 &&
+      isInitialLoadComplete.value
   }))
 
   /**
@@ -801,6 +808,8 @@
     if (hasIntegrations.value) {
       await layoutRef.value?.loadIntegrationOnShowButton()
     }
+    // Mark initial load complete so the card replaces the skeleton only now
+    isInitialLoadComplete.value = true
   })
 
   watch(
