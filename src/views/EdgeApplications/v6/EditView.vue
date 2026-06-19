@@ -17,7 +17,7 @@
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PrimeButton from '@aziontech/webkit/button'
 
-  import { VERSION_STATES } from '@/composables/versioning/version-machine'
+  import { toDeployableVersionOptions } from '@/composables/versioning/to-version-options'
 
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
@@ -30,7 +30,7 @@
   import { useVersionList } from '@/composables/versioning/use-version-list'
   import { useVersionRowActions } from '@/composables/versioning/use-version-row-actions'
 
-  defineOptions({ name: 'edge-applications-v6-edit-view' })
+  defineOptions({ name: 'application-v6-edit-view' })
 
   const route = useRoute()
   const router = useRouter()
@@ -122,14 +122,7 @@
     isDeployDrawerOpen.value = true
   }
 
-  const readyVersionOptions = computed(() =>
-    rawVersions.value
-      .filter((version) => version.state === VERSION_STATES.READY)
-      .map((version) => ({
-        label: version.comment || `Version ${version.id}`,
-        value: version.id
-      }))
-  )
+  const readyVersionOptions = computed(() => toDeployableVersionOptions(rawVersions.value))
 
   const deployResourceContext = computed(() => ({
     resourceType: 'application',
@@ -148,7 +141,7 @@
   <div
     v-if="isLoadingApplication"
     class="flex items-center justify-center p-8"
-    data-testid="edge-applications-v6-edit__loading"
+    data-testid="application-v6-edit__loading"
   >
     <ProgressSpinner
       class="w-10 h-10 text-color"
@@ -160,14 +153,14 @@
     v-else-if="loadError"
     class="w-full"
     severity="error"
-    data-testid="edge-applications-v6-edit__error"
+    data-testid="application-v6-edit__error"
   >
     Failed to load application. Try refreshing the page.
   </InlineMessage>
 
   <ContentBlock
     v-else
-    data-testid="edge-applications-v6-edit"
+    data-testid="application-v6-edit"
   >
     <template #heading>
       <PageHeadingBlock
@@ -180,7 +173,7 @@
             label="Deploy"
             icon="pi pi-cloud-upload"
             size="small"
-            data-testid="edge-applications-v6-edit__deploy"
+            data-testid="application-v6-edit__deploy"
             @click="openDeployDrawer"
           />
         </template>
@@ -216,7 +209,7 @@
         }"
         filtered-empty-title="No versions match your filters"
         filtered-empty-description="Try a different search term or status filter."
-        data-testid="edge-applications-v6-versions__table"
+        data-testid="application-v6-versions__table"
         @update:search-term="searchTerm = $event"
         @update:filter-values="filterValues = $event"
         @update:sort="sort = $event"
@@ -232,7 +225,7 @@
             size="small"
             class="version-toolbar-action"
             :loading="isCreatingDraft"
-            data-testid="edge-applications-v6-versions__new-draft"
+            data-testid="application-v6-versions__new-draft"
             @click="createDraft"
           />
         </template>

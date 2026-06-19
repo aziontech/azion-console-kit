@@ -4,10 +4,11 @@
   // form binds to the latest version and lifecycle actions work. Owns no routing
   // or toast: commands bubble up; EditView decides navigation + toast.
   import CustomPageVersionAdapter from '@/views/CustomPages/v6/CustomPageVersionAdapter.vue'
-  import CustomPageVersionHeadingActions from '@/views/CustomPages/v6/CustomPageVersionHeadingActions.vue'
+  import VersionHeadingActions from '@/templates/version-shell-block/components/VersionHeadingActions.vue'
   import VersionShell from '@/templates/version-shell-block/index.vue'
   import FormFieldsCustomPages from '@/views/CustomPages/FormFields/CustomPages.vue'
   import { customPageVersionService } from '@/services/v2/custom-page/custom-page-version-service'
+  import { useDeployResourceContext } from '@/composables/versioning/use-deploy-resource-context'
 
   defineOptions({ name: 'custom-pages-v6-main-settings-tab' })
 
@@ -30,6 +31,12 @@
 
   const useVersionQuery = () =>
     customPageVersionService.useLoadVersionQuery(props.resourceId, props.versionId)
+
+  const { resourceContext } = useDeployResourceContext({
+    resourceType: 'custom_page',
+    injectionKey: 'customPage',
+    versionService: customPageVersionService
+  })
 </script>
 
 <template>
@@ -43,13 +50,13 @@
     @cancel="emit('cancel')"
   >
     <CustomPageVersionAdapter
-      :custom-page="customPage"
+      :resource="customPage"
       :resource-id="resourceId"
       :version-id="versionId"
     >
       <div class="relative">
         <FormFieldsCustomPages class="flex gap-4" />
-        <CustomPageVersionHeadingActions />
+        <VersionHeadingActions :resource-context="resourceContext" />
       </div>
     </CustomPageVersionAdapter>
   </VersionShell>
