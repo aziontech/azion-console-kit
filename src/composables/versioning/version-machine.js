@@ -4,6 +4,7 @@
  */
 export const VERSION_STATES = {
   DRAFT: 'draft',
+  QUEUED: 'queued',
   BUILDING: 'building',
   READY: 'ready',
   ACTIVE: 'active',
@@ -18,6 +19,7 @@ export const VERSION_STATES = {
  */
 const STATE_STATUS = {
   [VERSION_STATES.DRAFT]: { content: 'Draft', severity: 'info' },
+  [VERSION_STATES.QUEUED]: { content: 'Queued', severity: 'info' },
   [VERSION_STATES.BUILDING]: { content: 'Building', severity: 'info' },
   [VERSION_STATES.READY]: { content: 'Ready', severity: 'success' },
   [VERSION_STATES.ACTIVE]: { content: 'Active', severity: 'success' },
@@ -41,9 +43,10 @@ export const mapVersionStateToStatus = (state) =>
 export const isEditable = (state) => ['draft', 'cancelled', 'error'].includes(state)
 
 /**
- * Version is being built by the platform — the UI locks writes.
+ * Version is queued or being built by the platform — the UI locks writes.
  */
-export const isProcessing = (state) => state === 'building'
+export const isProcessing = (state) =>
+  state === VERSION_STATES.QUEUED || state === VERSION_STATES.BUILDING
 
 /**
  * Immutable states: the version exists as a frozen artifact.
@@ -80,11 +83,12 @@ export const VERSION_ACTIONS = {
  *   user can do through the shell).
  * - `cancelled` and `error` inherit the same set as `draft` because they are
  *   recoverable states (the user resumes the draft).
- * - `building` is a transient lock — the only way out is CANCEL_BUILD.
+ * - `queued`/`building` are transient locks — the only way out is CANCEL_BUILD.
  * - `archived` cannot be edited; only fork a new draft or delete.
  */
 export const STATE_ACTIONS = {
   draft: ['SAVE', 'SAVE_AND_BUILD', 'NEW_DRAFT_FROM', 'DELETE'],
+  queued: ['CANCEL_BUILD'],
   building: ['CANCEL_BUILD'],
   ready: ['NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE', 'DEPLOY'],
   active: ['NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE', 'DEPLOY'],
