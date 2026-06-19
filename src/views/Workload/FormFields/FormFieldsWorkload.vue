@@ -4,6 +4,7 @@
   import { useField } from 'vee-validate'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { computed } from 'vue'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   import BlocksGeneral from './blocks/generalBlock.vue'
   import BlocksMutualAuthenticationSettings from './blocks/mutualAuthenticationSettingsBlock.vue'
@@ -17,6 +18,11 @@
     isDrawer: { type: Boolean },
     noBorder: { type: Boolean }
   })
+
+  // Read-only is owned by the VersionShell context (default false outside it, so
+  // the non-versioned/legacy flow is untouched). Immutable versions render the
+  // form disabled.
+  const { readOnly } = useVersionContext()
 
   const { value: isLocked } = useField('isLocked')
   const showWarningMessage = computed(() => props.isEdit && isLocked.value)
@@ -35,6 +41,7 @@
     :isEdit="props.isEdit"
     :isDrawer="props.isDrawer"
     :noBorder="props.noBorder"
+    :readOnly="readOnly"
   />
 
   <BlocksDomains
@@ -70,6 +77,7 @@
         name="active"
         auto
         :isCard="false"
+        :disabled="readOnly"
         title="Active"
       />
     </template>

@@ -74,7 +74,8 @@ export const metaFor = (action) => ACTION_META[action] ?? { label: action }
 /**
  * Actions eligible to appear in a LIST ROW menu (not the shell action bar).
  * Excludes the editing actions (SAVE / SAVE_AND_BUILD — they need the form and
- * the shell command bus) and DEPLOY (no API endpoint yet — it is a stub).
+ * the shell command bus) and DEPLOY (deploying is owned by the deploy-drawer-block,
+ * opened from the heading "Deploy" button — not dispatched as a row/menu command).
  */
 const ROW_ELIGIBLE = new Set([
   VERSION_ACTIONS.NEW_DRAFT_FROM,

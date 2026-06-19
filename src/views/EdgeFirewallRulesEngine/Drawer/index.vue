@@ -43,8 +43,16 @@
     loadNetworkListService: {
       type: Function,
       required: true
+    },
+    // Optional versioned facade (drop-in): when present, create/load/edit route
+    // through it instead of the non-versioned edgeFirewallRulesEngineService.
+    service: {
+      type: Object,
+      default: null
     }
   })
+
+  const rulesEngineService = props.service ?? edgeFirewallRulesEngineService
 
   const showCreateRulesEngineDrawer = ref(false)
   const showEditRulesEngineDrawer = ref(false)
@@ -187,20 +195,20 @@
   }
 
   const createEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
-    return await edgeFirewallRulesEngineService.createEdgeFirewallRulesEngineService(
+    return await rulesEngineService.createEdgeFirewallRulesEngineService(
       props.edgeFirewallId,
       payload
     )
   }
 
   const loadEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
-    return await edgeFirewallRulesEngineService.loadEdgeFirewallRulesEngineService({
+    return await rulesEngineService.loadEdgeFirewallRulesEngineService({
       edgeFirewallId: props.edgeFirewallId,
       id: payload.id
     })
   }
   const editEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
-    return await edgeFirewallRulesEngineService.editEdgeFirewallRulesEngineService(
+    return await rulesEngineService.editEdgeFirewallRulesEngineService(
       props.edgeFirewallId,
       payload
     )

@@ -88,9 +88,15 @@
     [VERSION_ACTIONS.CANCEL_BUILD]: 'Build cancelled',
     [VERSION_ACTIONS.NEW_DRAFT_FROM]: 'Draft created',
     [VERSION_ACTIONS.ARCHIVE]: 'Version archived',
-    [VERSION_ACTIONS.DELETE]: 'Version deleted',
-    [VERSION_ACTIONS.DEPLOY]: 'Deploy triggered'
+    [VERSION_ACTIONS.DELETE]: 'Version deleted'
+    // DEPLOY has no toast: the footer Deploy action opens the deploy drawer owned
+    // by VersionHeadingActions (handled in handleCommandSuccess), matching the
+    // heading Deploy button.
   }
+
+  // Ref to the editor body → VersionHeadingActions, so the VersionShell footer
+  // DEPLOY can open the SAME deploy drawer the heading Deploy uses (no 2nd drawer).
+  const editorTabsRef = ref(null)
 
   const goToVersionsList = () =>
     router.push({ name: 'edit-application', params: { id: edgeApplicationId.value } })
@@ -98,6 +104,11 @@
   const handleCancel = () => goToVersionsList()
 
   const handleCommandSuccess = ({ action, result }) => {
+    if (action === VERSION_ACTIONS.DEPLOY) {
+      editorTabsRef.value?.openDeployDrawer()
+      return
+    }
+
     toast.add({
       closable: true,
       severity: 'success',
@@ -198,6 +209,7 @@
            an in-place version switch (post-NEW_DRAFT_FROM) remounts the editor. -->
       <VersionEditorTabs
         v-if="versionId"
+        ref="editorTabsRef"
         :key="versionId"
         :application="application"
         :resource-id="edgeApplicationId"

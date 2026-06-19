@@ -1,0 +1,21 @@
+{
+  "count": 2,
+  "results": [
+    {
+      "id": "dep-magalu-storefront",
+      "name": "magalu-storefront",
+      "deployment_policy": "single_version",
+      "state": "active",
+      "created_at": "2026-05-01T10:00:00Z",
+      "updated_at": "2026-06-01T12:00:00Z"
+    },
+    {
+      "id": "dep-storefront-canary",
+      "name": "storefront-canary",
+      "deployment_policy": "versioned_urls",
+      "state": "active",
+      "created_at": "2026-05-01T10:00:00Z",
+      "updated_at": "2026-06-01T12:00:00Z"
+    }
+  ]
+}

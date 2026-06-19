@@ -1,4 +1,5 @@
 import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+import { mapStrategyForBuildAndActivate } from '@/services/v2/deployment/strategy-builder'
 
 const isObject = (value) => {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -161,25 +162,72 @@ export const DeploymentAdapter = {
   },
 
   /**
-   * Builds the `build_and_activate` request body from the drawer's resource
-   * context and the selected version id. Emits a single-item `resources` array,
-   * dropping any undefined key so the API only receives populated fields.
-   * `strategy`/`origin` are intentionally out of scope for this delivery.
+   * Splits the active release into the raw parts the composable recombines.
    *
-   * @param {{ resourceId: number, resourceType: string, resourceName: string }} resourceContext
-   * @param {string} versionId - `version_id` (ULID) sent as `resource_version`.
-   * @returns {{ resources: Array<object> }}
+   * - `applicationFromRelease`: the `application` resource of the active
+   *   release (`{ resourceId, resourceName, resourceVersion }`), or `null`.
+   * - `readOnlyResources`: the active release resources EXCLUDING both
+   *   `application` and `context.resourceType` (those own dedicated slots).
+   *
+   * @param {{ resources?: Array<object> } | null} release - Active release as returned by the API.
+   * @param {{ resourceType?: string }} [context={}] - Resource under promotion.
+   * @returns {{
+   *   applicationFromRelease: { resourceId: (number|string), resourceName: (string|null), resourceVersion: (string|null) } | null,
+   *   readOnlyResources: Array<{ resourceType: string, resourceId: (number|string), resourceName: (string|null), resourceVersion: (string|null) }>
+   * }}
    */
-  transformBuildAndActivatePayload(resourceContext = {}, versionId) {
-    return {
-      resources: [
-        pickDefined({
-          resource_id: resourceContext.resourceId,
-          resource_version: versionId,
-          resource_type: resourceContext.resourceType,
-          name: resourceContext.resourceName
-        })
-      ]
-    }
+  transformReleaseComposition(release, context = {}) {
+    const ctx = isObject(context) ? context : {}
+    const resources = isObject(release) && Array.isArray(release.resources) ? release.resources : []
+
+    const application = resources.find((resource) => resource?.resource_type === 'application')
+
+    const applicationFromRelease = application
+      ? {
+          resourceId: application.resource_id ?? application.global_id ?? null,
+          resourceName: application.resource_name ?? application.name ?? null,
+          resourceVersion:
+            application.resource_version ??
+            application.resource_version_id ??
+            application.version_id ??
+            null
+        }
+      : null
+
+    const readOnlyResources = resources
+      .filter(
+        (resource) =>
+          resource?.resource_type !== 'application' &&
+          String(resource?.resource_type) !== String(ctx.resourceType)
+      )
+      .map((resource) => ({
+        resourceType: resource.resource_type,
+        resourceId: resource.resource_id ?? resource.global_id ?? null,
+        resourceName: resource.resource_name ?? resource.name ?? null,
+        resourceVersion:
+          resource.resource_version ?? resource.resource_version_id ?? resource.version_id ?? null
+      }))
+
+    return { applicationFromRelease, readOnlyResources }
+  },
+
+  transformBuildAndActivatePayload(resources = [], strategy) {
+    const resourceRefs = (Array.isArray(resources) ? resources : []).map((resource) => {
+      // deployment-api schema: version is `version_id`; the `application`
+      // resource is keyed by `global_id`, every other type by `resource_id`.
+      // `name`/`resource_version` are rejected as unrecognized keys.
+      const isApplication = resource?.resource_type === 'application'
+      return pickDefined({
+        global_id: isApplication ? resource?.resource_id : undefined,
+        resource_id: isApplication ? undefined : resource?.resource_id,
+        version_id: resource?.resource_version,
+        resource_type: resource?.resource_type
+      })
+    })
+
+    return pickDefined({
+      resources: resourceRefs,
+      strategy: mapStrategyForBuildAndActivate(strategy)
+    })
   }
 }

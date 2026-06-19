@@ -51,6 +51,30 @@ export const workloadRoutes = {
       }
     },
     {
+      path: 'edit/:id/versions/:versionId',
+      name: 'edit-workload-version',
+      component: () => import('@views/Workload/v6/VersionEditView.vue'),
+      meta: {
+        title: 'Edit Version',
+        flag: 'use_v6_configurations',
+        breadCrumbs: [
+          { label: `Workloads`, to: `/workloads` },
+          {
+            label: `Edit Workload`,
+            dynamic: true,
+            routeParam: 'id',
+            toRoute: { name: 'edit-workload', params: ['id'] }
+          },
+          {
+            label: 'Version',
+            dynamic: true,
+            routeParam: 'versionId',
+            useParamValue: true
+          }
+        ]
+      }
+    },
+    {
       path: 'edit/:id/deployment/:versionId',
       name: 'workload-deployment-details',
       component: () => import('@views/Workload/DeploymentDetailsView.vue'),

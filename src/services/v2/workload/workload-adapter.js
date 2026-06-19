@@ -18,7 +18,8 @@ function extractAzionAppSubdomain(fullDomains, zones = []) {
   const cleanDomains = []
   let azionAppSubdomains = ''
 
-  fullDomains.forEach((entry) => {
+  const entries = Array.isArray(fullDomains) ? fullDomains : []
+  entries.forEach((entry) => {
     const name = typeof entry === 'string' ? entry : entry?.name
     const environment = typeof entry === 'string' ? null : (entry?.environment ?? null)
     const certificate = typeof entry === 'string' ? null : (entry?.certificate ?? null)

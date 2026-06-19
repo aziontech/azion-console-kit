@@ -1,8 +1,9 @@
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
-  import VersionActionDialog from './VersionActionDialog.vue'
-  import { metaFor } from '@/composables/versioning/version-actions'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
+  import VersionStateBadge from './VersionStateBadge.vue'
+  import { isImmutable, isEditable } from '@/composables/versioning/version-machine'
 
   defineOptions({ name: 'version-action-bar' })
 
@@ -22,137 +23,140 @@
     }
   })
 
-  // `dispatch` carries version lifecycle commands (SAVE, BUILD, ...).
-  // `cancel` is a pure navigation intent — close the edit and go back to the
-  // listing — so it deliberately bypasses the command bus / state machine.
   const emit = defineEmits(['dispatch', 'cancel'])
 
-  // Which available actions render as PRIMARY per state (a list, so a state can
-  // promote more than one). Anything available but unlisted renders secondary.
-  const PRIMARY_ACTIONS_BY_STATE = {
-    draft: ['SAVE_AND_BUILD'],
-    building: ['CANCEL_BUILD'],
-    ready: ['DEPLOY'],
-    active: ['NEW_DRAFT_FROM'],
-    archived: ['NEW_DRAFT_FROM'],
-    cancelled: ['SAVE_AND_BUILD'],
-    error: ['SAVE_AND_BUILD']
-  }
-
-  const isDisabled = (action) => props.disabledActions.includes(action)
-
-  // Only promote to primary actions that are actually available in this state.
-  const primarySet = computed(
-    () =>
-      new Set(
-        (PRIMARY_ACTIONS_BY_STATE[props.state] ?? []).filter((action) =>
-          props.availableActions.includes(action)
-        )
-      )
-  )
-
-  const primaryActions = computed(() =>
-    props.availableActions.filter((action) => primarySet.value.has(action))
-  )
-
-  // DELETE is pulled out of the secondary group so it can render right after
-  // Cancel (see template), instead of in availableActions order.
-  const deleteAction = computed(() => (props.availableActions.includes('DELETE') ? 'DELETE' : null))
-
-  const secondaryActions = computed(() =>
-    props.availableActions.filter((action) => action !== 'DELETE' && !primarySet.value.has(action))
-  )
-
-  const severityFor = (action, emphasis) => {
-    if (metaFor(action).danger) return 'danger'
-    return emphasis === 'primary' ? 'primary' : 'secondary'
-  }
-
-  const dialogVisible = ref(false)
-  const pendingAction = ref(null)
-  const dialogConfig = computed(() =>
-    pendingAction.value ? metaFor(pendingAction.value).dialog : null
-  )
-
-  const handleClick = (action) => {
-    if (isDisabled(action)) return
-    if (metaFor(action).dialog) {
-      pendingAction.value = action
-      dialogVisible.value = true
-      return
+  // Per-state banner copy + curated actions (the proposed toolbar format). Actions
+  // dispatch directly (no dialog); they are still filtered by availableActions.
+  const BANNER = {
+    draft: {
+      icon: 'pi pi-file-edit',
+      title: 'Draft',
+      subtitle: 'This version is open for editing. Deploy it when ready.',
+      actions: [
+        {
+          key: 'SAVE_AND_BUILD',
+          label: 'Save and Build',
+          icon: 'pi pi-cog',
+          emphasis: 'secondary'
+        },
+        { key: 'SAVE', label: 'Save', icon: 'pi pi-save', emphasis: 'primary' }
+      ]
+    },
+    building: {
+      icon: 'pi pi-spin pi-spinner',
+      title: 'Building version',
+      subtitle: 'This version is being built. You can cancel while it runs.',
+      actions: [
+        { key: 'CANCEL_BUILD', label: 'Cancel Build', icon: 'pi pi-times', emphasis: 'secondary' }
+      ]
+    },
+    ready: {
+      icon: 'pi pi-check-circle',
+      title: 'Viewing a Ready version',
+      subtitle:
+        'This version is read-only. Create a new version to make changes, or deploy it to go live.',
+      actions: [
+        { key: 'NEW_DRAFT_FROM', label: 'New Version', icon: 'pi pi-plus', emphasis: 'secondary' },
+        { key: 'DEPLOY', label: 'Deploy', icon: 'pi pi-cloud-upload', emphasis: 'primary' }
+      ]
+    },
+    active: {
+      icon: 'pi pi-check-circle',
+      title: 'Viewing a Deployed version',
+      subtitle:
+        'This version has been deployed and is read-only. Create a new version to make changes.',
+      actions: [
+        { key: 'NEW_DRAFT_FROM', label: 'New Version', icon: 'pi pi-plus', emphasis: 'secondary' },
+        { key: 'DEPLOY', label: 'Redeploy', icon: 'pi pi-refresh', emphasis: 'secondary' }
+      ]
+    },
+    archived: {
+      icon: 'pi pi-inbox',
+      title: 'Viewing an Archived version',
+      subtitle: 'This version is archived and read-only. Create a new version to make changes.',
+      actions: [
+        { key: 'NEW_DRAFT_FROM', label: 'New Version', icon: 'pi pi-plus', emphasis: 'secondary' }
+      ]
     }
-    emit('dispatch', action, {})
   }
 
-  const handleDialogConfirm = (comment) => {
-    const action = pendingAction.value
-    if (!action) return
-    emit('dispatch', action, { comment })
-    pendingAction.value = null
-    dialogVisible.value = false
+  const FALLBACK = {
+    icon: 'pi pi-info-circle',
+    title: 'Version',
+    subtitle: 'Create a new version to make changes.',
+    actions: [
+      { key: 'NEW_DRAFT_FROM', label: 'New Version', icon: 'pi pi-plus', emphasis: 'secondary' }
+    ]
   }
 
-  const handleDialogVisibility = (value) => {
-    dialogVisible.value = value
-    if (!value) pendingAction.value = null
+  const banner = computed(() => BANNER[props.state] ?? FALLBACK)
+
+  // Only render configured actions that the state machine actually allows.
+  const actions = computed(() =>
+    banner.value.actions.filter((action) => props.availableActions.includes(action.key))
+  )
+
+  const readOnly = computed(() => isImmutable(props.state))
+  const editable = computed(() => isEditable(props.state))
+
+  const isDisabled = (key) => props.disabledActions.includes(key)
+
+  const handleClick = (key) => {
+    if (isDisabled(key)) return
+    emit('dispatch', key, {})
   }
 </script>
 
 <template>
   <div
-    class="flex w-full gap-3 justify-end h-16 items-center border-t surface-border sticky bottom-0 surface-section z-50 px-2 md:px-8"
+    class="flex w-full flex-col gap-3 border-t border-[var(--surface-border)] bg-[var(--surface-section)] px-2 py-3 sticky bottom-0 z-50 md:flex-row md:items-center md:justify-between md:px-8"
     data-testid="version-action-bar"
+    :data-state="state"
   >
-    <PrimeButton
-      label="Cancel"
-      size="small"
-      outlined
-      data-testid="version-action-bar__cancel"
-      @click="emit('cancel')"
-    />
-    <PrimeButton
-      v-if="deleteAction"
-      :label="metaFor(deleteAction).label"
-      :severity="severityFor(deleteAction, 'secondary')"
-      size="small"
-      :outlined="!metaFor(deleteAction).danger"
-      :disabled="isDisabled(deleteAction)"
-      :data-testid="`version-action-bar__secondary-${deleteAction}`"
-      @click="handleClick(deleteAction)"
-    />
-    <PrimeButton
-      v-for="action in secondaryActions"
-      :key="action"
-      :label="metaFor(action).label"
-      :severity="severityFor(action, 'secondary')"
-      size="small"
-      :outlined="!metaFor(action).danger"
-      :disabled="isDisabled(action)"
-      :data-testid="`version-action-bar__secondary-${action}`"
-      @click="handleClick(action)"
-    />
-    <PrimeButton
-      v-for="action in primaryActions"
-      :key="action"
-      :label="metaFor(action).label"
-      :severity="severityFor(action, 'primary')"
-      size="small"
-      :disabled="isDisabled(action)"
-      :data-testid="`version-action-bar__primary-${action}`"
-      @click="handleClick(action)"
-    />
-    <VersionActionDialog
-      v-if="dialogConfig"
-      :visible="dialogVisible"
-      :title="dialogConfig.title"
-      :action-label="dialogConfig.actionLabel"
-      :require-comment="dialogConfig.required ?? false"
-      :placeholder="dialogConfig.placeholder"
-      :message="dialogConfig.message"
-      :show-comment="dialogConfig.showComment ?? true"
-      :confirm-severity="dialogConfig.confirmSeverity"
-      @confirm="handleDialogConfirm"
-      @update:visible="handleDialogVisibility"
-    />
+    <div class="flex items-start gap-3">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--surface-ground)]"
+      >
+        <i :class="[banner.icon, 'text-[var(--text-color-secondary)]']" />
+      </span>
+      <div class="flex flex-col gap-1">
+        <span class="flex flex-wrap items-center gap-2">
+          <span class="text-sm font-medium text-[var(--text-color)]">{{ banner.title }}</span>
+          <VersionStateBadge :state="state" />
+          <span
+            v-if="readOnly"
+            class="inline-flex items-center gap-1 rounded-md border border-[var(--surface-border)] px-2 py-0.5 text-xs text-[var(--text-color-secondary)]"
+            data-testid="version-action-bar__readonly"
+          >
+            <i class="pi pi-lock" />
+            Read Only
+          </span>
+          <PrimeTag
+            v-else-if="editable"
+            severity="info"
+            value="Editable"
+            data-testid="version-action-bar__editable"
+          />
+        </span>
+        <span class="text-xs text-[var(--text-color-secondary)] leading-tight">
+          {{ banner.subtitle }}
+        </span>
+      </div>
+    </div>
+
+    <div class="flex shrink-0 items-center justify-end gap-3">
+      <PrimeButton
+        v-for="action in actions"
+        :key="action.key"
+        :label="action.label"
+        :icon="action.icon"
+        size="small"
+        :outlined="action.emphasis === 'secondary'"
+        :severity="action.emphasis === 'secondary' ? 'secondary' : undefined"
+        :disabled="isDisabled(action.key)"
+        :data-testid="`version-action-bar__action-${action.key}`"
+        @click="handleClick(action.key)"
+      />
+    </div>
   </div>
 </template>

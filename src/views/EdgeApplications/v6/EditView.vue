@@ -83,7 +83,16 @@
     return sorted[0]?.id ?? null
   })
 
-  const activeTab = ref(TAB.VERSIONS)
+  // Active tab mirrors the optional `:tab?` route param, so the "Edit Application"
+  // breadcrumb (linking to the tabless route) always lands back on the Versions tab.
+  const activeTab = computed({
+    get: () => (String(route.params.tab) === 'settings' ? TAB.SETTINGS : TAB.VERSIONS),
+    set: (index) => {
+      const params = { id: edgeApplicationId.value }
+      if (index === TAB.SETTINGS) params.tab = 'settings'
+      router.replace({ name: 'edit-application', params })
+    }
+  })
 
   // Deploy drawer. The heading "Deploy" action only toggles it.
   const isDeployDrawerOpen = ref(false)
@@ -104,14 +113,14 @@
       }))
   )
 
-  // Triggered from the Versions listing context → no source version: the version
-  // field starts EMPTY for manual selection (req 4.3). `resourceId` is the numeric
-  // Application id; `resourceName` feeds `resources[].name` in the release payload.
+  const deployVersionId = computed(() =>
+    activeTab.value === TAB.SETTINGS ? latestVersionId.value : null
+  )
   const deployResourceContext = computed(() => ({
     resourceType: 'application',
     resourceId: Number(edgeApplicationId.value),
     resourceName: application.value?.name ?? '',
-    version: null,
+    version: deployVersionId.value ? { id: deployVersionId.value } : null,
     versions: readyVersionOptions.value
   }))
 
@@ -125,8 +134,9 @@
     [VERSION_ACTIONS.CANCEL_BUILD]: 'Build cancelled',
     [VERSION_ACTIONS.NEW_DRAFT_FROM]: 'Draft created',
     [VERSION_ACTIONS.ARCHIVE]: 'Version archived',
-    [VERSION_ACTIONS.DELETE]: 'Version deleted',
-    [VERSION_ACTIONS.DEPLOY]: 'Deploy triggered'
+    [VERSION_ACTIONS.DELETE]: 'Version deleted'
+    // DEPLOY has no toast: the footer Deploy action opens the deploy drawer
+    // (handled in handleCommandSuccess), matching the heading Deploy button.
   }
 
   // Returns to the Versions tab. The Settings tab targets the latest version, with
@@ -139,6 +149,11 @@
 
   // Command success emitted by MainSettingsTab (`{ action, result }`): toast + nav.
   const handleCommandSuccess = ({ action, result }) => {
+    if (action === VERSION_ACTIONS.DEPLOY) {
+      openDeployDrawer()
+      return
+    }
+
     toast.add({
       closable: true,
       severity: 'success',
@@ -220,18 +235,8 @@
       >
         <template #default>
           <div class="flex items-center gap-3">
-            <!-- Deploy belongs to the listing context; the Settings tab surfaces
-                 the version's own Build/Deploy via VersionHeadingActions. -->
-            <PrimeButton
-              v-if="activeTab === TAB.VERSIONS"
-              label="Deploy"
-              icon="pi pi-cloud-upload"
-              size="small"
-              data-testid="edge-applications-v6-edit__deploy"
-              @click="openDeployDrawer"
-            />
-            <!-- Teleport target for the version's status + lifecycle action on the
-                 Settings tab (Build when draft / Deploy when ready). -->
+            <!-- Teleport target for the version's status + lifecycle action, filled
+                 only on the Settings tab (Build when draft / Deploy when ready). -->
             <div
               id="version-lifecycle-action"
               class="flex items-center"

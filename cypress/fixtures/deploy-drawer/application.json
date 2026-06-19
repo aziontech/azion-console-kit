@@ -1,0 +1,13 @@
+{
+  "data": {
+    "id": 1727808946,
+    "name": "deploy-drawer-app",
+    "last_editor": "qa@azion.com",
+    "last_modified": "2026-06-01T12:00:00Z",
+    "active": true,
+    "debug": false,
+    "modules": {
+      "edge_cache": { "enabled": true }
+    }
+  }
+}

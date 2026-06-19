@@ -51,9 +51,8 @@
     useVersionList(rawVersions)
 
   const columns = [
-    { key: 'version', label: 'Version', size: 'minmax(220px, 1.4fr)' },
-    { key: 'status', label: 'Status', size: 'minmax(140px, 0.8fr)' },
-    { key: 'created', label: 'Created', size: 'minmax(180px, 1.2fr)' }
+    { key: 'version', label: 'Version' },
+    { key: 'created', label: 'Created by' }
   ]
 
   // Opens the FULL editor (VersionEditView) for a specific version by navigating
@@ -124,7 +123,7 @@
       :sort="sort"
       :sort-options="sortOptions"
       :show-row-actions="true"
-      :paginator-rows="20"
+      :paginator-rows="10"
       search-placeholder="Search versions"
       :empty-state="{
         title: 'This application has no versions yet',
@@ -155,7 +154,6 @@
           label="New Version"
           icon="pi pi-plus"
           size="small"
-          class="version-toolbar-action"
           :loading="isCreatingDraft"
           data-testid="edge-applications-v6-versions__new-draft"
           @click="createDraft"
@@ -172,11 +170,3 @@
     />
   </div>
 </template>
-
-<style scoped>
-  /* Match the toolbar dropdowns' control height (2.5rem) so the relocated
-     "New Version" button lines up with the Status/Sort dropdowns beside it. */
-  :deep(.version-toolbar-action.p-button) {
-    height: 2.5rem;
-  }
-</style>
