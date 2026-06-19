@@ -9,6 +9,7 @@
   import { useVersionContext } from '@/composables/versioning/use-version-context'
   import { validationSchema } from '@/views/CustomPages/Config/validationSchema'
   import { customPageVersionService } from '@/services/v2/custom-page/custom-page-version-service'
+  import { customPageService } from '@/services/v2/custom-page/custom-page-service'
 
   defineOptions({ name: 'custom-page-version-adapter' })
 
@@ -56,11 +57,13 @@
     execute: async () => {
       const { valid } = await validate()
       if (!valid) return
-      const result = await customPageVersionService.updateDraft(
-        props.resourceId,
-        props.versionId,
-        values
-      )
+      // Content (incl. `pages`) is saved via the BASE endpoint: the version
+      // endpoint rejects `pages` as a protected override (edge-api 10109). The
+      // base PATCH routes to the live draft in place.
+      const result = await customPageService.editCustomPagesService({
+        id: props.resourceId,
+        ...values
+      })
       resetForm({ values: { ...values } })
       return result
     }
@@ -71,11 +74,11 @@
     execute: async ({ comment }) => {
       const { valid } = await validate()
       if (!valid) return
-      const result = await customPageVersionService.updateDraft(
-        props.resourceId,
-        props.versionId,
-        values
-      )
+      // Save content via the BASE endpoint (see SAVE), then build the draft.
+      const result = await customPageService.editCustomPagesService({
+        id: props.resourceId,
+        ...values
+      })
       await customPageVersionService.build(props.resourceId, props.versionId, { comment })
       resetForm({ values: { ...values } })
       return result
