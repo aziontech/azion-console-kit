@@ -55,10 +55,11 @@
   const createdAtLabel = computed(() =>
     version.value?.createdAt ? formatExhibitionDate(version.value.createdAt, 'medium') : null
   )
-  const author = computed(() => version.value?.lastEditor || 'azion@azion.com')
+  const author = computed(() => version.value?.lastEditor || null)
   const createdInfo = computed(() => {
-    const by = `by ${author.value}`
-    return createdAtLabel.value ? `Created ${createdAtLabel.value} · ${by}` : by
+    const created = createdAtLabel.value ? `Created ${createdAtLabel.value}` : ''
+    const by = author.value ? `by ${author.value}` : ''
+    return [created, by].filter(Boolean).join(' · ') || null
   })
 </script>
 

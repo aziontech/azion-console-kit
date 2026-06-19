@@ -121,6 +121,16 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
 
   const selectedVersionId = ref(toValue(resourceContext)?.version?.id ?? null)
 
+  // The context's version arrives async (vue-query). Re-sync the pre-selected
+  // scoped version once it resolves, without clobbering a user pick.
+  watch(
+    () => toValue(resourceContext)?.version?.id,
+    (id) => {
+      if (id && selectedVersionId.value == null) selectedVersionId.value = id
+    },
+    { immediate: true }
+  )
+
   // Resolves the chosen scoped version to a concrete id for dispatch: the
   // LATEST_READY sentinel maps to the newest Ready option (first `isCurrent`,
   // else the first option); a pinned id is returned as-is.
@@ -339,6 +349,17 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
       : toVersionOptions(applicationVersionsRaw.value)
   )
 
+  // Resolves the editable application version, mapping the LATEST_READY sentinel
+  // to the newest Ready option (first `isCurrent`, else the first).
+  const resolvedApplicationVersionId = computed(() => {
+    if (selectedApplicationVersionId.value !== LATEST_READY) {
+      return selectedApplicationVersionId.value
+    }
+    const options = applicationVersions.value
+    const current = options.find((option) => option.isCurrent)
+    return current?.value ?? options[0]?.value ?? null
+  })
+
   // --- Composition (generic VM) -------------------------------------------
 
   const noApplication = computed(() => {
@@ -360,7 +381,7 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
   const applicationSlotVersionId = computed(() => {
     if (isScopedApplication.value) return resolvedVersionId.value
     if (applicationReadOnly.value) return activeReleaseApplication.value?.resourceVersion ?? null
-    return selectedApplicationVersionId.value
+    return resolvedApplicationVersionId.value
   })
 
   const applicationSlot = computed(() => {
