@@ -1,0 +1,51 @@
+{
+  "dep-magalu-storefront": {
+    "results": [
+      {
+        "id": "rel-checkout-redesign",
+        "name": "release-checkout-redesign",
+        "state": "ready",
+        "traffic_role": "ACTIVE",
+        "workload_count": 20,
+        "resources": [
+          {
+            "resource_type": "application",
+            "resource_id": 1727808946,
+            "resource_version_id": "01J8READY0000000000000002"
+          },
+          {
+            "resource_type": "firewall",
+            "resource_id": 555000111,
+            "resource_version_id": "01J8FIREWALL000000000000A"
+          }
+        ]
+      },
+      {
+        "id": "rel-standby-01",
+        "name": "release-standby",
+        "state": "ready",
+        "traffic_role": "STANDBY",
+        "workload_count": 0,
+        "resources": []
+      }
+    ]
+  },
+  "dep-storefront-canary": {
+    "results": [
+      {
+        "id": "rel-storefront-search",
+        "name": "release-storefront-search",
+        "state": "ready",
+        "traffic_role": "ACTIVE",
+        "workload_count": 3,
+        "resources": [
+          {
+            "resource_type": "application",
+            "resource_id": 1727808946,
+            "resource_version_id": "01J8READY0000000000000001"
+          }
+        ]
+      }
+    ]
+  }
+}

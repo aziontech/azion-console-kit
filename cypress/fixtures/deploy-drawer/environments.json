@@ -1,0 +1,15 @@
+{
+  "count": 2,
+  "results": [
+    {
+      "id": "env-prod-01",
+      "name": "Production",
+      "deployment_policy": "single_version"
+    },
+    {
+      "id": "env-prod-02",
+      "name": "Production",
+      "deployment_policy": "versioned_urls"
+    }
+  ]
+}

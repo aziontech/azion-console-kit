@@ -35,6 +35,7 @@ import WORKLOAD_SELECTORS from './selectors/product-selectors/workload.js'
 import CUSTOM_PAGES_SELECTORS from './selectors/product-selectors/custom-pages.js'
 import EDGE_CONNECTOR_SELECTORS from './selectors/product-selectors/edge-connectors.js'
 import EDGE_SQL_SELECTORS from './selectors/product-selectors/edge-sql.js'
+import DEPLOY_DRAWER_SELECTORS from './selectors/product-selectors/deploy-drawer.js'
 const selectors = {
   billing: BILLING_SELECTORS,
   list: LIST_TABLE_BLOCK_SELECTORS,
@@ -67,7 +68,8 @@ const selectors = {
   workload: WORKLOAD_SELECTORS,
   customPages: CUSTOM_PAGES_SELECTORS,
   edgeConnector: EDGE_CONNECTOR_SELECTORS,
-  edgeSQL: EDGE_SQL_SELECTORS
+  edgeSQL: EDGE_SQL_SELECTORS,
+  deployDrawer: DEPLOY_DRAWER_SELECTORS
 }
 
 export default selectors

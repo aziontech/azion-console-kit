@@ -6,7 +6,9 @@
    *  - VeeValidate useForm() with the Application's schema/initialValues.
    *  - isFormValid: Ref<boolean> derived from meta.valid.
    *  - 7 handlers registered via onVersionCommand:
-   *      SAVE, SAVE_AND_BUILD, ARCHIVE, CANCEL_BUILD, NEW_DRAFT_FROM, DELETE, DEPLOY
+   *      SAVE, SAVE_AND_BUILD, ARCHIVE, CANCEL_BUILD, NEW_DRAFT_FROM, DELETE
+   *      and DEPLOY (intentional no-op — deploying is owned by the deploy drawer,
+   *      opened locally from the heading "Deploy" button, not by this bus).
    *
    * The field components (descendants) use useField, which auto-connects to this
    * useForm through VeeValidate's internal provide. No extra provide/inject is
@@ -135,12 +137,7 @@
     edgeAppVersionService.deleteVersion(resourceId, versionId)
   )
 
-  onVersionCommand('DEPLOY', ({ resourceId, versionId }) => {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `[ApplicationVersionAdapter] DEPLOY is a placeholder — no API call performed (app ${resourceId}, version ${versionId})`
-    )
-  })
+  onVersionCommand('DEPLOY', () => {})
 </script>
 
 <template>

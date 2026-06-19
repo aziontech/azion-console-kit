@@ -1,5 +1,11 @@
 import * as yup from 'yup'
 import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
+import { buildStrategy } from '@/services/v2/deployment/strategy-builder'
+
+// Re-exported for backward compatibility; `buildStrategy` now lives in the
+// shared `strategy-builder` util (B2) so services can consume it without
+// importing from `views/`.
+export { buildStrategy }
 
 // TODO: confirm valid rollout_mode values with backend. Assumed INSTANT / GRADUAL.
 export const ROLLOUT_MODE_OPTIONS = [
@@ -73,46 +79,6 @@ const buildResources = (values) => {
     resources.push({ id: values.custom_page, resource_type: 'custom_page' })
   }
   return resources
-}
-
-const buildStrategy = (values) => {
-  const gradualEnabled = !!values.gradual_rollout_enabled
-  const skewEnabled = !!values.skew_protection_enabled
-  const hasRolloutMode = hasValue(values.rollout_mode)
-  if (!gradualEnabled && !skewEnabled && !hasRolloutMode) return undefined
-
-  return {
-    rollout_mode: hasRolloutMode ? values.rollout_mode : null,
-    gradual_rollout: {
-      enabled: gradualEnabled,
-      candidate_percentage: gradualEnabled ? values.gradual_rollout_candidate_percentage : null,
-      candidate_cookie_name: hasValue(values.gradual_rollout_candidate_cookie_name)
-        ? values.gradual_rollout_candidate_cookie_name
-        : null,
-      candidate_cookie_max_age_seconds: hasValue(
-        values.gradual_rollout_candidate_cookie_max_age_seconds
-      )
-        ? values.gradual_rollout_candidate_cookie_max_age_seconds
-        : null,
-      candidate_from_deployment_version_id: hasValue(
-        values.gradual_rollout_candidate_from_deployment_version_id
-      )
-        ? values.gradual_rollout_candidate_from_deployment_version_id
-        : null
-    },
-    skew_protection: {
-      enabled: skewEnabled,
-      cookie_name: hasValue(values.skew_protection_cookie_name)
-        ? values.skew_protection_cookie_name
-        : null,
-      max_age_seconds: hasValue(values.skew_protection_max_age_seconds)
-        ? values.skew_protection_max_age_seconds
-        : null,
-      max_skewed_deployments: hasValue(values.skew_protection_max_skewed_deployments)
-        ? values.skew_protection_max_skewed_deployments
-        : null
-    }
-  }
 }
 
 const buildOrigin = (values) => {

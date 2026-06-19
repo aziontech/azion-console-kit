@@ -14,6 +14,7 @@
    * design §6.1).
    */
   import { computed, ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useToast } from '@aziontech/webkit/use-toast'
   import ProgressSpinner from '@aziontech/webkit/progressspinner'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
@@ -22,9 +23,11 @@
   import EmptyDrawer from '@/templates/empty-drawer'
   import { useDeployDrawer } from '@/composables/deploy/use-deploy-drawer'
 
+  import PromotionContextBanner from '@/templates/deploy-drawer-block/components/PromotionContextBanner.vue'
   import WorkloadSelectField from '@/templates/deploy-drawer-block/components/WorkloadSelectField.vue'
   import EnvironmentSelectionInput from '@/templates/deploy-drawer-block/components/EnvironmentSelectionInput.vue'
-  import ResourceVersionField from '@/templates/deploy-drawer-block/components/ResourceVersionField.vue'
+  import ReleaseCompositionField from '@/templates/deploy-drawer-block/components/ReleaseCompositionField.vue'
+  import CanaryStrategyField from '@/templates/deploy-drawer-block/components/CanaryStrategyField.vue'
 
   defineOptions({ name: 'deploy-drawer-block' })
 
@@ -40,6 +43,10 @@
     resourceContext: {
       type: Object,
       required: true
+    },
+    title: {
+      type: String,
+      default: 'New Release'
     }
   })
 
@@ -52,6 +59,18 @@
   })
 
   const toast = useToast()
+  const router = useRouter()
+
+  const onBindEnvironment = () => {
+    if (!selectedWorkloadId.value) return
+    const { href } = router.resolve(`/workloads/edit/${selectedWorkloadId.value}`)
+    window.open(href, '_blank', 'noopener')
+  }
+
+  const onCreateApplication = () => {
+    const { href } = router.resolve({ name: 'create-application' })
+    window.open(href, '_blank', 'noopener')
+  }
 
   // The composable owns the whole data flow; `visible` gates fetching so the
   // closed drawer never fetches and reopen reuses the vue-query cache (req 1.5).
@@ -61,12 +80,29 @@
     refetch,
     workloadOptions,
     selectedWorkloadId,
-    workloadHasBindings,
+    selectedWorkloadName,
+    isLoadingBindings,
     environmentCards,
     selectedEnvironmentId,
+    selectedDeploymentName,
     resourceName,
+    scopedType,
+    isScopedApplication,
     versionOptions,
     selectedVersionId,
+    noApplication,
+    applicationReadOnly,
+    activeReleaseApplication,
+    applicationName,
+    applicationOptions,
+    isLoadingApplications,
+    selectedApplicationId,
+    applicationVersions,
+    isLoadingApplicationVersions,
+    selectedApplicationVersionId,
+    readOnlyResources,
+    setCanaryEnabled,
+    setCanaryForm,
     canDeploy,
     isDeploying,
     deployError,
@@ -98,7 +134,7 @@
   }
 
   const onDeploy = async () => {
-    if (!selectedVersionId.value) {
+    if (!canDeploy.value) {
       versionInvalid.value = true
       return
     }
@@ -110,7 +146,7 @@
       toast.add({
         closable: true,
         severity: 'success',
-        summary: 'Deploy triggered'
+        summary: 'Release started'
       })
       emit('deployed')
       isVisible.value = false
@@ -124,7 +160,7 @@
 <template>
   <EmptyDrawer
     v-model:visible="isVisible"
-    title="Deploy"
+    :title="title"
     data-testid="deploy-drawer"
   >
     <template #content>
@@ -135,7 +171,7 @@
         data-testid="deploy-drawer__loading"
       >
         <ProgressSpinner
-          class="w-10 h-10 text-color"
+          class="w-10 h-10 text-[var(--text-color)]"
           strokeWidth="4"
         />
       </div>
@@ -168,53 +204,92 @@
         class="flex w-full flex-col gap-6"
         data-testid="deploy-drawer__content"
       >
+        <PromotionContextBanner :resource-context="resourceContext" />
+
         <!-- Step 1: workload (req 2.1). -->
         <WorkloadSelectField
           v-model="selectedWorkloadId"
           :options="workloadOptions"
         />
 
-        <!-- Guard: a workload without deployable bindings blocks the flow (req 2.4). -->
-        <InlineMessage
-          v-if="selectedWorkloadId && !workloadHasBindings"
-          class="w-full"
-          severity="warn"
-          data-testid="deploy-drawer__no-bindings"
-        >
-          This workload has no deployable environments.
-        </InlineMessage>
-
-        <!-- Step 2: environment selection (req 3.1). -->
         <EnvironmentSelectionInput
-          v-if="selectedWorkloadId && workloadHasBindings"
+          v-if="selectedWorkloadId"
           v-model="selectedEnvironmentId"
           :environments="environmentCards"
+          :workload-name="selectedWorkloadName"
+          :resource-name="resourceName"
+          :loading="isLoadingBindings"
+          @bind="onBindEnvironment"
         />
 
-        <!-- Step 3: resource + version (req 4.1–4.5). -->
-        <ResourceVersionField
+        <!-- Step 3: generic Release composition — Application slot (editable |
+             read-only | no-application), optional scoped resource card and the
+             carried read-only resources of the active Release (design §7). -->
+        <ReleaseCompositionField
           v-if="selectedEnvironmentId"
-          v-model="selectedVersionId"
+          :deployment-name="selectedDeploymentName"
+          :no-application="noApplication"
+          :application-read-only="applicationReadOnly"
+          :active-release-application="activeReleaseApplication"
+          :application-name="applicationName"
+          :application-options="applicationOptions"
+          :is-loading-applications="isLoadingApplications"
+          :selected-application-id="selectedApplicationId"
+          :application-versions="applicationVersions"
+          :is-loading-application-versions="isLoadingApplicationVersions"
+          :selected-application-version-id="selectedApplicationVersionId"
+          :is-scoped-application="isScopedApplication"
+          :scoped-type="scopedType"
           :resource-name="resourceName"
-          :versions="versionOptions"
+          :version-options="versionOptions"
+          :selected-version-id="selectedVersionId"
+          :read-only-resources="readOnlyResources"
           :invalid="versionInvalid"
+          @update:selected-application-id="selectedApplicationId = $event"
+          @update:selected-application-version-id="selectedApplicationVersionId = $event"
+          @update:selected-version-id="selectedVersionId = $event"
+          @create-application="onCreateApplication"
+        />
+
+        <!-- Step 4: canary (gradual rollout). Optional; off emits no strategy
+             and keeps the INSTANT payload (design §4.5). -->
+        <CanaryStrategyField
+          v-if="selectedEnvironmentId"
+          @update:enabled="setCanaryEnabled"
+          @update:form="setCanaryForm"
         />
       </div>
     </template>
 
     <template #footer>
       <div
-        class="flex w-full justify-end gap-3 border-t border-[var(--surface-border)] bg-[var(--surface-section)] px-8 py-4"
+        class="flex w-full items-center justify-between gap-3 border-t border-[var(--surface-border)] bg-[var(--surface-section)] px-8 py-4"
       >
-        <PrimeButton
-          label="Deploy"
-          icon="pi pi-cloud-upload"
-          size="small"
-          :disabled="!canDeploy"
-          :loading="isDeploying"
-          data-testid="deploy-drawer__confirm"
-          @click="onDeploy"
-        />
+        <span
+          class="flex items-center gap-2 text-xs text-[var(--text-color-secondary)] leading-tight"
+          data-testid="deploy-drawer__footer-note"
+        >
+          <i class="pi pi-info-circle" />
+          build & activate creates, builds and activates in one action.
+        </span>
+        <div class="flex items-center gap-3">
+          <PrimeButton
+            label="Cancel"
+            size="small"
+            outlined
+            data-testid="deploy-drawer__cancel"
+            @click="isVisible = false"
+          />
+          <PrimeButton
+            label="Build & activate"
+            icon="pi pi-cloud-upload"
+            size="small"
+            :disabled="!canDeploy"
+            :loading="isDeploying"
+            data-testid="deploy-drawer__confirm"
+            @click="onDeploy"
+          />
+        </div>
       </div>
     </template>
   </EmptyDrawer>

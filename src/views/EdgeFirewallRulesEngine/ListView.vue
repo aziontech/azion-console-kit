@@ -17,6 +17,7 @@
 
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -56,8 +57,19 @@
     reorderRulesEngine: {
       type: Function,
       required: true
+    },
+    // Optional versioned facade (drop-in). When present, list/delete/reorder route
+    // through it instead of the non-versioned edgeFirewallRulesEngineService.
+    service: {
+      type: Object,
+      default: null
     }
   })
+
+  // Outside the VersionShell (legacy flow) this defaults to readOnly=false, so the
+  // legacy behavior is unchanged; inside an immutable version it disables writes.
+  const { readOnly } = useVersionContext()
+  const isReadOnly = computed(() => readOnly.value)
 
   const hasContentToList = ref(true)
   const drawerRef = ref('')
@@ -120,15 +132,18 @@
     }
   ])
 
-  const actions = computed(() => [
-    {
-      label: 'Delete',
-      type: 'delete',
-      title: 'rule',
-      icon: 'pi pi-trash',
-      service: deleteEdgeFirewallRulesEngineServiceWithDecorator
-    }
-  ])
+  const actions = computed(() => {
+    if (isReadOnly.value) return []
+    return [
+      {
+        label: 'Delete',
+        type: 'delete',
+        title: 'rule',
+        icon: 'pi pi-trash',
+        service: deleteEdgeFirewallRulesEngineServiceWithDecorator
+      }
+    ]
+  })
 
   // --- useDataTable integration ---
   const tableProps = {
@@ -237,6 +252,7 @@
   }
 
   const onPositionChange = (updatedRow, newValue) => {
+    if (isReadOnly.value) return
     changePosition(updatedRow, newValue)
 
     setTimeout(() => {
@@ -259,6 +275,7 @@
   }
 
   const onRowReorder = async (event) => {
+    if (isReadOnly.value) return
     const { dragIndex, dropIndex } = event
     const row = data.value[dragIndex]
     if (row.position && row.position.max >= dropIndex && row.position.min <= dropIndex) {
@@ -268,15 +285,17 @@
   }
 
   // --- Business logic ---
+  const rulesEngineService = props.service ?? edgeFirewallRulesEngineService
+
   function listEdgeFirewallRulesEngineServiceWithDecorator(query) {
-    return edgeFirewallRulesEngineService.listEdgeFirewallRulesEngineService({
+    return rulesEngineService.listEdgeFirewallRulesEngineService({
       id: props.edgeFirewallId,
       ...query
     })
   }
 
   const deleteEdgeFirewallRulesEngineServiceWithDecorator = async (ruleEngineId) => {
-    return await edgeFirewallRulesEngineService.deleteEdgeFirewallRulesEngineService(
+    return await rulesEngineService.deleteEdgeFirewallRulesEngineService(
       props.edgeFirewallId,
       ruleEngineId
     )
@@ -310,7 +329,7 @@
   const reorderDecoratorService = async (rulesData, reloadFn) => {
     isLoadingButtonOrder.value = true
     try {
-      await edgeFirewallRulesEngineService.reorderEdgeFirewallRulesEngineService(
+      await rulesEngineService.reorderEdgeFirewallRulesEngineService(
         rulesData,
         props.edgeFirewallId
       )
@@ -375,6 +394,7 @@
   <Drawer
     ref="drawerRef"
     :edgeFirewallId="edgeFirewallId"
+    :service="service"
     :createService="createEdgeFirewallRulesEngineService"
     :listFunctionsService="listFunctionsService"
     :loadService="loadEdgeFirewallRulesEngineService"
@@ -594,7 +614,7 @@
 
     <teleport
       to="#action-bar"
-      v-if="columnOrderAltered && !isLoading"
+      v-if="columnOrderAltered && !isLoading && !isReadOnly"
     >
       <div
         class="flex w-full gap-4 justify-end h-14 items-center border-t surface-border sticky bottom-0 surface-section px-2 md:px-8"

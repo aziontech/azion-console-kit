@@ -62,6 +62,7 @@
       :update:visible="toggleDrawerVisibility"
       position="right"
       tabindex="0"
+      :blockScroll="true"
       :pt="{
         root: {
           class: ['w-full', 'transition-all', 'duration-300', 'ease-in-out', resolvedWidthClass]

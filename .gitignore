@@ -62,6 +62,8 @@ CLAUDE.md
 AGENTS.md
 .opencode/
 .claude/
-AGENTS.md
+.gitnexus/
+.kilo/
+.kiro/
+/specs
 storybook/yarn.lock
-.gitnexus

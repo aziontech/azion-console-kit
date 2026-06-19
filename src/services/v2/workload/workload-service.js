@@ -50,8 +50,7 @@ export class WorkloadService extends BaseService {
   }
 
   #fetchOne = async ({ id }) => {
-    const [workloadDeployment, zonesResponse, workloadResponse] = await Promise.all([
-      this.workloadDeployment.listWorkloadDeployment(id),
+    const [zonesResponse, workloadResponse] = await Promise.all([
       this.edgeDNS
         .listEdgeDNSService({ fields: ['domain'], active: 'True' })
         .catch(() => ({ body: [] })),
@@ -61,9 +60,14 @@ export class WorkloadService extends BaseService {
     const zones = (zonesResponse?.body || []).map((zone) => zone.domain?.content ?? zone.domain)
 
     return (
-      this.adapter?.transformLoadWorkload?.(workloadResponse.data, workloadDeployment[0], zones) ??
+      this.adapter?.transformLoadWorkload?.(workloadResponse.data, undefined, zones) ??
       workloadResponse.data
     )
+  }
+
+  loadWorkloadBindings = async (id) => {
+    const { data } = await this.http.request({ method: 'GET', url: `${this.baseURL}/${id}` })
+    return Array.isArray(data?.bindings) ? data.bindings : []
   }
 
   prefetchList = (pageSize = 10) => {

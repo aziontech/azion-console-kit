@@ -2,7 +2,7 @@
   <CreateDrawerBlock
     v-if="loadCreateFunctionDrawer"
     v-model:visible="showCreateFunctionDrawer"
-    :createService="edgeFirewallFunctionService.createEdgeFirewallService"
+    :createService="createService"
     :schema="validationSchema"
     :initialValues="initialValues"
     :isOverlapped="isOverlapped"
@@ -84,8 +84,19 @@
     edgeFirewallID: {
       type: String,
       required: true
+    },
+    // Optional versioned facade (drop-in): when present, create/edit/load route
+    // through it instead of the non-versioned edgeFirewallFunctionService.
+    service: {
+      type: Object,
+      default: null
     }
   })
+
+  const createService = async (payload) => {
+    if (props.service) return await props.service.create(payload)
+    return await edgeFirewallFunctionService.createEdgeFirewallService(payload)
+  }
 
   const showCreateFunctionDrawer = ref(false)
   const showEditFunctionDrawer = ref(false)
@@ -195,6 +206,7 @@
   }
 
   const editService = async (payload) => {
+    if (props.service) return await props.service.edit(payload)
     return await edgeFirewallFunctionService.editEdgeFirewallFunctionService({
       ...payload,
       edgeFirewallID: props.edgeFirewallID
@@ -202,6 +214,9 @@
   }
 
   const loadService = async () => {
+    if (props.service) {
+      return await props.service.load({ functionID: selectedFunctionToEdit.value })
+    }
     return await edgeFirewallFunctionService.loadFunctionsService(
       props.edgeFirewallID,
       selectedFunctionToEdit.value

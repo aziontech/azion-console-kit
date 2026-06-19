@@ -234,6 +234,15 @@ export const queryKeys = {
     list: (params) => [...queryKeys.workload.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.workload.all, 'detail', id],
     metrics: (id, params) => [...queryKeys.workload.detail(id), 'metrics', normalizeParams(params)],
+    version: {
+      all: (parentId) => [...queryKeys.workload.detail(parentId), 'versions'],
+      list: (parentId) => [...queryKeys.workload.version.all(parentId), 'list'],
+      detail: (parentId, versionId) => [
+        ...queryKeys.workload.version.all(parentId),
+        'detail',
+        versionId
+      ]
+    },
     versions: (id, params) => [
       ...queryKeys.workload.detail(id),
       'versions',
@@ -269,6 +278,51 @@ export const queryKeys = {
         'detail',
         id
       ]
+    },
+    version: {
+      all: (parentId) => [...queryKeys.firewall.detail(parentId), 'versions'],
+      list: (parentId) => [...queryKeys.firewall.version.all(parentId), 'list'],
+      detail: (parentId, versionId) => [
+        ...queryKeys.firewall.version.all(parentId),
+        'detail',
+        versionId
+      ],
+      functions: {
+        all: (parentId, versionId) => [
+          ...queryKeys.firewall.version.detail(parentId, versionId),
+          'functions'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.firewall.version.detail(parentId, versionId),
+          'functions',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.firewall.version.detail(parentId, versionId),
+          'functions',
+          'detail',
+          id
+        ]
+      },
+      rulesEngine: {
+        all: (parentId, versionId) => [
+          ...queryKeys.firewall.version.detail(parentId, versionId),
+          'rules-engine'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.firewall.version.detail(parentId, versionId),
+          'rules-engine',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.firewall.version.detail(parentId, versionId),
+          'rules-engine',
+          'detail',
+          id
+        ]
+      }
     }
   },
   teams: {
@@ -324,6 +378,28 @@ export const queryKeys = {
         normalizeParams(params)
       ]
     }
+  },
+  deployment: {
+    all: ['deployment'],
+    list: (params) => [...queryKeys.deployment.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.deployment.all, 'detail', id]
+  },
+  release: {
+    all: (deploymentId) => [...queryKeys.deployment.detail(deploymentId), 'releases'],
+    list: (deploymentId, params) => [
+      ...queryKeys.release.all(deploymentId),
+      'list',
+      normalizeParams(params)
+    ],
+    detail: (deploymentId, releaseId) => [
+      ...queryKeys.release.all(deploymentId),
+      'detail',
+      releaseId
+    ],
+    activeComposition: (deploymentId) => [
+      ...queryKeys.release.all(deploymentId),
+      'active-composition'
+    ]
   },
   edgeFunction: {
     all: ['edge-functions'],
@@ -417,7 +493,16 @@ export const queryKeys = {
   customPages: {
     all: ['custom-pages'],
     list: (params) => [...queryKeys.customPages.all, 'list', normalizeParams(params)],
-    detail: (id) => [...queryKeys.customPages.all, 'detail', id]
+    detail: (id) => [...queryKeys.customPages.all, 'detail', id],
+    version: {
+      all: (parentId) => [...queryKeys.customPages.detail(parentId), 'versions'],
+      list: (parentId) => [...queryKeys.customPages.version.all(parentId), 'list'],
+      detail: (parentId, versionId) => [
+        ...queryKeys.customPages.version.all(parentId),
+        'detail',
+        versionId
+      ]
+    }
   },
   digitalCertificatesCRL: {
     all: ['digital-certificates-crl'],

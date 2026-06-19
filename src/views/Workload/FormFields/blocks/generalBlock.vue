@@ -13,6 +13,10 @@
     noBorder: {
       type: Boolean,
       required: true
+    },
+    readOnly: {
+      type: Boolean,
+      default: false
     }
   })
 </script>
@@ -29,6 +33,7 @@
         required
         name="name"
         placeholder="My Workload"
+        :readonly="props.readOnly"
         :value="name"
         description="This is an identification name for the Workload. Once you save the configuration, the URL will be automatically generated."
       />

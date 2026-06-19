@@ -1,0 +1,30 @@
+{
+  "count": 1,
+  "results": [
+    {
+      "id": 9001,
+      "name": "SSE 001",
+      "last_modified": "2026-06-01T12:00:00Z",
+      "last_editor": "qa@azion.com",
+      "product_version": "6.0",
+      "protocols": {},
+      "tls": {},
+      "mtls": {},
+      "workload_domain_allow_access": true,
+      "infrastructure": 1,
+      "active": true,
+      "workload_domain": "teste.gdsantana2.com",
+      "domains": [],
+      "bindings": [
+        {
+          "environment_id": "env-prod-01",
+          "deployment_id": "dep-magalu-storefront"
+        },
+        {
+          "environment_id": "env-prod-02",
+          "deployment_id": "dep-storefront-canary"
+        }
+      ]
+    }
+  ]
+}

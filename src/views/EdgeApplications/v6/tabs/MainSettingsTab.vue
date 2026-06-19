@@ -20,7 +20,7 @@
   import ApplicationVersionAdapter from '@/views/EdgeApplications/v6/ApplicationVersionAdapter.vue'
   import VersionShell from '@/templates/version-shell-block/index.vue'
   import FormFieldsEditEdgeApplications from '@/views/EdgeApplications/FormFields/FormFieldsEditEdgeApplications.vue'
-  import VersionHeadingActions from '@/views/EdgeApplications/v6/VersionHeadingActions.vue'
+  import ApplicationVersionHeadingActions from '@/views/EdgeApplications/v6/ApplicationVersionHeadingActions.vue'
   import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
 
   defineOptions({ name: 'edge-applications-v6-main-settings-tab' })
@@ -70,7 +70,7 @@
         <FormFieldsEditEdgeApplications class="flex gap-4" />
         <!-- Shell-slot-resident + Teleported to the heading (#version-lifecycle-action):
              the version's status + primary action (Build when draft / Deploy when ready). -->
-        <VersionHeadingActions />
+        <ApplicationVersionHeadingActions />
       </div>
     </ApplicationVersionAdapter>
   </VersionShell>

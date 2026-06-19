@@ -1,14 +1,16 @@
 <script setup>
   /**
    * EnvironmentSelectionInput — dumb/presentational selection input rendering N
-   * selectable cards (one RadioButton per environment, all sharing the same
-   * `name`). Each card shows exactly: the environment name (title), its policy
-   * (as a tag beside the name) and the associated deployment name. It does not
-   * fetch, filter or resolve anything — `environments` arrive already derived
-   * from the composable. Domains are intentionally NOT displayed.
+   * selectable radio cards (one RadioButton per binding, all sharing the same
+   * `name`). Each card shows the environment name, its policy and a "consome"
+   * badge, plus the bound deployment (strategy) with workload count and the
+   * active release. It does not fetch, filter or resolve anything —
+   * `environments` arrive already derived/enriched from the composable.
    */
   import RadioButton from '@aziontech/webkit/radiobutton'
   import PrimeTag from '@aziontech/webkit/prime-tag'
+  import PrimeButton from '@aziontech/webkit/button'
+  import LabelBlock from '@aziontech/webkit/label'
 
   defineOptions({ name: 'deploy-drawer-environment-selection-input' })
 
@@ -21,13 +23,21 @@
       type: Array,
       default: () => []
     },
+    workloadName: {
+      type: String,
+      default: ''
+    },
+    resourceName: {
+      type: String,
+      default: ''
+    },
     loading: {
       type: Boolean,
       default: false
     }
   })
 
-  const emit = defineEmits(['update:modelValue'])
+  const emit = defineEmits(['update:modelValue', 'bind'])
 
   const onSelect = (value) => emit('update:modelValue', value)
 </script>
@@ -37,12 +47,52 @@
     class="flex flex-col gap-3"
     data-testid="deploy-drawer__environment-selection"
   >
+    <LabelBlock
+      label="Environment"
+      isRequired
+    />
+    <span class="text-xs text-[var(--text-color-secondary)] leading-tight -mt-2">
+      Environments of {{ workloadName }}. The Deployment bound to each one is the strategy that runs
+      the Release.
+    </span>
+
     <div
       v-if="!loading && environments.length === 0"
-      class="rounded-md border border-dashed border-[var(--surface-border)] bg-[var(--surface-section)] px-4 py-6 text-center text-sm text-[var(--text-color-secondary)]"
+      class="flex items-start gap-3 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-4 py-4"
       data-testid="deploy-drawer__environment-empty"
     >
-      No environment available for this workload.
+      <span
+        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[var(--surface-ground)]"
+      >
+        <i class="pi pi-link text-[var(--text-color-secondary)]" />
+      </span>
+      <div class="flex flex-1 flex-col gap-2">
+        <span class="flex flex-wrap items-center gap-2">
+          <span class="text-sm font-medium text-[var(--text-color)]">No Environment bound</span>
+          <PrimeTag
+            severity="warning"
+            value="Action needed"
+          />
+        </span>
+        <span class="text-xs text-[var(--text-color-secondary)] leading-tight">
+          <b>{{ workloadName }}</b> has no Environment tied to a Deployment, so there's no strategy
+          to run this release.
+        </span>
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+          <span class="text-xs text-[var(--text-color-secondary)] leading-tight">
+            Bind an Environment to a Deployment in the Workload settings, then publish.
+          </span>
+          <PrimeButton
+            label="Bind Environment"
+            icon="pi pi-external-link"
+            iconPos="right"
+            size="small"
+            outlined
+            data-testid="deploy-drawer__environment-bind"
+            @click="emit('bind')"
+          />
+        </div>
+      </div>
     </div>
 
     <div
@@ -51,7 +101,7 @@
       class="flex items-start gap-3 rounded-md border px-4 py-3 transition-colors"
       :class="
         modelValue === env.id
-          ? 'border-[var(--primary-color)] bg-[var(--surface-section)]'
+          ? 'border-[var(--border-selected)] bg-[var(--surface-section)]'
           : 'border-[var(--surface-border)]'
       "
       :data-testid="`deploy-drawer__environment-card-${env.id}`"
@@ -65,18 +115,35 @@
       />
       <label
         :for="`deploy-drawer-environment-${env.id}`"
-        class="flex flex-1 flex-col gap-1 cursor-pointer"
+        class="flex flex-1 flex-col gap-1.5 cursor-pointer"
       >
-        <span class="flex items-center gap-2">
+        <span class="flex flex-wrap items-center gap-2">
+          <i class="pi pi-server text-[var(--text-color-secondary)]" />
           <span class="text-sm font-medium text-[var(--text-color)]">{{ env.name }}</span>
-          <PrimeTag
+          <span
             v-if="env.policyLabel"
-            severity="secondary"
-            :value="env.policyLabel"
-          />
+            class="inline-flex items-center rounded-md border border-[var(--surface-border)] px-2 py-0.5 text-xs text-[var(--text-color-secondary)]"
+          >
+            {{ env.policyLabel }}
+          </span>
+          <span
+            v-if="env.consumes && resourceName"
+            class="inline-flex items-center rounded-md border border-[var(--surface-border)] px-2 py-0.5 text-xs text-[var(--text-color-secondary)]"
+          >
+            consumes {{ resourceName }}
+          </span>
         </span>
         <span class="text-xs text-[var(--text-color-secondary)] leading-tight">
-          Deployment: {{ env.deploymentName }}
+          Deployment (strategy) {{ env.deploymentName }}
+          <template v-if="env.workloadCount != null">
+            · <i class="pi pi-globe" /> {{ env.workloadCount }} Workloads
+          </template>
+        </span>
+        <span
+          v-if="env.activeReleaseName"
+          class="text-xs text-[var(--text-color-secondary)] leading-tight"
+        >
+          <i class="pi pi-tag" /> Active release: {{ env.activeReleaseName }}
         </span>
       </label>
     </div>

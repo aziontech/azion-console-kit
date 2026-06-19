@@ -24,7 +24,7 @@
   import VersionShell from '@/templates/version-shell-block/index.vue'
   import FormFieldsEditEdgeApplications from '@/views/EdgeApplications/FormFields/FormFieldsEditEdgeApplications.vue'
   import VersionTabAddButton from '@/views/EdgeApplications/v6/tabs/VersionTabAddButton.vue'
-  import VersionHeadingActions from '@/views/EdgeApplications/v6/VersionHeadingActions.vue'
+  import ApplicationVersionHeadingActions from '@/views/EdgeApplications/v6/ApplicationVersionHeadingActions.vue'
   import EdgeApplicationsCacheSettingsListView from '@/views/EdgeApplicationsCacheSettings/ListView.vue'
   import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
   import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView.vue'
@@ -213,6 +213,14 @@
   // — they require an explicit `.value`.
   const useVersionQuery = () =>
     edgeAppVersionService.useLoadVersionQuery(props.resourceId, props.versionId)
+
+  // VersionHeadingActions owns the single DeployDrawerBlock. We forward its
+  // `openDeployDrawer` upward so VersionEditView can open the SAME drawer when
+  // the VersionShell footer dispatches DEPLOY — no second drawer is created.
+  const headingActionsRef = ref(null)
+  const openDeployDrawer = () => headingActionsRef.value?.openDeployDrawer()
+
+  defineExpose({ openDeployDrawer })
 </script>
 
 <template>
@@ -265,7 +273,7 @@
         <!-- Also shell-slot-resident + Teleported to the heading
              (#version-lifecycle-action): the version's primary action
              (Build / Deploy), gated by the injected version state. -->
-        <VersionHeadingActions />
+        <ApplicationVersionHeadingActions ref="headingActionsRef" />
       </div>
     </ApplicationVersionAdapter>
   </VersionShell>

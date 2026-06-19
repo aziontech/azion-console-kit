@@ -38,6 +38,16 @@
     deleteFunctionService: {
       required: true,
       type: Function
+    },
+    // Optional versioned facade (drop-in). When provided, list/delete/create/edit/
+    // load route through it instead of the non-versioned edgeFirewallFunctionService.
+    service: {
+      type: Object,
+      default: null
+    },
+    versionId: {
+      type: String,
+      default: null
     }
   })
 
@@ -92,6 +102,9 @@
   })
 
   const listFunctionsInstance = async (query) => {
+    if (props.service) {
+      return await props.service.list(query)
+    }
     const data = await edgeFirewallFunctionService.listEdgeFirewallFunctionsService(
       props.edgeFirewallID,
       query
@@ -100,6 +113,9 @@
   }
 
   const deleteFunctionsWithDecorator = async (functionId) => {
+    if (props.service) {
+      return await props.service.remove(functionId)
+    }
     return await edgeFirewallFunctionService.deleteEdgeFirewallFunctionService(
       functionId,
       props.edgeFirewallID
@@ -156,6 +172,7 @@
   <DrawerFunction
     ref="drawerFunctionRef"
     :edgeFirewallID="props.edgeFirewallID"
+    :service="props.service"
     :createFunctionService="props.createFunctionService"
     :loadFunctionService="props.loadFunctionService"
     :editFunctionService="props.editFunctionService"
