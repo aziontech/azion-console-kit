@@ -25,12 +25,17 @@ export const LATEST_READY = 'LATEST'
 
 const normalizeName = (name) => (isObject(name) ? (name.text ?? '') : (name ?? ''))
 
+// A version is deployable when it is built — `ready` or `active` (serving).
+const DEPLOYABLE_STATES = ['ready', 'active']
+
 const toVersionOptions = (versions) =>
   (Array.isArray(versions) ? versions : [])
-    .filter((version) => version?.state === 'ready')
+    .filter((version) => DEPLOYABLE_STATES.includes(version?.state))
     .map((version) => ({
-      label: version.version ?? version.id,
+      label: version.comment || version.id,
       value: version.id,
+      createdAt: version.createdAt ?? null,
+      author: version.lastEditor || null,
       isCurrent: Boolean(version.isCurrent)
     }))
 
@@ -395,7 +400,37 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
     noApplication: noApplication.value
   }))
 
-  const readOnlyResources = computed(() => composition.value.readOnlyResources)
+  // Read-only resource NAMES, resolved by type + id (the release returns ids
+  // only). Keyed `${type}:${id}`; resolution degrades to the id on miss.
+  const readOnlyResourceNames = ref({})
+
+  watch(
+    () => releaseParts.value.readOnlyResources,
+    async (list) => {
+      for (const entry of list ?? []) {
+        const key = `${entry.resourceType}:${entry.resourceId}`
+        if (entry.resourceName || entry.resourceId == null || readOnlyResourceNames.value[key]) {
+          continue
+        }
+        const name = await deployDrawerService.resolveResourceName(
+          entry.resourceType,
+          entry.resourceId
+        )
+        if (name) readOnlyResourceNames.value = { ...readOnlyResourceNames.value, [key]: name }
+      }
+    },
+    { immediate: true }
+  )
+
+  const readOnlyResources = computed(() =>
+    composition.value.readOnlyResources.map((entry) => ({
+      ...entry,
+      resourceName:
+        entry.resourceName ??
+        readOnlyResourceNames.value[`${entry.resourceType}:${entry.resourceId}`] ??
+        null
+    }))
+  )
 
   // Resolved display name of the application slot (catalog-resolved in read-only).
   const applicationName = computed(() => applicationSlot.value?.resourceName ?? null)

@@ -20,6 +20,10 @@
       type: String,
       default: ''
     },
+    showResource: {
+      type: Boolean,
+      default: true
+    },
     versions: {
       type: Array,
       default: () => []
@@ -62,7 +66,10 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-col gap-2">
+    <div
+      v-if="showResource"
+      class="flex flex-col gap-2"
+    >
       <LabelBlock
         label="Resource"
         isRequired

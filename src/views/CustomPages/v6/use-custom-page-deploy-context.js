@@ -28,7 +28,9 @@ export function useCustomPageDeployContext() {
   })
 
   const readyVersionOptions = computed(() =>
-    rawVersions.value.filter((item) => item.state === VERSION_STATES.READY).map(toVersionOption)
+    rawVersions.value
+      .filter((item) => [VERSION_STATES.READY, VERSION_STATES.ACTIVE].includes(item.state))
+      .map(toVersionOption)
   )
 
   const versionOptions = computed(() => {

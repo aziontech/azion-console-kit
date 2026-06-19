@@ -18,7 +18,11 @@ vi.mock('@/services/v2/deployment/deployment-service', () => ({
   deploymentService: { useDeploymentsListQuery: vi.fn() }
 }))
 vi.mock('@/services/v2/deploy-drawer/deploy-drawer-service', () => ({
-  deployDrawerService: { loadWorkloadEnvironments: vi.fn(), enrichReleases: vi.fn() }
+  deployDrawerService: {
+    loadWorkloadEnvironments: vi.fn(),
+    enrichReleases: vi.fn(),
+    resolveResourceName: vi.fn().mockResolvedValue(null)
+  }
 }))
 vi.mock('@/services/v2/edge-app/edge-app-service', () => ({
   edgeAppService: { listEdgeApplicationsService: vi.fn() }

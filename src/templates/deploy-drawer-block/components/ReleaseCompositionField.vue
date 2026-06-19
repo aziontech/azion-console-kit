@@ -233,6 +233,7 @@
       <ResourceVersionField
         :model-value="isScopedApplication ? selectedVersionId : selectedApplicationVersionId"
         :resource-name="isScopedApplication ? resourceName : ''"
+        :show-resource="isScopedApplication"
         :versions="applicationVersions"
         :disabled="isLoadingApplicationVersions"
         :invalid="invalid"
