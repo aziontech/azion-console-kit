@@ -24,6 +24,12 @@
     activeComponent: {
       type: Object,
       default: null
+    },
+    // Per-resource so the e2e selector is unique; defaults to the Application
+    // prefix for back-compat with its existing spec.
+    testidPrefix: {
+      type: String,
+      default: 'application-v6-edit'
     }
   })
 
@@ -32,6 +38,8 @@
   const isVisible = computed(() => Boolean(props.tab?.canCreate) && !readOnly.value)
 
   const label = computed(() => props.tab?.addButtonLabel || 'Create')
+
+  const addButtonTestid = computed(() => `${props.testidPrefix}__add-button`)
 
   const handleClick = () => {
     props.activeComponent?.openCreateDrawer?.()
@@ -48,7 +56,7 @@
       size="small"
       icon="pi pi-plus"
       @click="handleClick"
-      data-testid="edge-applications-v6-edit__add-button"
+      :data-testid="addButtonTestid"
     />
   </Teleport>
 </template>

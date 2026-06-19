@@ -1,6 +1,6 @@
 const DEPLOY_DRAWER_SELECTORS = {
   // Entry point on the v6 Application edit screen (Versions tab heading action).
-  openButton: '[data-testid="edge-applications-v6-edit__deploy"]',
+  openButton: '[data-testid="application-v6-edit__deploy"]',
 
   // Drawer shell + lifecycle regions.
   drawer: '[data-testid="deploy-drawer"]',

@@ -18,7 +18,7 @@
   import { useVersionList } from '@/composables/versioning/use-version-list'
   import { useVersionRowActions } from '@/composables/versioning/use-version-row-actions'
 
-  defineOptions({ name: 'edge-firewall-v6-versions-tab' })
+  defineOptions({ name: 'firewall-v6-versions-tab' })
 
   const props = defineProps({
     firewallId: {
@@ -88,7 +88,7 @@
 </script>
 
 <template>
-  <div data-testid="edge-firewall-v6-versions-tab">
+  <div data-testid="firewall-v6-versions-tab">
     <VersionListDataView
       :items="items"
       :columns="columns"
@@ -118,7 +118,7 @@
       }"
       filtered-empty-title="No versions match your filters"
       filtered-empty-description="Try a different search term or status filter."
-      data-testid="edge-firewall-v6-versions__table"
+      data-testid="firewall-v6-versions__table"
       @update:search-term="searchTerm = $event"
       @update:filter-values="filterValues = $event"
       @update:sort="sort = $event"
@@ -133,7 +133,7 @@
           icon="pi pi-plus"
           size="small"
           :loading="isCreatingDraft"
-          data-testid="edge-firewall-v6-versions__new-draft"
+          data-testid="firewall-v6-versions__new-draft"
           @click="createDraft"
         />
       </template>

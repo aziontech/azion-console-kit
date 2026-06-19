@@ -11,22 +11,19 @@
    * `command-success`/`command-error`/`cancel`. Keyed by versionId at the parent.
    */
   import { computed, ref } from 'vue'
-  import TabView from 'primevue/tabview'
-  import TabPanel from '@aziontech/webkit/tabpanel'
 
-  import EdgeFirewallVersionAdapter from '@/views/EdgeFirewall/v6/EdgeFirewallVersionAdapter.vue'
-  import VersionShell from '@/templates/version-shell-block/index.vue'
+  import FirewallVersionAdapter from '@/views/EdgeFirewall/v6/FirewallVersionAdapter.vue'
+  import VersionEditorTabsShell from '@/templates/version-shell-block/VersionEditorTabsShell.vue'
   import FormFieldsEdgeFirewall from '@/views/EdgeFirewall/FormFields/FormFieldsEdgeFirewall.vue'
-  import EdgeFirewallVersionHeadingActions from '@/views/EdgeFirewall/v6/EdgeFirewallVersionHeadingActions.vue'
-  import VersionTabAddButton from '@/views/EdgeApplications/v6/tabs/VersionTabAddButton.vue'
   import EdgeFirewallFunctionsListView from '@/views/EdgeFirewallFunctions/ListView.vue'
   import EdgeFirewallRulesEngineListView from '@/views/EdgeFirewallRulesEngine/ListView.vue'
 
   import { useVersionedFacades } from '@/views/EdgeFirewall/v6/tabs/use-versioned-facades'
+  import { useDeployResourceContext } from '@/composables/versioning/use-deploy-resource-context'
   import { documentationCatalog } from '@/helpers'
   import { edgeFirewallVersionService } from '@/services/v2/edge-firewall/edge-firewall-version-service'
 
-  defineOptions({ name: 'edge-firewall-v6-version-editor-tabs' })
+  defineOptions({ name: 'firewall-v6-version-editor-tabs' })
 
   const props = defineProps({
     firewall: {
@@ -62,8 +59,6 @@
     ...(versionModuleQuery.data.value?.config ?? {})
   }))
   const isEdgeFunctionEnabled = computed(() => !!moduleSource.value.edgeFunctionsEnabled)
-
-  const activeTabIndex = ref(0)
 
   const firewallTabs = computed(() => {
     if (!props.firewall) return []
@@ -121,24 +116,21 @@
     return tabs
   })
 
-  const componentsRefs = ref({})
-
-  const setComponentRef = (index) => (instance) => {
-    if (instance) {
-      componentsRefs.value[index] = instance
-    } else {
-      delete componentsRefs.value[index]
-    }
-  }
-
-  const activeTabDescriptor = computed(() => firewallTabs.value[activeTabIndex.value] ?? null)
-  const activeTabComponent = computed(() => componentsRefs.value[activeTabIndex.value] ?? null)
-
   const useVersionQuery = () =>
     edgeFirewallVersionService.useLoadVersionQuery(props.resourceId, props.versionId)
 
-  const headingActionsRef = ref(null)
-  const openDeployDrawer = () => headingActionsRef.value?.openDeployDrawer()
+  // The deploy `resourceContext` (ready versions of this Firewall) feeds the shared
+  // heading's DeployDrawerBlock.
+  const { resourceContext } = useDeployResourceContext({
+    resourceType: 'firewall',
+    injectionKey: 'edgeFirewall',
+    versionService: edgeFirewallVersionService
+  })
+
+  // Forward the editor shell's openDeployDrawer so VersionEditView can open the
+  // SAME drawer when the VersionShell footer dispatches DEPLOY.
+  const shellRef = ref(null)
+  const openDeployDrawer = () => shellRef.value?.openDeployDrawer()
 
   defineExpose({ openDeployDrawer })
 </script>
@@ -147,54 +139,18 @@
   <!-- Keyed by versionId at the parent: the shell calls the query factory once in
        setup and captures resourceId/versionId by value, so a version switch
        remounts shell + adapter to renew query, ctx and form. -->
-  <VersionShell
+  <VersionEditorTabsShell
+    ref="shellRef"
     :use-version-query="useVersionQuery"
     :resource-id="resourceId"
     :version-id="versionId"
-    data-testid="edge-firewall-v6-edit__shell"
-    @updated="emit('command-success', $event)"
+    :resource="firewall"
+    :adapter="FirewallVersionAdapter"
+    :tabs="firewallTabs"
+    :resource-context="resourceContext"
+    testid-prefix="firewall-v6-edit"
+    @command-success="emit('command-success', $event)"
     @command-error="emit('command-error', $event)"
     @cancel="emit('cancel')"
-  >
-    <EdgeFirewallVersionAdapter
-      :firewall="firewall"
-      :resource-id="resourceId"
-      :version-id="versionId"
-    >
-      <div class="flex align-center justify-between relative">
-        <TabView
-          v-model:activeIndex="activeTabIndex"
-          class="flex-1"
-        >
-          <TabPanel
-            v-for="(tab, index) in firewallTabs"
-            :key="tab.key"
-            :header="tab.label"
-            :pt="{
-              root: { 'data-testid': `edge-firewall-v6-edit__tab-panel__${tab.key}` }
-            }"
-          >
-            <div class="flex flex-col gap-4 mt-4">
-              <component
-                :is="tab.component"
-                :ref="setComponentRef(index)"
-                v-bind="tab.props ?? {}"
-              />
-            </div>
-          </TabPanel>
-        </TabView>
-        <!-- Lives in the shell slot (real readOnly) but Teleports its button to the
-             page heading (#version-tab-add-action). Hidden for Main Settings and
-             read-only versions. -->
-        <VersionTabAddButton
-          :tab="activeTabDescriptor"
-          :active-component="activeTabComponent"
-        />
-        <!-- Shell-slot-resident + Teleported to the heading
-             (#version-lifecycle-action): the version's primary action
-             (Build / Deploy), gated by the injected version state. -->
-        <EdgeFirewallVersionHeadingActions ref="headingActionsRef" />
-      </div>
-    </EdgeFirewallVersionAdapter>
-  </VersionShell>
+  />
 </template>

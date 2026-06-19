@@ -17,24 +17,21 @@
    * so it remounts on a version switch — facades and the query are built once.
    */
   import { computed, ref } from 'vue'
-  import TabView from 'primevue/tabview'
-  import TabPanel from '@aziontech/webkit/tabpanel'
 
   import ApplicationVersionAdapter from '@/views/EdgeApplications/v6/ApplicationVersionAdapter.vue'
-  import VersionShell from '@/templates/version-shell-block/index.vue'
+  import VersionEditorTabsShell from '@/templates/version-shell-block/VersionEditorTabsShell.vue'
   import FormFieldsEditEdgeApplications from '@/views/EdgeApplications/FormFields/FormFieldsEditEdgeApplications.vue'
-  import VersionTabAddButton from '@/views/EdgeApplications/v6/tabs/VersionTabAddButton.vue'
-  import ApplicationVersionHeadingActions from '@/views/EdgeApplications/v6/ApplicationVersionHeadingActions.vue'
   import EdgeApplicationsCacheSettingsListView from '@/views/EdgeApplicationsCacheSettings/ListView.vue'
   import EdgeApplicationsDeviceGroupsListView from '@/views/EdgeApplicationsDeviceGroups/ListView.vue'
   import EdgeApplicationsFunctionsListView from '@/views/EdgeApplicationsFunctions/ListView.vue'
   import EdgeApplicationsRulesEngineListView from '@/views/EdgeApplicationsRulesEngine/ListView.vue'
 
   import { useVersionedFacades } from '@/views/EdgeApplications/v6/tabs/use-versioned-facades'
+  import { useDeployResourceContext } from '@/composables/versioning/use-deploy-resource-context'
   import { documentationCatalog } from '@/helpers'
   import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
 
-  defineOptions({ name: 'edge-applications-v6-version-editor-tabs' })
+  defineOptions({ name: 'application-v6-version-editor-tabs' })
 
   const props = defineProps({
     // Parent Application — the form's base values; merged under the version config.
@@ -192,89 +189,42 @@
     return tabs
   })
 
-  // Component instances of the rendered tabs, keyed by tab index. Used to reach
-  // `openCreateDrawer` on the active tab from the "+ Add" button. An index-keyed
-  // function ref keeps the mapping stable regardless of TabView's render order.
-  const componentsRefs = ref({})
-
-  const setComponentRef = (index) => (instance) => {
-    if (instance) {
-      componentsRefs.value[index] = instance
-    } else {
-      delete componentsRefs.value[index]
-    }
-  }
-
-  const activeTabDescriptor = computed(() => applicationTabs.value[activeTabIndex.value] ?? null)
-  const activeTabComponent = computed(() => componentsRefs.value[activeTabIndex.value] ?? null)
-
-  // Factory passed to VersionShell. Defined in setup (not inline in the template)
-  // because, inside template function literals, refs are not auto-unwrapped
-  // — they require an explicit `.value`.
+  // Factory passed to the editor shell. Defined in setup (not inline in the
+  // template) because, inside template function literals, refs are not auto-unwrapped.
   const useVersionQuery = () =>
     edgeAppVersionService.useLoadVersionQuery(props.resourceId, props.versionId)
 
-  // VersionHeadingActions owns the single DeployDrawerBlock. We forward its
-  // `openDeployDrawer` upward so VersionEditView can open the SAME drawer when
-  // the VersionShell footer dispatches DEPLOY — no second drawer is created.
-  const headingActionsRef = ref(null)
-  const openDeployDrawer = () => headingActionsRef.value?.openDeployDrawer()
+  // The deploy `resourceContext` (ready versions of this Application) feeds the
+  // shared heading's DeployDrawerBlock.
+  const { resourceContext } = useDeployResourceContext({
+    resourceType: 'application',
+    injectionKey: 'edgeApplication',
+    versionService: edgeAppVersionService
+  })
+
+  // Forward the editor shell's openDeployDrawer so VersionEditView can open the
+  // SAME drawer when the VersionShell footer dispatches DEPLOY.
+  const shellRef = ref(null)
+  const openDeployDrawer = () => shellRef.value?.openDeployDrawer()
 
   defineExpose({ openDeployDrawer })
 </script>
 
 <template>
-  <!-- Keyed by versionId at the parent: the shell calls the query factory only
-       once in setup and captures resourceId/versionId by value, so a version
-       switch remounts shell + adapter to renew query, ctx and form. -->
-  <VersionShell
+  <!-- Keyed by versionId at the parent, so a version switch remounts the editor. -->
+  <VersionEditorTabsShell
+    ref="shellRef"
+    v-model:active-tab-index="activeTabIndex"
     :use-version-query="useVersionQuery"
     :resource-id="resourceId"
     :version-id="versionId"
-    data-testid="edge-applications-v6-edit__shell"
-    @updated="emit('command-success', $event)"
+    :resource="application"
+    :adapter="ApplicationVersionAdapter"
+    :tabs="applicationTabs"
+    :resource-context="resourceContext"
+    testid-prefix="application-v6-edit"
+    @command-success="emit('command-success', $event)"
     @command-error="emit('command-error', $event)"
     @cancel="emit('cancel')"
-  >
-    <ApplicationVersionAdapter
-      :application="application"
-      :resource-id="resourceId"
-      :version-id="versionId"
-    >
-      <div class="flex align-center justify-between relative">
-        <TabView
-          v-model:activeIndex="activeTabIndex"
-          class="flex-1"
-        >
-          <TabPanel
-            v-for="(tab, index) in applicationTabs"
-            :key="tab.key"
-            :header="tab.label"
-            :pt="{
-              root: { 'data-testid': `edge-applications-v6-edit__tab-panel__${tab.key}` }
-            }"
-          >
-            <div class="flex flex-col gap-4 mt-4">
-              <component
-                :is="tab.component"
-                :ref="setComponentRef(index)"
-                v-bind="tab.props ?? {}"
-              />
-            </div>
-          </TabPanel>
-        </TabView>
-        <!-- Lives in the shell slot so it injects the real `readOnly`, but
-             Teleports its button into the page heading (#version-tab-add-action),
-             next to the version status. Hidden for Main Settings and read-only. -->
-        <VersionTabAddButton
-          :tab="activeTabDescriptor"
-          :active-component="activeTabComponent"
-        />
-        <!-- Also shell-slot-resident + Teleported to the heading
-             (#version-lifecycle-action): the version's primary action
-             (Build / Deploy), gated by the injected version state. -->
-        <ApplicationVersionHeadingActions ref="headingActionsRef" />
-      </div>
-    </ApplicationVersionAdapter>
-  </VersionShell>
+  />
 </template>

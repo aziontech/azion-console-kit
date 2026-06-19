@@ -39,7 +39,7 @@
     @cancel="emit('cancel')"
   >
     <WorkloadVersionAdapter
-      :workload="workload"
+      :resource="workload"
       :resource-id="resourceId"
       :version-id="versionId"
     >

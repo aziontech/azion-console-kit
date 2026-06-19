@@ -1,147 +1,54 @@
 <script setup>
-  import { computed, ref, watch } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from '@aziontech/webkit/use-toast'
-  import ProgressSpinner from '@aziontech/webkit/progressspinner'
-  import InlineMessage from '@aziontech/webkit/inlinemessage'
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
+  // VersionEditView — the FULL version editor screen for a Workload. Logic lives in
+  // useVersionEditScreen; chrome in VersionEditScreen. Workload deploys via its own
+  // legacy flow, so there is no deploy drawer (supportsDeployDrawer: false), no
+  // resource provide, and a bare title.
+  import VersionEditScreen from '@/templates/version-shell-block/VersionEditScreen.vue'
   import WorkloadSettingsTab from '@/views/Workload/v6/WorkloadSettingsTab.vue'
+  import { useVersionEditScreen } from '@/composables/versioning/use-version-edit-screen'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { VERSION_ACTIONS } from '@/composables/versioning/version-machine'
 
   defineOptions({ name: 'workload-v6-version-edit-view' })
 
-  const route = useRoute()
-  const router = useRouter()
-  const toast = useToast()
-
-  const workloadId = computed(() => String(route.params.id))
-  const versionId = computed(() => (route.params.versionId ? String(route.params.versionId) : null))
-
-  if (!versionId.value) {
-    router.replace({ name: 'edit-workload', params: { id: workloadId.value, tab: 'versions' } })
-  }
-
-  const workload = ref(null)
-  const isLoading = ref(true)
-  const loadError = ref(null)
-
-  const loadWorkload = async () => {
-    if (!workload.value) isLoading.value = true
-    loadError.value = null
-    try {
-      workload.value = await workloadService.loadWorkload({ id: workloadId.value })
-    } catch (err) {
-      loadError.value = err
-      workload.value = null
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  watch(workloadId, loadWorkload, { immediate: true })
-
-  const title = computed(() => workload.value?.name ?? '')
-
-  const goToWorkload = () =>
-    router.push({ name: 'edit-workload', params: { id: workloadId.value, tab: 'versions' } })
-
-  const SUCCESS_SUMMARY = {
-    [VERSION_ACTIONS.SAVE]: 'Version saved',
-    [VERSION_ACTIONS.SAVE_AND_BUILD]: 'Build started',
-    [VERSION_ACTIONS.CANCEL_BUILD]: 'Build cancelled',
-    [VERSION_ACTIONS.NEW_DRAFT_FROM]: 'Draft created',
-    [VERSION_ACTIONS.ARCHIVE]: 'Version archived',
-    [VERSION_ACTIONS.DELETE]: 'Version deleted'
-  }
-
-  const handleCommandSuccess = ({ action, result }) => {
-    toast.add({
-      closable: true,
-      severity: 'success',
-      summary: SUCCESS_SUMMARY[action] ?? 'Done'
-    })
-
-    switch (action) {
-      case VERSION_ACTIONS.DELETE:
-      case VERSION_ACTIONS.SAVE_AND_BUILD:
-        goToWorkload()
-        return
-      case VERSION_ACTIONS.NEW_DRAFT_FROM:
-        if (result?.id) {
-          router.push({
-            name: 'edit-workload-version',
-            params: { id: workloadId.value, versionId: result.id }
-          })
-        }
-        return
-      case VERSION_ACTIONS.SAVE:
-        loadWorkload()
-        return
-      default:
-    }
-  }
-
-  const handleCommandError = ({ error }) => {
-    if (error && typeof error.showErrors === 'function') {
-      error.showErrors(toast)
-      return
-    }
-    const detail = error?.message ?? (typeof error === 'string' ? error : 'Something went wrong')
-    toast.add({ closable: true, severity: 'error', summary: 'Error', detail })
-  }
+  const {
+    resource,
+    resourceId,
+    versionId,
+    isLoading,
+    loadError,
+    title,
+    handleCommandSuccess,
+    handleCommandError,
+    handleCancel
+  } = useVersionEditScreen({
+    load: (id) => workloadService.loadWorkload({ id }),
+    listRoute: (id) => ({ name: 'edit-workload', params: { id, tab: 'versions' } }),
+    versionRouteName: 'edit-workload-version',
+    titleWithVersion: false,
+    supportsDeployDrawer: false
+  })
 </script>
 
 <template>
-  <div
-    v-if="isLoading"
-    class="flex items-center justify-center p-8"
-    data-testid="workload-v6-version-edit__loading"
+  <VersionEditScreen
+    :is-loading="isLoading"
+    :load-error="loadError"
+    :title="title"
+    :entity-name="resource?.name"
+    error-message="Failed to load workload. Try refreshing the page."
+    testid-prefix="workload-v6-version-edit"
   >
-    <ProgressSpinner
-      class="w-10 h-10 text-color"
-      strokeWidth="4"
-    />
-  </div>
-
-  <InlineMessage
-    v-else-if="loadError"
-    class="w-full"
-    severity="error"
-    data-testid="workload-v6-version-edit__error"
-  >
-    Failed to load workload. Try refreshing the page.
-  </InlineMessage>
-
-  <ContentBlock
-    v-else
-    data-testid="workload-v6-version-edit"
-  >
-    <template #heading>
-      <PageHeadingBlock
-        :pageTitle="title"
-        :entityName="workload?.name"
-      >
-        <template #default>
-          <div
-            id="version-lifecycle-action"
-            class="flex items-center"
-          />
-        </template>
-      </PageHeadingBlock>
-    </template>
-    <template #content>
+    <template #editor>
       <WorkloadSettingsTab
-        v-if="workload && versionId"
+        v-if="resource && versionId"
         :key="versionId"
-        :workload="workload"
-        :resource-id="workloadId"
+        :workload="resource"
+        :resource-id="resourceId"
         :version-id="versionId"
         @command-success="handleCommandSuccess"
         @command-error="handleCommandError"
-        @cancel="goToWorkload"
+        @cancel="handleCancel"
       />
     </template>
-  </ContentBlock>
+  </VersionEditScreen>
 </template>
