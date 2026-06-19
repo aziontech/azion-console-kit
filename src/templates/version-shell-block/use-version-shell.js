@@ -52,10 +52,6 @@ export const useVersionShell = ({ useVersionQuery, resourceId, versionId, bus })
     }
 
     const ctx = { resourceId, versionId, comment: payload.comment }
-    // The shell does not invalidate cache: each mutation in the resource service
-    // already calls queryClient.removeQueries, and the internal useQuery refetches on its own.
-    // The handler result is returned to the caller (e.g. draft created by
-    // NEW_DRAFT_FROM, used for navigation).
     return await bus.emit(action, ctx)
   }
 

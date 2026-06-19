@@ -15,8 +15,6 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
 
   const tracker = inject('tracker')
-  // Null-ref default so the component is safe without an `edgeApplication` provider
-  // (e.g. embedded in the Rules Engine form under the v6 flow); usages read `.value?`.
   const edgeApplication = inject('edgeApplication', ref(null))
   defineOptions({ name: 'drawer-origin' })
 

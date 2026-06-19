@@ -51,7 +51,6 @@ const environmentSchema = yup
   })
   .label('Environment')
 
-// v6: each domain carries its own environment + certificate.
 export const domainItemSchema = yup.object({
   id: yup.number(),
   subdomain: subdomainSchema,
@@ -60,7 +59,6 @@ export const domainItemSchema = yup.object({
   certificate: yup.mixed().nullable().notRequired().label('Digital Certificate')
 })
 
-// legacy: domains are simple subdomain/domain rows (no environment, no per-domain certificate).
 const legacyDomainItemSchema = yup.object({
   id: yup.number(),
   subdomain: subdomainSchema,
@@ -80,7 +78,6 @@ const nameSchema = yup
     }
   )
 
-// Keys shared by both account types (v6 and legacy).
 const baseSchema = {
   name: nameSchema,
   active: yup.boolean(),
@@ -128,10 +125,7 @@ const baseSchema = {
   })
 }
 
-// v6-only schema fragments.
 const v6Extras = {
-  // application/firewall flat fields are kept for adapter/deployment compatibility.
-  // The per-environment configuration lives in `environmentDeployments`.
   application: yup.number().nullable().notRequired().label('Application'),
   environmentDeployments: yup
     .object()
@@ -176,7 +170,6 @@ const v6Extras = {
     })
 }
 
-// legacy-only schema fragments (mirrors the previous flat form on `dev`).
 const legacyExtras = {
   application: yup.number().required().label('Application'),
   tls: yup.object({

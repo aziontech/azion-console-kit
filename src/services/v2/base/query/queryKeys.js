@@ -361,11 +361,6 @@ export const queryKeys = {
         ...queryKeys.deployments.versions.all(deploymentId),
         'detail',
         versionId
-      ],
-      diff: (deploymentId, params) => [
-        ...queryKeys.deployments.versions.all(deploymentId),
-        'diff',
-        normalizeParams(params)
       ]
     },
     history: {
@@ -376,6 +371,19 @@ export const queryKeys = {
         'by-deployment',
         deploymentId,
         normalizeParams(params)
+      ]
+    },
+    releases: {
+      all: (deploymentId) => [...queryKeys.deployments.detail(deploymentId), 'releases'],
+      list: (deploymentId, params) => [
+        ...queryKeys.deployments.releases.all(deploymentId),
+        'list',
+        normalizeParams(params)
+      ],
+      detail: (deploymentId, releaseId) => [
+        ...queryKeys.deployments.releases.all(deploymentId),
+        'detail',
+        releaseId
       ]
     }
   },

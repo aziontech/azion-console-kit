@@ -9,6 +9,16 @@ const toStringArray = (value) => {
   return value.map((item) => String(item))
 }
 
+const POLICY_LABELS = {
+  single_version: 'Single Version',
+  versioned_urls: 'Versioned URLs'
+}
+
+export const mapPolicyToLabel = (policy) => {
+  if (!policy) return ''
+  return POLICY_LABELS[policy] ?? String(policy)
+}
+
 const normalizeProtection = (protection) => {
   const source = isObject(protection) ? protection : {}
   const azionAuthentication = isObject(source.azion_authentication)
@@ -65,7 +75,7 @@ const normalizeEnvironment = (environment) => {
     id: source.id ?? null,
     name: source.name ?? '',
     description: source.description ?? null,
-    deployment_policy: source.deployment_policy,
+    deployment_policy: mapPolicyToLabel(source.deployment_policy),
     log_verbosity: typeof source.log_verbosity === 'string' ? source.log_verbosity : 'normal',
     robots_policy: typeof source.robots_policy === 'string' ? source.robots_policy : 'index',
     protection: normalizeProtection(source.protection),

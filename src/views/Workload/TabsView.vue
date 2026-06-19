@@ -11,7 +11,6 @@
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import OverviewTab from './Tabs/OverviewTab.vue'
   import VersionsTab from './Tabs/VersionsTab.vue'
-  import DeploymentsListSection from './Tabs/sections/DeploymentsListSection.vue'
   import CreateDeploymentVersionDrawer from './FormFields/components/CreateDeploymentVersionDrawer.vue'
   import WorkloadSettingsTab from './v6/WorkloadSettingsTab.vue'
   import { workloadService } from '@/services/v2/workload/workload-service'
@@ -26,7 +25,7 @@
     updatedRedirect: { type: String, required: true }
   })
 
-  const TAB_ORDER = ['overview', 'deployment', 'versions', 'settings']
+  const TAB_ORDER = ['overview', 'versions', 'settings']
   const TAB_TO_INDEX = TAB_ORDER.reduce((acc, name, index) => {
     acc[name] = index
     return acc
@@ -167,12 +166,10 @@
   }
 
   const createDrawerVisible = ref(false)
-  const deploymentsRefreshKey = ref(0)
 
   const onVersionCreated = () => {
-    deploymentsRefreshKey.value += 1
-    if (activeTab.value !== TAB_TO_INDEX['deployment']) {
-      changeTab(TAB_TO_INDEX['deployment'])
+    if (activeTab.value !== TAB_TO_INDEX['versions']) {
+      changeTab(TAB_TO_INDEX['versions'])
     }
   }
 
@@ -219,19 +216,6 @@
             :workloadId="workloadId"
             :workload="workload"
           />
-        </TabPanel>
-        <TabPanel
-          header="Deployment"
-          :pt="{ root: { 'data-testid': 'workload-tabs__tab__deployment' } }"
-        >
-          <div class="mt-4">
-            <DeploymentsListSection
-              v-if="activeTab === TAB_TO_INDEX['deployment']"
-              :key="deploymentsRefreshKey"
-              :workloadId="workloadId"
-              :workloadDeploymentId="workload?.workloadDeploymentId"
-            />
-          </div>
         </TabPanel>
         <TabPanel
           header="Versions"

@@ -41,19 +41,12 @@
     }
   })
 
-  // Lean schema for the v4 form: only `name` is required. The toggle fields
-  // (edgeCacheEnabled, debug, etc.) need no validation. Legacy V3 fields
-  // (httpPort/httpsPort/deliveryProtocol) no longer exist in this shape.
   const validationSchema = yup.object({
     name: yup.string().required()
   })
 
   const { version } = useVersionContext()
 
-  // Merge: parent Application base + config persisted in the version (subset of
-  // the form UI). The version config takes precedence — reflects the draft's
-  // saved state. Empty when the GET returns metadata only (form falls back to
-  // the parent Application).
   const mergedValues = computed(() => ({
     ...props.application,
     ...(version.value?.config ?? {})
@@ -64,20 +57,14 @@
     initialValues: mergedValues.value
   })
 
-  // Post-mutation refetch / application reloaded: re-syncs the form
-  // only when there is no pending edit (dirty preserves the user's work).
   watch(mergedValues, (next) => {
     if (!meta.value.dirty) resetForm({ values: next })
   })
-  // Version switch = new context: unconditional reset.
   watch(
     () => props.versionId,
     () => resetForm({ values: mergedValues.value })
   )
 
-  // Gate for the SAVE/SAVE_AND_BUILD buttons: meta.valid reflects the real validity
-  // (vee-validate runs an initial silent validation on mount). The shell reads this
-  // ref through the bus — which uses shallowRef precisely to avoid unwrapping it.
   const isFormValid = computed(() => meta.value.valid)
 
   onVersionCommand('SAVE', {
@@ -85,14 +72,11 @@
     execute: async () => {
       const { valid } = await validate()
       if (!valid) return
-      // Save Draft is a full replace (PUT): the form holds the complete editable
-      // state of the draft, so we send the whole set rather than a partial PATCH.
       const result = await edgeAppVersionService.updateDraft(
         props.resourceId,
         props.versionId,
         values
       )
-      // Saved state becomes the new baseline — clears dirty to allow re-sync.
       resetForm({ values: { ...values } })
       return result
     }
@@ -103,14 +87,11 @@
     execute: async ({ comment }) => {
       const { valid } = await validate()
       if (!valid) return
-      // Full replace (PUT), same as SAVE: the form holds the complete editable
-      // state of the draft, so we send the whole set rather than a partial PATCH.
       const result = await edgeAppVersionService.updateDraft(
         props.resourceId,
         props.versionId,
         values
       )
-      // Only triggers the build if the save succeeded.
       await edgeAppVersionService.build(props.resourceId, props.versionId, { comment })
       resetForm({ values: { ...values } })
       return result
@@ -125,7 +106,6 @@
     edgeAppVersionService.cancelBuild(resourceId, versionId, { comment })
   )
 
-  // Returns the created draft (ULID id) — essential for post-NEW_DRAFT_FROM navigation.
   onVersionCommand('NEW_DRAFT_FROM', ({ resourceId, versionId, comment }) =>
     edgeAppVersionService.createDraft(resourceId, {
       sourceVersionId: versionId,

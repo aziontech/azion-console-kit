@@ -27,14 +27,10 @@
       type: Boolean,
       required: true
     },
-    // Optional facade pre-bound to appId + versionId for the versioned (v6) flow,
-    // shaped `{ list, load, create, edit, remove }`; null in the legacy flow
-    // (the singleton `cacheSettingsService` is used instead).
     service: {
       type: Object,
       default: null
     },
-    // Pass-through version identifier for the versioned flow.
     versionId: {
       type: String,
       default: null
@@ -49,7 +45,6 @@
   //TODO: Fill this when API "fields" query parameter are fixed (id, name, modules)
   const CACHE_SETTING_API_FIELDS = []
 
-  // Use the injected facade (v6) when present, else the singleton service (legacy).
   const listFn = props.service
     ? props.service.list
     : (query) => cacheSettingsService.listCacheSettingsService(props.edgeApplicationId, query)

@@ -27,9 +27,6 @@
 
   defineOptions({ name: 'edge-applications-v6-version-edit-view' })
 
-  // Legacy origins service injected by the router so this view stays free of
-  // direct HTTP imports (azion-architecture/no-direct-http-in-components).
-  // Forwarded to the versioned Rules tab.
   const props = defineProps({
     listOriginsService: {
       type: Function,
@@ -44,7 +41,6 @@
   const edgeApplicationId = computed(() => String(route.params.id))
   const versionId = computed(() => (route.params.versionId ? String(route.params.versionId) : null))
 
-  // Guard: without a versionId there is no version to edit — go to the listing.
   if (!versionId.value) {
     router.replace({ name: 'edit-application', params: { id: edgeApplicationId.value } })
   }
@@ -53,8 +49,6 @@
   const isLoadingApplication = ref(true)
   const loadError = ref(null)
 
-  // Origins Drawer (mounted inside the Rules form) injects `edgeApplication` to gate
-  // the "Load Balancer" origin type — see EditView for the full rationale.
   provide('edgeApplication', application)
 
   const loadApplication = async () => {
@@ -81,7 +75,6 @@
     return `${name} — Version ${vid}`
   })
 
-  // Action → success toast summary map (constants, never loose strings).
   const SUCCESS_SUMMARY = {
     [VERSION_ACTIONS.SAVE]: 'Version saved',
     [VERSION_ACTIONS.SAVE_AND_BUILD]: 'Build started',
@@ -116,26 +109,21 @@
     })
 
     switch (action) {
-      // The version is gone — back to the listing (req 4.1).
       case VERSION_ACTIONS.DELETE:
         goToVersionsList()
         return
-      // No polling here: build progress is visible in the listing (req 4.5).
       case VERSION_ACTIONS.SAVE_AND_BUILD:
         goToVersionsList()
         return
-      // A new draft was created — open its full editor (req 4.2).
       case VERSION_ACTIONS.NEW_DRAFT_FROM:
         router.push({
           name: 'edit-application-version',
           params: { id: edgeApplicationId.value, versionId: result.id }
         })
         return
-      // Name may have changed and feeds the title — reload, staying here (req 4.3).
       case VERSION_ACTIONS.SAVE:
         loadApplication()
         return
-      // ARCHIVE / CANCEL_BUILD / DEPLOY stay on the screen without reload (req 4.3).
       default:
     }
   }
@@ -189,13 +177,10 @@
       >
         <template #default>
           <div class="flex items-center gap-3">
-            <!-- Teleport target for the active sub-tab's "+ Add" button. -->
             <div
               id="version-tab-add-action"
               class="flex items-center"
             />
-            <!-- Teleport target for the version's status + lifecycle action
-                 (Build when draft / Deploy when ready) — see VersionHeadingActions. -->
             <div
               id="version-lifecycle-action"
               class="flex items-center"
@@ -205,8 +190,6 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <!-- Keyed by versionId: the shell captures resourceId/versionId by value, so
-           an in-place version switch (post-NEW_DRAFT_FROM) remounts the editor. -->
       <VersionEditorTabs
         v-if="versionId"
         ref="editorTabsRef"

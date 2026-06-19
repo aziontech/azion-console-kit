@@ -31,7 +31,6 @@ const parseItemResponse = (data) => {
 }
 
 export class EnvironmentService extends BaseService {
-  // Standalone Environment API (split out of the Deployment API). Proxied via the `/environment-api` prefix.
   #baseURL = '/environment-api/v4/environments'
 
   #fetchList = async () => {

@@ -7,7 +7,6 @@ import { buildStrategy } from '@/services/v2/deployment/strategy-builder'
 // importing from `views/`.
 export { buildStrategy }
 
-// TODO: confirm valid rollout_mode values with backend. Assumed INSTANT / GRADUAL.
 export const ROLLOUT_MODE_OPTIONS = [
   { label: 'Instant', value: 'INSTANT' },
   { label: 'Gradual', value: 'GRADUAL' }

@@ -85,8 +85,6 @@
       type: String,
       default: null // null = all, 'azion_lua' = only Lua
     },
-    // Optional facade bound to appId + versionId for the versioned (v6) flow,
-    // shaped `{ list, load, create, edit, remove }`; null in the legacy flow.
     service: {
       type: Object,
       default: null
@@ -97,7 +95,6 @@
     }
   })
 
-  // create service handed to CreateDrawerBlock: facade when versioned, else singleton.
   const createService = props.service
     ? (payload) => props.service.create(payload)
     : edgeApplicationFunctionService.createEdgeApplicationFunction

@@ -29,12 +29,10 @@ export function useVersionRowActions({ resourceId, service, onCloned, onSuccess 
   const pendingItem = ref(null)
   const isExecuting = ref(false)
 
-  // Raw dialog meta for the pending action (or null when none is pending).
   const dialogConfig = computed(() =>
     pendingAction.value ? (metaFor(pendingAction.value).dialog ?? null) : null
   )
 
-  // Maps the shared dialog meta to VersionActionDialog props.
   const dialogProps = computed(() => {
     const cfg = dialogConfig.value
     if (!cfg) return {}
@@ -88,8 +86,6 @@ export function useVersionRowActions({ resourceId, service, onCloned, onSuccess 
     isExecuting.value = true
     try {
       await execute(action, item, comment)
-      // NEW_DRAFT_FROM navigates away (via onCloned); every other action stays
-      // on the list, so reload it to reflect the new version status.
       if (action !== 'NEW_DRAFT_FROM') onSuccess?.()
     } catch (err) {
       const verb = metaFor(action).label?.toLowerCase?.() ?? 'run'
