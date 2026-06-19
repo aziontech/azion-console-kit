@@ -55,16 +55,16 @@
     const name = customPage.value?.name ?? ''
     const vid = versionId.value
     if (!name || !vid) return name
-    return `${name} — Versão ${vid}`
+    return `${name} — Version ${vid}`
   })
 
   const SUCCESS_SUMMARY = {
-    [VERSION_ACTIONS.SAVE]: 'Versão salva',
-    [VERSION_ACTIONS.SAVE_AND_BUILD]: 'Build iniciado',
-    [VERSION_ACTIONS.CANCEL_BUILD]: 'Build cancelado',
-    [VERSION_ACTIONS.NEW_DRAFT_FROM]: 'Rascunho criado',
-    [VERSION_ACTIONS.ARCHIVE]: 'Versão arquivada',
-    [VERSION_ACTIONS.DELETE]: 'Versão excluída'
+    [VERSION_ACTIONS.SAVE]: 'Version saved',
+    [VERSION_ACTIONS.SAVE_AND_BUILD]: 'Build started',
+    [VERSION_ACTIONS.CANCEL_BUILD]: 'Build cancelled',
+    [VERSION_ACTIONS.NEW_DRAFT_FROM]: 'Draft created',
+    [VERSION_ACTIONS.ARCHIVE]: 'Version archived',
+    [VERSION_ACTIONS.DELETE]: 'Version deleted'
   }
 
   const editorTabsRef = ref(null)
@@ -83,7 +83,7 @@
     toast.add({
       closable: true,
       severity: 'success',
-      summary: SUCCESS_SUMMARY[action] ?? 'Concluído'
+      summary: SUCCESS_SUMMARY[action] ?? 'Done'
     })
 
     switch (action) {
@@ -112,12 +112,12 @@
       return
     }
 
-    const detail = error?.message ?? (typeof error === 'string' ? error : 'Algo deu errado')
+    const detail = error?.message ?? (typeof error === 'string' ? error : 'Something went wrong')
 
     toast.add({
       closable: true,
       severity: 'error',
-      summary: 'Erro',
+      summary: 'Error',
       detail
     })
   }
@@ -141,7 +141,7 @@
     severity="error"
     data-testid="custom-pages-v6-version-edit__error"
   >
-    Falha ao carregar a Custom Page. Tente atualizar a página.
+    Failed to load custom page. Try refreshing the page.
   </InlineMessage>
 
   <ContentBlock
