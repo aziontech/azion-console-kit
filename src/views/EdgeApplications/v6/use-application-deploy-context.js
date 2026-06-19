@@ -23,7 +23,7 @@ export function useApplicationDeployContext() {
     value: item.id,
     label: item.comment || item.id,
     createdAt: item.createdAt ?? null,
-    author: item.lastEditor || 'azion@azion.com',
+    author: item.lastEditor || null,
     isCurrent: item.id === version.value?.id
   })
 

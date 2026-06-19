@@ -26,6 +26,16 @@ const pickResourceName = (resource) => {
   return name ?? null
 }
 
+// The cached environment listing exposes `deployment_policy` already mapped to a
+// label ("Single Version"); the per-id fallback returns it raw ("single_version").
+// Normalize to the RAW value so policy comparisons in the composable are stable.
+const POLICY_BY_LABEL = {
+  'Single Version': 'single_version',
+  'Versioned URLs': 'versioned_urls'
+}
+
+const normalizePolicy = (value) => POLICY_BY_LABEL[value] ?? value ?? null
+
 // Resolves a workload's bindings (ids only) into environment cards with names,
 // fetching environment + deployment + active release. Keeps the composable free
 // of cross-service plumbing.
@@ -77,11 +87,13 @@ export class DeployDrawerService {
       this.#resolveDeployment(binding.deployment_id, deployments)
     ])
 
+    const policy = normalizePolicy(environment?.deployment_policy)
+
     return {
       id: binding.environment_id,
       name: environment?.name ?? binding.environment_id,
-      policy: environment?.deployment_policy ?? null,
-      policyLabel: environment ? mapPolicyToLabel(environment.deployment_policy) : '',
+      policy,
+      policyLabel: policy ? mapPolicyToLabel(policy) : '',
       deploymentId: binding.deployment_id,
       deploymentName: deployment?.name ?? binding.deployment_id,
       domains: Array.isArray(binding.domains) ? binding.domains : [],
