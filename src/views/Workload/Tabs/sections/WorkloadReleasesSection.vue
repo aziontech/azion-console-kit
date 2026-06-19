@@ -4,7 +4,7 @@
   import GenericDataView from '@/components/GenericDataView'
   import StatusTag from '@/components/StatusTag'
   import CurrentBadge from '@/components/CurrentBadge'
-  import DeploymentVersionDrawer from '@/views/Deployments/components/DeploymentVersionDrawer.vue'
+  import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
   import { useWorkloadReleases } from '@/views/Workload/composables/useWorkloadReleases'
 
   defineOptions({ name: 'workload-releases-section' })
@@ -196,9 +196,9 @@
     </template>
   </GenericDataView>
 
-  <DeploymentVersionDrawer
+  <DeploymentReleaseDrawer
     v-model:visible="drawerVisible"
-    :version="selectedRelease"
+    :release="selectedRelease"
   />
 </template>
 

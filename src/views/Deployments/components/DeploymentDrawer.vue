@@ -87,7 +87,9 @@
           header="Settings"
           :pt="{ root: { 'data-testid': 'deployment-drawer__tab__settings' } }"
         >
-          <FormFieldsDeployment isEdit />
+          <div class="flex flex-col gap-4 mt-4">
+            <FormFieldsDeployment isEdit />
+          </div>
         </TabPanel>
       </TabView>
     </template>
