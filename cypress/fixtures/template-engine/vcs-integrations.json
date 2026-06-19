@@ -1,0 +1,13 @@
+{
+  "results": [
+    {
+      "id": "vcs-int-1",
+      "scope": "azion-e2e-org",
+      "provider": {
+        "id": "github",
+        "name": "GitHub",
+        "callback_url": "https://api.azion.com/v4/vcs/callback"
+      }
+    }
+  ]
+}

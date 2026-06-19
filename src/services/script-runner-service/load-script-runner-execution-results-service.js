@@ -28,12 +28,37 @@ const adapt = (httpResponse) => {
   }
 }
 
+// The script-runner sometimes nests the upstream provider error inside
+// `result.errors.stack` as a (possibly double-encoded) JSON string. Mine the
+// most specific message available, falling back to the generic envelope fields.
+const extractScriptRunnerErrorMessage = (result) => {
+  let parsedStack = result?.errors?.stack
+  for (let attempt = 0; attempt < 2 && typeof parsedStack === 'string'; attempt++) {
+    try {
+      parsedStack = JSON.parse(parsedStack)
+    } catch {
+      break
+    }
+  }
+
+  if (parsedStack && typeof parsedStack === 'object') {
+    const fieldMessages = Array.isArray(parsedStack.errors)
+      ? parsedStack.errors.map((error) => error?.message).filter(Boolean)
+      : []
+    if (fieldMessages.length) return fieldMessages.join('; ')
+    if (parsedStack.message) return parsedStack.message
+  }
+
+  return result?.message || result?.errors?.message || 'Deployment failed.'
+}
+
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200: {
-      const hasErrors = httpResponse.body.result.errors || httpResponse.body.result.error
+      const result = httpResponse.body.result
+      const hasErrors = result.errors || result.error
       if (hasErrors) {
-        throw new Error(httpResponse.body.result.message).message
+        throw new Error(extractScriptRunnerErrorMessage(result)).message
       }
       return adapt(httpResponse)
     }

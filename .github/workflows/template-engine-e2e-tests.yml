@@ -1,0 +1,57 @@
+name: Template Engine E2E Tests (mocked)
+
+# Runs the mocked Template Engine end-to-end specs on every PR targeting `dev`
+# and `main`. The specs mock every backend call they need (including auth via
+# `cy.loginMock`), so this only needs the app running locally — no credentials
+# or network access to the real backend.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - dev
+      - main
+
+env:
+  HUSKY: 0
+
+permissions:
+  contents: read
+
+jobs:
+  template-engine-e2e:
+    name: Run Template Engine mocked E2E
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: 'yarn'
+
+      - name: Run Cypress (template-engine mocked specs)
+        uses: cypress-io/github-action@v6
+        with:
+          browser: chrome
+          start: yarn dev --logLevel=warn
+          wait-on: 'http://localhost:5173/'
+          wait-on-timeout: 120
+          spec: cypress/e2mock/template-engine/**/*.cy.js
+
+      - name: Upload Cypress Screenshots
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress_screenshots
+          path: cypress/screenshots
+          retention-days: 4
+
+      - name: Upload Cypress Videos
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress_videos
+          path: cypress/videos
+          retention-days: 1
