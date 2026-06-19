@@ -106,12 +106,13 @@ const normalizeReleaseResources = (resources) => {
       const type = resource.resource_type ?? null
       const meta = resolveResourceMeta(type)
       return {
-        id: resource.resource_id ?? null,
+        id: resource.global_id ?? resource.resource_id ?? null,
         type,
         label: meta.label,
         icon: meta.icon,
         name: resource.resource_name ?? '',
-        versionId: resource.resource_version_id ?? null
+        versionId:
+          resource.resource_version_id ?? resource.resource_version ?? resource.version_id ?? null
       }
     })
     .filter(Boolean)

@@ -13,30 +13,19 @@ const convertPortsArrayToIntegers = (ports) => {
   return ports.map((port) => parseInt(port.value))
 }
 
-function extractAzionAppSubdomain(fullDomains, zones = []) {
-  const cleanDomains = []
-  let azionAppSubdomains = ''
-
-  const entries = Array.isArray(fullDomains) ? fullDomains : []
-  entries.forEach((entry) => {
+function buildV6CleanDomains(fullDomains, zones = []) {
+  const cleanDomains = fullDomains.map((entry) => {
     const name = typeof entry === 'string' ? entry : entry?.name
     const environment = typeof entry === 'string' ? null : (entry?.environment ?? null)
     const certificate = typeof entry === 'string' ? null : (entry?.certificate ?? null)
     const { domain, subdomain } = getPrimaryDomain(name, zones)
 
-    if (domain === 'azion.app') {
-      azionAppSubdomains = subdomain
-    } else {
-      cleanDomains.push({ subdomain: subdomain ?? '', domain, environment, certificate })
-    }
+    return { subdomain: subdomain ?? '', domain, environment, certificate }
   })
 
-  return {
-    cleanDomains: cleanDomains.length
-      ? cleanDomains
-      : [{ subdomain: '', domain: '', environment: null, certificate: 0 }],
-    azionAppSubdomains
-  }
+  return cleanDomains.length
+    ? cleanDomains
+    : [{ subdomain: '', domain: '', environment: null, certificate: 0 }]
 }
 
 function extractAzionAppSubdomainLegacy(fullDomains, zones = []) {
@@ -126,6 +115,36 @@ const buildV6Bindings = (entries, environmentDeployments = {}) => {
     deployment_id: environmentDeployments?.[environment]?.deploymentId ?? null,
     domains
   }))
+}
+
+const resolveLoadedBindings = (workload, isV6) => {
+  if (Array.isArray(workload.bindings) && workload.bindings.length) {
+    return workload.bindings
+  }
+
+  if (isV6 && workload.deployment_id != null) {
+    return [
+      {
+        environment_id: workload.environment_id ?? null,
+        deployment_id: workload.deployment_id,
+        domains: workload.domains ?? []
+      }
+    ]
+  }
+
+  return []
+}
+
+const buildLoadedV6DomainEntries = (bindings = []) => {
+  if (!Array.isArray(bindings)) return []
+
+  return bindings.flatMap((binding) =>
+    (Array.isArray(binding?.domains) ? binding.domains : []).map((entry) => ({
+      name: typeof entry === 'string' ? entry : entry?.name,
+      environment: binding?.environment_id ?? null,
+      certificate: typeof entry === 'object' ? (entry?.certificate ?? null) : null
+    }))
+  )
 }
 
 export const WorkloadAdapter = {
@@ -272,8 +291,17 @@ export const WorkloadAdapter = {
   transformLoadWorkload({ data: workload }, workloadDeployment, zones = []) {
     const isV6 = hasFlagUseV6Configurations()
 
+    const bindings = resolveLoadedBindings(workload, isV6)
+    const v6FullDomains = buildLoadedV6DomainEntries(bindings)
+    const environmentDeployments = bindings.reduce((acc, binding) => {
+      if (binding?.environment_id != null) {
+        acc[binding.environment_id] = { deploymentId: binding.deployment_id ?? null }
+      }
+      return acc
+    }, {})
+
     const { azionAppSubdomains, cleanDomains } = isV6
-      ? extractAzionAppSubdomain(workload.domains, zones)
+      ? { azionAppSubdomains: '', cleanDomains: buildV6CleanDomains(v6FullDomains, zones) }
       : extractAzionAppSubdomainLegacy(workload.domains, zones)
 
     if (isV6) {
@@ -292,11 +320,11 @@ export const WorkloadAdapter = {
       name: workload.name,
       active: workload.active,
       workloadHostname: workload.workload_domain?.replace(/\.azion\.app$/, ''),
-      workloadDeploymentId: workloadDeployment?.id,
+      workloadDeploymentId: isV6 ? (bindings[0]?.deployment_id ?? null) : workloadDeployment?.id,
       application: workloadDeployment?.application,
       firewall: workloadDeployment?.firewall,
       customPage: workloadDeployment?.customPage,
-      initialDomains: workload.domains,
+      initialDomains: isV6 ? v6FullDomains : workload.domains,
       domains: cleanDomains,
       customDomain: azionAppSubdomains,
       useCustomDomain: !!azionAppSubdomains,
@@ -329,7 +357,8 @@ export const WorkloadAdapter = {
         crl: workload.mtls.config.crl
       },
       isLocked: isLocked(workload.product_version),
-      bindings: workload.bindings ?? []
+      bindings,
+      environmentDeployments
     }
   }
 }

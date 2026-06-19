@@ -45,7 +45,7 @@
 
 <template>
   <section
-    class="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-section)] relative mb-5"
+    class="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-section)] relative"
     data-testid="workload-overview__metrics-section"
   >
     <div class="flex flex-wrap overflow-hidden rounded-b-lg">
