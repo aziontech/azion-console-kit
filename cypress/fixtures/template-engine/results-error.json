@@ -1,0 +1,7 @@
+{
+  "result": {
+    "errors": {
+      "message": "Deployment failed: could not provision the edge application"
+    }
+  }
+}

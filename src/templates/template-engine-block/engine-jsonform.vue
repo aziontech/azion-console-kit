@@ -783,6 +783,7 @@
           summary: 'Error',
           detail: 'Workload ID not found'
         })
+        layoutRef.value?.handleSaveDomainsComplete?.()
         return
       }
 
@@ -801,6 +802,8 @@
         summary: 'Error',
         detail: error.message || 'Failed to update domain settings'
       })
+    } finally {
+      layoutRef.value?.handleSaveDomainsComplete?.()
     }
   }
 

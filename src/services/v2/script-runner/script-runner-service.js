@@ -46,7 +46,15 @@ export class ScriptRunnerService {
         if (hasErrors) {
           throw new Error(this.adapter.extractErrorMessage(data.result))
         }
-        return this.adapter.transformExecutionResultsResponse(data)
+        const transformed = this.adapter.transformExecutionResultsResponse(data)
+        // A 200 without an error envelope but with no provisioned resources means
+        // the deploy did not actually succeed - surface it as an error so the flow
+        // stays on the deploy step instead of optimistically showing success.
+        const { domain, edgeApplication } = transformed.result
+        if (!domain && !edgeApplication) {
+          throw new Error('Deployment did not provision any resources')
+        }
+        return transformed
       }
       case 400:
         throw new Errors.NotFoundError()
