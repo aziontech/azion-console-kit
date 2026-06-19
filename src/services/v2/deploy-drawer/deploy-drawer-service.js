@@ -3,6 +3,28 @@ import { environmentService } from '@/services/v2/environment/environment-servic
 import { deploymentService } from '@/services/v2/deployment/deployment-service'
 import { deploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
 import { mapPolicyToLabel } from '@/services/v2/deployment/deployment-adapter'
+import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
+import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+import { customPageService } from '@/services/v2/custom-page/custom-page-service'
+import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+
+// Loaders to resolve a resource's display NAME by id — the active-release
+// composition returns ids only. Unknown types degrade to the id.
+const RESOURCE_NAME_LOADERS = {
+  application: (id) => edgeAppService.loadEdgeApplicationService({ id }),
+  firewall: (id) => edgeFirewallService.loadEdgeFirewallService({ id }),
+  custom_page: (id) => customPageService.loadCustomPagesService({ id }),
+  function: (id) => edgeFunctionService.loadEdgeFunctionService({ id }),
+  network_list: (id) => networkListsService.loadNetworkList({ id })
+}
+
+const pickResourceName = (resource) => {
+  const source = resource?.data ?? resource
+  const name = source?.name
+  if (name && typeof name === 'object') return name.text ?? null
+  return name ?? null
+}
 
 // Resolves a workload's bindings (ids only) into environment cards with names,
 // fetching environment + deployment + active release. Keeps the composable free
@@ -107,6 +129,19 @@ export class DeployDrawerService {
         }
       })
     )
+  }
+
+  // Resolves a resource's display NAME by type + id (cache-aware via each
+  // service's own query cache). Returns null on miss so the caller falls back
+  // to the id.
+  resolveResourceName = async (resourceType, id) => {
+    const loader = RESOURCE_NAME_LOADERS[resourceType]
+    if (!loader || id == null) return null
+    try {
+      return pickResourceName(await loader(id))
+    } catch {
+      return null
+    }
   }
 }
 
