@@ -12,8 +12,7 @@
   import { deploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
   import InlineTag from '@/components/InlineTag'
   import StatusTag from '@/components/StatusTag'
-  import EditorAvatarCell from '@/views/Deployments/components/EditorAvatarCell.vue'
-  import DeploymentVersionDrawer from '@/views/Deployments/components/DeploymentVersionDrawer.vue'
+  import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
 
   defineOptions({ name: 'deployments-history-tab' })
 
@@ -408,7 +407,12 @@
       </template>
 
       <template #cell-lastEditor="{ item: version }">
-        <EditorAvatarCell :email="version.lastEditor" />
+        <span
+          class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-[var(--text-color-secondary)]"
+          data-sentry-mask
+        >
+          {{ version.lastEditor || '--' }}
+        </span>
       </template>
     </GenericDataView>
 
@@ -418,9 +422,9 @@
       :model="rowMenuItems"
     />
 
-    <DeploymentVersionDrawer
+    <DeploymentReleaseDrawer
       v-model:visible="drawerVisible"
-      :version="selectedVersion"
+      :release="selectedVersion"
       @rollback="onRequestRollback"
       @redeploy="onRequestRedeploy"
     />

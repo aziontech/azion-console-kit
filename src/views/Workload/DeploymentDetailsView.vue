@@ -7,7 +7,7 @@
   import Skeleton from '@aziontech/webkit/skeleton'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import DeploymentVersionDetails from '@/views/Deployments/components/DeploymentVersionDetails.vue'
+  import DeploymentReleaseDetails from '@/views/Deployments/components/DeploymentReleaseDetails.vue'
   import { workloadService } from '@/services/v2/workload/workload-service'
   import { deploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
@@ -224,9 +224,9 @@
           height="48px"
         />
       </div>
-      <DeploymentVersionDetails
+      <DeploymentReleaseDetails
         v-else-if="version"
-        :version="version"
+        :release="version"
       />
       <div
         v-else

@@ -58,6 +58,30 @@ export class EdgeFirewallService extends BaseService {
     )
   }
 
+  #fetchVersions = async (firewallId) => {
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: `${this.baseURL}/${firewallId}/versions`
+    })
+
+    const results = Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : []
+
+    return results.map((version) => ({
+      id: version.version_id ?? version.id ?? null,
+      state: version.state ?? null,
+      comment: version.comment ?? '',
+      createdAt: version.created_at ?? null
+    }))
+  }
+
+  listFirewallVersions = async (firewallId) => {
+    return await this.useEnsureQueryData(
+      queryKeys.firewall.version.list(firewallId),
+      () => this.#fetchVersions(firewallId),
+      { persist: false }
+    )
+  }
+
   getFirewallFromCache = (id) => {
     if (!id) return undefined
 

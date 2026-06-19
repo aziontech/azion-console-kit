@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, watch, onMounted } from 'vue'
+  import { ref, computed, onMounted, watch } from 'vue'
   import { useField } from 'vee-validate'
   import { useRouter } from 'vue-router'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -29,20 +29,18 @@
 
   const environmentMap = ref({})
 
-  const ensureEnvironment = async (envId) => {
-    if (!envId || environmentMap.value[envId]) return
+  const loadEnvironments = async () => {
     try {
-      const env = await environmentService.loadEnvironmentService({ id: envId })
-      if (env?.id != null) {
-        environmentMap.value = {
-          ...environmentMap.value,
-          [env.id]: {
-            name: env.name,
-            policy: env.deployment_policy ?? null,
-            policyLabel: mapPolicyToLabel(env.deployment_policy)
-          }
+      const { body } = await environmentService.listEnvironmentsService()
+      const map = {}
+      for (const env of body ?? []) {
+        if (env?.id == null) continue
+        map[String(env.id)] = {
+          name: env.name,
+          policyLabel: env.deployment_policy ?? ''
         }
       }
+      environmentMap.value = map
     } catch {
       // intentionally swallowed: env metadata is non-blocking UX
     }
@@ -54,22 +52,14 @@
       const envId = domain?.environment
       if (envId == null) continue
       if (!seen.has(envId)) {
-        seen.set(envId, { id: envId, name: environmentMap.value[envId]?.name || 'Environment' })
+        seen.set(envId, {
+          id: envId,
+          name: environmentMap.value[String(envId)]?.name || 'Environment'
+        })
       }
     }
     return Array.from(seen.values())
   })
-
-  watch(
-    domainList,
-    async (rows) => {
-      for (const row of rows || []) {
-        const envId = row?.environment
-        if (envId) await ensureEnvironment(envId)
-      }
-    },
-    { immediate: true, deep: true }
-  )
 
   const deploymentOptions = ref([])
   const isLoadingDeployments = ref(false)
@@ -82,18 +72,51 @@
     } finally {
       isLoadingDeployments.value = false
     }
+    await ensureBoundDeploymentsInOptions()
   }
 
-  onMounted(loadDeployments)
+  const ensureBoundDeploymentsInOptions = async () => {
+    const boundIds = Object.values(envDeploymentsState.value)
+      .map((entry) => entry?.deploymentId)
+      .filter(Boolean)
 
-  const policyLabelFor = (envId) => environmentMap.value[envId]?.policyLabel || ''
+    const missingIds = boundIds.filter(
+      (id) => !deploymentOptions.value.some((deployment) => String(deployment.id) === String(id))
+    )
 
-  const policyFor = (envId) => environmentMap.value[envId]?.policy ?? null
+    for (const id of missingIds) {
+      try {
+        const { data } = await deploymentService.getDeploymentByIdService(id)
+        if (data?.id != null) {
+          deploymentOptions.value = [
+            ...deploymentOptions.value,
+            { ...data, policyLabel: mapPolicyToLabel(data.deployment_policy) }
+          ]
+        }
+      } catch {
+        // intentionally swallowed: keeping the bound deployment visible is best-effort
+      }
+    }
+  }
+
+  watch(envDeploymentsState, () => {
+    if (!isLoadingDeployments.value) ensureBoundDeploymentsInOptions()
+  })
+
+  onMounted(() => {
+    loadEnvironments()
+    loadDeployments()
+  })
+
+  const policyLabelFor = (envId) => environmentMap.value[String(envId)]?.policyLabel || ''
+
+  const deploymentPolicyLabel = (deployment) =>
+    deployment?.policyLabel ?? mapPolicyToLabel(deployment?.deployment_policy)
 
   const isDeploymentCompatible = (envId, deployment) => {
-    const policy = policyFor(envId)
-    if (!policy) return true
-    return deployment?.deployment_policy === policy
+    const policyLabel = policyLabelFor(envId)
+    if (!policyLabel) return true
+    return deploymentPolicyLabel(deployment) === policyLabel
   }
 
   const isOptionDisabledFor = (envId) => (deployment) => !isDeploymentCompatible(envId, deployment)
