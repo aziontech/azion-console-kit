@@ -149,7 +149,10 @@ export const queryKeys = {
     },
     version: {
       all: (parentId) => [...queryKeys.application.detail(parentId), 'versions'],
-      list: (parentId) => [...queryKeys.application.version.all(parentId), 'list'],
+      list: (parentId, params) =>
+        params === undefined
+          ? [...queryKeys.application.version.all(parentId), 'list']
+          : [...queryKeys.application.version.all(parentId), 'list', normalizeParams(params)],
       detail: (parentId, versionId) => [
         ...queryKeys.application.version.all(parentId),
         'detail',
@@ -412,7 +415,19 @@ export const queryKeys = {
   edgeFunction: {
     all: ['edge-functions'],
     list: (params) => [...queryKeys.edgeFunction.all, 'list', normalizeParams(params)],
-    detail: (id) => [...queryKeys.edgeFunction.all, 'detail', id]
+    detail: (id) => [...queryKeys.edgeFunction.all, 'detail', id],
+    version: {
+      all: (parentId) => [...queryKeys.edgeFunction.detail(parentId), 'versions'],
+      list: (parentId, params) =>
+        params === undefined
+          ? [...queryKeys.edgeFunction.version.all(parentId), 'list']
+          : [...queryKeys.edgeFunction.version.all(parentId), 'list', normalizeParams(params)],
+      detail: (parentId, versionId) => [
+        ...queryKeys.edgeFunction.version.all(parentId),
+        'detail',
+        versionId
+      ]
+    }
   },
   edgeDNS: {
     all: ['edge-dns'],
@@ -464,6 +479,23 @@ export const queryKeys = {
     all: ['edge-connectors'],
     list: (params) => [...queryKeys.edgeConnectors.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.edgeConnectors.all, 'detail', id]
+  },
+  connector: {
+    all: ['connectors'],
+    list: (params) => [...queryKeys.connector.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.connector.all, 'detail', id],
+    version: {
+      all: (parentId) => [...queryKeys.connector.detail(parentId), 'versions'],
+      list: (parentId, params) =>
+        params === undefined
+          ? [...queryKeys.connector.version.all(parentId), 'list']
+          : [...queryKeys.connector.version.all(parentId), 'list', normalizeParams(params)],
+      detail: (parentId, versionId) => [
+        ...queryKeys.connector.version.all(parentId),
+        'detail',
+        versionId
+      ]
+    }
   },
   teamPermission: {
     all: ['team-permissions'],

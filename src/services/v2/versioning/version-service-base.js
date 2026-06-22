@@ -11,11 +11,25 @@ export class VersionServiceBase extends BaseService {
     return `${base}/${versionId}${suffix}`
   }
 
-  #invalidate = (resourceId) =>
+  // Overridable invalidation hook called by every mutation. Default removes the
+  // version cache; subclasses may extend it (e.g. also invalidating the resource
+  // detail). Protected by convention.
+  invalidateAfterMutation(resourceId) {
     this.queryClient.removeQueries({ queryKey: this.versionKeys.all(resourceId) })
+  }
 
-  #fetchList = async (resourceId) => {
-    const { data } = await this.http.request({ method: 'GET', url: this.getUrl(resourceId) })
+  // Splits caller `params` into the control flag and the request/key params, so
+  // `skipCache` never leaks into the HTTP query string nor the cache key.
+  #splitListParams = (params) => {
+    const { skipCache, ...rest } = params ?? {}
+    const hasParams = Object.keys(rest).length > 0
+    return { skipCache: Boolean(skipCache), listParams: hasParams ? rest : undefined }
+  }
+
+  #fetchList = async (resourceId, listParams) => {
+    const request = { method: 'GET', url: this.getUrl(resourceId) }
+    if (listParams) request.params = listParams
+    const { data } = await this.http.request(request)
     return this.adapter?.transformListVersions?.(data) ?? data
   }
 
@@ -34,22 +48,27 @@ export class VersionServiceBase extends BaseService {
       { persist: false }
     )
 
-  useListVersionsQuery = (resourceId) =>
-    this.useQuery(
-      this.versionKeys.list(toValue(resourceId)),
-      () => this.#fetchList(toValue(resourceId)),
-      { persist: false, enabled: true }
+  // `params` flow into the queryKey and the fetch; `skipCache` disables persist.
+  // Default (no params) keeps the previous behavior unchanged.
+  useListVersionsQuery = (resourceId, params) => {
+    const { skipCache, listParams } = this.#splitListParams(params)
+    return this.useQuery(
+      this.versionKeys.list(toValue(resourceId), listParams),
+      () => this.#fetchList(toValue(resourceId), listParams),
+      { persist: !skipCache, enabled: true, skipCache }
     )
+  }
 
   // Async, cache-aware list reusable by callers that react to `resourceId`
   // changes (e.g. watchers). Returns the adapted array (same shape as
   // `useListVersionsQuery`'s `.data.body`).
-  async listVersions(resourceId) {
+  async listVersions(resourceId, params) {
     const id = toValue(resourceId)
+    const { skipCache, listParams } = this.#splitListParams(params)
     const result = await this.useEnsureQueryData(
-      this.versionKeys.list(id),
-      () => this.#fetchList(id),
-      { persist: false }
+      this.versionKeys.list(id, listParams),
+      () => this.#fetchList(id, listParams),
+      { persist: !skipCache, skipCache }
     )
     return result?.body ?? []
   }
@@ -68,7 +87,7 @@ export class VersionServiceBase extends BaseService {
       url: this.getUrl(resourceId),
       body: payload
     })
-    this.#invalidate(resourceId)
+    this.invalidateAfterMutation(resourceId)
     return this.adapter?.transformLoadVersion?.(data) ?? data
   }
 
@@ -79,7 +98,7 @@ export class VersionServiceBase extends BaseService {
       url: this.getUrl(resourceId, versionId),
       body: payload
     })
-    this.#invalidate(resourceId)
+    this.invalidateAfterMutation(resourceId)
     return this.adapter?.transformLoadVersion?.(data) ?? data
   }
 
@@ -90,13 +109,13 @@ export class VersionServiceBase extends BaseService {
       url: this.getUrl(resourceId, versionId),
       body: payload
     })
-    this.#invalidate(resourceId)
+    this.invalidateAfterMutation(resourceId)
     return this.adapter?.transformLoadVersion?.(data) ?? data
   }
 
   deleteVersion = async (resourceId, versionId) => {
     await this.http.request({ method: 'DELETE', url: this.getUrl(resourceId, versionId) })
-    this.#invalidate(resourceId)
+    this.invalidateAfterMutation(resourceId)
   }
 
   build = async (resourceId, versionId, body = {}) => {
@@ -106,7 +125,7 @@ export class VersionServiceBase extends BaseService {
       url: this.getUrl(resourceId, versionId, '/build'),
       body: payload
     })
-    this.#invalidate(resourceId)
+    this.invalidateAfterMutation(resourceId)
   }
 
   archive = async (resourceId, versionId, body = {}) => {
@@ -119,7 +138,7 @@ export class VersionServiceBase extends BaseService {
       url: this.getUrl(resourceId, versionId, '/archive'),
       body: payload
     })
-    this.#invalidate(resourceId)
+    this.invalidateAfterMutation(resourceId)
   }
 
   cancelBuild = async (resourceId, versionId, body = {}) => {
@@ -129,6 +148,6 @@ export class VersionServiceBase extends BaseService {
       url: this.getUrl(resourceId, versionId, '/cancel'),
       body: payload
     })
-    this.#invalidate(resourceId)
+    this.invalidateAfterMutation(resourceId)
   }
 }

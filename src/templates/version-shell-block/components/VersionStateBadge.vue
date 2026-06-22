@@ -16,14 +16,14 @@
    * `active` reuses 'success' (same as ready) to communicate "built & stable".
    */
   const STATE_VISUAL = {
-    draft: { severity: 'warning', label: 'Draft' },
-    queued: { severity: 'info', label: 'Queued' },
-    building: { severity: 'info', label: 'Building' },
+    draft: { severity: 'warning', label: 'Draft', icon: 'pi pi-file-edit' },
+    queued: { severity: 'info', label: 'Queued', icon: 'pi pi-clock' },
+    building: { severity: 'info', label: 'Building', icon: 'pi pi-spin pi-spinner' },
     ready: { severity: 'success', label: 'Ready' },
     active: { severity: 'success', label: 'Active' },
     archived: { severity: 'secondary', label: 'Archived' },
     canceled: { severity: 'warning', label: 'Canceled' },
-    error: { severity: 'danger', label: 'Error' }
+    error: { severity: 'danger', label: 'Error', icon: 'pi pi-exclamation-triangle' }
   }
 </script>
 
@@ -32,6 +32,7 @@
     v-if="STATE_VISUAL[state]"
     :severity="STATE_VISUAL[state].severity"
     :value="STATE_VISUAL[state].label"
+    :icon="STATE_VISUAL[state].icon"
     :data-state="state"
     data-testid="version-state-badge"
   />
