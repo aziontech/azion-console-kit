@@ -148,17 +148,42 @@
     left: 0.85rem;
     right: auto;
   }
+  /* Cap the panel to the drawer content width so it never spills outside the
+     drawer. 52rem = max-w-4xl (56rem) − p-8 (2rem ×2); calc covers narrow viewports. */
+  .deploy-workload-dropdown-panel {
+    max-width: min(52rem, calc(100vw - 4rem));
+  }
   /* Keep items at the panel width so long names truncate instead of widening it. */
   .deploy-workload-dropdown-panel .p-dropdown-items-wrapper,
   .deploy-workload-dropdown-panel .p-dropdown-items {
     width: 100%;
     max-width: 100%;
   }
+  .deploy-workload-dropdown-panel .p-dropdown-items {
+    padding: 0.5rem;
+  }
   .deploy-workload-dropdown-panel .p-dropdown-item {
     width: 100%;
     min-width: 0;
     max-width: 100%;
     overflow: hidden;
+    height: auto !important;
+    min-height: 3rem !important;
+    border-radius: 0.5rem;
+    padding: 0.75rem 0.875rem;
+    margin-bottom: 0.25rem;
+  }
+  .deploy-workload-dropdown-panel .p-dropdown-item:last-child {
+    margin-bottom: 0;
+  }
+  .deploy-workload-dropdown-panel .p-dropdown-item:hover {
+    background: var(--surface-hover);
+    color: var(--text-color);
+  }
+  .deploy-workload-dropdown-panel .p-dropdown-item.p-highlight {
+    background: var(--surface-hover);
+    color: var(--text-color);
+    font-weight: 500;
   }
   .deploy-workload-dropdown-panel .p-dropdown-item > * {
     min-width: 0;

@@ -9,7 +9,6 @@
   import { computed } from 'vue'
   import Dropdown from '@aziontech/webkit/dropdown'
   import LabelBlock from '@aziontech/webkit/label'
-  import InlineTag from '@/components/InlineTag'
   import { convertToRelativeTime } from '@/helpers/convert-date'
   import { LATEST_READY } from '@/composables/deploy/use-deploy-drawer'
 
@@ -156,11 +155,6 @@
             class="flex w-full items-center gap-3"
             :data-testid="`deploy-drawer__version-option-${option.value}`"
           >
-            <InlineTag
-              text="Ready"
-              type="success"
-              icon="pi pi-circle-fill"
-            />
             <span class="flex min-w-0 flex-col gap-1">
               <span class="flex items-center gap-2">
                 <span class="font-mono text-sm text-[var(--text-color)]">{{ option.label }}</span>
@@ -212,10 +206,12 @@
     padding: 0.5rem;
   }
   .deploy-version-dropdown-panel .p-dropdown-item {
-    align-items: flex-start;
+    align-items: flex-start !important;
+    height: auto !important;
+    min-height: 3rem !important;
     border-radius: 0.5rem;
-    padding: 0.625rem 0.875rem;
-    margin-bottom: 0.125rem;
+    padding: 0.75rem 0.875rem;
+    margin-bottom: 0.25rem;
     color: var(--text-color);
     line-height: 1.5rem;
   }
