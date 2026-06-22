@@ -19,9 +19,12 @@ const unwrap = (raw) => raw?.data ?? raw
 
 const isDefined = (value) => value !== undefined && value !== null
 
-export const createVersionAdapter = ({ normalizeConfig, mapResourceFields } = {}) => {
+export const createVersionAdapter = ({ normalizeConfig, mapResourceFields, mapMeta } = {}) => {
   const toConfig = typeof normalizeConfig === 'function' ? normalizeConfig : () => ({})
   const toFields = typeof mapResourceFields === 'function' ? mapResourceFields : () => ({})
+  // `mapMeta` lets a resource add extra meta fields (e.g. deploymentId); without it
+  // the output is byte-identical to the base meta.
+  const toMeta = typeof mapMeta === 'function' ? mapMeta : null
 
   // v6 endpoints may wrap version fields under `meta`; list/flat payloads keep them
   // at the root. `meta.*` wins, then the flat keys (where `version_state` precedes
@@ -30,7 +33,7 @@ export const createVersionAdapter = ({ normalizeConfig, mapResourceFields } = {}
     if (!raw || typeof raw !== 'object') return raw
     const meta = raw.meta && typeof raw.meta === 'object' ? raw.meta : null
 
-    return {
+    const baseMeta = {
       id: meta?.version_id ?? raw.version_id ?? raw.id,
       state: meta?.state ?? raw.version_state ?? raw.state,
       version: meta?.version ?? raw.version ?? null,
@@ -40,7 +43,12 @@ export const createVersionAdapter = ({ normalizeConfig, mapResourceFields } = {}
       lastModified:
         meta?.last_modified ?? raw.last_modified ?? raw.ready_at ?? raw.created_at ?? null,
       lastEditor: meta?.last_editor ?? raw.last_editor ?? null,
-      sourceVersionId: meta?.source_version_id ?? raw.source_version_id ?? null,
+      sourceVersionId: meta?.source_version_id ?? raw.source_version_id ?? null
+    }
+
+    return {
+      ...baseMeta,
+      ...(toMeta ? toMeta(raw) : {}),
       config: toConfig(raw)
     }
   }

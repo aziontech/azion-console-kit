@@ -130,10 +130,12 @@ export function useResourceVersionLanding({
         goToVersionsList()
         return
       case VERSION_ACTIONS.NEW_DRAFT_FROM:
-        router.push({
-          name: versionRouteName,
-          params: { id: resourceId.value, versionId: result.id }
-        })
+        if (result?.id) {
+          router.push({
+            name: versionRouteName,
+            params: { id: resourceId.value, versionId: result.id }
+          })
+        }
         return
       case VERSION_ACTIONS.SAVE:
         loadResource()

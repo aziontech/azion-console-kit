@@ -70,7 +70,9 @@ export function useVersionFormAdapter({
 
   const runSave = async ({ build, comment }) => {
     const { valid } = await validate()
-    if (!valid) return
+    // Throw (not silent return) so the shell emits `command-error`, not a false
+    // `updated` success that would toast + navigate without anything being saved.
+    if (!valid) throw new Error('Please review the highlighted fields and try again.')
     const ctx = {
       service: versionService,
       resourceId: toValue(resourceId),

@@ -93,8 +93,8 @@ export const STATE_ACTIONS = {
   ready: ['NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE', 'DEPLOY'],
   active: ['NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE', 'DEPLOY'],
   archived: ['NEW_DRAFT_FROM', 'DELETE'],
-  canceled: ['NEW_DRAFT_FROM', 'DELETE'],
-  error: ['DELETE', 'NEW_DRAFT_FROM']
+  canceled: ['SAVE', 'SAVE_AND_BUILD', 'NEW_DRAFT_FROM', 'DELETE'],
+  error: ['SAVE', 'SAVE_AND_BUILD', 'NEW_DRAFT_FROM', 'DELETE']
 }
 
 /**

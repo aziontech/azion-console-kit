@@ -29,7 +29,7 @@ module.exports = {
       extends: ['plugin:cypress/recommended']
     },
     {
-      files: ['scripts/**/*.cjs'],
+      files: ['scripts/**/*.{cjs,mjs}'],
       env: { node: true },
       rules: {
         'no-console': 'off',

@@ -77,6 +77,43 @@
       actions: [
         { key: 'NEW_DRAFT_FROM', label: 'New Version', icon: 'pi pi-plus', emphasis: 'secondary' }
       ]
+    },
+    queued: {
+      icon: 'pi pi-spin pi-spinner',
+      title: 'Queued to build',
+      subtitle: 'This version is queued and will build shortly. You can cancel while it waits.',
+      actions: [
+        { key: 'CANCEL_BUILD', label: 'Cancel Build', icon: 'pi pi-times', emphasis: 'secondary' }
+      ]
+    },
+    canceled: {
+      icon: 'pi pi-file-edit',
+      title: 'Build canceled',
+      subtitle:
+        'The build was canceled. This version is open for editing — save or build it again.',
+      actions: [
+        {
+          key: 'SAVE_AND_BUILD',
+          label: 'Save and Build',
+          icon: 'pi pi-cog',
+          emphasis: 'secondary'
+        },
+        { key: 'SAVE', label: 'Save', icon: 'pi pi-save', emphasis: 'primary' }
+      ]
+    },
+    error: {
+      icon: 'pi pi-exclamation-triangle',
+      title: 'Build failed',
+      subtitle: 'The last build failed. Fix the configuration and build again.',
+      actions: [
+        {
+          key: 'SAVE_AND_BUILD',
+          label: 'Save and Build',
+          icon: 'pi pi-cog',
+          emphasis: 'secondary'
+        },
+        { key: 'SAVE', label: 'Save', icon: 'pi pi-save', emphasis: 'primary' }
+      ]
     }
   }
 
