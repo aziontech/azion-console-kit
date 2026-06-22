@@ -9,8 +9,6 @@ import GeneralBlock from '@/views/EdgeConnectors/FormFields/blocks/General.vue'
 import StatusBlock from '@/views/EdgeConnectors/FormFields/blocks/Status.vue'
 import ConnectorTypeBlock from '@/views/EdgeConnectors/FormFields/blocks/ConnectorType.vue'
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
-import { getRowActions } from '@/composables/versioning/version-actions'
-import { VERSION_STATES } from '@/composables/versioning/version-machine'
 import { createFormHarness } from '@/tests/kit/vee-validate-setup'
 
 // Task 11.4 (optional): Connector v6 across the 3 connector types
@@ -107,39 +105,10 @@ describe('EdgeConnectors v6 — read-only in immutable state (3 types)', () => {
   })
 })
 
-describe('EdgeConnectors v6 — version-list row actions eligible per state', () => {
-  // The VersionsTab wires the shared getRowActions(state); assert the eligibility
-  // matrix the listing surfaces for every lifecycle state.
-  it('offers Build + Clone + Delete on a draft', () => {
-    expect(getRowActions(VERSION_STATES.DRAFT)).toEqual(['BUILD', 'NEW_DRAFT_FROM', 'DELETE'])
-  })
-
-  it('offers Clone + Archive + Delete on a built version (ready/active)', () => {
-    expect(getRowActions(VERSION_STATES.READY)).toEqual(['NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE'])
-    expect(getRowActions(VERSION_STATES.ACTIVE)).toEqual(['NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE'])
-  })
-
-  it('offers only Clone + Delete on an archived version', () => {
-    expect(getRowActions(VERSION_STATES.ARCHIVED)).toEqual(['NEW_DRAFT_FROM', 'DELETE'])
-  })
-
-  it('offers no row actions while building/queued (fail-closed)', () => {
-    expect(getRowActions(VERSION_STATES.BUILDING)).toEqual([])
-    expect(getRowActions(VERSION_STATES.QUEUED)).toEqual([])
-  })
-
-  it('treats recoverable states (canceled/error) as cloneable + deletable drafts', () => {
-    expect(getRowActions(VERSION_STATES.CANCELED)).toEqual(['NEW_DRAFT_FROM', 'DELETE'])
-    expect(getRowActions(VERSION_STATES.ERROR)).toEqual(['NEW_DRAFT_FROM', 'DELETE'])
-  })
-
-  it('never surfaces editing or deploy actions in a row menu', () => {
-    const everyAction = Object.values(VERSION_STATES).flatMap((state) => getRowActions(state))
-    expect(everyAction).not.toContain('SAVE')
-    expect(everyAction).not.toContain('SAVE_AND_BUILD')
-    expect(everyAction).not.toContain('DEPLOY')
-  })
-})
+// The legacy Clone/Build row-eligibility suite (getRowActions) was retired in
+// Phase 4 (task 9.1). The fixed 5-item row menu is now covered by
+// `src/tests/composables/versioning/version-menu-items.test.js` (Properties P1–P4),
+// and Clone as Draft / Build remain available in the shell action bar.
 
 describe('EdgeConnectors v6 — thin version adapter', () => {
   const __dirname = dirname(fileURLToPath(import.meta.url))

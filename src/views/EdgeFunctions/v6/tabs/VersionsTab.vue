@@ -2,7 +2,7 @@
   // VersionsTab — the version LISTING body of the v6 Edge Functions screen.
   // Lists every version with search/filter/sort and per-row actions
   // (Clone / Archive / Delete). Clicking a version opens its full editor.
-  import { computed, ref } from 'vue'
+  import { computed, inject, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from '@aziontech/webkit/use-toast'
   import PrimeButton from '@aziontech/webkit/button'
@@ -12,7 +12,7 @@
 
   import { edgeFunctionVersionService } from '@/services/v2/edge-function/edge-function-version-service'
   import { useVersionList } from '@/composables/versioning/use-version-list'
-  import { useVersionRowActions } from '@/composables/versioning/use-version-row-actions'
+  import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
 
   defineOptions({ name: 'edge-functions-v6-versions-tab' })
 
@@ -50,6 +50,10 @@
     })
   }
 
+  // The landing owns the release drawer; the tab only routes through the
+  // single shared row-menu driver (spec §3.3/3.6, Req 1.4/10.1).
+  const menuHost = inject('versionMenuHost', {})
+
   const {
     handleRowAction,
     dialogConfig,
@@ -57,10 +61,12 @@
     dialogVisible,
     handleConfirm,
     handleVisibility
-  } = useVersionRowActions({
+  } = useVersionMenuActions({
+    resourceType: 'function',
     resourceId: edgeFunctionId,
-    service: edgeFunctionVersionService,
-    onCloned: goToVersion,
+    versionService: edgeFunctionVersionService,
+    router,
+    openPromoteDrawer: menuHost.openPromoteDrawer,
     onSuccess: () => versionsQuery.refetch?.()
   })
 
@@ -101,6 +107,7 @@
       :sort="sort"
       :sort-options="sortOptions"
       :show-row-actions="true"
+      resource-type="function"
       :paginator-rows="20"
       search-placeholder="Search versions"
       :empty-state="{
@@ -123,7 +130,6 @@
       @update:filter-values="filterValues = $event"
       @update:sort="sort = $event"
       @refresh="versionsQuery.refetch?.()"
-      @row-click="goToVersion"
       @row-action="handleRowAction"
     >
       <template #toolbar-actions>

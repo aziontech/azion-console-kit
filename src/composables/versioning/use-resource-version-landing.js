@@ -52,6 +52,17 @@ export function useResourceVersionLanding({
 
   provide(provideKey, resource)
 
+  // Shared seam consumed by the slotted Versions tab to wire the single
+  // row-menu router (useVersionMenuActions); avoids per-resource menu logic.
+  provide('versionMenuHost', {
+    resourceType,
+    resourceId,
+    versionService,
+    router,
+    openPromoteDrawer: (payload) => openPromoteDrawer(payload),
+    onSuccess: () => versionsQuery.refetch?.()
+  })
+
   const loadResource = async () => {
     if (!resource.value) isLoading.value = true
     loadError.value = null
@@ -90,15 +101,25 @@ export function useResourceVersionLanding({
   })
 
   const isDeployDrawerOpen = ref(false)
+  // Version pinned by a row-menu Promote; cleared when the drawer closes.
+  const pinnedDeployVersionId = ref(null)
   const openDeployDrawer = () => {
+    pinnedDeployVersionId.value = null
     isDeployDrawerOpen.value = true
   }
 
-  // On the Settings tab the drawer pre-selects the latest version; on Versions it
-  // opens unfilled. Options come from the shared mapper (no current on a listing).
-  const deployVersionId = computed(() =>
-    activeTab.value === LANDING_TAB.SETTINGS ? latestVersionId.value : null
-  )
+  // Promote from the row menu: open the release drawer with this version pinned.
+  const openPromoteDrawer = ({ pin } = {}) => {
+    pinnedDeployVersionId.value = pin ?? null
+    isDeployDrawerOpen.value = true
+  }
+
+  // Promote pins the chosen version; on Settings the drawer pre-selects the
+  // latest; on Versions it opens unfilled. Options come from the shared mapper.
+  const deployVersionId = computed(() => {
+    if (pinnedDeployVersionId.value) return pinnedDeployVersionId.value
+    return activeTab.value === LANDING_TAB.SETTINGS ? latestVersionId.value : null
+  })
   const deployResourceContext = computed(() => ({
     resourceType,
     resourceId: Number(resourceId.value),
@@ -106,6 +127,11 @@ export function useResourceVersionLanding({
     version: deployVersionId.value ? { id: deployVersionId.value } : null,
     versions: toDeployableVersionOptions(rawVersions.value)
   }))
+
+  // Drop the pinned version once the drawer is dismissed so the next open is clean.
+  watch(isDeployDrawerOpen, (open) => {
+    if (!open) pinnedDeployVersionId.value = null
+  })
 
   const goToVersionsList = () => {
     activeTab.value = LANDING_TAB.VERSIONS
@@ -162,6 +188,7 @@ export function useResourceVersionLanding({
     activeTab,
     isDeployDrawerOpen,
     openDeployDrawer,
+    openPromoteDrawer,
     deployResourceContext,
     handleCommandSuccess,
     handleCommandError,
