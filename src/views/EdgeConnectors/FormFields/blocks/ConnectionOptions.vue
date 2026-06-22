@@ -21,7 +21,7 @@
             name="connectionOptions.host"
             :value="host"
             placeholder="example.com"
-            :disabled="props.isLoadingData"
+            :disabled="isDisabled"
             data-testid="edge-connectors-form__connection-options__host-field"
           />
         </div>
@@ -32,7 +32,7 @@
             name="connectionOptions.path"
             :value="path"
             placeholder="/api/v1/resource"
-            :disabled="props.isLoadingData"
+            :disabled="isDisabled"
             data-testid="edge-connectors-form__connection-options__path-field"
           />
         </div>
@@ -45,7 +45,7 @@
               name="connectionOptions.realIpHeader"
               :value="realIpHeader"
               placeholder="X-Real-IP"
-              :disabled="props.isLoadingData"
+              :disabled="isDisabled"
               data-testid="edge-connectors-form__connection-options__real-ip-header-field"
             />
           </div>
@@ -56,7 +56,7 @@
               name="connectionOptions.realPortHeader"
               :value="realPortHeader"
               placeholder="X-Real-PORT"
-              :disabled="props.isLoadingData"
+              :disabled="isDisabled"
               data-testid="edge-connectors-form__connection-options__real-port-header-field"
             />
           </div>
@@ -69,8 +69,8 @@
             :value="followingRedirect"
             title="Following Redirect"
             :isCard="false"
-            :disabled="props.isLoadingData"
-            :readonly="props.isLoadingData"
+            :disabled="isDisabled"
+            :readonly="isDisabled"
             description="Enable this option to automatically follow HTTP redirects from the origin server."
             data-testid="edge-connectors-form__connection-options__following-redirect-field"
           />
@@ -85,7 +85,7 @@
             optionValue="value"
             :value="dnsResolution"
             appendTo="self"
-            :disabled="props.isLoadingData"
+            :disabled="isDisabled"
             description="Define how DNS resolution is handled for this connection."
             data-testid="edge-connectors-form__connection-options__dns-resolution-field"
           />
@@ -100,7 +100,7 @@
             optionValue="value"
             :value="transportPolicy"
             appendTo="self"
-            :disabled="props.isLoadingData"
+            :disabled="isDisabled"
             description="Specify the transport protocol behavior for the connection."
             data-testid="edge-connectors-form__connection-options__transport-policy-field"
           />
@@ -126,7 +126,7 @@
             optionValue="name"
             :value="bucket"
             inputId="bucket"
-            :disabled="props.isLoadingData"
+            :disabled="isDisabled"
           >
             <template #footer>
               <ul class="p-2">
@@ -136,6 +136,7 @@
                     class="w-full whitespace-nowrap flex"
                     data-testid="domains-form__create-edge-storage-button"
                     text
+                    :disabled="isDisabled"
                     size="small"
                     icon="pi pi-plus-circle"
                     :pt="{
@@ -157,7 +158,7 @@
             name="connectionOptions.prefix"
             :value="prefix"
             placeholder="images/"
-            :disabled="props.isLoadingData"
+            :disabled="isDisabled"
             data-testid="edge-connectors-form__connection-options__prefix-field"
           />
         </div>
@@ -175,7 +176,7 @@
             optionValue="value"
             :value="region"
             appendTo="self"
-            :disabled="props.isLoadingData"
+            :disabled="isDisabled"
             description="Select the region where the live stream will be ingested to optimize latency and performance."
             data-testid="edge-connectors-form__connection-options__region-field"
           />
@@ -196,6 +197,7 @@
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
   import PrimeButton from '@aziontech/webkit/button'
   import DrawerEdgeStorage from '@/views/EdgeStorage/Drawer/index.vue'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsConnectionOptions' })
 
@@ -223,6 +225,10 @@
   const { value: prefix } = useField('connectionOptions.prefix')
 
   const { value: type } = useField('type')
+
+  const { readOnly } = useVersionContext()
+  // Inputs are blocked while data loads or the version is immutable (read-only).
+  const isDisabled = computed(() => props.isLoadingData || readOnly.value)
 
   const dnsResolutionList = [
     { label: 'IPv4 and IPv6', value: 'both' },

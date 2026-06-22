@@ -13,6 +13,7 @@
           auto
           :isCard="false"
           :value="mutualAuthentication"
+          :disabled="readOnly"
           title="Mutual Authentication"
           data-testid="edge-connectors-form__mutual-authentication-settings__mutual-authentication-field"
         />
@@ -39,6 +40,7 @@
           optionValue="id"
           :value="trustedCaCertificate"
           inputId="trustedCaCertificate"
+          :disabled="readOnly"
           @onSelectOption="changeTrustedCaCertificate"
         >
           <template #footer>
@@ -48,6 +50,7 @@
                   class="w-full whitespace-nowrap flex"
                   data-testid="edge-connectors-form__mutual-authentication-settings__create-trusted-ca-certificate-button"
                   text
+                  :disabled="readOnly"
                   @click="openDrawer('trusted_ca_certificate')"
                   size="small"
                   icon="pi pi-plus-circle"
@@ -75,6 +78,7 @@
           optionValue="id"
           :value="crlCertificate"
           inputId="crlCertificate"
+          :disabled="readOnly"
           @onSelectOption="changeCrlCertificate"
         >
           <template #footer>
@@ -84,6 +88,7 @@
                   class="w-full whitespace-nowrap flex"
                   data-testid="edge-connectors-form__mutual-authentication-settings__create-trusted-ca-certificate-button"
                   text
+                  :disabled="readOnly"
                   @click="openDrawer('certificateRevogationList')"
                   size="small"
                   icon="pi pi-plus-circle"
@@ -113,6 +118,7 @@
   import Drawer from '@/views/DigitalCertificates/Drawer'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
   import { digitalCertificatesCRLService } from '@/services/v2/digital-certificates/digital-certificates-crl-service'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsMutualAuthenticationSettings' })
 
@@ -126,6 +132,7 @@
   const { value: mutualAuthentication } = useField('mtls.active')
   const { value: trustedCaCertificate } = useField('mtls.config.certificate')
   const { value: crlCertificate } = useField('mtls.config.crl')
+  const { readOnly } = useVersionContext()
 
   const drawerRef = ref(null)
   const certificateType = ref('trusted_ca_certificate')

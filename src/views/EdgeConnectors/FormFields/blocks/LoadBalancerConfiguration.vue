@@ -15,6 +15,7 @@
           optionValue="value"
           :value="method"
           appendTo="self"
+          :disabled="readOnly"
           description="Select the load balancing method to define how traffic is distributed across multiple origins."
           data-testid="edge-connectors-form__load-balancer-configuration__method-field"
         />
@@ -27,6 +28,7 @@
           :value="maxRetries"
           :min="0"
           :max="20"
+          :disabled="readOnly"
           description="Maximum number of retry attempts for failed connections. Value 0 for no retries. Valid range: 0-20."
           data-testid="edge-connectors-form__load-balancer-configuration__max-retries-field"
         />
@@ -39,6 +41,7 @@
           :value="connectionTimeout"
           :min="1"
           :max="300"
+          :disabled="readOnly"
           description="Maximum time (in seconds) the Connector will wait to establish a connection with the origin. Valid range: 1-300."
           data-testid="edge-connectors-form__load-balancer-configuration__connection-timeout-field"
         />
@@ -51,6 +54,7 @@
           :value="readWriteTimeout"
           :min="1"
           :max="600"
+          :disabled="readOnly"
           description="Maximum time (in seconds) the Connector will wait for data to be read from or written to the origin. Valid range: 1-600."
           data-testid="edge-connectors-form__load-balancer-configuration__read-write-timeout-field"
         />
@@ -65,6 +69,7 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldNumber from '@aziontech/webkit/field-number'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsLoadBalancerConfiguration' })
 
@@ -80,6 +85,7 @@
   const { value: connectionTimeout } = useField('modules.loadBalancer.config.connectionTimeout')
   const { value: readWriteTimeout } = useField('modules.loadBalancer.config.readWriteTimeout')
   const { value: loadBalancerEnabled } = useField('modules.loadBalancer.enabled')
+  const { readOnly } = useVersionContext()
 
   const methodsList = [
     { label: 'Round Robin', value: 'round_robin' },

@@ -12,6 +12,7 @@
           auto
           :isCard="false"
           :value="active"
+          :disabled="readOnly"
           title="Active"
           data-testid="edge-connectors-form__status__active-field"
         />
@@ -24,6 +25,7 @@
   import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsStatus' })
 
@@ -35,4 +37,5 @@
   })
 
   const { value: active } = useField('active')
+  const { readOnly } = useVersionContext()
 </script>
