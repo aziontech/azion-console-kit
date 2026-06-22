@@ -14,6 +14,7 @@
         description="Give an unique and descriptive name to identify the Connectors."
         name="name"
         :value="name"
+        :disabled="readOnly"
         placeholder="My Connector"
         data-testid="edge-connectors-form__general__name-field"
       />
@@ -25,6 +26,7 @@
   import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsGeneral' })
 
@@ -44,4 +46,5 @@
   })
 
   const { value: name } = useField('name')
+  const { readOnly } = useVersionContext()
 </script>

@@ -60,7 +60,7 @@
                     icon="pi pi-trash"
                     severity="primary"
                     outlined
-                    :disabled="addresses.length === 1"
+                    :disabled="addresses.length === 1 || readOnly"
                     @click.stop="removeAddressByIndex(addressIndex)"
                     :data-testid="`edge-connectors-form__address-management__remove-button[${addressIndex}]`"
                   />
@@ -75,6 +75,7 @@
                   description="IPv4/IPv6 address or CNAME to resolve (e.g., 'example.com' or '192.168.0.1')."
                   :name="`addresses[${addressIndex}].address`"
                   :value="addresses[addressIndex].value.address"
+                  :disabled="readOnly"
                   placeholder="example.com"
                   data-testid="edge-connectors-form__address-management__address-field"
                 />
@@ -88,6 +89,7 @@
                     :value="addresses[addressIndex].value.httpPort"
                     :min="1"
                     :max="65535"
+                    :disabled="readOnly"
                     description="Specify the plain (non-encrypted) port for communication with the origin (e.g., 80 for HTTP)."
                     data-testid="edge-connectors-form__address-management__http-port-field"
                   />
@@ -100,6 +102,7 @@
                     :value="addresses[addressIndex].value.httpsPort"
                     :min="1"
                     :max="65535"
+                    :disabled="readOnly"
                     description="Specify the secure port for encrypted communication with the origin (e.g., 443 for HTTPS)."
                     data-testid="edge-connectors-form__address-management__https-port-field"
                   />
@@ -122,6 +125,7 @@
                   optionValue="value"
                   :value="addresses[addressIndex].value.serverRole || 'primary'"
                   appendTo="self"
+                  :disabled="readOnly"
                   description="Define the role of the server in the load balancing setup."
                   data-testid="edge-connectors-form__address-management__server-role-field"
                 />
@@ -135,6 +139,7 @@
                     :max="100"
                     :name="`addresses[${addressIndex}].weight`"
                     :value="addresses[addressIndex].value.weight || 1"
+                    :disabled="readOnly"
                     description="Higher weights allocate more traffic to this address."
                     data-testid="edge-connectors-form__address-management__weight-field"
                   />
@@ -148,6 +153,7 @@
                   auto
                   :isCard="false"
                   :value="addresses[addressIndex].value.active"
+                  :disabled="readOnly"
                   title="Active"
                   data-testid="edge-connectors-form__address-management__active-field"
                 />
@@ -167,6 +173,7 @@
                 description="IPv4/IPv6 address or CNAME to resolve."
                 :name="`addresses[${0}].address`"
                 :value="addresses[0]?.value?.address"
+                :disabled="readOnly"
                 placeholder=""
                 data-testid="edge-connectors-form__address-management__address-field"
               />
@@ -179,6 +186,7 @@
                   :name="`addresses[${0}].httpPort`"
                   :value="addresses[0]?.value?.httpPort"
                   :min="0"
+                  :disabled="readOnly"
                   description=""
                   data-testid="edge-connectors-form__address-management__http-port-field"
                 />
@@ -190,6 +198,7 @@
                   :name="`addresses[${0}].httpsPort`"
                   :value="addresses[0]?.value?.httpsPort"
                   :min="0"
+                  :disabled="readOnly"
                   description=""
                   data-testid="edge-connectors-form__address-management__https-port-field"
                 />
@@ -238,6 +247,7 @@
   import FieldNumber from '@aziontech/webkit/field-number'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsAddress' })
 
@@ -265,6 +275,7 @@
 
   const { fields: addresses, push: pushAddress, remove: removeAddress } = useFieldArray('addresses')
   const { value: loadBalancer } = useField('modules.loadBalancer.enabled')
+  const { readOnly } = useVersionContext()
   const activeAccordions = ref(0)
 
   const isLoadBalancerEnabled = computed(() => {
@@ -272,7 +283,11 @@
   })
 
   const disableAddButton = computed(() => {
-    return addresses.value.length === maximumAddressQuantity || !isLoadBalancerEnabled.value
+    return (
+      addresses.value.length === maximumAddressQuantity ||
+      !isLoadBalancerEnabled.value ||
+      readOnly.value
+    )
   })
 
   const addNewAddress = () => {

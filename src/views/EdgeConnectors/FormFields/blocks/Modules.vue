@@ -11,6 +11,7 @@
           nameField="modules.loadBalancer.enabled"
           name="modules.loadBalancer.enabled"
           :value="loadBalancer"
+          :disabled="readOnly"
           title="Load Balancer"
           subtitle="Distribute traffic across multiple addresses with load balancing settings. Enabling this module unlocks support for multiple addresses and advanced traffic distribution configurations."
           data-testid="edge-connectors-form__modules__load-balance-enabled-field"
@@ -21,6 +22,7 @@
           nameField="modules.originShield.enabled"
           name="modules.originShield.enabled"
           :value="originShield"
+          :disabled="readOnly"
           title="Origin Shield"
           subtitle="Protect your origin by centralizing requests through a shield location. Enabling this module also unlocks HMAC authentication settings for secure content delivery."
           data-testid="edge-connectors-form__modules__origin-shield-enabled-field"
@@ -34,6 +36,7 @@
   import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsModules' })
 
@@ -46,4 +49,5 @@
 
   const { value: loadBalancer } = useField('modules.loadBalancer.enabled')
   const { value: originShield } = useField('modules.originShield.enabled')
+  const { readOnly } = useVersionContext()
 </script>
