@@ -1,0 +1,10 @@
+{
+  "results": [
+    {
+      "id": "github",
+      "name": "GitHub",
+      "installation_url": "https://github.com/apps/azion/installations/new",
+      "callback_url": "https://api.azion.com/v4/vcs/callback"
+    }
+  ]
+}

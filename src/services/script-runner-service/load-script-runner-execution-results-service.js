@@ -55,10 +55,16 @@ const extractScriptRunnerErrorMessage = (result) => {
 const parseHttpResponse = (httpResponse) => {
   switch (httpResponse.statusCode) {
     case 200: {
-      const result = httpResponse.body.result
+      const result = httpResponse.body.result || {}
       const hasErrors = result.errors || result.error
       if (hasErrors) {
         throw new Error(extractScriptRunnerErrorMessage(result)).message
+      }
+      // A 200 without an error envelope but with no provisioned resources means the
+      // deploy did not actually succeed - surface it as an error so the flow stays
+      // on the deploy step instead of optimistically showing success.
+      if (!result.domain || !result.edge_application) {
+        throw new Error('Deployment did not provision any resources').message
       }
       return adapt(httpResponse)
     }

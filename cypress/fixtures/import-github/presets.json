@@ -1,0 +1,5 @@
+[
+  { "label": "Next.js", "value": "next" },
+  { "label": "React", "value": "react" },
+  { "label": "Vue", "value": "vue" }
+]

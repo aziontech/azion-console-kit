@@ -1,0 +1,9 @@
+{
+  "id": 9001,
+  "name": "Import from GitHub",
+  "solution_reference_id": "tmpl-e2e-123",
+  "slug": "my-template-e2e",
+  "vendor": { "slug": "azion", "name": "Azion" },
+  "version": "1.0.0",
+  "is_launched": true
+}

@@ -820,6 +820,7 @@
                 :loading="isGithubConnectLoading"
                 @change="handleIntegrationChange"
                 appendTo="self"
+                data-testid="import-github__git-scope-dropdown"
               >
                 <template #value="slotProps">
                   <div
@@ -881,6 +882,7 @@
                 :loading="isLoadingRepositories"
                 filter
                 @change="handleRepositoryChange"
+                data-testid="import-github__repository-dropdown"
               >
                 <template #value="slotProps">
                   <div
@@ -920,6 +922,7 @@
                 :value="applicationName"
                 :disabled="isDeploying"
                 description="Give a unique name to the Application. It’ll also be used for the bucket for storage and the function."
+                data-testid="import-github__application-name"
               />
             </div>
 
@@ -940,6 +943,7 @@
                 placeholder="Select a framework"
                 :class="{ 'p-invalid': presetError }"
                 :disabled="isDeploying"
+                data-testid="import-github__framework-dropdown"
               >
                 <template #value="slotProps">
                   <div
@@ -991,6 +995,7 @@
                 placeholder="./"
                 :value="rootDirectory"
                 :disabled="isDeploying"
+                data-testid="import-github__root-directory"
               />
             </div>
 
@@ -1132,6 +1137,7 @@
             class="w-full"
             :loading="isDeploying"
             @click="onDeploy"
+            data-testid="import-github__deploy-button"
           />
         </template>
       </CardBox>

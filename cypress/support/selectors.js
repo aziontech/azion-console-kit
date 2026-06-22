@@ -36,6 +36,7 @@ import CUSTOM_PAGES_SELECTORS from './selectors/product-selectors/custom-pages.j
 import EDGE_CONNECTOR_SELECTORS from './selectors/product-selectors/edge-connectors.js'
 import EDGE_SQL_SELECTORS from './selectors/product-selectors/edge-sql.js'
 import TEMPLATE_ENGINE_SELECTORS from './selectors/product-selectors/template-engine.js'
+import IMPORT_GITHUB_SELECTORS from './selectors/product-selectors/import-github.js'
 const selectors = {
   billing: BILLING_SELECTORS,
   list: LIST_TABLE_BLOCK_SELECTORS,
@@ -69,7 +70,8 @@ const selectors = {
   customPages: CUSTOM_PAGES_SELECTORS,
   edgeConnector: EDGE_CONNECTOR_SELECTORS,
   edgeSQL: EDGE_SQL_SELECTORS,
-  templateEngine: TEMPLATE_ENGINE_SELECTORS
+  templateEngine: TEMPLATE_ENGINE_SELECTORS,
+  importGithub: IMPORT_GITHUB_SELECTORS
 }
 
 export default selectors
