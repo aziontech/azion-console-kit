@@ -10,8 +10,12 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
 
   import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
-  import { getRowActions, metaFor } from '@/composables/versioning/version-actions'
+  import {
+    buildVersionMenuItems,
+    mapVersionMenuItemsToMenu
+  } from '@/composables/versioning/version-actions'
   import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+  import '@/assets/styles/version-row-menu.css'
 
   defineOptions({ name: 'version-list-data-view' })
 
@@ -109,6 +113,10 @@
     documentationService: {
       type: Function,
       default: null
+    },
+    resourceType: {
+      type: String,
+      default: ''
     }
   })
 
@@ -231,7 +239,13 @@
 
   const isPrimaryColumn = (column) => column?.key === 'version'
 
-  const triggerRowClick = (item) => emit('row-click', item)
+  // Clicking anywhere on the row opens the version configuration — same outcome
+  // as the menu's "Open configuration" item, routed through the shared driver
+  // (Req 2.2). `row-click` is kept for legacy consumers until they migrate.
+  const triggerRowClick = (item) => {
+    emit('row-action', { action: 'OPEN_CONFIGURATION', item })
+    emit('row-click', item)
+  }
 
   const hasErrorAction = computed(
     () => !!(props.errorState?.buttonLabel && props.errorState?.buttonAction)
@@ -243,24 +257,24 @@
   const runErrorAction = () => props.errorState?.buttonAction?.()
   const runEmptyAction = () => props.emptyState?.buttonAction?.()
 
-  const ICON_FOR = {
-    BUILD: 'pi pi-cog',
-    NEW_DRAFT_FROM: 'pi pi-copy',
-    ARCHIVE: 'pi pi-inbox',
-    DELETE: 'pi pi-trash'
-  }
-
-  const hasRowActions = (version) => getRowActions(version?.state).length > 0
+  // The row menu always offers the fixed 5-item model (never-hide pattern);
+  // the only state with no menu is `deleted`, where every item is gone.
+  const hasRowActions = (version) =>
+    buildVersionMenuItems(version?.state, { resourceType: props.resourceType }).length > 0
 
   const overflowMenuRef = ref(null)
   const rowMenuModel = ref([])
 
+  // Opening the kebab must not bubble into the row click (Req 2.4). The model is
+  // built by the shared mapper so every listing renders an identical menu (Req 1.4).
   const openRowMenu = (event, version) => {
-    rowMenuModel.value = getRowActions(version.state).map((action) => ({
-      label: metaFor(action).label,
-      icon: ICON_FOR[action],
-      command: () => emit('row-action', { action, item: version })
-    }))
+    event?.stopPropagation?.()
+    rowMenuModel.value = mapVersionMenuItemsToMenu(
+      version.state,
+      { resourceType: props.resourceType },
+      (payload) => emit('row-action', payload),
+      version
+    )
     overflowMenuRef.value?.toggle?.(event)
   }
 </script>
@@ -529,7 +543,8 @@
                   <PrimeButton
                     icon="pi pi-ellipsis-v"
                     text
-                    size="small"
+                    severity="secondary"
+                    class="version-row-menu__trigger"
                     :aria-label="rowActionsAriaLabel"
                     :data-testid="`version-list-data-view__row-${version.id}__menu`"
                     @click="openRowMenu($event, version)"
@@ -565,10 +580,10 @@
                     </div>
                     <PrimeButton
                       v-if="showRowActions && hasRowActions(version)"
-                      class="card-more"
+                      class="card-more version-row-menu__trigger"
                       icon="pi pi-ellipsis-v"
                       text
-                      size="small"
+                      severity="secondary"
                       :aria-label="rowActionsAriaLabel"
                       @click="openRowMenu($event, version)"
                     />
@@ -643,7 +658,26 @@
       ref="overflowMenuRef"
       :popup="true"
       :model="rowMenuModel"
-    />
+      appendTo="body"
+      class="version-row-menu"
+    >
+      <template #item="{ item, props: itemProps }">
+        <a
+          v-tooltip.left="item.tooltip ? { value: item.tooltip, showDelay: 200 } : undefined"
+          class="version-row-menu__item"
+          :class="{ 'version-row-menu__item--danger': item.class === 'danger' }"
+          v-bind="itemProps.action"
+        >
+          <span
+            v-if="item.icon"
+            class="version-row-menu__icon"
+            :class="item.icon"
+            aria-hidden="true"
+          />
+          <span class="version-row-menu__label">{{ item.label }}</span>
+        </a>
+      </template>
+    </Menu>
   </div>
 </template>
 
@@ -685,6 +719,14 @@
     height: 2.5rem !important;
     padding: 0;
     border-radius: 0.375rem;
+  }
+
+  /* Kebab trigger: text/secondary, 32px square (Req 8.1). */
+  :deep(.version-row-menu__trigger.p-button) {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    color: var(--text-color-secondary);
   }
 
   @media (min-width: 640px) {

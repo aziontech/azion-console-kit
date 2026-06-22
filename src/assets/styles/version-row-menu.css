@@ -1,0 +1,74 @@
+/* Shared styling for the version row-action menu (kebab). The popup Menu is
+   appendTo="body", so it lives outside any scoped subtree and is styled with
+   DS tokens only (Req 8.2/8.6). Imported by every listing that renders the
+   shared model so the menu looks identical everywhere (Req 1.4). */
+.version-row-menu.p-menu {
+  min-width: 13.75rem;
+  padding: 0.375rem;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  background: var(--surface-section);
+  box-shadow: var(--shadow-md);
+}
+
+.version-row-menu.p-menu .p-menuitem {
+  margin: 0;
+}
+
+.version-row-menu.p-menu .p-menuitem-separator {
+  border-top: 1px solid var(--surface-border);
+  margin: 0.375rem 0;
+}
+
+.version-row-menu .version-row-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.375rem;
+  color: var(--text-color);
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  cursor: pointer;
+  transition: background-color 200ms ease-in-out;
+}
+
+.version-row-menu .version-row-menu__item:hover {
+  background: var(--surface-hover);
+}
+
+/* Keyboard focus (↑/↓): PrimeVue marks the active item via data-p-focused;
+   mirror the hover overlay so focus is visible (Req 8.4 / NFR-A.1). */
+.version-row-menu .p-menuitem .p-menuitem-content:focus-visible .version-row-menu__item,
+.version-row-menu .p-menuitem[data-p-focused='true']:not(.p-disabled) .version-row-menu__item,
+.version-row-menu .p-focus .version-row-menu__item {
+  background: var(--surface-hover);
+  outline: 1px solid var(--surface-border);
+  outline-offset: -1px;
+}
+
+.version-row-menu .version-row-menu__item--danger {
+  color: var(--red-500);
+}
+
+/* Disabled item (Req 7.3): dimmed, not-allowed, no hover/focus overlay. */
+.version-row-menu .p-menuitem.p-disabled .version-row-menu__item {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.version-row-menu .p-menuitem.p-disabled .version-row-menu__item:hover,
+.version-row-menu .p-menuitem.p-disabled .p-menuitem-content:focus-visible .version-row-menu__item {
+  background: transparent;
+  outline: none;
+}
+
+.version-row-menu .version-row-menu__icon {
+  font-size: 0.875rem;
+  color: inherit;
+}
+
+.version-row-menu .version-row-menu__label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
