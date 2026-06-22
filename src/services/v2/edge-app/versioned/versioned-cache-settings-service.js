@@ -9,5 +9,8 @@ export const versionedCacheSettingsService = createVersionedSubResourceService({
     transformLoad: (data) => CacheSettingsAdapter.transformLoadCacheSetting(data),
     requestPayload: (payload) => CacheSettingsAdapter.requestPayload(payload)
   },
-  queryKeyGroup: queryKeys.application.version.cacheSettings
+  queryKeyGroup: queryKeys.application.version.cacheSettings,
+  idKey: 'cacheId',
+  createdMessage: 'Cache Settings successfully created',
+  updatedMessage: 'Cache Settings successfully edited'
 })

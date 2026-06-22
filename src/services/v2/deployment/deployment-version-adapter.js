@@ -69,54 +69,63 @@ const normalizeVersion = (version) => {
   }
 }
 
+const normalizeVersionItem = (data) => {
+  const normalized = normalizeVersion(data)
+  return {
+    ...normalized,
+    status: mapStateToStatus(normalized.state)
+  }
+}
+
+const normalizeDraftPayload = (payload = {}) =>
+  pickDefined({
+    resources: normalizePayloadResources(payload.resources),
+    strategy: payload.strategy,
+    origin: payload.origin
+  })
+
+const normalizeReasonPayload = (payload = {}) =>
+  pickDefined({
+    reason: payload.reason,
+    comment: payload.comment
+  })
+
+// Deployment version adapter aligned to the VersionServiceBase contract,
+// preserving deployment-specific normalization (resources[], status via
+// mapStateToStatus, last_modified_by). Build/cancel share the reason payload.
 export const DeploymentVersionAdapter = {
-  transformList(data) {
+  transformListVersions(data) {
     if (!Array.isArray(data)) return []
-    return data.map((item) => {
-      const normalized = normalizeVersion(item)
-      return {
-        ...normalized,
-        status: mapStateToStatus(normalized.state)
-      }
-    })
+    return data.map((item) => normalizeVersionItem(item))
   },
 
-  transformItem(data) {
+  transformLoadVersion(data) {
     if (!data) return null
-    const normalized = normalizeVersion(data)
-    return {
-      ...normalized,
-      status: mapStateToStatus(normalized.state)
-    }
+    return normalizeVersionItem(data)
   },
 
-  transformCreatePayload(payload = {}) {
-    return pickDefined({
-      resources: normalizePayloadResources(payload.resources),
-      strategy: payload.strategy,
-      origin: payload.origin
-    })
+  transformCreateDraftPayload(payload = {}) {
+    return normalizeDraftPayload(payload)
   },
 
-  transformEditDraftPayload(payload = {}) {
-    return pickDefined({
-      resources: normalizePayloadResources(payload.resources),
-      strategy: payload.strategy,
-      origin: payload.origin
-    })
+  transformDraftPayload(payload = {}) {
+    return normalizeDraftPayload(payload)
   },
 
-  transformCancelPayload(payload = {}) {
-    return pickDefined({
-      reason: payload.reason,
-      comment: payload.comment
-    })
+  transformBuildPayload(payload = {}) {
+    return normalizeReasonPayload(payload)
   },
 
   transformArchivePayload(payload = {}) {
-    return pickDefined({
-      reason: payload.reason,
-      comment: payload.comment
-    })
+    return normalizeReasonPayload(payload)
   }
 }
+
+// Backward-compatible aliases: deployment-version-service.js still calls the
+// pre-contract names until tasks 4.1/4.3 reconcile the consumers.
+DeploymentVersionAdapter.transformList = DeploymentVersionAdapter.transformListVersions
+DeploymentVersionAdapter.transformItem = DeploymentVersionAdapter.transformLoadVersion
+DeploymentVersionAdapter.transformCreatePayload =
+  DeploymentVersionAdapter.transformCreateDraftPayload
+DeploymentVersionAdapter.transformEditDraftPayload = DeploymentVersionAdapter.transformDraftPayload
+DeploymentVersionAdapter.transformCancelPayload = DeploymentVersionAdapter.transformBuildPayload

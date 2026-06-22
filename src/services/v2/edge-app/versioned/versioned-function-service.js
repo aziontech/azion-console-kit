@@ -11,5 +11,7 @@ export const versionedFunctionService = createVersionedSubResourceService({
     requestPayload: (payload) => EdgeApplicationFunctionsAdapter.transformPayload(payload),
     editPayload: (payload) => EdgeApplicationFunctionsAdapter.transformEditPayload(payload)
   },
-  queryKeyGroup: queryKeys.application.version.functions
+  queryKeyGroup: queryKeys.application.version.functions,
+  createdMessage: 'Your Function has been created',
+  updatedMessage: 'Your Function has been updated'
 })
