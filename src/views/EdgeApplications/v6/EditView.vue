@@ -28,7 +28,7 @@
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
   import { useVersionList } from '@/composables/versioning/use-version-list'
-  import { useVersionRowActions } from '@/composables/versioning/use-version-row-actions'
+  import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
 
   defineOptions({ name: 'application-v6-edit-view' })
 
@@ -79,6 +79,24 @@
     router.push(`/applications/edit/${edgeApplicationId.value}/versions/${id}`)
   }
 
+  const isDeployDrawerOpen = ref(false)
+  // Version pinned by a row-menu Promote; cleared when the drawer closes.
+  const pinnedDeployVersionId = ref(null)
+  const openDeployDrawer = () => {
+    pinnedDeployVersionId.value = null
+    isDeployDrawerOpen.value = true
+  }
+  // Promote from the row menu: open the release drawer with this version pinned.
+  const openPromoteDrawer = ({ pin } = {}) => {
+    pinnedDeployVersionId.value = pin ?? null
+    isDeployDrawerOpen.value = true
+  }
+  watch(isDeployDrawerOpen, (open) => {
+    if (!open) pinnedDeployVersionId.value = null
+  })
+
+  // Single shared row-menu driver (spec §3.3, Req 1.4/10.1): nav, Promote
+  // (this view's drawer) and Archive/Delete all flow through one router.
   const {
     handleRowAction,
     dialogConfig,
@@ -86,10 +104,12 @@
     dialogVisible,
     handleConfirm,
     handleVisibility
-  } = useVersionRowActions({
+  } = useVersionMenuActions({
+    resourceType: 'application',
     resourceId: edgeApplicationId,
-    service: edgeAppVersionService,
-    onCloned: goToVersion,
+    versionService: edgeAppVersionService,
+    router,
+    openPromoteDrawer,
     onSuccess: () => versionsQuery.refetch?.()
   })
 
@@ -117,18 +137,13 @@
     }
   }
 
-  const isDeployDrawerOpen = ref(false)
-  const openDeployDrawer = () => {
-    isDeployDrawerOpen.value = true
-  }
-
   const readyVersionOptions = computed(() => toDeployableVersionOptions(rawVersions.value))
 
   const deployResourceContext = computed(() => ({
     resourceType: 'application',
     resourceId: Number(edgeApplicationId.value),
     resourceName: application.value?.name ?? '',
-    version: null,
+    version: pinnedDeployVersionId.value ? { id: pinnedDeployVersionId.value } : null,
     versions: readyVersionOptions.value
   }))
 
@@ -192,6 +207,7 @@
         :sort="sort"
         :sort-options="sortOptions"
         :show-row-actions="true"
+        resource-type="application"
         :paginator-rows="20"
         search-placeholder="Search versions"
         :empty-state="{
@@ -214,7 +230,6 @@
         @update:filter-values="filterValues = $event"
         @update:sort="sort = $event"
         @refresh="versionsQuery.refetch?.()"
-        @row-click="goToVersion"
         @row-action="handleRowAction"
       >
         <template #toolbar-actions>

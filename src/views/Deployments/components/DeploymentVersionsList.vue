@@ -1,16 +1,21 @@
 <script setup>
   import { computed, onMounted, ref, watch } from 'vue'
+  import { useRouter } from 'vue-router'
   import { watchDebounced } from '@vueuse/core'
   import { useToast } from '@aziontech/webkit/use-toast'
   import Menu from '@aziontech/webkit/menu'
   import Calendar from '@aziontech/webkit/calendar'
   import Dropdown from '@aziontech/webkit/dropdown'
   import GenericDataView from '@/components/GenericDataView'
+  import VersionActionDialog from '@/templates/version-shell-block/components/VersionActionDialog.vue'
   import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
   import InlineTag from '@/components/InlineTag'
   import StatusTag from '@/components/StatusTag'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
   import { useReleaseDrawerController } from '@/composables/versioning/use-deployment-release-drawer'
+  import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
+  import { mapVersionMenuItemsToMenu } from '@/composables/versioning/version-actions'
+  import '@/assets/styles/version-row-menu.css'
 
   defineOptions({ name: 'deployment-versions-list' })
 
@@ -22,6 +27,7 @@
   })
 
   const toast = useToast()
+  const router = useRouter()
 
   const versions = ref([])
   const totalRecords = ref(0)
@@ -138,14 +144,33 @@
 
   const goToDetails = (version) => openRelease(version)
 
+  // Same shared driver + model as every other version listing (Req 1.4): the
+  // row menu is built by `mapVersionMenuItemsToMenu` and routed through
+  // `useVersionMenuActions`, never a local item. This is the deployment-release
+  // history view, so the release drawer (view-only) remains reachable by clicking
+  // the row name; the menu's Open-configuration has no deployment editor route yet.
+  const {
+    handleRowAction,
+    dialogConfig,
+    dialogProps,
+    dialogVisible,
+    handleConfirm,
+    handleVisibility
+  } = useVersionMenuActions({
+    resourceType: 'deployment',
+    resourceId: computed(() => String(props.deploymentId)),
+    versionService: deploymentVersionService,
+    router,
+    onSuccess: () => loadVersions()
+  })
+
   const openRowMenu = ({ event, version }) => {
-    rowMenuItems.value = [
-      {
-        label: 'View details',
-        icon: 'pi pi-eye',
-        command: () => openRelease(version)
-      }
-    ]
+    rowMenuItems.value = mapVersionMenuItemsToMenu(
+      version.state,
+      { resourceType: 'deployment' },
+      handleRowAction,
+      version
+    )
     rowMenuRef.value?.toggle?.(event)
   }
 
@@ -296,6 +321,33 @@
       ref="rowMenuRef"
       :popup="true"
       :model="rowMenuItems"
+      appendTo="body"
+      class="version-row-menu"
+    >
+      <template #item="{ item, props: itemProps }">
+        <a
+          v-tooltip.left="item.tooltip ? { value: item.tooltip, showDelay: 200 } : undefined"
+          class="version-row-menu__item"
+          :class="{ 'version-row-menu__item--danger': item.class === 'danger' }"
+          v-bind="itemProps.action"
+        >
+          <span
+            v-if="item.icon"
+            class="version-row-menu__icon"
+            :class="item.icon"
+            aria-hidden="true"
+          />
+          <span class="version-row-menu__label">{{ item.label }}</span>
+        </a>
+      </template>
+    </Menu>
+
+    <VersionActionDialog
+      v-if="dialogConfig"
+      v-bind="dialogProps"
+      :visible="dialogVisible"
+      @confirm="handleConfirm"
+      @update:visible="handleVisibility"
     />
 
     <DeploymentReleaseDrawer

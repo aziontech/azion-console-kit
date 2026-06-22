@@ -1,10 +1,17 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import Menu from '@aziontech/webkit/menu'
+  import PrimeButton from '@aziontech/webkit/button'
   import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
   import VersionListDataView from '@/components/VersionListDataView'
+  import VersionActionDialog from '@/templates/version-shell-block/components/VersionActionDialog.vue'
   import { workloadVersionService } from '@/services/v2/workload/workload-version-service'
   import { useVersionList } from '@/composables/versioning/use-version-list'
   import { useWorkloadVersionEnvironments } from '@/composables/versioning/use-workload-version-environments'
+  import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
+  import { mapVersionMenuItemsToMenu } from '@/composables/versioning/version-actions'
+  import '@/assets/styles/version-row-menu.css'
 
   defineOptions({ name: 'workload-v6-versions-tab' })
 
@@ -15,6 +22,7 @@
     }
   })
 
+  const router = useRouter()
   const workloadId = computed(() => String(props.workloadId))
 
   const versionsQuery = workloadVersionService.useListVersionsQuery(workloadId)
@@ -34,6 +42,41 @@
     { key: 'status', label: 'Status', size: 'minmax(140px, 0.8fr)' },
     { key: 'created', label: 'Created by', size: 'minmax(180px, 1.2fr)' }
   ]
+
+  // Single shared driver: every workload version surface (the list AND the
+  // current-by-environment band) routes row-action through the same composable
+  // and renders the same model, so the menu can never diverge (Req 1.4, 3.3).
+  const {
+    handleRowAction,
+    dialogConfig,
+    dialogProps,
+    dialogVisible,
+    handleConfirm,
+    handleVisibility
+  } = useVersionMenuActions({
+    resourceType: 'workload',
+    resourceId: workloadId,
+    versionService: workloadVersionService,
+    router,
+    workloadId,
+    onSuccess: () => versionsQuery.refetch?.()
+  })
+
+  // The band has no per-row emitter, so it renders the shared model into a popup
+  // Menu and forwards the command to the same handler used by the list.
+  const bandMenuRef = ref(null)
+  const bandMenuModel = ref([])
+
+  const openBandMenu = (event, version) => {
+    event?.stopPropagation?.()
+    bandMenuModel.value = mapVersionMenuItemsToMenu(
+      version.state,
+      { resourceType: 'workload' },
+      handleRowAction,
+      version
+    )
+    bandMenuRef.value?.toggle?.(event)
+  }
 </script>
 
 <template>
@@ -62,11 +105,22 @@
           class="flex flex-col gap-2 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] p-4"
           data-testid="workload-v6-versions__environment-card"
         >
-          <span
-            class="text-[0.625rem] font-medium uppercase leading-4 tracking-[0.0625rem] text-[var(--text-color-secondary)]"
-          >
-            Environment
-          </span>
+          <div class="flex items-start justify-between gap-2">
+            <span
+              class="text-[0.625rem] font-medium uppercase leading-4 tracking-[0.0625rem] text-[var(--text-color-secondary)]"
+            >
+              Environment
+            </span>
+            <PrimeButton
+              icon="pi pi-ellipsis-v"
+              text
+              severity="secondary"
+              class="-mr-1 -mt-1 h-8 w-8 !p-0 text-[var(--text-color-secondary)]"
+              aria-label="Version actions"
+              :data-testid="`workload-v6-versions__environment-menu-${environment.environmentId}`"
+              @click="openBandMenu($event, environment.version)"
+            />
+          </div>
           <span
             class="font-mono text-sm font-semibold leading-5 text-[var(--text-color)]"
             :title="environment.environmentId"
@@ -97,7 +151,8 @@
       :filter-values="filterValues"
       :sort="sort"
       :sort-options="sortOptions"
-      :show-row-actions="false"
+      :show-row-actions="true"
+      resource-type="workload"
       :paginator-rows="20"
       search-placeholder="Search versions"
       :empty-state="{
@@ -118,6 +173,40 @@
       @update:filter-values="filterValues = $event"
       @update:sort="sort = $event"
       @refresh="versionsQuery.refetch?.()"
+      @row-action="handleRowAction"
+    />
+
+    <Menu
+      ref="bandMenuRef"
+      :popup="true"
+      :model="bandMenuModel"
+      appendTo="body"
+      class="version-row-menu"
+    >
+      <template #item="{ item, props: itemProps }">
+        <a
+          v-tooltip.left="item.tooltip ? { value: item.tooltip, showDelay: 200 } : undefined"
+          class="version-row-menu__item"
+          :class="{ 'version-row-menu__item--danger': item.class === 'danger' }"
+          v-bind="itemProps.action"
+        >
+          <span
+            v-if="item.icon"
+            class="version-row-menu__icon"
+            :class="item.icon"
+            aria-hidden="true"
+          />
+          <span class="version-row-menu__label">{{ item.label }}</span>
+        </a>
+      </template>
+    </Menu>
+
+    <VersionActionDialog
+      v-if="dialogConfig"
+      v-bind="dialogProps"
+      :visible="dialogVisible"
+      @confirm="handleConfirm"
+      @update:visible="handleVisibility"
     />
   </div>
 </template>
