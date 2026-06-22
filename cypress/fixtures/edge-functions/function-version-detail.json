@@ -1,0 +1,13 @@
+{
+  "data": {
+    "version_id": "01JFUNCREADY00000000000001",
+    "version_state": "ready",
+    "comment": "Initial function version",
+    "created_at": "2026-06-10T09:00:00Z",
+    "name": "v6-function",
+    "active": true,
+    "code": "async function handle() {}",
+    "language": "javascript",
+    "runtime_environment": "azion_js"
+  }
+}

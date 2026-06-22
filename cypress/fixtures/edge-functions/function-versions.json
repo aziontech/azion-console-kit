@@ -1,0 +1,11 @@
+{
+  "count": 1,
+  "results": [
+    {
+      "version_id": "01JFUNCREADY00000000000001",
+      "version_state": "ready",
+      "comment": "Initial function version",
+      "created_at": "2026-06-10T09:00:00Z"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 <script setup>
   import { watch, computed, ref } from 'vue'
   import { useThemeStore } from '@/stores/theme'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   const emit = defineEmits(['update:modelValue'])
   const props = defineProps({
@@ -11,7 +12,8 @@
       default: true
     },
     readOnly: {
-      type: Boolean
+      type: Boolean,
+      default: false
     },
     runtime: {
       type: String,
@@ -25,12 +27,17 @@
 
   const code = ref(props.initialValue)
 
-  const EDITOR_OPTIONS = ref({
+  // Effective read-only: explicit prop OR immutable version state.
+  // Outside the VersionShell the context default is false, so non-versioned usage is unchanged.
+  const { readOnly: versionReadOnly } = useVersionContext()
+  const isReadOnly = computed(() => props.readOnly || Boolean(versionReadOnly.value))
+
+  const EDITOR_OPTIONS = computed(() => ({
     minimap: { enabled: props.minimap },
     tabSize: 2,
     formatOnPaste: true,
-    readOnly: props.readOnly
-  })
+    readOnly: isReadOnly.value
+  }))
 
   const store = useThemeStore()
   const theme = computed(() => {
@@ -40,10 +47,6 @@
   watch(
     () => props.modelValue,
     (modelValue) => (code.value = modelValue)
-  )
-  watch(
-    () => props.readOnly,
-    (value) => (EDITOR_OPTIONS.value.readOnly = value)
   )
 </script>
 
@@ -56,7 +59,7 @@
     :class="{
       'border-transparent': !errors,
       '!border-red-500 border h-[calc(100%-1.5rem)]': errors,
-      'cursor-not-allowed': EDITOR_OPTIONS.readOnly
+      'cursor-not-allowed': isReadOnly
     }"
     :options="EDITOR_OPTIONS"
     @change="emit('update:modelValue', $event)"

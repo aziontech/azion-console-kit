@@ -25,7 +25,10 @@
     adapter: { type: [Object, Function], required: true },
     tabs: { type: Array, default: () => [] },
     resourceContext: { type: Object, default: null },
-    testidPrefix: { type: String, required: true }
+    testidPrefix: { type: String, required: true },
+    // Render the single tab's component directly, without the outer TabView. For
+    // resources whose form already provides its own tabs (e.g. Functions).
+    bare: { type: Boolean, default: false }
   })
 
   const emit = defineEmits(['command-success', 'command-error', 'cancel'])
@@ -72,30 +75,42 @@
       :version-id="versionId"
     >
       <div class="flex align-center justify-between relative">
-        <TabView
-          v-model:activeIndex="activeTabIndex"
+        <div
+          v-if="bare && tabs[0]"
           class="flex-1"
         >
-          <TabPanel
-            v-for="(tab, index) in tabs"
-            :key="tab.key"
-            :header="tab.label"
-            :pt="{ root: { 'data-testid': `${testidPrefix}__tab-panel__${tab.key}` } }"
+          <component
+            :is="tabs[0].component"
+            :ref="setComponentRef(0)"
+            v-bind="tabs[0].props ?? {}"
+          />
+        </div>
+        <template v-else>
+          <TabView
+            v-model:activeIndex="activeTabIndex"
+            class="flex-1"
           >
-            <div class="flex flex-col gap-4 mt-4">
-              <component
-                :is="tab.component"
-                :ref="setComponentRef(index)"
-                v-bind="tab.props ?? {}"
-              />
-            </div>
-          </TabPanel>
-        </TabView>
-        <VersionTabAddButton
-          :tab="activeTabDescriptor"
-          :active-component="activeTabComponent"
-          :testid-prefix="testidPrefix"
-        />
+            <TabPanel
+              v-for="(tab, index) in tabs"
+              :key="tab.key"
+              :header="tab.label"
+              :pt="{ root: { 'data-testid': `${testidPrefix}__tab-panel__${tab.key}` } }"
+            >
+              <div class="flex flex-col gap-4 mt-4">
+                <component
+                  :is="tab.component"
+                  :ref="setComponentRef(index)"
+                  v-bind="tab.props ?? {}"
+                />
+              </div>
+            </TabPanel>
+          </TabView>
+          <VersionTabAddButton
+            :tab="activeTabDescriptor"
+            :active-component="activeTabComponent"
+            :testid-prefix="testidPrefix"
+          />
+        </template>
         <VersionHeadingActions
           ref="headingActionsRef"
           :resource-context="resourceContext"
