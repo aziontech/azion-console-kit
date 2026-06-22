@@ -87,6 +87,7 @@
     'deploy',
     'finish',
     'retry',
+    'start-new',
     'manage',
     'open-url',
     'next-step',
@@ -756,6 +757,18 @@
     emit('retry')
   }
 
+  /**
+   * Reset the form to its empty state so the user can start a new deploy.
+   */
+  const handleStartNew = () => {
+    formData.value = {}
+    errors.value = []
+    selectedIntegration.value = ''
+    vcsIntegrationError.value = ''
+    validationAttempted.value = false
+    emit('start-new')
+  }
+
   const handleManage = (data) => {
     emit('manage', data)
   }
@@ -888,6 +901,7 @@
       @deploy="handleDeploy"
       @finish="handleFinish"
       @retry="handleRetry"
+      @start-new="handleStartNew"
       @manage="handleManage"
       @save-domains="handleSaveDomains"
       @open-url="handleOpenUrl"

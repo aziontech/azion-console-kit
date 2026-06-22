@@ -192,17 +192,22 @@
     ]
   }
 
-  // Setup form with vee-validate
-  const { handleSubmit, resetForm } = useForm({
+  // Setup form with vee-validate.
+  // keepValuesOnUnmount keeps values when fields unmount (e.g. the Install Command
+  // field lives in a collapsed Accordion) so they are not wiped from the form.
+  const { handleSubmit, resetForm, setFieldValue, values } = useForm({
     validationSchema,
-    initialValues
+    initialValues,
+    keepValuesOnUnmount: true
   })
 
-  // UseField for individual fields
-  const { value: applicationName } = useField('applicationName')
+  // UseField for fields that are bound directly here (dropdowns / variables list).
+  // applicationName, rootDirectory and installCommand are intentionally NOT declared
+  // with useField here: they are owned by their FieldText/FieldInputTextPrivacy
+  // components. Registering them twice (here AND in the component) makes the field's
+  // displayed value go stale in vee-validate. Read them via `values` and write via
+  // `setFieldValue` instead.
   const { value: preset, errorMessage: presetError } = useField('preset')
-  const { value: rootDirectory } = useField('rootDirectory')
-  const { value: installCommand } = useField('installCommand')
   const { value: newVariables } = useField('newVariables')
   const { value: githubAccount, errorMessage: githubAccountError } = useField('githubAccount')
   const { value: repository, errorMessage: repositoryError } = useField('repository')
@@ -220,58 +225,25 @@
   }
 
   const initializeFromQueryParams = async () => {
-    const {
-      gitScope: queryGitScope,
-      repositoryName: queryRepoName,
-      formApplicationName,
-      formPreset,
-      formRootDirectory,
-      formInstallCommand,
-      formVariables
-    } = route.query
+    const { gitScope: queryGitScope, repositoryName: queryRepoName } = route.query
 
-    // Check if we're restoring from a previous state (deploying step with saved form values)
-    const isRestoringFormState = route.query.step && route.query.executionId
-
-    // Only set applicationName to suggestedApplicationName if there's no formApplicationName in the route and not restoring
-    if (isRestoringFormState && formApplicationName) {
-      applicationName.value = formApplicationName
-    } else if (suggestedApplicationName.value) {
-      applicationName.value = suggestedApplicationName.value
-    }
-
-    // Restore other form values from route if available
-    if (formPreset) {
-      preset.value = formPreset
-    }
-    if (formRootDirectory) {
-      rootDirectory.value = formRootDirectory
-    }
-    if (formInstallCommand) {
-      installCommand.value = formInstallCommand
-    }
-    if (formVariables) {
-      try {
-        newVariables.value = JSON.parse(formVariables)
-      } catch (error) {
-        // Silently fail - use default variables
-      }
+    if (suggestedApplicationName.value) {
+      setFieldValue('applicationName', suggestedApplicationName.value)
     }
 
     if (queryGitScope && queryRepoName) {
       await detectAndSetFrameworkPreset(repositoryOwnerRef, queryRepoName)
     }
 
-    // Força o form a refletir os valores corretos
-    // Use restored values from route if available, otherwise use defaults
+    // Seed the form, keeping the build-step defaults (Root Directory / Install Command).
     resetForm({
       values: {
         githubAccount: githubAccount.value || '',
         repository: repository.value || '',
-        applicationName: applicationName.value || suggestedApplicationName.value || '',
+        applicationName: values.applicationName || suggestedApplicationName.value || '',
         preset: preset.value || '',
-        rootDirectory: rootDirectory.value || '/',
-        installCommand: installCommand.value || 'npm install',
+        rootDirectory: values.rootDirectory || '/',
+        installCommand: values.installCommand || 'npm install',
         newVariables: newVariables.value || [{ key: '', value: '', isPublic: false }]
       }
     })
@@ -398,7 +370,7 @@
     const repo = repositoriesListRaw.value.find((repo) => repo.url === repoUrl)
     if (repo) {
       // Update suggested application name based on repository name
-      applicationName.value = repo.name.toLowerCase().replace(/[^a-z0-9-]/g, '-')
+      setFieldValue('applicationName', repo.name.toLowerCase().replace(/[^a-z0-9-]/g, '-'))
       // Resolve the account name (scope) from the selected GitHub integration
       const accountName = getOptionNameByValue({
         listOption: integrationsList.value,
@@ -438,8 +410,12 @@
   }
 
   // Step Navigation Methods
-  const updateRouteQuery = (step, id = null, applicationNameValue = null, formValues = null) => {
-    // Preserve existing query params and add/overwrite step-related ones
+  // Persist only the minimal state needed to resume after a reload: the current
+  // step, the execution id (to resume polling / fetch results) and the application
+  // name (used as the success card title). Form values are intentionally NOT put
+  // in the URL — the form is disabled while deploying and hidden on success, so
+  // there is nothing to re-fill, and persisting them bloated the URL.
+  const updateRouteQuery = (step, id = null, applicationNameValue = null) => {
     const query = { ...route.query, step }
     if (id) {
       query.executionId = id
@@ -447,18 +423,6 @@
     if (applicationNameValue) {
       query.applicationName = applicationNameValue
     }
-    // Persist form values in route query to preserve them during navigation
-    if (formValues) {
-      query.formApplicationName = formValues.applicationName
-      query.formPreset = formValues.preset
-      query.formRootDirectory = formValues.rootDirectory
-      query.formInstallCommand = formValues.installCommand
-      // Variables are stored as JSON string
-      if (formValues.newVariables && formValues.newVariables.length > 0) {
-        query.formVariables = JSON.stringify(formValues.newVariables)
-      }
-    }
-    // Apply the new query to the URL so the deploy state survives a reload
     router.replace({ query })
   }
 
@@ -528,11 +492,50 @@
     emit('finish')
   }
 
+  // Build-settings fields that must always carry a default value. Set them through
+  // the form's setFieldValue so every useField instance (incl. the one inside the
+  // FieldText/FieldInputTextPrivacy component) reflects it in the UI, not just the
+  // local ref. Falls back to the default whenever the field is empty.
+  const ensureBuildDefaults = () => {
+    setFieldValue('rootDirectory', values.rootDirectory || '/')
+    setFieldValue('installCommand', values.installCommand || 'npm install')
+  }
+
+  /**
+   * Retry the deploy in place with the same form data.
+   * Clears the failed state and the previous execution, then re-submits.
+   * Keeping the same form values re-instantiates the deploy; the DeployStatusCard
+   * remounts (keyed by executionId) so the log stream restarts from scratch.
+   */
   const handleRetry = () => {
+    deployFailed.value = false
+    results.value = null
+    executionId.value = ''
+    // Keep Root Directory / Install Command filled with their defaults so the
+    // retry re-deploys with valid values instead of cleared fields.
+    ensureBuildDefaults()
+    emit('retry')
+    onDeploy()
+  }
+
+  /**
+   * Start a new deploy from scratch: reset the form, re-enable the fields and
+   * return to the settings step.
+   */
+  const handleStartNewDeploy = () => {
+    resetForm({ values: initialValues })
+    ensureBuildDefaults()
     currentStep.value = 'settings'
     deployFailed.value = false
     executionId.value = ''
+    results.value = null
     isDeploying.value = false
+    isRestoringState.value = false
+    appUrl.value = ''
+    deployedApplicationName.value = ''
+    // Start from zero: drop the persisted deploy step / executionId / form values
+    // from the URL so a reload no longer restores the previous (failed) deploy.
+    router.replace({ query: {} })
     emit('retry')
   }
 
@@ -626,8 +629,8 @@
     // Set execution ID from response for DeployStatusCard
     if (response?.result?.uuid) {
       executionId.value = response.result.uuid
-      // Update route query params to preserve state on reload, including form values
-      updateRouteQuery('deploying', executionId.value, formValues.applicationName, formValues)
+      // Persist only the step + executionId so a reload can resume the logs view.
+      updateRouteQuery('deploying', executionId.value, formValues.applicationName)
     }
 
     // Set app URL for success card
@@ -928,7 +931,7 @@
                 required
                 name="applicationName"
                 :placeholder="suggestedApplicationName"
-                :value="applicationName"
+                :value="values.applicationName"
                 :disabled="isDeploying"
                 description="Give a unique name to the Application. It’ll also be used for the bucket for storage and the function."
                 data-testid="import-github__application-name"
@@ -1002,7 +1005,7 @@
                 class=""
                 name="rootDirectory"
                 placeholder="./"
-                :value="rootDirectory"
+                :value="values.rootDirectory"
                 :disabled="isDeploying"
                 data-testid="import-github__root-directory"
               />
@@ -1035,7 +1038,7 @@
                       name="installCommand"
                       description="This command is automatically set based on your project. Enable custom command to override it."
                       placeholder="npm install"
-                      :value="installCommand"
+                      :value="values.installCommand"
                       :isPublic="isInstallCommandEditable"
                       @update:isPublic="isInstallCommandEditable = $event"
                       :showPrivacyIcon="false"
@@ -1158,15 +1161,17 @@
       v-show="currentStep === 'deploying' || currentStep === 'success'"
     >
       <DeployStatusCard
+        :key="executionId"
         :execution-id="executionId"
         :get-logs-service="getScriptRunnerLogsService"
         :results="results"
         :deploy-failed="deployFailed"
-        :application-name="applicationName"
+        :application-name="values.applicationName"
         :deploy-start-time="deployStartTime"
         :deploy-started="currentStep === 'deploying' || currentStep === 'success'"
         @finish="handleFinish"
         @retry="handleRetry"
+        @start-new="handleStartNewDeploy"
         @manage="handleManage"
       />
     </div>

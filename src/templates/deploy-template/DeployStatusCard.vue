@@ -1,5 +1,6 @@
 <script setup>
   import { computed, onUnmounted, ref, watch } from 'vue'
+  import PrimeButton from 'primevue/button'
   import CardBox from '@aziontech/webkit/content/card-box'
   import ScriptRunnerBlock from '@/templates/script-runner-block'
 
@@ -71,7 +72,7 @@
     }
   })
 
-  const emit = defineEmits(['finish', 'retry', 'manage', 'open-url', 'next-step'])
+  const emit = defineEmits(['finish', 'retry', 'start-new', 'manage', 'open-url', 'next-step'])
 
   const timer = ref(0)
   const intervalRef = ref(null)
@@ -108,9 +109,36 @@
     return props.results?.domain?.id || null
   })
 
+  // Once the user picks a recovery action we hide the footer immediately, so the
+  // actions never linger into the new (in-progress) deploy. They reappear only
+  // when a genuinely new failure happens (deployFailed flips back to true).
+  const recoveryDismissed = ref(false)
+  const showRecoveryActions = computed(() => props.deployFailed && !recoveryDismissed.value)
+
   const handleFinish = async () => {
     emit('finish')
   }
+
+  const handleRetry = () => {
+    recoveryDismissed.value = true
+    emit('retry')
+  }
+
+  const handleStartNew = () => {
+    recoveryDismissed.value = true
+    emit('start-new')
+  }
+
+  // Clearing the failed-state arms the actions again for the next failure. (A new
+  // execution also remounts this card via :key, resetting recoveryDismissed.)
+  watch(
+    () => props.deployFailed,
+    (failed) => {
+      if (!failed) {
+        recoveryDismissed.value = false
+      }
+    }
+  )
 
   const goToDomainEditView = () => {
     emit('manage', { type: 'domain', id: domainId.value })
@@ -163,6 +191,7 @@
     <CardBox
       title="Deployment"
       data-testid="deploy-status-card"
+      :class="{ '[&>footer]:hidden': !showRecoveryActions }"
     >
       <template #header>
         <h2 class="text-heading-md text-[var(--text-default)]">Deployment</h2>
@@ -182,6 +211,31 @@
             :executionId="props.executionId"
             :start="props.deployStarted"
             @onFinish.once="handleFinish"
+          />
+        </div>
+      </template>
+
+      <template #footer>
+        <div
+          v-if="showRecoveryActions"
+          class="flex flex-col sm:flex-row w-full gap-3"
+        >
+          <PrimeButton
+            type="button"
+            label="Start new deploy"
+            severity="secondary"
+            outlined
+            class="w-full"
+            data-testid="deploy-status-card__new-deploy-button"
+            @click="handleStartNew"
+          />
+          <PrimeButton
+            type="button"
+            label="Retry deploy"
+            severity="primary"
+            class="w-full"
+            data-testid="deploy-status-card__retry-button"
+            @click="handleRetry"
           />
         </div>
       </template>

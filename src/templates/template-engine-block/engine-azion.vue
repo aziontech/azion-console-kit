@@ -72,6 +72,7 @@
     'deploy',
     'finish',
     'retry',
+    'start-new',
     'manage',
     'open-url',
     'next-step',
@@ -489,11 +490,12 @@
    */
   const initializeForm = async () => {
     const schema = await createSchemaObject()
-    const { errors, defineInputBinds, setFieldValue, validate, validateField, values } = useForm({
-      validationSchema: schema
-    })
+    const { errors, defineInputBinds, setFieldValue, validate, validateField, values, resetForm } =
+      useForm({
+        validationSchema: schema
+      })
 
-    formTools.value = { errors, setFieldValue, validate, validateField, values }
+    formTools.value = { errors, setFieldValue, validate, validateField, values, resetForm }
 
     // Initialize fields with defineInputBinds (validate only on blur, not on input/change)
     const registerFieldWithValueAndValidation = (field) => {
@@ -752,6 +754,16 @@
     emit('retry')
   }
 
+  /**
+   * Reset the form to its initial state so the user can start a new deploy.
+   */
+  const handleStartNew = () => {
+    formTools.value.resetForm?.()
+    setIntegration.value = ''
+    vcsIntegrationError.value = ''
+    emit('start-new')
+  }
+
   const handleManage = (data) => {
     emit('manage', data)
   }
@@ -890,6 +902,7 @@
       @deploy="handleDeploy"
       @finish="handleFinish"
       @retry="handleRetry"
+      @start-new="handleStartNew"
       @manage="handleManage"
       @save-domains="handleSaveDomains"
       @open-url="handleOpenUrl"

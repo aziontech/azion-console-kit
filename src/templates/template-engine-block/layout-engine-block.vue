@@ -165,6 +165,7 @@
     'deploy',
     'finish',
     'retry',
+    'start-new',
     'manage',
     'open-url',
     'next-step',
@@ -450,14 +451,27 @@
   }
 
   /**
-   * Handle retry action
+   * Handle retry action - in place.
+   * Stays on the deployment step; the parent re-runs the deploy with the same
+   * data and a new executionId remounts the DeployStatusCard (stream restarts).
    */
   const handleRetry = () => {
-    // Go back to settings if has settings, otherwise go to repository
-    currentStep.value = props.hasSettings ? 'settings' : 'repository'
     isDeployInitiated.value = false
-    showNextButton.value = props.showNextButton
     emit('retry')
+  }
+
+  /**
+   * Handle "start new deploy" action.
+   * Resets the flow back to the first step (re-enabling the fields) and lets the
+   * parent clear the deploy state.
+   */
+  const handleStartNew = () => {
+    reset()
+    // Clear the persisted deploy state from the URL right here (one hop from the
+    // button) so "start from zero" works even before the event reaches the parent
+    // orchestrator. A reload then no longer restores the previous deploy.
+    router.replace({ query: {} })
+    emit('start-new')
   }
 
   /**
@@ -893,6 +907,7 @@
     >
       <DeployStatusCard
         v-if="props.executionId"
+        :key="props.executionId"
         :execution-id="props.executionId"
         :get-logs-service="getScriptRunnerLogsService"
         :results="currentStep === 'success' ? { domain: { url: props.appUrl } } : props.results"
@@ -903,6 +918,7 @@
         :deploy-started="currentStep === 'deployment' || currentStep === 'success'"
         @finish="handleFinish"
         @retry="handleRetry"
+        @start-new="handleStartNew"
         @manage="handleManage"
         @open-url="handleOpenUrl"
         @next-step="handleNextStep"

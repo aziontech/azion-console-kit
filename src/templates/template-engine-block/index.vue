@@ -242,6 +242,9 @@
       const domain = response.result?.domain?.cname || response.result?.domain?.url || ''
       updateRouteQuery('success', currentExecutionId.value, domain)
     } catch (error) {
+      // Mark the deploy as failed so the logs card surfaces the recovery actions
+      // (Retry deploy / Start new deploy) instead of leaving the user stuck.
+      localDeployFailed.value = true
       toast.add({
         closable: true,
         severity: 'error',
@@ -251,6 +254,32 @@
     }
 
     emit('finish')
+  }
+
+  /**
+   * Retry the deploy in place with the same form data.
+   * Clears the failed state and previous execution, then re-submits via the same
+   * handler (the engine still holds the form values). A new executionId remounts
+   * the DeployStatusCard so the log stream restarts.
+   */
+  const handleRetry = () => {
+    localDeployFailed.value = false
+    results.value = null
+    localExecutionId.value = ''
+    handleSubmit()
+  }
+
+  /**
+   * Start a new deploy from scratch. The active engine resets its own form (via
+   * its own start-new handler in the same event chain); here we clear the deploy
+   * state and the persisted route query so the flow restarts clean.
+   */
+  const handleStartNew = () => {
+    localExecutionId.value = ''
+    localDeployFailed.value = false
+    results.value = null
+    localDeployStartTime.value = null
+    router.replace({ query: {} })
   }
 
   watch(
@@ -359,6 +388,8 @@
         :results="results"
         @deploy="handleSubmit"
         @finish="handleFinish"
+        @retry="handleRetry"
+        @start-new="handleStartNew"
       />
     </div>
     <div v-else>
@@ -378,6 +409,8 @@
         :results="results"
         @deploy="handleSubmit"
         @finish="handleFinish"
+        @retry="handleRetry"
+        @start-new="handleStartNew"
       />
     </div>
   </div>

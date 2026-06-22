@@ -39,6 +39,8 @@ export default {
   // Cards
   inputsCard: '[data-testid="template-engine__inputs-card"]',
   deployStatusCard: '[data-testid="deploy-status-card"]',
+  deployRetryButton: '[data-testid="deploy-status-card__retry-button"]',
+  deployNewButton: '[data-testid="deploy-status-card__new-deploy-button"]',
   deploySuccessCard: '[data-testid="deploy-success-card"]',
   deploySuccessUrl: '[data-testid="deploy-success-card__app-url"]',
   deploySuccessResourceLink: '[data-testid="deploy-success-card__resource-link"]',
