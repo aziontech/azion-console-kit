@@ -40,8 +40,9 @@
     useVersionList(rawVersions)
 
   const columns = [
-    { key: 'version', label: 'Version' },
-    { key: 'created', label: 'Created by' }
+    { key: 'version', label: 'Version', size: 'minmax(220px, 1.4fr)' },
+    { key: 'status', label: 'Status', size: 'minmax(140px, 0.8fr)' },
+    { key: 'created', label: 'Created by', size: 'minmax(180px, 1.2fr)' }
   ]
 
   const goToVersion = (versionIdOrObject) => {
@@ -101,7 +102,7 @@
       :sort="sort"
       :sort-options="sortOptions"
       :show-row-actions="true"
-      :paginator-rows="10"
+      :paginator-rows="20"
       search-placeholder="Search versions"
       :empty-state="{
         title: 'This firewall has no versions yet',

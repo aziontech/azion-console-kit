@@ -49,7 +49,7 @@
     <template #heading>
       <PageHeadingBlock
         pageTitle="Deployments"
-        description="View and manage your deployment history."
+        description="View and manage your deployments and release history. Deployment Settings are reusable across Workloads."
         data-testid="deployments-heading"
       >
         <template #default>
