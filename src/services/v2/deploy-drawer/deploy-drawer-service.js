@@ -7,6 +7,7 @@ import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
 import { customPageService } from '@/services/v2/custom-page/custom-page-service'
 import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
 import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
 
 // Loaders to resolve a resource's display NAME by id — the active-release
@@ -16,6 +17,7 @@ const RESOURCE_NAME_LOADERS = {
   firewall: (id) => edgeFirewallService.loadEdgeFirewallService({ id }),
   custom_page: (id) => customPageService.loadCustomPagesService({ id }),
   function: (id) => edgeFunctionService.loadEdgeFunctionService({ id }),
+  connector: (id) => edgeConnectorsService.loadEdgeConnectorsService({ id }),
   network_list: (id) => networkListsService.loadNetworkList({ id })
 }
 

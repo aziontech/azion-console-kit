@@ -13,6 +13,7 @@
   import InlineTag from '@/components/InlineTag'
   import StatusTag from '@/components/StatusTag'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
+  import { useReleaseDrawerController } from '@/composables/versioning/use-deployment-release-drawer'
 
   defineOptions({ name: 'deployments-history-tab' })
 
@@ -35,8 +36,13 @@
   const rowMenuRef = ref(null)
   const rowMenuItems = ref([])
 
-  const drawerVisible = ref(false)
-  const selectedVersion = ref(null)
+  // This context can rollback/redeploy, so the drawer action stays enabled.
+  const {
+    visible: drawerVisible,
+    selectedRelease: selectedVersion,
+    openRelease,
+    closeDrawer
+  } = useReleaseDrawerController({ actionable: true })
 
   const confirmDialog = ref({
     visible: false,
@@ -180,20 +186,14 @@
     }
   }
 
-  const openDrawer = (version) => {
-    if (!version) return
-    selectedVersion.value = version
-    drawerVisible.value = true
-  }
-
-  const goToDetails = (version) => openDrawer(version)
+  const goToDetails = (version) => openRelease(version)
 
   const openRowMenu = ({ event, version }) => {
     rowMenuItems.value = [
       {
         label: 'View details',
         icon: 'pi pi-eye',
-        command: () => openDrawer(version)
+        command: () => openRelease(version)
       }
     ]
     rowMenuRef.value?.toggle?.(event)
@@ -254,8 +254,7 @@
             : 'Redeploy requested successfully'
       })
       closeConfirmDialog()
-      drawerVisible.value = false
-      selectedVersion.value = null
+      closeDrawer()
       await loadVersions()
     } catch (error) {
       toast.add({
@@ -425,6 +424,7 @@
     <DeploymentReleaseDrawer
       v-model:visible="drawerVisible"
       :release="selectedVersion"
+      :actionable="true"
       @rollback="onRequestRollback"
       @redeploy="onRequestRedeploy"
     />

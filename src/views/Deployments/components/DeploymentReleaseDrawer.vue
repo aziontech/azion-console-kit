@@ -1,12 +1,11 @@
 <script setup>
-  import { computed, ref, watch } from 'vue'
+  import { toRef } from 'vue'
   import Button from '@aziontech/webkit/button'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useToast } from '@aziontech/webkit/use-toast'
   import InfoDrawerBlock from '@/templates/info-drawer-block/index.vue'
   import DeploymentReleaseDetails from '@/views/Deployments/components/DeploymentReleaseDetails.vue'
-  import { deploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
-  import { resolveReleaseResources } from '@/views/Deployments/utils/resolveReleaseResources'
+  import { useDeploymentReleaseDrawer } from '@/composables/versioning/use-deployment-release-drawer'
 
   defineOptions({ name: 'deployment-release-drawer' })
 
@@ -18,6 +17,12 @@
     release: {
       type: Object,
       default: null
+    },
+    // Uniform rollback/redeploy contract: when false, the secondary button is
+    // hidden so a context that cannot act never emits a no-op that only toasts.
+    actionable: {
+      type: Boolean,
+      default: true
     }
   })
 
@@ -25,94 +30,34 @@
 
   const toast = useToast()
 
-  const detail = ref(null)
-  const isLoading = ref(false)
-  const resolvedResources = ref([])
+  // The composable owns all drawer state; the component stays thin and only
+  // surfaces fetch errors as a toast (DOM-bound concern kept out of the composable).
+  const onError = (error) =>
+    toast.add({
+      closable: true,
+      severity: 'error',
+      summary: 'Error',
+      detail: error?.message || 'Failed to load release details'
+    })
 
-  const displayRelease = computed(() => {
-    const base = detail.value ?? props.release
-    if (!base) return base
-    return {
-      ...base,
-      resources: resolvedResources.value.length ? resolvedResources.value : (base.resources ?? [])
+  const forward = (event, payload) => emit(event, payload)
+
+  const {
+    detail,
+    isLoading,
+    visibleDrawer,
+    displayRelease,
+    visitUrl,
+    secondaryButtonLabel,
+    onSecondaryAction
+  } = useDeploymentReleaseDrawer({
+    release: toRef(props, 'release'),
+    visible: toRef(props, 'visible'),
+    emit: (event, payload) => {
+      if (event === 'error') return onError(payload)
+      return forward(event, payload)
     }
   })
-
-  const visibleDrawer = computed({
-    get: () => props.visible,
-    set: (value) => emit('update:visible', value)
-  })
-
-  const visitUrl = computed(
-    () =>
-      displayRelease.value?.urls?.deployment_url || displayRelease.value?.urls?.canonical_url || ''
-  )
-
-  const secondaryButtonLabel = computed(() =>
-    displayRelease.value?.isCurrent ? 'Rollback' : 'Redeploy'
-  )
-
-  const onSecondaryAction = () => {
-    const release = displayRelease.value
-    if (!release) return
-    if (release.isCurrent) {
-      emit('rollback', release)
-    } else {
-      emit('redeploy', release)
-    }
-  }
-
-  const fetchDetail = async () => {
-    const deploymentId = props.release?.deployment_id
-    const releaseId = props.release?.id
-
-    if (!deploymentId || !releaseId) {
-      detail.value = null
-      return
-    }
-
-    isLoading.value = true
-    try {
-      const { data } = await deploymentReleaseService.getReleaseByIdService(deploymentId, releaseId)
-      detail.value = data
-      resolvedResources.value = data?.resources ?? []
-
-      const enriched = await resolveReleaseResources(data?.resources ?? [])
-      if (detail.value?.id === data?.id) {
-        resolvedResources.value = enriched
-      }
-    } catch (error) {
-      detail.value = null
-      resolvedResources.value = []
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Error',
-        detail: error?.message || 'Failed to load release details'
-      })
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  watch(
-    () => props.visible,
-    (open) => {
-      if (open) {
-        fetchDetail()
-      } else {
-        detail.value = null
-        resolvedResources.value = []
-      }
-    }
-  )
-
-  watch(
-    () => props.release?.id,
-    () => {
-      if (props.visible) fetchDetail()
-    }
-  )
 </script>
 
 <template>
@@ -137,6 +82,7 @@
         />
       </a>
       <Button
+        v-if="actionable"
         outlined
         :label="secondaryButtonLabel"
         :icon="secondaryButtonLabel === 'Rollback' ? 'pi pi-refresh' : 'pi pi-sync'"

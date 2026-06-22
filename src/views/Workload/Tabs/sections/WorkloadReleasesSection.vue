@@ -6,6 +6,7 @@
   import CurrentBadge from '@/components/CurrentBadge'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
   import { useWorkloadReleases } from '@/views/Workload/composables/useWorkloadReleases'
+  import { useReleaseDrawerController } from '@/composables/versioning/use-deployment-release-drawer'
 
   defineOptions({ name: 'workload-releases-section' })
 
@@ -24,8 +25,13 @@
   const paginatorFirst = ref(0)
   const paginatorRows = ref(10)
 
-  const drawerVisible = ref(false)
-  const selectedRelease = ref(null)
+  // Read-only context (no rollback/redeploy here), so the drawer action is
+  // hidden rather than wired to a handler that does nothing.
+  const {
+    visible: drawerVisible,
+    selectedRelease,
+    openRelease
+  } = useReleaseDrawerController({ actionable: false })
 
   const statusAllOption = { label: 'Status', value: 'all' }
 
@@ -62,11 +68,7 @@
     return parts.join(' · ')
   }
 
-  const goToDetails = (release) => {
-    if (!release) return
-    selectedRelease.value = release
-    drawerVisible.value = true
-  }
+  const goToDetails = (release) => openRelease(release)
 
   const columns = [
     { key: 'release', label: 'Release', size: 'minmax(0, 1fr)', align: 'start' },
@@ -199,6 +201,7 @@
   <DeploymentReleaseDrawer
     v-model:visible="drawerVisible"
     :release="selectedRelease"
+    :actionable="false"
   />
 </template>
 

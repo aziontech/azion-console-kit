@@ -1,6 +1,12 @@
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
 import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
+import { edgeConnectorVersionService } from '@/services/v2/edge-connectors/edge-connector-version-service'
+import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+import { edgeFunctionVersionService } from '@/services/v2/edge-function/edge-function-version-service'
+import { customPageService } from '@/services/v2/custom-page/custom-page-service'
+import { customPageVersionService } from '@/services/v2/custom-page/custom-page-version-service'
 
 /**
  * Registry of release-resource resolvers, keyed by `resource_type`.
@@ -29,6 +35,27 @@ const RESOURCE_RESOLVERS = {
         (version) => String(version.id) === String(versionId)
       )
       return match?.comment || match?.id
+    }
+  },
+  connector: {
+    listNames: () => edgeConnectorsService.listEdgeConnectorsService({ page: 1, pageSize: 100 }),
+    resolveVersionName: async (id, versionId) => {
+      const version = await edgeConnectorVersionService.loadVersion(id, versionId)
+      return version?.comment || version?.id
+    }
+  },
+  function: {
+    listNames: () => edgeFunctionService.listEdgeFunctionsService({ page: 1, pageSize: 100 }),
+    resolveVersionName: async (id, versionId) => {
+      const version = await edgeFunctionVersionService.loadVersion(id, versionId)
+      return version?.comment || version?.id
+    }
+  },
+  custom_page: {
+    listNames: () => customPageService.listCustomPagesService({ page: 1, pageSize: 100 }),
+    resolveVersionName: async (id, versionId) => {
+      const version = await customPageVersionService.loadVersion(id, versionId)
+      return version?.comment || version?.id
     }
   }
 }
