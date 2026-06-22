@@ -6,9 +6,9 @@
  *
  * The state→actions matrix itself lives in `version-machine.js`
  * (`getAvailableActions`); this module only adds the *presentation* layer plus
- * the list-row eligibility filter.
+ * the fixed row-menu model (`buildVersionMenuItems`).
  */
-import { getAvailableActions, VERSION_ACTIONS, VERSION_STATES } from './version-machine'
+import { isReady, canArchive, canDelete } from './version-machine'
 
 /**
  * Intrinsic, state-independent metadata for each action:
@@ -46,8 +46,12 @@ export const ACTION_META = {
       placeholder: 'Optional comment'
     }
   },
+  OPEN_CONFIGURATION: { label: 'Open configuration', icon: 'pi pi-sliders-h' },
+  PROMOTE: { label: 'Promote version', icon: 'pi pi-arrow-up-right' },
+  ROLLBACK: { label: 'Rollback to this version', icon: 'pi pi-history' },
   ARCHIVE: {
     label: 'Archive',
+    icon: 'pi pi-inbox',
     dialog: {
       required: true,
       title: 'Archive Version',
@@ -58,6 +62,7 @@ export const ACTION_META = {
   DELETE: {
     label: 'Delete',
     danger: true,
+    icon: 'pi pi-trash',
     dialog: {
       title: 'Delete Version',
       actionLabel: 'Delete',
@@ -71,27 +76,92 @@ export const ACTION_META = {
 
 export const metaFor = (action) => ACTION_META[action] ?? { label: action }
 
-/**
- * Actions eligible to appear in a LIST ROW menu (not the shell action bar).
- * Excludes the editing actions (SAVE / SAVE_AND_BUILD — they need the form and
- * the shell command bus) and DEPLOY (deploying is owned by the deploy-drawer-block,
- * opened from the heading "Deploy" button — not dispatched as a row/menu command).
- */
-const ROW_ELIGIBLE = new Set([
-  VERSION_ACTIONS.NEW_DRAFT_FROM,
-  VERSION_ACTIONS.ARCHIVE,
-  VERSION_ACTIONS.DELETE
-])
+// Clone/Build never appear in the row menu — those flows live in the shell
+// action bar (VersionActionBar). The row menu is the fixed 5-item model below;
+// the legacy `getRowActions` filter was retired in Phase 4 (task 9.1).
 
 /**
- * Returns the management actions a list row should offer for a given version
- * state: `getAvailableActions(state)` intersected with the row-eligible set,
- * preserving the state-machine order. Empty for `building`/unknown (fail-closed).
- * @param {string} state version lifecycle state
- * @returns {string[]} eligible action keys for a row menu
+ * Tooltip shown while Rollback stays disabled (Phase 2 — depends on the
+ * version↔release↔environment data not available in the list yet).
  */
-export const getRowActions = (state) => {
-  const base = getAvailableActions(state).filter((action) => ROW_ELIGIBLE.has(action))
-  if (state === VERSION_STATES.DRAFT) return ['BUILD', ...base]
-  return base
+const ROLLBACK_DEFERRED_TOOLTIP =
+  'Rollback depends on environment data and will be available in a later phase'
+
+/**
+ * Builds the FIXED 5-item version row menu in spec order
+ * `[OPEN_CONFIGURATION, PROMOTE, ROLLBACK, ARCHIVE, DELETE]`. Pure: enablement
+ * derives only from `state` (via version-machine predicates), no I/O. The
+ * "never hide" pattern — items stay visible+disabled with a tooltip; only
+ * DELETE is omitted when the version is already `deleted`.
+ * @param {string} state version lifecycle state
+ * @param {object} [ctx] reserved for Phase 2 gating (unused here)
+ * @returns {Array<{action,label,icon,disabled,tooltip,danger,separatorBefore}>}
+ */
+// eslint-disable-next-line no-unused-vars
+export const buildVersionMenuItems = (state, ctx = {}) => {
+  const item = (action, overrides = {}) => {
+    const meta = metaFor(action)
+    return {
+      action,
+      label: meta.label,
+      icon: meta.icon ?? null,
+      disabled: false,
+      tooltip: null,
+      danger: false,
+      separatorBefore: false,
+      ...overrides
+    }
+  }
+
+  const promoteDisabled = !isReady(state)
+  const archiveDisabled = !canArchive(state)
+  const deleteEnabled = canDelete(state)
+
+  const items = [
+    item('OPEN_CONFIGURATION'),
+    item('PROMOTE', {
+      disabled: promoteDisabled,
+      tooltip: promoteDisabled ? 'Only Ready versions can be promoted' : null
+    }),
+    // Phase 2 (Req 11): Rollback stays always-disabled until the
+    // version↔release↔environment data lands; no behavior wired here yet.
+    item('ROLLBACK', { disabled: true, tooltip: ROLLBACK_DEFERRED_TOOLTIP }),
+    item('ARCHIVE', { disabled: archiveDisabled })
+  ]
+
+  if (deleteEnabled) {
+    items.push(item('DELETE', { danger: true, separatorBefore: true }))
+  }
+
+  return items
+}
+
+/**
+ * Maps the pure menu model to PrimeVue MenuItems, injecting a native separator
+ * before Delete and forwarding `tooltip`/`danger` for the styled item slot. The
+ * single mapper shared by every listing (VersionListDataView, DeploymentVersionsList)
+ * so the rendered menu is byte-identical (Req 1.4). The command stops propagation
+ * so the click never bubbles to the row (Req 2.4), then calls `onAction`.
+ * @param {string} state version lifecycle state
+ * @param {object} ctx context forwarded to buildVersionMenuItems (Phase 2)
+ * @param {(payload:{action:string,item:object})=>void} onAction row-action handler
+ * @param {object} item the version row the menu acts on
+ */
+export const mapVersionMenuItemsToMenu = (state, ctx, onAction, item) => {
+  const menu = []
+  buildVersionMenuItems(state, ctx).forEach((entry) => {
+    if (entry.separatorBefore) menu.push({ separator: true })
+    menu.push({
+      label: entry.label,
+      icon: entry.icon,
+      disabled: entry.disabled,
+      class: entry.danger && !entry.disabled ? 'danger' : null,
+      tooltip: entry.tooltip,
+      command: ({ originalEvent } = {}) => {
+        originalEvent?.stopPropagation?.()
+        onAction?.({ action: entry.action, item })
+      }
+    })
+  })
+  return menu
 }
