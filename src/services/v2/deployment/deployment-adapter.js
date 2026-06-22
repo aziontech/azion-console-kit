@@ -66,6 +66,13 @@ export const resolveResourceMeta = (type) => {
   }
 }
 
+const RESOURCE_DISPLAY_ORDER = Object.keys(RESOURCE_TYPE_META)
+
+export const resourceDisplayOrderIndex = (type) => {
+  const index = RESOURCE_DISPLAY_ORDER.indexOf(type)
+  return index === -1 ? RESOURCE_DISPLAY_ORDER.length : index
+}
+
 const normalizeCanary = (canary) => {
   const source = isObject(canary) ? canary : {}
   return {
@@ -206,6 +213,11 @@ export const DeploymentAdapter = {
         resourceVersion:
           resource.resource_version ?? resource.resource_version_id ?? resource.version_id ?? null
       }))
+      .sort(
+        (left, right) =>
+          resourceDisplayOrderIndex(left.resourceType) -
+          resourceDisplayOrderIndex(right.resourceType)
+      )
 
     return { applicationFromRelease, readOnlyResources }
   },

@@ -65,6 +65,10 @@
       type: Boolean,
       default: false
     },
+    hasScopedResource: {
+      type: Boolean,
+      default: true
+    },
     scopedType: {
       type: String,
       default: null
@@ -82,6 +86,10 @@
       default: null
     },
     readOnlyResources: {
+      type: Array,
+      default: () => []
+    },
+    editableResources: {
       type: Array,
       default: () => []
     },
@@ -103,6 +111,8 @@
     'update:selectedApplicationId',
     'update:selectedApplicationVersionId',
     'update:selectedVersionId',
+    'update:resourceId',
+    'update:resourceVersion',
     'create-application'
   ])
 </script>
@@ -121,9 +131,8 @@
       </span>
     </div>
 
-    <!-- Scoped resource card — the context resource being deployed: always on top. -->
     <div
-      v-if="!isScopedApplication"
+      v-if="hasScopedResource && !isScopedApplication"
       class="flex flex-col gap-4 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-4 py-4"
       data-testid="deploy-drawer__composition-scoped"
     >
@@ -143,7 +152,6 @@
       />
     </div>
 
-    <!-- Application card — no application available: deploy is blocked. -->
     <div
       v-if="noApplication"
       class="flex flex-col gap-3 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-4 py-4"
@@ -167,7 +175,6 @@
       />
     </div>
 
-    <!-- Application card — read-only (Single + active release): pinned to the live Application. -->
     <div
       v-else-if="applicationReadOnly"
       class="flex flex-col gap-3 rounded-md border border-[var(--surface-border)] px-4 py-4"
@@ -214,9 +221,6 @@
       </span>
     </div>
 
-    <!-- Application card — editable: pick the Application and its Ready version.
-         When the scoped resource IS the application, it is the one being
-         deployed, so the card is highlighted. -->
     <div
       v-else
       class="flex flex-col gap-4 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-4 py-4"
@@ -235,8 +239,6 @@
         </span>
       </div>
 
-      <!-- When the scoped resource IS the application, only the version picker is
-           shown (the resource name is fixed); otherwise pick from the catalog. -->
       <ResourceSelectField
         v-if="!isScopedApplication"
         :model-value="selectedApplicationId"
@@ -265,54 +267,92 @@
       />
     </div>
 
-    <!-- Read-only cards — resources carried over from the active Release. -->
-    <div
-      v-for="entry in readOnlyResources"
-      :key="`${entry.resourceType}:${entry.resourceId}`"
-      class="flex flex-col gap-3 rounded-md border border-[var(--surface-border)] px-4 py-4"
-      :data-testid="`deploy-drawer__composition-keep-${entry.resourceType}-${entry.resourceId}`"
-    >
-      <div class="flex items-center justify-between">
+    <template v-if="hasScopedResource">
+      <div
+        v-for="entry in readOnlyResources"
+        :key="`${entry.resourceType}:${entry.resourceId}`"
+        class="flex flex-col gap-3 rounded-md border border-[var(--surface-border)] px-4 py-4"
+        :data-testid="`deploy-drawer__composition-keep-${entry.resourceType}-${entry.resourceId}`"
+      >
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2">
+            <i
+              :class="[resolveResourceMeta(entry.resourceType).icon, 'text-[var(--text-color)]']"
+            />
+            <span class="text-sm font-medium text-[var(--text-color)]">
+              {{ resolveResourceMeta(entry.resourceType).label }}
+            </span>
+          </span>
+          <span
+            class="inline-flex items-center gap-1 rounded-md bg-[var(--surface-section)] px-2 py-0.5 text-xs text-[var(--text-color-secondary)]"
+          >
+            <i class="pi pi-lock" /> Read-only
+          </span>
+        </div>
+
+        <div
+          class="flex items-center justify-between gap-3 rounded-md border border-[var(--surface-border)] bg-[var(--surface-ground)] px-3 py-2"
+        >
+          <Skeleton
+            v-if="isResolvingReadOnlyNames && !entry.resourceName"
+            width="10rem"
+            height="1rem"
+          />
+          <span
+            v-else
+            class="text-sm text-[var(--text-color)] truncate"
+          >
+            {{ entry.resourceName ?? entry.resourceId }}
+          </span>
+          <span class="font-mono text-xs text-[var(--text-color-secondary)] shrink-0">
+            {{ entry.resourceVersion }}
+          </span>
+        </div>
+
+        <span
+          class="flex items-center gap-1 text-xs text-[var(--text-color-secondary)] leading-tight"
+        >
+          <i class="pi pi-lock" /> Active release
+        </span>
+      </div>
+    </template>
+    <template v-else>
+      <div
+        v-for="resource in editableResources"
+        :key="resource.key"
+        class="flex flex-col gap-4 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-4 py-4"
+        :data-testid="`deploy-drawer__composition-editable-${resource.resourceType}`"
+      >
         <span class="flex items-center gap-2">
-          <i :class="[resolveResourceMeta(entry.resourceType).icon, 'text-[var(--text-color)]']" />
+          <i
+            :class="[resolveResourceMeta(resource.resourceType).icon, 'text-[var(--text-color)]']"
+          />
           <span class="text-sm font-medium text-[var(--text-color)]">
-            {{ resolveResourceMeta(entry.resourceType).label }}
+            {{ resolveResourceMeta(resource.resourceType).label }}
           </span>
         </span>
-        <span
-          class="inline-flex items-center gap-1 rounded-md bg-[var(--surface-section)] px-2 py-0.5 text-xs text-[var(--text-color-secondary)]"
-        >
-          <i class="pi pi-lock" /> Read-only
-        </span>
-      </div>
 
-      <div
-        class="flex items-center justify-between gap-3 rounded-md border border-[var(--surface-border)] bg-[var(--surface-ground)] px-3 py-2"
-      >
-        <Skeleton
-          v-if="isResolvingReadOnlyNames && !entry.resourceName"
-          width="10rem"
-          height="1rem"
+        <ResourceSelectField
+          :model-value="resource.selectedId"
+          :options="resource.options"
+          :loading="resource.isLoadingOptions"
+          :label="resolveResourceMeta(resource.resourceType).label"
+          :placeholder="`Select a ${resolveResourceMeta(resource.resourceType).label}`"
+          @update:model-value="emit('update:resourceId', { key: resource.key, value: $event })"
         />
-        <span
-          v-else
-          class="text-sm text-[var(--text-color)] truncate"
-        >
-          {{ entry.resourceName ?? entry.resourceId }}
-        </span>
-        <span class="font-mono text-xs text-[var(--text-color-secondary)] shrink-0">
-          {{ entry.resourceVersion }}
-        </span>
+
+        <ResourceVersionField
+          v-if="resource.versioned"
+          :model-value="resource.selectedVersionId"
+          :show-resource="false"
+          :versions="resource.versionOptions"
+          :disabled="resource.isLoadingVersions"
+          :invalid="invalid"
+          @update:model-value="emit('update:resourceVersion', { key: resource.key, value: $event })"
+        />
       </div>
+    </template>
 
-      <span
-        class="flex items-center gap-1 text-xs text-[var(--text-color-secondary)] leading-tight"
-      >
-        <i class="pi pi-lock" /> Active release
-      </span>
-    </div>
-
-    <!-- Footer note — scope of the Release. -->
     <div
       class="flex items-start gap-2 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-3 py-2 text-xs text-[var(--text-color-secondary)] leading-tight"
       data-testid="deploy-drawer__composition-note"

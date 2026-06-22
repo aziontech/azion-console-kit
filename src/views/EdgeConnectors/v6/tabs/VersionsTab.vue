@@ -138,6 +138,7 @@
           :loading="isCreatingDraft"
           data-testid="edge-connectors-v6-versions__new-draft"
           @click="createDraft"
+          class="h-[2.5rem]"
         />
       </template>
     </VersionListDataView>

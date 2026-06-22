@@ -10,6 +10,7 @@ import { deploymentReleaseService } from '@/services/v2/deployment/deployment-re
 import { DeploymentAdapter } from '@/services/v2/deployment/deployment-adapter'
 import { buildStrategy } from '@/services/v2/deployment/strategy-builder'
 import { deployDrawerService } from '@/services/v2/deploy-drawer/deploy-drawer-service'
+import { RESOURCE_CATALOG_REGISTRY } from '@/services/v2/deploy-drawer/resource-catalog-registry'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
 
@@ -39,10 +40,16 @@ const toVersionOptions = (versions) =>
       isCurrent: Boolean(version.isCurrent)
     }))
 
-export function useDeployDrawer(resourceContext, { visible } = {}) {
+export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadId } = {}) {
   // `enabled` gates fetching to the drawer's open state (req 1.1, 1.5): closed
   // drawer never fetches, reopen reuses the vue-query cache.
   const enabled = computed(() => Boolean(toValue(visible)))
+
+  // Workload-first mode (e.g. opened from the Workload screen): there is no
+  // origin resource to anchor the Release, so the scoped slot is skipped and the
+  // workload comes pre-selected. Resource-first callers (App/Firewall/Page) pass
+  // a context with a `resourceId`, keeping the original behavior unchanged.
+  const hasScopedResource = computed(() => toValue(resourceContext)?.resourceId != null)
 
   // Fast-path on open: prime the vue-query cache with the three listings, so card
   // derivation resolves environment/deployment names from cache (no per-id call).
@@ -83,7 +90,16 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
     }))
   )
 
-  const selectedWorkloadId = ref(null)
+  const selectedWorkloadId = ref(toValue(preselectedWorkloadId) ?? null)
+
+  // Keep the selection pinned to the pre-selected workload as the value resolves
+  // (the option may arrive after the drawer opens).
+  watch(
+    () => toValue(preselectedWorkloadId),
+    (id) => {
+      if (id != null) selectedWorkloadId.value = id
+    }
+  )
 
   const selectedWorkload = computed(
     () => workloadsBody.value.find((workload) => workload.id === selectedWorkloadId.value) ?? null
@@ -148,9 +164,20 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
     return match?.label ?? id
   })
 
-  watch(selectedWorkloadId, async (id) => {
-    selectedEnvironmentId.value = null
-    environmentCards.value = []
+  // Tracks the workload whose environment selection has already been reset, so a
+  // pre-selected workload (whose bindings resolve after open) reloads its cards
+  // without wiping a selection the user has already made.
+  let lastResetWorkloadId = null
+
+  // Source includes the selected workload's bindings: when the workload is
+  // pre-selected before the listing query resolves, the bindings arrive later
+  // and must (re)trigger the environment load.
+  watch([selectedWorkloadId, () => selectedWorkload.value?.bindings], async ([id]) => {
+    if (id !== lastResetWorkloadId) {
+      selectedEnvironmentId.value = null
+      environmentCards.value = []
+      lastResetWorkloadId = id
+    }
     if (!id) return
 
     // Phase 1: base cards from cache — render immediately.
@@ -223,8 +250,14 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
 
   // Single + deployed + scoped is NOT the application => the application slot is
   // read-only (it carries the current live application). Otherwise editable.
+  // Workload-first mode (no scoped resource) is a free composition: the
+  // application is always editable, even under single_version.
   const applicationReadOnly = computed(
-    () => isSingle.value && hasActiveRelease.value && !isScopedApplication.value
+    () =>
+      hasScopedResource.value &&
+      isSingle.value &&
+      hasActiveRelease.value &&
+      !isScopedApplication.value
   )
 
   // --- Application catalog (editable slot) ---------------------------------
@@ -416,7 +449,7 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
   })
 
   const scopedSlot = computed(() => {
-    if (isScopedApplication.value) return null
+    if (isScopedApplication.value || !hasScopedResource.value) return null
     const context = toValue(resourceContext) ?? {}
     return {
       resourceType: scopedType.value,
@@ -481,6 +514,128 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
   // Resolved display name of the application slot (catalog-resolved in read-only).
   const applicationName = computed(() => applicationSlot.value?.resourceName ?? null)
 
+  // --- Editable composition resources (workload-first only) ----------------
+
+  // In workload-first mode the carried resources are not pinned: the user may
+  // swap each resource and (for versioned types) its version. Seeded from the
+  // active release; resource-first callers keep the read-only behavior untouched.
+  const editableResources = ref([])
+  const catalogByType = ref({})
+  const catalogLoadingByType = ref({})
+  const versionsByResource = ref({})
+  const versionsLoadingByResource = ref({})
+
+  const editableSourceResources = computed(() =>
+    hasScopedResource.value ? null : releaseParts.value.readOnlyResources
+  )
+
+  watch(
+    editableSourceResources,
+    (list) => {
+      if (!list) {
+        editableResources.value = []
+        return
+      }
+      editableResources.value = list.map((entry) => ({
+        key: `${entry.resourceType}:${entry.resourceId}`,
+        resourceType: entry.resourceType,
+        versioned: Boolean(RESOURCE_CATALOG_REGISTRY[entry.resourceType]?.versioned),
+        selectedId: entry.resourceId,
+        selectedVersionId: entry.resourceVersion ?? null
+      }))
+    },
+    { immediate: true }
+  )
+
+  // Load each present type's catalog once.
+  watch(
+    () => editableResources.value.map((resource) => resource.resourceType),
+    async (types) => {
+      for (const type of [...new Set(types)]) {
+        const registry = RESOURCE_CATALOG_REGISTRY[type]
+        if (!registry || catalogByType.value[type] || catalogLoadingByType.value[type]) continue
+        catalogLoadingByType.value = { ...catalogLoadingByType.value, [type]: true }
+        try {
+          const items = await registry.listCatalog()
+          catalogByType.value = {
+            ...catalogByType.value,
+            [type]: items.map((item) => ({ label: item.name, value: item.id }))
+          }
+        } catch {
+          catalogByType.value = { ...catalogByType.value, [type]: [] }
+        } finally {
+          catalogLoadingByType.value = { ...catalogLoadingByType.value, [type]: false }
+        }
+      }
+    },
+    { immediate: true }
+  )
+
+  // Load Ready versions for each selected versioned resource.
+  watch(
+    () =>
+      editableResources.value
+        .filter((resource) => resource.versioned && resource.selectedId != null)
+        .map((resource) => `${resource.resourceType}:${resource.selectedId}`)
+        .join('|'),
+    () => {
+      editableResources.value.forEach(async (resource) => {
+        if (!resource.versioned || resource.selectedId == null) return
+        const key = `${resource.resourceType}:${resource.selectedId}`
+        if (versionsByResource.value[key] || versionsLoadingByResource.value[key]) return
+        const registry = RESOURCE_CATALOG_REGISTRY[resource.resourceType]
+        if (!registry?.listVersions) return
+        versionsLoadingByResource.value = { ...versionsLoadingByResource.value, [key]: true }
+        try {
+          const raw = await registry.listVersions(resource.selectedId)
+          versionsByResource.value = { ...versionsByResource.value, [key]: toVersionOptions(raw) }
+        } catch {
+          versionsByResource.value = { ...versionsByResource.value, [key]: [] }
+        } finally {
+          versionsLoadingByResource.value = { ...versionsLoadingByResource.value, [key]: false }
+        }
+      })
+    },
+    { immediate: true }
+  )
+
+  const setEditableResourceId = (key, id) => {
+    const resource = editableResources.value.find((entry) => entry.key === key)
+    if (!resource) return
+    resource.selectedId = id
+    resource.selectedVersionId = null
+  }
+
+  const setEditableResourceVersion = (key, versionId) => {
+    const resource = editableResources.value.find((entry) => entry.key === key)
+    if (resource) resource.selectedVersionId = versionId
+  }
+
+  // View model for the editable cards (selection + catalog + version options).
+  const editableResourceCards = computed(() =>
+    editableResources.value.map((resource) => {
+      const versionsKey = `${resource.resourceType}:${resource.selectedId}`
+      return {
+        key: resource.key,
+        resourceType: resource.resourceType,
+        versioned: resource.versioned,
+        selectedId: resource.selectedId,
+        selectedVersionId: resource.selectedVersionId,
+        options: catalogByType.value[resource.resourceType] ?? [],
+        isLoadingOptions: Boolean(catalogLoadingByType.value[resource.resourceType]),
+        versionOptions: resource.versioned ? (versionsByResource.value[versionsKey] ?? []) : [],
+        isLoadingVersions: Boolean(versionsLoadingByResource.value[versionsKey])
+      }
+    })
+  )
+
+  const editableResourcesValid = computed(() =>
+    editableResources.value.every(
+      (resource) =>
+        resource.selectedId != null && (!resource.versioned || Boolean(resource.selectedVersionId))
+    )
+  )
+
   // --- Release limit (Case 5) ---------------------------------------------
 
   // Best-effort: no reliable count/limit is available from the current payload,
@@ -516,7 +671,10 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
       Boolean(selectedEnvironmentId.value) &&
       !noApplication.value &&
       Boolean(applicationSlot.value?.versionId) &&
-      (isScopedApplication.value || Boolean(scopedSlot.value?.versionId)) &&
+      (isScopedApplication.value ||
+        !hasScopedResource.value ||
+        Boolean(scopedSlot.value?.versionId)) &&
+      editableResourcesValid.value &&
       !atReleaseLimit.value &&
       !isDeploying.value
   )
@@ -540,8 +698,9 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
       const resources = [applicationResource]
 
       // When the scoped resource is the application, the application item IS the
-      // scoped one — no duplicate (req 8.4).
-      if (!isScopedApplication.value) {
+      // scoped one — no duplicate (req 8.4). In workload-first mode there is no
+      // scoped resource to add.
+      if (!isScopedApplication.value && hasScopedResource.value) {
         resources.push({
           resource_id: context.resourceId,
           resource_version: resolvedVersionId.value,
@@ -550,14 +709,26 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
         })
       }
 
-      readOnlyResources.value.forEach((resource) => {
-        resources.push({
-          resource_id: resource.resourceId,
-          resource_version: resource.resourceVersion,
-          resource_type: resource.resourceType,
-          name: resource.resourceName ?? undefined
+      // Workload-first: the user-composed resources (editable). Resource-first:
+      // the carried read-only resources of the active release, unchanged.
+      if (hasScopedResource.value) {
+        readOnlyResources.value.forEach((resource) => {
+          resources.push({
+            resource_id: resource.resourceId,
+            resource_version: resource.resourceVersion,
+            resource_type: resource.resourceType,
+            name: resource.resourceName ?? undefined
+          })
         })
-      })
+      } else {
+        editableResources.value.forEach((resource) => {
+          resources.push({
+            resource_id: resource.selectedId,
+            resource_version: resource.versioned ? resource.selectedVersionId : undefined,
+            resource_type: resource.resourceType
+          })
+        })
+      }
 
       // `strategy` is `undefined` unless canary is enabled, so the no-canary
       // path emits the INSTANT payload unchanged (req 2.1, 2.2).
@@ -589,6 +760,7 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
     resourceName,
     scopedType,
     isScopedApplication,
+    hasScopedResource,
     versionLabel,
     versionOptions,
     selectedVersionId,
@@ -611,6 +783,9 @@ export function useDeployDrawer(resourceContext, { visible } = {}) {
     composition,
     readOnlyResources,
     isResolvingReadOnlyNames,
+    editableResourceCards,
+    setEditableResourceId,
+    setEditableResourceVersion,
     noApplication,
     isLoadingComposition,
     compositionError,

@@ -36,13 +36,18 @@
       type: Boolean,
       default: false
     },
-    /**
-     * Origin resource seam (design §5.1) — the ONLY resource-specific input.
-     * `{ resourceType, resourceId, resourceName, version, versions }`.
-     */
     resourceContext: {
       type: Object,
-      required: true
+      required: false,
+      default: () => ({})
+    },
+    preselectedWorkloadId: {
+      type: [String, Number],
+      default: null
+    },
+    lockWorkload: {
+      type: Boolean,
+      default: false
     },
     title: {
       type: String,
@@ -52,7 +57,6 @@
 
   const emit = defineEmits(['update:visible', 'deployed'])
 
-  // `v-model:visible` over the drawer, mirroring the placeholder contract.
   const isVisible = computed({
     get: () => props.visible,
     set: (value) => emit('update:visible', value)
@@ -72,8 +76,6 @@
     window.open(href, '_blank', 'noopener')
   }
 
-  // The composable owns the whole data flow; `visible` gates fetching so the
-  // closed drawer never fetches and reopen reuses the vue-query cache (req 1.5).
   const {
     isLoading,
     hasError,
@@ -88,6 +90,7 @@
     resourceName,
     scopedType,
     isScopedApplication,
+    hasScopedResource,
     versionOptions,
     selectedVersionId,
     noApplication,
@@ -103,23 +106,23 @@
     selectedApplicationVersionId,
     readOnlyResources,
     isResolvingReadOnlyNames,
+    editableResourceCards,
+    setEditableResourceId,
+    setEditableResourceVersion,
     setCanaryEnabled,
     setCanaryForm,
     canDeploy,
     isDeploying,
     deployError,
     deploy
-  } = useDeployDrawer(() => props.resourceContext, { visible: isVisible })
+  } = useDeployDrawer(() => props.resourceContext, {
+    visible: isVisible,
+    preselectedWorkloadId: () => props.preselectedWorkloadId
+  })
 
-  // Required-version signal: flips on a confirm attempt with no version chosen
-  // (req 4.5). Clearing happens implicitly once a version is selected and the
-  // user retries.
   const versionInvalid = ref(false)
 
   const surfaceDeployError = (error) => {
-    // Mirror EditView.handleCommandError: prefer the API's own error renderer,
-    // else fall back to a generic error toast (req 5.5). The drawer stays open
-    // and all selections are preserved — the composable does not reset state.
     if (error && typeof error.showErrors === 'function') {
       error.showErrors(toast)
       return
@@ -153,7 +156,6 @@
       emit('deployed')
       isVisible.value = false
     } catch (error) {
-      // Keep the drawer open and preserve the configuration (req 5.5).
       surfaceDeployError(deployError.value ?? error)
     }
   }
@@ -166,7 +168,6 @@
     data-testid="deploy-drawer"
   >
     <template #content>
-      <!-- 1. Initial load: block interaction with the dependent fields (req 1.2). -->
       <div
         v-if="isLoading"
         class="flex w-full items-center justify-center py-16"
@@ -177,8 +178,6 @@
           strokeWidth="4"
         />
       </div>
-
-      <!-- 2. Load failure: actionable error + retry, without closing (req 1.4). -->
       <div
         v-else-if="hasError"
         class="flex w-full flex-col items-start gap-3"
@@ -206,12 +205,14 @@
         class="flex w-full flex-col gap-6"
         data-testid="deploy-drawer__content"
       >
-        <PromotionContextBanner :resource-context="resourceContext" />
-
-        <!-- Step 1: workload (req 2.1). -->
+        <PromotionContextBanner
+          v-if="hasScopedResource"
+          :resource-context="resourceContext"
+        />
         <WorkloadSelectField
           v-model="selectedWorkloadId"
           :options="workloadOptions"
+          :disabled="lockWorkload"
         />
 
         <EnvironmentSelectionInput
@@ -223,10 +224,6 @@
           :loading="isLoadingBindings"
           @bind="onBindEnvironment"
         />
-
-        <!-- Step 3: generic Release composition — Application slot (editable |
-             read-only | no-application), optional scoped resource card and the
-             carried read-only resources of the active Release (design §7). -->
         <ReleaseCompositionField
           v-if="selectedEnvironmentId"
           :deployment-name="selectedDeploymentName"
@@ -241,22 +238,23 @@
           :is-loading-application-versions="isLoadingApplicationVersions"
           :selected-application-version-id="selectedApplicationVersionId"
           :is-scoped-application="isScopedApplication"
+          :has-scoped-resource="hasScopedResource"
           :scoped-type="scopedType"
           :resource-name="resourceName"
           :version-options="versionOptions"
           :selected-version-id="selectedVersionId"
           :read-only-resources="readOnlyResources"
+          :editable-resources="editableResourceCards"
           :is-resolving-application-name="isResolvingApplicationName"
           :is-resolving-read-only-names="isResolvingReadOnlyNames"
           :invalid="versionInvalid"
           @update:selected-application-id="selectedApplicationId = $event"
           @update:selected-application-version-id="selectedApplicationVersionId = $event"
           @update:selected-version-id="selectedVersionId = $event"
+          @update:resource-id="setEditableResourceId($event.key, $event.value)"
+          @update:resource-version="setEditableResourceVersion($event.key, $event.value)"
           @create-application="onCreateApplication"
         />
-
-        <!-- Step 4: canary (gradual rollout). Optional; off emits no strategy
-             and keeps the INSTANT payload (design §4.5). -->
         <CanaryStrategyField
           v-if="selectedEnvironmentId"
           @update:enabled="setCanaryEnabled"

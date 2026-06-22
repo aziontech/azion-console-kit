@@ -31,6 +31,7 @@
       type: String,
       default: 'Create a version on the Versions tab to start configuring this resource.'
     },
+    showSettings: { type: Boolean, default: true },
     testidPrefix: { type: String, required: true }
   })
 
@@ -70,7 +71,10 @@
         :entityName="entityName"
       >
         <template #default>
-          <div class="flex items-center gap-3">
+          <div
+            v-if="showSettings"
+            class="flex items-center gap-3"
+          >
             <div
               id="version-lifecycle-action"
               class="flex items-center"
@@ -81,6 +85,7 @@
     </template>
     <template #content>
       <TabView
+        v-if="showSettings"
         v-model:activeIndex="activeTab"
         :pt="{ root: { class: 'flex flex-col gap-4' } }"
       >
@@ -125,6 +130,11 @@
           </template>
         </TabPanel>
       </TabView>
+
+      <slot
+        v-else
+        name="versions"
+      />
 
       <DeployDrawerBlock
         v-model:visible="deployVisible"

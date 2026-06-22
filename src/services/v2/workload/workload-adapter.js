@@ -305,11 +305,13 @@ export const WorkloadAdapter = {
       : extractAzionAppSubdomainLegacy(workload.domains, zones)
 
     if (isV6) {
+      const httpsEnabled = workload.protocols?.http?.https_ports != null
       const legacyCertificate = workload.tls?.certificate ?? null
-      if (legacyCertificate !== null) {
+      const fallbackCertificate = legacyCertificate ?? (httpsEnabled ? 0 : null)
+      if (fallbackCertificate !== null) {
         cleanDomains.forEach((domain) => {
           if (domain.certificate === null || domain.certificate === undefined) {
-            domain.certificate = legacyCertificate
+            domain.certificate = fallbackCertificate
           }
         })
       }

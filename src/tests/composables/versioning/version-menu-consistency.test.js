@@ -37,13 +37,41 @@ import { VERSION_STATES } from '@/composables/versioning/version-machine'
  * Adding a new listing without the shared driver makes this enumeration fail.
  */
 const LISTINGS = [
-  { name: 'EdgeApplications EditView', resourceType: 'application', file: 'src/views/EdgeApplications/v6/EditView.vue' },
-  { name: 'EdgeFirewall VersionsTab', resourceType: 'firewall', file: 'src/views/EdgeFirewall/v6/tabs/VersionsTab.vue' },
-  { name: 'EdgeConnectors VersionsTab', resourceType: 'connector', file: 'src/views/EdgeConnectors/v6/tabs/VersionsTab.vue' },
-  { name: 'CustomPages VersionsTab', resourceType: 'custom_page', file: 'src/views/CustomPages/v6/tabs/VersionsTab.vue' },
-  { name: 'EdgeFunctions VersionsTab', resourceType: 'function', file: 'src/views/EdgeFunctions/v6/tabs/VersionsTab.vue' },
-  { name: 'Workload VersionsTab', resourceType: 'workload', file: 'src/views/Workload/Tabs/VersionsTab.vue' },
-  { name: 'DeploymentVersionsList', resourceType: 'deployment', file: 'src/views/Deployments/components/DeploymentVersionsList.vue' }
+  {
+    name: 'EdgeApplications EditView',
+    resourceType: 'application',
+    file: 'src/views/EdgeApplications/v6/EditView.vue'
+  },
+  {
+    name: 'EdgeFirewall VersionsTab',
+    resourceType: 'firewall',
+    file: 'src/views/EdgeFirewall/v6/tabs/VersionsTab.vue'
+  },
+  {
+    name: 'EdgeConnectors VersionsTab',
+    resourceType: 'connector',
+    file: 'src/views/EdgeConnectors/v6/tabs/VersionsTab.vue'
+  },
+  {
+    name: 'CustomPages VersionsTab',
+    resourceType: 'custom_page',
+    file: 'src/views/CustomPages/v6/tabs/VersionsTab.vue'
+  },
+  {
+    name: 'EdgeFunctions VersionsTab',
+    resourceType: 'function',
+    file: 'src/views/EdgeFunctions/v6/tabs/VersionsTab.vue'
+  },
+  {
+    name: 'Workload VersionsTab',
+    resourceType: 'workload',
+    file: 'src/views/Workload/Tabs/VersionsTab.vue'
+  },
+  {
+    name: 'DeploymentVersionsList',
+    resourceType: 'deployment',
+    file: 'src/views/Deployments/components/DeploymentVersionsList.vue'
+  }
 ]
 
 const ALL_STATES = [...Object.values(VERSION_STATES), 'deleted', 'totally-unknown']
@@ -105,13 +133,9 @@ describe('P6 — identical rendered menu across listings for the same state', ()
     )
 
     LISTINGS.forEach(({ resourceType }) => {
-      const model = stripCommands(
-        mapVersionMenuItemsToMenu(state, { resourceType }, vi.fn(), item)
-      )
+      const model = stripCommands(mapVersionMenuItemsToMenu(state, { resourceType }, vi.fn(), item))
       expect(model.map((entry) => entry.label)).toEqual(reference.map((entry) => entry.label))
-      expect(model.map((entry) => entry.disabled)).toEqual(
-        reference.map((entry) => entry.disabled)
-      )
+      expect(model.map((entry) => entry.disabled)).toEqual(reference.map((entry) => entry.disabled))
       expect(model.map((entry) => entry.separator ?? false)).toEqual(
         reference.map((entry) => entry.separator ?? false)
       )
