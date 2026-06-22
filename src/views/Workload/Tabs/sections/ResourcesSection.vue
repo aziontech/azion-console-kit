@@ -23,13 +23,9 @@
     customPage: ({ id }) => customPageService.loadCustomPagesService({ id })
   }
 
-  // TODO: replace with the real value once /workload/deployments returns resource versions
-  const MOCK_VERSIONS = {
-    application: 'v1.4.2',
-    firewall: 'v0.9.1',
-    customPage: 'v2.0.0'
-  }
-
+  // Per-resource versions are intentionally NOT shown: the /workload/deployments
+  // API does not return them yet. Surface a real version here once it does — never
+  // a fabricated placeholder.
   const LONG_NAME_THRESHOLD = 22
 
   // nested cache: { [key]: { [id]: name } }
@@ -77,7 +73,6 @@
         label: meta?.label ?? key,
         icon: meta?.icon ?? 'pi pi-cog',
         name,
-        version: MOCK_VERSIONS[key] ?? 'v1.0.0',
         isLongName: name.length > LONG_NAME_THRESHOLD
       }
     }).filter(Boolean)
@@ -128,7 +123,6 @@
           >
             {{ resource.name }}
           </span>
-          <span class="text-xs text-color-secondary shrink-0">{{ resource.version }}</span>
         </div>
       </div>
     </div>

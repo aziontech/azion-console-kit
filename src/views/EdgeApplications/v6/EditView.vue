@@ -70,7 +70,7 @@
   const columns = [
     { key: 'version', label: 'Version', size: 'minmax(220px, 1.4fr)' },
     { key: 'status', label: 'Status', size: 'minmax(140px, 0.8fr)' },
-    { key: 'created', label: 'Created', size: 'minmax(180px, 1.2fr)' }
+    { key: 'created', label: 'Created by', size: 'minmax(180px, 1.2fr)' }
   ]
 
   const goToVersion = (versionIdOrObject) => {
