@@ -669,6 +669,12 @@
           currentStep !== 'repository' || (!showNextButton && !$slots['footer-actions'])
       }"
     >
+      <template #header>
+        <h2 class="text-heading-md text-[var(--text-default)]">
+          {{ props.title || 'Start from Template' }}
+        </h2>
+      </template>
+
       <template #content>
         <div class="p-4 sm:p-6 flex flex-col gap-6">
           <div

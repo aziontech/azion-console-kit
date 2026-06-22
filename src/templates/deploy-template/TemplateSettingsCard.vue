@@ -57,6 +57,10 @@
     data-testid="template-engine__settings-card"
     :class="{ '[&>footer]:hidden': props.hideFooter }"
   >
+    <template #header>
+      <h2 class="text-heading-md text-[var(--text-default)]">Template Settings</h2>
+    </template>
+
     <template #content>
       <div class="p-4 sm:p-6 flex flex-col gap-6">
         <slot name="form">

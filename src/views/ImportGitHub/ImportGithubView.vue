@@ -757,6 +757,10 @@
           { '[&>footer]:hidden': currentStep !== 'settings' || loadingStore.isLoading }
         ]"
       >
+        <template #header>
+          <h2 class="text-heading-md text-[var(--text-default)]">Import from Git</h2>
+        </template>
+
         <template
           v-if="loadingStore.isLoading"
           #content

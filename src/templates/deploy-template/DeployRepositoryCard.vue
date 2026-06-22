@@ -173,6 +173,10 @@
     title="Start from Template"
     :class="{ '[&>footer]:hidden': props.collapsed }"
   >
+    <template #header>
+      <h2 class="text-heading-md">Start from Template</h2>
+    </template>
+
     <template #content>
       <div class="p-4 sm:p-6 flex flex-col gap-6">
         <TemplateInfoBlock

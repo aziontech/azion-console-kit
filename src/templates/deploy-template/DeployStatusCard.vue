@@ -165,7 +165,7 @@
       data-testid="deploy-status-card"
     >
       <template #header>
-        <h2 class="text-label-md text-[var(--text-default)]">Deployment</h2>
+        <h2 class="text-heading-md text-[var(--text-default)]">Deployment</h2>
         <span
           v-if="isUnfinished"
           class="ml-auto text-sm font-normal text-color-secondary"

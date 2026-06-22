@@ -353,6 +353,10 @@
     title="Deployment Successful"
     data-testid="deploy-success-card"
   >
+    <template #header>
+      <h2 class="text-heading-md text-[var(--text-default)]">Deployment Successful</h2>
+    </template>
+
     <template #content>
       <div class="p-4 sm:p-6 flex flex-col gap-6">
         <p class="text-sm text-color-secondary leading-5">
