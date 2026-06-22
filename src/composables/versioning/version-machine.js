@@ -61,6 +61,36 @@ export const isImmutable = (state) => ['ready', 'active', 'archived'].includes(s
 export const isTerminal = (state) => state === 'archived'
 
 /**
+ * Row-menu predicates (single source of enablement for the version menu).
+ * Pure: same input → same output, no I/O. Open-configuration read-only vs.
+ * editable reuses `isEditable` above. See spec version-actions-menu Req 2/3/5/6/7.
+ */
+
+/**
+ * Promote is enabled only for a built, idle version (`ready`).
+ */
+export const isReady = (state) => state === VERSION_STATES.READY
+
+/**
+ * Archive is enabled when the version is built-but-idle or recoverable,
+ * i.e. `state ∈ {ready, error, canceled}` (Req 5.1). Backend stays the
+ * authority on "in use as Current"; pre-emptive blocking is Phase 2.
+ */
+export const canArchive = (state) =>
+  [VERSION_STATES.READY, VERSION_STATES.ERROR, VERSION_STATES.CANCELED].includes(state)
+
+/**
+ * Delete is enabled for any version still present, i.e. not already deleted
+ * (Req 6.1). A `deleted` version is absent from the list, hence the guard.
+ */
+export const canDelete = (state) => state !== 'deleted'
+
+/**
+ * Open configuration is always available, including `archived` (Req 2.1).
+ */
+export const isOpenable = () => true
+
+/**
  * High-level actions exposed by the VersionShell UI.
  * These are user intents; the underlying service call is resolved
  * downstream by the command bus handlers.
