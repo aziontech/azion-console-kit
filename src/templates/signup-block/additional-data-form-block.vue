@@ -160,6 +160,7 @@
   import { ref, inject, computed, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
+  import { trackSignUpSafely } from '@/helpers/track-auth-event'
   import * as yup from 'yup'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
@@ -487,7 +488,7 @@
       }
 
       const updatedAccount = await props.updateAccountInfoService(accountPayload)
-      accountStore.setAccountData({ jobRole: updatedAccount.jobRole })
+      accountStore.setAccountData({ jobRole: updatedAccount.jobRole, name: fullName.value })
 
       const patchName = props.patchFullnameService(usersPayload)
       const postAddData = props.postAdditionalDataService({
@@ -499,6 +500,14 @@
       await postAddData
 
       tracker.signUp.submittedAdditionalData(values).track()
+
+      // Re-send the signup event to HubSpot, now enriched with the data
+      // collected in this step (full name, role, etc.)
+      trackSignUpSafely({
+        tracker,
+        method: accountStore.ssoSignUpMethod || 'email',
+        signupTypeFlags: accountStore.getSignupTypeFlags()
+      })
     } catch (err) {
       const errors = JSON.parse(err)
 
