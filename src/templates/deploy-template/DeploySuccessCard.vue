@@ -151,21 +151,11 @@
    * - customDomain is required
    * - domains can be empty (customDomain provides the values)
    * When useCustomDomain is false:
-   * - domains must have at least one item with a value
+   * - domains is optional and may be an empty array
    */
   const validationSchema = yup.object({
     useCustomDomain: yup.boolean(),
-    domains: yup.array().when('useCustomDomain', {
-      is: false,
-      then: (schema) =>
-        schema
-          .min(1, 'At least one domain is required')
-          .test(
-            'has-valid-domain',
-            'At least one domain must be filled',
-            (value) => value && value.some((item) => item.domain && item.domain.trim() !== '')
-          )
-    }),
+    domains: yup.array(),
     customDomain: yup.string().when('useCustomDomain', {
       is: true,
       then: (schema) => schema.required('Custom domain is required when using custom domain')
