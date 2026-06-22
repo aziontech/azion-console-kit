@@ -1,0 +1,25 @@
+{
+  "status": "running",
+  "logs": [
+    {
+      "content": "<span style=\"color: #E850A8\">BRAND_COLOR_LINE</span>",
+      "timestamp": "2026-06-10T12:00:00.000Z"
+    },
+    {
+      "content": "<span style=\"color: #e850a8\">BRAND_COLOR_LOWER</span>",
+      "timestamp": "2026-06-10T12:00:01.000Z"
+    },
+    {
+      "content": "<span style=\"color: #00ff00\">WRONG_COLOR_LINE</span>",
+      "timestamp": "2026-06-10T12:00:03.000Z"
+    },
+    {
+      "content": "<span style='color: #00ff00'>SINGLE_QUOTE_WRONG</span>",
+      "timestamp": "2026-06-10T12:00:04.000Z"
+    },
+    {
+      "content": "<span style=\"color: #00ff00; font-weight: bold\">MIXED_STYLE_LINE</span>",
+      "timestamp": "2026-06-10T12:00:06.000Z"
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+import { sanitizeLogColors } from '@/helpers/sanitize-log-colors'
+
 const safeJsonParse = (value) => {
   try {
     return JSON.parse(value)
@@ -23,7 +25,7 @@ const formatLog = (log, index) => {
   const type = detectLogType(content)
   return {
     id: `log-${index}-${Date.now()}`,
-    content,
+    content: sanitizeLogColors(content),
     timeStamp: Intl.DateTimeFormat('us', {
       timeStyle: 'medium',
       hourCycle: 'h23'

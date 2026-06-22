@@ -1,5 +1,6 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeScriptRunnerBaseUrl } from './make-script-runner-base-url'
+import { sanitizeLogColors } from '@/helpers/sanitize-log-colors'
 
 export const getScriptRunnerLogsService = async (executionId) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -18,7 +19,7 @@ const detectLogType = (content) => {
 
 const formatLog = (log, index) => ({
   id: `log-${index}-${Date.now()}`,
-  content: log?.content,
+  content: sanitizeLogColors(log?.content),
   timeStamp: Intl.DateTimeFormat('us', {
     timeStyle: 'medium',
     hourCycle: 'h23'
