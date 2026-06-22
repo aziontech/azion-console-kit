@@ -20,11 +20,7 @@ const RESOURCE_TYPES = ['edge_application', 'edge_firewall', 'edge_connector', '
 
 // Expected enablement per state, derived from the spec matrix (P3).
 const PROMOTE_ENABLED_STATES = [VERSION_STATES.READY]
-const ARCHIVE_ENABLED_STATES = [
-  VERSION_STATES.READY,
-  VERSION_STATES.ERROR,
-  VERSION_STATES.CANCELED
-]
+const ARCHIVE_ENABLED_STATES = [VERSION_STATES.READY, VERSION_STATES.ERROR, VERSION_STATES.CANCELED]
 
 const actionsOf = (items) => items.map((entry) => entry.action)
 const byAction = (items, action) => items.find((entry) => entry.action === action)
@@ -40,7 +36,9 @@ describe('buildVersionMenuItems — P1: same set + order regardless of resourceT
   })
 
   it('produces an identical item set for two different resourceTypes (same state)', () => {
-    const fromApp = buildVersionMenuItems(VERSION_STATES.READY, { resourceType: 'edge_application' })
+    const fromApp = buildVersionMenuItems(VERSION_STATES.READY, {
+      resourceType: 'edge_application'
+    })
     const fromFw = buildVersionMenuItems(VERSION_STATES.READY, { resourceType: 'edge_firewall' })
     expect(fromApp).toEqual(fromFw)
   })
@@ -101,17 +99,20 @@ describe('buildVersionMenuItems — P3: enablement matrix', () => {
     }
   )
 
-  it.each(ALL_STATES)('Delete is present (enabled) iff state is not deleted (state "%s")', (state) => {
-    const deleteItem = byAction(buildVersionMenuItems(state), 'DELETE')
-    if (state === 'deleted') {
-      expect(deleteItem).toBeUndefined()
-    } else {
-      expect(deleteItem).toBeDefined()
-      expect(deleteItem.disabled).toBe(false)
-      expect(deleteItem.danger).toBe(true)
-      expect(deleteItem.separatorBefore).toBe(true)
+  it.each(ALL_STATES)(
+    'Delete is present (enabled) iff state is not deleted (state "%s")',
+    (state) => {
+      const deleteItem = byAction(buildVersionMenuItems(state), 'DELETE')
+      if (state === 'deleted') {
+        expect(deleteItem).toBeUndefined()
+      } else {
+        expect(deleteItem).toBeDefined()
+        expect(deleteItem.disabled).toBe(false)
+        expect(deleteItem.danger).toBe(true)
+        expect(deleteItem.separatorBefore).toBe(true)
+      }
     }
-  })
+  )
 })
 
 describe('buildVersionMenuItems — P4: purity (same input → same output, no side effects)', () => {

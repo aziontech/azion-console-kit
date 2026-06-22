@@ -23,12 +23,15 @@ const VERSION_ACTIONS_SRC = readFileSync(
 )
 
 describe('Phase 2 deferral guard — Rollback stays disabled', () => {
-  it.each(ALL_STATES)('Rollback is disabled with a tooltip in every state (state "%s")', (state) => {
-    const rollback = byAction(buildVersionMenuItems(state), 'ROLLBACK')
-    expect(rollback).toBeDefined()
-    expect(rollback.disabled).toBe(true)
-    expect(rollback.tooltip).toBeTruthy()
-  })
+  it.each(ALL_STATES)(
+    'Rollback is disabled with a tooltip in every state (state "%s")',
+    (state) => {
+      const rollback = byAction(buildVersionMenuItems(state), 'ROLLBACK')
+      expect(rollback).toBeDefined()
+      expect(rollback.disabled).toBe(true)
+      expect(rollback.tooltip).toBeTruthy()
+    }
+  )
 
   it('keeps Rollback disabled even if ctx carries Phase 2 hints', () => {
     const ctx = { resourceType: 'application', isCurrentSomewhere: true, environments: ['prod'] }

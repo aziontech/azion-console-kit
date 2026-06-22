@@ -238,7 +238,7 @@
             label="New Version"
             icon="pi pi-plus"
             size="small"
-            class="version-toolbar-action"
+            class="h-[2.5rem]"
             :loading="isCreatingDraft"
             data-testid="application-v6-versions__new-draft"
             @click="createDraft"
@@ -261,9 +261,3 @@
     </template>
   </ContentBlock>
 </template>
-
-<style scoped>
-  :deep(.version-toolbar-action.p-button) {
-    height: 2.5rem;
-  }
-</style>

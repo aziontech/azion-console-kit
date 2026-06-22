@@ -3,8 +3,10 @@
   import { useRoute, useRouter } from 'vue-router'
   import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
+  import PrimeButton from '@aziontech/webkit/button'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import DeployDrawerBlock from '@/templates/deploy-drawer-block'
   import { DataTableActionsButtons } from '@/components/list-table'
   import SettingsTab from '@/views/Deployments/tabs/SettingsTab.vue'
   import DeploymentHistoryTab from '@/views/Deployments/tabs/DeploymentHistoryTab.vue'
@@ -31,6 +33,11 @@
     })
   }
 
+  const isDeployDrawerOpen = ref(false)
+  const openDeployDrawer = () => {
+    isDeployDrawerOpen.value = true
+  }
+
   const indexToTabName = (index) => TAB_ORDER[index] || TAB_ORDER[0]
 
   const handleTabClick = ({ index = 0 }) => {
@@ -53,6 +60,13 @@
         data-testid="deployments-heading"
       >
         <template #default>
+          <PrimeButton
+            label="Deploy"
+            icon="pi pi-cloud-upload"
+            size="small"
+            data-testid="deployments__deploy"
+            @click="openDeployDrawer"
+          />
           <DataTableActionsButtons
             size="small"
             label="Deployment"
@@ -81,6 +95,8 @@
           <DeploymentHistoryTab v-if="activeTab === TAB_TO_INDEX.history" />
         </TabPanel>
       </TabView>
+
+      <DeployDrawerBlock v-model:visible="isDeployDrawerOpen" />
     </template>
   </ContentBlock>
 </template>

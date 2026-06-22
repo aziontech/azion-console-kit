@@ -1,7 +1,4 @@
 <script setup>
-  // v6 EditView — the Firewall landing (Versions + Settings tabs), gated by
-  // `use_v6_configurations`. Logic lives in useResourceVersionLanding; chrome in
-  // ResourceVersionLanding. This view only wires the Firewall config + tabs.
   import VersionsTab from '@/views/EdgeFirewall/v6/tabs/VersionsTab.vue'
   import MainSettingsTab from '@/views/EdgeFirewall/v6/tabs/MainSettingsTab.vue'
   import ResourceVersionLanding from '@/templates/version-shell-block/ResourceVersionLanding.vue'

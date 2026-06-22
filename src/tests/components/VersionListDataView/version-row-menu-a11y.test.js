@@ -38,7 +38,9 @@ const openRealMenu = async (state) => {
     },
     global: { plugins: [WebkitPlugin], stubs: { DataView: DataViewStub } }
   })
-  await wrapper.get(`[data-testid="version-list-data-view__row-${version.id}__menu"]`).trigger('click')
+  await wrapper
+    .get(`[data-testid="version-list-data-view__row-${version.id}__menu"]`)
+    .trigger('click')
   await nextTick()
   await nextTick()
   await nextTick()
@@ -146,7 +148,9 @@ describe('VersionListDataView kebab — keyboard navigation (task 5.3 / Req 8.4)
     const { wrapper, panel } = await openRealMenu(VERSION_STATES.READY)
     const list = panel.querySelector('[role="menu"]')
     list.focus()
-    list.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', bubbles: true }))
+    list.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', bubbles: true })
+    )
     await nextTick()
     const focused = panel.querySelector('.p-menuitem.p-focus')
     expect(focused).not.toBeNull()
@@ -158,7 +162,9 @@ describe('VersionListDataView kebab — keyboard navigation (task 5.3 / Req 8.4)
     const { wrapper, panel } = await openRealMenu(VERSION_STATES.READY)
     const list = panel.querySelector('[role="menu"]')
     list.focus()
-    list.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }))
+    list.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true })
+    )
     await nextTick()
     await nextTick()
     expect(document.querySelector(PANEL)).toBeNull()
