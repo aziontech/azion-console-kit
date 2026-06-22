@@ -9,5 +9,7 @@ export const versionedDeviceGroupService = createVersionedSubResourceService({
     transformLoad: (data) => DeviceGroupAdapter.transformLoadDeviceGroup(data),
     requestPayload: (payload) => DeviceGroupAdapter.transformPayload(payload)
   },
-  queryKeyGroup: queryKeys.application.version.deviceGroups
+  queryKeyGroup: queryKeys.application.version.deviceGroups,
+  createdMessage: 'Device Group successfully created',
+  updatedMessage: 'Device Group successfully updated'
 })

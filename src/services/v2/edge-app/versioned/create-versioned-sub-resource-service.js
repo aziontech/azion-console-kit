@@ -20,7 +20,14 @@ import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
  * @param {Object}  args.queryKeyGroup  Versioned query-key group: `all`/`list`/`detail`(appId, versionId, ...).
  * @returns {VersionedSubResourceService}
  */
-export const createVersionedSubResourceService = ({ path, adapter, queryKeyGroup }) => {
+export const createVersionedSubResourceService = ({
+  path,
+  adapter,
+  queryKeyGroup,
+  idKey = 'id',
+  createdMessage = 'Created successfully',
+  updatedMessage = 'Updated successfully'
+}) => {
   class VersionedSubResourceService extends BaseService {
     constructor() {
       super()
@@ -28,6 +35,9 @@ export const createVersionedSubResourceService = ({ path, adapter, queryKeyGroup
       this.path = path
       this.adapter = adapter
       this.queryKeyGroup = queryKeyGroup
+      this.idKey = idKey
+      this.createdMessage = createdMessage
+      this.updatedMessage = updatedMessage
     }
 
     getUrl(appId, versionId, suffix = '') {
@@ -91,14 +101,17 @@ export const createVersionedSubResourceService = ({ path, adapter, queryKeyGroup
         queryKey: this.queryKeyGroup.all(appId, versionId)
       })
 
-      return data
+      // Normalize to the same shape the non-versioned siblings return, so the
+      // shared CreateDrawerBlock gets its success toast (`feedback`) and the new
+      // id (under the resource's `idKey`, e.g. `cacheId`).
+      return { [this.idKey]: data?.data?.id ?? data?.id, feedback: this.createdMessage }
     }
 
     edit = async (appId, versionId, payload) => {
       const body =
         this.adapter?.editPayload?.(payload) ?? this.adapter?.requestPayload?.(payload) ?? payload
 
-      const { data } = await this.http.request({
+      await this.http.request({
         method: 'PUT',
         url: this.getUrl(appId, versionId, `/${payload.id}`),
         body
@@ -108,7 +121,8 @@ export const createVersionedSubResourceService = ({ path, adapter, queryKeyGroup
         queryKey: this.queryKeyGroup.all(appId, versionId)
       })
 
-      return data
+      // Non-versioned siblings resolve edit with the success message string.
+      return this.updatedMessage
     }
 
     remove = async (appId, versionId, id) => {
