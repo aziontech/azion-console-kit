@@ -399,9 +399,14 @@
     if (repo) {
       // Update suggested application name based on repository name
       applicationName.value = repo.name.toLowerCase().replace(/[^a-z0-9-]/g, '-')
-
+      // Resolve the account name (scope) from the selected GitHub integration
+      const accountName = getOptionNameByValue({
+        listOption: integrationsList.value,
+        optionValue: githubAccount.value,
+        key: 'value'
+      })
       // Detect framework automatically
-      await detectAndSetFrameworkPreset(repo.owner?.login, repo.name)
+      await detectAndSetFrameworkPreset(accountName, repo.name)
     }
   }
 
@@ -415,7 +420,7 @@
         repositoryName: repoName
       })
       if (result) {
-        preset.value = result.framework
+        preset.value = result
         packageJsonData.value = result.packageJson
       }
     } catch (error) {
