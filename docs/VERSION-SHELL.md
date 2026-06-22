@@ -3,10 +3,14 @@
 Documentação de referência do framework de versionamento de recursos do Console
 (contas v6, flag `use_v6_configurations`). Cobre o `<VersionShell>`, a máquina de
 estados, a comunicação via command bus, o fluxo de dados completo e o roteiro para
-plugar novos recursos (Firewall, WAF, Custom Pages).
+plugar novos recursos.
 
 > Implementação de referência: **Application** (`src/views/EdgeApplications/v6/`).
-> Specs do desenvolvimento: `specs/version-shell-command-bus-fix/` e
+> Consumidores em produção: Application, Workload, Custom Page, Firewall, Deployment
+> e — adicionados pelo spec `version-shell-connector-functions` — **Edge Connector**
+> e **Edge Function**.
+> Specs do desenvolvimento: `specs/version-shell-command-bus-fix/`,
+> `specs/version-shell-connector-functions/` e
 > `docs/superpowers/specs/2026-06-11-version-shell-command-bus-design.md`.
 
 ---
@@ -31,8 +35,8 @@ máquina de estados.
 │ toasts • navegação pós-comando • carrega o recurso pai                │
 │  ┌──────────────────── <VersionShell> (agnóstico) ─────────────────┐  │
 │  │ state machine • action bar • dialog de comment • overlay • bus  │  │
-│  │  ┌──────────── <ResourceVersionAdapter> (específico) ────────┐  │  │
-│  │  │ useForm (VeeValidate) • 6 handlers onVersionCommand       │  │  │
+│  │  ┌─── <ResourceVersionAdapter> thin (específico) ───────────┐  │  │
+│  │  │ useVersionFormAdapter: useForm + 7 handlers no bus        │  │  │
 │  │  │  ┌──────────────── form fields / tabs ─────────────────┐  │  │  │
 │  │  │  │ useField auto-conecta • readOnly via versionContext │  │  │  │
 │  │  │  └──────────────────────────────────────────────────────┘ │  │  │
@@ -57,9 +61,10 @@ máquina de estados.
 | **VersionActionDialog** | `.../components/VersionActionDialog.vue` | Coleta o comment (obrigatório ou opcional); confirma/cancela | Não sabe qual comando está confirmando |
 | **ProcessingOverlay** | `.../components/ProcessingOverlay.vue` | Bloqueia a UI quando `isProcessing(state)` (`building`); botão Cancel quando `CANCEL_BUILD` está disponível | Não despacha direto (emite `cancel` pro shell) |
 | **VersionStateBadge** | `.../components/VersionStateBadge.vue` | Badge visual do estado | — |
-| **ResourceVersionAdapter** (ex.: `ApplicationVersionAdapter`) | `src/views/EdgeApplications/v6/ApplicationVersionAdapter.vue` | Hospeda o `useForm` (schema do recurso); merge `recurso ⊕ version.config` como initial values; re-sync via `watch` + `resetForm`; registra os 6 handlers chamando o service; expõe `ready: isFormValid` (gate dos botões SAVE) | Não renderiza UI (template é `<slot />`); não toca cache; não mostra toast |
-| **Version service** (ex.: `edgeAppVersionService`) | `src/services/v2/edge-app/edge-app-version-service.js` | HTTP dos endpoints `/versions`; `useLoadVersionQuery` com queryKey canônico; **toda mutação chama `queryClient.removeQueries(queryKeys.<recurso>.version.all(rid))`** | Não importa composables (regra ESLint `services-http-only`) |
-| **Version adapter** (ex.: `EdgeAppVersionAdapter`) | `src/services/v2/edge-app/edge-app-version-adapter.js` | Único ponto que conhece o contrato de payload: form values → campos da Application **no nível raiz** + `comment?`/`source_version?` (strip de `undefined`); `GET` → `{ id, state, comment, timestamps, config }`, onde `config` extrai os campos da Application do raiz do snapshot no shape de form UI (descarta `null`) | Não chama HTTP |
+| **useVersionFormAdapter** | `src/composables/versioning/use-version-form-adapter.js` | **Fonte única** do filho do shell: hospeda o `useForm` (schema do recurso); merge `recurso ⊕ version.config` como initial values; re-sync via `watch` + `resetForm`; registra **7 handlers** (os 6 do ciclo + `DEPLOY` no-op) chamando o service via `saveStrategy`; expõe `ready: isFormValid` (gate dos botões SAVE) | Não renderiza UI; não toca cache; não mostra toast |
+| **`<Recurso>VersionAdapter.vue`** (ex.: `CustomPageVersionAdapter`) | `src/views/<Recurso>/v6/<Recurso>VersionAdapter.vue` | **Thin** (≤35 linhas, template `<slot/>`): só chama `useVersionFormAdapter({ resource, resourceId, versionId, versionService, validationSchema, saveStrategy })`. Cada recurso fornece apenas essas 3 especializações | Não tem handler inline; não conhece bus/máquina |
+| **Version service** (ex.: `edgeAppVersionService`) | `src/services/v2/edge-app/edge-app-version-service.js` | HTTP dos endpoints `/versions` (herdado de `VersionServiceBase`); `useLoadVersionQuery`/`useListVersionsQuery` (lista aceita `params`/`skipCache`) com queryKey canônico; **toda mutação chama o hook `invalidateAfterMutation(rid)`** (default: `removeQueries(versionKeys.all(rid))`, sobrescrevível) | Não importa composables (regra ESLint `services-http-only`) |
+| **Version adapter** (ex.: `EdgeAppVersionAdapter`) | `src/services/v2/edge-app/edge-app-version-adapter.js` | Único ponto que conhece o contrato de payload, criado por `createVersionAdapter({ normalizeConfig, mapResourceFields, mapMeta? })`: form values → campos do recurso **no nível raiz** + `comment?`/`source_version?` (strip de `undefined`); `GET` → `{ id, state, comment, timestamps, ...mapMeta, config }`, onde `config` extrai os campos do recurso do raiz do snapshot no shape de form UI (descarta `null`). `mapMeta` adiciona campos extras de meta (ex.: Workload: `deploymentId`/`environmentId`/`lastError`) | Não chama HTTP; não reimplementa `stripUndefinedDeep`/`normalizeVersion` |
 | **EditView** (caller) | `src/views/EdgeApplications/v6/EditView.vue` | Carrega o recurso pai; passa a factory `useVersionQuery`; guarda de rota sem `versionId`; toasts de sucesso/erro; navegação pós-comando; `:key="versionId"` no shell e no badge | Não executa comandos; não conhece o bus |
 
 ---
@@ -76,7 +81,7 @@ flowchart TD
   VS --> PO["ProcessingOverlay<br/>(v-if isProcessing)"]
   VS --> VAB["VersionActionBar"]
   VAB --> VAD["VersionActionDialog<br/>(comment)"]
-  VS -->|slot| AD["ApplicationVersionAdapter<br/>useForm + 6 onVersionCommand"]
+  VS -->|slot| AD["ApplicationVersionAdapter (thin)<br/>useVersionFormAdapter (7 handlers)"]
   AD -->|slot| TV["TabView"]
   TV --> TP["TabPanel Main Settings"]
   TP --> FF["FormFieldsEditEdgeApplications"]
@@ -101,9 +106,15 @@ flowchart LR
     CMD["use-version-command.js"] --> BUS
     CTX["use-version-context.js"]
     VM["version-machine.js"]
+    UFA["use-version-form-adapter.js<br/>(useForm + 7 handlers)"]
   end
 
-  subgraph resource["camada do recurso (específico)"]
+  subgraph base["camada base (agnóstico)"]
+    VSB["version-service-base.js<br/>(lifecycle + invalidateAfterMutation)"]
+    FACT["version-adapter.js<br/>(createVersionAdapter + mapMeta)"]
+  end
+
+  subgraph resource["camada do recurso (específico, thin)"]
     ADP["ApplicationVersionAdapter.vue"]
     SVC["edge-app-version-service.js"] --> SAD["edge-app-version-adapter.js"]
     SAD --> EAD["edge-app-adapter.js (transformPayload, DRY)"]
@@ -113,7 +124,10 @@ flowchart LR
   UVS --> VM
   BAR --> VM
   OVL --> VM
-  ADP --> CMD & CTX & SVC
+  UFA --> CMD & CTX
+  SVC --> VSB
+  SAD --> FACT
+  ADP --> UFA & SVC
   EV2["EditView.vue"] --> IDX & ADP & SVC & VM
 ```
 
@@ -240,10 +254,13 @@ Quatro canais, cada um com uma direção única:
 ```
 mutação no service (updateDraft/build/...)
   → HTTP
-  → queryClient.removeQueries(queryKeys.application.version.all(rid))
+  → this.invalidateAfterMutation(rid)   // default: removeQueries(versionKeys.all(rid))
   → o useQuery canônico (shell + badge, deduplicado por queryKey) refetcha sozinho
   → version.value atualiza → state recomputa → action bar / readOnly / overlay reagem
 ```
+
+`invalidateAfterMutation` é o hook sobrescrevível da base — recursos que mudam
+mais de um cache estendem-no (ex.: Deployment invalida também `deployments.detail`).
 
 O shell e a EditView **nunca** invalidam cache. Não há polling: o estado atualiza
 por invalidação pós-mutação e por ação do usuário (decisão de produto — pós-build
@@ -269,12 +286,12 @@ o usuário é levado à listagem de versões).
      └─ ctx = { resourceId, versionId, comment }
 6. Bus
    return await bus.emit(action, ctx) → entry.execute(ctx)
-7. Handler (Adapter do recurso) — exemplo SAVE
-   validate() → inválido? return (nenhum HTTP)
-   edgeAppVersionService.updateDraft(rid, vid, values)       // SAVE = PUT (full replace)
+7. Handler (useVersionFormAdapter) — exemplo SAVE
+   validate() → inválido? throw (shell emite command-error; nenhum HTTP)
+   saveStrategy.save(ctx) → service.updateDraft(rid, vid, values)  // SAVE = PUT (full replace)
      └─ EdgeAppVersionAdapter.transformDraftPayload(values)   // form → campos no raiz
      └─ PUT /v4/workspace/applications/{rid}/versions/{vid}
-     └─ queryClient.removeQueries(version.all(rid))           // invalidação
+     └─ this.invalidateAfterMutation(rid)                     // removeQueries(versionKeys.all)
    resetForm({ values })                                      // baseline novo, limpa dirty
    return result                                              // volta pelo bus
 8. Shell emite o desfecho
@@ -310,7 +327,7 @@ sequenceDiagram
   AD->>SV: updateDraft(rid, vid, values)
   SV->>API: PUT .../versions/{vid} { name, modules, active, debug }
   API-->>SV: 200 (versão)
-  SV->>SV: removeQueries(version.all) → refetch automático
+  SV->>SV: invalidateAfterMutation(rid) → refetch automático
   SV-->>AD: versão normalizada
   AD->>AD: resetForm({ values }) — limpa dirty
   AD-->>SH: result
@@ -420,51 +437,64 @@ sequenceDiagram
 | `src/tests/templates/version-shell-block/version-shell-events.test.js` | P3 — `updated`/`command-error` sem unhandled rejection; retorno do handler; **regressão do `ready` desembrulhado** (disabledActions reativo) |
 | `src/tests/views/EdgeApplications/v6/application-version-adapter.test.js` | SAVE inválido não muta; SAVE válido + payload; ordem patch→build; re-sync pristine/dirty; retorno do NEW_DRAFT_FROM |
 | `src/tests/views/EdgeApplications/FormFields/block/*.test.js` | P4 — `readOnly=true` desabilita os 4 blocks; default mantém habilitado |
+| `src/tests/services/v2/edge-connectors/edge-connector-version-{service,adapter}.test.js` | Connector polimórfico (HTTP/Storage/LiveIngest): `baseURL`, queryKeys, herança da base; form→payload no raiz e `config` do snapshot |
+| `src/tests/services/v2/edge-function/edge-function-version-{service,adapter}.test.js` | Function: `baseURL`, herança da base; mapeamento `runtime`/`execution_environment`/`default_args`/`code`; `config` do snapshot |
+| `src/tests/views/EdgeFunctions/v6/code-editor-readonly.test.js` | P6 — `code-editor` não-editável em estado imutável via `useVersionContext().readOnly` |
 
 ---
 
-## 11. Próximos passos: implementar o VersionShell nos demais recursos
+## 11. Adicionar um recurso ao VersionShell
 
-A API já expõe versionamento com o **mesmo contrato** para Firewall, WAF
-(`docs/edge-api/FIREWALL.md`) e Custom Pages (`docs/edge-api/CUSTOM_PAGES.md`):
-estados `draft/building/ready/archived`, clone com `source_version`/`comment` +
-campos do recurso **no nível raiz**, PATCH de draft, archive/build/cancel. O WAF
-declara explicitamente "mesma máquina de estados do Firewall".
+A API expõe versionamento com o **mesmo contrato** para todos os recursos sob
+`v4/workspace/<recurso>`: estados `draft/building/ready/archived`, clone com
+`source_version`/`comment` + campos do recurso **no nível raiz**, PATCH de draft,
+archive/build/cancel. Plugar um recurso é só fornecer os artefatos **thin** abaixo
+— **zero linha** no shell/bus/máquina/`use-version-form-adapter` (gate P8 em CI).
+
+### 11.0 Recursos já plugados
+
+| Recurso | Base URL das versões | Adapter component |
+|---|---|---|
+| Application | `v4/workspace/applications` | `EdgeApplications/v6/ApplicationVersionAdapter.vue` |
+| Workload | `v4/workspace/workloads` | (via `useVersionFormAdapter` + `workloadSaveStrategy`) |
+| Custom Page | `v4/workspace/custom_pages` | `CustomPages/v6/CustomPageVersionAdapter.vue` |
+| Firewall | `v4/workspace/firewalls` | — |
+| Edge Connector | `v4/workspace/connectors` | `EdgeConnectors/v6/EdgeConnectorVersionAdapter.vue` |
+| Edge Function | `v4/workspace/functions` | `EdgeFunctions/v6/EdgeFunctionVersionAdapter.vue` |
+| Deployment | `/deployment-api/v4/deployments` | — (consome a base direto) |
 
 ### 11.1 Checklist por recurso (nada no framework muda)
 
 | # | Entrega | Base de cópia | Esforço |
 |---|---|---|---|
 | 1 | Namespace em `queryKeys` (`<recurso>.version.all/list/detail`) | `queryKeys.application.version` | Trivial |
-| 2 | `<recurso>-version-service.js` (6 mutações + `useLoadVersionQuery` + invalidação) | `edge-app-version-service.js` | Baixo — muda `baseURL` (Firewall: `/edge_firewall/api/firewalls`; Custom Pages: `/workspace/api/custom_pages`) |
-| 3 | `<recurso>-version-adapter.js` (form ⇄ payload no raiz; `config` na leitura) | `edge-app-version-adapter.js` | **Único ponto de pensamento real** — o conjunto de campos do recurso é específico |
-| 4 | `<Recurso>VersionAdapter.vue` (useForm + 6 handlers) | `ApplicationVersionAdapter.vue` | Trivial — o schema yup já existe nas telas atuais |
-| 5 | `v6/EditView.vue` + `v6/VersionsListView.vue` | os de Application | Baixo — já trazem as lições do §9 embutidas |
-| 6 | Fork no router (`hasFlagUseV6Configurations` / `meta.flag`) + rota `edit/:id/versions/:versionId` | `edge-application-routes` | Trivial |
-| 7 | readOnly nos form fields do recurso (`useVersionContext` + `:disabled`) | os 4 blocks de Application | Baixo |
-| 8 | Testes (espelhar as 4 suites do §10) | suites de Application | Baixo |
+| 2 | `<recurso>-version-service.js` — `extends VersionServiceBase`, seta `adapter`/`baseURL = 'v4/workspace/<recurso>'`/`versionKeys`. Ciclo de vida + invalidação herdados; sobrescreva `invalidateAfterMutation` só se precisar invalidar cache extra (ex.: Deployment) | `custom-page-version-service.js` | Trivial |
+| 3 | `<recurso>-version-adapter.js` — `createVersionAdapter({ normalizeConfig, mapResourceFields, mapMeta? })`; **não** reimplemente `stripUndefinedDeep`/`normalizeVersion` | `custom-page-version-adapter.js` | **Único ponto de pensamento real** — campos do recurso são específicos |
+| 4 | `<Recurso>VersionAdapter.vue` (thin, ≤35 linhas) — só chama `useVersionFormAdapter` com `versionService`/`validationSchema`/`saveStrategy` | `CustomPageVersionAdapter.vue` | Trivial — o schema yup já existe nas telas atuais |
+| 5 | `v6/EditView.vue` + `v6/VersionEditView.vue` + `v6/tabs/*` (landing + edit screen compartilhados) | os de Custom Page | Baixo — já trazem as lições do §9 embutidas |
+| 6 | Fork no router (`hasFlagUseV6Configurations` / `meta.flag`) + rota `edit/:id/versions/:versionId` | `workload-routes` | Trivial |
+| 7 | readOnly nos form fields do recurso (`useVersionContext` + `:disabled`) | os blocks de Connector/Function | Baixo |
+| 8 | Entrada no `RESOURCE_RESOLVERS` do Release Drawer (`resolveReleaseResources.js`, chave = `resource_type`) | entradas `connector`/`function` | Trivial |
+| 9 | Testes (espelhar as suites do §10) | suites de Custom Page/Connector/Function | Baixo |
 
-### 11.2 Dificuldade por recurso
+> `saveStrategy` é o ponto de variação do write: `defaultSaveStrategy` (SAVE = PUT;
+> SAVE_AND_BUILD = PUT + build). Recursos com semântica própria fornecem o seu
+> (ex.: `workloadSaveStrategy` — build implícito no PUT; Custom Page —
+> `customPageSaveStrategy`, salva conteúdo via endpoint base).
 
-- **Custom Pages — fácil (~1 dia com testes).** Form único
-  (`FormFieldsCustomPages`, schema centralizado em `Config/validationSchema`),
-  service v2 pronto, sem sub-tabs. Candidato ideal a segundo consumidor para
-  validar o padrão.
-- **Firewall — médio (~1,5–2 dias).** Form simples (`FormFieldsEdgeFirewall`),
-  mas exige duas decisões de escopo: (a) tabs **Functions** e **Rules Engine** —
-  versioná-las exige consumir os endpoints `/versions/{vid}/...` (mesmo "out of
-  scope" aceito em Application no primeiro PR); (b) campo `domains` (vínculo com
-  outro recurso) — definir se entra no payload de versão ou fica read-only no
-  contexto de versão. Ponto a favor: o `GET` da versão de Firewall retorna o
-  **snapshot completo** do recurso, então o form pode inicializar direto da versão.
-- **WAF — fácil depois do Firewall.** Mesma máquina, mesmos endpoints sob
-  `/edge_firewall/api/wafs` — é o checklist de novo com outro baseURL/shape.
+### 11.2 WAF — fora de escopo (status real)
+
+**WAF não tem versionamento.** Não há API de versões confirmada para WAF; o recurso
+fica **deferido** até o backend expor o contrato. Não existem service/adapter/views
+v6 para WAF, e nenhuma `baseURL` `/edge_firewall/api/wafs` é consumida pelo
+framework. (Versões anteriores deste doc afirmavam, incorretamente, que o WAF
+compartilhava a máquina de estados do Firewall com API pronta.)
 
 ### 11.3 Mudanças no framework: nenhuma obrigatória, uma a vigiar
 
 `STATE_ACTIONS`, `PRIMARY_BY_STATE` (ActionBar) e `REQUIRES_COMMENT` (ActionBar)
 são **constantes globais compartilhadas** por todos os recursos. Hoje isso é
-correto — os quatro lifecycles são idênticos. **Se** um recurso divergir um dia
+correto — os lifecycles dos recursos plugados são idênticos. **Se** um recurso divergir um dia
 (ex.: archive sem comment obrigatório, recurso sem etapa de build), esses três
 mapas precisam ser promovidos a props/configuração do `<VersionShell>`, com os
 valores atuais como default. Não parametrizar antes da divergência existir
