@@ -1,7 +1,7 @@
 <script setup>
   import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
-  import * as yup from 'yup'
+  import { validationSchema } from './Config/validationSchema'
 
   import ContentBlock from '@/templates/content-block'
   import EditFormBlock from '@/templates/edit-form-block'
@@ -54,26 +54,6 @@
       })
       .track()
   }
-
-  const validationSchema = yup.object({
-    name: yup.string().required('Name is a required field'),
-    code: yup.string().required('Code is a required field'),
-    azionForm: yup.object(),
-    defaultArgs: yup.string().test('validJson', 'Invalid JSON', (value) => {
-      let isValidJson = true
-      try {
-        JSON.parse(value)
-      } catch {
-        isValidJson = false
-      }
-      return isValidJson
-    }),
-    active: yup.boolean(),
-    runtime: yup.string(),
-    runtimeFormat: yup.object().nullable(),
-    executionEnvironment: yup.string(),
-    isProprietaryCode: yup.boolean()
-  })
 
   const hasAdditionalErrors = () => {
     return additionalErrors.value.length
