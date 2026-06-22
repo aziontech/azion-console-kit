@@ -3,25 +3,30 @@ import { useToast } from '@aziontech/webkit/use-toast'
 import { metaFor } from '@/composables/versioning/version-actions'
 
 /**
- * Handles the management actions (Clone / Archive / Delete) a version list row
- * can trigger, emitted by `VersionListDataView`'s `row-action` event.
+ * Handles the row-menu management actions (Archive / Delete) emitted by
+ * `VersionListDataView`'s `row-action` event. Clone/Build are NOT routed here —
+ * they live in the shell action bar, not the row menu (spec version-actions-menu
+ * §3.4). ARCHIVE runs immediately (no modal) with a success toast; DELETE opens
+ * a destructive confirmation dialog first.
  *
- * Actions that carry a dialog (comment or confirmation) open `VersionActionDialog`
- * first; otherwise they run immediately. Execution goes DIRECTLY through the
- * version service — the VersionShell command bus is shell-scoped and is not
- * available here (and the list manages many versions, not one). Each service
- * mutation already invalidates the vue-query cache, so the list refetches with
- * no extra work.
+ * Execution goes DIRECTLY through the version service — the VersionShell command
+ * bus is shell-scoped and is not available here (and the list manages many
+ * versions, not one). Each service mutation already invalidates the vue-query
+ * cache, so the list refetches with no extra work. The backend stays the
+ * authority on "in use as Current": its rejection surfaces as an error toast.
  *
  * @param {object} cfg
  * @param {import('vue').MaybeRefOrGetter<string>} cfg.resourceId application id (ref/getter/plain)
- * @param {object} cfg.service version service exposing deleteVersion/archive/createDraft/cancelBuild
- * @param {(newVersionId: string) => void} [cfg.onCloned] called after a successful clone (e.g. navigate)
- * @param {() => void} [cfg.onSuccess] called after a successful non-navigating action, so the
+ * @param {object} cfg.service version service exposing deleteVersion/archive
+ * @param {() => void} [cfg.onSuccess] called after a successful action, so the
  *   consuming view can reload the list and reflect the new version status
  * @returns dialog state + handlers to wire into the view and VersionActionDialog
  */
-export function useVersionRowActions({ resourceId, service, onCloned, onSuccess } = {}) {
+// Default archive note: the row-menu Archive runs without a modal (Req 5.2),
+// but the version service requires a non-empty comment — supply a stable one.
+const DEFAULT_ARCHIVE_COMMENT = 'Archived from the versions list'
+
+export function useVersionRowActions({ resourceId, service, onSuccess } = {}) {
   const toast = useToast()
 
   const dialogVisible = ref(false)
@@ -60,33 +65,37 @@ export function useVersionRowActions({ resourceId, service, onCloned, onSuccess 
     }
   }
 
-  const execute = async (action, item, comment) => {
+  // Only Archive/Delete reach the row-action path; everything else is a no-op
+  // here (Clone/Build stay in the shell action bar).
+  const execute = async (action, item) => {
     const rid = toValue(resourceId)
     switch (action) {
-      case 'BUILD':
-        return service.build(rid, item.id, {})
       case 'DELETE':
         return service.deleteVersion(rid, item.id)
       case 'ARCHIVE':
-        return service.archive(rid, item.id, { comment })
-      case 'CANCEL_BUILD':
-        return service.cancelBuild(rid, item.id, { comment })
-      case 'NEW_DRAFT_FROM': {
-        const draft = await service.createDraft(rid, { sourceVersionId: item.id, comment })
-        if (draft?.id) onCloned?.(draft.id)
-        return draft
-      }
+        return service.archive(rid, item.id, { comment: DEFAULT_ARCHIVE_COMMENT })
       default:
         return undefined
     }
   }
 
-  const run = async (action, item, comment) => {
+  const notifySuccess = (action) => {
+    if (action !== 'ARCHIVE') return
+    toast.add({
+      closable: true,
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Version archived.'
+    })
+  }
+
+  const run = async (action, item) => {
     if (isExecuting.value) return
     isExecuting.value = true
     try {
-      await execute(action, item, comment)
-      if (action !== 'NEW_DRAFT_FROM') onSuccess?.()
+      await execute(action, item)
+      notifySuccess(action)
+      onSuccess?.()
     } catch (err) {
       const verb = metaFor(action).label?.toLowerCase?.() ?? 'run'
       reportError(err, `Failed to ${verb} the version. Try again.`)
@@ -95,25 +104,27 @@ export function useVersionRowActions({ resourceId, service, onCloned, onSuccess 
     }
   }
 
+  // DELETE opens the destructive confirm dialog; ARCHIVE runs with no modal.
   const handleRowAction = ({ action, item } = {}) => {
-    if (!action || !item) return
-    if (metaFor(action).dialog) {
+    if (action !== 'ARCHIVE' && action !== 'DELETE') return
+    if (!item) return
+    if (action === 'DELETE') {
       pendingAction.value = action
       pendingItem.value = item
       dialogVisible.value = true
       return
     }
-    run(action, item, '')
+    run(action, item)
   }
 
-  const handleConfirm = (comment) => {
+  const handleConfirm = () => {
     const action = pendingAction.value
     const item = pendingItem.value
     if (!action || !item) return
     dialogVisible.value = false
     pendingAction.value = null
     pendingItem.value = null
-    run(action, item, comment)
+    run(action, item)
   }
 
   const handleVisibility = (value) => {
