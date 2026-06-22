@@ -10,6 +10,7 @@
   import InlineTag from '@/components/InlineTag'
   import StatusTag from '@/components/StatusTag'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
+  import { useReleaseDrawerController } from '@/composables/versioning/use-deployment-release-drawer'
 
   defineOptions({ name: 'deployment-versions-list' })
 
@@ -35,8 +36,13 @@
   const rowMenuRef = ref(null)
   const rowMenuItems = ref([])
 
-  const drawerVisible = ref(false)
-  const selectedVersion = ref(null)
+  // This context only views version details; rollback/redeploy live in the
+  // Deployment History tab, so the drawer action is hidden here (not a no-op).
+  const {
+    visible: drawerVisible,
+    selectedRelease: selectedVersion,
+    openRelease
+  } = useReleaseDrawerController({ actionable: false })
 
   const statusAllOption = { label: 'Status', value: 'all' }
   const environmentAllOption = { label: 'Environment', value: 'all' }
@@ -130,41 +136,17 @@
     }
   }
 
-  const openDrawer = (version) => {
-    if (!version) return
-    selectedVersion.value = version
-    drawerVisible.value = true
-  }
-
-  const goToDetails = (version) => openDrawer(version)
+  const goToDetails = (version) => openRelease(version)
 
   const openRowMenu = ({ event, version }) => {
     rowMenuItems.value = [
       {
         label: 'View details',
         icon: 'pi pi-eye',
-        command: () => openDrawer(version)
+        command: () => openRelease(version)
       }
     ]
     rowMenuRef.value?.toggle?.(event)
-  }
-
-  const onRollback = (version) => {
-    toast.add({
-      closable: true,
-      severity: 'info',
-      summary: 'Rollback',
-      detail: `Rollback requested for "${version?.name || version?.id || 'version'}"`
-    })
-  }
-
-  const onRedeploy = (version) => {
-    toast.add({
-      closable: true,
-      severity: 'info',
-      summary: 'Redeploy',
-      detail: `Redeploy requested for "${version?.name || version?.id || 'version'}"`
-    })
   }
 
   const onPage = (event) => {
@@ -319,8 +301,7 @@
     <DeploymentReleaseDrawer
       v-model:visible="drawerVisible"
       :release="selectedVersion"
-      @rollback="onRollback"
-      @redeploy="onRedeploy"
+      :actionable="false"
     />
   </div>
 </template>

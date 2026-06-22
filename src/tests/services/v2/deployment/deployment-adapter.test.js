@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DeploymentAdapter } from '@/services/v2/deployment/deployment-adapter'
+import { DeploymentAdapter, resolveResourceMeta } from '@/services/v2/deployment/deployment-adapter'
 
 const activeRelease = {
   resources: [
@@ -244,5 +244,31 @@ describe('DeploymentAdapter.transformBuildAndActivatePayload', () => {
         resource_type: 'application'
       }
     ])
+  })
+})
+
+describe('resolveResourceMeta', () => {
+  it('resolves the connector type with its Azion label + icon token', () => {
+    expect(resolveResourceMeta('connector')).toEqual({
+      type: 'connector',
+      label: 'Connector',
+      icon: 'ai ai-edge-connectors'
+    })
+  })
+
+  it('resolves the function type with its Azion label + icon token', () => {
+    expect(resolveResourceMeta('function')).toEqual({
+      type: 'function',
+      label: 'Function',
+      icon: 'ai ai-edge-functions'
+    })
+  })
+
+  it('falls back to a title-cased label + generic icon for unknown types', () => {
+    expect(resolveResourceMeta('some_other')).toEqual({
+      type: 'some_other',
+      label: 'Some Other',
+      icon: 'pi pi-box'
+    })
   })
 })
