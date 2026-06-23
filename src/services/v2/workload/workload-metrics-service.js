@@ -1,5 +1,6 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { WorkloadMetricsAdapter } from './workload-metrics-adapter'
 
 const RANGE_PRESETS = {
   '1h': { hours: 1, label: 'Last 1 hour' },
@@ -8,81 +9,71 @@ const RANGE_PRESETS = {
   '30d': { hours: 24 * 30, label: 'Last 30 days' }
 }
 
-const hashSeed = (workloadId, range, key) => {
-  const source = `${workloadId || 'wl'}:${range}:${key}`
-  let hash = 0
-  for (let index = 0; index < source.length; index += 1) {
-    hash = (hash * 31 + source.charCodeAt(index)) >>> 0
+const HOUR_IN_MS = 60 * 60 * 1000
+
+const toBeholderFormat = (date) => date.toISOString().replace(/(\..+)/, '')
+
+const computeRanges = (range) => {
+  const windowMs = RANGE_PRESETS[range].hours * HOUR_IN_MS
+  const now = new Date()
+  const curBegin = new Date(now.getTime() - windowMs)
+  const prevBegin = new Date(curBegin.getTime() - windowMs)
+
+  return {
+    curBegin: toBeholderFormat(curBegin),
+    curEnd: toBeholderFormat(now),
+    prevBegin: toBeholderFormat(prevBegin),
+    prevEnd: toBeholderFormat(curBegin)
   }
-  return hash
 }
 
-const pseudoFloat = (workloadId, range, key, salt = 0) => {
-  const hash = hashSeed(workloadId, range, `${key}:${salt}`)
-  return (hash % 10000) / 10000
-}
-
-const formatNumber = (value, fraction = 1) => {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(fraction)}M`
-  if (value >= 1_000) return `${(value / 1_000).toFixed(fraction)}K`
-  return value.toFixed(fraction)
-}
-
-const buildMetrics = (workloadId, range) => {
-  const requestsBase = 8_000_000 + pseudoFloat(workloadId, range, 'requests') * 12_000_000
-  const bandwidthBase = 350 + pseudoFloat(workloadId, range, 'bandwidth') * 900
-  const latencyBase = 24 + pseudoFloat(workloadId, range, 'latency') * 40
-  const errorBase = 0.05 + pseudoFloat(workloadId, range, 'errors') * 0.4
-
-  const variation = (key) => {
-    const raw = pseudoFloat(workloadId, range, key, 1) * 24 - 8
-    return Number(raw.toFixed(2))
+const WORKLOAD_OVERVIEW_METRICS_QUERY = `
+  query workloadOverviewMetrics(
+    $curBegin: DateTime!
+    $curEnd: DateTime!
+    $prevBegin: DateTime!
+    $prevEnd: DateTime!
+    $configurationId: [String]!
+  ) {
+    curRequests: httpMetrics(limit: 1, aggregate: { sum: requests }, filter: { tsRange: { begin: $curBegin, end: $curEnd }, configurationIdIn: $configurationId }) { sum }
+    curBandwidth: httpMetrics(limit: 5000, groupBy: [ts], orderBy: [ts_ASC], filter: { tsRange: { begin: $curBegin, end: $curEnd }, configurationIdIn: $configurationId }) { dataTransferredTotal }
+    curLatency: httpMetrics(limit: 1, aggregate: { avg: requestTime }, filter: { tsRange: { begin: $curBegin, end: $curEnd }, configurationIdIn: $configurationId }) { avg }
+    curErrors5xx: httpMetrics(limit: 1, aggregate: { sum: requests }, filter: { tsRange: { begin: $curBegin, end: $curEnd }, configurationIdIn: $configurationId, statusRange: { begin: 500, end: 599 } }) { sum }
+    prevRequests: httpMetrics(limit: 1, aggregate: { sum: requests }, filter: { tsRange: { begin: $prevBegin, end: $prevEnd }, configurationIdIn: $configurationId }) { sum }
+    prevBandwidth: httpMetrics(limit: 5000, groupBy: [ts], orderBy: [ts_ASC], filter: { tsRange: { begin: $prevBegin, end: $prevEnd }, configurationIdIn: $configurationId }) { dataTransferredTotal }
+    prevLatency: httpMetrics(limit: 1, aggregate: { avg: requestTime }, filter: { tsRange: { begin: $prevBegin, end: $prevEnd }, configurationIdIn: $configurationId }) { avg }
+    prevErrors5xx: httpMetrics(limit: 1, aggregate: { sum: requests }, filter: { tsRange: { begin: $prevBegin, end: $prevEnd }, configurationIdIn: $configurationId, statusRange: { begin: 500, end: 599 } }) { sum }
   }
-
-  return [
-    {
-      key: 'requests',
-      label: 'Requests',
-      value: formatNumber(requestsBase, 1),
-      unit: '',
-      tooltip: 'Total HTTP requests served by this Workload.',
-      variation: { value: variation('requests'), type: 'regular' }
-    },
-    {
-      key: 'bandwidth',
-      label: 'Bandwidth',
-      value: formatNumber(bandwidthBase, 0),
-      unit: 'GB',
-      tooltip: 'Total data transferred from the edge to clients.',
-      variation: { value: variation('bandwidth'), type: 'regular' }
-    },
-    {
-      key: 'latency',
-      label: 'p95 Latency',
-      value: Math.round(latencyBase).toString(),
-      unit: 'ms',
-      tooltip: '95th-percentile response time at the edge.',
-      variation: { value: variation('latency'), type: 'inverse' }
-    },
-    {
-      key: 'errors',
-      label: '5xx Errors',
-      value: errorBase.toFixed(2),
-      unit: '%',
-      tooltip: 'Share of 5xx responses returned to clients.',
-      variation: { value: variation('errors'), type: 'inverse' }
-    }
-  ]
-}
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+`
 
 export class WorkloadMetricsService extends BaseService {
+  constructor() {
+    super()
+    this.adapter = WorkloadMetricsAdapter
+    this.baseURL = 'v4/metrics/graphql'
+  }
+
   #fetchMetrics = async (workloadId, params = {}) => {
-    await sleep(220)
     const range = RANGE_PRESETS[params.range] ? params.range : '24h'
+    const { curBegin, curEnd, prevBegin, prevEnd } = computeRanges(range)
+
+    const { data } = await this.http.request({
+      method: 'POST',
+      url: this.baseURL,
+      body: {
+        query: WORKLOAD_OVERVIEW_METRICS_QUERY,
+        variables: {
+          curBegin,
+          curEnd,
+          prevBegin,
+          prevEnd,
+          configurationId: [String(workloadId)]
+        }
+      }
+    })
+
     return {
-      body: buildMetrics(workloadId, range),
+      body: this.adapter.transformOverviewMetrics(data?.data),
       range,
       rangeLabel: RANGE_PRESETS[range].label,
       generatedAt: new Date().toISOString()

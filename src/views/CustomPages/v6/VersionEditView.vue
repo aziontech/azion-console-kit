@@ -35,7 +35,6 @@
     :title="title"
     :entity-name="resource?.name"
     error-message="Failed to load custom page. Try refreshing the page."
-    :has-add-action="true"
     testid-prefix="custom-pages-v6-version-edit"
   >
     <template #editor>

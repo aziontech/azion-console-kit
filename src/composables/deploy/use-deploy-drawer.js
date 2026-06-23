@@ -11,7 +11,6 @@ import { DeploymentAdapter } from '@/services/v2/deployment/deployment-adapter'
 import { buildStrategy } from '@/services/v2/deployment/strategy-builder'
 import { deployDrawerService } from '@/services/v2/deploy-drawer/deploy-drawer-service'
 import { RESOURCE_CATALOG_REGISTRY } from '@/services/v2/deploy-drawer/resource-catalog-registry'
-import { getVersionCapability } from '@/composables/versioning/version-capability'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
 
@@ -21,6 +20,9 @@ const APPLICATION_TYPE = 'application'
 const SINGLE_VERSION = 'single_version'
 const APPLICATION_CATALOG_PAGE_SIZE = 100
 
+const OPTIONAL_RESOURCE_TYPES = ['firewall', 'custom_page']
+const RELEASE_RESOURCE_TYPES = new Set([APPLICATION_TYPE, ...OPTIONAL_RESOURCE_TYPES])
+
 // Sentinel for "Track latest Ready": pin to the newest Ready version at dispatch
 // time rather than a fixed short_id. Distinct from any real version id.
 export const LATEST_READY = 'LATEST'
@@ -29,11 +31,6 @@ const normalizeName = (name) => (isObject(name) ? (name.text ?? '') : (name ?? '
 
 // A version is deployable when it is built — `ready` or `active` (serving).
 const DEPLOYABLE_STATES = ['ready', 'active']
-
-// A type belongs in the release picker only when its class can be deployed.
-// `versioned-only` (function/network_list/waf) returns `canDeploy: false`, so
-// it is filtered out of the selectable composition (req 2.7).
-const isDeployableType = (resourceType) => getVersionCapability(resourceType).canDeploy
 
 const toVersionOptions = (versions) =>
   (Array.isArray(versions) ? versions : [])
@@ -45,6 +42,13 @@ const toVersionOptions = (versions) =>
       author: version.lastEditor || null,
       isCurrent: Boolean(version.isCurrent)
     }))
+
+const resolveLatestVersion = (options, selected) => {
+  if (selected !== LATEST_READY) return selected
+  const list = Array.isArray(options) ? options : []
+  const current = list.find((option) => option.isCurrent)
+  return current?.value ?? list[0]?.value ?? null
+}
 
 export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadId } = {}) {
   // `enabled` gates fetching to the drawer's open state (req 1.1, 1.5): closed
@@ -156,12 +160,9 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
   // Resolves the chosen scoped version to a concrete id for dispatch: the
   // LATEST_READY sentinel maps to the newest Ready option (first `isCurrent`,
   // else the first option); a pinned id is returned as-is.
-  const resolvedVersionId = computed(() => {
-    if (selectedVersionId.value !== LATEST_READY) return selectedVersionId.value
-    const options = versionOptions.value
-    const current = options.find((option) => option.isCurrent)
-    return current?.value ?? options[0]?.value ?? null
-  })
+  const resolvedVersionId = computed(() =>
+    resolveLatestVersion(versionOptions.value, selectedVersionId.value)
+  )
 
   const versionLabel = computed(() => {
     const id = toValue(resourceContext)?.version?.id ?? null
@@ -253,6 +254,12 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
   )
 
   const activeReleaseApplication = computed(() => releaseParts.value.applicationFromRelease)
+
+  const carriedReadOnlyResources = computed(() =>
+    releaseParts.value.readOnlyResources.filter((entry) =>
+      RELEASE_RESOURCE_TYPES.has(entry.resourceType)
+    )
+  )
 
   // Single + deployed + scoped is NOT the application => the application slot is
   // read-only (it carries the current live application). Otherwise editable.
@@ -404,14 +411,9 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
 
   // Resolves the editable application version, mapping the LATEST_READY sentinel
   // to the newest Ready option (first `isCurrent`, else the first).
-  const resolvedApplicationVersionId = computed(() => {
-    if (selectedApplicationVersionId.value !== LATEST_READY) {
-      return selectedApplicationVersionId.value
-    }
-    const options = applicationVersions.value
-    const current = options.find((option) => option.isCurrent)
-    return current?.value ?? options[0]?.value ?? null
-  })
+  const resolvedApplicationVersionId = computed(() =>
+    resolveLatestVersion(applicationVersions.value, selectedApplicationVersionId.value)
+  )
 
   // --- Composition (generic VM) -------------------------------------------
 
@@ -470,7 +472,7 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
   const composition = computed(() => ({
     applicationSlot: applicationSlot.value,
     scopedSlot: scopedSlot.value,
-    readOnlyResources: releaseParts.value.readOnlyResources,
+    readOnlyResources: carriedReadOnlyResources.value,
     noApplication: noApplication.value
   }))
 
@@ -480,7 +482,7 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
   const isResolvingReadOnlyNames = ref(false)
 
   watch(
-    () => releaseParts.value.readOnlyResources,
+    () => carriedReadOnlyResources.value,
     async (list) => {
       const pending = (list ?? []).filter(
         (entry) =>
@@ -531,12 +533,8 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
   const versionsByResource = ref({})
   const versionsLoadingByResource = ref({})
 
-  // Workload-first composition is user-picked, so `versioned-only` types are
-  // dropped from the selectable set (req 2.7); deployable types are unchanged.
   const editableSourceResources = computed(() =>
-    hasScopedResource.value
-      ? null
-      : releaseParts.value.readOnlyResources.filter((entry) => isDeployableType(entry.resourceType))
+    hasScopedResource.value ? null : carriedReadOnlyResources.value
   )
 
   watch(
@@ -546,13 +544,17 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
         editableResources.value = []
         return
       }
-      editableResources.value = list.map((entry) => ({
-        key: `${entry.resourceType}:${entry.resourceId}`,
-        resourceType: entry.resourceType,
-        versioned: Boolean(RESOURCE_CATALOG_REGISTRY[entry.resourceType]?.versioned),
-        selectedId: entry.resourceId,
-        selectedVersionId: entry.resourceVersion ?? null
-      }))
+      editableResources.value = OPTIONAL_RESOURCE_TYPES.map((resourceType) => {
+        const seeded = list.find((entry) => entry.resourceType === resourceType) ?? null
+        return {
+          key: resourceType,
+          resourceType,
+          optional: true,
+          versioned: Boolean(RESOURCE_CATALOG_REGISTRY[resourceType]?.versioned),
+          selectedId: seeded?.resourceId ?? null,
+          selectedVersionId: seeded?.resourceVersion ?? null
+        }
+      })
     },
     { immediate: true }
   )
@@ -628,6 +630,7 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
       return {
         key: resource.key,
         resourceType: resource.resourceType,
+        optional: Boolean(resource.optional),
         versioned: resource.versioned,
         selectedId: resource.selectedId,
         selectedVersionId: resource.selectedVersionId,
@@ -640,10 +643,10 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
   )
 
   const editableResourcesValid = computed(() =>
-    editableResources.value.every(
-      (resource) =>
-        resource.selectedId != null && (!resource.versioned || Boolean(resource.selectedVersionId))
-    )
+    editableResources.value.every((resource) => {
+      if (resource.selectedId == null) return resource.optional === true
+      return !resource.versioned || Boolean(resource.selectedVersionId)
+    })
   )
 
   // --- Release limit (Case 5) ---------------------------------------------
@@ -732,9 +735,15 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
         })
       } else {
         editableResources.value.forEach((resource) => {
+          if (resource.selectedId == null) return
+          const versionsKey = `${resource.resourceType}:${resource.selectedId}`
+          const resolvedVersion = resolveLatestVersion(
+            versionsByResource.value[versionsKey],
+            resource.selectedVersionId
+          )
           resources.push({
             resource_id: resource.selectedId,
-            resource_version: resource.versioned ? resource.selectedVersionId : undefined,
+            resource_version: resource.versioned ? resolvedVersion : undefined,
             resource_type: resource.resourceType
           })
         })

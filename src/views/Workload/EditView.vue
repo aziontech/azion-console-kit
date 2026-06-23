@@ -37,18 +37,10 @@
             @click="onCancel"
           />
           <PrimeButton
-            outlined
             type="button"
-            label="Save as Draft"
+            label="Save"
             :loading="loading"
-            data-testid="workload-settings__save-draft"
-            @click="onSubmit"
-          />
-          <PrimeButton
-            type="button"
-            label="Save and Deploy"
-            :loading="loading"
-            data-testid="workload-settings__save-deploy"
+            data-testid="workload-settings__save"
             @click="onSubmit"
           />
         </ActionBarBlock>

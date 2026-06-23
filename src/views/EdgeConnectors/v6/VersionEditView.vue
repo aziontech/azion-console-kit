@@ -35,7 +35,6 @@
     :title="title"
     :entity-name="resource?.name"
     error-message="Failed to load connector. Try refreshing the page."
-    :has-add-action="true"
     testid-prefix="edge-connectors-v6-version-edit"
   >
     <template #editor>

@@ -70,9 +70,9 @@ const LISTINGS = [
     file: 'src/views/Workload/Tabs/VersionsTab.vue'
   },
   {
-    name: 'DeploymentVersionsList',
+    name: 'Deployment VersionsTab',
     resourceType: 'deployment',
-    file: 'src/views/Deployments/components/DeploymentVersionsList.vue'
+    file: 'src/views/Deployments/tabs/VersionsTab.vue'
   },
   {
     name: 'NetworkLists VersionsTab',

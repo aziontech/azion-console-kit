@@ -6,7 +6,7 @@
   import MessageCard from '@/components/MessageCard'
   import Dropdown from '@aziontech/webkit/dropdown'
   import PrimeButton from '@aziontech/webkit/button'
-  import Tag from '@aziontech/webkit/tag'
+  import Tag from '@aziontech/webkit/prime-tag'
   import { environmentService } from '@/services/v2/environment/environment-service'
   import { deploymentService } from '@/services/v2/deployment/deployment-service'
   import { mapPolicyToLabel } from '@/services/v2/deployment/deployment-adapter'
@@ -214,7 +214,7 @@
             <span class="text-sm font-medium text-color truncate">{{ env.name }}</span>
             <Tag
               v-if="policyLabelFor(env.id)"
-              severity="secondary"
+              severity="info"
               :value="policyLabelFor(env.id)"
               :data-testid="`deployment-settings__policy-${env.id}`"
             />
@@ -255,7 +255,7 @@
                 <span class="truncate">{{ option.name }}</span>
                 <Tag
                   v-if="option.policyLabel"
-                  severity="secondary"
+                  severity="info"
                   :value="option.policyLabel"
                 />
               </div>

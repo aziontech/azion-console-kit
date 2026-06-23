@@ -102,15 +102,15 @@
       })
       .label('Domain'),
     environment: yup.string().required('Environment is required').label('Environment'),
-    domainType: yup.string().oneOf([DOMAIN_TYPE.AZION, DOMAIN_TYPE.OWN]).required()
-    // certificate: yup
-    //   .mixed()
-    //   .nullable()
-    //   .test('cert-when-https', 'Digital Certificate is required', function (value) {
-    //     if (!props.useHttps) return true
-    //     return value !== undefined && value !== null && value !== 0
-    //   })
-    //   .label('Digital Certificate')
+    domainType: yup.string().oneOf([DOMAIN_TYPE.AZION, DOMAIN_TYPE.OWN]).required(),
+    certificate: yup
+      .mixed()
+      .nullable()
+      .test('cert-when-https', 'Digital Certificate is required', function (value) {
+        if (!props.useHttps) return true
+        return value !== undefined && value !== null
+      })
+      .label('Digital Certificate')
   })
 
   const { handleSubmit, resetForm, values, setFieldValue } = useForm({

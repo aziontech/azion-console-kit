@@ -1,23 +1,20 @@
 <script setup>
   import { computed, onMounted, ref, watch } from 'vue'
-  import { useRouter } from 'vue-router'
   import { watchDebounced } from '@vueuse/core'
   import { useToast } from '@aziontech/webkit/use-toast'
   import Menu from '@aziontech/webkit/menu'
   import Calendar from '@aziontech/webkit/calendar'
   import Dropdown from '@aziontech/webkit/dropdown'
+  import PrimeDialog from '@aziontech/webkit/dialog'
+  import PrimeButton from '@aziontech/webkit/button'
   import GenericDataView from '@/components/GenericDataView'
-  import VersionActionDialog from '@/templates/version-shell-block/components/VersionActionDialog.vue'
-  import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
+  import { deploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
   import InlineTag from '@/components/InlineTag'
   import StatusTag from '@/components/StatusTag'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
   import { useReleaseDrawerController } from '@/composables/versioning/use-deployment-release-drawer'
-  import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
-  import { mapVersionMenuItemsToMenu } from '@/composables/versioning/version-actions'
-  import '@/assets/styles/version-row-menu.css'
 
-  defineOptions({ name: 'deployment-versions-list' })
+  defineOptions({ name: 'deployment-releases-tab' })
 
   const props = defineProps({
     deploymentId: {
@@ -27,7 +24,6 @@
   })
 
   const toast = useToast()
-  const router = useRouter()
 
   const versions = ref([])
   const totalRecords = ref(0)
@@ -42,13 +38,20 @@
   const rowMenuRef = ref(null)
   const rowMenuItems = ref([])
 
-  // This context only views version details; rollback/redeploy live in the
-  // Deployment History tab, so the drawer action is hidden here (not a no-op).
+  // This context can rollback/redeploy, so the drawer action stays enabled.
   const {
     visible: drawerVisible,
     selectedRelease: selectedVersion,
-    openRelease
-  } = useReleaseDrawerController({ actionable: false })
+    openRelease,
+    closeDrawer
+  } = useReleaseDrawerController({ actionable: true })
+
+  const confirmDialog = ref({
+    visible: false,
+    action: null,
+    version: null,
+    loading: false
+  })
 
   const statusAllOption = { label: 'Status', value: 'all' }
   const environmentAllOption = { label: 'Environment', value: 'all' }
@@ -112,19 +115,31 @@
     return true
   }
 
-  const filteredVersions = computed(() => versions.value.filter(matchesDateRange))
+  const matchesEnvironment = (version) => {
+    const environment = filterValues.value.environment
+    if (environment === 'all') return true
+    return version.environmentLabel === environment
+  }
+
+  const filteredVersions = computed(() =>
+    versions.value.filter((version) => matchesDateRange(version) && matchesEnvironment(version))
+  )
 
   const loadVersions = async () => {
+    if (!props.deploymentId) {
+      versions.value = []
+      totalRecords.value = 0
+      return
+    }
+
     loading.value = true
     try {
       const status = filterValues.value.status
-      const environment = filterValues.value.environment
-      const result = await deploymentVersionService.listVersionsService(props.deploymentId, {
+      const result = await deploymentReleaseService.listReleasesService(props.deploymentId, {
         page: Math.floor(paginatorFirst.value / paginatorRows.value) + 1,
         pageSize: paginatorRows.value,
         search: searchTerm.value?.trim() || undefined,
-        state: status !== 'all' ? status : undefined,
-        environment: environment !== 'all' ? environment : undefined
+        state: status !== 'all' ? status : undefined
       })
       versions.value = Array.isArray(result?.body) ? result.body : []
       totalRecords.value = typeof result?.count === 'number' ? result.count : versions.value.length
@@ -133,7 +148,7 @@
         closable: true,
         severity: 'error',
         summary: 'Error',
-        detail: error?.message || 'Failed to load deployment versions'
+        detail: error?.message || 'Failed to load deployment history'
       })
       versions.value = []
       totalRecords.value = 0
@@ -144,34 +159,85 @@
 
   const goToDetails = (version) => openRelease(version)
 
-  // Same shared driver + model as every other version listing (Req 1.4): the
-  // row menu is built by `mapVersionMenuItemsToMenu` and routed through
-  // `useVersionMenuActions`, never a local item. This is the deployment-release
-  // history view, so the release drawer (view-only) remains reachable by clicking
-  // the row name; the menu's Open-configuration has no deployment editor route yet.
-  const {
-    handleRowAction,
-    dialogConfig,
-    dialogProps,
-    dialogVisible,
-    handleConfirm,
-    handleVisibility
-  } = useVersionMenuActions({
-    resourceType: 'deployment',
-    resourceId: computed(() => String(props.deploymentId)),
-    versionService: deploymentVersionService,
-    router,
-    onSuccess: () => loadVersions()
+  const openRowMenu = ({ event, version }) => {
+    rowMenuItems.value = [
+      {
+        label: 'View details',
+        icon: 'pi pi-eye',
+        command: () => openRelease(version)
+      }
+    ]
+    rowMenuRef.value?.toggle?.(event)
+  }
+
+  const onRequestRollback = (version) => {
+    confirmDialog.value = {
+      visible: true,
+      action: 'rollback',
+      version,
+      loading: false
+    }
+  }
+
+  const onRequestRedeploy = (version) => {
+    confirmDialog.value = {
+      visible: true,
+      action: 'redeploy',
+      version,
+      loading: false
+    }
+  }
+
+  const confirmDialogTitle = computed(() =>
+    confirmDialog.value.action === 'rollback' ? 'Roll back version' : 'Redeploy version'
+  )
+
+  const confirmDialogMessage = computed(() => {
+    const name =
+      confirmDialog.value.version?.name || confirmDialog.value.version?.id || 'this version'
+    return confirmDialog.value.action === 'rollback'
+      ? `Roll back to "${name}"? Traffic will move to the previous active version.`
+      : `Redeploy "${name}"? It will become the active version for its environment.`
   })
 
-  const openRowMenu = ({ event, version }) => {
-    rowMenuItems.value = mapVersionMenuItemsToMenu(
-      version.state,
-      { resourceType: 'deployment' },
-      handleRowAction,
-      version
-    )
-    rowMenuRef.value?.toggle?.(event)
+  const closeConfirmDialog = () => {
+    confirmDialog.value = { visible: false, action: null, version: null, loading: false }
+  }
+
+  const runConfirmedAction = async () => {
+    const { action, version } = confirmDialog.value
+    if (!action || !version?.id || !version?.deployment_id) return
+
+    confirmDialog.value.loading = true
+    try {
+      if (action === 'rollback') {
+        await deploymentReleaseService.rollbackReleaseService(version.deployment_id, version.id)
+      } else {
+        await deploymentReleaseService.activateReleaseService(version.deployment_id, version.id)
+      }
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Success',
+        detail:
+          action === 'rollback'
+            ? 'Rollback requested successfully'
+            : 'Redeploy requested successfully'
+      })
+      closeConfirmDialog()
+      closeDrawer()
+      await loadVersions()
+    } catch (error) {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail:
+          error?.message ||
+          (action === 'rollback' ? 'Failed to roll back version' : 'Failed to redeploy version')
+      })
+      confirmDialog.value.loading = false
+    }
   }
 
   const onPage = (event) => {
@@ -217,12 +283,12 @@
       :toolbarMode="'compact'"
       :showHeader="false"
       searchPlaceholder="Placeholder"
-      emptyTitle="No Deployment versions yet"
-      emptyDescription="Deployment versions will appear here once you deploy your resources."
-      filteredEmptyTitle="No versions found"
+      emptyTitle="No releases yet"
+      emptyDescription="Releases will appear here once you deploy a version of this deployment."
+      filteredEmptyTitle="No releases found"
       filteredEmptyDescription="Try changing your search or filters."
-      rowActionsAriaLabel="Version actions"
-      overflowMenuAriaLabel="More version actions"
+      rowActionsAriaLabel="Release actions"
+      overflowMenuAriaLabel="More release actions"
       @refresh="loadVersions"
       @page="onPage"
       @open-row-menu="({ event, deployment }) => openRowMenu({ event, version: deployment })"
@@ -294,7 +360,7 @@
             v-if="version.duration"
             class="text-xs text-[var(--text-color-secondary)] whitespace-nowrap"
           >
-            {{ version.duration }}
+            Deployed in {{ version.duration }}
           </span>
         </div>
       </template>
@@ -321,40 +387,43 @@
       ref="rowMenuRef"
       :popup="true"
       :model="rowMenuItems"
-      appendTo="body"
-      class="version-row-menu"
-    >
-      <template #item="{ item, props: itemProps }">
-        <a
-          v-tooltip.left="item.tooltip ? { value: item.tooltip, showDelay: 200 } : undefined"
-          class="version-row-menu__item"
-          :class="{ 'version-row-menu__item--danger': item.class === 'danger' }"
-          v-bind="itemProps.action"
-        >
-          <span
-            v-if="item.icon"
-            class="version-row-menu__icon"
-            :class="item.icon"
-            aria-hidden="true"
-          />
-          <span class="version-row-menu__label">{{ item.label }}</span>
-        </a>
-      </template>
-    </Menu>
-
-    <VersionActionDialog
-      v-if="dialogConfig"
-      v-bind="dialogProps"
-      :visible="dialogVisible"
-      @confirm="handleConfirm"
-      @update:visible="handleVisibility"
     />
 
     <DeploymentReleaseDrawer
       v-model:visible="drawerVisible"
       :release="selectedVersion"
-      :actionable="false"
+      :actionable="true"
+      @rollback="onRequestRollback"
+      @redeploy="onRequestRedeploy"
     />
+
+    <PrimeDialog
+      v-model:visible="confirmDialog.visible"
+      modal
+      :closable="!confirmDialog.loading"
+      :header="confirmDialogTitle"
+      class="max-w-md w-full"
+      :pt="{
+        headerTitle: { 'data-testid': 'deployment-releases__confirm-dialog__title' }
+      }"
+    >
+      <p class="text-sm text-[var(--text-color-secondary)]">
+        {{ confirmDialogMessage }}
+      </p>
+      <template #footer>
+        <PrimeButton
+          label="Cancel"
+          outlined
+          :disabled="confirmDialog.loading"
+          @click="closeConfirmDialog"
+        />
+        <PrimeButton
+          :label="confirmDialog.action === 'rollback' ? 'Rollback' : 'Redeploy'"
+          :loading="confirmDialog.loading"
+          @click="runConfirmedAction"
+        />
+      </template>
+    </PrimeDialog>
   </div>
 </template>
 
