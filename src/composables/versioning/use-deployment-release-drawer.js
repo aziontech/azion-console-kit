@@ -139,7 +139,7 @@ export function useDeploymentReleaseDrawer({ release, visible, emit } = {}) {
 
 // Consumer-facing half of the drawer composable: owns the visibility + selected
 // release state that used to be duplicated as local refs in every consumer
-// (`DeploymentHistoryTab`, `DeploymentVersionsList`, `WorkloadReleasesSection`).
+// (`ReleasesTab`, `WorkloadReleasesSection`).
 // `actionable` declares whether this context can run rollback/redeploy so the
 // drawer hides the button instead of emitting a no-op that only toasts.
 export function useReleaseDrawerController({ actionable = false } = {}) {

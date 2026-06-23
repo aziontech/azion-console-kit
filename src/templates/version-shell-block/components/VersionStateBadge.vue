@@ -19,7 +19,7 @@
     draft: { severity: 'warning', label: 'Draft', icon: 'pi pi-file-edit' },
     queued: { severity: 'info', label: 'Queued', icon: 'pi pi-clock' },
     building: { severity: 'info', label: 'Building', icon: 'pi pi-spin pi-spinner' },
-    ready: { severity: 'success', label: 'Ready', icon: 'pi pi-check' },
+    ready: { severity: 'success', label: 'Ready', icon: 'pi pi-circle-fill' },
     active: { severity: 'success', label: 'Active' },
     archived: { severity: 'secondary', label: 'Archived' },
     canceled: { severity: 'warning', label: 'Canceled' },

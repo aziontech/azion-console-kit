@@ -178,13 +178,13 @@
     </template>
 
     <template #cell-status="{ item }">
-      <div class="flex flex-col gap-0.5 min-w-0">
+      <div class="flex gap-0.5 min-w-0">
         <StatusTag :status="item.status" />
         <span
           v-if="item.duration"
           class="text-xs text-color-secondary pl-4"
         >
-          {{ item.duration }}
+          Deployed in {{ item.duration }}
         </span>
       </div>
     </template>

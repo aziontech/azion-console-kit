@@ -8,7 +8,17 @@ export const deploymentRoutes = {
   children: [
     {
       path: '',
-      redirect: { name: 'deployments-list', params: { tab: 'overview' } }
+      name: 'deployments-list',
+      component: () => import('@views/Deployments/ListView.vue'),
+      meta: {
+        title: 'Deployments',
+        breadCrumbs: [
+          {
+            label: 'Deployments',
+            to: '/deployments'
+          }
+        ]
+      }
     },
     {
       path: 'create',
@@ -28,15 +38,36 @@ export const deploymentRoutes = {
       }
     },
     {
-      path: ':tab(overview|history)',
-      name: 'deployments-list',
+      path: 'edit/:id/:tab(versions|releases)?',
+      name: 'deployments-edit',
       component: () => import('@views/Deployments/TabsView.vue'),
       meta: {
-        title: 'Deployments',
+        title: 'Edit Deployment',
         breadCrumbs: [
           {
             label: 'Deployments',
             to: '/deployments'
+          },
+          {
+            label: 'Edit'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id/versions/:versionId',
+      name: 'edit-deployment-version',
+      component: () => import('@views/Deployments/v6/VersionEditView.vue'),
+      meta: {
+        title: 'Edit Version',
+        flag: 'use_v6_configurations',
+        breadCrumbs: [
+          {
+            label: 'Deployments',
+            to: '/deployments'
+          },
+          {
+            label: 'Edit Version'
           }
         ]
       }

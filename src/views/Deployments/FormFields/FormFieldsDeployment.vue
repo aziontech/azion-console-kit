@@ -7,6 +7,7 @@
   import FieldNumber from '@aziontech/webkit/field-number'
   import RadioButton from '@aziontech/webkit/radiobutton'
   import LabelBlock from '@aziontech/webkit/label'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'form-fields-deployment' })
 
@@ -16,6 +17,10 @@
       default: false
     }
   })
+
+  // Read-only is owned by the VersionShell context (default false outside it, so
+  // the create flow is untouched). Immutable versions render the form disabled.
+  const { readOnly } = useVersionContext()
 
   const { value: name } = useField('name')
   const { value: description } = useField('description')
@@ -75,6 +80,7 @@
           placeholder="magalu-storefront"
           description="Use a clear name to identify this deployment."
           :value="name"
+          :disabled="readOnly"
           data-testid="deployment-form__name-field"
         />
 
@@ -84,6 +90,7 @@
           placeholder="Logical deploy channel"
           description="Optional description used for internal identification."
           :value="description"
+          :disabled="readOnly"
           data-testid="deployment-form__description-field"
         />
       </div>
@@ -113,6 +120,7 @@
                 name="binding_policy"
                 :value="option.value"
                 :modelValue="bindingPolicy"
+                :disabled="readOnly"
                 @update:modelValue="setBindingPolicy"
                 :data-testid="`deployment-form__binding-policy-${option.value}`"
               />
@@ -156,7 +164,7 @@
                 name="deployment_policy"
                 :value="option.value"
                 :modelValue="deploymentVersionPolicy"
-                :disabled="props.isEdit"
+                :disabled="props.isEdit || readOnly"
                 @update:modelValue="setDeploymentVersionPolicy"
                 :data-testid="`deployment-form__version-policy-${option.value}`"
               />
@@ -206,6 +214,7 @@
             :value="strategyCanaryEnabled"
             auto
             :isCard="false"
+            :disabled="readOnly"
             title="Canary"
             description="Enable gradual rollout to a percentage of traffic before promoting the new version."
             data-testid="deployment-form__canary-enabled-field"
@@ -221,6 +230,7 @@
               :min="0"
               :max="100"
               :value="strategyCanaryDefaultPercentage"
+              :disabled="readOnly"
               description="Percentage of traffic routed to the candidate version (0-100)."
               placeholder="10"
               :useGrouping="false"
@@ -237,6 +247,7 @@
             :value="strategySkewEnabled"
             auto
             :isCard="false"
+            :disabled="readOnly"
             title="Skew Protection"
             description="Keep the previous version reachable via versioned URL after a new version is promoted."
             data-testid="deployment-form__skew-enabled-field"
@@ -251,6 +262,7 @@
               name="strategy_skew_default_ttl_seconds"
               :min="0"
               :value="strategySkewDefaultTtlSeconds"
+              :disabled="readOnly"
               description="How long the previous version stays reachable, in seconds."
               placeholder="3600"
               :useGrouping="false"
