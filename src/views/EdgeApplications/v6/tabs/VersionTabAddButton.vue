@@ -3,8 +3,8 @@
    * VersionTabAddButton — the active-tab "+ Add" button for the v6 EditView tabs.
    *
    * Lives inside the VersionShell slot so `useVersionContext()` injects the real
-   * `readOnly` (req 8.2), but Teleports its DOM into the page heading
-   * (`#version-tab-add-action`) so it sits next to the version badge.
+   * `readOnly` (req 8.2). Rendered as the default content of the shell's
+   * `#tab-actions` slot, pinned to the right of the tab bar (not the page heading).
    *
    * Renders only when the active `tab` supports create AND the version is editable
    * (req 8.1 / 8.2). The parent passes the active tab descriptor and the resolved
@@ -47,16 +47,12 @@
 </script>
 
 <template>
-  <Teleport
+  <PrimeButton
     v-if="isVisible"
-    to="#version-tab-add-action"
-  >
-    <PrimeButton
-      :label="label"
-      size="small"
-      icon="pi pi-plus"
-      @click="handleClick"
-      :data-testid="addButtonTestid"
-    />
-  </Teleport>
+    :label="label"
+    size="small"
+    icon="pi pi-plus"
+    @click="handleClick"
+    :data-testid="addButtonTestid"
+  />
 </template>

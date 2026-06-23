@@ -40,17 +40,44 @@ export const buildStrategy = (values) => {
   }
 }
 
+const SKEW_PROTECTION_DEFAULTS = {
+  cookie_name: '__azdeploy_skew',
+  max_age_seconds: 3600,
+  max_skewed_deployments: 10
+}
+
+const buildSkewProtection = (skew) => {
+  const source = skew && typeof skew === 'object' ? skew : {}
+  return {
+    enabled: Boolean(source.enabled),
+    cookie_name: hasValue(source.cookie_name)
+      ? source.cookie_name
+      : SKEW_PROTECTION_DEFAULTS.cookie_name,
+    max_age_seconds: hasValue(source.max_age_seconds)
+      ? source.max_age_seconds
+      : SKEW_PROTECTION_DEFAULTS.max_age_seconds,
+    max_skewed_deployments: hasValue(source.max_skewed_deployments)
+      ? source.max_skewed_deployments
+      : SKEW_PROTECTION_DEFAULTS.max_skewed_deployments
+  }
+}
+
 export const mapStrategyForBuildAndActivate = (strategy) => {
   if (!strategy) return undefined
 
+  const mapped = {
+    ...strategy,
+    skew_protection: buildSkewProtection(strategy.skew_protection)
+  }
+
   const gradualRollout = strategy.gradual_rollout
-  if (!gradualRollout) return strategy
+  if (!gradualRollout) return mapped
 
   // eslint-disable-next-line no-unused-vars
   const { candidate_from_deployment_version_id, ...gradualRest } = gradualRollout
 
   return {
-    ...strategy,
+    ...mapped,
     gradual_rollout: {
       ...gradualRest,
       candidate_from_release_id: null

@@ -57,10 +57,15 @@ describe('useDeploymentReleaseDrawer', () => {
 
   it('applies a deterministic fallback (id/label) when a name is blank', async () => {
     getReleaseByIdService.mockResolvedValue({
-      data: { id: 'R1', resources: [{ id: 'res-1', label: 'Function', name: '' }] }
+      data: {
+        id: 'R1',
+        resources: [{ type: 'application', id: 'res-1', label: 'Application', name: '' }]
+      }
     })
     // Single resolution source returns the resource still without a name.
-    resolveReleaseResources.mockResolvedValue([{ id: 'res-1', label: 'Function', name: '' }])
+    resolveReleaseResources.mockResolvedValue([
+      { type: 'application', id: 'res-1', label: 'Application', name: '' }
+    ])
 
     const { visible, api } = setup()
     visible.value = true
@@ -71,23 +76,34 @@ describe('useDeploymentReleaseDrawer', () => {
 
   it('falls back to label, then em dash, when id is also missing', async () => {
     getReleaseByIdService.mockResolvedValue({
-      data: { id: 'R1', resources: [{ label: 'Function', name: '' }, { name: '' }] }
+      data: {
+        id: 'R1',
+        resources: [
+          { type: 'application', label: 'Application', name: '' },
+          { type: 'firewall', name: '' }
+        ]
+      }
     })
-    resolveReleaseResources.mockResolvedValue([{ label: 'Function', name: '' }, { name: '' }])
+    resolveReleaseResources.mockResolvedValue([
+      { type: 'application', label: 'Application', name: '' },
+      { type: 'firewall', name: '' }
+    ])
 
     const { visible, api } = setup()
     visible.value = true
     await flush()
 
-    expect(api.displayRelease.value.resources[0].name).toBe('Function')
+    expect(api.displayRelease.value.resources[0].name).toBe('Application')
     expect(api.displayRelease.value.resources[1].name).toBe('--')
   })
 
   it('uses resolveReleaseResources as the single resolution source', async () => {
     getReleaseByIdService.mockResolvedValue({
-      data: { id: 'R1', resources: [{ id: 'res-1', name: 'adapter-name' }] }
+      data: { id: 'R1', resources: [{ type: 'application', id: 'res-1', name: 'adapter-name' }] }
     })
-    resolveReleaseResources.mockResolvedValue([{ id: 'res-1', name: 'resolved-name' }])
+    resolveReleaseResources.mockResolvedValue([
+      { type: 'application', id: 'res-1', name: 'resolved-name' }
+    ])
 
     const { visible, api } = setup()
     visible.value = true
@@ -95,6 +111,31 @@ describe('useDeploymentReleaseDrawer', () => {
 
     expect(resolveReleaseResources).toHaveBeenCalledTimes(1)
     expect(api.displayRelease.value.resources[0].name).toBe('resolved-name')
+  })
+
+  it('shows only application, firewall and custom_page resources in the drawer', async () => {
+    const allResources = [
+      { type: 'application', id: 'app-1', name: 'app' },
+      { type: 'firewall', id: 'fw-1', name: 'fw' },
+      { type: 'custom_page', id: 'cp-1', name: 'page' },
+      { type: 'function', id: 'fn-1', name: 'fn' },
+      { type: 'connector', id: 'cn-1', name: 'conn' }
+    ]
+    getReleaseByIdService.mockResolvedValue({ data: { id: 'R1', resources: allResources } })
+    // The resolver only ever receives the already-filtered drawer resources.
+    resolveReleaseResources.mockImplementation(async (resources) => resources)
+
+    const { visible, api } = setup()
+    visible.value = true
+    await flush()
+
+    const types = api.displayRelease.value.resources.map((resource) => resource.type)
+    expect(types).toEqual(['application', 'firewall', 'custom_page'])
+    expect(resolveReleaseResources).toHaveBeenCalledWith([
+      { type: 'application', id: 'app-1', name: 'app' },
+      { type: 'firewall', id: 'fw-1', name: 'fw' },
+      { type: 'custom_page', id: 'cp-1', name: 'page' }
+    ])
   })
 
   it('stale guard: a newer release wins over an older in-flight resolution', async () => {

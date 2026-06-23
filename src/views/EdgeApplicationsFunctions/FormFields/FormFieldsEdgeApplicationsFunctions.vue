@@ -16,6 +16,7 @@
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+  import { hasFlagUseV6Configurations } from '@/composables/user-flag'
 
   const emit = defineEmits(['toggleDrawer', 'additionalErrors'])
 
@@ -47,6 +48,7 @@
 
   const drawerRef = ref('')
   const isDropdownLoaded = ref(false)
+  const isV6 = hasFlagUseV6Configurations()
 
   const openDrawer = () => {
     drawerRef.value.openCreateDrawer()
@@ -242,6 +244,7 @@
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
         <Drawer
+          v-if="!isV6"
           ref="drawerRef"
           @onSuccess="handleDrawerSuccess"
         />
@@ -267,7 +270,10 @@
                 : ''
             "
           >
-            <template #footer>
+            <template
+              v-if="!isV6"
+              #footer
+            >
               <ul class="p-2">
                 <li>
                   <PrimeButton

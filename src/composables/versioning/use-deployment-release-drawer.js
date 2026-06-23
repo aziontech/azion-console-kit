@@ -12,6 +12,13 @@ import { resolveReleaseResources } from '@/views/Deployments/utils/resolveReleas
 // blank. Order: resolved/adapter name → resource id → label → em dash.
 const FALLBACK_LABEL = '--'
 
+const DRAWER_RESOURCE_TYPES = new Set(['application', 'firewall', 'custom_page'])
+
+const filterDrawerResources = (resources) =>
+  (Array.isArray(resources) ? resources : []).filter((resource) =>
+    DRAWER_RESOURCE_TYPES.has(resource?.type)
+  )
+
 const withResolvedName = (resource) => ({
   ...resource,
   name: resource?.name || resource?.id || resource?.label || FALLBACK_LABEL
@@ -43,10 +50,9 @@ export function useDeploymentReleaseDrawer({ release, visible, emit } = {}) {
   const displayRelease = computed(() => {
     const base = detail.value ?? currentRelease.value
     if (!base) return base
-    const resources = resolvedResources.value.length
-      ? resolvedResources.value
-      : (base.resources ?? [])
-    return { ...base, resources: resources.map(withResolvedName) }
+    const source = resolvedResources.value.length ? resolvedResources.value : (base.resources ?? [])
+    const resources = filterDrawerResources(source).map(withResolvedName)
+    return { ...base, resources }
   })
 
   const visitUrl = computed(
@@ -89,11 +95,12 @@ export function useDeploymentReleaseDrawer({ release, visible, emit } = {}) {
       const { data } = await deploymentReleaseService.getReleaseByIdService(deploymentId, releaseId)
       if (seq !== resolveSeq) return
       detail.value = data
-      resolvedResources.value = data?.resources ?? []
+      const drawerResources = filterDrawerResources(data?.resources)
+      resolvedResources.value = drawerResources
 
       // Single resolution pipeline: enrich names via the util, guarded against
       // stale writes from a newer release selection.
-      const enriched = await resolveReleaseResources(data?.resources ?? [])
+      const enriched = await resolveReleaseResources(drawerResources)
       if (seq !== resolveSeq) return
       resolvedResources.value = enriched
     } catch (error) {

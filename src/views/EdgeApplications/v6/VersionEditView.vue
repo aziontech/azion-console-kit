@@ -42,7 +42,6 @@
     :title="title"
     :entity-name="resource?.name"
     error-message="Failed to load application. Try refreshing the page."
-    :has-add-action="true"
     testid-prefix="application-v6-version-edit"
   >
     <template #editor>
