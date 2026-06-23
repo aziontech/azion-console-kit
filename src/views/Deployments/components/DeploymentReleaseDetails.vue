@@ -69,7 +69,7 @@
               v-if="release.duration"
               class="text-xs text-[var(--text-color-secondary)] whitespace-nowrap"
             >
-              {{ release.duration }}
+              Deployed in {{ release.duration }}
             </span>
           </div>
         </div>

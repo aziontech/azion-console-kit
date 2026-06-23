@@ -139,7 +139,7 @@ export const buildVersionMenuItems = (state, ctx = {}) => {
 /**
  * Maps the pure menu model to PrimeVue MenuItems, injecting a native separator
  * before Delete and forwarding `tooltip`/`danger` for the styled item slot. The
- * single mapper shared by every listing (VersionListDataView, DeploymentVersionsList)
+ * single mapper shared by every listing (VersionListDataView, deployment VersionsTab)
  * so the rendered menu is byte-identical (Req 1.4). The command stops propagation
  * so the click never bubbles to the row (Req 2.4), then calls `onAction`.
  * @param {string} state version lifecycle state

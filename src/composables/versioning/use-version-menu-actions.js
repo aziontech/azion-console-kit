@@ -29,7 +29,8 @@ export const RESOURCE_VERSION_ROUTES = {
   custom_page: 'edit-custom-pages-version',
   function: 'edit-functions-version',
   connector: 'edit-connectors-version',
-  workload: 'edit-workload-version'
+  workload: 'edit-workload-version',
+  deployment: 'edit-deployment-version'
 }
 
 /**

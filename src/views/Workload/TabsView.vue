@@ -24,7 +24,7 @@
     updatedRedirect: { type: String, required: true }
   })
 
-  const TAB_ORDER = ['overview', 'versions', 'settings']
+  const TAB_ORDER = ['overview', 'releases', 'settings']
   const TAB_TO_INDEX = TAB_ORDER.reduce((acc, name, index) => {
     acc[name] = index
     return acc
@@ -111,7 +111,7 @@
   const workloadName = computed(() => workload.value?.name || '')
 
   const createDrawerVisible = ref(false)
-  const versionsRefreshKey = ref(0)
+  const releasesRefreshKey = ref(0)
 
   const isDeployDrawerOpen = ref(false)
   const openDeployDrawer = () => {
@@ -119,9 +119,9 @@
   }
 
   const onVersionCreated = () => {
-    versionsRefreshKey.value += 1
-    if (activeTab.value !== TAB_TO_INDEX['versions']) {
-      changeTab(TAB_TO_INDEX['versions'])
+    releasesRefreshKey.value += 1
+    if (activeTab.value !== TAB_TO_INDEX['releases']) {
+      changeTab(TAB_TO_INDEX['releases'])
     }
   }
 
@@ -171,13 +171,13 @@
           />
         </TabPanel>
         <TabPanel
-          header="Versions"
-          :pt="{ root: { 'data-testid': 'workload-tabs__tab__versions' } }"
+          header="Releases"
+          :pt="{ root: { 'data-testid': 'workload-tabs__tab__releases' } }"
         >
           <div class="mt-4">
             <WorkloadReleasesSection
-              v-if="activeTab === TAB_TO_INDEX['versions']"
-              :key="versionsRefreshKey"
+              v-if="activeTab === TAB_TO_INDEX['releases']"
+              :key="releasesRefreshKey"
               :workloadId="workloadId"
               :workload="workload"
             />
