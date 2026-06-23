@@ -1,0 +1,11 @@
+{
+  "count": 1,
+  "results": [
+    {
+      "version_id": "01JWAFREADY000000000000001",
+      "version_state": "ready",
+      "comment": "Initial WAF version",
+      "created_at": "2026-06-10T09:00:00Z"
+    }
+  ]
+}

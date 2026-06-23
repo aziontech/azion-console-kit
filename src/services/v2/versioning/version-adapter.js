@@ -43,7 +43,9 @@ export const createVersionAdapter = ({ normalizeConfig, mapResourceFields, mapMe
       lastModified:
         meta?.last_modified ?? raw.last_modified ?? raw.ready_at ?? raw.created_at ?? null,
       lastEditor: meta?.last_editor ?? raw.last_editor ?? null,
-      sourceVersionId: meta?.source_version_id ?? raw.source_version_id ?? null
+      sourceVersionId: meta?.source_version_id ?? raw.source_version_id ?? null,
+      // Informative only; null when the API omits it (e.g. Network List / WAF).
+      referenceCount: meta?.reference_count ?? raw.reference_count ?? null
     }
 
     return {

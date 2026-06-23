@@ -2,6 +2,7 @@ import { computed, toValue, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import { onVersionCommand } from './use-version-command'
 import { useVersionContext } from './use-version-context'
+import { DEFAULT_CAPABILITY } from './version-capability'
 
 // SAVE persists the draft; SAVE_AND_BUILD persists then builds. The version service
 // owns its own cache invalidation.
@@ -31,7 +32,9 @@ export const workloadSaveStrategy = {
  * registers the 7 lifecycle handlers on the command bus ONCE. Each resource adapter
  * is a thin `<script setup>` that calls this with its three specializations:
  * `versionService`, `validationSchema` and `saveStrategy` (defaults to save/build).
- * DEPLOY is a no-op — deploying is owned by the deploy drawer in the heading.
+ * DEPLOY is a deployable-only no-op (the deploy drawer in the heading owns it);
+ * for `versioned-only` it is not registered, so the footer drops it and dispatch
+ * fail-closes. `capability` defaults to the version-context's (deployable outside).
  *
  * `resource`, `resourceId` and `versionId` accept refs/getters so the form stays in
  * sync with the host props.
@@ -42,9 +45,14 @@ export function useVersionFormAdapter({
   versionId,
   versionService,
   validationSchema,
-  saveStrategy = defaultSaveStrategy
+  saveStrategy = defaultSaveStrategy,
+  capability
 }) {
-  const { version } = useVersionContext()
+  const { version, capability: contextCapability } = useVersionContext()
+  // Option override wins; otherwise the shell-provided capability; deployable if absent.
+  const resolvedCapability = computed(
+    () => toValue(capability) ?? toValue(contextCapability) ?? DEFAULT_CAPABILITY
+  )
 
   // Parent resource base merged under the version config (the draft's saved state
   // wins). Nested arrays (e.g. custom page `pages[]`) are preserved by the service.
@@ -104,7 +112,11 @@ export function useVersionFormAdapter({
   onVersionCommand('DELETE', ({ resourceId: rid, versionId: vid }) =>
     versionService.deleteVersion(rid, vid)
   )
-  onVersionCommand('DEPLOY', () => {})
+  // Register DEPLOY only for deployable classes; versioned-only omits it so the
+  // footer (availableActions ∩ registered) drops it and dispatch fail-closes.
+  if (resolvedCapability.value.canDeploy) {
+    onVersionCommand('DEPLOY', () => {})
+  }
 
   return { values, meta, isFormValid }
 }

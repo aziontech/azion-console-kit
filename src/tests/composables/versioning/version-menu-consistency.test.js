@@ -26,6 +26,8 @@ const rowActionsApi = {
 vi.mock('@/composables/versioning/use-version-row-actions', () => ({
   useVersionRowActions: vi.fn(() => rowActionsApi)
 }))
+// The driver now calls useToast directly for NEW_DRAFT_FROM errors; provide a stub.
+vi.mock('@aziontech/webkit/use-toast', () => ({ useToast: () => ({ add: vi.fn() }) }))
 
 import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
 import { mapVersionMenuItemsToMenu } from '@/composables/versioning/version-actions'
@@ -71,10 +73,30 @@ const LISTINGS = [
     name: 'DeploymentVersionsList',
     resourceType: 'deployment',
     file: 'src/views/Deployments/components/DeploymentVersionsList.vue'
+  },
+  {
+    name: 'NetworkLists VersionsTab',
+    resourceType: 'network_list',
+    file: 'src/views/NetworkLists/v6/tabs/VersionsTab.vue'
+  },
+  {
+    name: 'WafRules VersionsTab',
+    resourceType: 'waf',
+    file: 'src/views/WafRules/v6/tabs/VersionsTab.vue'
   }
 ]
 
 const ALL_STATES = [...Object.values(VERSION_STATES), 'deleted', 'totally-unknown']
+
+// Cross-listing menu equality holds within a capability class. Versioned-only
+// resources (function/network_list/waf) intentionally diverge — no Promote/
+// Rollback, a "New version from this" item — so they are excluded from the
+// byte-identical assertions (Req 2.2, 2.3); their menu is locked by the
+// capability enumeration test.
+const VERSIONED_ONLY_TYPES = new Set(['function', 'network_list', 'waf'])
+const DEPLOYABLE_LISTINGS = LISTINGS.filter(
+  ({ resourceType }) => !VERSIONED_ONLY_TYPES.has(resourceType)
+)
 
 const readSource = (relative) =>
   readFileSync(fileURLToPath(new URL(`../../../../${relative}`, import.meta.url)), 'utf8')
@@ -119,7 +141,7 @@ describe('P6 — every listing wires the shared driver (no local menu handling)'
 describe('P6 — identical rendered menu across listings for the same state', () => {
   it.each(ALL_STATES)('state "%s": every resourceType yields a byte-identical model', (state) => {
     const handler = vi.fn()
-    const models = LISTINGS.map(({ resourceType }) =>
+    const models = DEPLOYABLE_LISTINGS.map(({ resourceType }) =>
       stripCommands(mapVersionMenuItemsToMenu(state, { resourceType }, handler, item))
     )
 
@@ -132,7 +154,7 @@ describe('P6 — identical rendered menu across listings for the same state', ()
       mapVersionMenuItemsToMenu(state, { resourceType: 'application' }, vi.fn(), item)
     )
 
-    LISTINGS.forEach(({ resourceType }) => {
+    DEPLOYABLE_LISTINGS.forEach(({ resourceType }) => {
       const model = stripCommands(mapVersionMenuItemsToMenu(state, { resourceType }, vi.fn(), item))
       expect(model.map((entry) => entry.label)).toEqual(reference.map((entry) => entry.label))
       expect(model.map((entry) => entry.disabled)).toEqual(reference.map((entry) => entry.disabled))

@@ -1,4 +1,5 @@
 import { inject, readonly, ref } from 'vue'
+import { DEFAULT_CAPABILITY } from '@/composables/versioning/version-capability'
 
 /**
  * Provide/inject key used by the VersionShell to expose the current version
@@ -15,6 +16,9 @@ export const VERSION_CONTEXT_KEY = Symbol('versionContext')
  * source of truth. `isVersioned` is true only inside the shell — shared tabs use it
  * to drop layout the shell already provides (e.g. the `isTabs` top margin).
  *
+ * `capability` is the resource class `{ canDeploy, canPromote, canRollback }`; it
+ * defaults to `DEFAULT_CAPABILITY` (deployable) when consumed outside the shell.
+ *
  * @returns {{
  *   state: import('vue').Ref<string>,
  *   readOnly: import('vue').ComputedRef<boolean> | { value: boolean },
@@ -22,6 +26,7 @@ export const VERSION_CONTEXT_KEY = Symbol('versionContext')
  *   availableActions: import('vue').Ref<string[]>,
  *   disabledActions: import('vue').Ref<string[]>,
  *   isVersioned: import('vue').Ref<boolean>,
+ *   capability: {canDeploy: boolean, canPromote: boolean, canRollback: boolean},
  *   dispatch: (action: string, payload?: object) => Promise<any>
  * }}
  */
@@ -33,6 +38,7 @@ export const useVersionContext = () => {
     availableActions: readonly(ref([])),
     disabledActions: readonly(ref([])),
     isVersioned: readonly(ref(false)),
+    capability: DEFAULT_CAPABILITY,
     dispatch: async () => {}
   })
 }

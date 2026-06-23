@@ -27,11 +27,11 @@
     severity="info"
     data-testid="deploy-drawer__context-banner"
   >
-    <span class="flex flex-col gap-1 text-left">
-      <span class="text-sm leading-relaxed text-[var(--text-color)]">
+    <span class="flex flex-col gap-[var(--spacing-1)] text-left">
+      <span class="text-body-sm text-[var(--text-color)]">
         Promoting version
         <code
-          class="rounded border border-[var(--surface-border)] bg-[var(--surface-section)] px-1.5 py-0.5 font-mono text-xs text-[var(--text-color)]"
+          class="rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[6px] py-[2px] font-mono text-body-xs text-[var(--text-color)]"
           data-testid="deploy-drawer__context-version-chip"
           >{{ versionLabel }}</code
         >
@@ -39,7 +39,7 @@
         <span class="font-medium">{{ resourceName }}</span
         >. It only serves traffic as part of a Release.
       </span>
-      <span class="text-xs leading-relaxed text-[var(--text-color-secondary)]">
+      <span class="text-body-xs text-[var(--text-color-secondary)]">
         Below, the Environments that consume this resource.
       </span>
     </span>

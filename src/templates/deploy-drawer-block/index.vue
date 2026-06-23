@@ -170,7 +170,7 @@
     <template #content>
       <div
         v-if="isLoading"
-        class="flex w-full items-center justify-center py-16"
+        class="flex w-full items-center justify-center py-[var(--spacing-16)]"
         data-testid="deploy-drawer__loading"
       >
         <ProgressSpinner
@@ -180,7 +180,7 @@
       </div>
       <div
         v-else-if="hasError"
-        class="flex w-full flex-col items-start gap-3"
+        class="flex w-full flex-col items-start gap-[var(--spacing-3)]"
         data-testid="deploy-drawer__error"
       >
         <InlineMessage
@@ -202,7 +202,7 @@
       <!-- 3. Progressive reveal of the configuration steps. -->
       <div
         v-else
-        class="flex w-full flex-col gap-6"
+        class="flex w-full flex-col gap-[var(--spacing-6)]"
         data-testid="deploy-drawer__content"
       >
         <PromotionContextBanner
@@ -265,16 +265,16 @@
 
     <template #footer>
       <div
-        class="flex w-full items-center justify-between gap-3 border-t border-[var(--surface-border)] bg-[var(--surface-section)] px-8 py-4"
+        class="flex w-full items-center justify-between gap-[var(--spacing-3)] border-t border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-8)] py-[var(--spacing-4)]"
       >
         <span
-          class="flex items-center gap-2 text-xs text-[var(--text-color-secondary)] leading-tight"
+          class="flex items-center gap-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
           data-testid="deploy-drawer__footer-note"
         >
           <i class="pi pi-info-circle" />
           build & activate creates, builds and activates in one action.
         </span>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-[var(--spacing-3)]">
           <PrimeButton
             label="Cancel"
             size="small"

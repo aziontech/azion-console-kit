@@ -1,0 +1,11 @@
+{
+  "data": {
+    "version_id": "01JNETLREADY00000000000001",
+    "version_state": "ready",
+    "comment": "Initial network list version",
+    "created_at": "2026-06-10T09:00:00Z",
+    "name": "v6-network-list",
+    "type": "ip_cidr",
+    "items_values": ["192.168.0.0/24"]
+  }
+}

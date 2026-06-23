@@ -63,13 +63,13 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col gap-[var(--spacing-2)]">
     <LabelBlock
       label="Workload"
       name="deploy-drawer-workload-select"
       isRequired
     />
-    <span class="text-xs text-[var(--text-color-secondary)] leading-tight">
+    <span class="text-body-xs text-[var(--text-color-secondary)]">
       Choose the Workload that will serve this version. The available Environments — and each one's
       Deployment (strategy) — come from it.
     </span>
@@ -94,33 +94,33 @@
       <template #value>
         <span
           v-if="selectedOption"
-          class="flex items-center gap-2"
+          class="flex items-center gap-[var(--spacing-2)]"
         >
           <i class="pi pi-globe text-[var(--text-color-secondary)]" />
-          <span class="text-sm font-medium text-[var(--text-color)]">{{
+          <span class="text-body-sm font-medium text-[var(--text-color)]">{{
             selectedOption.label
           }}</span>
           <span
             v-if="selectedOption.domain"
-            class="text-xs text-[var(--text-color-secondary)]"
+            class="text-body-xs text-[var(--text-color-secondary)]"
           >
             {{ selectedOption.domain }}
           </span>
         </span>
         <span
           v-else
-          class="text-sm text-[var(--text-color-secondary)]"
+          class="text-body-sm text-[var(--text-color-secondary)]"
           >Select a Workload</span
         >
       </template>
       <template #option="{ option }">
-        <span class="flex w-full min-w-0 items-center gap-3 overflow-hidden">
+        <span class="flex w-full min-w-0 items-center gap-[var(--spacing-3)] overflow-hidden">
           <i class="pi pi-globe shrink-0 text-[var(--text-color-secondary)]" />
-          <span class="flex min-w-0 flex-1 flex-col gap-0.5 overflow-hidden">
-            <span class="block truncate text-sm font-medium text-[var(--text-color)]">
+          <span class="flex min-w-0 flex-1 flex-col gap-[2px] overflow-hidden">
+            <span class="block truncate text-body-sm font-medium text-[var(--text-color)]">
               {{ option.label }}
             </span>
-            <span class="block truncate text-xs leading-tight text-[var(--text-color-secondary)]">
+            <span class="block truncate text-body-xs text-[var(--text-color-secondary)]">
               {{ optionMeta(option) }}
             </span>
           </span>

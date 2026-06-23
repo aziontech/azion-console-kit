@@ -10,15 +10,15 @@
 
   defineOptions({ name: 'edge-functions-v6-edit-view' })
 
-  const { resource, resourceId, isLoading, loadError, isDeployDrawerOpen, deployResourceContext } =
-    useResourceVersionLanding({
-      load: (id) => edgeFunctionService.loadEdgeFunctionService({ id }),
-      provideKey: 'edgeFunction',
-      versionService: edgeFunctionVersionService,
-      resourceType: 'function',
-      routeName: 'edit-functions',
-      versionRouteName: 'edit-functions-version'
-    })
+  // Edge Function is versioned-only: the landing yields no deploy context/drawer.
+  const { resource, resourceId, isLoading, loadError } = useResourceVersionLanding({
+    load: (id) => edgeFunctionService.loadEdgeFunctionService({ id }),
+    provideKey: 'edgeFunction',
+    versionService: edgeFunctionVersionService,
+    resourceType: 'function',
+    routeName: 'edit-functions',
+    versionRouteName: 'edit-functions-version'
+  })
 
   const pageDescription =
     "Each version is an isolated snapshot of this function's configuration. Edit a draft, then build it to publish an immutable version."
@@ -26,14 +26,12 @@
 
 <template>
   <ResourceVersionLanding
-    v-model:deploy-visible="isDeployDrawerOpen"
     :is-loading="isLoading"
     :load-error="loadError"
     :title="resource?.name ?? ''"
     :description="pageDescription"
     :entity-name="resource?.name"
     error-message="Failed to load function. Try refreshing the page."
-    :resource-context="deployResourceContext"
     :show-settings="false"
     testid-prefix="edge-functions-v6-edit"
   >

@@ -38,6 +38,13 @@
       type: Boolean,
       default: false
     },
+    // Distinguishes the failure so the error state shows the right affordance:
+    // 'network' offers Retry, 'forbidden' (403) hides it, 'notFound' (404)
+    // offers a back-to-list action instead (Req 5.2, 6.1).
+    errorKind: {
+      type: String,
+      default: 'network'
+    },
     hasVersions: {
       type: Boolean,
       default: false
@@ -247,8 +254,16 @@
     emit('row-click', item)
   }
 
-  const hasErrorAction = computed(
-    () => !!(props.errorState?.buttonLabel && props.errorState?.buttonAction)
+  const isForbiddenError = computed(() => props.errorKind === 'forbidden')
+  const isNotFoundError = computed(() => props.errorKind === 'notFound')
+
+  // 403 has no useful Retry; 404 should route back to the list, not retry.
+  const hasErrorAction = computed(() => {
+    if (isForbiddenError.value) return false
+    return !!(props.errorState?.buttonLabel && props.errorState?.buttonAction)
+  })
+  const errorActionIcon = computed(() =>
+    isNotFoundError.value ? 'pi pi-arrow-left' : 'pi pi-refresh'
   )
   const hasEmptyAction = computed(
     () => !!(props.emptyState?.buttonLabel && props.emptyState?.buttonAction)
@@ -256,6 +271,13 @@
 
   const runErrorAction = () => props.errorState?.buttonAction?.()
   const runEmptyAction = () => props.emptyState?.buttonAction?.()
+
+  // Informative "In use" count; null/absent means the API does not expose it
+  // (Network List / WAF) and the column auto-hides (Req 5.4). No UI lock here.
+  const resolveReferenceCount = (version) => {
+    const count = version?.referenceCount
+    return count == null || count === '' ? '--' : count
+  }
 
   // The row menu always offers the fixed 5-item model (never-hide pattern);
   // the only state with no menu is `deleted`, where every item is gone.
@@ -357,9 +379,9 @@
       <PrimeButton
         v-if="hasErrorAction"
         :label="errorState.buttonLabel"
-        icon="pi pi-refresh"
+        :icon="errorActionIcon"
         size="small"
-        data-testid="version-list-data-view__error-action"
+        :data-testid="`version-list-data-view__error-action--${errorKind}`"
         @click="runErrorAction"
       />
     </div>
@@ -521,6 +543,18 @@
                           data-sentry-mask
                         >
                           {{ version.lastEditor || 'azion@azion.com' }}
+                        </span>
+                      </button>
+
+                      <button
+                        v-else-if="column.key === 'inUse'"
+                        type="button"
+                        class="in-use-cell-button inline-flex min-w-0 max-w-full items-center border-0 bg-transparent p-0 text-left"
+                        :data-testid="`version-list-data-view__row-${version.id}__in-use`"
+                        @click="triggerRowClick(version)"
+                      >
+                        <span class="in-use-count text-sm text-[var(--text-color)]">
+                          {{ resolveReferenceCount(version) }}
                         </span>
                       </button>
 
@@ -917,6 +951,10 @@
   }
 
   .status-cell-button {
+    cursor: pointer;
+  }
+
+  .in-use-cell-button {
     cursor: pointer;
   }
 

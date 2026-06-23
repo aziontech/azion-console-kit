@@ -25,6 +25,23 @@ module.exports = {
   ],
   overrides: [
     {
+      // versioned-only-subresources feature scope: design-system lint is a
+      // build-breaker (task 9.3). New/touched lines must use
+      // @aziontech/webkit + @aziontech/theme tokens — no raw colors,
+      // Tailwind palette/typography/spacing/radius/shadow utilities.
+      files: [
+        'src/templates/version-shell-block/**/*.{vue,js}',
+        'src/templates/deploy-drawer-block/**/*.{vue,js}',
+        'src/composables/versioning/**/*.{vue,js}',
+        'src/views/EdgeFunctions/v6/**/*.{vue,js}',
+        'src/views/NetworkLists/v6/**/*.{vue,js}',
+        'src/views/WafRules/v6/**/*.{vue,js}'
+      ],
+      rules: {
+        'azion-architecture/no-raw-design-values': 'error'
+      }
+    },
+    {
       files: ['cypress/**/*.{cy,spec}.{js,ts,jsx,tsx}'],
       extends: ['plugin:cypress/recommended']
     },

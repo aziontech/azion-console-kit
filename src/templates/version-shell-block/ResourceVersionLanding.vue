@@ -42,11 +42,11 @@
 <template>
   <div
     v-if="isLoading"
-    class="flex items-center justify-center p-8"
+    class="flex items-center justify-center p-[var(--spacing-8)]"
     :data-testid="`${testidPrefix}__loading`"
   >
     <ProgressSpinner
-      class="w-10 h-10 text-color"
+      class="w-10 h-10 text-[var(--text-color)]"
       strokeWidth="4"
     />
   </div>
@@ -73,7 +73,7 @@
         <template #default>
           <div
             v-if="showSettings"
-            class="flex items-center gap-3"
+            class="flex items-center gap-[var(--spacing-3)]"
           >
             <div
               id="version-lifecycle-action"
@@ -87,7 +87,7 @@
       <TabView
         v-if="showSettings"
         v-model:activeIndex="activeTab"
-        :pt="{ root: { class: 'flex flex-col gap-4' } }"
+        :pt="{ root: { class: 'flex flex-col gap-[var(--spacing-4)]' } }"
       >
         <TabPanel
           header="Versions"
@@ -109,14 +109,14 @@
             />
             <div
               v-else
-              class="flex w-full flex-col items-center justify-center gap-3 rounded-md border border-dashed border-[var(--surface-border)] bg-[var(--surface-section)] px-6 py-16 text-center text-[var(--text-color-secondary)]"
+              class="flex w-full flex-col items-center justify-center gap-[var(--spacing-3)] rounded-[var(--shape-elements)] border border-dashed border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-6)] py-[var(--spacing-16)] text-center text-[var(--text-color-secondary)]"
               :data-testid="`${testidPrefix}__settings-empty`"
             >
-              <i class="pi pi-file-edit text-2xl text-[var(--text-color-secondary)]" />
-              <h3 class="m-0 text-base font-semibold leading-6 text-[var(--text-color)]">
+              <i class="pi pi-file-edit text-heading-md text-[var(--text-color-secondary)]" />
+              <h3 class="m-[0] text-body-md font-semibold text-[var(--text-color)]">
                 No version to edit yet
               </h3>
-              <p class="m-0 max-w-md text-sm leading-6">
+              <p class="m-[0] max-w-[var(--container-md)] text-body-sm">
                 {{ emptyStateDescription }}
               </p>
               <PrimeButton
@@ -137,6 +137,7 @@
       />
 
       <DeployDrawerBlock
+        v-if="resourceContext"
         v-model:visible="deployVisible"
         :resource-context="resourceContext"
       />
