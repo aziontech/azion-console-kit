@@ -28,9 +28,6 @@ const adapt = (httpResponse) => {
   }
 }
 
-// The script-runner sometimes nests the upstream provider error inside
-// `result.errors.stack` as a (possibly double-encoded) JSON string. Mine the
-// most specific message available, falling back to the generic envelope fields.
 const extractScriptRunnerErrorMessage = (result) => {
   let parsedStack = result?.errors?.stack
   for (let attempt = 0; attempt < 2 && typeof parsedStack === 'string'; attempt++) {
@@ -60,9 +57,6 @@ const parseHttpResponse = (httpResponse) => {
       if (hasErrors) {
         throw new Error(extractScriptRunnerErrorMessage(result)).message
       }
-      // A 200 without an error envelope but with no provisioned resources means the
-      // deploy did not actually succeed - surface it as an error so the flow stays
-      // on the deploy step instead of optimistically showing success.
       if (!result.domain || !result.edge_application) {
         throw new Error('Deployment did not provision any resources').message
       }

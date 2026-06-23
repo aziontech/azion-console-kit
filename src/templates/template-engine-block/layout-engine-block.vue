@@ -467,9 +467,6 @@
    */
   const handleStartNew = () => {
     reset()
-    // Clear the persisted deploy state from the URL right here (one hop from the
-    // button) so "start from zero" works even before the event reaches the parent
-    // orchestrator. A reload then no longer restores the previous deploy.
     router.replace({ query: {} })
     emit('start-new')
   }

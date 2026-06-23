@@ -1008,12 +1008,6 @@
 </template>
 
 <style scoped>
-  /*
-   * JsonForms vue-vanilla wraps fields in a VerticalLayout (.vertical-layout / .vertical-layout-item)
-   * which stacks them as blocks. We promote both the JsonForms root (style="display: contents")
-   * and the `.vertical-layout` to `display: contents` so each `.vertical-layout-item` becomes a
-   * direct grid item of `.settings-jsonform-grid`, which lays them out 2 per row.
-   */
   .settings-jsonform-grid :deep(.vertical-layout) {
     display: contents;
   }

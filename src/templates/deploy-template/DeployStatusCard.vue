@@ -5,43 +5,31 @@
   import ScriptRunnerBlock from '@/templates/script-runner-block'
 
   const props = defineProps({
-    // Execution ID for the script runner
     executionId: {
       type: String,
       required: true
     },
 
-    // Service to get logs
     getLogsService: {
       type: Function,
       required: true
     },
-
-    // Results from deploy (populated after finish)
     results: {
       type: Object,
       default: null
     },
-
-    // Deploy failed state
     deployFailed: {
       type: Boolean,
       default: false
     },
-
-    // Application name for heading
     applicationName: {
       type: String,
       default: ''
     },
-
-    // Deploy start time (timestamp)
     deployStartTime: {
       type: Number,
       default: null
     },
-
-    // Labels
     deployLabel: {
       type: String,
       default: 'Deploy'
@@ -54,8 +42,6 @@
       type: String,
       default: 'Back'
     },
-
-    // Button visibility
     showManageButton: {
       type: Boolean,
       default: true
@@ -64,8 +50,6 @@
       type: Boolean,
       default: true
     },
-
-    // Deploy control
     deployStarted: {
       type: Boolean,
       default: false
@@ -109,9 +93,6 @@
     return props.results?.domain?.id || null
   })
 
-  // Once the user picks a recovery action we hide the footer immediately, so the
-  // actions never linger into the new (in-progress) deploy. They reappear only
-  // when a genuinely new failure happens (deployFailed flips back to true).
   const recoveryDismissed = ref(false)
   const showRecoveryActions = computed(() => props.deployFailed && !recoveryDismissed.value)
 
@@ -129,8 +110,6 @@
     emit('start-new')
   }
 
-  // Clearing the failed-state arms the actions again for the next failure. (A new
-  // execution also remounts this card via :key, resetting recoveryDismissed.)
   watch(
     () => props.deployFailed,
     (failed) => {
