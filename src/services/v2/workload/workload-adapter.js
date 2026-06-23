@@ -93,27 +93,34 @@ const handleTlsLegacy = (payload) => {
 const buildV6DomainEntries = (payload) => {
   return payload.domains
     .filter(({ subdomain, domain }) => subdomain || domain)
-    .map(({ subdomain, domain, environment }) => ({
+    .map(({ subdomain, domain, environment, certificate }) => ({
       name: subdomain ? `${subdomain}.${domain}` : domain,
-      environment: environment ?? null
+      environment: environment ?? null,
+      certificate: certificate ?? null
     }))
 }
 
-const buildV6Bindings = (entries, environmentDeployments = {}) => {
-  const domainsByEnvironment = new Map()
+const buildV6Bindings = (entries, environmentDeployments = {}, autoDomainAllowAccess) => {
+  const bindingByEnvironment = new Map()
 
-  for (const { name, environment } of entries) {
+  for (const { name, environment, certificate } of entries) {
     if (environment == null) continue
-    if (!domainsByEnvironment.has(environment)) {
-      domainsByEnvironment.set(environment, [])
+    if (!bindingByEnvironment.has(environment)) {
+      bindingByEnvironment.set(environment, { domains: [], certificate: null })
     }
-    domainsByEnvironment.get(environment).push(name)
+    const binding = bindingByEnvironment.get(environment)
+    binding.domains.push(name)
+    if (binding.certificate == null && certificate != null) {
+      binding.certificate = certificate
+    }
   }
 
-  return Array.from(domainsByEnvironment, ([environment, domains]) => ({
+  return Array.from(bindingByEnvironment, ([environment, binding]) => ({
     environment_id: environment,
     deployment_id: environmentDeployments?.[environment]?.deploymentId ?? null,
-    domains
+    auto_domain_allow_access: autoDomainAllowAccess,
+    certificate: binding.certificate,
+    domains: binding.domains
   }))
 }
 
@@ -138,13 +145,16 @@ const resolveLoadedBindings = (workload, isV6) => {
 const buildLoadedV6DomainEntries = (bindings = []) => {
   if (!Array.isArray(bindings)) return []
 
-  return bindings.flatMap((binding) =>
-    (Array.isArray(binding?.domains) ? binding.domains : []).map((entry) => ({
+  return bindings.flatMap((binding) => {
+    const bindingCertificate = binding?.certificate ?? null
+
+    return (Array.isArray(binding?.domains) ? binding.domains : []).map((entry) => ({
       name: typeof entry === 'string' ? entry : entry?.name,
       environment: binding?.environment_id ?? null,
-      certificate: typeof entry === 'object' ? (entry?.certificate ?? null) : null
+      certificate:
+        bindingCertificate ?? (typeof entry === 'object' ? (entry?.certificate ?? null) : null)
     }))
-  )
+  })
 }
 
 export const WorkloadAdapter = {
@@ -158,7 +168,11 @@ export const WorkloadAdapter = {
     if (isV6) {
       const domainEntries = buildV6DomainEntries(payload)
       // domains = domainEntries.map((entry) => entry.name)
-      bindings = buildV6Bindings(domainEntries, payload.environmentDeployments)
+      bindings = buildV6Bindings(
+        domainEntries,
+        payload.environmentDeployments,
+        payload.workloadHostnameAllowAccess
+      )
 
       tls = handleTls(payload)
     } else {
@@ -200,11 +214,12 @@ export const WorkloadAdapter = {
           crl: payload.mtls.crl || null
         }
       },
-      domains,
-      workload_domain_allow_access: payload.workloadHostnameAllowAccess
+      domains
     }
     if (isV6) {
       payloadResquest.bindings = bindings
+    } else {
+      payloadResquest.workload_domain_allow_access = payload.workloadHostnameAllowAccess
     }
     if (payloadResquest.tls === null) {
       delete payloadResquest.tls
@@ -252,7 +267,9 @@ export const WorkloadAdapter = {
       workloadHostname: item.workloadHostname?.content?.replace(/\.azion\.app$/, ''),
       infrastructure: item.infrastructure === 'Production' ? '1' : '2',
       isLocked: item.isLocked,
-      workloadHostnameAllowAccess: item.workloadDomainAllowAccess,
+      workloadHostnameAllowAccess: isV6
+        ? (item.bindings?.[0]?.auto_domain_allow_access ?? item.workloadDomainAllowAccess)
+        : item.workloadDomainAllowAccess,
       initialDomains: item.domains,
       tls: item.tls
         ? {
@@ -331,7 +348,9 @@ export const WorkloadAdapter = {
       customDomain: azionAppSubdomains,
       useCustomDomain: !!azionAppSubdomains,
       infrastructure: String(workload.infrastructure),
-      workloadHostnameAllowAccess: workload.workload_domain_allow_access,
+      workloadHostnameAllowAccess: isV6
+        ? (bindings[0]?.auto_domain_allow_access ?? workload.workload_domain_allow_access)
+        : workload.workload_domain_allow_access,
       tls: {
         minimumVersion: workload.tls.minimum_version,
         ciphers: workload.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value,

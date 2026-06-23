@@ -34,7 +34,8 @@ export const RESOURCE_VERSION_ROUTES = {
   connector: 'edit-connectors-version',
   workload: 'edit-workload-version',
   network_list: 'edit-network-lists-version',
-  waf: 'edit-waf-rules-version'
+  waf: 'edit-waf-rules-version',
+  deployment: 'edit-deployment-version'
 }
 
 /**

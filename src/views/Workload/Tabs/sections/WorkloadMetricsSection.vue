@@ -15,7 +15,7 @@
     items: [
       { key: 'requests', label: 'Requests', value: '--', unit: '', isLoading: true },
       { key: 'bandwidth', label: 'Bandwidth', value: '--', unit: '', isLoading: true },
-      { key: 'latency', label: 'p95 Latency', value: '--', unit: '', isLoading: true },
+      { key: 'latency', label: 'Avg Latency', value: '--', unit: '', isLoading: true },
       { key: 'errors', label: '5xx Errors', value: '--', unit: '', isLoading: true }
     ]
   })
@@ -25,8 +25,7 @@
     metrics.items = metrics.items.map((item) => ({ ...item, isLoading: true }))
     try {
       const result = await workloadMetricsService.loadWorkloadMetricsService(props.workloadId, {
-        range: range.value,
-        skipCache: true
+        range: range.value
       })
       const next = Array.isArray(result?.body) ? result.body : []
       if (next.length) {

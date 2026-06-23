@@ -30,6 +30,28 @@ vi.mock('@/services/v2/edge-app/edge-app-service', () => ({
 vi.mock('@/services/v2/edge-app/edge-app-version-service', () => ({
   edgeAppVersionService: { listVersions: vi.fn() }
 }))
+// Catalog registry is only exercised by the workload-first editable rows;
+// stub it so firewall/custom_page catalogs and versions are deterministic.
+vi.mock('@/services/v2/deploy-drawer/resource-catalog-registry', () => ({
+  RESOURCE_CATALOG_REGISTRY: {
+    application: {
+      versioned: true,
+      listCatalog: vi.fn().mockResolvedValue([]),
+      listVersions: vi.fn().mockResolvedValue([])
+    },
+    firewall: {
+      versioned: true,
+      listCatalog: vi.fn().mockResolvedValue([{ id: 7, name: 'My Firewall' }]),
+      listVersions: vi.fn().mockResolvedValue([{ id: 'fw-1', state: 'ready' }])
+    },
+    custom_page: {
+      versioned: true,
+      listCatalog: vi.fn().mockResolvedValue([{ id: 5, name: 'Pages' }]),
+      listVersions: vi.fn().mockResolvedValue([{ id: 'cp-1', state: 'ready' }])
+    }
+  },
+  isVersionedResourceType: (type) => ['application', 'firewall', 'custom_page'].includes(type)
+}))
 
 import { workloadService } from '@/services/v2/workload/workload-service'
 import { environmentService } from '@/services/v2/environment/environment-service'
@@ -461,5 +483,113 @@ describe('useDeployDrawer - canary', () => {
     expect(payload.strategy.rollout_mode).toBe('GRADUAL')
     expect(payload.strategy.gradual_rollout.enabled).toBe(true)
     expect(payload.strategy.gradual_rollout.candidate_percentage).toBe(20)
+  })
+})
+
+describe('useDeployDrawer - workload-first composition (application + firewall + custom_page)', () => {
+  // No scoped resource → workload-first mode (opened from Workload/Deployment).
+  const WORKLOAD_FIRST_CONTEXT = {}
+
+  const selectApplication = async (drawer) => {
+    drawer.selectedApplicationId.value = 99
+    await flushPromises()
+    drawer.selectedApplicationVersionId.value = 'app-new'
+    await nextTick()
+  }
+
+  it('always offers firewall + custom_page as optional rows, empty without an active release', async () => {
+    const drawer = useDeployDrawer(WORKLOAD_FIRST_CONTEXT, { visible: ref(true) })
+    await selectThroughToDeployment(drawer)
+
+    expect(drawer.hasScopedResource.value).toBe(false)
+    expect(drawer.editableResourceCards.value.map((card) => card.resourceType)).toEqual([
+      'firewall',
+      'custom_page'
+    ])
+    expect(drawer.editableResourceCards.value.every((card) => card.optional)).toBe(true)
+    expect(drawer.editableResourceCards.value.every((card) => card.selectedId == null)).toBe(true)
+  })
+
+  it('pre-fills firewall + custom_page from the active release and drops unsupported types', async () => {
+    deploymentReleaseService.getActiveReleaseComposition.mockResolvedValue({
+      resources: [
+        APP_RESOURCE,
+        { resource_type: 'firewall', resource_id: 7, resource_version_id: 'fw-1' },
+        { resource_type: 'custom_page', resource_id: 5, resource_version_id: 'cp-1' },
+        { resource_type: 'function', resource_id: 3, resource_version_id: 'fn-1' }
+      ]
+    })
+
+    const drawer = useDeployDrawer(WORKLOAD_FIRST_CONTEXT, { visible: ref(true) })
+    await selectThroughToDeployment(drawer)
+
+    const cards = drawer.editableResourceCards.value
+    expect(cards.map((card) => card.resourceType)).toEqual(['firewall', 'custom_page'])
+    expect(cards.find((card) => card.resourceType === 'firewall')).toMatchObject({
+      selectedId: 7,
+      selectedVersionId: 'fw-1'
+    })
+    expect(cards.find((card) => card.resourceType === 'custom_page')).toMatchObject({
+      selectedId: 5,
+      selectedVersionId: 'cp-1'
+    })
+    expect(cards.some((card) => card.resourceType === 'function')).toBe(false)
+  })
+
+  it('deploys application alone when the optional rows are left empty', async () => {
+    const drawer = useDeployDrawer(WORKLOAD_FIRST_CONTEXT, { visible: ref(true) })
+    await selectThroughToDeployment(drawer)
+    await selectApplication(drawer)
+
+    expect(drawer.canDeploy.value).toBe(true)
+
+    await drawer.deploy()
+
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledWith(
+      DEPLOYMENT_ID,
+      expect.objectContaining({
+        resources: [{ global_id: 99, version_id: 'app-new', resource_type: 'application' }]
+      })
+    )
+  })
+
+  it('includes a filled optional resource and skips the empty one in the payload', async () => {
+    deploymentReleaseService.getActiveReleaseComposition.mockResolvedValue({
+      resources: [{ resource_type: 'firewall', resource_id: 7, resource_version_id: 'fw-1' }]
+    })
+
+    const drawer = useDeployDrawer(WORKLOAD_FIRST_CONTEXT, { visible: ref(true) })
+    await selectThroughToDeployment(drawer)
+    await selectApplication(drawer)
+
+    await drawer.deploy()
+
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledWith(
+      DEPLOYMENT_ID,
+      expect.objectContaining({
+        resources: [
+          { global_id: 99, version_id: 'app-new', resource_type: 'application' },
+          { resource_id: 7, version_id: 'fw-1', resource_type: 'firewall' }
+        ]
+      })
+    )
+  })
+
+  it('resolves the "latest" sentinel to a concrete version_id for an optional resource', async () => {
+    const drawer = useDeployDrawer(WORKLOAD_FIRST_CONTEXT, { visible: ref(true) })
+    await selectThroughToDeployment(drawer)
+    await selectApplication(drawer)
+
+    drawer.setEditableResourceId('firewall', 7)
+    await flushPromises()
+    drawer.setEditableResourceVersion('firewall', LATEST_READY)
+    await nextTick()
+
+    await drawer.deploy()
+
+    const payload = deploymentReleaseService.buildAndActivate.mock.calls.at(-1)[1]
+    const firewall = payload.resources.find((resource) => resource.resource_type === 'firewall')
+    expect(firewall).toEqual({ resource_id: 7, version_id: 'fw-1', resource_type: 'firewall' })
+    expect(firewall.version_id).not.toBe(LATEST_READY)
   })
 })

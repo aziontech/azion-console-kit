@@ -6,6 +6,7 @@
   import DrawerFunction from './Drawer'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { openDocumentationProducts } from '@/helpers/azion-documentation-window-opener'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
   import ListTable from '@/components/list-table/ListTable.vue'
 
   defineOptions({ name: 'list-edge-applications-functions-tab' })
@@ -53,6 +54,7 @@
 
   const router = useRouter()
   const route = useRoute()
+  const { isVersioned } = useVersionContext()
   const drawerFunctionRef = ref('')
   const listTableRef = ref(null)
 
@@ -190,7 +192,7 @@
     exportFileName="Firewall Functions"
     :lazy="true"
     :frozenColumns="frozenColumns"
-    :isTabs="true"
+    :isTabs="!isVersioned"
     emptyListMessage="No functions found."
     :emptyBlock="{
       title: 'No Functions have been instantiated',

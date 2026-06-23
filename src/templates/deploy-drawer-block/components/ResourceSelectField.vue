@@ -34,6 +34,14 @@
     disabled: {
       type: Boolean,
       default: false
+    },
+    required: {
+      type: Boolean,
+      default: true
+    },
+    clearable: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -53,7 +61,7 @@
     <LabelBlock
       :label="label"
       name="deploy-drawer-resource-select"
-      isRequired
+      :isRequired="required"
     />
     <Dropdown
       inputId="deploy-drawer-resource-select"
@@ -67,6 +75,7 @@
       :filterPlaceholder="filterPlaceholder"
       :loading="loading"
       :disabled="disabled"
+      :showClear="clearable"
       class="w-full"
       data-testid="deploy-drawer__resource-select"
       @update:modelValue="onChange"

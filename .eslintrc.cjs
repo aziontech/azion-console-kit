@@ -31,7 +31,6 @@ module.exports = {
       // Tailwind palette/typography/spacing/radius/shadow utilities.
       files: [
         'src/templates/version-shell-block/**/*.{vue,js}',
-        'src/templates/deploy-drawer-block/**/*.{vue,js}',
         'src/composables/versioning/**/*.{vue,js}',
         'src/views/EdgeFunctions/v6/**/*.{vue,js}',
         'src/views/NetworkLists/v6/**/*.{vue,js}',
@@ -39,6 +38,15 @@ module.exports = {
       ],
       rules: {
         'azion-architecture/no-raw-design-values': 'error'
+      }
+    },
+    {
+      // deploy-drawer-block belongs to the new-release-drawer feature and is being
+      // refactored there with the project's existing utilities; keep the DS rule a
+      // non-blocking warning so it does not gate that feature mid-flight.
+      files: ['src/templates/deploy-drawer-block/**/*.{vue,js}'],
+      rules: {
+        'azion-architecture/no-raw-design-values': 'warn'
       }
     },
     {

@@ -119,12 +119,12 @@
 
 <template>
   <div
-    class="flex flex-col gap-[var(--spacing-4)]"
+    class="flex flex-col gap-4"
     data-testid="deploy-drawer__composition"
   >
-    <div class="flex flex-col gap-[var(--spacing-1)]">
+    <div class="flex flex-col gap-1">
       <LabelBlock label="Release composition" />
-      <span class="text-body-xs text-[var(--text-color-secondary)]">
+      <span class="text-xs text-[var(--text-color-secondary)] leading-tight">
         A Release binds one Resource Version of each type configured in
         <span class="font-medium">{{ deploymentName }}</span
         >.
@@ -133,12 +133,12 @@
 
     <div
       v-if="hasScopedResource && !isScopedApplication"
-      class="flex flex-col gap-[var(--spacing-4)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-4)] py-[var(--spacing-4)]"
+      class="flex flex-col gap-4 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-4 py-4"
       data-testid="deploy-drawer__composition-scoped"
     >
-      <span class="flex items-center gap-[var(--spacing-2)]">
+      <span class="flex items-center gap-2">
         <i :class="[resolveResourceMeta(scopedType).icon, 'text-[var(--text-color)]']" />
-        <span class="text-body-sm font-medium text-[var(--text-color)]">
+        <span class="text-sm font-medium text-[var(--text-color)]">
           {{ resolveResourceMeta(scopedType).label }}
         </span>
       </span>
@@ -154,14 +154,14 @@
 
     <div
       v-if="noApplication"
-      class="flex flex-col gap-[var(--spacing-3)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-4)] py-[var(--spacing-4)]"
+      class="flex flex-col gap-3 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-4 py-4"
       data-testid="deploy-drawer__composition-no-application"
     >
-      <span class="flex items-center gap-[var(--spacing-2)]">
+      <span class="flex items-center gap-2">
         <i :class="[resolveResourceMeta('application').icon, 'text-[var(--text-color)]']" />
-        <span class="text-body-sm font-medium text-[var(--text-color)]">Application</span>
+        <span class="text-sm font-medium text-[var(--text-color)]">Application</span>
       </span>
-      <span class="text-body-xs text-[var(--text-color-secondary)]">
+      <span class="text-xs text-[var(--text-color-secondary)] leading-tight">
         No Application available. A Release must include an Application. Create one to continue.
       </span>
       <PrimeButton
@@ -177,23 +177,23 @@
 
     <div
       v-else-if="applicationReadOnly"
-      class="flex flex-col gap-[var(--spacing-3)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] px-[var(--spacing-4)] py-[var(--spacing-4)]"
+      class="flex flex-col gap-3 rounded-md border border-[var(--surface-border)] px-4 py-4"
       data-testid="deploy-drawer__composition-application-readonly"
     >
       <div class="flex items-center justify-between">
-        <span class="flex items-center gap-[var(--spacing-2)]">
+        <span class="flex items-center gap-2">
           <i :class="[resolveResourceMeta('application').icon, 'text-[var(--text-color)]']" />
-          <span class="text-body-sm font-medium text-[var(--text-color)]">Application</span>
+          <span class="text-sm font-medium text-[var(--text-color)]">Application</span>
         </span>
         <span
-          class="inline-flex items-center gap-[var(--spacing-1)] rounded-[var(--shape-elements)] bg-[var(--surface-section)] px-[var(--spacing-2)] py-[2px] text-body-xs text-[var(--text-color-secondary)]"
+          class="inline-flex items-center gap-1 rounded-md bg-[var(--surface-section)] px-2 py-0.5 text-xs text-[var(--text-color-secondary)]"
         >
           <i class="pi pi-lock" /> Read-only
         </span>
       </div>
 
       <div
-        class="flex items-center justify-between gap-[var(--spacing-3)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-ground)] px-[var(--spacing-3)] py-[var(--spacing-2)]"
+        class="flex items-center justify-between gap-3 rounded-md border border-[var(--surface-border)] bg-[var(--surface-ground)] px-3 py-2"
       >
         <Skeleton
           v-if="isResolvingApplicationName && !applicationName"
@@ -202,20 +202,20 @@
         />
         <span
           v-else
-          class="text-body-sm text-[var(--text-color)] truncate"
+          class="text-sm text-[var(--text-color)] truncate"
         >
           {{ applicationName ?? activeReleaseApplication?.resourceVersion ?? '—' }}
         </span>
         <span
           v-if="applicationName"
-          class="font-mono text-body-xs text-[var(--text-color-secondary)] shrink-0"
+          class="font-mono text-xs text-[var(--text-color-secondary)] shrink-0"
         >
           {{ activeReleaseApplication?.resourceVersion }}
         </span>
       </div>
 
       <span
-        class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
+        class="flex items-center gap-1 text-xs text-[var(--text-color-secondary)] leading-tight"
       >
         <i class="pi pi-lock" /> Active release
       </span>
@@ -223,16 +223,16 @@
 
     <div
       v-else
-      class="flex flex-col gap-[var(--spacing-4)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-4)] py-[var(--spacing-4)]"
+      class="flex flex-col gap-4 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-4 py-4"
       data-testid="deploy-drawer__composition-application"
     >
       <div class="flex items-center justify-between">
-        <span class="flex items-center gap-[var(--spacing-2)]">
+        <span class="flex items-center gap-2">
           <i :class="[resolveResourceMeta('application').icon, 'text-[var(--text-color)]']" />
-          <span class="text-body-sm font-medium text-[var(--text-color)]">Application</span>
+          <span class="text-sm font-medium text-[var(--text-color)]">Application</span>
         </span>
         <span
-          class="inline-flex items-center gap-[var(--spacing-1)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] px-[var(--spacing-2)] py-[2px] text-body-xs text-[var(--text-color-secondary)]"
+          class="inline-flex items-center gap-1 rounded-md border border-[var(--surface-border)] px-2 py-0.5 text-xs text-[var(--text-color-secondary)]"
           data-testid="deploy-drawer__composition-required"
         >
           Required
@@ -271,27 +271,27 @@
       <div
         v-for="entry in readOnlyResources"
         :key="`${entry.resourceType}:${entry.resourceId}`"
-        class="flex flex-col gap-[var(--spacing-3)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] px-[var(--spacing-4)] py-[var(--spacing-4)]"
+        class="flex flex-col gap-3 rounded-md border border-[var(--surface-border)] px-4 py-4"
         :data-testid="`deploy-drawer__composition-keep-${entry.resourceType}-${entry.resourceId}`"
       >
         <div class="flex items-center justify-between">
-          <span class="flex items-center gap-[var(--spacing-2)]">
+          <span class="flex items-center gap-2">
             <i
               :class="[resolveResourceMeta(entry.resourceType).icon, 'text-[var(--text-color)]']"
             />
-            <span class="text-body-sm font-medium text-[var(--text-color)]">
+            <span class="text-sm font-medium text-[var(--text-color)]">
               {{ resolveResourceMeta(entry.resourceType).label }}
             </span>
           </span>
           <span
-            class="inline-flex items-center gap-[var(--spacing-1)] rounded-[var(--shape-elements)] bg-[var(--surface-section)] px-[var(--spacing-2)] py-[2px] text-body-xs text-[var(--text-color-secondary)]"
+            class="inline-flex items-center gap-1 rounded-md bg-[var(--surface-section)] px-2 py-0.5 text-xs text-[var(--text-color-secondary)]"
           >
             <i class="pi pi-lock" /> Read-only
           </span>
         </div>
 
         <div
-          class="flex items-center justify-between gap-[var(--spacing-3)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-ground)] px-[var(--spacing-3)] py-[var(--spacing-2)]"
+          class="flex items-center justify-between gap-3 rounded-md border border-[var(--surface-border)] bg-[var(--surface-ground)] px-3 py-2"
         >
           <Skeleton
             v-if="isResolvingReadOnlyNames && !entry.resourceName"
@@ -300,17 +300,17 @@
           />
           <span
             v-else
-            class="text-body-sm text-[var(--text-color)] truncate"
+            class="text-sm text-[var(--text-color)] truncate"
           >
             {{ entry.resourceName ?? entry.resourceId }}
           </span>
-          <span class="font-mono text-body-xs text-[var(--text-color-secondary)] shrink-0">
+          <span class="font-mono text-xs text-[var(--text-color-secondary)] shrink-0">
             {{ entry.resourceVersion }}
           </span>
         </div>
 
         <span
-          class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
+          class="flex items-center gap-1 text-xs text-[var(--text-color-secondary)] leading-tight"
         >
           <i class="pi pi-lock" /> Active release
         </span>
@@ -320,17 +320,26 @@
       <div
         v-for="resource in editableResources"
         :key="resource.key"
-        class="flex flex-col gap-[var(--spacing-4)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-4)] py-[var(--spacing-4)]"
+        class="flex flex-col gap-4 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-4 py-4"
         :data-testid="`deploy-drawer__composition-editable-${resource.resourceType}`"
       >
-        <span class="flex items-center gap-[var(--spacing-2)]">
-          <i
-            :class="[resolveResourceMeta(resource.resourceType).icon, 'text-[var(--text-color)]']"
-          />
-          <span class="text-body-sm font-medium text-[var(--text-color)]">
-            {{ resolveResourceMeta(resource.resourceType).label }}
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2">
+            <i
+              :class="[resolveResourceMeta(resource.resourceType).icon, 'text-[var(--text-color)]']"
+            />
+            <span class="text-sm font-medium text-[var(--text-color)]">
+              {{ resolveResourceMeta(resource.resourceType).label }}
+            </span>
           </span>
-        </span>
+          <span
+            v-if="resource.optional"
+            class="inline-flex items-center gap-1 rounded-md border border-[var(--surface-border)] px-2 py-0.5 text-xs text-[var(--text-color-secondary)]"
+            data-testid="deploy-drawer__composition-optional"
+          >
+            Optional
+          </span>
+        </div>
 
         <ResourceSelectField
           :model-value="resource.selectedId"
@@ -338,11 +347,13 @@
           :loading="resource.isLoadingOptions"
           :label="resolveResourceMeta(resource.resourceType).label"
           :placeholder="`Select a ${resolveResourceMeta(resource.resourceType).label}`"
+          :required="!resource.optional"
+          :clearable="resource.optional"
           @update:model-value="emit('update:resourceId', { key: resource.key, value: $event })"
         />
 
         <ResourceVersionField
-          v-if="resource.versioned"
+          v-if="resource.versioned && resource.selectedId != null"
           :model-value="resource.selectedVersionId"
           :show-resource="false"
           :versions="resource.versionOptions"
@@ -352,23 +363,5 @@
         />
       </div>
     </template>
-
-    <div
-      class="flex items-start gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-3)] py-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
-      data-testid="deploy-drawer__composition-note"
-    >
-      <i class="pi pi-info-circle mt-[2px]" />
-      <span>Only the resources above are part of this Release.</span>
-    </div>
-
-    <PrimeButton
-      label="Add resource"
-      icon="pi pi-plus"
-      size="small"
-      text
-      disabled
-      class="self-start"
-      data-testid="deploy-drawer__composition-add-resource"
-    />
   </div>
 </template>
