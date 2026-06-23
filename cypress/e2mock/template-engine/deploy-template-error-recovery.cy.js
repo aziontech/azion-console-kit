@@ -193,17 +193,23 @@ describe('Template Engine - Deploy error recovery (mocked)', { tags: ['@dev3'] }
 
     openTemplateCard()
 
-    // Repository step (Azion engine uses its own git scope dropdown).
+    // Repository step (Azion engine uses its own git scope dropdown and the
+    // az_name field for the application name).
     cy.get(templateEngine.azionGitScopeDropdown).should('be.visible').click()
     cy.contains(templateEngine.dropdownItem, 'azion-e2e-org').click()
-    cy.get(templateEngine.projectNameInput).clear()
-    cy.get(templateEngine.projectNameInput).type(PROJECT_NAME)
+    cy.get(templateEngine.azionAppNameInput).clear()
+    cy.get(templateEngine.azionAppNameInput).type(PROJECT_NAME)
 
     // This template has settings => advance to settings and deploy from there.
     cy.get(templateEngine.nextButton).should('not.be.disabled').click()
     cy.get(templateEngine.settingsCard).should('be.visible')
 
-    cy.clock(null, ['setTimeout', 'setInterval'])
+    // Fake only setInterval (used by the log polling). The Azion engine validates
+    // via vee-validate, whose deploy-time validation resolves through a setTimeout
+    // debounce; freezing setTimeout would stall validateForm() and the deploy would
+    // never reach the instantiate request. The jsonform engine validates synchronously,
+    // which is why the other tests can safely freeze both timers.
+    cy.clock(null, ['setInterval'])
 
     cy.get(templateEngine.settingsDeployButton).should('not.be.disabled').click()
     cy.wait('@instantiate').its('response.statusCode').should('eq', 201)
@@ -221,6 +227,6 @@ describe('Template Engine - Deploy error recovery (mocked)', { tags: ['@dev3'] }
 
     cy.get(templateEngine.deployStatusCard).should('not.exist')
     cy.get(templateEngine.inputsCard).should('be.visible')
-    cy.get(templateEngine.projectNameInput).should('not.be.disabled').and('have.value', '')
+    cy.get(templateEngine.azionAppNameInput).should('not.be.disabled').and('have.value', '')
   })
 })

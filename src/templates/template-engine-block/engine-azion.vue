@@ -88,6 +88,10 @@
   const isFormReady = ref(false)
   const setIntegration = ref('')
   const isInitialized = ref(false)
+  // Bumped on "start new deploy" to remount the az_name field. FieldInputTextPrivacy
+  // keeps its own value via an internal useField and only reads `value` as its initial
+  // value, so resetForm() can't clear its displayed input — remounting it via :key does.
+  const inputsResetKey = ref(0)
   const isEdgeAppNamePublic = ref(false)
   const vcsIntegrationError = ref('')
   const vcsIntegrationFieldName = ref('platform_feature__vcs_integration__uuid')
@@ -761,6 +765,8 @@
     formTools.value.resetForm?.()
     setIntegration.value = ''
     vcsIntegrationError.value = ''
+    // Force the az_name privacy field to remount so its internal value clears too
+    inputsResetKey.value += 1
     emit('start-new')
   }
 
@@ -1007,6 +1013,7 @@
               </div>
               <FieldInputTextPrivacy
                 v-else-if="isHandleField(field.name) && field.name === 'az_name'"
+                :key="`az-name-${inputsResetKey}`"
                 class="w-full sm:w-1/2"
                 :class="{
                   '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
@@ -1175,6 +1182,7 @@
                       <!-- Regular field in group -->
                       <FieldInputTextPrivacy
                         v-if="field.name === 'az_name'"
+                        :key="`az-name-${inputsResetKey}`"
                         :class="{
                           '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
                         }"
@@ -1335,6 +1343,7 @@
                       class="w-full sm:w-1/2"
                     >
                       <FieldInputTextPrivacy
+                        :key="`az-name-${inputsResetKey}`"
                         :class="{
                           '[&_small.p-error]:hidden': isRequiredError(getDisplayError(field.name))
                         }"

@@ -27,6 +27,9 @@ export default {
 
   // Azion engine (groups-based schema) repository / settings
   azionGitScopeDropdown: '[data-testid="field-dropdown__dropdown"]',
+  // Azion engine names the repository field "az_name", so the privacy input carries
+  // the data-testid "field-az_name__input" (not the default field-text-privacy__input).
+  azionAppNameInput: '[data-testid="field-az_name__input"]',
   azionSettingOneInput: 'input[name="setting_one"]',
   azionSettingTwoInput: 'input[name="setting_two"]',
   azionSettingThreeInput: 'input[name="setting_three"]',

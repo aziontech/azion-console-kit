@@ -135,7 +135,7 @@ describe('Template Engine - Settings 2-per-row layout (mocked)', { tags: ['@dev3
     // Repository step: select Git Scope (FieldDropdown) and fill a valid name
     cy.get(templateEngine.azionGitScopeDropdown).should('be.visible').click()
     cy.contains(templateEngine.dropdownItem, 'azion-e2e-org').click()
-    cy.get(templateEngine.projectNameInput).clear().type(VALID_NAME)
+    cy.get(templateEngine.azionAppNameInput).clear().type(VALID_NAME)
 
     // Advance to the settings step
     cy.get(templateEngine.nextButton).should('not.be.disabled').click()
