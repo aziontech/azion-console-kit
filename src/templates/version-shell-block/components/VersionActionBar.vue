@@ -30,7 +30,7 @@
   const BANNER = {
     draft: {
       icon: 'pi pi-file-edit',
-      title: 'Draft',
+      title: 'Editing a Draft version',
       subtitle: 'This version is open for editing. Deploy it when ready.',
       actions: [
         {

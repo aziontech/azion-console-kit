@@ -105,11 +105,19 @@
               </div>
             </TabPanel>
           </TabView>
-          <VersionTabAddButton
-            :tab="activeTabDescriptor"
-            :active-component="activeTabComponent"
-            :testid-prefix="testidPrefix"
-          />
+          <div class="absolute right-0 top-1 z-10 flex items-center">
+            <slot
+              name="tab-actions"
+              :tab="activeTabDescriptor"
+              :active-component="activeTabComponent"
+            >
+              <VersionTabAddButton
+                :tab="activeTabDescriptor"
+                :active-component="activeTabComponent"
+                :testid-prefix="testidPrefix"
+              />
+            </slot>
+          </div>
         </template>
         <VersionHeadingActions
           ref="headingActionsRef"

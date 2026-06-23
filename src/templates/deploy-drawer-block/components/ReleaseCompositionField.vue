@@ -323,14 +323,23 @@
         class="flex flex-col gap-4 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-4 py-4"
         :data-testid="`deploy-drawer__composition-editable-${resource.resourceType}`"
       >
-        <span class="flex items-center gap-2">
-          <i
-            :class="[resolveResourceMeta(resource.resourceType).icon, 'text-[var(--text-color)]']"
-          />
-          <span class="text-sm font-medium text-[var(--text-color)]">
-            {{ resolveResourceMeta(resource.resourceType).label }}
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2">
+            <i
+              :class="[resolveResourceMeta(resource.resourceType).icon, 'text-[var(--text-color)]']"
+            />
+            <span class="text-sm font-medium text-[var(--text-color)]">
+              {{ resolveResourceMeta(resource.resourceType).label }}
+            </span>
           </span>
-        </span>
+          <span
+            v-if="resource.optional"
+            class="inline-flex items-center gap-1 rounded-md border border-[var(--surface-border)] px-2 py-0.5 text-xs text-[var(--text-color-secondary)]"
+            data-testid="deploy-drawer__composition-optional"
+          >
+            Optional
+          </span>
+        </div>
 
         <ResourceSelectField
           :model-value="resource.selectedId"
@@ -338,11 +347,13 @@
           :loading="resource.isLoadingOptions"
           :label="resolveResourceMeta(resource.resourceType).label"
           :placeholder="`Select a ${resolveResourceMeta(resource.resourceType).label}`"
+          :required="!resource.optional"
+          :clearable="resource.optional"
           @update:model-value="emit('update:resourceId', { key: resource.key, value: $event })"
         />
 
         <ResourceVersionField
-          v-if="resource.versioned"
+          v-if="resource.versioned && resource.selectedId != null"
           :model-value="resource.selectedVersionId"
           :show-resource="false"
           :versions="resource.versionOptions"
@@ -352,23 +363,5 @@
         />
       </div>
     </template>
-
-    <div
-      class="flex items-start gap-2 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-3 py-2 text-xs text-[var(--text-color-secondary)] leading-tight"
-      data-testid="deploy-drawer__composition-note"
-    >
-      <i class="pi pi-info-circle mt-0.5" />
-      <span>Only the resources above are part of this Release.</span>
-    </div>
-
-    <PrimeButton
-      label="Add resource"
-      icon="pi pi-plus"
-      size="small"
-      text
-      disabled
-      class="self-start"
-      data-testid="deploy-drawer__composition-add-resource"
-    />
   </div>
 </template>

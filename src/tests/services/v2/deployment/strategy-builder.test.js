@@ -66,11 +66,46 @@ describe('strategy-builder.mapStrategyForBuildAndActivate', () => {
     expect(mapped.gradual_rollout).not.toHaveProperty('candidate_from_deployment_version_id')
     expect(mapped.gradual_rollout.candidate_from_release_id).toBeNull()
     expect(mapped.gradual_rollout.candidate_percentage).toBe(25)
-    expect(mapped.skew_protection).toEqual({ enabled: false })
+    expect(mapped.skew_protection).toEqual({
+      enabled: false,
+      cookie_name: '__azdeploy_skew',
+      max_age_seconds: 3600,
+      max_skewed_deployments: 10
+    })
   })
 
-  it('passes a strategy through unchanged when it has no gradual_rollout', () => {
-    const strategy = { rollout_mode: 'INSTANT', skew_protection: { enabled: true } }
-    expect(mapStrategyForBuildAndActivate(strategy)).toEqual(strategy)
+  it('normalizes skew_protection with the API defaults when no gradual_rollout is present', () => {
+    const mapped = mapStrategyForBuildAndActivate({
+      rollout_mode: 'INSTANT',
+      skew_protection: { enabled: true }
+    })
+
+    expect(mapped.rollout_mode).toBe('INSTANT')
+    expect(mapped).not.toHaveProperty('gradual_rollout')
+    expect(mapped.skew_protection).toEqual({
+      enabled: true,
+      cookie_name: '__azdeploy_skew',
+      max_age_seconds: 3600,
+      max_skewed_deployments: 10
+    })
+  })
+
+  it('keeps skew_protection values provided by the form, defaulting only the gaps', () => {
+    const mapped = mapStrategyForBuildAndActivate({
+      rollout_mode: 'INSTANT',
+      skew_protection: {
+        enabled: true,
+        cookie_name: 'custom_skew',
+        max_age_seconds: null,
+        max_skewed_deployments: 3
+      }
+    })
+
+    expect(mapped.skew_protection).toEqual({
+      enabled: true,
+      cookie_name: 'custom_skew',
+      max_age_seconds: 3600,
+      max_skewed_deployments: 3
+    })
   })
 })

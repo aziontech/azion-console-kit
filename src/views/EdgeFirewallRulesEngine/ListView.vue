@@ -68,7 +68,7 @@
 
   // Outside the VersionShell (legacy flow) this defaults to readOnly=false, so the
   // legacy behavior is unchanged; inside an immutable version it disables writes.
-  const { readOnly } = useVersionContext()
+  const { readOnly, isVersioned } = useVersionContext()
   const isReadOnly = computed(() => readOnly.value)
 
   const hasContentToList = ref(true)
@@ -153,7 +153,7 @@
     emptyListMessage: 'No rules found.',
     exportFileName: 'Firewall Rules Engine',
     editInDrawer: openEditDrawer,
-    isTabs: true,
+    isTabs: false,
     orderableRows: true,
     showContrastInactiveLine: false,
     enableEditClick: true
@@ -405,7 +405,7 @@
   />
 
   <div
-    class="max-w-full mt-4"
+    class="max-w-full"
     data-testid="data-table-container"
   >
     <DataTable
@@ -420,7 +420,6 @@
           class: 'cursor-pointer'
         })
       }"
-      containerClass="mt-4"
       v-model:filters="filters"
       :globalFilterFields="filterBy"
       v-model:selection="selectedItems"
@@ -439,6 +438,7 @@
       data-testid="rules-engine-list"
       @on-load-data="handleLoadData"
       @on-before-go-to-edit="handleTrackEditEvent"
+      :class="{ 'mt-4': !isVersioned }"
     >
       <template #header>
         <DataTable.Header :showDivider="false">
