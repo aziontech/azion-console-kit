@@ -42,7 +42,7 @@
 
 <template>
   <div
-    class="flex flex-col gap-4"
+    class="flex flex-col gap-[var(--spacing-4)]"
     data-testid="deploy-drawer__canary"
   >
     <FieldSwitchBlock
@@ -57,7 +57,7 @@
 
     <div
       v-if="canaryEnabled"
-      class="flex flex-col gap-4 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-4 py-4"
+      class="flex flex-col gap-[var(--spacing-4)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-4)] py-[var(--spacing-4)]"
       data-testid="deploy-drawer__canary-fields"
     >
       <FieldDropdown

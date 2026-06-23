@@ -108,6 +108,39 @@ describe('useVersionRowActions — backend authority on "in use"', () => {
 
     expect(showErrors).toHaveBeenCalledOnce()
   })
+
+  // Property 5: a rejection must not produce a false success — no success toast
+  // and no view reload/navigation; the list stays consistent (Req 3.1/3.2/3.4).
+  it('does not signal success nor reload when Archive is rejected', async () => {
+    const onSuccess = vi.fn()
+    const service = makeService({
+      archive: vi.fn().mockRejectedValue(new Error('Version in use as Current'))
+    })
+    const api = useVersionRowActions({ resourceId: 'app1', service, onSuccess })
+
+    api.handleRowAction({ action: 'ARCHIVE', item })
+    await flush()
+
+    expect(onSuccess).not.toHaveBeenCalled()
+    expect(toastAdd).not.toHaveBeenCalledWith(expect.objectContaining({ severity: 'success' }))
+    expect(api.isExecuting.value).toBe(false)
+  })
+
+  it('does not signal success nor reload when Delete is rejected', async () => {
+    const onSuccess = vi.fn()
+    const service = makeService({
+      deleteVersion: vi.fn().mockRejectedValue(new Error('Version in use as Current'))
+    })
+    const api = useVersionRowActions({ resourceId: 'app1', service, onSuccess })
+
+    api.handleRowAction({ action: 'DELETE', item })
+    api.handleConfirm()
+    await flush()
+
+    expect(onSuccess).not.toHaveBeenCalled()
+    expect(toastAdd).not.toHaveBeenCalledWith(expect.objectContaining({ severity: 'success' }))
+    expect(api.isExecuting.value).toBe(false)
+  })
 })
 
 describe('useVersionRowActions — retired row actions are no-ops', () => {

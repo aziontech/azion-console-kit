@@ -11,6 +11,7 @@ import { DeploymentAdapter } from '@/services/v2/deployment/deployment-adapter'
 import { buildStrategy } from '@/services/v2/deployment/strategy-builder'
 import { deployDrawerService } from '@/services/v2/deploy-drawer/deploy-drawer-service'
 import { RESOURCE_CATALOG_REGISTRY } from '@/services/v2/deploy-drawer/resource-catalog-registry'
+import { getVersionCapability } from '@/composables/versioning/version-capability'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
 
@@ -28,6 +29,11 @@ const normalizeName = (name) => (isObject(name) ? (name.text ?? '') : (name ?? '
 
 // A version is deployable when it is built — `ready` or `active` (serving).
 const DEPLOYABLE_STATES = ['ready', 'active']
+
+// A type belongs in the release picker only when its class can be deployed.
+// `versioned-only` (function/network_list/waf) returns `canDeploy: false`, so
+// it is filtered out of the selectable composition (req 2.7).
+const isDeployableType = (resourceType) => getVersionCapability(resourceType).canDeploy
 
 const toVersionOptions = (versions) =>
   (Array.isArray(versions) ? versions : [])
@@ -525,8 +531,12 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
   const versionsByResource = ref({})
   const versionsLoadingByResource = ref({})
 
+  // Workload-first composition is user-picked, so `versioned-only` types are
+  // dropped from the selectable set (req 2.7); deployable types are unchanged.
   const editableSourceResources = computed(() =>
-    hasScopedResource.value ? null : releaseParts.value.readOnlyResources
+    hasScopedResource.value
+      ? null
+      : releaseParts.value.readOnlyResources.filter((entry) => isDeployableType(entry.resourceType))
   )
 
   watch(

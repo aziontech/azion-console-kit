@@ -1,4 +1,5 @@
 import { toValue } from 'vue'
+import { useToast } from '@aziontech/webkit/use-toast'
 import { useVersionRowActions } from '@/composables/versioning/use-version-row-actions'
 
 /**
@@ -9,6 +10,8 @@ import { useVersionRowActions } from '@/composables/versioning/use-version-row-a
  *   - OPEN_CONFIGURATION → router.push to the version editor of `resourceType`
  *     (RESOURCE_VERSION_ROUTES map), passing id + versionId; no draft creation.
  *   - PROMOTE            → openPromoteDrawer({ scopedType, pin, workloadId }).
+ *   - NEW_DRAFT_FROM     → versionService.createDraft(resourceId,
+ *     { sourceVersionId: item.id }) then route to the new draft (versioned-only).
  *   - ROLLBACK           → no-op (disabled this phase; behavior is Phase 2).
  *   - ARCHIVE / DELETE   → delegated to use-version-row-actions (dialog + service
  *     + toast). Its dialog state/handlers are re-exposed so the host renders
@@ -29,7 +32,9 @@ export const RESOURCE_VERSION_ROUTES = {
   custom_page: 'edit-custom-pages-version',
   function: 'edit-functions-version',
   connector: 'edit-connectors-version',
-  workload: 'edit-workload-version'
+  workload: 'edit-workload-version',
+  network_list: 'edit-network-lists-version',
+  waf: 'edit-waf-rules-version'
 }
 
 /**
@@ -53,6 +58,7 @@ export function useVersionMenuActions({
   onSuccess,
   workloadId
 } = {}) {
+  const toast = useToast()
   const rowActions = useVersionRowActions({
     resourceId,
     service: versionService,
@@ -77,6 +83,36 @@ export function useVersionMenuActions({
     })
   }
 
+  // New version from this: clone the source version into a draft, then route to
+  // it (mirror of VersionsTab.createDraft). Errors surface via toast, as elsewhere.
+  const newDraftFrom = async (item) => {
+    const type = toValue(resourceType)
+    const name = RESOURCE_VERSION_ROUTES[type]
+    if (!item?.id || !name) return
+    try {
+      const draft = await versionService.createDraft(toValue(resourceId), {
+        sourceVersionId: item.id
+      })
+      if (draft?.id) {
+        router?.push({
+          name,
+          params: { id: String(toValue(resourceId)), versionId: String(draft.id) }
+        })
+      }
+    } catch (err) {
+      if (err && typeof err.showErrors === 'function') {
+        err.showErrors(toast)
+      } else {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.message ?? 'Failed to create a new version. Try again.'
+        })
+      }
+    }
+  }
+
   // Routes a `row-action` payload. ARCHIVE/DELETE keep their dialog+service+toast
   // flow inside use-version-row-actions; ROLLBACK is deferred (no-op this phase).
   const handleRowAction = ({ action, item } = {}) => {
@@ -85,6 +121,8 @@ export function useVersionMenuActions({
         return openConfiguration(item)
       case 'PROMOTE':
         return promote(item)
+      case 'NEW_DRAFT_FROM':
+        return newDraftFrom(item)
       case 'ROLLBACK':
         return undefined
       case 'ARCHIVE':

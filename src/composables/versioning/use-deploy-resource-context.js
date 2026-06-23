@@ -1,6 +1,7 @@
 import { computed, inject, ref, toValue } from 'vue'
 import { useRoute } from 'vue-router'
 import { toDeployableVersionOptions, toVersionOption } from './to-version-options'
+import { getVersionCapability } from './version-capability'
 
 /**
  * useDeployResourceContext — builds the `resourceContext` consumed by the shared
@@ -25,6 +26,9 @@ export function useDeployResourceContext({
 }) {
   const route = useRoute()
 
+  // versioned-only resources expose no deploy drawer — yield a null context.
+  const capability = getVersionCapability(resourceType)
+
   const resource = inject(injectionKey, ref(null))
   const resourceId = computed(() => Number(resource.value?.id ?? route.params.id))
   const resourceName = computed(() => resource.value?.name ?? '')
@@ -46,13 +50,16 @@ export function useDeployResourceContext({
     return [toVersionOption(current ?? { id: currentId.value }, currentId.value)]
   })
 
-  const resourceContext = computed(() => ({
-    resourceType,
-    resourceId: resourceId.value,
-    resourceName: resourceName.value,
-    version: currentId.value ? { id: currentId.value } : null,
-    versions: versionOptions.value
-  }))
+  const resourceContext = computed(() => {
+    if (!capability.canDeploy) return null
+    return {
+      resourceType,
+      resourceId: resourceId.value,
+      resourceName: resourceName.value,
+      version: currentId.value ? { id: currentId.value } : null,
+      versions: versionOptions.value
+    }
+  })
 
   return { resourceContext }
 }

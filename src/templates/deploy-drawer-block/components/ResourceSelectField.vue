@@ -49,7 +49,7 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col gap-[var(--spacing-2)]">
     <LabelBlock
       :label="label"
       name="deploy-drawer-resource-select"
@@ -74,21 +74,21 @@
       <template #value>
         <span
           v-if="selectedOption"
-          class="flex items-center gap-2"
+          class="flex items-center gap-[var(--spacing-2)]"
         >
           <i class="pi pi-box text-[var(--text-color-secondary)]" />
-          <span class="text-sm text-[var(--text-color)]">{{ selectedOption.label }}</span>
+          <span class="text-body-sm text-[var(--text-color)]">{{ selectedOption.label }}</span>
         </span>
         <span
           v-else
-          class="text-sm text-[var(--text-color-secondary)]"
+          class="text-body-sm text-[var(--text-color-secondary)]"
           >{{ placeholder }}</span
         >
       </template>
       <template #option="{ option }">
-        <span class="flex w-full items-center gap-3">
+        <span class="flex w-full items-center gap-[var(--spacing-3)]">
           <i class="pi pi-box text-[var(--text-color-secondary)]" />
-          <span class="text-sm font-medium text-[var(--text-color)] truncate">
+          <span class="text-body-sm font-medium text-[var(--text-color)] truncate">
             {{ option.label }}
           </span>
           <i

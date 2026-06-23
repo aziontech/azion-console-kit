@@ -7,6 +7,7 @@ const pureAdapters = require('./lib/rules/pure-adapters')
 const moduleIsolation = require('./lib/rules/module-isolation')
 const namingConvention = require('./lib/rules/naming-convention')
 const typeSeparation = require('./lib/rules/type-separation')
+const noRawDesignValues = require('./lib/rules/no-raw-design-values')
 const recommended = require('./lib/configs/recommended')
 
 module.exports = {
@@ -19,7 +20,8 @@ module.exports = {
     'pure-adapters': pureAdapters,
     'module-isolation': moduleIsolation,
     'naming-convention': namingConvention,
-    'type-separation': typeSeparation
+    'type-separation': typeSeparation,
+    'no-raw-design-values': noRawDesignValues
   },
   configs: {
     recommended

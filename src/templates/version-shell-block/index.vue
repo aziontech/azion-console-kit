@@ -4,6 +4,7 @@
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { useVersionShell } from './use-version-shell'
   import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
+  import { getVersionCapability } from '@/composables/versioning/version-capability'
   import { VERSION_ACTIONS, isProcessing } from '@/composables/versioning/version-machine'
   import {
     createVersionCommandBus,
@@ -20,6 +21,7 @@
    *                    Typically `() => service.useLoadVersionQuery(rid, vid)`.
    *                    The service controls queryKey, queryFn and refetchInterval.
    *  - resourceId, versionId — used to build the command ctx.
+   *  - resourceType — resolves the version capability; omitted/unknown stays deployable.
    */
   const props = defineProps({
     useVersionQuery: {
@@ -33,8 +35,16 @@
     versionId: {
       type: String,
       required: true
+    },
+    resourceType: {
+      type: String,
+      default: undefined
     }
   })
+
+  // Provided as a ref so in-shell surfaces read `capability.value` (deployable by
+  // default); resourceType resolves the class once at mount.
+  const capability = readonly(ref(getVersionCapability(props.resourceType)))
 
   const emit = defineEmits(['updated', 'command-error', 'cancel'])
 
@@ -73,6 +83,7 @@
     availableActions,
     disabledActions,
     isVersioned: readonly(ref(true)),
+    capability,
     dispatch: handleDispatch
   })
 
@@ -97,11 +108,11 @@
   >
     <div
       v-if="isLoading"
-      class="flex items-center justify-center p-8"
+      class="flex items-center justify-center p-[var(--spacing-8)]"
       data-testid="version-shell__loading"
     >
       <ProgressSpinner
-        class="w-10 h-10 text-color"
+        class="w-10 h-10 text-[var(--text-color)]"
         strokeWidth="4"
       />
     </div>

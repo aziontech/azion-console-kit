@@ -74,17 +74,17 @@
     :visible="visible"
     :blockScroll="true"
     modal
-    class="w-full max-w-xl"
+    class="w-full max-w-[var(--container-xl)]"
     :closable="false"
     @update:visible="emit('update:visible', $event)"
   >
     <template #header>
-      <h5 class="text-lg not-italic font-medium leading-5">{{ title }}</h5>
+      <h5 class="text-heading-sm not-italic font-medium">{{ title }}</h5>
     </template>
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-[var(--spacing-2)]">
       <p
         v-if="message"
-        class="text-sm"
+        class="text-body-sm"
         data-testid="version-action-dialog__message"
       >
         {{ message }}

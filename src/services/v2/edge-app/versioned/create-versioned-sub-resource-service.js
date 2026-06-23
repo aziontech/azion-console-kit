@@ -2,9 +2,10 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 
 /**
- * Factory producing a generic CRUDL service for a versioned Edge Application
- * sub-resource. All endpoints are scoped to an application + version:
- *   `v4/workspace/applications/{appId}/versions/{versionId}/{path}`
+ * Factory producing a generic CRUDL service for a versioned sub-resource.
+ * All endpoints are scoped to a parent resource + version:
+ *   `{baseURL}/{appId}/versions/{versionId}/{path}`
+ * `baseURL` defaults to Edge Applications; other resources (e.g. WAF) override it.
  *
  * The optional `adapter` is called via generic, normalized method names so the
  * factory stays resource-agnostic; every call is optional-chained and falls back
@@ -18,12 +19,14 @@ import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
  * @param {string}  args.path           Snake_case API path segment (e.g. 'cache_settings').
  * @param {Object} [args.adapter]       Adapter exposing the generic methods above.
  * @param {Object}  args.queryKeyGroup  Versioned query-key group: `all`/`list`/`detail`(appId, versionId, ...).
+ * @param {string} [args.baseURL]       Parent resource base path (defaults to Edge Applications).
  * @returns {VersionedSubResourceService}
  */
 export const createVersionedSubResourceService = ({
   path,
   adapter,
   queryKeyGroup,
+  baseURL = 'v4/workspace/applications',
   idKey = 'id',
   createdMessage = 'Created successfully',
   updatedMessage = 'Updated successfully'
@@ -31,7 +34,7 @@ export const createVersionedSubResourceService = ({
   class VersionedSubResourceService extends BaseService {
     constructor() {
       super()
-      this.baseURL = 'v4/workspace/applications'
+      this.baseURL = baseURL
       this.path = path
       this.adapter = adapter
       this.queryKeyGroup = queryKeyGroup

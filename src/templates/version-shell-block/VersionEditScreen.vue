@@ -25,11 +25,11 @@
 <template>
   <div
     v-if="isLoading"
-    class="flex items-center justify-center p-8"
+    class="flex items-center justify-center p-[var(--spacing-8)]"
     :data-testid="`${testidPrefix}__loading`"
   >
     <ProgressSpinner
-      class="w-10 h-10 text-color"
+      class="w-10 h-10 text-[var(--text-color)]"
       strokeWidth="4"
     />
   </div>
@@ -53,7 +53,7 @@
         :entityName="entityName"
       >
         <template #default>
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-[var(--spacing-3)]">
             <div
               v-if="hasAddAction"
               id="version-tab-add-action"

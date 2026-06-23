@@ -2,6 +2,7 @@ import * as Helpers from '@/helpers'
 import { documentationSecureProducts } from '@/helpers/azion-documentation-catalog'
 import * as WafRulesService from '@/services/waf-rules-services'
 import * as DomainsService from '@/services/domains-services'
+import { hasFlagUseV6Configurations } from '@/composables/user-flag'
 
 import { listCountriesService } from '@/services/network-lists-services'
 
@@ -48,7 +49,10 @@ export const wafRulesRoutes = {
     {
       path: 'edit/:id/:tab?',
       name: 'edit-waf-rules',
-      component: () => import('@views/WafRules/TabsView.vue'),
+      component: () =>
+        hasFlagUseV6Configurations()
+          ? import('@views/WafRules/v6/EditView.vue')
+          : import('@views/WafRules/TabsView.vue'),
       props: {
         wafRulesAllowed: {
           documentationServiceAllowed: Helpers.documentationCatalog.wafAllowed
@@ -76,7 +80,35 @@ export const wafRulesRoutes = {
           {
             label: 'Edit WAF Rule',
             dynamic: true,
-            routeParam: 'id'
+            routeParam: 'id',
+            toRoute: { name: 'edit-waf-rules', params: ['id'] }
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit/:id/versions/:versionId/:tab?',
+      name: 'edit-waf-rules-version',
+      component: () => import('@views/WafRules/v6/VersionEditView.vue'),
+      meta: {
+        title: 'Edit Version',
+        flag: 'use_v6_configurations',
+        breadCrumbs: [
+          {
+            label: 'WAF Rules',
+            to: '/waf'
+          },
+          {
+            label: 'Edit WAF Rule',
+            dynamic: true,
+            routeParam: 'id',
+            toRoute: { name: 'edit-waf-rules', params: ['id'] }
+          },
+          {
+            label: 'Version',
+            dynamic: true,
+            routeParam: 'versionId',
+            useParamValue: true
           }
         ]
       }

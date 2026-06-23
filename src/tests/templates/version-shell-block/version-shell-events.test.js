@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { ref } from 'vue'
 import { onVersionCommand } from '@/composables/versioning/use-version-command'
@@ -67,6 +67,18 @@ const mountShell = ({ handler, state = 'draft' }) =>
     }
   })
 
+// The shell teleports its action bar to #action-bar (a host layout target); create
+// it so the teleport is valid and findComponent can reach the (teleported) stub.
+beforeEach(() => {
+  const target = document.createElement('div')
+  target.id = 'action-bar'
+  document.body.appendChild(target)
+})
+
+afterEach(() => {
+  document.body.innerHTML = ''
+})
+
 const dispatchSave = (wrapper) =>
   wrapper.findComponent(VersionActionBarStub).vm.$emit('dispatch', 'SAVE', {})
 
@@ -74,6 +86,7 @@ describe('VersionShell — handleDispatch events (P3)', () => {
   it('emits `updated` with { action, result } when the handler resolves', async () => {
     const handler = vi.fn().mockResolvedValue('patched')
     const wrapper = mountShell({ handler })
+    await flushPromises()
 
     dispatchSave(wrapper)
     await flushPromises()
@@ -87,6 +100,7 @@ describe('VersionShell — handleDispatch events (P3)', () => {
     const error = new Error('boom')
     const handler = vi.fn().mockRejectedValue(error)
     const wrapper = mountShell({ handler })
+    await flushPromises()
 
     dispatchSave(wrapper)
     // P3 invariant: handleDispatch's try/catch swallows the handler rejection,
@@ -103,6 +117,7 @@ describe('VersionShell — handleDispatch events (P3)', () => {
   it('passes the handler resolved value through as the `updated` result', async () => {
     const handler = vi.fn().mockResolvedValue({ draftId: 'draft-99' })
     const wrapper = mountShell({ handler })
+    await flushPromises()
 
     dispatchSave(wrapper)
     await flushPromises()
@@ -115,6 +130,7 @@ describe('VersionShell — handleDispatch events (P3)', () => {
   it('forwards the action bar `cancel` (navigation intent) without touching the bus', async () => {
     const handler = vi.fn()
     const wrapper = mountShell({ handler })
+    await flushPromises()
 
     wrapper.findComponent(VersionActionBarStub).vm.$emit('cancel')
     await flushPromises()

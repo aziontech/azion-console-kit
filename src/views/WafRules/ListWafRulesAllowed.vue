@@ -7,11 +7,12 @@
   import Illustration from '@/assets/svg/illustration-layers.vue'
   import PrimeButton from '@aziontech/webkit/button'
   import ListTable from '@/components/list-table/ListTable.vue'
-  import { ref, inject } from 'vue'
+  import { ref, computed, inject } from 'vue'
   import { useRoute } from 'vue-router'
   import * as yup from 'yup'
   import FormFieldsAllowed from './FormFields/FormFieldsAllowed.vue'
   import { wafService } from '@/services/v2/waf/waf-service'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
   import { optionsRuleIds, itemDefaultCondition } from '@/views/WafRules/Config'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -30,8 +31,27 @@
     documentationServiceAllowed: {
       required: true,
       type: Function
+    },
+    // Optional versioned facade (drop-in). When present, CRUD routes through it
+    // instead of the non-versioned wafService; absent in the legacy flow.
+    service: {
+      type: Object,
+      default: null
+    },
+    wafId: {
+      type: [String, Number],
+      default: null
+    },
+    versionId: {
+      type: String,
+      default: null
     }
   })
+
+  // Outside the VersionShell (legacy flow) readOnly defaults to false, so legacy
+  // behavior is unchanged; inside an immutable version it disables writes.
+  const { readOnly } = useVersionContext()
+  const isReadOnly = computed(() => readOnly.value)
 
   const schemaConditions = yup.object().shape({
     field: yup.string().when('match', {
@@ -60,7 +80,7 @@
     operator: false
   }
 
-  const wafRuleId = ref(route.params.id)
+  const wafRuleId = ref(props.wafId ?? route.params.id)
 
   const handleSuccessEdit = () => {
     reloadWafRulesAllowedList()
@@ -172,10 +192,12 @@
   }
 
   const handleListWafRulesAllowedService = async (query) => {
+    if (props.service) return await props.service.list(query)
     return await wafService.listWafRulesAllowed({ wafId: wafRuleId.value, ...query })
   }
 
   const handleDeleteWafRulesAllowedService = async (id) => {
+    if (props.service) return await props.service.remove(id)
     return await wafService.deleteWafRuleAllowed({
       wafId: wafRuleId.value,
       allowedId: id
@@ -183,14 +205,18 @@
   }
 
   const handleCreateWafRulesAllowedService = async (payload) => {
+    if (props.service) return await props.service.create(payload)
     return await wafService.createWafRuleAllowed({ payload, id: wafRuleId.value })
   }
 
   const handleLoadWafRulesAllowedService = async (allowedId) => {
+    if (props.service) return await props.service.load(allowedId)
     return await wafService.loadWafRuleAllowed({ id: wafRuleId.value, allowedId })
   }
 
   const handleEditWafRulesAllowedService = async (payload) => {
+    if (props.service)
+      return await props.service.edit({ ...payload, id: selectedWafRulesAllowedToEdit.value })
     return await wafService.editWafRuleAllowed({
       payload,
       wafId: wafRuleId.value,
@@ -199,6 +225,7 @@
   }
 
   const openEditDrawerWafRulesAllowed = (event) => {
+    if (isReadOnly.value) return
     selectedWafRulesAllowedToEdit.value = parseInt(event.id)
     showEditWafRulesAllowedDrawer.value = true
     tracker.product.clickToEdit({
@@ -207,6 +234,7 @@
   }
 
   const openCreateDrawerWafAllowed = () => {
+    if (isReadOnly.value) return
     tracker.product
       .clickToCreate({
         productName: 'Allowed Rule'
@@ -215,15 +243,19 @@
     showCreateWafRulesAllowedDrawer.value = true
   }
 
-  const actions = [
-    {
-      label: 'Delete',
-      type: 'delete',
-      title: 'WAF allowed rule',
-      icon: 'pi pi-trash',
-      service: handleDeleteWafRulesAllowedService
-    }
-  ]
+  // No write actions on an immutable version (req 4.4 / 6.5).
+  const actions = computed(() => {
+    if (isReadOnly.value) return []
+    return [
+      {
+        label: 'Delete',
+        type: 'delete',
+        title: 'WAF allowed rule',
+        icon: 'pi pi-trash',
+        service: handleDeleteWafRulesAllowedService
+      }
+    ]
+  })
 
   defineExpose({
     openCreateDrawer: openCreateDrawerWafAllowed
@@ -258,7 +290,10 @@
         :documentationService="props.documentationServiceAllowed"
         :inTabs="true"
       >
-        <template #default>
+        <template
+          #default
+          v-if="!isReadOnly"
+        >
           <PrimeButton
             class="max-md:w-full w-fit"
             severity="secondary"

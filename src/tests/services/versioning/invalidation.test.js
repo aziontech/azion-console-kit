@@ -7,6 +7,9 @@ import { EdgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-s
 import { EdgeFirewallVersionService } from '@/services/v2/edge-firewall/edge-firewall-version-service'
 import { CustomPageVersionService } from '@/services/v2/custom-page/custom-page-version-service'
 import { WorkloadVersionService } from '@/services/v2/workload/workload-version-service'
+import { NetworkListVersionService } from '@/services/v2/network-lists/network-list-version-service'
+import { WafVersionService } from '@/services/v2/waf/waf-version-service'
+import { versionedWafExceptionsService } from '@/services/v2/waf/versioned/versioned-waf-exceptions-service'
 
 // Property 7 contract test (task 1.4): the Wave-0 base generalization (list
 // params + overridable `invalidateAfterMutation`) must not change the behavior
@@ -16,8 +19,9 @@ import { WorkloadVersionService } from '@/services/v2/workload/workload-version-
 const RID = 'res-1'
 const VID = 'AV000001'
 
-// Each service under test + its expected version queryKey namespace. These four
-// are the resources guaranteed to extend `VersionServiceBase` before the rollout.
+// Each service under test + its expected version queryKey namespace. The first
+// four shipped before the rollout; `network-list`/`waf` join the same contract
+// (task 1.3, P7) by extending `VersionServiceBase` with their own bindings.
 const SERVICES = [
   {
     name: 'EdgeAppVersionService',
@@ -42,6 +46,18 @@ const SERVICES = [
     Service: WorkloadVersionService,
     keys: queryKeys.workload.version,
     baseURL: 'v4/workspace/workloads'
+  },
+  {
+    name: 'NetworkListVersionService',
+    Service: NetworkListVersionService,
+    keys: queryKeys.networkList.version,
+    baseURL: 'v4/workspace/network_lists'
+  },
+  {
+    name: 'WafVersionService',
+    Service: WafVersionService,
+    keys: queryKeys.waf.version,
+    baseURL: 'v4/workspace/wafs'
   }
 ]
 
@@ -248,6 +264,41 @@ describe('Regression — Workload rollback still invalidates the same version ca
     expect(removeSpy).toHaveBeenCalledWith({ queryKey: queryKeys.workload.version.all(RID) })
     expect(hookSpy).not.toHaveBeenCalled()
   })
+})
+
+describe('Property 7 — versioned WAF exceptions invalidate the version cache', () => {
+  // The exceptions sub-resource is built via `createVersionedSubResourceService`
+  // (not `VersionServiceBase`), so it is scoped to (wafId, versionId) and lives
+  // outside the SERVICES array. Every mutation still removes its own version
+  // cache key, keeping the shared Allowed Rules ListView fresh.
+  const WAF_ID = 'waf-1'
+  const exceptionsKey = queryKeys.waf.version.exceptions.all(WAF_ID, VID)
+
+  const EXCEPTION_MUTATIONS = [
+    {
+      name: 'create',
+      invoke: (svc) => svc.create(WAF_ID, VID, { name: 'allow', ruleId: 9, conditions: [] }),
+      response: { data: { data: { id: 7 } } }
+    },
+    {
+      name: 'edit',
+      invoke: (svc) => svc.edit(WAF_ID, VID, { id: 5, name: 'allow', ruleId: 9, conditions: [] }),
+      response: { data: {} }
+    },
+    { name: 'remove', invoke: (svc) => svc.remove(WAF_ID, VID, 55), response: { data: {} } }
+  ]
+
+  it.each(EXCEPTION_MUTATIONS)(
+    '$name removes queryKeys.waf.version.exceptions.all(wafId, versionId)',
+    async ({ invoke, response }) => {
+      vi.spyOn(httpService, 'request').mockResolvedValueOnce(response)
+      const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+
+      await invoke(versionedWafExceptionsService)
+
+      expect(removeSpy).toHaveBeenCalledWith({ queryKey: exceptionsKey })
+    }
+  )
 })
 
 describe('Structural — every base mutation routes through the hook', () => {
