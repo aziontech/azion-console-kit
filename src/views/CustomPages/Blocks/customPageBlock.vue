@@ -13,6 +13,7 @@
         description="Give a unique and descriptive name to identify the custom page."
         name="name"
         :value="name"
+        :disabled="readOnly"
       />
     </template>
   </FormHorizontal>
@@ -22,8 +23,12 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldText from '@aziontech/webkit/field-text'
   import { useField } from 'vee-validate'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   const { value: name } = useField('name')
+
+  // readOnly defaults to false outside the VersionShell; immutable versions disable it.
+  const { readOnly } = useVersionContext()
 
   const props = defineProps({
     isDrawer: {

@@ -36,7 +36,7 @@
 
   // Latest-Ready fallback: a built version flagged current borrows the "Current"
   // presentation without depending on an `active` state from the API.
-  const CURRENT_VISUAL = { severity: 'success', label: 'Current', icon: 'pi pi-circle-on' }
+  const CURRENT_VISUAL = { severity: 'success', label: 'Current', icon: 'pi pi-circle-fill' }
 
   const visual = computed(() => {
     const isBuilt = props.state === 'ready' || props.state === 'active'
@@ -57,3 +57,11 @@
     rounded
   />
 </template>
+
+<style scoped>
+  /* The state dot uses the default PrimeIcons size, which reads oversized inside a
+     small status tag — shrink it for a subtler badge. */
+  :deep(.p-tag-icon) {
+    font-size: 0.625rem;
+  }
+</style>
