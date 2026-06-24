@@ -470,19 +470,21 @@
                       <button
                         v-if="column.key === 'version'"
                         type="button"
-                        class="version-cell-button inline-flex max-w-full min-w-0 flex-wrap items-center gap-2 border-0 bg-transparent p-0 text-left text-[var(--text-color)]"
+                        class="version-cell-button flex max-w-full min-w-0 flex-col items-start gap-1 border-0 bg-transparent p-0 text-left text-[var(--text-color)]"
                         :data-testid="`version-list-data-view__row-${version.id}__primary`"
                         @click="triggerRowClick(version)"
                       >
-                        <span class="version-hash font-mono text-sm font-semibold leading-5">
-                          {{ version.id }}
-                        </span>
-                        <span
-                          v-if="version.state === 'active'"
-                          class="version-current-tag inline-flex items-center gap-1 rounded text-xs font-medium leading-4"
-                        >
-                          <i class="pi pi-circle-on" />
-                          Current
+                        <span class="inline-flex max-w-full min-w-0 flex-wrap items-center gap-2">
+                          <span class="version-hash font-mono text-sm font-semibold leading-5">
+                            {{ version.id }}
+                          </span>
+                          <span
+                            v-if="version.state === 'active'"
+                            class="version-current-tag inline-flex items-center gap-1 rounded text-xs font-medium leading-4"
+                          >
+                            <i class="pi pi-circle-on" />
+                            Current
+                          </span>
                         </span>
                         <span
                           v-if="version.comment"
@@ -891,10 +893,6 @@
     display: inline-flex;
     align-items: center;
     white-space: nowrap;
-    padding: 0.0625rem 0.4375rem;
-    border-radius: 0.3125rem;
-    border: 1px solid var(--surface-border);
-    background: var(--surface-section);
     color: var(--text-color);
   }
 

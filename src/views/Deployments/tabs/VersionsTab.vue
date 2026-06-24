@@ -1,6 +1,8 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useToast } from '@aziontech/webkit/use-toast'
+  import PrimeButton from '@aziontech/webkit/button'
   import VersionListDataView from '@/components/VersionListDataView'
   import VersionActionDialog from '@/templates/version-shell-block/components/VersionActionDialog.vue'
   import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
@@ -18,6 +20,7 @@
   })
 
   const router = useRouter()
+  const toast = useToast()
   const deploymentId = computed(() => String(props.deploymentId))
 
   const versionsQuery = deploymentVersionService.useListVersionsQuery(deploymentId)
@@ -50,6 +53,35 @@
     router,
     onSuccess: () => versionsQuery.refetch?.()
   })
+
+  const isCreatingDraft = ref(false)
+
+  const createDraft = async () => {
+    if (isCreatingDraft.value) return
+    isCreatingDraft.value = true
+    try {
+      const draft = await deploymentVersionService.createDraft(deploymentId.value, {})
+      if (draft?.id) {
+        router.push({
+          name: 'edit-deployment-version',
+          params: { id: deploymentId.value, versionId: String(draft.id) }
+        })
+      }
+    } catch (err) {
+      if (err && typeof err.showErrors === 'function') {
+        err.showErrors(toast)
+      } else {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.message ?? 'Failed to create a new version. Try again.'
+        })
+      }
+    } finally {
+      isCreatingDraft.value = false
+    }
+  }
 </script>
 
 <template>
@@ -91,7 +123,19 @@
       @update:sort="sort = $event"
       @refresh="versionsQuery.refetch?.()"
       @row-action="handleRowAction"
-    />
+    >
+      <template #toolbar-actions>
+        <PrimeButton
+          label="New Version"
+          icon="pi pi-plus"
+          size="small"
+          class="h-[2.5rem]"
+          :loading="isCreatingDraft"
+          data-testid="deployment-v6-versions__new-draft"
+          @click="createDraft"
+        />
+      </template>
+    </VersionListDataView>
 
     <VersionActionDialog
       v-if="dialogConfig"

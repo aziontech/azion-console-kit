@@ -49,7 +49,9 @@ export const deploymentRoutes = {
             to: '/deployments'
           },
           {
-            label: 'Edit'
+            label: 'Edit',
+            dynamic: true,
+            routeParam: 'id'
           }
         ]
       }
@@ -67,7 +69,16 @@ export const deploymentRoutes = {
             to: '/deployments'
           },
           {
-            label: 'Edit Version'
+            label: 'Edit Version',
+            dynamic: true,
+            routeParam: 'id',
+            toRoute: { name: 'deployments-edit', params: ['id'] }
+          },
+          {
+            label: 'Version',
+            dynamic: true,
+            routeParam: 'versionId',
+            useParamValue: true
           }
         ]
       }

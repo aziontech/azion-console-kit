@@ -10,7 +10,7 @@
   import GenericDataView from '@/components/GenericDataView'
   import { deploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
   import InlineTag from '@/components/InlineTag'
-  import StatusTag from '@/components/StatusTag'
+  import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
   import { useReleaseDrawerController } from '@/composables/versioning/use-deployment-release-drawer'
 
@@ -32,7 +32,7 @@
   const paginatorFirst = ref(0)
   const paginatorRows = ref(10)
   const searchTerm = ref('')
-  const filterValues = ref({ status: 'all', environment: 'all' })
+  const filterValues = ref({ status: 'all' })
   const dateRange = ref(null)
 
   const rowMenuRef = ref(null)
@@ -54,7 +54,6 @@
   })
 
   const statusAllOption = { label: 'Status', value: 'all' }
-  const environmentAllOption = { label: 'Environment', value: 'all' }
 
   const columns = computed(() => [
     { key: 'deployment', label: 'Deployment', size: 'minmax(220px, 1.4fr)', align: 'start' },
@@ -89,20 +88,6 @@
     ]
   })
 
-  const environmentOptions = computed(() => {
-    const labels = Array.from(
-      new Set(versions.value.map((version) => version.environmentLabel).filter(Boolean))
-    )
-
-    return [
-      environmentAllOption,
-      ...labels.map((label) => ({
-        label,
-        value: label
-      }))
-    ]
-  })
-
   const matchesDateRange = (version) => {
     const [from, to] = Array.isArray(dateRange.value) ? dateRange.value : []
     if (!from && !to) return true
@@ -115,14 +100,8 @@
     return true
   }
 
-  const matchesEnvironment = (version) => {
-    const environment = filterValues.value.environment
-    if (environment === 'all') return true
-    return version.environmentLabel === environment
-  }
-
   const filteredVersions = computed(() =>
-    versions.value.filter((version) => matchesDateRange(version) && matchesEnvironment(version))
+    versions.value.filter((version) => matchesDateRange(version))
   )
 
   const loadVersions = async () => {
@@ -311,14 +290,6 @@
           :manualInput="false"
           class="dataview-control dataview-dropdown min-w-0 flex-1 sm:min-w-[12rem]"
         />
-        <Dropdown
-          v-model="filterValues.environment"
-          :options="environmentOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Environment"
-          class="dataview-control dataview-dropdown min-w-0 flex-1 sm:min-w-[9.5rem]"
-        />
       </template>
 
       <template #cell-deployment="{ item: version }">
@@ -331,20 +302,11 @@
           >
             {{ version.name || version.id || '--' }}
           </button>
-          <div class="flex items-center gap-1">
-            <span
-              v-if="version.environmentLabel"
-              class="text-xs leading-none text-[var(--text-color-secondary)] whitespace-nowrap"
-            >
-              {{ version.environmentLabel }}
-            </span>
-            <i
-              v-if="version.environmentIcon"
-              :class="[version.environmentIcon, 'text-xs text-[var(--text-color-secondary)]']"
-              aria-hidden="true"
-            />
+          <div
+            v-if="version.isCurrent"
+            class="flex items-center gap-1"
+          >
             <InlineTag
-              v-if="version.isCurrent"
               text="Current"
               type="info"
               icon="pi pi-arrow-circle-up"
@@ -355,7 +317,7 @@
 
       <template #cell-status="{ item: version }">
         <div class="flex items-center gap-3">
-          <StatusTag :status="version.status" />
+          <VersionStateBadge :state="version.state" />
           <span
             v-if="version.duration"
             class="text-xs text-[var(--text-color-secondary)] whitespace-nowrap"

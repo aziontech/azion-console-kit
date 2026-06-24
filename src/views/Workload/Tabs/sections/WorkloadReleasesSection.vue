@@ -2,8 +2,8 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import Dropdown from '@aziontech/webkit/dropdown'
   import GenericDataView from '@/components/GenericDataView'
-  import StatusTag from '@/components/StatusTag'
   import CurrentBadge from '@/components/CurrentBadge'
+  import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
   import { useWorkloadReleases } from '@/views/Workload/composables/useWorkloadReleases'
   import { useReleaseDrawerController } from '@/composables/versioning/use-deployment-release-drawer'
@@ -179,10 +179,10 @@
 
     <template #cell-status="{ item }">
       <div class="flex gap-0.5 min-w-0">
-        <StatusTag :status="item.status" />
+        <VersionStateBadge :state="item.state" />
         <span
           v-if="item.duration"
-          class="text-xs text-color-secondary pl-4"
+          class="flex items-center text-xs text-color-secondary pl-4"
         >
           Deployed in {{ item.duration }}
         </span>
