@@ -23,6 +23,7 @@
           optionLabel="name"
           optionValue="value"
           placeholder="Select a Connector"
+          :disabled="readOnly"
         >
           <template #footer>
             <ul class="p-2">
@@ -39,6 +40,7 @@
                     root: { class: 'p-2' }
                   }"
                   label="Create Connector"
+                  :disabled="readOnly"
                 />
               </li>
             </ul>
@@ -54,6 +56,7 @@
           placeholder="/path/error_page.html"
           name="uri"
           :value="uri"
+          :disabled="readOnly"
         />
       </div>
       <div
@@ -66,6 +69,7 @@
           :value="customStatusCode"
           :min="100"
           :max="599"
+          :disabled="readOnly"
         />
       </div>
       <div
@@ -78,6 +82,7 @@
           :value="ttl"
           :min="0"
           :max="31536000"
+          :disabled="readOnly"
         />
       </div>
       <div
@@ -121,7 +126,12 @@
   import PrimeButton from '@aziontech/webkit/button'
   import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
   import { useField } from 'vee-validate'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
   import { computed, ref, watch } from 'vue'
+
+  // readOnly defaults to false outside the VersionShell; immutable versions disable
+  // the editable response fields (connector, URI, custom status code, TTL).
+  const { readOnly } = useVersionContext()
 
   const { value: response } = useField('response')
 
