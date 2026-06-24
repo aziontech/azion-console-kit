@@ -8,7 +8,12 @@
   import { ref, computed } from 'vue'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { useField, useFieldArray } from 'vee-validate'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
   import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/Config/listStatusCode'
+
+  // readOnly defaults to false outside the VersionShell; immutable versions block
+  // adding/deleting page codes.
+  const { readOnly } = useVersionContext()
 
   const drawerRef = ref(null)
   const listTableRef = ref(null)
@@ -113,7 +118,7 @@
       label: 'Delete',
       title: 'Page Code',
       icon: 'pi pi-trash',
-      disabled: (item) => item.code.origin === 'Azion',
+      disabled: (item) => item.code.origin === 'Azion' || readOnly.value,
       service: (item) => deletePage(item)
     }
   ]
@@ -229,7 +234,7 @@
                 data-testid="status-code__add-button"
                 severity="secondary"
                 @click="openCreateStatusCodeDrawer"
-                :disabled="disabledButtonAdd"
+                :disabled="disabledButtonAdd || readOnly"
                 class="w-full sm:w-auto"
               />
             </div>
