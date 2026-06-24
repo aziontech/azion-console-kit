@@ -29,7 +29,10 @@ const VERSIONED_FORM_COMPONENTS = [
   'src/views/Workload/FormFields/FormFieldsWorkload.vue',
   'src/views/CustomPages/FormFields/CustomPages.vue',
   'src/views/CustomPages/Blocks/customPageBlock.vue',
-  'src/views/CustomPages/Blocks/pagesCodeBlock.vue'
+  'src/views/CustomPages/Blocks/pagesCodeBlock.vue',
+  'src/views/CustomPages/Blocks/statusConfigurationBlock.vue',
+  'src/views/CustomPages/Blocks/responseDetailsBlock.vue',
+  'src/views/CustomPages/Drawer/drawerSelectPageCode.vue'
 ]
 
 describe('Version Shell readOnly — single rule, consumed by every versioned form', () => {
