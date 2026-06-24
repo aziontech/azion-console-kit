@@ -45,6 +45,11 @@
   const {
     detail,
     isLoading,
+    logs,
+    impactedWorkloads,
+    impactedWorkloadCount,
+    isLoadingImpactedWorkloads,
+    deploymentName,
     visibleDrawer,
     displayRelease,
     visitUrl,
@@ -110,6 +115,11 @@
       <DeploymentReleaseDetails
         v-else-if="displayRelease"
         :release="displayRelease"
+        :logs="logs"
+        :impacted-workloads="impactedWorkloads"
+        :impacted-workloads-count="impactedWorkloadCount"
+        :is-loading-impacted-workloads="isLoadingImpactedWorkloads"
+        :deployment-name="deploymentName"
       />
     </template>
   </InfoDrawerBlock>

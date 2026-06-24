@@ -21,6 +21,7 @@
     building: { severity: 'info', label: 'Building', icon: 'pi pi-spin pi-spinner' },
     ready: { severity: 'success', label: 'Ready', icon: 'pi pi-circle-fill' },
     active: { severity: 'success', label: 'Active' },
+    archiving: { severity: 'secondary', label: 'Archiving', icon: 'pi pi-spin pi-spinner' },
     archived: { severity: 'secondary', label: 'Archived' },
     canceled: { severity: 'warning', label: 'Canceled' },
     error: { severity: 'danger', label: 'Error', icon: 'pi pi-exclamation-triangle' }

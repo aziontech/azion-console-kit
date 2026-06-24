@@ -1,6 +1,21 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { DeploymentReleaseAdapter } from '@/services/v2/deployment/deployment-release-adapter'
+import { DeploymentLogsAdapter } from '@/services/v2/deployment/deployment-logs-adapter'
+import { makeRealTimeEventsBaseUrl } from '@/services/real-time-events-service/make-real-time-events-service'
+
+const RUNNERS_EVENTS_QUERY = `query getRunnersEvents($traceId: String, $begin: DateTime!, $end: DateTime!) {
+  runnersEvents(
+    filter: { traceIdEq: $traceId, tsRange: { begin: $begin, end: $end } }
+    orderBy: [ts_ASC]
+  ) {
+    ts
+    clientId
+    messageId
+    level
+    phrase
+  }
+}`
 
 const parseListResponse = (data) => {
   if (Array.isArray(data)) {
@@ -111,6 +126,29 @@ export class DeploymentReleaseService extends BaseService {
       {
         persist: !skipCache,
         skipCache
+      }
+    )
+  }
+
+  getReleaseLogsService = async (traceId, { begin, end } = {}) => {
+    if (!traceId || !begin || !end) {
+      return { data: [] }
+    }
+
+    return await this.useEnsureQueryData(
+      queryKeys.deployments.releases.logs(traceId, begin, end),
+      async () => {
+        const { data } = await this.http.request({
+          method: 'POST',
+          url: makeRealTimeEventsBaseUrl(),
+          body: {
+            query: RUNNERS_EVENTS_QUERY,
+            variables: { traceId, begin, end }
+          }
+        })
+
+        const events = data?.data?.runnersEvents ?? []
+        return { data: DeploymentLogsAdapter.transformList(events) }
       }
     )
   }

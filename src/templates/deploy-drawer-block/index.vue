@@ -26,6 +26,7 @@
   import PromotionContextBanner from '@/templates/deploy-drawer-block/components/PromotionContextBanner.vue'
   import WorkloadSelectField from '@/templates/deploy-drawer-block/components/WorkloadSelectField.vue'
   import EnvironmentSelectionInput from '@/templates/deploy-drawer-block/components/EnvironmentSelectionInput.vue'
+  import ImpactedWorkloadsPanel from '@/templates/deploy-drawer-block/components/ImpactedWorkloadsPanel.vue'
   import ReleaseCompositionField from '@/templates/deploy-drawer-block/components/ReleaseCompositionField.vue'
   import CanaryStrategyField from '@/templates/deploy-drawer-block/components/CanaryStrategyField.vue'
 
@@ -48,6 +49,10 @@
     lockWorkload: {
       type: Boolean,
       default: false
+    },
+    preselectedDeploymentId: {
+      type: [String, Number],
+      default: null
     },
     title: {
       type: String,
@@ -87,6 +92,11 @@
     environmentCards,
     selectedEnvironmentId,
     selectedDeploymentName,
+    isDeploymentAnchored,
+    targetDeploymentId,
+    impactedWorkloads,
+    impactedWorkloadCount,
+    isLoadingImpactedWorkloads,
     resourceName,
     scopedType,
     isScopedApplication,
@@ -117,8 +127,17 @@
     deploy
   } = useDeployDrawer(() => props.resourceContext, {
     visible: isVisible,
-    preselectedWorkloadId: () => props.preselectedWorkloadId
+    preselectedWorkloadId: () => props.preselectedWorkloadId,
+    preselectedDeploymentId: () => props.preselectedDeploymentId
   })
+
+  // The Release composition reveals once a target deployment exists: directly in
+  // anchored mode, or after the environment pick in the standard flow.
+  const showComposition = computed(() =>
+    isDeploymentAnchored.value
+      ? Boolean(targetDeploymentId.value)
+      : Boolean(selectedEnvironmentId.value)
+  )
 
   const versionInvalid = ref(false)
 
@@ -210,13 +229,14 @@
           :resource-context="resourceContext"
         />
         <WorkloadSelectField
+          v-if="!isDeploymentAnchored"
           v-model="selectedWorkloadId"
           :options="workloadOptions"
           :disabled="lockWorkload"
         />
 
         <EnvironmentSelectionInput
-          v-if="selectedWorkloadId"
+          v-if="!isDeploymentAnchored && selectedWorkloadId"
           v-model="selectedEnvironmentId"
           :environments="environmentCards"
           :workload-name="selectedWorkloadName"
@@ -224,8 +244,16 @@
           :loading="isLoadingBindings"
           @bind="onBindEnvironment"
         />
+
+        <ImpactedWorkloadsPanel
+          v-if="isDeploymentAnchored"
+          :deployment-name="selectedDeploymentName"
+          :workloads="impactedWorkloads"
+          :count="impactedWorkloadCount"
+          :loading="isLoadingImpactedWorkloads"
+        />
         <ReleaseCompositionField
-          v-if="selectedEnvironmentId"
+          v-if="showComposition"
           :deployment-name="selectedDeploymentName"
           :no-application="noApplication"
           :application-read-only="applicationReadOnly"
@@ -256,7 +284,7 @@
           @create-application="onCreateApplication"
         />
         <CanaryStrategyField
-          v-if="selectedEnvironmentId"
+          v-if="showComposition"
           @update:enabled="setCanaryEnabled"
           @update:form="setCanaryForm"
         />

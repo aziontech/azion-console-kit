@@ -50,7 +50,10 @@ const resolveLatestVersion = (options, selected) => {
   return current?.value ?? list[0]?.value ?? null
 }
 
-export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadId } = {}) {
+export function useDeployDrawer(
+  resourceContext,
+  { visible, preselectedWorkloadId, preselectedDeploymentId } = {}
+) {
   // `enabled` gates fetching to the drawer's open state (req 1.1, 1.5): closed
   // drawer never fetches, reopen reuses the vue-query cache.
   const enabled = computed(() => Boolean(toValue(visible)))
@@ -60,6 +63,12 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
   // workload comes pre-selected. Resource-first callers (App/Firewall/Page) pass
   // a context with a `resourceId`, keeping the original behavior unchanged.
   const hasScopedResource = computed(() => toValue(resourceContext)?.resourceId != null)
+
+  // Deployment-anchored mode (opened from a Deployment's edit page): the target
+  // deployment is fixed, so the workload+environment steps are replaced by a
+  // read-only "impacted workloads" summary. The Release still composes freely.
+  const anchoredDeploymentId = computed(() => toValue(preselectedDeploymentId) ?? null)
+  const isDeploymentAnchored = computed(() => anchoredDeploymentId.value != null)
 
   // Fast-path on open: prime the vue-query cache with the three listings, so card
   // derivation resolves environment/deployment names from cache (no per-id call).
@@ -82,6 +91,52 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
   const workloadsBody = computed(() => workloadsQuery.data.value?.body ?? [])
   const environmentsBody = computed(() => environmentsQuery.data.value?.body ?? [])
   const deploymentsBody = computed(() => deploymentsQuery.data.value?.body ?? [])
+
+  // --- Deployment-anchored derivations ------------------------------------
+
+  const anchoredDeployment = computed(() => {
+    if (!isDeploymentAnchored.value) return null
+    const id = String(anchoredDeploymentId.value)
+    return deploymentsBody.value.find((deployment) => String(deployment.id) === id) ?? null
+  })
+
+  const environmentNameById = computed(() => {
+    const map = {}
+    environmentsBody.value.forEach((environment) => {
+      map[String(environment.id)] = environment.name
+    })
+    return map
+  })
+
+  const bindingsForAnchoredDeployment = (workload) =>
+    (workload.bindings ?? []).filter(
+      (binding) => String(binding.deployment_id) === String(anchoredDeploymentId.value)
+    )
+
+  // Workloads impacted by a release on the anchored deployment, derived from the
+  // cached workloads listing: a deployment is reusable across workloads, so any
+  // workload whose binding points at it is affected (req: count + list).
+  const impactedWorkloads = computed(() => {
+    if (!isDeploymentAnchored.value) return []
+    return workloadsBody.value
+      .filter((workload) => bindingsForAnchoredDeployment(workload).length > 0)
+      .map((workload) => ({
+        id: workload.id,
+        name: workload.name?.text ?? workload.name,
+        environments: bindingsForAnchoredDeployment(workload).map(
+          (binding) =>
+            environmentNameById.value[String(binding.environment_id)] ?? binding.environment_id
+        )
+      }))
+  })
+
+  const impactedWorkloadCount = computed(() => impactedWorkloads.value.length)
+
+  const isLoadingImpactedWorkloads = computed(
+    () =>
+      isDeploymentAnchored.value &&
+      (workloadsQuery.isLoading.value || environmentsQuery.isLoading.value)
+  )
 
   // The displayed domain is a real CUSTOM domain from the workload bindings.
   // `workload_domain` is the internal map_name (e.g. `__v_<hash>` for a version),
@@ -132,9 +187,17 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
     () => environmentCards.value.find((card) => card.id === selectedEnvironmentId.value) ?? null
   )
 
-  const targetDeploymentId = computed(() => selectedEnvironmentCard.value?.deploymentId ?? null)
+  const targetDeploymentId = computed(() =>
+    isDeploymentAnchored.value
+      ? anchoredDeploymentId.value
+      : (selectedEnvironmentCard.value?.deploymentId ?? null)
+  )
 
-  const selectedDeploymentName = computed(() => selectedEnvironmentCard.value?.deploymentName ?? '')
+  const selectedDeploymentName = computed(() =>
+    isDeploymentAnchored.value
+      ? (anchoredDeployment.value?.name ?? '')
+      : (selectedEnvironmentCard.value?.deploymentName ?? '')
+  )
 
   // --- Scoped resource (origin) -------------------------------------------
 
@@ -240,7 +303,11 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
   // The target deployment drives the composition fetch (design §3.1, §4.6).
   watch(targetDeploymentId, (deploymentId) => loadComposition(deploymentId), { immediate: true })
 
-  const policy = computed(() => selectedEnvironmentCard.value?.policy ?? null)
+  const policy = computed(() =>
+    isDeploymentAnchored.value
+      ? (anchoredDeployment.value?.deployment_policy ?? anchoredDeployment.value?.policy ?? null)
+      : (selectedEnvironmentCard.value?.policy ?? null)
+  )
   const isSingle = computed(() => policy.value === SINGLE_VERSION)
   const hasActiveRelease = computed(() => Boolean(activeRelease.value))
 
@@ -282,7 +349,7 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
   // catalog resolves the live application's NAME from its id (the release only
   // carries the version_id).
   const shouldLoadCatalog = computed(
-    () => Boolean(selectedEnvironmentId.value) && !isScopedApplication.value
+    () => Boolean(targetDeploymentId.value) && !isScopedApplication.value
   )
 
   watch(
@@ -678,10 +745,17 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
   const isDeploying = ref(false)
   const deployError = ref(null)
 
+  // Anchored mode needs only the fixed deployment; the standard flow still
+  // requires a chosen workload + environment to resolve its target deployment.
+  const hasReleaseTarget = computed(() =>
+    isDeploymentAnchored.value
+      ? Boolean(targetDeploymentId.value)
+      : Boolean(selectedWorkloadId.value) && Boolean(selectedEnvironmentId.value)
+  )
+
   const canDeploy = computed(
     () =>
-      Boolean(selectedWorkloadId.value) &&
-      Boolean(selectedEnvironmentId.value) &&
+      hasReleaseTarget.value &&
       !noApplication.value &&
       Boolean(applicationSlot.value?.versionId) &&
       (isScopedApplication.value ||
@@ -780,6 +854,10 @@ export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadI
     scopedType,
     isScopedApplication,
     hasScopedResource,
+    isDeploymentAnchored,
+    impactedWorkloads,
+    impactedWorkloadCount,
+    isLoadingImpactedWorkloads,
     versionLabel,
     versionOptions,
     selectedVersionId,
