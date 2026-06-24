@@ -16,40 +16,6 @@ export const VERSION_STATES = {
 }
 
 /**
- * Maps each canonical version state to the `{ content, severity }` shape the
- * StatusTag component consumes. The version in use reads as "Current": `active`
- * when the API exposes it, otherwise the latest Ready resolved by the host.
- */
-const STATE_STATUS = {
-  [VERSION_STATES.DRAFT]: { content: 'Draft', severity: 'info' },
-  [VERSION_STATES.QUEUED]: { content: 'Queued', severity: 'info' },
-  [VERSION_STATES.BUILDING]: { content: 'Building', severity: 'info' },
-  [VERSION_STATES.READY]: { content: 'Ready', severity: 'success' },
-  [VERSION_STATES.ACTIVE]: { content: 'Current', severity: 'success' },
-  [VERSION_STATES.ARCHIVED]: { content: 'Archived', severity: 'secondary' },
-  [VERSION_STATES.CANCELED]: { content: 'Canceled', severity: 'warning' },
-  [VERSION_STATES.ERROR]: { content: 'Error', severity: 'danger' }
-}
-
-/**
- * The version in use status, shown when the host marks a built version as the
- * current one (latest Ready fallback, since the API has no current field).
- */
-const CURRENT_STATUS = { content: 'Current', severity: 'success' }
-
-/**
- * Parses a raw version state into the StatusTag `{ content, severity }` shape.
- * When `isCurrent` is set, a built (`ready`/`active`) version reads as "Current".
- * Unknown states fail soft: the original value is echoed with neutral severity.
- */
-export const mapVersionStateToStatus = (state, isCurrent = false) => {
-  if (isCurrent && (state === VERSION_STATES.READY || state === VERSION_STATES.ACTIVE)) {
-    return CURRENT_STATUS
-  }
-  return STATE_STATUS[state] ?? { content: state || 'Unknown', severity: 'secondary' }
-}
-
-/**
  * A version is editable when the user can mutate its payload.
  * `draft` is the natural editing state; `canceled` and `error` are
  * recoverable terminal states where the user resumes work on the same draft.
@@ -68,11 +34,6 @@ export const isProcessing = (state) =>
  * (retired) cannot be edited in place; the user must fork a draft.
  */
 export const isImmutable = (state) => ['ready', 'active', 'archived'].includes(state)
-
-/**
- * Terminal state from which no transition is possible.
- */
-export const isTerminal = (state) => state === 'archived'
 
 /**
  * Row-menu predicates (single source of enablement for the version menu).
@@ -98,11 +59,6 @@ export const canArchive = (state) =>
  * (Req 6.1). A `deleted` version is absent from the list, hence the guard.
  */
 export const canDelete = (state) => state !== 'deleted'
-
-/**
- * Open configuration is always available, including `archived` (Req 2.1).
- */
-export const isOpenable = () => true
 
 /**
  * High-level actions exposed by the VersionShell UI.
