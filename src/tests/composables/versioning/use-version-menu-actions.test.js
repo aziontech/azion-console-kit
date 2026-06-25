@@ -20,6 +20,8 @@ const rowActionsApi = {
 vi.mock('@/composables/versioning/use-version-row-actions', () => ({
   useVersionRowActions: vi.fn(() => rowActionsApi)
 }))
+// The driver now calls useToast directly for NEW_DRAFT_FROM errors; provide a stub.
+vi.mock('@aziontech/webkit/use-toast', () => ({ useToast: () => ({ add: vi.fn() }) }))
 
 import {
   useVersionMenuActions,

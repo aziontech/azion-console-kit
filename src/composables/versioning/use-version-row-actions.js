@@ -89,19 +89,26 @@ export function useVersionRowActions({ resourceId, service, onSuccess } = {}) {
     })
   }
 
+  // The backend is the authority on "in use as Current". We mutate, then react:
+  // success toast + view reload run ONLY after the API confirms. A rejection
+  // (e.g. in use) surfaces the returned error and leaves the list untouched —
+  // no optimistic remove/archive, no navigation (Req 3.1, 3.2, 3.4).
   const run = async (action, item) => {
     if (isExecuting.value) return
     isExecuting.value = true
     try {
       await execute(action, item)
-      notifySuccess(action)
-      onSuccess?.()
     } catch (err) {
       const verb = metaFor(action).label?.toLowerCase?.() ?? 'run'
       reportError(err, `Failed to ${verb} the version. Try again.`)
+      return
     } finally {
       isExecuting.value = false
     }
+    // Post-confirmation view sync — outside the mutation try so a failing
+    // reload never reads as the action itself having failed.
+    notifySuccess(action)
+    onSuccess?.()
   }
 
   // DELETE opens the destructive confirm dialog; ARCHIVE runs with no modal.

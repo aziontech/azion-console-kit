@@ -46,7 +46,9 @@ const RESOURCE_TYPE_META = {
   firewall: { label: 'Firewall', icon: 'ai ai-edge-firewall' },
   custom_page: { label: 'Custom Page', icon: 'ai ai-custom-pages' },
   function: { label: 'Function', icon: 'ai ai-edge-functions' },
-  connector: { label: 'Connector', icon: 'ai ai-edge-connectors' }
+  connector: { label: 'Connector', icon: 'ai ai-edge-connectors' },
+  network_list: { label: 'Network List', icon: 'ai ai-network-lists' },
+  waf: { label: 'WAF', icon: 'ai ai-waf-rules' }
 }
 
 const snakeToTitle = (value) =>

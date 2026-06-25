@@ -67,10 +67,50 @@ const superclassOf = (code) => {
 const serviceFiles = listFiles('-version-service.js')
 const adapterFiles = listFiles('-version-adapter.js')
 
+// Versioned sub-resource services live under */versioned/ and don't carry the
+// -version-service.js suffix, but are version-scoped mutators that must obey P3.
+// Drop the create-* factory (it's the shared builder, not a leaf service).
+const versionedSubResourceServiceFiles = listFiles('-service.js').filter(
+  (file) =>
+    file.includes(`${sep}versioned${sep}`) &&
+    !file.endsWith('create-versioned-sub-resource-service.js')
+)
+
+const httpOnlyServiceFiles = [...serviceFiles, ...versionedSubResourceServiceFiles].sort()
+
+// Resources whose version coverage is contractual, not incidental: a rename or a
+// move must fail this test, not silently drop the file from the data-driven globs.
+const REQUIRED_VERSION_SERVICES = [
+  'network-lists/network-list-version-service.js',
+  'waf/waf-version-service.js'
+]
+const REQUIRED_VERSION_ADAPTERS = [
+  'network-lists/network-list-version-adapter.js',
+  'waf/waf-version-adapter.js'
+]
+const REQUIRED_VERSIONED_SUB_RESOURCE_SERVICES = [
+  'waf/versioned/versioned-waf-exceptions-service.js'
+]
+
 describe('versioning structural properties', () => {
   it('finds every version service and adapter module', () => {
     expect(serviceFiles.length).toBeGreaterThan(0)
     expect(adapterFiles.length).toBeGreaterThan(0)
+  })
+
+  it('enumerates the network-list and waf version services + adapters', () => {
+    const serviceKeys = serviceFiles.map(toKey)
+    const adapterKeys = adapterFiles.map(toKey)
+    const subResourceKeys = versionedSubResourceServiceFiles.map(toKey)
+    for (const key of REQUIRED_VERSION_SERVICES) {
+      expect(serviceKeys, `${key} must be discovered by the P1/P3 enumeration`).toContain(key)
+    }
+    for (const key of REQUIRED_VERSION_ADAPTERS) {
+      expect(adapterKeys, `${key} must be discovered by the P2 enumeration`).toContain(key)
+    }
+    for (const key of REQUIRED_VERSIONED_SUB_RESOURCE_SERVICES) {
+      expect(subResourceKeys, `${key} must be discovered by the P3 enumeration`).toContain(key)
+    }
   })
 
   describe('P1 — version services extend VersionServiceBase', () => {
@@ -149,13 +189,13 @@ describe('versioning structural properties', () => {
     })
 
     it('every version service lives under the covered glob path', () => {
-      for (const file of serviceFiles) {
+      for (const file of httpOnlyServiceFiles) {
         const rel = relative(resolve(__dirname, '../../../..'), file).split(sep).join('/')
         expect(rel.startsWith('src/services/v2/'), `${rel} is outside the lint glob`).toBe(true)
       }
     })
 
-    it.each(serviceFiles.map((file) => [toKey(file), file]))(
+    it.each(httpOnlyServiceFiles.map((file) => [toKey(file), file]))(
       '%s imports no composables/stores/DOM',
       (key, file) => {
         const sources = importSourcesOf(readFileSync(file, 'utf-8')).filter(

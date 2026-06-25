@@ -145,8 +145,8 @@ const routePurge = { edit: 'list-real-time-purge', list: 'list-real-time-purge' 
 const routeCertificate = { edit: 'edit-digital-certificates', list: 'list-digital-certificates' }
 
 const ROUTE_MAP = {
-  NetworkList: { edit: 'edit-network-list', list: 'list-network-list' },
-  'Network List': { edit: 'edit-network-list', list: 'list-network-list' },
+  NetworkList: { edit: 'edit-network-lists', list: 'list-network-list' },
+  'Network List': { edit: 'edit-network-lists', list: 'list-network-list' },
   Function: { edit: 'edit-functions', list: 'list-functions' },
   'Tls Certificate': routeCertificate,
   'Tls Certificate Revocation List': routeCertificate,

@@ -3,10 +3,10 @@
   import EditFormBlock from '@templates/edit-form-block'
   import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
-  import * as yup from 'yup'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import FormFieldsWafRules from './FormFields/FormFieldsWafRules.vue'
   import { wafService } from '@/services/v2/waf/waf-service'
+  import { validationSchema } from './Config/validation'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -49,27 +49,6 @@
       type: Boolean,
       required: true
     }
-  })
-
-  const validationSchema = yup.object({
-    name: yup.string().required(),
-    sqlInjection: yup.boolean(),
-    sqlInjectionSensitivity: yup.string(),
-    remoteFileInclusion: yup.boolean(),
-    remoteFileInclusionSensitivity: yup.string(),
-    directoryTraversal: yup.boolean(),
-    directoryTraversalSensitivity: yup.string(),
-    crossSiteScripting: yup.boolean(),
-    crossSiteScriptingSensitivity: yup.string(),
-    fileUpload: yup.boolean(),
-    fileUploadSensitivity: yup.string(),
-    evadingTricks: yup.boolean(),
-    evadingTricksSensitivity: yup.string(),
-    unwantedAccess: yup.boolean(),
-    unwantedAccessSensitivity: yup.string(),
-    identifiedAttack: yup.boolean(),
-    identifiedAttackSensitivity: yup.string(),
-    active: yup.boolean()
   })
 
   const wafRuleId = ref(route.params.id)

@@ -6,11 +6,18 @@ estados, a comunicação via command bus, o fluxo de dados completo e o roteiro 
 plugar novos recursos.
 
 > Implementação de referência: **Application** (`src/views/EdgeApplications/v6/`).
-> Consumidores em produção: Application, Workload, Custom Page, Firewall, Deployment
-> e — adicionados pelo spec `version-shell-connector-functions` — **Edge Connector**
-> e **Edge Function**.
+> Consumidores em produção: Application, Workload, Custom Page, Firewall, Deployment,
+> Edge Connector, Edge Function e — adicionados pelo spec
+> `version-shell-network-lists-waf` — **Network List** (atômico) e **WAF**
+> (composto, com exceptions/allowed rules versionadas).
+> **Classe de capability** (spec `versioned-only-subresources`): cada recurso é
+> `deployable` (default) ou `versioned-only`. **Edge Function, Network List e WAF**
+> são `versioned-only` — **sem Deploy/Promote/Rollback/Release** (§12). Tudo o mais
+> permanece byte-idêntico ao default.
 > Specs do desenvolvimento: `specs/version-shell-command-bus-fix/`,
-> `specs/version-shell-connector-functions/` e
+> `specs/version-shell-connector-functions/`,
+> `specs/version-shell-network-lists-waf/`,
+> `specs/versioned-only-subresources/` e
 > `docs/superpowers/specs/2026-06-11-version-shell-command-bus-design.md`.
 
 ---
@@ -461,7 +468,16 @@ archive/build/cancel. Plugar um recurso é só fornecer os artefatos **thin** ab
 | Firewall | `v4/workspace/firewalls` | — |
 | Edge Connector | `v4/workspace/connectors` | `EdgeConnectors/v6/EdgeConnectorVersionAdapter.vue` |
 | Edge Function | `v4/workspace/functions` | `EdgeFunctions/v6/EdgeFunctionVersionAdapter.vue` |
+| Network List (atômico) | `v4/workspace/network_lists` | `NetworkLists/v6/NetworkListVersionAdapter.vue` |
+| WAF (composto) | `v4/workspace/wafs` | `WafRules/v6/WafVersionAdapter.vue` |
 | Deployment | `/deployment-api/v4/deployments` | — (consome a base direto) |
+
+> **Network List** é atômico (itens IP/ASN/Country no snapshot da versão), espelha
+> `EdgeConnectors/v6`. **WAF** é composto (espelha `EdgeFirewall/v6`): Main Settings no
+> snapshot + sub-resource **exceptions** (allowed rules) versionado em
+> `v4/workspace/wafs/{id}/versions/{vid}/exceptions`, via
+> `versionedWafExceptionsService` (`createVersionedSubResourceService`); Tuning fica fora
+> do escopo de versão.
 
 ### 11.1 Checklist por recurso (nada no framework muda)
 
@@ -482,13 +498,28 @@ archive/build/cancel. Plugar um recurso é só fornecer os artefatos **thin** ab
 > (ex.: `workloadSaveStrategy` — build implícito no PUT; Custom Page —
 > `customPageSaveStrategy`, salva conteúdo via endpoint base).
 
-### 11.2 WAF — fora de escopo (status real)
+### 11.2 Network List (atômico) e WAF (composto) — status real
 
-**WAF não tem versionamento.** Não há API de versões confirmada para WAF; o recurso
-fica **deferido** até o backend expor o contrato. Não existem service/adapter/views
-v6 para WAF, e nenhuma `baseURL` `/edge_firewall/api/wafs` é consumida pelo
-framework. (Versões anteriores deste doc afirmavam, incorretamente, que o WAF
-compartilhava a máquina de estados do Firewall com API pronta.)
+Ambos plugados pelo spec `version-shell-network-lists-waf`, espelhando padrões já em
+produção:
+
+- **Network List** (atômico, espelha `EdgeConnectors/v6`): itens (IP/ASN/Country),
+  tipo e nome viajam no snapshot da versão; sem sub-resource. Service
+  `network-list-version-service.js` (`baseURL='v4/workspace/network_lists'`), adapter
+  `network-list-version-adapter.js` (`createVersionAdapter`, reusa `NetworkListsAdapter`),
+  views em `src/views/NetworkLists/v6/`. Network List **global** (`client_id:'global'`)
+  versiona por linha do snapshot, sem vazamento de tenant.
+- **WAF** (composto, espelha `EdgeFirewall/v6`): Main Settings (thresholds por módulo)
+  no snapshot + sub-resource **exceptions** (allowed rules) versionado. Service
+  `waf-version-service.js` (`baseURL='v4/workspace/wafs'`), adapter
+  `waf-version-adapter.js`, sub-resource `versioned-waf-exceptions-service.js`
+  (`createVersionedSubResourceService`, endpoint
+  `v4/workspace/wafs/{id}/versions/{vid}/exceptions`, invalida
+  `queryKeys.waf.version.exceptions`). O `ListWafRulesAllowed` é drop-in com o `service`
+  versionado injetado via `use-versioned-facades`. A aba **Tuning** fica fora do escopo
+  de versão (não é snapshot). Views em `src/views/WafRules/v6/`.
+
+> Certificates (cert + CRL) seguem **fora de escopo** — sem versionamento no backend.
 
 ### 11.3 Mudanças no framework: nenhuma obrigatória, uma a vigiar
 
@@ -499,4 +530,107 @@ correto — os lifecycles dos recursos plugados são idênticos. **Se** um recur
 mapas precisam ser promovidos a props/configuração do `<VersionShell>`, com os
 valores atuais como default. Não parametrizar antes da divergência existir
 (YAGNI) — o custo da promoção é pequeno e localizado.
+
+> A primeira divergência já existe e foi resolvida **por configuração** (capability),
+> não por fork: a classe `versioned-only` (§12). Deploy/Promote/Rollback são
+> filtrados por `capability`, sem tocar `STATE_ACTIONS`/`PRIMARY_BY_STATE`/`REQUIRES_COMMENT`.
+
+---
+
+## 12. Classe de recurso: `deployable` vs `versioned-only`
+
+Spec: `specs/versioned-only-subresources/`. Todo recurso versionado pertence a uma
+**classe**, expressa por uma **capability** imutável
+`{ canDeploy, canPromote, canRollback }`. A classe é a única forma de divergência
+suportada hoje — **não há fork do shell, do bus nem da máquina de estados**.
+
+| Classe | Capability | Deploy/Promote/Rollback/Release | Recursos |
+|---|---|---|---|
+| `deployable` (default) | `{ canDeploy:true, canPromote:true, canRollback:true }` | **Sim** | Application, Workload, Custom Page, Firewall, Edge Connector, Deployment, **e o modo legacy/v3** |
+| `versioned-only` | `{ canDeploy:false, canPromote:false, canRollback:false }` | **Não** | **Edge Function, Network List, WAF** |
+
+O default é byte-idêntico ao comportamento anterior: deployáveis e o modo legacy/v3
+**não regridem**.
+
+### 12.1 Capability central (`version-capability.js`)
+
+Fonte única: `src/composables/versioning/version-capability.js`. Módulo puro
+(dados + lookup; sem estado, sem I/O, sem Vue).
+
+```js
+export const DEFAULT_CAPABILITY = { canDeploy: true,  canPromote: true,  canRollback: true }  // deployable
+export const VERSIONED_ONLY     = { canDeploy: false, canPromote: false, canRollback: false }
+
+// Só as divergências do default são listadas; o resto cai no fallback.
+export const RESOURCE_CAPABILITY = { function: VERSIONED_ONLY, network_list: VERSIONED_ONLY, waf: VERSIONED_ONLY }
+
+// Fallback deployable → qualquer recurso é deployável até ser declarado o contrário.
+getVersionCapability(resourceType) => RESOURCE_CAPABILITY[resourceType] ?? DEFAULT_CAPABILITY
+```
+
+A capability é **sempre** o objeto `{ canDeploy, canPromote, canRollback }`. As chaves
+de `RESOURCE_CAPABILITY` são `resource_type` (`function`, `network_list`, `waf`).
+
+### 12.2 Como a capability flui (provide in-shell + argumento fora do shell)
+
+A lista de versões e `buildVersionMenuItems` rodam **fora** da árvore de provide do
+shell, então a capability viaja por dois canais:
+
+- **In-shell (provide/inject)**: `VersionShell` recebe `resourceType` por prop, resolve
+  a capability e a **provê** no `VERSION_CONTEXT_KEY`. `useVersionContext()` expõe
+  `capability` com default `DEFAULT_CAPABILITY` (fora do shell → deployable).
+  Consumidores: `VersionActionBar`, `VersionHeadingActions`.
+- **Fora do shell (argumento puro)**: as funções puras recebem a capability por
+  parâmetro, com default que preserva a saída atual:
+  - `getAvailableActions(state, capability = DEFAULT_CAPABILITY)` e
+    `isActionAvailable(state, action, capability)` filtram `DEPLOY`/`PROMOTE`/`ROLLBACK`
+    quando a capability nega.
+  - `buildVersionMenuItems(state, ctx, capability = getVersionCapability(ctx.resourceType))`.
+
+### 12.3 O que muda para `versioned-only` (e o que NÃO muda)
+
+**Removido da UI** (não há Deploy/Promote/Rollback/Release):
+
+- **Heading**: o botão Deploy é `v-if="capability.canDeploy"`; o deploy drawer só monta
+  quando `canDeploy && resourceContext`.
+- **Footer (ActionBar)**: como o footer filtra por `availableActions` e DEPLOY já não
+  chega (interseção), os banners `ready`/`active` ramificam só a **copy** (sem menção a
+  Deploy).
+- **Form adapter**: `onVersionCommand('DEPLOY', …)` vira **condicional** a `canDeploy` —
+  versioned-only **não registra** DEPLOY. Belt-and-suspenders com o filtro da máquina
+  (§12.2): `availableActions = getAvailableActions ∩ registered` o exclui e o `dispatch`
+  fail-closes.
+- **Landing**: para versioned-only não se constrói `deployResourceContext`, não se provê
+  `openPromoteDrawer`, e o deploy drawer não monta.
+- **Kebab da lista** (`buildVersionMenuItems`): quando `!canPromote`, **omite** PROMOTE e
+  ROLLBACK e **insere** `NEW_DRAFT_FROM` com label **"New version from this"** (override no
+  item, sem mutar `ACTION_META`). Menu versioned-only:
+  `[OPEN_CONFIGURATION, NEW_DRAFT_FROM, ARCHIVE, DELETE]`.
+- **Release picker**: Function/Network List/WAF são filtrados para fora do seletor de
+  recursos deployáveis (frontend/BFF; sem tocar a API).
+
+**Mantido (não regride)**: máquina de estados, bus, comment-gate, read-only/fork-on-edit,
+ciclo de cache e todos os comandos não-deploy (SAVE/SAVE_AND_BUILD/CANCEL_BUILD/
+NEW_DRAFT_FROM/ARCHIVE/DELETE). Archive/Delete **respeitam o erro da API** quando a
+versão está em uso (sem trava própria de UI; sem falso sucesso/navegação em rejeição).
+
+### 12.4 Os três consumidores `versioned-only`
+
+| Recurso | `resource_type` | Base URL das versões | Notas |
+|---|---|---|---|
+| Edge Function | `function` | `v4/workspace/functions` | `reference_count` exposto pela API → coluna **"In use"** apenas informativa |
+| Network List | `network_list` | `v4/workspace/network_lists` | atômico; sem `reference_count` → coluna "In use" omitida |
+| WAF | `waf` | `v4/workspace/wafs` | composto (exceptions versionadas); `versioned-only` não altera exceptions/Tuning |
+
+A versão em uso é rotulada **"Current"** (heurística frontend-only: estado `active` se a
+API retornar, senão a latest Ready); a **habilitação** do recurso continua exibida como
+**Active/Inactive**, em tag distinta. Toda a copy nova é em **EN** (padrão do shell host).
+
+### 12.5 Garantia de não-regressão
+
+Teste de enumeração `(classe, estado) → ações` cobre os 8 estados × {`deployable`,
+`versioned-only`} sobre `getAvailableActions` + `buildVersionMenuItems`
+(`src/tests/composables/versioning/version-capability.enumeration.test.js`): deployável
+idêntico ao atual; versioned-only **nunca** contém DEPLOY/PROMOTE/ROLLBACK em nenhum
+estado.
 

@@ -7,6 +7,10 @@ import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-s
 import { edgeFunctionVersionService } from '@/services/v2/edge-function/edge-function-version-service'
 import { customPageService } from '@/services/v2/custom-page/custom-page-service'
 import { customPageVersionService } from '@/services/v2/custom-page/custom-page-version-service'
+import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+import { networkListVersionService } from '@/services/v2/network-lists/network-list-version-service'
+import { wafService } from '@/services/v2/waf/waf-service'
+import { wafVersionService } from '@/services/v2/waf/waf-version-service'
 
 /**
  * Registry of release-resource resolvers, keyed by `resource_type`.
@@ -55,6 +59,20 @@ const RESOURCE_RESOLVERS = {
     listNames: () => customPageService.listCustomPagesService({ page: 1, pageSize: 100 }),
     resolveVersionName: async (id, versionId) => {
       const version = await customPageVersionService.loadVersion(id, versionId)
+      return version?.comment || version?.id
+    }
+  },
+  network_list: {
+    listNames: () => networkListsService.listNetworkLists({ page: 1, pageSize: 100 }),
+    resolveVersionName: async (id, versionId) => {
+      const version = await networkListVersionService.loadVersion(id, versionId)
+      return version?.comment || version?.id
+    }
+  },
+  waf: {
+    listNames: () => wafService.listWafRules({ page: 1, pageSize: 100 }),
+    resolveVersionName: async (id, versionId) => {
+      const version = await wafVersionService.loadVersion(id, versionId)
       return version?.comment || version?.id
     }
   }

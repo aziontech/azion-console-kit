@@ -135,6 +135,7 @@ describe('WorkloadVersionAdapter normalized meta shape (refactor parity)', () =>
     'lastModified',
     'lastEditor',
     'sourceVersionId',
+    'referenceCount',
     'deploymentId',
     'environmentId',
     'lastError'

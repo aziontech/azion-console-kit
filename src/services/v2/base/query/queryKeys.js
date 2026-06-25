@@ -515,7 +515,37 @@ export const queryKeys = {
     list: (params) => [...queryKeys.waf.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.waf.all, 'detail', id],
     allowed: (wafId, params) => [...queryKeys.waf.all, 'allowed', wafId, normalizeParams(params)],
-    domains: (wafId) => [...queryKeys.waf.all, 'domains', wafId]
+    domains: (wafId) => [...queryKeys.waf.all, 'domains', wafId],
+    version: {
+      all: (parentId) => [...queryKeys.waf.detail(parentId), 'versions'],
+      list: (parentId, params) =>
+        params === undefined
+          ? [...queryKeys.waf.version.all(parentId), 'list']
+          : [...queryKeys.waf.version.all(parentId), 'list', normalizeParams(params)],
+      detail: (parentId, versionId) => [
+        ...queryKeys.waf.version.all(parentId),
+        'detail',
+        versionId
+      ],
+      exceptions: {
+        all: (parentId, versionId) => [
+          ...queryKeys.waf.version.detail(parentId, versionId),
+          'exceptions'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.waf.version.detail(parentId, versionId),
+          'exceptions',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.waf.version.detail(parentId, versionId),
+          'exceptions',
+          'detail',
+          id
+        ]
+      }
+    }
   },
   edgeSql: {
     all: ['edge-sql'],
@@ -532,6 +562,22 @@ export const queryKeys = {
     list: (params) => [...queryKeys.networkLists.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.networkLists.all, 'detail', id],
     dropdown: (params) => [...queryKeys.networkLists.all, 'dropdown', normalizeParams(params)]
+  },
+  networkList: {
+    all: ['network-list'],
+    detail: (id) => [...queryKeys.networkList.all, 'detail', id],
+    version: {
+      all: (parentId) => [...queryKeys.networkList.detail(parentId), 'versions'],
+      list: (parentId, params) =>
+        params === undefined
+          ? [...queryKeys.networkList.version.all(parentId), 'list']
+          : [...queryKeys.networkList.version.all(parentId), 'list', normalizeParams(params)],
+      detail: (parentId, versionId) => [
+        ...queryKeys.networkList.version.all(parentId),
+        'detail',
+        versionId
+      ]
+    }
   },
   digitalCertificates: {
     all: ['digital-certificates'],

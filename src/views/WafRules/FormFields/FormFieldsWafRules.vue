@@ -8,6 +8,7 @@
   import { ref } from 'vue'
 
   import { useField } from 'vee-validate'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
   defineOptions({ name: 'form-fields-waf-rules' })
 
   const props = defineProps({
@@ -18,6 +19,10 @@
   })
 
   const { value: name } = useField('name')
+
+  // readOnly defaults to false outside the VersionShell; inside an immutable
+  // version (ready/active/archived/...) it disables every field.
+  const { readOnly } = useVersionContext()
 
   const sensitivity = ref([
     { name: 'Sensitivity Highest', value: 'highest' },
@@ -121,6 +126,7 @@
         name="name"
         data-testid="waf-rules-form__name-field"
         :value="name"
+        :disabled="readOnly"
         placeholder="My WAF rule"
       />
     </template>
@@ -135,6 +141,7 @@
           label="Threat Type Configuration"
           isCard
           input-class="w-full"
+          :disabled="readOnly"
           :options="switchOptions"
         >
           <template #footer="{ item }">
@@ -145,6 +152,7 @@
                 optionValue="value"
                 :name="item.dropdown.value"
                 :value="item.dropdown.initialValue"
+                :disabled="readOnly"
                 :data-testid="`waf-rules-form__${item.dropdown.value}-field`"
               />
             </div>
@@ -162,7 +170,7 @@
           auto
           :isCard="false"
           title="Active"
-          :disabled="props.disabledActive"
+          :disabled="props.disabledActive || readOnly"
           data-testid="waf-rules-form__active-field"
         />
       </div>

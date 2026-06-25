@@ -64,17 +64,17 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-[var(--spacing-4)]">
     <div
       v-if="showResource"
-      class="flex flex-col gap-2"
+      class="flex flex-col gap-[var(--spacing-2)]"
     >
       <LabelBlock
         label="Resource"
         isRequired
       />
       <span
-        class="flex items-center gap-2 rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)] px-3 py-2 text-sm text-[var(--text-color)]"
+        class="flex items-center gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-3)] py-[var(--spacing-2)] text-body-sm text-[var(--text-color)]"
         data-testid="deploy-drawer__resource-name"
       >
         <i class="pi pi-box text-[var(--text-color-secondary)]" />
@@ -82,7 +82,7 @@
       </span>
     </div>
 
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-[var(--spacing-2)]">
       <LabelBlock
         label="Version (Ready)"
         name="deploy-drawer-version-select"
@@ -115,30 +115,32 @@
         <template #value>
           <span
             v-if="isLatest"
-            class="flex items-center gap-2 text-sm text-[var(--text-color)]"
+            class="flex items-center gap-[var(--spacing-2)] text-body-sm text-[var(--text-color)]"
           >
             <i class="pi pi-sync text-[var(--text-primary)]" />
             latest Ready
           </span>
           <span
             v-else-if="selectedOption"
-            class="font-mono text-sm text-[var(--text-color)]"
+            class="font-mono text-body-sm text-[var(--text-color)]"
           >
             {{ selectedOption.label }}
           </span>
           <span
             v-else
-            class="text-sm text-[var(--text-color-secondary)]"
+            class="text-body-sm text-[var(--text-color-secondary)]"
             >Select a version</span
           >
         </template>
         <template #option="{ option }">
           <div
             v-if="option.isLatest"
-            class="flex w-full flex-col gap-1"
+            class="flex w-full flex-col gap-[var(--spacing-1)]"
             data-testid="deploy-drawer__version-latest"
           >
-            <span class="flex w-full items-center gap-2 text-sm text-[var(--text-color)]">
+            <span
+              class="flex w-full items-center gap-[var(--spacing-2)] text-body-sm text-[var(--text-color)]"
+            >
               <i class="pi pi-sync text-[var(--text-primary)]" />
               Track latest Ready
               <i
@@ -146,28 +148,30 @@
                 class="pi pi-check ml-auto text-[var(--text-primary)]"
               />
             </span>
-            <span class="text-xs text-[var(--text-color-secondary)] leading-tight">
+            <span class="text-body-xs text-[var(--text-color-secondary)]">
               Always the newest Ready version
             </span>
           </div>
           <div
             v-else
-            class="flex w-full items-center gap-3"
+            class="flex w-full items-center gap-[var(--spacing-3)]"
             :data-testid="`deploy-drawer__version-option-${option.value}`"
           >
-            <span class="flex min-w-0 flex-col gap-1">
-              <span class="flex items-center gap-2">
-                <span class="font-mono text-sm text-[var(--text-color)]">{{ option.label }}</span>
+            <span class="flex min-w-0 flex-col gap-[var(--spacing-1)]">
+              <span class="flex items-center gap-[var(--spacing-2)]">
+                <span class="font-mono text-body-sm text-[var(--text-color)]">{{
+                  option.label
+                }}</span>
                 <span
                   v-if="option.isCurrent"
-                  class="text-xs text-[var(--info-contrast,#66adff)]"
+                  class="text-body-xs text-[var(--info-contrast)]"
                 >
                   Current
                 </span>
               </span>
               <span
                 v-if="option.createdAt || option.author"
-                class="text-xs text-[var(--text-color-secondary)] leading-tight"
+                class="text-body-xs text-[var(--text-color-secondary)]"
               >
                 <template v-if="option.createdAt">{{
                   convertToRelativeTime(option.createdAt)
@@ -185,7 +189,7 @@
       </Dropdown>
       <small
         v-if="invalid"
-        class="p-error text-xs font-normal leading-tight"
+        class="p-error text-body-xs font-normal"
         data-testid="deploy-drawer__version-error"
       >
         Version is required
