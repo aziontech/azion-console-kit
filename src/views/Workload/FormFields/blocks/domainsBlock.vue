@@ -69,9 +69,23 @@
     )
   }
 
+  const SINGLE_VERSION_LABEL = mapPolicyToLabel('single_version')
+
+  const isSingleVersionEnv = (envId) =>
+    environmentMap.value[String(envId)]?.deployment_policy === SINGLE_VERSION_LABEL
+
+  const AZION_APP_SUFFIX = '.azion.app'
+
   const buildAzionDomain = (name) => {
     const sanitized = (name ?? '').replace(/\s+/g, '').toLowerCase()
-    return sanitized ? `${sanitized}.azion.app` : ''
+    return sanitized ? `${sanitized}${AZION_APP_SUFFIX}` : ''
+  }
+
+  const isAzionDomainValue = (item) => {
+    const domain = typeof item?.domain === 'string' ? item.domain : ''
+    if (domain === 'azion.app') return true
+    const fullHostname = item?.subdomain ? `${item.subdomain}.${domain}` : domain
+    return fullHostname.endsWith(AZION_APP_SUFFIX)
   }
 
   const sugestionDomains = async () => {
@@ -124,6 +138,29 @@
 
   const domainList = computed(() => (Array.isArray(domains.value) ? domains.value : []))
   const hasMultipleDomains = computed(() => domainList.value.length > 1)
+
+  const lockedSingleVersionEnvironmentId = computed(() => {
+    const list = domainList.value
+    for (let index = 0; index < list.length; index++) {
+      if (editingIndex.value !== null && index === editingIndex.value) continue
+      const envId = list[index]?.environment
+      if (envId != null && isSingleVersionEnv(envId)) return envId
+    }
+    return null
+  })
+
+  const azionDomainEnvironmentIds = computed(() => {
+    const ids = []
+    const list = domainList.value
+    for (let index = 0; index < list.length; index++) {
+      if (editingIndex.value !== null && index === editingIndex.value) continue
+      const item = list[index]
+      if (item?.environment != null && isAzionDomainValue(item)) {
+        ids.push(item.environment)
+      }
+    }
+    return ids
+  })
 
   const openCreateDrawer = () => {
     drawerMode.value = 'create'
@@ -294,6 +331,8 @@
         :certificateOptions="certificateOptions"
         :certificateLoading="certificateLoading"
         :useHttps="!!useHttps"
+        :lockedSingleVersionEnvironmentId="lockedSingleVersionEnvironmentId"
+        :azionDomainEnvironmentIds="azionDomainEnvironmentIds"
         @save="handleDrawerSave"
         @certificateCreated="fetchCertificates"
       />
