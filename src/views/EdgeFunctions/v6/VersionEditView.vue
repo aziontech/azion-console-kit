@@ -24,7 +24,9 @@
     load: (id) => edgeFunctionService.loadEdgeFunctionService({ id }),
     provideKey: 'edgeFunction',
     listRoute: (id) => ({ name: 'edit-functions', params: { id } }),
-    versionRouteName: 'edit-functions-version'
+    versionRouteName: 'edit-functions-version',
+    // Edge Function is versioned-only: no deploy drawer to open on DEPLOY.
+    supportsDeployDrawer: false
   })
 </script>
 

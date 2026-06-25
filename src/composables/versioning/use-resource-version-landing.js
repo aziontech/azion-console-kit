@@ -3,6 +3,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useToast } from '@aziontech/webkit/use-toast'
 import { VERSION_ACTIONS } from '@/composables/versioning/version-machine'
 import { toDeployableVersionOptions } from '@/composables/versioning/to-version-options'
+import { getVersionCapability } from '@/composables/versioning/version-capability'
 
 export const LANDING_TAB = { VERSIONS: 0, SETTINGS: 1 }
 
@@ -44,6 +45,9 @@ export function useResourceVersionLanding({
   const router = useRouter()
   const toast = useToast()
 
+  // versioned-only resources have no Deploy/Promote affordance — no drawer wiring.
+  const capability = getVersionCapability(resourceType)
+
   const resourceId = computed(() => String(route.params.id))
 
   const resource = ref(null)
@@ -54,12 +58,13 @@ export function useResourceVersionLanding({
 
   // Shared seam consumed by the slotted Versions tab to wire the single
   // row-menu router (useVersionMenuActions); avoids per-resource menu logic.
+  // Promote is only seamed for deployable resources (capability.canDeploy).
   provide('versionMenuHost', {
     resourceType,
     resourceId,
     versionService,
     router,
-    openPromoteDrawer: (payload) => openPromoteDrawer(payload),
+    ...(capability.canDeploy ? { openPromoteDrawer: (payload) => openPromoteDrawer(payload) } : {}),
     onSuccess: () => versionsQuery.refetch?.()
   })
 
@@ -114,19 +119,27 @@ export function useResourceVersionLanding({
     isDeployDrawerOpen.value = true
   }
 
-  // Promote pins the chosen version; on Settings the drawer pre-selects the
-  // latest; on Versions it opens unfilled. Options come from the shared mapper.
-  const deployVersionId = computed(() => {
-    if (pinnedDeployVersionId.value) return pinnedDeployVersionId.value
-    return activeTab.value === LANDING_TAB.SETTINGS ? latestVersionId.value : null
+  // Deployable (Ready) version options for the drawer; the shared mapper orders
+  // them newest-first.
+  const deployableVersionOptions = computed(() => toDeployableVersionOptions(rawVersions.value))
+
+  // A row-menu Promote pins a version; otherwise default to the latest deployable
+  // one so the drawer always references a concrete version (the banner and the
+  // promote stay consistent) regardless of the landing tab it was opened from.
+  const deployVersionId = computed(
+    () => pinnedDeployVersionId.value ?? deployableVersionOptions.value[0]?.value ?? null
+  )
+  // versioned-only: no deploy context built — the drawer is never fed nor mounted.
+  const deployResourceContext = computed(() => {
+    if (!capability.canDeploy) return null
+    return {
+      resourceType,
+      resourceId: Number(resourceId.value),
+      resourceName: resource.value?.name ?? '',
+      version: deployVersionId.value ? { id: deployVersionId.value } : null,
+      versions: deployableVersionOptions.value
+    }
   })
-  const deployResourceContext = computed(() => ({
-    resourceType,
-    resourceId: Number(resourceId.value),
-    resourceName: resource.value?.name ?? '',
-    version: deployVersionId.value ? { id: deployVersionId.value } : null,
-    versions: toDeployableVersionOptions(rawVersions.value)
-  }))
 
   // Drop the pinned version once the drawer is dismissed so the next open is clean.
   watch(isDeployDrawerOpen, (open) => {

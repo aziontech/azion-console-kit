@@ -25,6 +25,9 @@
     adapter: { type: [Object, Function], required: true },
     tabs: { type: Array, default: () => [] },
     resourceContext: { type: Object, default: null },
+    // Resolves the version capability inside the editor; omitted/unknown stays
+    // deployable so existing resources keep their current behavior.
+    resourceType: { type: String, default: undefined },
     testidPrefix: { type: String, required: true },
     // Render the single tab's component directly, without the outer TabView. For
     // resources whose form already provides its own tabs (e.g. Functions).
@@ -63,6 +66,7 @@
     :use-version-query="useVersionQuery"
     :resource-id="resourceId"
     :version-id="versionId"
+    :resource-type="resourceType"
     :data-testid="`${testidPrefix}__shell`"
     @updated="emit('command-success', $event)"
     @command-error="emit('command-error', $event)"
@@ -96,7 +100,7 @@
               :header="tab.label"
               :pt="{ root: { 'data-testid': `${testidPrefix}__tab-panel__${tab.key}` } }"
             >
-              <div class="flex flex-col gap-4 mt-4">
+              <div class="flex flex-col gap-[var(--spacing-4)] mt-[var(--spacing-4)]">
                 <component
                   :is="tab.component"
                   :ref="setComponentRef(index)"

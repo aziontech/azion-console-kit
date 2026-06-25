@@ -3,15 +3,16 @@
   import PrimeButton from '@aziontech/webkit/button'
   import VersionStateBadge from './VersionStateBadge.vue'
   import { useVersionContext } from '@/composables/versioning/use-version-context'
-  import { VERSION_ACTIONS, VERSION_STATES } from '@/composables/versioning/version-machine'
+  import { DEFAULT_CAPABILITY } from '@/composables/versioning/version-capability'
+  import { getVersionBarActions } from '@/composables/versioning/version-actions'
+  import { VERSION_ACTIONS } from '@/composables/versioning/version-machine'
   import { formatExhibitionDate } from '@/helpers/convert-date'
   import DeployDrawerBlock from '@/templates/deploy-drawer-block'
 
   defineOptions({ name: 'version-heading-actions' })
 
-  // `resourceContext` is the only resource-specific input: it feeds the
-  // DeployDrawerBlock. When null (e.g. Workload), the Deploy button never shows
-  // and no drawer is mounted — only StatusTag / Build / created info.
+  // `resourceContext` feeds the DeployDrawerBlock; null (e.g. versioned-only) means
+  // no Deploy action and no drawer is mounted.
   const props = defineProps({
     resourceContext: {
       type: Object,
@@ -19,27 +20,37 @@
     }
   })
 
-  const { state, version, disabledActions, dispatch } = useVersionContext()
+  const { state, version, availableActions, disabledActions, dispatch, capability } =
+    useVersionContext()
 
-  const showBuild = computed(() => state.value === VERSION_STATES.DRAFT)
+  const cap = computed(() => capability?.value ?? DEFAULT_CAPABILITY)
 
-  // Deploy stays visible across states (set 2 mockup) and only enables on a
-  // deployable, built version with a resource context to feed the drawer.
-  const isDeployable = computed(() =>
-    [VERSION_STATES.READY, VERSION_STATES.ACTIVE].includes(state.value)
-  )
-  const isDeployDisabled = computed(() => !isDeployable.value || !props.resourceContext)
-
-  const isBuildDisabled = computed(() =>
-    disabledActions.value.includes(VERSION_ACTIONS.SAVE_AND_BUILD)
+  // Same source + same availableActions intersection as VersionActionBar, so the
+  // heading and the footer toolbar render an identical button set per state.
+  const actions = computed(() =>
+    getVersionBarActions(state.value, cap.value).filter((action) =>
+      availableActions.value.includes(action.key)
+    )
   )
 
-  const handleBuild = () => dispatch(VERSION_ACTIONS.SAVE_AND_BUILD, {})
+  const isDisabled = (key) =>
+    disabledActions.value.includes(key) ||
+    (key === VERSION_ACTIONS.DEPLOY && !props.resourceContext)
 
   const isDeployDrawerOpen = ref(false)
   const openDeployDrawer = () => {
     isDeployDrawerOpen.value = true
   }
+
+  // Deploy opens the heading's own drawer; every other action dispatches on the bus.
+  const handleAction = (key) => {
+    if (isDisabled(key)) return
+    if (key === VERSION_ACTIONS.DEPLOY) return openDeployDrawer()
+    dispatch(key, {})
+  }
+
+  const testIdFor = (key) =>
+    key === VERSION_ACTIONS.DEPLOY ? 'version-heading__deploy' : `version-heading__action-${key}`
 
   // Exposed so the host view can open THIS drawer from the VersionShell footer
   // Deploy action (DEPLOY command-success), unifying both Deploy entrypoints.
@@ -68,31 +79,24 @@
     v-if="isMounted"
     to="#version-lifecycle-action"
   >
-    <div class="flex flex-col items-end gap-2">
-      <div class="flex items-center gap-4">
+    <div class="flex flex-col items-end gap-[var(--spacing-2)]">
+      <div class="flex items-center gap-[var(--spacing-4)]">
         <VersionStateBadge :state="state" />
         <PrimeButton
-          v-if="showBuild"
-          label="Build"
-          icon="pi pi-code"
+          v-for="action in actions"
+          :key="action.key"
+          :label="action.label"
+          :icon="action.icon"
           size="small"
-          outlined
-          severity="secondary"
-          :disabled="isBuildDisabled"
-          data-testid="version-heading__build"
-          @click="handleBuild"
-        />
-        <PrimeButton
-          label="Deploy"
-          icon="pi pi-cloud-upload"
-          size="small"
-          :disabled="isDeployDisabled"
-          data-testid="version-heading__deploy"
-          @click="openDeployDrawer"
+          :outlined="action.emphasis === 'secondary'"
+          :severity="action.emphasis === 'secondary' ? 'secondary' : undefined"
+          :disabled="isDisabled(action.key)"
+          :data-testid="testIdFor(action.key)"
+          @click="handleAction(action.key)"
         />
       </div>
       <span
-        class="text-xs text-[var(--text-color-secondary)]"
+        class="text-body-xs text-[var(--text-color-secondary)]"
         data-sentry-mask
         data-testid="version-heading__version-info"
       >
@@ -102,7 +106,7 @@
   </Teleport>
 
   <DeployDrawerBlock
-    v-if="resourceContext"
+    v-if="cap.canDeploy && resourceContext"
     v-model:visible="isDeployDrawerOpen"
     :resource-context="resourceContext"
   />

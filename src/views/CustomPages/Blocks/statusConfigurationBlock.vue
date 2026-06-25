@@ -26,7 +26,7 @@
           optionLabel="label"
           optionValue="value"
           appendTo="self"
-          :disabled="props.isEdit"
+          :disabled="props.isEdit || readOnly"
         />
       </div>
     </template>
@@ -37,7 +37,12 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal.vue'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import { CODE_OPTIONS } from '@/views/CustomPages/Config/listStatusCode'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
   import { computed } from 'vue'
+
+  // readOnly defaults to false outside the VersionShell; immutable versions disable
+  // the editable Page Code dropdown.
+  const { readOnly } = useVersionContext()
 
   const listTypes = [
     { label: 'Page Default', value: 'page_default' },

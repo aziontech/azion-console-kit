@@ -5,10 +5,15 @@
   import { useField } from 'vee-validate'
   import FieldGroupSwitch from '@aziontech/webkit/field-group-switch'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'form-fields-edge-firewall' })
 
   const { value: name } = useField('name')
+
+  // readOnly defaults to false outside the VersionShell (non-versioned create/edit
+  // stays editable); inside an immutable version it disables every field.
+  const { readOnly } = useVersionContext()
 
   const switchOptions = [
     {
@@ -54,6 +59,7 @@
         name="name"
         data-testid="edge-firewall-form__name-field"
         :value="name"
+        :disabled="readOnly"
         placeholder="My Firewall"
         description="Give a unique and descriptive name to identify the Firewall."
       />
@@ -67,6 +73,7 @@
       <div class="flex flex-col gap-2">
         <FieldGroupSwitch
           isCard
+          :disabled="readOnly"
           :options="switchOptions"
         >
           <template #footer="{ item }">
@@ -93,6 +100,7 @@
           name="debugRules"
           auto
           :isCard="false"
+          :disabled="readOnly"
           title="Active"
           subtitle="Rules that were successfully executed will be shown under the Straceback field in Data Streaming and Real-Time Events or the stacktrace variable in GraphQL."
         />
@@ -107,6 +115,7 @@
           name="isActive"
           auto
           :isCard="false"
+          :disabled="readOnly"
           title="Active"
         />
       </div>

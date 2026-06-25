@@ -10,6 +10,7 @@
         :value="active"
         auto
         :isCard="false"
+        :disabled="readOnly"
         title="Active"
       />
     </template>
@@ -22,6 +23,10 @@
   import blockPagesCodeBlock from '@/views/CustomPages/Blocks/pagesCodeBlock'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
   import { useField } from 'vee-validate'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   const { value: active } = useField('active')
+
+  // readOnly defaults to false outside the VersionShell; immutable versions disable it.
+  const { readOnly } = useVersionContext()
 </script>
