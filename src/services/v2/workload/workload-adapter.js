@@ -168,7 +168,6 @@ export const WorkloadAdapter = {
 
     if (isV6) {
       const domainEntries = buildV6DomainEntries(payload)
-      // domains = domainEntries.map((entry) => entry.name)
       bindings = buildV6Bindings(
         domainEntries,
         payload.environmentDeployments,

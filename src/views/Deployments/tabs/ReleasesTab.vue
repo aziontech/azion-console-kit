@@ -57,7 +57,13 @@
 
   const columns = computed(() => [
     { key: 'deployment', label: 'Deployment', size: 'minmax(220px, 1.4fr)', align: 'start' },
-    { key: 'status', label: 'Status', size: 'minmax(160px, 1fr)', align: 'start' },
+    {
+      key: 'status',
+      label: 'Status',
+      size: 'minmax(160px, 1fr)',
+      align: 'start',
+      mobileSlot: 'status'
+    },
     {
       key: 'lastModified',
       label: 'Last Modified',
@@ -103,6 +109,12 @@
   const filteredVersions = computed(() =>
     versions.value.filter((version) => matchesDateRange(version))
   )
+
+  const activeFilterCount = computed(() => {
+    const statusActive = filterValues.value.status && filterValues.value.status !== 'all' ? 1 : 0
+    const dateActive = Array.isArray(dateRange.value) && dateRange.value.some(Boolean) ? 1 : 0
+    return statusActive + dateActive
+  })
 
   const loadVersions = async () => {
     if (!props.deploymentId) {
@@ -261,6 +273,8 @@
       :totalRecords="totalRecords"
       :toolbarMode="'compact'"
       :showHeader="false"
+      primaryColumnKey="deployment"
+      :activeFilterCount="activeFilterCount"
       searchPlaceholder="Placeholder"
       emptyTitle="No releases yet"
       emptyDescription="Releases will appear here once you deploy a version of this deployment."
@@ -270,6 +284,7 @@
       overflowMenuAriaLabel="More release actions"
       @refresh="loadVersions"
       @page="onPage"
+      @row-primary-click="goToDetails"
       @open-row-menu="({ event, deployment }) => openRowMenu({ event, version: deployment })"
     >
       <template #toolbar-extras>

@@ -239,40 +239,56 @@ export function useDeployDrawer(
   // without wiping a selection the user has already made.
   let lastResetWorkloadId = null
 
-  // Source includes the selected workload's bindings: when the workload is
-  // pre-selected before the listing query resolves, the bindings arrive later
-  // and must (re)trigger the environment load.
-  watch([selectedWorkloadId, () => selectedWorkload.value?.bindings], async ([id]) => {
-    if (id !== lastResetWorkloadId) {
-      selectedEnvironmentId.value = null
-      environmentCards.value = []
-      lastResetWorkloadId = id
-    }
-    if (!id) return
+  // Monotonic token: a superseded run (id change OR a later same-id fire) must
+  // never overwrite the latest. The end guard alone (id check) does not cover two
+  // concurrent same-id fires, where the slower one (e.g. a per-id fallback fetch)
+  // could land last and clobber good cards with an empty result.
+  let environmentLoadSeq = 0
 
-    // Phase 1: base cards from cache — render immediately.
-    isLoadingBindings.value = true
-    let base = []
-    try {
-      base = await deployDrawerService.loadWorkloadEnvironments(id, {
-        bindings: selectedWorkload.value?.bindings,
-        environments: environmentsBody.value,
-        deployments: deploymentsBody.value
-      })
-    } catch {
-      base = []
-    } finally {
-      isLoadingBindings.value = false
-    }
-    if (selectedWorkloadId.value !== id) return
-    environmentCards.value = base
+  // `immediate` is required: when the workloads listing is already cached, the
+  // pre-selected workload's bindings are present at registration and never change
+  // again, so a lazy watcher would never fire and the cards would stay empty.
+  // `enabled` gates the actual load to the open drawer (and re-triggers on open),
+  // so a closed-but-mounted drawer never fetches.
+  watch(
+    [enabled, selectedWorkloadId, () => selectedWorkload.value?.bindings],
+    async ([, id]) => {
+      const seq = ++environmentLoadSeq
 
-    // Phase 2: enrich with the active release without blocking the render.
-    const enriched = await deployDrawerService
-      .enrichReleases(base, toValue(resourceContext)?.resourceType)
-      .catch(() => null)
-    if (enriched && selectedWorkloadId.value === id) environmentCards.value = enriched
-  })
+      if (id !== lastResetWorkloadId) {
+        selectedEnvironmentId.value = null
+        environmentCards.value = []
+        lastResetWorkloadId = id
+      }
+      if (!enabled.value || !id) return
+
+      // Phase 1: base cards from cache — render immediately.
+      isLoadingBindings.value = true
+      let base = []
+      try {
+        base = await deployDrawerService.loadWorkloadEnvironments(id, {
+          bindings: selectedWorkload.value?.bindings,
+          environments: environmentsBody.value,
+          deployments: deploymentsBody.value
+        })
+      } catch {
+        base = []
+      } finally {
+        if (seq === environmentLoadSeq) isLoadingBindings.value = false
+      }
+      if (seq !== environmentLoadSeq || selectedWorkloadId.value !== id) return
+      environmentCards.value = base
+
+      // Phase 2: enrich with the active release without blocking the render.
+      const enriched = await deployDrawerService
+        .enrichReleases(base, toValue(resourceContext)?.resourceType)
+        .catch(() => null)
+      if (enriched && seq === environmentLoadSeq && selectedWorkloadId.value === id) {
+        environmentCards.value = enriched
+      }
+    },
+    { immediate: true }
+  )
 
   // --- Active release (baseline) ------------------------------------------
 

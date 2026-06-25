@@ -61,6 +61,10 @@
     releases.value.filter((release) => matchesSearch(release) && matchesStatus(release))
   )
 
+  const activeFilterCount = computed(() =>
+    filterValues.value.status && filterValues.value.status !== 'all' ? 1 : 0
+  )
+
   const rowSubtitle = (release) => {
     const parts = []
     if (release.environmentLabel) parts.push(release.environmentLabel)
@@ -72,7 +76,13 @@
 
   const columns = [
     { key: 'release', label: 'Release', size: 'minmax(0, 1fr)', align: 'start' },
-    { key: 'status', label: 'Status', size: 'minmax(0, 1fr)', align: 'start' },
+    {
+      key: 'status',
+      label: 'Status',
+      size: 'minmax(0, 1fr)',
+      align: 'start',
+      mobileSlot: 'status'
+    },
     { key: 'createdAt', label: 'Date', size: 'minmax(0, 1fr)', align: 'start' },
     { key: 'author', label: 'Author', size: 'minmax(0, 1fr)', align: 'start' }
   ]
@@ -130,6 +140,8 @@
     :paginatorFirst="paginatorFirst"
     :paginatorRows="paginatorRows"
     toolbarMode="compact"
+    primaryColumnKey="release"
+    :activeFilterCount="activeFilterCount"
     searchPlaceholder="Search Releases"
     emptyTitle="No releases yet"
     emptyDescription="Releases will appear here once the Workload's deployments have them."
@@ -137,6 +149,8 @@
     filteredEmptyDescription="Try changing your search or filters."
     @refresh="reload"
     @page="onPage"
+    @row-primary-click="goToDetails"
+    @open-row-menu="({ deployment }) => goToDetails(deployment)"
   >
     <template #toolbar-extras>
       <Dropdown
