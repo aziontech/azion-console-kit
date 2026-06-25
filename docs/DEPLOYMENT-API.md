@@ -26,6 +26,8 @@ GraphQL is the optimized state-only channel for service-to-service callers (Data
 | Multi-tenant | Every entity carries `client_id` from `auth.account.clientId` |
 | Single response envelope | `{ "data": { ...flat resource } }` |
 | List response envelope (Azion V4) | `{ count, total_pages, page, page_size, next, previous, results: [...] }` |
+| Pagination | `?page` (1-based, default 1, max 1000) + `?page_size` (default 20, max 100) |
+| Ordering | `?ordering=<field>` — **azion-django-extensions / DRF OrderingFilter** convention: prefix with `-` for descending, comma-separate multiple fields. Unknown fields are silently ignored; default ordering used as fallback. Example: `?ordering=-created_at,name` |
 | Error envelope | `{ "errors": [{ status, code, title, detail, meta }] }` — `meta.source.pointer` = `/<field>` |
 | Request body | **Flat** — no `{data:{type,attributes}}` wrapper |
 
@@ -110,17 +112,20 @@ query Q($r:[ResourceStateInput!]!) {
 }
 ```
 
-Batch state lookup. Input tuples: `{ resourceType, resourceId, resourceVersion? }`. Supported `resourceType`: `deployment`, `release` (`environment` returns `state: null` — moved to environment-api). `resourceVersion` is required only for `release`. Output preserves input order (1:1). Missing rows / unknown types / parent-guard failures return `state: null`.
+Batch state lookup. Input semantics per `resourceType`:
+- `deployment` → `resourceId` = deployment_id (required); `resourceVersion` must be null.
+- `release` → `resourceVersion` = release_id (required); `resourceId` is ignored and may be omitted.
+- `environment` → returns `state: null` (moved to environment-api).
 
-**Carve-out:** `findStateById` for `deployment` does **not** filter by `client_id` — `/api/graphql` is service-to-service. For `release`, the parent guard ensures the version belongs to the given deployment (returns null otherwise; never reveals cross-deployment existence).
+Output preserves input order (1:1). `state` is null when the resource is not found, the required key is omitted, or the `resourceType` is unrecognized. Both lookups bypass `client_id` filtering — `/api/graphql` is the secret-gated service-to-service carve-out.
 
 **Example request variables**
 
 ```json
 {
   "r": [
-    { "resourceType": "deployment", "resourceId": "ADEPSTG1", "resourceVersion": null },
-    { "resourceType": "release", "resourceId": "ADEPSTG1", "resourceVersion": "ARELACT1" }
+    { "resourceType": "deployment", "resourceId": "ADEPSTG1" },
+    { "resourceType": "release", "resourceVersion": "ARELACT1" }
   ]
 }
 ```
@@ -231,7 +236,16 @@ Creates a deployment (base row + a v1 version-row in `state='draft'`). **Does no
 
 ### GET /v4/deployments
 
-Lists deployments (Azion V4 pagination + `?name=<substring>` filter). One row per deployment (base + latest version row). Each result includes `version_id` (the latest `deployment_versions.id` projected into the response) alongside `id` (the base `deployments.id`); `state` is the version's state.
+Lists deployments (Azion V4 pagination). One row per deployment (base + latest version row). Each result includes `version_id` (the latest `deployment_versions.id` projected into the response) alongside `id` (the base `deployments.id`); `state` is the version's state.
+
+**Query parameters:**
+
+| Parameter | Type | Description |
+|---|---|---|
+| `page` | integer | Page number (1-based, default 1, max 1000) |
+| `page_size` | integer | Items per page (default 20, max 100) |
+| `name` | string | Case-insensitive substring filter on deployment name |
+| `ordering` | string | Comma-separated sort fields. Prefix with `-` for descending. **Allowed:** `id`, `name`, `created_at`, `updated_at`, `state`. **Default:** `-created_at,-id` (newest first). Example: `?ordering=-state,name` |
 
 **Response 200**
 
@@ -270,17 +284,27 @@ Updates a deployment. **State-aware**: if the latest `deployment_versions` row i
 
 ### DELETE /v4/deployments/{id}
 
-Hard-deletes a deployment. Blocked while any non-archived `release` still references it.
+Soft-deletes a deployment (async, edge parity). The base + its `deployment_versions` + its `releases` all transition to `deleting` (cascade) and a base-level `deployment / delete` outbox event is emitted; the worker drives them to `deleted` (state-aware trigger `sync_outbox_base_delete_to_deployment`). Blocked (`RESOURCE_IN_USE`) while the deployment is bound to a workload on the edge.
 
-**Response 200** — `{ "data": null }`
+**Response 204** — no content
 - **404** — not found
-- **409** — `43001 DEPLOYMENT_HAS_ACTIVE_VERSIONS`
+- **409** — `RESOURCE_IN_USE`
+
+### POST /v4/deployments/{id}/archive
+
+Soft-archives a deployment (async). Same cascade shape as delete but to `archiving` → `archived`: the base + its `deployment_versions` + its `releases` transition to `archiving`, a base-level `deployment / delete` outbox event is emitted, and the worker drives them to `archived` (state-aware trigger). Only deployments in an archivable state (`ready`/`draft`/`error`/`canceled`, per `@azion/versioning` v2.4) may be archived. Blocked (`RESOURCE_IN_USE`) while bound to a workload on the edge.
+
+Body: `{ "reason": "SUPERSEDED" | "SECURITY_ISSUE" | "POLICY_VIOLATION" | "MANUAL", "comment"?: string }`.
+
+**Response 202** — `{ "data": { "id": "<id>", "state": "archiving" } }`
+- **404** — not found
+- **409** — `RESOURCE_IN_USE`; `InvalidStateTransition` when not archivable
 
 ---
 
 ## Deployments — Build-config versioning (`/v4/deployments/{id}/versions/*`)
 
-Powered by the external lib `@azion/versioning` mounted under `/v4/deployments`. Version rows live in the sibling `deployment_versions` table — one row per `(deployment_id, version_number)`. The `deployments` table holds identity + denormalized state only. See [DATABASE.md](./DATABASE.md) and [DATA-MODEL-AND-FLOW.md](./DATA-MODEL-AND-FLOW.md).
+Powered by the external lib `@azion/versioning` mounted under `/v4/deployments`. Version rows live in the sibling `deployment_versions` table — one row per `(deployment_id, version_number)`. The `deployments` table holds identity + denormalized state only. See [DATABASE.md](./DATABASE.md).
 
 ### GET /v4/deployments/{id}/versions
 
@@ -316,22 +340,32 @@ Transitions a READY version-row → archiving (worker drives the rest).
 
 ### DELETE /v4/deployments/{id}/versions/{vid}
 
-Hard-deletes draft/error/canceled rows; enqueues a delete outbox event for ready rows. Blocked while traffic_role ≠ INACTIVE.
+Soft-deletes all rows: transitions state to `deleted` (draft/error/canceled — direct, no outbox) or emits a delete outbox event for the worker to drive `deleting → deleted` (ready/queued/building). Blocked while traffic_role ≠ INACTIVE.
 
 ---
 
 ## Releases — Build and Activate (one-shot)
 
-### POST /v4/deployments/{id}/build_and_activate
+### POST /v4/deployments/{id}/build_and_activate _(internal — not in public OpenAPI spec)_
 
-Creates a draft release, validates the catalog, transitions to QUEUED, and emits an INSTALL outbox event with `outbox.auto_activate=TRUE` on the column. When the worker finishes the build (`outbox.status='succeeded'`), the SQL trigger `trg_outbox_auto_activate_on_success` flips the release's `traffic_role` to `ACTIVE` (demoting the previous ACTIVE) and emits a `deployment / install` event with the new routing. Atomic equivalent of `POST /releases` + `POST /releases/:rid/build` + `POST /releases/:rid/activate` — without client polling. Use this for the first upload of a deployment to the edge.
+**Optimistic activation** (lib v3 + migration 0052). Creates a release in `state=queued` AND **synchronously** flips routing in the same transaction:
+
+- `releases.traffic_role` of the new release → `ACTIVE` (single_version) or `VALID_URL` (versioned_urls).
+- Previous ACTIVE demoted to `VALID_URL` (skew protection on) or `INACTIVE` (otherwise).
+- New `deployment_versions` row materialized (reused pending draft OR cloned from latest READY) and stamped with `activated_release_id`.
+- Two outbox rows emitted: `release/install` (carrying a `prior_state_snapshot` for rollback) + `deployment/install` (new routing).
+
+The release returns from the API already marked as routing-active — a subsequent `GET` reflects the new state immediately. If the worker reports `outbox.status='error'` (or the user `/cancel`s the build), the lib's dispatcher trigger calls `fn_revert_deployment_build_activate` which restores `traffic_role`, prior ACTIVE, and cleans up the auto-created `deployment_versions` row. The failed release stays in `state=error` (or `state=canceled` for cancel) for inspection and PATCH-and-retry — same semantic as the Python workload pattern.
+
+Atomic equivalent of `POST /releases` + `POST /releases/:rid/build` + `POST /releases/:rid/activate` — without client polling and without waiting for the build to finish before routing flips. Use this for the first upload of a deployment to the edge and any subsequent rollout that should be visible immediately on the API surface.
 
 **Request**
 
 ```json
 {
   "resources": [
-    { "global_id": 521846 }
+    { "global_id": 521846, "resource_type": "application", "version_id": "AAPV0001" },
+    { "resource_id": 318420, "resource_type": "connector", "version_id": "ARSV0001" }
   ],
   "strategy":              { /* optional */ },
   "origin":                { /* optional */ },
@@ -339,9 +373,9 @@ Creates a draft release, validates the catalog, transitions to QUEUED, and emits
 }
 ```
 
-The client supplies only `global_id` per resource — the external REST identity of the upstream entity (positive integer, e.g. an Application or Connector row id). At CREATE the API resolves each `global_id` to its `resource_type` / `resource_id` / `resource_version` via the edge-api `getResourceState(globalIds)` query, then validates composition (exactly one `application`, at-most-one singletons) on the resolved types. `resource_id` / `resource_version` are internal — never accepted in the request, never echoed in the response (which exposes only `global_id` + the resolved `resource_type`), and never surfaced in the outbox payload to the client. A `global_id` the catalog can't resolve → **404**; an unresolvable/invalid type or composition → **422**.
+Each resource carries its identity explicitly. The **application** is sent by `global_id` (its external REST identity) plus `resource_type: "application"` and `version_id` (the resource version short_id); it does **not** carry `resource_id` — the edge-api is the source of truth and resolves the internal `resource_id` from `global_id` via `getResourceStateByGlobalIds`, which we store and pass on the outbox. **Other resources** carry `resource_id` directly: `{ resource_id, resource_type, version_id }`. Composition (exactly one `application`, at-most-one singletons) is validated after resolution. The application's resolved `resource_id` is internal — never echoed in the response (which shows `global_id` + `resource_type` + `version_id` for the application; `resource_id` + `resource_type` + `version_id` for the others). A `global_id` the edge can't confirm → **404**; invalid composition → **422**.
 
-`deployment_version_id` (optional) lets the caller pick **which** `deployment_versions` draft becomes the activated row when the auto-activate trigger fires. Default behavior is "pick the head" (highest `version_number`). With multiple drafts on a deployment, the head may not be the one the caller wants to ship — supply this field to target a specific draft. Validated server-side: the row must belong to `:id` AND be in `state='draft'` (else 422). The use case persists it on `outbox.target_deployment_version_id`; the trigger reads the column and reuses that row instead of the head.
+`deployment_version_id` (optional) lets the caller pick **which** `deployment_versions` draft becomes the activated row. Default behavior is "pick the head" (highest `version_number`). With multiple drafts on a deployment, the head may not be the one the caller wants to ship — supply this field to target a specific draft. Validated server-side: the row must belong to `:id` AND be in `state='draft'` (else 422). The use case threads it into `ReleaseSnapshotService.snapshotForActivation` synchronously.
 
 **Response 202**
 
@@ -349,12 +383,13 @@ The client supplies only `global_id` per resource — the external REST identity
 { "data": { "id": "ARELNEW1", "state": "queued", "trace_id": "fdf67102-a2eb-45ce-92fb-c7dbf1d8e8d2" } }
 ```
 
-`trace_id` is an auto-generated UUIDv4 persisted on `outbox.trace_id` for this build. The auto-activate trigger propagates it onto the follow-on `deployment / install` row so the entire build → activate chain shares one id — index, log, or join on it to trace the async flow.
+`trace_id` is an auto-generated UUIDv4 persisted on `outbox.trace_id` for this build. Both the `release/install` and `deployment/install` rows emitted in the same tx share this id so the entire build → activate chain can be correlated downstream.
 
 - **404** — deployment not found
-- **422** — catalog rejected (resource missing/blocked/unknown type) or composition invalid
+- **409** — `ConcurrentActivation` when another `/build_and_activate` (or `/activate`) is racing on the same deployment and won the partial UNIQUE `idx_unique_active_version`. Caller can retry once the in-flight save commits.
+- **422** — catalog rejected (resource missing/blocked/unknown type), composition invalid, or `VERSIONED_URLS_ACTIVE_LIMIT` reached (the new slot would exceed the cap).
 
-> The outbox event emitted by the auto-activate trigger is **stripped** (no skew/candidate cookies). A subsequent `/activate` or `PATCH /strategy` re-emits the full doc.
+> The compensating `deployment/install` event emitted by `fn_revert_deployment_build_activate` on rollback is also stripped (no skew/candidate cookies) and re-emits the restored routing. A subsequent `/activate` or `PATCH /strategy` re-emits the full doc.
 
 ---
 
@@ -364,50 +399,71 @@ Operations on the `releases` table — the URL says **releases**, the table stay
 
 ### POST /v4/deployments/{did}/releases
 
-Creates a release in `state="draft"`. The API resolves each `global_id` against the edge-api catalog at CREATE and validates composition, then persists the draft (resolved `resource_id`/`resource_version` are stored internally). No outbox event is emitted at draft time. Refine via PATCH; finalize via POST on `/releases/:rid/build`. Limit: `DRAFT_LIMIT_PER_DEPLOYMENT` per `(client_id, deployment_id)` (default 20).
+Creates a release in `state="draft"`. The API resolves the application's `global_id` against the edge-api at CREATE and validates composition, then persists the draft. Other resources are stored as supplied (their state is validated later at `/build`). No outbox event is emitted at draft time. Refine via PATCH; finalize via POST on `/releases/:rid/build`. Limit: `DRAFT_LIMIT_PER_DEPLOYMENT` per `(client_id, deployment_id)` (default 20).
 
 **Request**
 
 ```json
 {
   "resources": [
-    { "global_id": 521846 }
+    { "global_id": 521846, "resource_type": "application", "version_id": "AAPV0001" },
+    { "resource_id": 318420, "resource_type": "connector", "version_id": "ARSV0001" }
   ],
   "strategy": { /* optional */ },
   "origin":   { /* optional */ }
 }
 ```
 
-Resources are supplied by `global_id` only (see Build-and-Activate above for the full resolution contract).
+The application is sent by `global_id`; other resources by `resource_id` (see Build-and-Activate above for the full resolution contract).
 
 **Response 202** — `{ "data": { "id": "ARELDRF1", "state": "draft" } }`
 
-- **400** — `global_id` missing / not a positive integer / unknown key (strict)
-- **404** — deployment not found, or a `global_id` the catalog can't resolve
-- **422** — composition invalid / unknown resource type (`43002`), or `43003 DRAFT_LIMIT_EXCEEDED`
+- **400** — malformed resource: application sent by `resource_id`, a standard resource sent by `global_id`, missing `version_id`, non-positive-int id, or an unknown key (strict)
+- **404** — deployment not found, or an application `global_id` the edge can't confirm (`43000`)
+- **422** — composition invalid (`43002`), or `43003 DRAFT_LIMIT_EXCEEDED`
 
 ### GET /v4/deployments/{did}/releases
 
-Lists releases for a deployment. Pagination + optional filters:
+Lists releases for a deployment. Pagination + optional filters + optional ordering.
 
-- `?state=<lifecycle>` — exact match on `releases.state` (`draft`/`queued`/`building`/`ready`/`error`/`canceled`/`archiving`/`archived`).
-- `?traffic_role=active` — **semantic** filter: returns only what is currently serving traffic. Set depends on the deployment's `deployment_policy`:
-    - `single_version` → `ACTIVE` + `CANDIDATE` (CANDIDATE only present during a gradual rollout in progress).
-    - `versioned_urls` → `ACTIVE` + `VALID_URL` (every slot serves traffic via its versioned hostname).
+**Query parameters:**
 
-Both filters can be combined and intersect (e.g. `?state=ready&traffic_role=active`). Only the literal `'active'` is accepted on `traffic_role` — the raw enum is intentionally not exposed (the contextual policy-aware meaning is the useful one).
+| Parameter | Type | Description |
+|---|---|---|
+| `page` | integer | Page number (1-based, default 1, max 1000) |
+| `page_size` | integer | Items per page (default 20, max 100) |
+| `state` | enum | Exact match on `releases.state`: `draft` / `queued` / `building` / `ready` / `error` / `canceled` / `archiving` / `archived` |
+| `traffic_role` | `"active"` | **Semantic** filter — returns only what is currently serving traffic. Actual roles depend on `deployment_policy`: `single_version` → `ACTIVE` + `CANDIDATE`; `versioned_urls` → `ACTIVE` + `VALID_URL`. Only the literal `'active'` is accepted (raw enum not exposed). |
+| `ordering` | string | Comma-separated sort fields. Prefix with `-` for descending. **Allowed:** `id`, `created_at`, `state`, `traffic_role`. **Default:** `-created_at,-id` (newest first). Example: `?ordering=state,-created_at` |
+
+`?state` and `?traffic_role` can be combined and intersect (e.g. `?state=ready&traffic_role=active`).
 
 - **404** — `?traffic_role=active` requires a deployment lookup; unknown `:did` returns `43000 DEPLOYMENT_NOT_FOUND`. Without `traffic_role=active` the list returns an empty page for unknown ids (current behavior).
 
 ### GET /v4/deployments/{did}/releases/{rid}
 
-Reads a single release. Response includes `resources` (each `{ global_id, resource_type }` — `resource_id`/`resource_version` stay internal), `strategy`, `urls`, `kivo`, `origin`, `audit`, `traffic_role`, `state`, etc.
+Reads a single release. Response includes `resources` (each `{ global_id, resource_id, resource_type, version_id }` — the application carries `global_id` with `resource_id: null` since its internal id stays hidden; other resources carry `resource_id` with `global_id: null`), `strategy`, `urls`, `kivo`, `origin`, `audit`, `traffic_role`, `state`, etc.
 
 ### PATCH /v4/deployments/{did}/releases/{rid}
 
-Full-replace patch over a release in `draft` **or** `error` (`resources` as `[{ global_id }]`, `strategy`, `origin`). Body must carry ≥1 of the three. Replacing `resources` re-resolves the `global_id`s against the catalog and re-validates composition. The row stays in its source state — PATCH never transitions to `queued`; the subsequent `/build` does. Admitting `error` here lets a failed release be edited and rebuilt in place without going through delete + recreate. Other states (`canceled`, `queued`, `building`, `ready`, `archived`, `archiving`) are rejected with 409.
+**State-aware** full-replace patch (`resources` — same union shape as create: application by `global_id`, others by `resource_id`; plus `strategy`, `origin`; fields absent are inherited):
 
-- **409** — release is not in `draft` nor `error`
+- **draft** → edited **in place** (iterate on the draft before `/build`); stays `draft`.
+- **ready / error / canceled / archived** → **cloned** into a brand-new `draft` carrying the source's composition + the override. The source row is left untouched. Build + activate the clone afterward (or use `/patch_and_activate`). Subject to the draft cap.
+- **queued / building** → **409** (in-flight, racing the worker).
+- **deleting / deleted** → hidden → **404**.
+
+Returns the (in-place or newly-cloned) draft.
+- **404** — release not found (or in a gone state)
+- **409** — in-flight (`queued`/`building`)
+
+### POST /v4/deployments/{did}/releases/{rid}/patch_and_activate _(internal — not in public OpenAPI spec)_
+
+One-shot "edit + roll out": **clone** the release with the payload override (`resources?`/`strategy?`/`origin?`), **build** it, and **activate** the clone — in a single call. Delegates to `/build_and_activate` and inherits its optimistic-activation semantic (the clone becomes `ACTIVE` synchronously; rollback on worker error or cancel). Works for both policies (single_version swaps the active pointer; versioned_urls adds the clone to the valid-URL set). Equivalent to PATCH-clone + `/build_and_activate` in one request.
+
+**Response 202** — `{ "data": { "id": "ARELNEW1", "state": "queued", "trace_id": "..." } }`
+- **404** — source release not found
+- **422** — catalog/composition validation failed
 
 ### POST /v4/deployments/{did}/releases/{rid}/build
 
@@ -422,16 +478,18 @@ Full-replace patch over a release in `draft` **or** `error` (`resources` as `[{ 
 
 ### DELETE /v4/deployments/{did}/releases/{rid}
 
-Hard-deletes a release on the Control Plane. Non-draft deletes also emit a `release / delete` outbox row so the worker reclaims the Data Plane artifacts (Kivo, edge build cache).
+Soft-deletes a release, with **canonical (Python-aligned, `@azion/versioning` v2.5) routing**:
 
-**Gating** — a release can be deleted in any state **except** the intermediate worker-driven states (`queued`/`building`/`archiving`), and only when it isn't currently routing traffic. Concretely:
+- `ready` / `queued` / `building` (present/about-to-be on the edge) → `deleting` + emit `release / delete`; the state-sync trigger drives `deleting → deleted` on worker success.
+- `draft` / `error` / `canceled` / `archived` (never on the edge or already superseded) → **direct** to `deleted` (no outbox; metadata cleanup).
+- `deleting` / `deleted` → hidden → **404**.
 
-- `draft` → always allowed; no outbox emitted.
-- `ready`, `error`, `canceled`, `archived` → allowed when `traffic_role === 'INACTIVE'`. Outbox emitted (`release / delete`).
-- `queued`/`building`/`archiving` → **409 `VersionInProcessing`** (call `/cancel` first).
-- `traffic_role !== 'INACTIVE'` (ACTIVE / CANDIDATE / VALID_URL) → **409 `VersionStillReferenced`** (demote first via `/activate` of another release, `/rollback`, etc.).
+**In-use gate (policy-aware)** — a release that is currently routing cannot be deleted:
 
-The previous "must `/archive` first when state is `ready`" rule was dropped — a ready release already demoted out of routing is deletable directly.
+- **single_version**: `ACTIVE` or `CANDIDATE` → **409 `VersionStillReferenced`**. `VALID_URL` (a parked previous active) and `INACTIVE` are deletable.
+- **versioned_urls**: a release with role `ACTIVE`/`VALID_URL` is blocked **only when it is the last valid release** (deleting it would empty `valid_releases`); if other valid releases remain, it can be deleted.
+
+`queued`/`building` no longer require `/cancel` first — they soft-delete via the outbox.
 
 ---
 
@@ -447,10 +505,10 @@ Cancels a queued or building release.
 
 ### POST /v4/deployments/{did}/releases/{rid}/archive
 
-Archives a READY release. Required body: `reason` (`SUPERSEDED | SECURITY_ISSUE | POLICY_VIOLATION | MANUAL`) + optional `comment`.
+Archives a release in an archivable state (`ready`/`draft`/`error`/`canceled`, per `@azion/versioning` v2.5). Canonical routing: `ready` → `archiving` + emit `release / delete` (worker reclaims edge artifacts; trigger drives `archiving → archived`); `draft`/`error`/`canceled` → **direct** to `archived` (no outbox). Same **policy-aware in-use gate** as delete (an ACTIVE/CANDIDATE single_version release, or the last valid versioned_urls release, cannot be archived). Required body: `reason` (`SUPERSEDED | SECURITY_ISSUE | POLICY_VIOLATION | MANUAL`) + optional `comment`.
 
-- **202** — async transition (returns `{data: {id, state}}`)
-- **409** — release is `ACTIVE` (must demote first) or still referenced
+- **202** — async transition (returns `{data: {id, state: "archiving" | "archived"}}`)
+- **409** — release is still routing → `VersionStillReferenced`; or not archivable → `InvalidStateTransition`
 
 ### POST /v4/deployments/{did}/releases/{rid}/promote
 
@@ -478,17 +536,24 @@ In addition to the routing update, every INSTANT activate (and `versioned_urls` 
 
 GRADUAL activations (CANDIDATE only) skip the snapshot — it fires when the candidate is later promoted to ACTIVE.
 
-The same logic applies to the `/build_and_activate` auto-activate path inside trigger `trg_outbox_auto_activate_on_success`.
+The same `ReleaseSnapshotService.snapshotForActivation` is reused by `/build_and_activate` (which inlines it into the optimistic-save transaction).
 
 **Request** — `{ "strategy": { /* optional override */ }, "deployment_version_id": "ADEPVTGT" /* optional */ }`
 
-When omitted, the head (highest `version_number`) is used. When provided, must reference a `deployment_versions` row of `:did` in `state='draft'` (else 422 Validation). For the sync `/activate` path the failure is loud (the request fails); the async `/build_and_activate` trigger silently falls back to the head when an override is stale (so a long-running build doesn't fail because the targeted draft was already promoted by a concurrent activate).
+When omitted, the head (highest `version_number`) is used. When provided, must reference a `deployment_versions` row of `:did` in `state='draft'` (else 422 Validation). Both sync `/activate` and `/build_and_activate` validate this loud (the request fails on a stale id).
+
+**CANDIDATE uniqueness invariant** — a deployment has **at most one** active `CANDIDATE` at a time. Activating with `strategy.rollout_mode = GRADUAL` when a different release is already `CANDIDATE` returns **422 `CandidateAlreadyExists`**. Re-issuing GRADUAL on the same `:rid` (idempotent strategy refresh) is allowed. To start a new canary you must first either **promote** the existing candidate (INSTANT activate) or **rollback** it (see below).
+
 - **202** — `{ "data": { "id": "ARELACT1", "state": "ready" } }`
-- **422** — `VERSIONED_URLS_ACTIVE_LIMIT` exceeded, or `deployment_version_id` is unknown / belongs to another deployment / is not `draft`
+- **409** — `ConcurrentActivation` when another activate/build_and_activate is racing on the same deployment (partial UNIQUE `idx_unique_active_version`). Caller can retry.
+- **422** — `VERSIONED_URLS_ACTIVE_LIMIT` exceeded; `deployment_version_id` unknown / cross-deployment / not `draft`; or `CandidateAlreadyExists` when a concurrent CANDIDATE blocks a new GRADUAL activate.
 
 ### POST /v4/deployments/{did}/releases/{rid}/rollback
 
-Rolls back `ACTIVE` on a `single_version` deployment to a previously routed release (must be in `state=ready`). Snapshots the deployment build-config under the same rule as `/activate`.
+Single_version only. Two semantically distinct flows share the verb, dispatched by the target release's current `traffic_role`:
+
+1. **Restore a previously-routed release** (`:rid` in `VALID_URL`/`INACTIVE`, or idempotent on the current `ACTIVE`) → make `:rid` the new ACTIVE. Demotes the current ACTIVE to `VALID_URL` (if skew on) or `INACTIVE`. Snapshots the deployment build-config under the same rule as `/activate`.
+2. **Abandon an active canary** (`:rid` in `CANDIDATE`) → demote `:rid` to `VALID_URL` (if the current ACTIVE has skew on) or `INACTIVE`. The current ACTIVE stays put; the deployment doc is re-emitted with `candidate: null`. No snapshot is taken (no new release becomes active). Pair this with `/activate` again for a fresh canary attempt.
 
 **Request** — `{ "reason": "operator-supplied", "comment": "optional" }`
 - **422** — deployment policy is `versioned_urls`
@@ -498,7 +563,9 @@ Rolls back `ACTIVE` on a `single_version` deployment to a previously routed rele
 Mutates `releases.strategy` for the ACTIVE release (`single_version` only). Partial merge of `gradual_rollout` / `skew_protection`.
 
 - **200** — `{ "data": { "deployment_id": "...", "release_id": "...", "strategy": {...} } }`
-- **422** — release is not ACTIVE or deployment is `versioned_urls`
+- **422** — release is not ACTIVE or deployment is `versioned_urls`; or `strategy.gradual_rollout.candidate_from_release_id` references a release of a different deployment.
+
+> **Cross-resource invariant:** any persisted `strategy.gradual_rollout.candidate_from_release_id` (here, on `/strategy`, `/activate`, `/build_and_activate`, `POST /releases`, and `PATCH /releases/:rid`) must point at a release of the same `:did`. Cross-deployment references are rejected with **422 Validation** (`field: strategy.gradual_rollout.candidate_from_release_id`).
 
 ---
 
@@ -519,7 +586,7 @@ API-driven transitions: `create draft`, `finalize` (POST on `:vid/build` or `:ri
 
 For `releases`, `traffic_role` is orthogonal to `state` and controls routing. The partial UNIQUE index `idx_unique_active_version` enforces **one `ACTIVE` per `deployment_id`**.
 
-The one-shot `POST /build_and_activate` sets `outbox.auto_activate=TRUE` on the new column (the marker lives outside `message.payload` because the Config Builder rejects unknown payload keys as resource_type variants). When the worker writes `outbox.status='succeeded'`, the trigger `trg_outbox_auto_activate_on_success` flips the release's `traffic_role` to `ACTIVE` and emits a `deployment / install` event with the new routing. On `status='error'`, a sibling trigger clears the column so retries do not silently re-activate.
+The one-shot `POST /build_and_activate` is **optimistic** (lib v3 + migration 0052): the synchronous save flips `traffic_role` + materializes the `deployment_versions` row + emits both `release/install` (with a `prior_state_snapshot` carrying everything needed to undo) and `deployment/install`. If the worker writes `outbox.status='error'` (or the user `/cancel`s the build), the lib's generic dispatcher trigger calls `fn_revert_deployment_build_activate` which atomically restores the pre-save state. The failed release stays in `state=error` (or `state=canceled`) for inspection and PATCH-and-retry — same semantic as the Python `workload` pattern.
 
 ---
 

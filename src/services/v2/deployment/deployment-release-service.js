@@ -45,6 +45,8 @@ const parseItemResponse = (data) => {
   return data
 }
 
+const DEFAULT_RELEASES_ORDERING = '-created_at,-id'
+
 const buildApiListParams = (params = {}) => {
   const page = Number(params.page) > 0 ? Number(params.page) : 1
 
@@ -56,9 +58,15 @@ const buildApiListParams = (params = {}) => {
       ? params.state.trim()
       : undefined
 
+  const ordering =
+    typeof params.ordering === 'string' && params.ordering.trim().length > 0
+      ? params.ordering.trim()
+      : DEFAULT_RELEASES_ORDERING
+
   return {
     page,
     page_size: pageSize,
+    ordering,
     ...(state ? { state } : {})
   }
 }

@@ -70,6 +70,7 @@
     v-model:visible="visibleDrawer"
     title="Deployment Details"
     width-class="max-w-6xl"
+    :bottom-sheet-on-mobile="true"
   >
     <template #header-actions>
       <a

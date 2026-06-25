@@ -72,7 +72,8 @@ export class WorkloadService extends BaseService {
 
   loadWorkloadBindings = async (id) => {
     const { data } = await this.http.request({ method: 'GET', url: `${this.baseURL}/${id}` })
-    return Array.isArray(data?.bindings) ? data.bindings : []
+    const workload = data?.data ?? data
+    return Array.isArray(workload?.bindings) ? workload.bindings : []
   }
 
   prefetchList = (pageSize = 10) => {

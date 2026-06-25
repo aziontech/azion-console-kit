@@ -1,15 +1,18 @@
 <script setup>
   import { computed, ref, useSlots } from 'vue'
+  import { useMediaQuery } from '@vueuse/core'
   import DataView from 'primevue/dataview'
   import PrimeButton from '@aziontech/webkit/button'
   import Dropdown from '@aziontech/webkit/dropdown'
   import InputText from '@aziontech/webkit/inputtext'
   import Skeleton from '@aziontech/webkit/skeleton'
   import Menu from '@aziontech/webkit/menu'
+  import OverlayPanel from '@aziontech/webkit/overlaypanel'
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
 
   import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
+  import VersionActionSheet from '@/components/VersionListDataView/VersionActionSheet.vue'
   import {
     buildVersionMenuItems,
     mapVersionMenuItemsToMenu
@@ -226,23 +229,35 @@
     return 'align-start'
   }
 
-  const mobileSlotMap = computed(() => {
-    const map = { primary: null, secondary: null, badge: null, body: [], footer: [] }
-    for (const col of visibleColumns.value) {
-      const slot = col?.mobileSlot
-      if (!slot || slot === 'hidden') continue
-      if (slot === 'body' || slot === 'footer') {
-        map[slot].push(col)
-      } else if (slot in map) {
-        map[slot] = col
-      }
-    }
-    return map
+  // Card layout is the default responsive presentation (< lg). The card model is
+  // derived from `visibleColumns`: the `version` column is the title, `status`
+  // renders unlabeled below it, and the rest become labeled rows. Explicit
+  // `mobileSlot` hints still win when provided.
+  const cardPrimaryColumn = computed(() => {
+    const explicit = visibleColumns.value.find((col) => col?.mobileSlot === 'primary')
+    if (explicit) return explicit
+    return (
+      visibleColumns.value.find((col) => col?.key === 'version') || visibleColumns.value[0] || null
+    )
   })
 
-  const hasMobileCardLayout = computed(() =>
-    visibleColumns.value.some((col) => col?.mobileSlot && col.mobileSlot !== 'hidden')
+  const cardStatusColumn = computed(
+    () =>
+      visibleColumns.value.find(
+        (col) =>
+          col?.mobileSlot === 'status' || col?.mobileSlot === 'badge' || col?.key === 'status'
+      ) || null
   )
+
+  const cardFieldColumns = computed(() => {
+    const primaryKey = cardPrimaryColumn.value?.key
+    const statusKey = cardStatusColumn.value?.key
+    return visibleColumns.value.filter(
+      (col) => col?.key !== primaryKey && col?.key !== statusKey && col?.mobileSlot !== 'hidden'
+    )
+  })
+
+  const hasMobileCardLayout = computed(() => visibleColumns.value.length > 0)
 
   const isPrimaryColumn = (column) => column?.key === 'version'
 
@@ -287,6 +302,12 @@
   const overflowMenuRef = ref(null)
   const rowMenuModel = ref([])
 
+  // On phones the popup menu is cramped against the trigger; the same model is
+  // presented as a bottom action sheet instead (popup stays on tablet/desktop).
+  const isMobileSheet = useMediaQuery('(max-width: 767.98px)')
+  const actionSheetVisible = ref(false)
+  const actionSheetVersion = ref(null)
+
   // Opening the kebab must not bubble into the row click (Req 2.4). The model is
   // built by the shared mapper so every listing renders an identical menu (Req 1.4).
   const openRowMenu = (event, version) => {
@@ -297,7 +318,33 @@
       (payload) => emit('row-action', payload),
       version
     )
+    if (isMobileSheet.value) {
+      actionSheetVersion.value = version
+      actionSheetVisible.value = true
+      return
+    }
     overflowMenuRef.value?.toggle?.(event)
+  }
+
+  // Below `lg` the filter + sort dropdowns are collapsed behind a single filter
+  // button + overlay so they don't crowd the toolbar.
+  const isCompactViewport = useMediaQuery('(max-width: 1023.98px)')
+
+  const hasCollapsibleFilters = computed(
+    () => props.filters.length > 0 || props.sortOptions.length > 0 || !!slots['toolbar-extras']
+  )
+
+  const activeFilterCount = computed(() =>
+    props.filters.reduce((count, filter) => {
+      const value = resolveFilterValue(filter)
+      const isActive = value != null && value !== '' && value !== filter?.defaultValue
+      return count + (isActive ? 1 : 0)
+    }, 0)
+  )
+
+  const filtersOverlayRef = ref(null)
+  const toggleFiltersOverlay = (event) => {
+    filtersOverlayRef.value?.toggle?.(event)
   }
 </script>
 
@@ -307,8 +354,26 @@
     data-testid="version-list-data-view"
   >
     <div class="flex flex-wrap items-center justify-between gap-2">
-      <div class="dataview-toolbar flex w-full flex-wrap items-center gap-2 md:flex-1">
-        <span class="dataview-search p-input-icon-left w-full sm:min-w-80 sm:flex-1">
+      <div class="dataview-toolbar flex min-w-0 flex-1 flex-wrap items-center gap-2">
+        <button
+          v-if="isCompactViewport && hasCollapsibleFilters"
+          type="button"
+          class="filter-toggle"
+          :aria-label="sortAriaLabel"
+          data-testid="version-list-data-view__filters-toggle"
+          @click="toggleFiltersOverlay"
+        >
+          <i class="pi pi-filter" />
+          <span class="filter-toggle-label">Filters</span>
+          <span
+            v-if="activeFilterCount"
+            class="filter-toggle-badge"
+          >
+            {{ activeFilterCount }}
+          </span>
+        </button>
+
+        <span class="dataview-search p-input-icon-left min-w-0 flex-1 sm:min-w-80">
           <i class="pi pi-search text-[var(--text-color-secondary)]" />
           <InputText
             v-model="searchValue"
@@ -318,36 +383,71 @@
             data-testid="version-list-data-view__search"
           />
         </span>
-        <Dropdown
-          v-for="filter in filters"
-          :key="filter.key"
-          :modelValue="resolveFilterValue(filter)"
-          :options="filter.options"
-          :pt="dropdownPt"
-          :optionLabel="filter.optionLabel || 'label'"
-          :optionValue="filter.optionValue || 'value'"
-          :aria-label="filter.placeholder"
-          class="dataview-control dataview-dropdown dataview-dropdown-min min-w-0 w-full sm:w-auto"
-          :placeholder="filter.placeholder"
-          :data-testid="`version-list-data-view__filter-${filter.key}`"
-          @update:modelValue="updateFilterValue(filter.key, $event)"
-        />
-        <Dropdown
-          v-if="sortOptions.length"
-          v-model="sortValue"
-          :options="sortOptions"
-          :pt="dropdownPt"
-          optionLabel="label"
-          optionValue="value"
-          :aria-label="sortAriaLabel"
-          class="dataview-control dataview-dropdown dataview-dropdown-min min-w-0 w-full sm:w-auto"
-          :placeholder="sortAriaLabel"
-          data-testid="version-list-data-view__sort"
-        />
-        <slot name="toolbar-extras" />
+
+        <template v-if="!isCompactViewport">
+          <Dropdown
+            v-for="filter in filters"
+            :key="filter.key"
+            :modelValue="resolveFilterValue(filter)"
+            :options="filter.options"
+            :pt="dropdownPt"
+            :optionLabel="filter.optionLabel || 'label'"
+            :optionValue="filter.optionValue || 'value'"
+            :aria-label="filter.placeholder"
+            class="dataview-control dataview-dropdown dataview-dropdown-min min-w-0 w-full sm:w-auto"
+            :placeholder="filter.placeholder"
+            :data-testid="`version-list-data-view__filter-${filter.key}`"
+            @update:modelValue="updateFilterValue(filter.key, $event)"
+          />
+          <Dropdown
+            v-if="sortOptions.length"
+            v-model="sortValue"
+            :options="sortOptions"
+            :pt="dropdownPt"
+            optionLabel="label"
+            optionValue="value"
+            :aria-label="sortAriaLabel"
+            class="dataview-control dataview-dropdown dataview-dropdown-min min-w-0 w-full sm:w-auto"
+            :placeholder="sortAriaLabel"
+            data-testid="version-list-data-view__sort"
+          />
+          <slot name="toolbar-extras" />
+        </template>
+
+        <OverlayPanel ref="filtersOverlayRef">
+          <div class="dataview-filters-overlay-content">
+            <template v-if="isCompactViewport">
+              <Dropdown
+                v-for="filter in filters"
+                :key="filter.key"
+                :modelValue="resolveFilterValue(filter)"
+                :options="filter.options"
+                :pt="dropdownPt"
+                :optionLabel="filter.optionLabel || 'label'"
+                :optionValue="filter.optionValue || 'value'"
+                :aria-label="filter.placeholder"
+                class="dataview-control dataview-dropdown min-w-0 w-full"
+                :placeholder="filter.placeholder"
+                @update:modelValue="updateFilterValue(filter.key, $event)"
+              />
+              <Dropdown
+                v-if="sortOptions.length"
+                v-model="sortValue"
+                :options="sortOptions"
+                :pt="dropdownPt"
+                optionLabel="label"
+                optionValue="value"
+                :aria-label="sortAriaLabel"
+                class="dataview-control dataview-dropdown min-w-0 w-full"
+                :placeholder="sortAriaLabel"
+              />
+              <slot name="toolbar-extras" />
+            </template>
+          </div>
+        </OverlayPanel>
       </div>
 
-      <div class="flex w-full items-center justify-end gap-2 sm:w-auto">
+      <div class="flex flex-none items-center justify-end gap-2">
         <slot name="toolbar-actions"> </slot>
       </div>
     </div>
@@ -590,33 +690,52 @@
                 <div
                   v-if="hasMobileCardLayout"
                   class="card-view"
+                  @click="triggerRowClick(version)"
                 >
-                  <div class="card-top">
+                  <div class="card-head">
                     <div
-                      v-if="mobileSlotMap.primary"
-                      class="card-primary"
+                      v-if="cardPrimaryColumn"
+                      class="card-title"
                     >
                       <slot
-                        :name="`cell-${mobileSlotMap.primary.key}`"
+                        :name="`cell-${cardPrimaryColumn.key}`"
                         :item="version"
-                        :column="mobileSlotMap.primary"
-                        :isPrimary="isPrimaryColumn(mobileSlotMap.primary)"
+                        :column="cardPrimaryColumn"
+                        :isPrimary="isPrimaryColumn(cardPrimaryColumn)"
                         :onPrimaryClick="() => triggerRowClick(version)"
-                      />
-                    </div>
-                    <div
-                      v-if="mobileSlotMap.badge"
-                      class="card-badge"
-                    >
-                      <slot
-                        :name="`cell-${mobileSlotMap.badge.key}`"
-                        :item="version"
-                        :column="mobileSlotMap.badge"
-                      />
+                        :cardMode="true"
+                      >
+                        <template v-if="cardPrimaryColumn.key === 'version'">
+                          <span class="inline-flex max-w-full min-w-0 flex-wrap items-center gap-2">
+                            <span class="version-hash font-mono text-sm font-semibold leading-5">
+                              {{ version.id }}
+                            </span>
+                            <span
+                              v-if="version.state === 'active'"
+                              class="version-current-tag inline-flex items-center gap-1 rounded text-xs font-medium leading-4"
+                            >
+                              <i class="pi pi-circle-on" />
+                              Current
+                            </span>
+                          </span>
+                          <span
+                            v-if="version.comment"
+                            class="version-comment mt-1 block min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs text-[var(--text-color-secondary)]"
+                          >
+                            {{ version.comment }}
+                          </span>
+                        </template>
+                        <span
+                          v-else
+                          class="cell-default"
+                        >
+                          {{ resolveDisplayValue(version, cardPrimaryColumn) }}
+                        </span>
+                      </slot>
                     </div>
                     <PrimeButton
                       v-if="showRowActions && hasRowActions(version)"
-                      class="card-more version-row-menu__trigger"
+                      class="card-kebab version-row-menu__trigger"
                       icon="pi pi-ellipsis-v"
                       text
                       severity="secondary"
@@ -624,53 +743,34 @@
                       @click="openRowMenu($event, version)"
                     />
                   </div>
+
                   <div
-                    v-if="slots['mobile-secondary']"
-                    class="card-secondary"
+                    v-if="cardStatusColumn"
+                    class="card-status"
                   >
                     <slot
-                      name="mobile-secondary"
+                      :name="`cell-${cardStatusColumn.key}`"
                       :item="version"
-                    />
-                  </div>
-                  <div
-                    v-else-if="mobileSlotMap.secondary"
-                    class="card-secondary"
-                  >
-                    <slot
-                      :name="`cell-${mobileSlotMap.secondary.key}`"
-                      :item="version"
-                      :column="mobileSlotMap.secondary"
-                    />
-                  </div>
-                  <div
-                    v-if="mobileSlotMap.body.length"
-                    class="card-body"
-                  >
-                    <div
-                      v-for="col in mobileSlotMap.body"
-                      :key="col.key"
-                      class="card-body-row"
+                      :column="cardStatusColumn"
+                      :cardMode="true"
                     >
-                      <slot
-                        :name="`cell-${col.key}`"
-                        :item="version"
-                        :column="col"
-                      />
-                    </div>
+                      <VersionStateBadge :state="version.state" />
+                    </slot>
                   </div>
+
                   <div
-                    v-if="mobileSlotMap.footer.length"
+                    v-if="cardFieldColumns.length"
                     class="card-divider"
                   />
+
                   <div
-                    v-if="mobileSlotMap.footer.length"
-                    class="card-footer"
+                    v-if="cardFieldColumns.length"
+                    class="card-fields"
                   >
                     <div
-                      v-for="col in mobileSlotMap.footer.slice(0, 2)"
+                      v-for="col in cardFieldColumns"
                       :key="col.key"
-                      class="card-field"
+                      class="card-field-row"
                     >
                       <span class="card-field-label">{{ col.mobileLabel || col.label }}</span>
                       <div class="card-field-value">
@@ -678,7 +778,33 @@
                           :name="`cell-${col.key}`"
                           :item="version"
                           :column="col"
-                        />
+                          :cardMode="true"
+                        >
+                          <template v-if="col.key === 'created'">
+                            <span
+                              class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm text-[var(--text-color)]"
+                            >
+                              {{
+                                version.createdAt
+                                  ? formatDateToDayMonthYearHour(version.createdAt)
+                                  : '--'
+                              }}
+                            </span>
+                            <span
+                              class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs text-[var(--text-color-secondary)]"
+                              data-sentry-mask
+                            >
+                              {{ version.lastEditor || 'azion@azion.com' }}
+                            </span>
+                          </template>
+                          <span
+                            v-else-if="col.key === 'inUse'"
+                            class="in-use-count text-sm text-[var(--text-color)]"
+                          >
+                            {{ resolveReferenceCount(version) }}
+                          </span>
+                          <span v-else>{{ resolveDisplayValue(version, col) }}</span>
+                        </slot>
                       </div>
                     </div>
                   </div>
@@ -714,6 +840,13 @@
         </a>
       </template>
     </Menu>
+
+    <VersionActionSheet
+      v-model:visible="actionSheetVisible"
+      :title="actionSheetVersion?.id"
+      :state="actionSheetVersion?.state"
+      :items="rowMenuModel"
+    />
   </div>
 </template>
 
@@ -964,6 +1097,52 @@
     display: none;
   }
 
+  .filter-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 2.5rem;
+    padding: 0 0.875rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 0.375rem;
+    background: var(--surface-section);
+    color: var(--text-color);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.5rem;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .filter-toggle:hover {
+    background: var(--surface-ground);
+  }
+
+  .filter-toggle-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.125rem;
+    height: 1.125rem;
+    padding: 0 0.3125rem;
+    border-radius: 9999px;
+    background: var(--primary-color);
+    color: var(--primary-color-text);
+    font-size: 0.6875rem;
+    font-weight: 600;
+  }
+
+  .dataview-filters-overlay-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-width: 13rem;
+  }
+
+  .dataview-filters-overlay-content :deep(.p-dropdown) {
+    width: 100%;
+  }
+
   @media (max-width: 1023.98px) {
     .table-scroll {
       overflow-x: visible;
@@ -975,44 +1154,6 @@
 
     .header-row {
       display: none;
-    }
-
-    .data-row {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 1rem;
-      min-height: 0;
-      padding: 1rem;
-    }
-
-    .cell {
-      align-items: flex-start;
-      justify-content: flex-start;
-      text-align: left;
-      gap: 1rem;
-    }
-
-    .cell .cell-content {
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-
-    .mobile-label {
-      display: block;
-      width: min(35%, 7.5rem);
-      flex-shrink: 0;
-      font-size: 0.625rem;
-      font-weight: 400;
-      line-height: 1.25rem;
-      text-transform: uppercase;
-      letter-spacing: 0.0625rem;
-      color: var(--text-color-secondary);
-    }
-
-    .actions-cell {
-      width: 100%;
-      justify-content: flex-end;
     }
 
     .has-card-layout .data-row.card-row {
@@ -1037,112 +1178,88 @@
     .has-card-layout .card-view {
       display: flex;
       flex-direction: column;
-      gap: 0.5625rem;
-      padding: 0.8125rem 0.875rem;
+      padding: 0.875rem;
       border: 1px solid var(--surface-border);
       border-radius: 0.75rem;
       background: var(--surface-section);
+      cursor: pointer;
       transition: border-color 0.12s ease;
       min-width: 0;
     }
 
-    .has-card-layout .card-view:active {
+    .has-card-layout .card-view:hover {
       border-color: var(--text-color-secondary);
     }
 
-    .card-top {
+    .card-head {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
+      justify-content: space-between;
       gap: 0.5rem;
       min-width: 0;
     }
 
-    .card-primary {
+    .card-title {
       flex: 1;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
       font-size: 0.9375rem;
       font-weight: 600;
     }
 
-    .card-badge {
-      flex-shrink: 0;
+    .card-kebab {
+      flex: none;
+      margin: -0.25rem -0.25rem 0 0;
     }
 
-    .card-more {
-      flex-shrink: 0;
-    }
-
-    .card-secondary {
-      font-family: var(--font-mono, ui-monospace, monospace);
-      font-size: 0.6875rem;
-      color: var(--text-color-secondary);
-      margin-top: -0.1875rem;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .card-body {
-      display: flex;
-      flex-direction: column;
-      gap: 0.375rem;
-      min-width: 0;
-    }
-
-    .card-body-row {
-      min-width: 0;
-      font-size: 0.8125rem;
-      color: var(--text-color-secondary);
+    .card-status {
+      margin-top: 0.75rem;
     }
 
     .card-divider {
       height: 1px;
       background: var(--surface-border);
-      margin: 0.0625rem 0;
+      margin: 0.875rem 0;
     }
 
-    .card-footer {
-      display: grid;
-      grid-template-columns: 1fr 1.3fr;
-      gap: 0.625rem 0.875rem;
-    }
-
-    .card-field {
+    .card-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
       min-width: 0;
+    }
+
+    .card-field-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+      min-width: 0;
+      font-size: 0.8125rem;
     }
 
     .card-field-label {
-      display: block;
-      font-size: 0.625rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      flex: none;
+      padding-top: 0.0625rem;
       color: var(--text-color-secondary);
-      margin-bottom: 0.1875rem;
     }
 
     .card-field-value {
-      font-size: 0.78125rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      min-width: 0;
+      text-align: right;
       color: var(--text-color);
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .card-field-value :deep(*) {
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
   }
 
-  @media (min-width: 640px) and (max-width: 1023.98px) {
+  /* Tablet: two-column card grid */
+  @media (min-width: 768px) and (max-width: 1023.98px) {
     .has-card-layout :deep(.p-grid) {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: 1fr 1fr;
       align-content: start;
       gap: 0.75rem;
       padding: 1rem;
@@ -1150,22 +1267,34 @@
     }
   }
 
-  @media (max-width: 639.98px) {
-    .cell {
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .mobile-label {
-      width: 100%;
-    }
-
+  /* Mobile: single-column cards + icon-only filter button */
+  @media (max-width: 767.98px) {
     .has-card-layout :deep(.p-grid) {
       display: grid;
       grid-template-columns: 1fr;
       gap: 0.625rem;
       padding: 0.75rem;
       margin: 0;
+    }
+
+    .filter-toggle {
+      position: relative;
+      width: 2.5rem;
+      padding: 0;
+      justify-content: center;
+    }
+
+    .filter-toggle-label {
+      display: none;
+    }
+
+    .filter-toggle-badge {
+      position: absolute;
+      top: -0.25rem;
+      right: -0.25rem;
+      min-width: 1rem;
+      height: 1rem;
+      padding: 0;
     }
   }
 

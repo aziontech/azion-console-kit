@@ -94,7 +94,7 @@ export class VersionServiceBase extends BaseService {
   updateDraft = async (resourceId, versionId, values = {}) => {
     const payload = this.adapter?.transformDraftPayload?.(values) ?? values
     const { data } = await this.http.request({
-      method: 'PUT',
+      method: 'PATCH',
       url: this.getUrl(resourceId, versionId),
       body: payload
     })
