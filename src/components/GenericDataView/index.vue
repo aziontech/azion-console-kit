@@ -1081,6 +1081,8 @@
 
   :deep(.p-paginator .p-dropdown) {
     height: 2rem;
+    width: auto;
+    min-width: 4rem;
     margin-left: 0.25rem;
     border-color: var(--surface-border);
     border-radius: 0.375rem;
@@ -1094,7 +1096,7 @@
     line-height: 1.5;
   }
 
-  :deep(.p-paginator .p-inputtext) {
+  :deep(.p-paginator .p-paginator-page-input .p-inputtext) {
     width: 2rem;
     height: 2rem;
     padding: 0.25rem;

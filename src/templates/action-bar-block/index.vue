@@ -11,6 +11,7 @@
     loading: Boolean,
     inDrawer: Boolean,
     cancelDisabled: Boolean,
+    submitDisabled: Boolean,
     primaryActionLabel: { type: String, default: 'Save' },
     secondaryActionLabel: { type: String, default: 'Cancel' }
   })
@@ -55,6 +56,7 @@
           <ButtonSave
             :label="props.primaryActionLabel"
             :loading="isDisabledSubmit"
+            :disabled="props.submitDisabled"
             class="max-md:w-full md:min-w-[5rem]"
             data-testid="form-actions-submit-button"
             @click="handleSubmit"

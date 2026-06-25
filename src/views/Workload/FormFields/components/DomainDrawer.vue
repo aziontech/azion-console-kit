@@ -17,6 +17,7 @@
 
   const DOMAIN_TYPE = { AZION: 'azion', OWN: 'own' }
   const AZION_APP_SUFFIX = '.azion.app'
+  const SINGLE_VERSION_POLICY = 'single_version'
 
   const stripAzionSuffix = (value) =>
     typeof value === 'string' && value.endsWith(AZION_APP_SUFFIX)
@@ -82,6 +83,14 @@
     useHttps: {
       type: Boolean,
       default: false
+    },
+    lockedSingleVersionEnvironmentId: {
+      type: [String, Number],
+      default: null
+    },
+    azionDomainEnvironmentIds: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -137,6 +146,12 @@
 
   const isAzionDomain = computed(() => values.domainType === DOMAIN_TYPE.AZION)
 
+  const hasAzionDomainConflict = computed(() => {
+    if (!isAzionDomain.value) return false
+    if (values.environment == null) return false
+    return props.azionDomainEnvironmentIds.some((id) => String(id) === String(values.environment))
+  })
+
   const dropdownPt = computed(() => ({
     trigger: {
       class: [
@@ -156,6 +171,15 @@
   }))
 
   const onDomainTypeChange = (value) => setFieldValue('domainType', value)
+
+  const isEnvironmentOptionDisabled = (option) => {
+    if (option?.deployment_policy !== SINGLE_VERSION_POLICY) return false
+    const optionId = String(option.value)
+    if (optionId === String(values.environment)) return false
+    const lockedId = props.lockedSingleVersionEnvironmentId
+    if (lockedId === null || lockedId === undefined) return false
+    return optionId !== String(lockedId)
+  }
 
   const digitalCertificateDrawerRef = ref(null)
   const certificateStatus = ref('')
@@ -191,6 +215,7 @@
   })
 
   const onSave = handleSubmit((formValues) => {
+    if (hasAzionDomainConflict.value) return
     const isAzion = formValues.domainType === DOMAIN_TYPE.AZION
     const composedDomain = isAzion ? `${formValues.domain}${AZION_APP_SUFFIX}` : formValues.domain
 
@@ -269,7 +294,7 @@
             name="domain"
             required
           />
-          <div class="domain-drawer__domain-control flex items-stretch">
+          <div class="domain-drawer__domain-control flex items-start">
             <FieldDropdown
               name="domain"
               editable
@@ -300,7 +325,6 @@
           type="info"
           description="Your workload is always accessible at a azion.app subdomain based on the workload name. Custom domains allow visitors to access your project at your own domains."
           data-testid="domain-drawer__azion-domain-info"
-          class="max-w-xl"
         />
 
         <div class="flex flex-col gap-2">
@@ -315,12 +339,21 @@
             :loadService="environmentService.loadEnvironmentService"
             optionLabel="name"
             optionValue="value"
+            :moreOptions="['deployment_policy']"
+            :optionDisabled="isEnvironmentOptionDisabled"
             :value="values.environment"
             appendTo="self"
             placeholder="Select an option"
             data-testid="domain-drawer__environment-field"
           />
         </div>
+
+        <MessageCard
+          v-if="hasAzionDomainConflict"
+          type="warning"
+          description="This environment already has an .azion.app domain. Only one Azion domain is allowed per environment."
+          data-testid="domain-drawer__azion-domain-conflict"
+        />
 
         <div
           v-if="useHttps"
@@ -383,6 +416,7 @@
       <ActionBarBlock
         :inDrawer="true"
         primaryActionLabel="Save"
+        :submitDisabled="hasAzionDomainConflict"
         @onSubmit="onSave"
         @onCancel="onCancel"
       />
@@ -397,6 +431,7 @@
 
   .domain-drawer__tag {
     flex-shrink: 0;
+    height: 34px;
   }
 
   .tag-enter-active,
