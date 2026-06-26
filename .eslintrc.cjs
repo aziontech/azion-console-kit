@@ -50,6 +50,22 @@ module.exports = {
       }
     },
     {
+      // new-release-screen feature (spec new-release-screen, Property 1).
+      // The full-page "Review & deploy" surface and its canonical, surface-agnostic
+      // composition blocks (relocated from deploy-drawer-block). The design-system
+      // rule (no raw hex/rgb, fixed-size/palette/typography utilities, non-token
+      // shadows) is a build-breaker on these paths: the feature is complete and the
+      // shared blocks are relocated, so it is promoted to error (task 15.1). The
+      // release store carries no markup, so it is excluded.
+      files: [
+        'src/views/Deployments/v6/**/*.{vue,js}',
+        'src/templates/release-composition/**/*.{vue,js}'
+      ],
+      rules: {
+        'azion-architecture/no-raw-design-values': 'error'
+      }
+    },
+    {
       files: ['cypress/**/*.{cy,spec}.{js,ts,jsx,tsx}'],
       extends: ['plugin:cypress/recommended']
     },
