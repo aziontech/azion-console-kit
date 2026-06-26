@@ -49,6 +49,7 @@
                 title="Deploy Log"
                 :getLogsService="props.getLogsService"
                 :executionId="executionId"
+                :start="true"
                 @onFinish.once="handleFinish"
               />
 
