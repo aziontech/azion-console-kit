@@ -102,7 +102,9 @@ export class DeployDrawerService {
       activeRelease: null,
       activeReleaseName: null,
       workloadCount: null,
-      consumes: false
+      consumes: false,
+      consumedResourceId: null,
+      consumedResourceName: null
     }
   }
 
@@ -124,22 +126,40 @@ export class DeployDrawerService {
   }
 
   // Phase 2 (async, non-blocking): enrich each card with its deployment's active
-  // release (name, consumes, workload count). Returns enriched copies.
+  // release (name, workload count) and the resource it actually consumes for the
+  // scoped type — resolving that resource's id to a display NAME so the badge
+  // reflects the live release, not the resource the drawer was opened from.
+  // Returns enriched copies.
   enrichReleases = async (cards, resourceType) => {
     if (!Array.isArray(cards) || !cards.length) return cards ?? []
 
     return Promise.all(
       cards.map(async (card) => {
         const release = await this.#loadActiveRelease(card.deploymentId)
+        const consumedResource =
+          resourceType &&
+          (release?.resources ?? []).find((resource) => resource.resource_type === resourceType)
+        // The active-release resource keys its id by `resource_id` for every type
+        // but `global_id` for the application; it usually carries ids only, so the
+        // name is resolved by id, degrading to the id when that lookup misses.
+        const consumedResourceId = consumedResource
+          ? (consumedResource.resource_id ?? consumedResource.global_id ?? null)
+          : null
+        const consumedResourceName = consumedResource
+          ? (consumedResource.resource_name ??
+            consumedResource.name ??
+            (await this.resolveResourceName(resourceType, consumedResourceId)) ??
+            (consumedResourceId != null ? String(consumedResourceId) : null))
+          : null
+
         return {
           ...card,
           activeRelease: release ?? null,
           activeReleaseName: release?.name ?? release?.id ?? null,
           workloadCount: release?.workload_count ?? null,
-          consumes: Boolean(
-            resourceType &&
-            (release?.resources ?? []).some((resource) => resource.resource_type === resourceType)
-          )
+          consumes: Boolean(consumedResource),
+          consumedResourceId,
+          consumedResourceName
         }
       })
     )

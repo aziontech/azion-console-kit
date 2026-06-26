@@ -315,7 +315,7 @@
             :data-testid="`version-row__name-${version.id}`"
             @click="goToDetails(version)"
           >
-            {{ version.name || version.id || '--' }}
+            <span class="font-mono">{{ version.name || version.id || '--' }}</span>
           </button>
           <div
             v-if="version.isCurrent"

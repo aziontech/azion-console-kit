@@ -27,10 +27,6 @@
       type: String,
       default: ''
     },
-    resourceName: {
-      type: String,
-      default: ''
-    },
     loading: {
       type: Boolean,
       default: false
@@ -131,10 +127,10 @@
             {{ env.policyLabel }}
           </span>
           <span
-            v-if="env.consumes && resourceName"
+            v-if="env.consumes && env.consumedResourceName"
             class="inline-flex items-center rounded-[var(--shape-elements)] border border-[var(--surface-border)] px-[var(--spacing-2)] py-[2px] text-body-xs text-[var(--text-color-secondary)]"
           >
-            consumes {{ resourceName }}
+            consumes {{ env.consumedResourceName }}
           </span>
         </span>
         <span class="text-body-xs text-[var(--text-color-secondary)]">

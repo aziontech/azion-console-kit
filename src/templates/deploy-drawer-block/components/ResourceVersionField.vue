@@ -205,11 +205,24 @@
     background: var(--surface-section);
     color: var(--text-color);
     box-shadow: 0 8px 24px color-mix(in srgb, var(--surface-900, #111827) 16%, transparent);
+    /* Cap the panel to the drawer content width so it never spills outside the
+       drawer. 52rem = max-w-4xl (56rem) − p-8 (2rem ×2); calc covers narrow viewports. */
+    max-width: min(52rem, calc(100vw - 4rem));
+  }
+  /* Keep items at the panel width so long ids/authors truncate instead of widening it. */
+  .deploy-version-dropdown-panel .p-dropdown-items-wrapper,
+  .deploy-version-dropdown-panel .p-dropdown-items {
+    width: 100%;
+    max-width: 100%;
   }
   .deploy-version-dropdown-panel .p-dropdown-items {
     padding: 0.5rem;
   }
   .deploy-version-dropdown-panel .p-dropdown-item {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
     align-items: flex-start !important;
     height: auto !important;
     min-height: 3rem !important;
@@ -218,6 +231,10 @@
     margin-bottom: 0.25rem;
     color: var(--text-color);
     line-height: 1.5rem;
+  }
+  .deploy-version-dropdown-panel .p-dropdown-item > * {
+    min-width: 0;
+    max-width: 100%;
   }
   .deploy-version-dropdown-panel .p-dropdown-item:last-child {
     margin-bottom: 0;

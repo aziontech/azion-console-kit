@@ -240,7 +240,6 @@
           v-model="selectedEnvironmentId"
           :environments="environmentCards"
           :workload-name="selectedWorkloadName"
-          :resource-name="resourceName"
           :loading="isLoadingBindings"
           @bind="onBindEnvironment"
         />
