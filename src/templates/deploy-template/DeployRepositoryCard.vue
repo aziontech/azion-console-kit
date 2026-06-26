@@ -180,6 +180,7 @@
     <template #content>
       <div class="p-4 sm:p-6 flex flex-col gap-6">
         <TemplateInfoBlock
+          v-if="props.imagePreview"
           :preview-src="props.imagePreview"
           :preview-alt="props.previewAlt"
           :template-title="props.templateTitle"

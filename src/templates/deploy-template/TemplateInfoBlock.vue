@@ -46,20 +46,24 @@
     }
   })
 
-  const hasPreview = computed(() => {
-    return props.previewSrc || (props.templateTitle && props.templateDescription && props.githubUrl)
-  })
+  const hasResources = computed(() => props.resources?.length > 0)
 
-  // In resourcesOnly mode (DeploySuccessCard) the title/description/github block is hidden,
-  // but the template's preview image should still surface when it was provided.
-  const showPreview = computed(() => {
-    if (props.resourcesOnly) return !!props.previewSrc
-    return hasPreview.value
-  })
+  // The preview image is the anchor for the whole info block. Without it the layout
+  // collapses, so we surface the block only when an image was actually provided.
+  const showPreview = computed(() => !!props.previewSrc)
+
+  // Template title/description/github only show alongside the preview image and never
+  // in resourcesOnly mode (DeploySuccessCard).
+  const showInfo = computed(() => showPreview.value && !props.resourcesOnly)
+
+  // Render the wrapper only when there's something to show: a preview image or
+  // (in resourcesOnly mode) the resources-created list.
+  const hasContent = computed(() => showPreview.value || hasResources.value)
 </script>
 
 <template>
   <div
+    v-if="hasContent"
     :class="[
       'bg-[var(--surface-50)] rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden',
       { '!flex-col': !showPreview }
@@ -99,7 +103,7 @@
         :github-url="props.githubUrl"
       >
         <div
-          v-if="!props.resourcesOnly && props.templateTitle"
+          v-if="showInfo && props.templateTitle"
           class="flex items-center gap-2.5"
         >
           <div class="flex-1 flex items-center gap-1.5">
@@ -130,13 +134,13 @@
         </div>
 
         <p
-          v-if="!props.resourcesOnly && props.templateDescription"
+          v-if="showInfo && props.templateDescription"
           class="text-xs text-color-secondary leading-4"
         >
           {{ props.templateDescription }}
         </p>
         <div
-          v-if="!props.resourcesOnly"
+          v-if="showInfo"
           class="flex flex-col gap-1.5"
         >
           <span class="text-[10px] text-color-secondary leading-3">Cloning from</span>
@@ -149,7 +153,7 @@
         </div>
         <!-- Resources Created Section -->
         <div
-          v-if="props.resources && props.resources.length > 0"
+          v-if="hasResources"
           :class="['flex flex-col', showPreview ? 'gap-3 pt-2' : 'gap-2']"
         >
           <span class="text-xs font-normal font-['Proto_Mono'] text-color-muted leading-4">

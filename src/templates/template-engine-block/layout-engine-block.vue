@@ -688,13 +688,10 @@
 
       <template #content>
         <div class="p-4 sm:p-6 flex flex-col gap-6">
+          <!-- Only render the template info card when a preview image is available.
+               Without the image the layout collapses, so we keep just the inputs. -->
           <div
-            v-if="
-              props.previewSrc ||
-              props.templateTitle ||
-              props.templateDescription ||
-              props.githubUrl
-            "
+            v-if="props.previewSrc"
             class="bg-[var(--surface-50)] h-auto md:h-40 rounded-lg border surface-border flex flex-col md:flex-row gap-5 overflow-hidden"
           >
             <div class="w-full md:w-72 shrink-0 flex flex-col justify-center items-center">

@@ -48,14 +48,31 @@
   })
   const disabled = computed(() => !control.value.enabled || control.value.schema.readOnly)
 
+  /**
+   * Coerce the raw input string to the type expected by the schema.
+   * The privacy field is backed by a text input (emits strings), but the schema
+   * may declare `type: number`/`integer` (e.g. a Firewall ID). Without this,
+   * the numeric value fails JSON Schema validation and the field is treated as
+   * empty, surfacing a spurious "is a required property" error.
+   */
+  const parseValue = (rawValue) => {
+    const schemaType = control.value.schema.type
+    if (schemaType !== 'number' && schemaType !== 'integer') return rawValue
+
+    if (rawValue === '' || rawValue === null || rawValue === undefined) return undefined
+    const parsed = Number(rawValue)
+    return Number.isNaN(parsed) ? rawValue : parsed
+  }
+
   const onChange = (value) => {
-    handleChange(path.value, value)
-    emit('change', value)
+    const parsedValue = parseValue(value)
+    handleChange(path.value, parsedValue)
+    emit('change', parsedValue)
   }
 
   const onBlur = (event) => {
     isBlurred.value = true
-    const value = event.target?.value
+    const value = parseValue(event.target?.value)
     handleChange(path.value, value)
     // Capture the error at blur time to prevent it from updating during typing
     if (isRequiredAndEmpty.value) {
