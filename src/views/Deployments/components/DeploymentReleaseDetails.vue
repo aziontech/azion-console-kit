@@ -3,7 +3,7 @@
   import InlineTag from '@/components/InlineTag'
   import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
   import ImpactedWorkloadsPanel from '@/templates/deploy-drawer-block/components/ImpactedWorkloadsPanel.vue'
-  import DeploymentLogsAccordion from '@/views/Deployments/components/DeploymentLogsAccordion.vue'
+  import ScriptRunnerBlock from '@/templates/script-runner-block'
   import { convertToRelativeTime } from '@/helpers/convert-date'
 
   defineOptions({ name: 'deployment-release-details' })
@@ -39,6 +39,15 @@
 
   const createdRelative = computed(() =>
     props.release?.created_at ? convertToRelativeTime(props.release.created_at) : ''
+  )
+
+  const runnerLogs = computed(() =>
+    props.logs.map((log, index) => ({
+      id: `release-log-${index}`,
+      timeStamp: log.timestamp,
+      content: log.content,
+      type: log.level === 'info' ? undefined : log.level
+    }))
   )
 </script>
 
@@ -131,6 +140,9 @@
       :loading="isLoadingImpactedWorkloads"
     />
 
-    <DeploymentLogsAccordion :logs="logs" />
+    <ScriptRunnerBlock
+      title="Deployment Logs"
+      :logs="runnerLogs"
+    />
   </div>
 </template>
