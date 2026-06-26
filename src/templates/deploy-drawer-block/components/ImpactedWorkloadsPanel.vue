@@ -2,14 +2,14 @@
   /**
    * ImpactedWorkloadsPanel — read-only impact-radius warning for the
    * deployment-anchored deploy flow. Fixed-footprint, 3-layer progressive
-   * disclosure: constant-height summary → collapsible scrollable list grouped by
-   * environment → search + environment filter for large lists. Dumb/presentational:
-   * `workloads` arrive already derived (`{ id, name, environments: [name] }`).
+   * disclosure: constant-height summary → clickable environment pills that filter
+   * the list → collapsible scrollable list grouped by environment with a name
+   * search. Dumb/presentational: `workloads` arrive already derived
+   * (`{ id, name, environments: [name] }`).
    */
   import { computed, ref, watch } from 'vue'
   import LabelBlock from '@aziontech/webkit/label'
   import InputText from '@aziontech/webkit/inputtext'
-  import SelectButton from '@aziontech/webkit/selectbutton'
   import MessageCard from '@/components/MessageCard'
 
   defineOptions({ name: 'deploy-drawer-impacted-workloads-panel' })
@@ -38,10 +38,6 @@
     inlineThreshold: {
       type: Number,
       default: 5
-    },
-    searchThreshold: {
-      type: Number,
-      default: 8
     },
     listMaxHeight: {
       type: Number,
@@ -98,12 +94,16 @@
     )
   })
 
-  const showSearchAndFilter = computed(() => props.count >= props.searchThreshold)
+  watch(breakdown, (entries) => {
+    if (
+      activeEnv.value !== ALL &&
+      !entries.some((entry) => entry.environment === activeEnv.value)
+    ) {
+      activeEnv.value = ALL
+    }
+  })
 
-  const filterOptions = computed(() => [
-    { label: 'All', value: ALL },
-    ...breakdown.value.map((entry) => ({ label: entry.environment, value: entry.environment }))
-  ])
+  const showSearchAndFilter = computed(() => totalRows.value > 1)
 
   const filteredRows = computed(() => {
     const term = search.value.trim().toLowerCase()
@@ -134,6 +134,12 @@
   const toggle = () => {
     userToggled.value = true
     expanded.value = !expanded.value
+  }
+
+  const selectEnv = (environment) => {
+    activeEnv.value = environment
+    userToggled.value = true
+    expanded.value = true
   }
 </script>
 
@@ -204,16 +210,61 @@
 
         <ul
           class="flex flex-wrap gap-1.5"
-          aria-label="Impacted environments"
+          aria-label="Filter by environment"
           data-testid="deploy-drawer__impacted-workloads-pills"
         >
+          <li>
+            <button
+              type="button"
+              :aria-pressed="activeEnv === ALL"
+              class="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs transition-colors"
+              :class="
+                activeEnv === ALL
+                  ? 'impacted-pill--active border-[var(--primary-color)] text-[var(--primary-color)]'
+                  : 'border-[var(--surface-border)] bg-[var(--surface-section)] text-[var(--text-color-secondary)] hover:text-[var(--text-color)]'
+              "
+              data-testid="deploy-drawer__impacted-workloads-pill-all"
+              @click="selectEnv(ALL)"
+            >
+              <span>All</span>
+              <span
+                class="font-medium"
+                :class="
+                  activeEnv === ALL ? 'text-[var(--primary-color)]' : 'text-[var(--text-color)]'
+                "
+              >
+                {{ totalRows }}
+              </span>
+            </button>
+          </li>
           <li
             v-for="entry in breakdown"
             :key="entry.environment"
-            class="inline-flex items-center gap-1 rounded-full border border-[var(--surface-border)] bg-[var(--surface-section)] px-2.5 py-0.5 text-xs text-[var(--text-color-secondary)]"
           >
-            <span>{{ entry.environment }}</span>
-            <span class="font-medium text-[var(--text-color)]">{{ entry.total }}</span>
+            <button
+              type="button"
+              :aria-pressed="activeEnv === entry.environment"
+              class="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs transition-colors"
+              :class="
+                activeEnv === entry.environment
+                  ? 'impacted-pill--active border-[var(--primary-color)] text-[var(--primary-color)]'
+                  : 'border-[var(--surface-border)] bg-[var(--surface-section)] text-[var(--text-color-secondary)] hover:text-[var(--text-color)]'
+              "
+              :data-testid="`deploy-drawer__impacted-workloads-pill-${entry.environment}`"
+              @click="selectEnv(entry.environment)"
+            >
+              <span>{{ entry.environment }}</span>
+              <span
+                class="font-medium"
+                :class="
+                  activeEnv === entry.environment
+                    ? 'text-[var(--primary-color)]'
+                    : 'text-[var(--text-color)]'
+                "
+              >
+                {{ entry.total }}
+              </span>
+            </button>
           </li>
         </ul>
 
@@ -238,16 +289,6 @@
                 data-testid="deploy-drawer__impacted-workloads-search"
               />
             </span>
-            <SelectButton
-              v-model="activeEnv"
-              :options="filterOptions"
-              optionLabel="label"
-              optionValue="value"
-              :allowEmpty="false"
-              aria-label="Filter by environment"
-              class="impacted-env-filter w-full overflow-x-auto whitespace-nowrap"
-              data-testid="deploy-drawer__impacted-workloads-filter"
-            />
           </div>
 
           <div
@@ -300,3 +341,9 @@
     </template>
   </div>
 </template>
+
+<style scoped>
+  .impacted-pill--active {
+    background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+  }
+</style>

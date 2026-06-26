@@ -172,7 +172,7 @@
           :data-testid="`workload-releases__row__id-${item.id}`"
           @click="goToDetails(item)"
         >
-          {{ item.name || item.id }}
+          <span class="font-mono">{{ item.name || item.id }}</span>
         </button>
         <div class="flex items-center gap-2 min-w-0">
           <span
