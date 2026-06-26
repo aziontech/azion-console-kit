@@ -54,6 +54,17 @@
     () => props.options.find((option) => option.value === props.modelValue) ?? null
   )
 
+  // Options sorted ascending by label (case-insensitive, natural numeric order) so
+  // the resource list is predictable regardless of the catalog's API order.
+  const sortedOptions = computed(() =>
+    [...props.options].sort((left, right) =>
+      String(left?.label ?? '').localeCompare(String(right?.label ?? ''), undefined, {
+        sensitivity: 'base',
+        numeric: true
+      })
+    )
+  )
+
   const filterPlaceholder = computed(() => `Search ${props.options.length} options`)
 </script>
 
@@ -72,7 +83,7 @@
     </label>
     <Dropdown
       :modelValue="modelValue"
-      :options="options"
+      :options="sortedOptions"
       optionLabel="label"
       optionValue="value"
       :placeholder="placeholder"
@@ -106,24 +117,11 @@
 
 <style scoped>
   /* Tune the webkit Dropdown control to the app's surface tokens (the webkit
-     defaults — --bg-surface / --border-default — are a different DS layer).
-     Recolour the webkit focus ring variable to brand-orange right on the control:
-     --ring-color is #FFFFFF (white) in the dark theme, so whatever state the webkit
-     paints its ring in (focus, open, etc.) it now comes out orange, never white. */
+     defaults — --bg-surface / --border-default — are a different DS layer). The
+     focus ring is left to the webkit component itself (its --ring-color token);
+     no per-component ring override here. */
   :deep(.release-composition-control) {
     background: var(--surface-section) !important;
     border-color: var(--surface-border) !important;
-    --ring-color: var(--border-selected);
-  }
-
-  /* Focus/open: the webkit default is a white (--ring-color: #FFFFFF), offset 2px
-     ring. The mock uses a brand-orange border + a soft orange glow hugging the
-     control (no offset gap): `border-color:#f3652b; box-shadow:0 0 0 .2rem #f3642b50`.
-     Replicate it for BOTH the focused state and the open state (aria-expanded) so
-     the ring is consistent across every select on the screen. */
-  :deep(.release-composition-control:focus-within),
-  :deep(.release-composition-control:has([aria-expanded='true'])) {
-    border-color: var(--border-selected) !important;
-    box-shadow: 0 0 0 0.2rem var(--primary-mask) !important;
   }
 </style>

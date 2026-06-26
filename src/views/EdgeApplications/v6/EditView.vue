@@ -24,6 +24,7 @@
   import VersionListDataView from '@/components/VersionListDataView'
   import VersionActionDialog from '@/templates/version-shell-block/components/VersionActionDialog.vue'
   import DeployDrawerBlock from '@/templates/deploy-drawer-block'
+  import { releaseComposerRouteFromResource } from '@/templates/release-composition/release-composer-route'
 
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
@@ -79,24 +80,40 @@
     router.push(`/applications/edit/${edgeApplicationId.value}/versions/${id}`)
   }
 
+  // DeployDrawerBlock stays mounted (rollback fallback); the visible/pinned models
+  // are retained but the Deploy/Promote entries now route to the full-page composer.
   const isDeployDrawerOpen = ref(false)
   // Version pinned by a row-menu Promote; cleared when the drawer closes.
   const pinnedDeployVersionId = ref(null)
-  const openDeployDrawer = () => {
-    pinnedDeployVersionId.value = null
-    isDeployDrawerOpen.value = true
+  // Heading Deploy: route to the composer scoped to this Application, pinning the
+  // newest Ready version so the composer opens with a concrete selection.
+  const openRelease = () => {
+    router.push(
+      releaseComposerRouteFromResource({
+        resourceType: 'application',
+        resourceId: Number(edgeApplicationId.value),
+        version: null,
+        versions: readyVersionOptions.value
+      })
+    )
   }
-  // Promote from the row menu: open the release drawer with this version pinned.
-  const openPromoteDrawer = ({ pin } = {}) => {
-    pinnedDeployVersionId.value = pin ?? null
-    isDeployDrawerOpen.value = true
+  // Promote from the row menu: route to the composer with this version pinned.
+  const openPromoteRelease = ({ pin } = {}) => {
+    router.push(
+      releaseComposerRouteFromResource({
+        resourceType: 'application',
+        resourceId: Number(edgeApplicationId.value),
+        version: pin ? { id: pin } : null,
+        versions: readyVersionOptions.value
+      })
+    )
   }
   watch(isDeployDrawerOpen, (open) => {
     if (!open) pinnedDeployVersionId.value = null
   })
 
   // Single shared row-menu driver (spec §3.3, Req 1.4/10.1): nav, Promote
-  // (this view's drawer) and Archive/Delete all flow through one router.
+  // (routes to the composer) and Archive/Delete all flow through one router.
   const {
     handleRowAction,
     dialogConfig,
@@ -109,7 +126,7 @@
     resourceId: edgeApplicationId,
     versionService: edgeAppVersionService,
     router,
-    openPromoteDrawer,
+    openPromoteDrawer: openPromoteRelease,
     onSuccess: () => versionsQuery.refetch?.()
   })
 
@@ -189,7 +206,7 @@
             icon="pi pi-cloud-upload"
             size="small"
             data-testid="application-v6-edit__deploy"
-            @click="openDeployDrawer"
+            @click="openRelease"
           />
         </template>
       </PageHeadingBlock>

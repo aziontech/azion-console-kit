@@ -49,7 +49,10 @@ export const deploymentRoutes = {
             to: '/deployments'
           },
           {
-            label: 'Edit'
+            label: 'Edit Deployment',
+            dynamic: true,
+            routeParam: 'id',
+            toRoute: { name: 'deployments-edit', params: ['id'] }
           }
         ]
       }
@@ -67,7 +70,39 @@ export const deploymentRoutes = {
             to: '/deployments'
           },
           {
-            label: 'Edit Version'
+            label: 'Edit Deployment',
+            dynamic: true,
+            routeParam: 'id',
+            toRoute: { name: 'deployments-edit', params: ['id'] }
+          },
+          {
+            label: 'Version',
+            dynamic: true,
+            routeParam: 'versionId',
+            useParamValue: true
+          }
+        ]
+      }
+    },
+    {
+      path: 'releases/new',
+      name: 'release-composer',
+      component: () => import('@views/Deployments/v6/ReleaseComposerView.vue'),
+      meta: {
+        title: 'Review & deploy',
+        flag: 'use_v6_configurations',
+        breadCrumbs: [
+          {
+            label: 'Deployments',
+            to: '/deployments'
+          },
+          {
+            label: 'Deployment',
+            dynamic: true,
+            routeParam: 'id'
+          },
+          {
+            label: 'New release'
           }
         ]
       }

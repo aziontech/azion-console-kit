@@ -43,7 +43,7 @@
       :resource-id="resourceId"
       :version-id="versionId"
     >
-      <div class="relative flex flex-col gap-8 max-md:gap-6">
+      <div class="relative flex flex-col gap-[var(--spacing-8)] max-md:gap-[var(--spacing-6)]">
         <FormFieldsDeployment isEdit />
         <VersionHeadingActions />
       </div>

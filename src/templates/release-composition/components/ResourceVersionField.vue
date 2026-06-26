@@ -212,23 +212,11 @@
 
 <style scoped>
   /* Tune the webkit Dropdown control to the app's surface tokens (the webkit
-     defaults — --bg-surface / --border-default — are a different DS layer).
-     Recolour the webkit focus ring variable to brand-orange right on the control:
-     --ring-color is #FFFFFF (white) in the dark theme, so whatever state the webkit
-     paints its ring in (focus, open, etc.) it now comes out orange, never white. */
+     defaults — --bg-surface / --border-default — are a different DS layer). The
+     focus ring is left to the webkit component itself (its --ring-color token);
+     no per-component ring override here. */
   :deep(.release-composition-control) {
     background: var(--surface-section) !important;
     border-color: var(--surface-border) !important;
-    --ring-color: var(--border-selected);
-  }
-
-  /* Focus/open: replace the webkit white (--ring-color: #FFFFFF), offset ring with
-     the mock's brand-orange border + soft orange glow hugging the control (no gap):
-     `border-color:#f3652b; box-shadow:0 0 0 .2rem #f3642b50`. Covers the focused AND
-     open (aria-expanded) states so it matches the Resource select exactly. */
-  :deep(.release-composition-control:focus-within),
-  :deep(.release-composition-control:has([aria-expanded='true'])) {
-    border-color: var(--border-selected) !important;
-    box-shadow: 0 0 0 0.2rem var(--primary-mask) !important;
   }
 </style>

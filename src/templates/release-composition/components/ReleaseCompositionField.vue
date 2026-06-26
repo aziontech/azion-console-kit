@@ -369,7 +369,10 @@
               class="inline-flex h-[var(--spacing-7)] w-[var(--spacing-7)] items-center justify-center rounded-[var(--shape-elements)] bg-[var(--surface-section)]"
             >
               <i
-                :class="[resolveResourceMeta(resource.resourceType).icon, 'text-[var(--text-color)]']"
+                :class="[
+                  resolveResourceMeta(resource.resourceType).icon,
+                  'text-[var(--text-color)]'
+                ]"
               />
             </span>
             <span class="text-body-sm font-semibold text-[var(--text-color)]">
@@ -417,7 +420,9 @@
             :versions="resource.versionOptions"
             :disabled="resource.isLoadingVersions"
             :invalid="invalid"
-            @update:model-value="emit('update:resourceVersion', { key: resource.key, value: $event })"
+            @update:model-value="
+              emit('update:resourceVersion', { key: resource.key, value: $event })
+            "
           />
 
           <slot

@@ -86,9 +86,9 @@ describe('ReleaseCompositionField', () => {
 
       const card = wrapper.find('[data-testid="release-composition__composition-application"]')
       expect(card.exists()).toBe(true)
-      expect(
-        wrapper.find('[data-testid="release-composition__composition-required"]').text()
-      ).toBe('Required')
+      expect(wrapper.find('[data-testid="release-composition__composition-required"]').text()).toBe(
+        'Required'
+      )
       expect(card.find('[data-testid="release-composition__resource-select"]').exists()).toBe(true)
     })
 
@@ -190,9 +190,7 @@ describe('ReleaseCompositionField', () => {
     it('renders the empty-state block and emits create-application', async () => {
       const wrapper = makeWrapper({ noApplication: true })
 
-      const block = wrapper.find(
-        '[data-testid="release-composition__composition-no-application"]'
-      )
+      const block = wrapper.find('[data-testid="release-composition__composition-no-application"]')
       expect(block.exists()).toBe(true)
       expect(
         wrapper.find('[data-testid="release-composition__composition-application"]').exists()
@@ -231,9 +229,9 @@ describe('ReleaseCompositionField', () => {
         scopedType: 'application'
       })
 
-      expect(
-        wrapper.find('[data-testid="release-composition__composition-scoped"]').exists()
-      ).toBe(false)
+      expect(wrapper.find('[data-testid="release-composition__composition-scoped"]').exists()).toBe(
+        false
+      )
     })
   })
 
@@ -250,9 +248,7 @@ describe('ReleaseCompositionField', () => {
       expect(firewall.text()).toContain('v7')
       expect(firewall.text()).toContain('Read-only')
 
-      const fn = wrapper.find(
-        '[data-testid="release-composition__composition-keep-function-fn-9"]'
-      )
+      const fn = wrapper.find('[data-testid="release-composition__composition-keep-function-fn-9"]')
       expect(fn.exists()).toBe(true)
       expect(fn.text()).toContain('edge-fn')
       expect(fn.text()).toContain('v2')
@@ -297,7 +293,11 @@ describe('ReleaseCompositionField', () => {
     })
 
     it('emits update:resourceId with the resource key when an editable selection changes', () => {
-      const wrapper = makeWrapper({ noApplication: true, hasScopedResource: false, editableResources })
+      const wrapper = makeWrapper({
+        noApplication: true,
+        hasScopedResource: false,
+        editableResources
+      })
 
       // noApplication drops the Application select, so the first select field
       // is the editable firewall resource.
@@ -305,11 +305,17 @@ describe('ReleaseCompositionField', () => {
         .findAllComponents({ name: 'release-resource-select-field' })[0]
         .vm.$emit('update:modelValue', 'fw-3')
 
-      expect(wrapper.emitted('update:resourceId').at(-1)).toEqual([{ key: 'firewall', value: 'fw-3' }])
+      expect(wrapper.emitted('update:resourceId').at(-1)).toEqual([
+        { key: 'firewall', value: 'fw-3' }
+      ])
     })
 
     it('emits update:resourceVersion with the resource key when an editable version changes', () => {
-      const wrapper = makeWrapper({ noApplication: true, hasScopedResource: false, editableResources })
+      const wrapper = makeWrapper({
+        noApplication: true,
+        hasScopedResource: false,
+        editableResources
+      })
 
       // noApplication drops the Application card, so the first version field is
       // the editable firewall resource (versioned with a selected id).
