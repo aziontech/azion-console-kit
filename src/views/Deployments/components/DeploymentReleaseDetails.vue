@@ -1,9 +1,9 @@
 <script setup>
   import { computed } from 'vue'
-  import StatusTag from '@/components/StatusTag'
   import InlineTag from '@/components/InlineTag'
+  import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
+  import ImpactedWorkloadsPanel from '@/templates/deploy-drawer-block/components/ImpactedWorkloadsPanel.vue'
   import DeploymentLogsAccordion from '@/views/Deployments/components/DeploymentLogsAccordion.vue'
-  import { deploymentLogsMock } from '@/views/Deployments/components/deployment-logs.mock'
   import { convertToRelativeTime } from '@/helpers/convert-date'
 
   defineOptions({ name: 'deployment-release-details' })
@@ -15,7 +15,23 @@
     },
     logs: {
       type: Array,
-      default: () => deploymentLogsMock
+      default: () => []
+    },
+    impactedWorkloads: {
+      type: Array,
+      default: () => []
+    },
+    impactedWorkloadsCount: {
+      type: Number,
+      default: 0
+    },
+    isLoadingImpactedWorkloads: {
+      type: Boolean,
+      default: false
+    },
+    deploymentName: {
+      type: String,
+      default: ''
     }
   })
 
@@ -31,23 +47,22 @@
     <div class="rounded-md border border-[var(--surface-border)] overflow-hidden">
       <div class="flex flex-wrap gap-px bg-[var(--surface-border)]">
         <div
-          class="flex flex-col items-start p-3 bg-[var(--surface-section)] grow basis-full sm:basis-[calc((100%_-_1px)/2)] md:basis-[calc((100%_-_2px)/3)] min-w-0"
+          class="flex flex-col items-start p-3 bg-[var(--surface-section)] grow basis-full sm:basis-[calc((100%_-_1px)/2)] md:basis-[calc((100%_-_1px)/2)] min-w-0"
         >
           <div class="flex items-center h-6">
-            <span class="text-xs text-[var(--text-color-secondary)]">Environment</span>
+            <span class="text-xs text-[var(--text-color-secondary)]">Status</span>
           </div>
-          <div class="flex items-center gap-1 h-6 w-full min-w-0">
-            <span
-              v-if="release.environmentLabel"
-              class="text-sm text-[var(--text-color)]"
-            >
-              {{ release.environmentLabel }}
-            </span>
-            <i
-              v-if="release.environmentIcon"
-              :class="[release.environmentIcon, 'text-xs text-[var(--text-color-secondary)]']"
-              aria-hidden="true"
+          <div class="flex items-center gap-2 h-6 w-full min-w-0">
+            <VersionStateBadge
+              v-if="release.state"
+              :state="release.state"
             />
+            <span
+              v-if="release.duration"
+              class="text-xs text-[var(--text-color-secondary)] whitespace-nowrap"
+            >
+              Deployed in {{ release.duration }}
+            </span>
             <InlineTag
               v-if="release.isCurrent"
               text="Current"
@@ -58,24 +73,7 @@
         </div>
 
         <div
-          class="flex flex-col items-start p-3 bg-[var(--surface-section)] grow basis-full sm:basis-[calc((100%_-_1px)/2)] md:basis-[calc((100%_-_2px)/3)] min-w-0"
-        >
-          <div class="flex items-center h-6">
-            <span class="text-xs text-[var(--text-color-secondary)]">Status</span>
-          </div>
-          <div class="flex items-center gap-2 h-6 w-full min-w-0">
-            <StatusTag :status="release.status" />
-            <span
-              v-if="release.duration"
-              class="text-xs text-[var(--text-color-secondary)] whitespace-nowrap"
-            >
-              Deployed in {{ release.duration }}
-            </span>
-          </div>
-        </div>
-
-        <div
-          class="flex flex-col items-start p-3 bg-[var(--surface-section)] grow basis-full sm:basis-[calc((100%_-_1px)/2)] md:basis-[calc((100%_-_2px)/3)] min-w-0"
+          class="flex flex-col items-start p-3 bg-[var(--surface-section)] grow basis-full sm:basis-[calc((100%_-_1px)/2)] md:basis-[calc((100%_-_1px)/2)] min-w-0"
         >
           <div class="flex items-center h-6">
             <span class="text-xs text-[var(--text-color-secondary)]">Created</span>
@@ -125,6 +123,13 @@
         </div>
       </div>
     </div>
+
+    <ImpactedWorkloadsPanel
+      :deployment-name="deploymentName"
+      :workloads="impactedWorkloads"
+      :count="impactedWorkloadsCount"
+      :loading="isLoadingImpactedWorkloads"
+    />
 
     <DeploymentLogsAccordion :logs="logs" />
   </div>

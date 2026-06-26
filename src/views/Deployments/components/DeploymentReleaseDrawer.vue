@@ -45,6 +45,11 @@
   const {
     detail,
     isLoading,
+    logs,
+    impactedWorkloads,
+    impactedWorkloadCount,
+    isLoadingImpactedWorkloads,
+    deploymentName,
     visibleDrawer,
     displayRelease,
     visitUrl,
@@ -65,6 +70,7 @@
     v-model:visible="visibleDrawer"
     title="Deployment Details"
     width-class="max-w-6xl"
+    :bottom-sheet-on-mobile="true"
   >
     <template #header-actions>
       <a
@@ -110,6 +116,11 @@
       <DeploymentReleaseDetails
         v-else-if="displayRelease"
         :release="displayRelease"
+        :logs="logs"
+        :impacted-workloads="impactedWorkloads"
+        :impacted-workloads-count="impactedWorkloadCount"
+        :is-loading-impacted-workloads="isLoadingImpactedWorkloads"
+        :deployment-name="deploymentName"
       />
     </template>
   </InfoDrawerBlock>

@@ -1,5 +1,6 @@
 import { toValue } from 'vue'
 import { VersionServiceBase } from '@/services/v2/versioning/version-service-base'
+import { versionListCachePolicy } from '@/services/v2/versioning/version-cache-policy'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { DeploymentVersionAdapter } from '@/services/v2/deployment/deployment-version-adapter'
 
@@ -57,7 +58,12 @@ export class DeploymentVersionService extends VersionServiceBase {
         const { results, count } = parseListResponse(data)
         return { body: this.adapter.transformListVersions(results), count }
       },
-      { persist: !skipCache, enabled: true, skipCache: Boolean(skipCache) }
+      {
+        persist: !skipCache,
+        enabled: true,
+        skipCache: Boolean(skipCache),
+        ...versionListCachePolicy()
+      }
     )
   }
 

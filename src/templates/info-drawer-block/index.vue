@@ -1,5 +1,6 @@
 <script setup>
   import { computed, ref } from 'vue'
+  import { useMediaQuery } from '@vueuse/core'
   import Sidebar from '@aziontech/webkit/sidebar'
   import Button from '@aziontech/webkit/button'
 
@@ -18,6 +19,13 @@
     widthClass: {
       type: String,
       default: 'max-w-4xl'
+    },
+    // Opt-in: present as a bottom sheet on mobile (slide up from the bottom)
+    // instead of the right-side drawer. Default keeps existing behavior so the
+    // other InfoDrawerBlock consumers are unaffected.
+    bottomSheetOnMobile: {
+      type: Boolean,
+      default: false
     }
   })
   const visibleDrawer = computed({
@@ -26,6 +34,9 @@
       emit('update:visible', value)
     }
   })
+
+  const isMobile = useMediaQuery('(max-width: 767.98px)')
+  const useBottomSheet = computed(() => props.bottomSheetOnMobile && isMobile.value)
 
   const handlePositionDrawer = ref('right')
 
@@ -37,9 +48,14 @@
     }
   }
 
-  const sizeSidebar = computed(() =>
-    handlePositionDrawer.value === 'right' ? `${props.widthClass} w-full p-0` : 'w-full p-0'
+  const drawerPosition = computed(() =>
+    useBottomSheet.value ? 'bottom' : handlePositionDrawer.value
   )
+
+  const sizeSidebar = computed(() => {
+    if (useBottomSheet.value) return 'w-full max-h-[90vh] p-0 rounded-t-2xl overflow-hidden'
+    return handlePositionDrawer.value === 'right' ? `${props.widthClass} w-full p-0` : 'w-full p-0'
+  })
 
   const iconExpand = computed(
     () => `pi pi-window-${handlePositionDrawer.value === 'right' ? 'maximize' : 'minimize'}`
@@ -51,7 +67,7 @@
 <template>
   <Sidebar
     v-model:visible="visibleDrawer"
-    :position="handlePositionDrawer"
+    :position="drawerPosition"
     :pt="{
       root: { class: sizeSidebar },
       header: { class: 'flex justify-between font-medium px-8' },
@@ -67,6 +83,7 @@
       <div class="flex gap-2 items-center">
         <slot name="header-actions"></slot>
         <Button
+          v-if="!useBottomSheet"
           outlined
           class="text-color"
           :icon="iconExpand"

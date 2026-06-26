@@ -26,9 +26,10 @@
   const STATE_VISUAL = {
     draft: { severity: 'warning', label: 'Draft', icon: 'pi pi-file-edit' },
     queued: { severity: 'info', label: 'Queued', icon: 'pi pi-clock' },
-    building: { severity: 'info', label: 'Building', icon: 'pi pi-spin pi-spinner' },
+    building: { severity: 'info', label: 'Building', icon: 'pi pi-spinner animate-spin' },
     ready: { severity: 'success', label: 'Ready', icon: 'pi pi-circle-fill' },
-    active: { severity: 'success', label: 'Current', icon: 'pi pi-circle-fill' },
+    active: { severity: 'success', label: 'Active' },
+    archiving: { severity: 'secondary', label: 'Archiving', icon: 'pi pi-spinner animate-spin' },
     archived: { severity: 'secondary', label: 'Archived' },
     canceled: { severity: 'warning', label: 'Canceled' },
     error: { severity: 'danger', label: 'Error', icon: 'pi pi-exclamation-triangle' }

@@ -1,5 +1,6 @@
 import { toValue } from 'vue'
 import { BaseService } from '@/services/v2/base/query/baseService'
+import { versionListCachePolicy } from './version-cache-policy'
 
 // Shared base for resource version services: lifecycle endpoints under
 // `/{baseURL}/{resourceId}/versions` + cache invalidation. Subclasses set
@@ -55,7 +56,7 @@ export class VersionServiceBase extends BaseService {
     return this.useQuery(
       this.versionKeys.list(toValue(resourceId), listParams),
       () => this.#fetchList(toValue(resourceId), listParams),
-      { persist: !skipCache, enabled: true, skipCache }
+      { persist: !skipCache, enabled: true, skipCache, ...versionListCachePolicy() }
     )
   }
 
@@ -94,7 +95,7 @@ export class VersionServiceBase extends BaseService {
   updateDraft = async (resourceId, versionId, values = {}) => {
     const payload = this.adapter?.transformDraftPayload?.(values) ?? values
     const { data } = await this.http.request({
-      method: 'PUT',
+      method: 'PATCH',
       url: this.getUrl(resourceId, versionId),
       body: payload
     })

@@ -25,15 +25,6 @@ const pickDefined = (payload) => {
 
 const ARCHIVE_REASONS = new Set(['SUPERSEDED', 'SECURITY_ISSUE', 'POLICY_VIOLATION', 'MANUAL'])
 
-const TRAFFIC_ROLE_TO_ENV_LABEL = {
-  ACTIVE: 'Production',
-  CANDIDATE: 'Canary',
-  VALID_URL: 'Stage',
-  INACTIVE: 'Stage'
-}
-
-const TRAFFIC_ROLES_WITH_HISTORY_ICON = new Set(['VALID_URL', 'INACTIVE'])
-
 const normalizeGradualRollout = (gradual) => {
   const source = isObject(gradual) ? gradual : {}
   return {
@@ -144,7 +135,8 @@ const normalizeRelease = (release) => {
     state_detail: source.state_detail ?? null,
     client_id: source.client_id ?? null,
     last_modified_by: normalizeAuditActor(source.last_modified_by),
-    created_at: source.created_at ?? null
+    created_at: source.created_at ?? null,
+    trace_id: source.trace_id ?? source.kivo?.trace_id ?? source.audit?.trace_id ?? null
   }
 }
 
@@ -174,13 +166,9 @@ const formatDurationFromAudit = (requestedAt, readyAt) => {
 }
 
 const deriveDisplayFields = (normalized) => {
-  const trafficRole = normalized.traffic_role
-  const envLabel = TRAFFIC_ROLE_TO_ENV_LABEL[trafficRole] || ''
   return {
     status: mapStateToStatus(normalized.state),
-    isCurrent: trafficRole === 'ACTIVE',
-    environmentLabel: envLabel,
-    environmentIcon: TRAFFIC_ROLES_WITH_HISTORY_ICON.has(trafficRole) ? 'pi pi-history' : null,
+    isCurrent: normalized.traffic_role === 'ACTIVE',
     duration: formatDurationFromAudit(normalized.audit?.requested_at, normalized.audit?.ready_at),
     lastEditor:
       normalized.audit?.requested_by_email ||

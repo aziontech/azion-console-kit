@@ -64,8 +64,9 @@ const normalizeVersion = (version) => {
     meta: { state },
     state,
     state_detail: source.state_detail ?? null,
-    created_at: source.created_at ?? null,
-    last_modified_by: resolveActorEmail(source.last_modified_by)
+    comment: source.description ?? meta.description ?? '',
+    createdAt: source.updated_at ?? meta.updated_at ?? source.created_at ?? meta.created_at ?? null,
+    lastEditor: resolveActorEmail(source.last_modified_by)
   }
 }
 
