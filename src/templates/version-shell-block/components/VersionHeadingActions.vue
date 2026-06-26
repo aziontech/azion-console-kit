@@ -1,5 +1,6 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
   import PrimeButton from '@aziontech/webkit/button'
   import VersionStateBadge from './VersionStateBadge.vue'
   import { useVersionContext } from '@/composables/versioning/use-version-context'
@@ -7,6 +8,7 @@
   import { getVersionBarActions } from '@/composables/versioning/version-actions'
   import { VERSION_ACTIONS } from '@/composables/versioning/version-machine'
   import { formatExhibitionDate } from '@/helpers/convert-date'
+  import { releaseComposerRouteFromResource } from '@/templates/release-composition/release-composer-route'
   import DeployDrawerBlock from '@/templates/deploy-drawer-block'
 
   defineOptions({ name: 'version-heading-actions' })
@@ -19,6 +21,8 @@
       default: null
     }
   })
+
+  const router = useRouter()
 
   const { state, version, availableActions, disabledActions, dispatch, capability } =
     useVersionContext()
@@ -37,24 +41,31 @@
     disabledActions.value.includes(key) ||
     (key === VERSION_ACTIONS.DEPLOY && !props.resourceContext)
 
+  // DeployDrawerBlock stays mounted (rollback fallback); the model is retained but
+  // the Deploy action now routes to the full-page composer, scoped to this version.
   const isDeployDrawerOpen = ref(false)
-  const openDeployDrawer = () => {
-    isDeployDrawerOpen.value = true
+  const openRelease = () => {
+    router.push(
+      releaseComposerRouteFromResource({
+        ...props.resourceContext,
+        version: version.value?.id ? { id: version.value.id } : props.resourceContext?.version
+      })
+    )
   }
 
-  // Deploy opens the heading's own drawer; every other action dispatches on the bus.
+  // Deploy opens the full-page composer; every other action dispatches on the bus.
   const handleAction = (key) => {
     if (isDisabled(key)) return
-    if (key === VERSION_ACTIONS.DEPLOY) return openDeployDrawer()
+    if (key === VERSION_ACTIONS.DEPLOY) return openRelease()
     dispatch(key, {})
   }
 
   const testIdFor = (key) =>
     key === VERSION_ACTIONS.DEPLOY ? 'version-heading__deploy' : `version-heading__action-${key}`
 
-  // Exposed so the host view can open THIS drawer from the VersionShell footer
-  // Deploy action (DEPLOY command-success), unifying both Deploy entrypoints.
-  defineExpose({ openDeployDrawer })
+  // Exposed so the host view can route to the composer from the VersionShell
+  // footer Deploy action (DEPLOY command-success), unifying both Deploy entrypoints.
+  defineExpose({ openRelease })
 
   // Guard the teleport until mount: the target (#version-lifecycle-action) lives in
   // the heading and a cached version query can render this slot before it exists.

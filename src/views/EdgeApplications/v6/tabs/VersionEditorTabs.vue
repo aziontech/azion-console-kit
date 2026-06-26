@@ -203,12 +203,12 @@
     currentVersionId: () => props.versionId
   })
 
-  // Forward the editor shell's openDeployDrawer so VersionEditView can open the
-  // SAME drawer when the VersionShell footer dispatches DEPLOY.
+  // Forward the editor shell's openRelease so VersionEditView can route to the
+  // composer when the VersionShell footer dispatches DEPLOY.
   const shellRef = ref(null)
-  const openDeployDrawer = () => shellRef.value?.openDeployDrawer()
+  const openRelease = () => shellRef.value?.openRelease()
 
-  defineExpose({ openDeployDrawer })
+  defineExpose({ openRelease })
 </script>
 
 <template>

@@ -32,7 +32,7 @@ vi.mock('@/services/v2/edge-app/edge-app-version-service', () => ({
 }))
 // Catalog registry is only exercised by the workload-first editable rows;
 // stub it so firewall/custom_page catalogs and versions are deterministic.
-vi.mock('@/services/v2/deploy-drawer/resource-catalog-registry', () => ({
+vi.mock('@/services/v2/deployment/resource-catalog-registry', () => ({
   RESOURCE_CATALOG_REGISTRY: {
     application: {
       versioned: true,
@@ -60,6 +60,7 @@ import { deploymentReleaseService } from '@/services/v2/deployment/deployment-re
 import { deployDrawerService } from '@/services/v2/deploy-drawer/deploy-drawer-service'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
+import { RESOURCE_CATALOG_REGISTRY } from '@/services/v2/deployment/resource-catalog-registry'
 import { useDeployDrawer, LATEST_READY } from '@/composables/deploy/use-deploy-drawer'
 
 const WORKLOAD_ID = 'wl-1'
@@ -94,6 +95,23 @@ const APP_RESOURCE = {
   resource_id: 99,
   resource_name: 'Catalog App',
   resource_version_id: 'app-live'
+}
+
+// `vi.clearAllMocks()` (afterEach) wipes the `mockResolvedValue` baked into the
+// module-mock above, so the catalog registry stubs must be re-seeded per test;
+// otherwise `listVersions`/`listCatalog` resolve to `undefined` from the second
+// test onward and `resolveLatestVersion` collapses to `null`.
+const wireCatalogRegistry = () => {
+  RESOURCE_CATALOG_REGISTRY.application.listCatalog.mockResolvedValue([])
+  RESOURCE_CATALOG_REGISTRY.application.listVersions.mockResolvedValue([])
+  RESOURCE_CATALOG_REGISTRY.firewall.listCatalog.mockResolvedValue([{ id: 7, name: 'My Firewall' }])
+  RESOURCE_CATALOG_REGISTRY.firewall.listVersions.mockResolvedValue([
+    { id: 'fw-1', state: 'ready' }
+  ])
+  RESOURCE_CATALOG_REGISTRY.custom_page.listCatalog.mockResolvedValue([{ id: 5, name: 'Pages' }])
+  RESOURCE_CATALOG_REGISTRY.custom_page.listVersions.mockResolvedValue([
+    { id: 'cp-1', state: 'ready' }
+  ])
 }
 
 // `policy` drives single/versioned derivation; `loadWorkloadEnvironments`
@@ -138,6 +156,7 @@ const selectThroughToDeployment = async (drawer) => {
 
 beforeEach(() => {
   wireListings()
+  wireCatalogRegistry()
   deploymentReleaseService.getActiveReleaseComposition.mockResolvedValue(null)
   deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: {} })
 })

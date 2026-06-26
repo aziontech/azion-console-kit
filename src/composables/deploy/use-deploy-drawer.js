@@ -10,9 +10,18 @@ import { deploymentReleaseService } from '@/services/v2/deployment/deployment-re
 import { DeploymentAdapter } from '@/services/v2/deployment/deployment-adapter'
 import { buildStrategy } from '@/services/v2/deployment/strategy-builder'
 import { deployDrawerService } from '@/services/v2/deploy-drawer/deploy-drawer-service'
-import { RESOURCE_CATALOG_REGISTRY } from '@/services/v2/deploy-drawer/resource-catalog-registry'
+import { RESOURCE_CATALOG_REGISTRY } from '@/services/v2/deployment/resource-catalog-registry'
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
+import {
+  LATEST_READY,
+  toVersionOptions,
+  resolveLatestVersion
+} from '@/templates/release-composition/version-options'
+
+// Re-exported for back-compat: existing importers (e.g. tests) still pull the
+// sentinel from this composable. The canonical home is `version-options`.
+export { LATEST_READY }
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value)
 
@@ -23,32 +32,7 @@ const APPLICATION_CATALOG_PAGE_SIZE = 100
 const OPTIONAL_RESOURCE_TYPES = ['firewall', 'custom_page']
 const RELEASE_RESOURCE_TYPES = new Set([APPLICATION_TYPE, ...OPTIONAL_RESOURCE_TYPES])
 
-// Sentinel for "Track latest Ready": pin to the newest Ready version at dispatch
-// time rather than a fixed short_id. Distinct from any real version id.
-export const LATEST_READY = 'LATEST'
-
 const normalizeName = (name) => (isObject(name) ? (name.text ?? '') : (name ?? ''))
-
-// A version is deployable when it is built — `ready` or `active` (serving).
-const DEPLOYABLE_STATES = ['ready', 'active']
-
-const toVersionOptions = (versions) =>
-  (Array.isArray(versions) ? versions : [])
-    .filter((version) => DEPLOYABLE_STATES.includes(version?.state))
-    .map((version) => ({
-      label: version.comment || version.id,
-      value: version.id,
-      createdAt: version.createdAt ?? null,
-      author: version.lastEditor || null,
-      isCurrent: Boolean(version.isCurrent)
-    }))
-
-const resolveLatestVersion = (options, selected) => {
-  if (selected !== LATEST_READY) return selected
-  const list = Array.isArray(options) ? options : []
-  const current = list.find((option) => option.isCurrent)
-  return current?.value ?? list[0]?.value ?? null
-}
 
 export function useDeployDrawer(resourceContext, { visible, preselectedWorkloadId } = {}) {
   // `enabled` gates fetching to the drawer's open state (req 1.1, 1.5): closed

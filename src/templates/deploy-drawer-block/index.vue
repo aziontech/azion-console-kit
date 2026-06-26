@@ -26,8 +26,8 @@
   import PromotionContextBanner from '@/templates/deploy-drawer-block/components/PromotionContextBanner.vue'
   import WorkloadSelectField from '@/templates/deploy-drawer-block/components/WorkloadSelectField.vue'
   import EnvironmentSelectionInput from '@/templates/deploy-drawer-block/components/EnvironmentSelectionInput.vue'
-  import ReleaseCompositionField from '@/templates/deploy-drawer-block/components/ReleaseCompositionField.vue'
-  import CanaryStrategyField from '@/templates/deploy-drawer-block/components/CanaryStrategyField.vue'
+  import ReleaseCompositionField from '@/templates/release-composition/components/ReleaseCompositionField.vue'
+  import CanaryStrategyField from '@/templates/release-composition/components/CanaryStrategyField.vue'
 
   defineOptions({ name: 'deploy-drawer-block' })
 

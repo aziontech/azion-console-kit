@@ -56,12 +56,18 @@ describe('CanaryStrategyField', () => {
     await enableCanary(wrapper)
 
     expect(wrapper.find('[data-testid="release-composition__canary-fields"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="release-composition__canary-rollout-mode"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="release-composition__canary-rollout-mode"]').exists()).toBe(
+      true
+    )
     expect(
       wrapper.find('[data-testid="release-composition__canary-candidate-percentage"]').exists()
     ).toBe(true)
-    expect(wrapper.find('[data-testid="release-composition__canary-cookie-name"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="release-composition__canary-cookie-max-age"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="release-composition__canary-cookie-name"]').exists()).toBe(
+      true
+    )
+    expect(
+      wrapper.find('[data-testid="release-composition__canary-cookie-max-age"]').exists()
+    ).toBe(true)
 
     expect(wrapper.emitted('update:enabled')?.at(-1)).toEqual([true])
   })
