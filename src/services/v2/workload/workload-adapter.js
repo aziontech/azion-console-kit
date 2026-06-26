@@ -96,7 +96,7 @@ const buildV6DomainEntries = (payload) => {
     .map(({ subdomain, domain, environment, certificate }) => ({
       name: subdomain ? `${subdomain}.${domain}` : domain,
       environment: environment ?? null,
-      certificate: certificate ?? null
+      certificate: certificate ?? 0
     }))
 }
 
@@ -110,8 +110,9 @@ const buildV6Bindings = (entries, environmentDeployments = {}, autoDomainAllowAc
     }
     const binding = bindingByEnvironment.get(environment)
     binding.domains.push(name)
-    if (binding.certificate == null && certificate != null) {
-      binding.certificate = certificate
+    const resolvedCertificate = certificate === 0 ? null : certificate
+    if (binding.certificate == null && resolvedCertificate != null) {
+      binding.certificate = resolvedCertificate
     }
   }
 
@@ -167,7 +168,6 @@ export const WorkloadAdapter = {
 
     if (isV6) {
       const domainEntries = buildV6DomainEntries(payload)
-      // domains = domainEntries.map((entry) => entry.name)
       bindings = buildV6Bindings(
         domainEntries,
         payload.environmentDeployments,
@@ -325,13 +325,11 @@ export const WorkloadAdapter = {
       const httpsEnabled = workload.protocols?.http?.https_ports != null
       const legacyCertificate = workload.tls?.certificate ?? null
       const fallbackCertificate = legacyCertificate ?? (httpsEnabled ? 0 : null)
-      if (fallbackCertificate !== null) {
-        cleanDomains.forEach((domain) => {
-          if (domain.certificate === null || domain.certificate === undefined) {
-            domain.certificate = fallbackCertificate
-          }
-        })
-      }
+      cleanDomains.forEach((domain) => {
+        if (domain.certificate === null || domain.certificate === undefined) {
+          domain.certificate = fallbackCertificate ?? 0
+        }
+      })
     }
 
     return {

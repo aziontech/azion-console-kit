@@ -387,6 +387,14 @@ export const queryKeys = {
         ...queryKeys.deployments.releases.all(deploymentId),
         'detail',
         releaseId
+      ],
+      logs: (traceId, begin, end) => [
+        ...queryKeys.deployments.all,
+        'releases',
+        'logs',
+        traceId,
+        begin,
+        end
       ]
     }
   },

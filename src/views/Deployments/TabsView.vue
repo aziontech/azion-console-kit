@@ -4,8 +4,10 @@
   import { useToast } from '@aziontech/webkit/use-toast'
   import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
+  import PrimeButton from '@aziontech/webkit/button'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
+  import DeployDrawerBlock from '@/templates/deploy-drawer-block'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import VersionsTab from '@/views/Deployments/tabs/VersionsTab.vue'
   import ReleasesTab from '@/views/Deployments/tabs/ReleasesTab.vue'
@@ -68,6 +70,20 @@
 
   const deploymentName = computed(() => deployment.value?.name || '')
 
+  const isDeployDrawerOpen = ref(false)
+  const releasesRefreshKey = ref(0)
+
+  const openDeployDrawer = () => {
+    isDeployDrawerOpen.value = true
+  }
+
+  const onDeployed = () => {
+    releasesRefreshKey.value += 1
+    if (activeTab.value !== TAB_TO_INDEX.releases) {
+      changeTab(TAB_TO_INDEX.releases)
+    }
+  }
+
   const fetchDeployment = async () => {
     isLoading.value = true
     try {
@@ -98,7 +114,17 @@
         :entityName="deploymentName"
         description="View and manage the versions and releases of this deployment."
         data-testid="deployments-edit-heading"
-      />
+      >
+        <template #default>
+          <PrimeButton
+            label="Deploy"
+            icon="pi pi-cloud-upload"
+            size="small"
+            data-testid="deployments-edit__deploy"
+            @click="openDeployDrawer"
+          />
+        </template>
+      </PageHeadingBlock>
     </template>
     <template #content>
       <DialogUnsaved
@@ -128,10 +154,17 @@
         >
           <ReleasesTab
             v-if="activeTab === TAB_TO_INDEX.releases"
+            :key="releasesRefreshKey"
             :deploymentId="deploymentId"
           />
         </TabPanel>
       </TabView>
+
+      <DeployDrawerBlock
+        v-model:visible="isDeployDrawerOpen"
+        :preselected-deployment-id="deploymentId"
+        @deployed="onDeployed"
+      />
     </template>
   </ContentBlock>
 </template>

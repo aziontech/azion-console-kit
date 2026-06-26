@@ -2,8 +2,8 @@
   import { computed, onMounted, ref, watch } from 'vue'
   import Dropdown from '@aziontech/webkit/dropdown'
   import GenericDataView from '@/components/GenericDataView'
-  import StatusTag from '@/components/StatusTag'
   import CurrentBadge from '@/components/CurrentBadge'
+  import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
   import { useWorkloadReleases } from '@/views/Workload/composables/useWorkloadReleases'
   import { useReleaseDrawerController } from '@/composables/versioning/use-deployment-release-drawer'
@@ -61,6 +61,10 @@
     releases.value.filter((release) => matchesSearch(release) && matchesStatus(release))
   )
 
+  const activeFilterCount = computed(() =>
+    filterValues.value.status && filterValues.value.status !== 'all' ? 1 : 0
+  )
+
   const rowSubtitle = (release) => {
     const parts = []
     if (release.environmentLabel) parts.push(release.environmentLabel)
@@ -72,7 +76,13 @@
 
   const columns = [
     { key: 'release', label: 'Release', size: 'minmax(0, 1fr)', align: 'start' },
-    { key: 'status', label: 'Status', size: 'minmax(0, 1fr)', align: 'start' },
+    {
+      key: 'status',
+      label: 'Status',
+      size: 'minmax(0, 1fr)',
+      align: 'start',
+      mobileSlot: 'status'
+    },
     { key: 'createdAt', label: 'Date', size: 'minmax(0, 1fr)', align: 'start' },
     { key: 'author', label: 'Author', size: 'minmax(0, 1fr)', align: 'start' }
   ]
@@ -130,6 +140,8 @@
     :paginatorFirst="paginatorFirst"
     :paginatorRows="paginatorRows"
     toolbarMode="compact"
+    primaryColumnKey="release"
+    :activeFilterCount="activeFilterCount"
     searchPlaceholder="Search Releases"
     emptyTitle="No releases yet"
     emptyDescription="Releases will appear here once the Workload's deployments have them."
@@ -137,6 +149,8 @@
     filteredEmptyDescription="Try changing your search or filters."
     @refresh="reload"
     @page="onPage"
+    @row-primary-click="goToDetails"
+    @open-row-menu="({ deployment }) => goToDetails(deployment)"
   >
     <template #toolbar-extras>
       <Dropdown
@@ -158,7 +172,7 @@
           :data-testid="`workload-releases__row__id-${item.id}`"
           @click="goToDetails(item)"
         >
-          {{ item.name || item.id }}
+          <span class="font-mono">{{ item.name || item.id }}</span>
         </button>
         <div class="flex items-center gap-2 min-w-0">
           <span
@@ -179,10 +193,10 @@
 
     <template #cell-status="{ item }">
       <div class="flex gap-0.5 min-w-0">
-        <StatusTag :status="item.status" />
+        <VersionStateBadge :state="item.state" />
         <span
           v-if="item.duration"
-          class="text-xs text-color-secondary pl-4"
+          class="flex items-center text-xs text-color-secondary pl-4"
         >
           Deployed in {{ item.duration }}
         </span>
