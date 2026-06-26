@@ -11,8 +11,15 @@ const edgeApiHost =
     ? 'jkjuyhi0gza.map.azionedge.net'
     : 'urvlgkvpxla.map.azionedge.net'
 
-const deploymentApiHost = 'deployment-api.azion.app'
-const environmentApiHost = 'environment-api-stage.azion.app'
+const deploymentApiHost =
+  environment === 'production'
+    ? 'deployment-api.azion.app'
+    : 'deployment-api-stage.azion.app'
+
+const environmentApiHost =
+  environment === 'production'
+    ? 'environment-api.azion.app'
+    : 'environment-api-stage.azion.app'
 
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
