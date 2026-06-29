@@ -30,7 +30,8 @@ import { httpService } from '@/services/v2/base/http/httpService'
 import {
   useReleaseComposition,
   BUILD_AND_ACTIVATE_ERROR_TYPES,
-  VERSIONED_URLS_ACTIVE_LIMIT_CODE
+  VERSIONED_URLS_ACTIVE_LIMIT_CODE,
+  SCOPED_PUBLISH_SKIP_REASONS
 } from '@/templates/release-composition/use-release-composition'
 
 // Mirrors the `useQuery`-shaped object the composable reads from
@@ -70,7 +71,7 @@ afterEach(() => {
 })
 
 describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
-  it('empty state: no DS selected => impact available-but-empty, no rows, null totals', async () => {
+  it('empty state: no DS selected => impact available-but-empty, no rows, zeroed totals', async () => {
     const { impact, impactUnavailable } = useReleaseComposition({
       enabled: ref(true),
       selectedDsIds: ref([]),
@@ -78,14 +79,16 @@ describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
     })
     await flushPromises()
 
-    // req 7.1: nothing selected is "no impact to preview", NOT "unavailable".
+    // req 7.1: nothing selected is "no impact to preview", NOT "unavailable". The
+    // panel reads `totals` unguarded, so it is a zeroed object (NOT null) with no
+    // fabricated rows — Scenario B opens here with 0 DSs selected (req 3.9).
     expect(impactUnavailable.value).toBe(false)
     expect(impact.value.hasSelection).toBe(false)
     expect(impact.value.perDs).toEqual([])
-    expect(impact.value.totals).toBeNull()
+    expect(impact.value.totals).toEqual({ dsCount: 0, totalDomains: 0, totalWorkloads: 0 })
   })
 
-  it('degraded state: DS selected but no reverse-lookup => unavailable, zero rows, null totals', async () => {
+  it('degraded state: DS selected but no reverse-lookup => unavailable, zero rows, real dsCount only', async () => {
     deploymentReleaseService.getActiveReleaseComposition.mockResolvedValue(
       release([{ resource_type: 'application', global_id: 42, version_id: 'app-live' }])
     )
@@ -97,13 +100,14 @@ describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
     })
     await flushPromises()
 
-    // No browser-reachable reverse-lookup source exists today, so the impact
-    // degrades. Nothing synthetic may be produced: zero rows, null totals.
+    // No reverse-lookup data for these DSs, so impact degrades. Nothing synthetic
+    // is produced (zero rows, zero workloads/domains) but `totals.dsCount` still
+    // reflects the REAL selection so the panel can show "{N} selected" (Property 8).
     expect(impactUnavailable.value).toBe(true)
     expect(impact.value.hasSelection).toBe(true)
     expect(impact.value.perDs).toEqual([])
     expect(impact.value.perDs).toHaveLength(0)
-    expect(impact.value.totals).toBeNull()
+    expect(impact.value.totals).toEqual({ dsCount: 2, totalDomains: 0, totalWorkloads: 0 })
   })
 
   it('never invents environments/workloads/domains/counts for a selected DS', async () => {
@@ -122,12 +126,13 @@ describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
     await flushPromises()
 
     // Even with an active release loaded (so resources are known), there is no
-    // blast-radius data — impact must stay strictly empty, not derived.
+    // blast-radius data — impact must stay strictly empty (no derived rows), with
+    // only the REAL dsCount surfaced (no fabricated workloads/domains).
     expect(impact.value).toEqual({
       hasSelection: true,
       impactUnavailable: true,
       perDs: [],
-      totals: null
+      totals: { dsCount: 1, totalDomains: 0, totalWorkloads: 0 }
     })
   })
 
@@ -151,7 +156,7 @@ describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
     expect(stub.refetch).toHaveBeenCalledTimes(1)
     expect(impactUnavailable.value).toBe(true)
     expect(impact.value.perDs).toEqual([])
-    expect(impact.value.totals).toBeNull()
+    expect(impact.value.totals).toEqual({ dsCount: 1, totalDomains: 0, totalWorkloads: 0 })
   })
 
   it('never exercises a GraphQL/fetch/s2s path - only the injected v2 services', async () => {
@@ -616,5 +621,252 @@ describe('useReleaseComposition - Property 7 (buildAndActivate fan-out, no retry
     const [, payload] = deploymentReleaseService.buildAndActivate.mock.calls[0]
     // The real buildStrategy + adapter produced a strategy block from the form.
     expect(payload.strategy).toBeTruthy()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Property 8 (scoped publish) — buildAndActivate's PER-DS preserve & swap path.
+// In a scoped (Scenario B) entry the store hands over `{ scoped: true, override:
+// { resource_type, resource_id, version } }`. The composable builds a SEPARATE
+// body per selected DS: that DS's OWN active composition with ONLY the scoped
+// resource's version swapped; every other resource/subresource is carried over
+// byte-for-byte (req 5.6). A DS missing the scoped resource is a no-op MISMATCH
+// (req 5.8); a DS with no active composition is DEGRADED and excluded (req 5.7).
+// `DeploymentAdapter` stays real so the genuine deployment-api body is asserted.
+// ---------------------------------------------------------------------------
+describe('useReleaseComposition - Property 8 (scoped publish: per-DS preserve & swap)', () => {
+  // ds-keep holds the scoped application (global_id 42) plus other resources that
+  // must survive untouched; ds-other holds a different app (mismatch); ds-gone has
+  // no active composition (degraded).
+  const wireScopedReleases = () => {
+    deploymentReleaseService.getActiveReleaseComposition.mockImplementation((dsId) => {
+      if (dsId === 'ds-keep') {
+        return Promise.resolve(
+          release([
+            { resource_type: 'application', global_id: 42, version_id: 'app-old' },
+            { resource_type: 'firewall', resource_id: 7, version_id: 'fw-keep' },
+            { resource_type: 'function', resource_id: 'fn-1', version_id: 'fn-keep' }
+          ])
+        )
+      }
+      if (dsId === 'ds-other') {
+        return Promise.resolve(
+          release([{ resource_type: 'application', global_id: 99, version_id: 'other-app' }])
+        )
+      }
+      return Promise.resolve(null)
+    })
+  }
+
+  const scopedAppOverride = () => ({
+    scoped: true,
+    override: { resource_type: 'application', resource_id: 42, version: 'app-new' },
+    canary: false,
+    canaryForm: {}
+  })
+
+  it('swaps ONLY the scoped resource version and preserves every other resource byte-for-byte', async () => {
+    wireScopedReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = useReleaseComposition({
+      enabled: ref(true),
+      selectedDsIds: ref(['ds-keep']),
+      versionedResources: ref([])
+    })
+    await flushPromises()
+
+    const results = await buildAndActivate(scopedAppOverride(), ['ds-keep'])
+
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
+    const [calledId, payload] = deploymentReleaseService.buildAndActivate.mock.calls[0]
+    expect(calledId).toBe('ds-keep')
+
+    // The application is keyed by global_id (adapter contract) and ONLY its version
+    // changed to the override; firewall + function keep their pinned versions.
+    const byType = Object.fromEntries(
+      payload.resources.map((resource) => [resource.resource_type, resource])
+    )
+    expect(byType.application).toEqual({
+      global_id: 42,
+      version_id: 'app-new',
+      resource_type: 'application'
+    })
+    expect(byType.firewall).toEqual({
+      resource_id: 7,
+      version_id: 'fw-keep',
+      resource_type: 'firewall'
+    })
+    expect(byType.function).toEqual({
+      resource_id: 'fn-1',
+      version_id: 'fn-keep',
+      resource_type: 'function'
+    })
+
+    expect(results[0]).toMatchObject({ id: 'ds-keep', ok: true })
+  })
+
+  it('matches the scoped application by global_id (not resource_id)', async () => {
+    wireScopedReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = useReleaseComposition({
+      enabled: ref(true),
+      selectedDsIds: ref(['ds-keep']),
+      versionedResources: ref([])
+    })
+    await flushPromises()
+
+    // The override id is the application's global_id; the swap must land on it.
+    await buildAndActivate(scopedAppOverride(), ['ds-keep'])
+    const [, payload] = deploymentReleaseService.buildAndActivate.mock.calls[0]
+    const appRef = payload.resources.find((resource) => resource.resource_type === 'application')
+    expect(appRef.global_id).toBe(42)
+    expect(appRef.version_id).toBe('app-new')
+  })
+
+  it('reports a no-op MISMATCH (never injects) when the scoped resource is absent (req 5.8)', async () => {
+    wireScopedReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = useReleaseComposition({
+      enabled: ref(true),
+      selectedDsIds: ref(['ds-other']),
+      versionedResources: ref([])
+    })
+    await flushPromises()
+
+    // ds-other holds app 99, not the scoped app 42 → mismatch, never published.
+    const results = await buildAndActivate(scopedAppOverride(), ['ds-other'])
+
+    expect(deploymentReleaseService.buildAndActivate).not.toHaveBeenCalled()
+    expect(results).toEqual([
+      {
+        id: 'ds-other',
+        ok: false,
+        skipped: true,
+        skipReason: SCOPED_PUBLISH_SKIP_REASONS.MISMATCH,
+        traceId: null,
+        value: null,
+        error: null,
+        errorType: null
+      }
+    ])
+  })
+
+  it('EXCLUDES a DEGRADED DS (no active composition) and never borrows another DS body (req 5.7)', async () => {
+    wireScopedReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = useReleaseComposition({
+      enabled: ref(true),
+      selectedDsIds: ref(['ds-gone']),
+      versionedResources: ref([])
+    })
+    await flushPromises()
+
+    const results = await buildAndActivate(scopedAppOverride(), ['ds-gone'])
+
+    expect(deploymentReleaseService.buildAndActivate).not.toHaveBeenCalled()
+    expect(results).toEqual([
+      {
+        id: 'ds-gone',
+        ok: false,
+        skipped: true,
+        skipReason: SCOPED_PUBLISH_SKIP_REASONS.DEGRADED,
+        traceId: null,
+        value: null,
+        error: null,
+        errorType: null
+      }
+    ])
+  })
+
+  it('fans out per-DS: each selected DS gets its OWN composition, mismatch/degraded excluded', async () => {
+    wireScopedReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = useReleaseComposition({
+      enabled: ref(true),
+      selectedDsIds: ref(['ds-keep', 'ds-other', 'ds-gone']),
+      versionedResources: ref([])
+    })
+    await flushPromises()
+
+    const results = await buildAndActivate(scopedAppOverride(), ['ds-keep', 'ds-other', 'ds-gone'])
+
+    // Only ds-keep is published (its own body); the other two are excluded.
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
+    expect(deploymentReleaseService.buildAndActivate.mock.calls[0][0]).toBe('ds-keep')
+
+    // Results preserve the caller's id order with per-DS outcome.
+    expect(
+      results.map((entry) => ({ id: entry.id, ok: entry.ok, skip: entry.skipReason }))
+    ).toEqual([
+      { id: 'ds-keep', ok: true, skip: undefined },
+      { id: 'ds-other', ok: false, skip: SCOPED_PUBLISH_SKIP_REASONS.MISMATCH },
+      { id: 'ds-gone', ok: false, skip: SCOPED_PUBLISH_SKIP_REASONS.DEGRADED }
+    ])
+  })
+
+  it('never POSTs version_id:null — a null/undefined override version is a hard UNRESOLVED_VERSION error (Issue 3)', async () => {
+    // The store resolves the LATEST sentinel in composePayload(), but when the
+    // scoped resource's versions were never loaded that resolution yields null.
+    // The composable must NEVER dispatch `version_id: null` (the API rejects it):
+    // every target DS is surfaced as a hard UNRESOLVED_VERSION error instead.
+    wireScopedReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = useReleaseComposition({
+      enabled: ref(true),
+      selectedDsIds: ref(['ds-keep']),
+      versionedResources: ref([])
+    })
+    await flushPromises()
+
+    const nullVersionOverride = {
+      scoped: true,
+      override: { resource_type: 'application', resource_id: 42, version: null },
+      canary: false,
+      canaryForm: {}
+    }
+    const results = await buildAndActivate(nullVersionOverride, ['ds-keep'])
+
+    // No publish was issued — a null pin never left the composable.
+    expect(deploymentReleaseService.buildAndActivate).not.toHaveBeenCalled()
+    expect(results).toEqual([
+      {
+        id: 'ds-keep',
+        ok: false,
+        skipped: true,
+        skipReason: SCOPED_PUBLISH_SKIP_REASONS.UNRESOLVED_VERSION,
+        traceId: null,
+        value: null,
+        error: null,
+        errorType: null
+      }
+    ])
+  })
+
+  it('reads the active composition on demand when it was not pre-loaded (req 2.1)', async () => {
+    // No selectedDsIds, so the watcher never pre-loads — buildAndActivate must
+    // fetch the composition itself for the target DS.
+    deploymentReleaseService.getActiveReleaseComposition.mockResolvedValue(
+      release([{ resource_type: 'application', global_id: 42, version_id: 'app-old' }])
+    )
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = useReleaseComposition({
+      enabled: ref(true),
+      selectedDsIds: ref([]),
+      versionedResources: ref([])
+    })
+    await flushPromises()
+
+    const results = await buildAndActivate(scopedAppOverride(), ['ds-lazy'])
+
+    expect(deploymentReleaseService.getActiveReleaseComposition).toHaveBeenCalledWith('ds-lazy')
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
+    expect(results[0]).toMatchObject({ id: 'ds-lazy', ok: true })
   })
 })

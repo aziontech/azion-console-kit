@@ -36,6 +36,7 @@
   import { LATEST_READY } from '@/templates/release-composition/version-options'
   import { useReleaseComposition } from '@/templates/release-composition/use-release-composition'
   import { useReleaseImpact } from '@/templates/release-composition/use-release-impact'
+  import { resolveConsumingDeployments } from '@/services/v2/release-impact/consuming-deployments'
   import {
     resolveResourceMeta,
     mapPolicyToLabel
@@ -91,6 +92,18 @@
   //                       the picker so the user chooses targets)
   const entryScenario = ref('global')
   const isFromDeployment = computed(() => entryScenario.value === 'from-deployment')
+
+  // The consuming Deployment Settings resolved for a scoped (Scenario B) entry —
+  // the SELECTABLE CANDIDATE set the picker lists (req 1.9). Populated async on
+  // mount via the HOP 1 strategy; the user picks from it (nothing pre-selected).
+  const scopedCandidateDsIds = ref([])
+
+  // Whether the scoped candidate resolution FAILED (vs genuinely resolving to an
+  // empty set). On failure we must NOT filter the picker to an empty candidate
+  // set — that hides every row and blocks the user (§7.4). Instead we fall back
+  // to the FULL DS list so the user can still pick. A genuine empty resolution
+  // (the resource truly has no consuming DS) keeps the empty filter.
+  const candidateResolutionFailed = ref(false)
 
   const store = useReleaseStore()
   const {
@@ -149,11 +162,22 @@
   // itself (delegates to its injected lookup service); created before the
   // composition so the engine reads the populated ref (design §3.1, §3.6).
   const impact = useReleaseImpact({ selectedDsIds: deploymentIds })
+  // Surfaced to the ImpactPanel so the unavailable state explains WHY (req 11.2):
+  // 'fetch_failed' (Retry may help) vs 'legacy_no_bindings' (data gap, Retry won't).
+  const impactReason = impact.degradationReason
 
   const composition = useReleaseComposition({
     selectedDsIds: deploymentIds,
     versionedResources,
-    reverseLookupByDs: impact.reverseLookupByDs
+    reverseLookupByDs: impact.reverseLookupByDs,
+    // HOP 1 (req 1.2 / 8.3): inject the REAL consuming-deployments resolver so a
+    // scoped entry resolves its candidate set over the full tenant inventory
+    // (resource-usage endpoint, falling back to the client-side fan-out) instead
+    // of the composable's `scanLoadedReleases` default — which only sees already
+    // SELECTED DSs and so resolves to `[]` on a scoped entry (it opens with none
+    // selected). `scanLoadedReleases` stays the no-injection default for callers
+    // that intentionally scan only the loaded releases.
+    resolveConsumingDeployments
   })
 
   // --- Feed composable-loaded data back into the store (single source of truth) ---
@@ -208,17 +232,41 @@
     const isFromVersion = String(query.fromVersion ?? '') === 'true'
 
     const rawDeploymentIds = query.deploymentIds ?? params.deploymentIds ?? null
-    let preselectedDsIds = Array.isArray(rawDeploymentIds)
+    const preselectedDsIds = Array.isArray(rawDeploymentIds)
       ? rawDeploymentIds
       : rawDeploymentIds
         ? String(rawDeploymentIds).split(',').filter(Boolean)
         : []
 
-    // Resource-scoped entry: pre-select the consuming Deployment Settings by a
-    // client-side scan over already-loaded active releases (req 1.3; may be
-    // empty — never fabricated, the user can then pick).
-    if (isFromVersion && incomingScopedType && resourceId && !preselectedDsIds.length) {
-      preselectedDsIds = composition.resolveConsumingDsIds(incomingScopedType, resourceId)
+    // Resource-scoped entry (Scenario B): resolve the consuming Deployment
+    // Settings as the selectable CANDIDATE set and present them in the picker,
+    // but pre-select NONE — the user must explicitly choose which DSs to publish
+    // into (req 1.9). The screen NEVER opens with deployments pre-selected.
+    // `resolveConsumingDeployments` runs through the active HOP 1 strategy
+    // (`resourceUsageResolver`); it may be async, so resolve it into the
+    // candidate ref without ever feeding `openRelease`'s selection.
+    if (isFromVersion && incomingScopedType && resourceId) {
+      candidateResolutionFailed.value = false
+      Promise.resolve(
+        composition.resolveConsumingDeployments({
+          resource_type: incomingScopedType,
+          resource_id: resourceId
+        })
+      )
+        .then((result) => {
+          candidateResolutionFailed.value = false
+          scopedCandidateDsIds.value = (result?.deployments ?? []).map((entry) =>
+            String(entry.deploymentId)
+          )
+        })
+        .catch(() => {
+          // A resolution FAILURE must not block the screen (req 7.4). It is NOT a
+          // genuine-empty candidate set: filtering the picker to `[]` would hide
+          // every row. Flag the failure so `enrichedDeployments` lists the FULL DS
+          // set instead, letting the user still pick a target.
+          candidateResolutionFailed.value = true
+          scopedCandidateDsIds.value = []
+        })
     }
 
     // Capture the entry flow once: a scoped resource is Scenario B; a deployment
@@ -230,12 +278,14 @@
         ? 'from-deployment'
         : 'global'
 
+    // Scenario B opens with ZERO selected DSs (req 1.9); only Scenario A carries
+    // its single pre-selected deployment forward.
     store.openRelease({
       fromVersion: isFromVersion,
       scopedType: incomingScopedType,
       versionId: query.versionId ?? params.versionId ?? '',
       resourceId,
-      deploymentIds: preselectedDsIds
+      deploymentIds: incomingScopedType ? [] : preselectedDsIds
     })
 
     // Prime the selectable instance catalogs the singleton selectors render:
@@ -255,6 +305,12 @@
   // composition collapses to just that one type, which is then editable).
   const isScoped = computed(() => Boolean(scopedType.value))
 
+  // The scoped composition (one resource version) is shown as soon as the screen
+  // opens — it does NOT wait for a Deployment Settings selection (req 1.9: the
+  // screen opens with the resource filled and 0 DSs selected; the picker is the
+  // final step). Non-scoped flows still gate the composition on a selected DS.
+  const showComposition = computed(() => hasSelectedDs.value || isScoped.value)
+
   // The name of the single deployment in scope (Scenario A) — for the intro/notice.
   const deploymentName = computed(() => {
     const match = deployments.value.find((ds) => String(ds.id) === String(effDsId.value))
@@ -268,7 +324,7 @@
   // isn't enough on its own.
   watch(
     deploymentName,
-    (name) => breadcrumbs.update(route.meta.breadCrumbs ?? [], route, name || undefined),
+    (name) => breadcrumbs.update(route.meta?.breadCrumbs ?? [], route, name || undefined),
     { immediate: true }
   )
 
@@ -343,7 +399,7 @@
   // `resources` computed, re-keyed to the real resource types and wired to the
   // real store + composable. One uniform card per type.
   const resources = computed(() => {
-    if (!hasSelectedDs.value) return []
+    if (!showComposition.value) return []
 
     const scoped = isScoped.value
     const types = scoped ? [scopedType.value] : SINGLETON_TYPES
@@ -370,7 +426,18 @@
       const base = activeReleaseResources.value[type] ?? { resourceId: null, version: null }
       const catalogOptions = composition.catalogOptionsFor(type)
       const fallbackResourceId = base.resourceId ?? catalogOptions[0]?.value ?? null
-      const name = resNames.value[type] !== undefined ? resNames.value[type] : fallbackResourceId
+      const rawName = resNames.value[type] !== undefined ? resNames.value[type] : fallbackResourceId
+      // Normalise the selected id to the catalog option's NATIVE value type so the
+      // dropdown's strict-equality match resolves the label. A scoped entry seeds
+      // `resNames[scopedType]` from the route (always a STRING), while the catalog
+      // options carry numeric ids — without this coercion the strict `===` in
+      // ResourceSelectField fails and the card shows the placeholder ("Select
+      // Application") instead of the selected resource name + version. Fall back to
+      // the raw id when the catalog has not loaded yet (never fabricated).
+      const matchedOption = catalogOptions.find(
+        (option) => String(option.value) === String(rawName)
+      )
+      const name = matchedOption ? matchedOption.value : rawName
       // Default to the LATEST_READY sentinel; a scoped-from-version entry pins
       // the promoted version. The user picks/confirms before deploy.
       const version =
@@ -394,8 +461,11 @@
         nameOptions: composition.catalogOptionsFor(type),
         isLoadingOptions: composition.isLoadingCatalog(type),
         version,
-        versionOptions: composition.versionOptionsFor(type, name),
-        isLoadingVersions: composition.isLoadingVersionsFor(type, name),
+        // Version options are loaded under the RAW id (`versionedResources` keys
+        // off `resNames`/the active release), so look them up by `rawName` to stay
+        // on the same store key — `name` may be the coerced catalog value.
+        versionOptions: composition.versionOptionsFor(type, rawName),
+        isLoadingVersions: composition.isLoadingVersionsFor(type, rawName),
         ownedCollections: owned,
         hasOwned: owned.length > 0,
         lockReason: 'Kept from the active release'
@@ -464,7 +534,18 @@
   const dsQuery = ref('')
   const enrichedDeployments = computed(() => {
     const term = dsQuery.value.trim().toLowerCase()
+    // Scoped (Scenario B): restrict the picker to the resolved consuming-DS
+    // candidate set (req 1.9). Non-scoped flows list every Deployment Settings.
+    // On a candidate-resolution FAILURE (§7.4) do NOT filter — an empty Set would
+    // match nothing and block the user; fall back to the FULL list (null = no
+    // filter) so the user can still pick. A genuine-empty resolution keeps the
+    // (empty) candidate filter.
+    const candidateSet =
+      isScoped.value && !candidateResolutionFailed.value
+        ? new Set(scopedCandidateDsIds.value)
+        : null
     return deployments.value
+      .filter((ds) => !candidateSet || candidateSet.has(String(ds.id)))
       .filter(
         (ds) =>
           !term ||
@@ -625,7 +706,7 @@
 
           <div class="flex flex-col gap-[var(--spacing-6)] p-[var(--spacing-4)]">
             <div
-              v-if="hasSelectedDs"
+              v-if="showComposition"
               class="order-1 flex flex-col gap-[var(--spacing-3)]"
               data-testid="release-composition__composition"
             >
@@ -687,22 +768,26 @@
               />
             </div>
 
+            <CanaryStrategyField
+              v-if="showComposition"
+              class="order-2 border-t border-[var(--surface-border)] pt-[var(--spacing-6)]"
+              @update:enabled="onCanaryEnabled"
+              @update:form="onCanaryForm"
+            />
+
+            <!-- The Deployment Settings picker is the FINAL section: it sits below
+                 the composition (and canary), never the opening element (req 4.5 /
+                 NRS §1.4). `order-3` + source-last keeps it last regardless of
+                 which sibling sections render. -->
             <DeploymentSettingsPicker
               v-if="!isFromDeployment"
-              class="order-2"
+              class="order-3"
               :deployments="enrichedDeployments"
               :model-value="deploymentIds"
               :query="dsQuery"
               @update:model-value="onPickDs"
               @update:query="dsQuery = $event"
               @bind-environment="onBindEnvironment"
-            />
-
-            <CanaryStrategyField
-              v-if="hasSelectedDs"
-              class="order-3 border-t border-[var(--surface-border)] pt-[var(--spacing-6)]"
-              @update:enabled="onCanaryEnabled"
-              @update:form="onCanaryForm"
             />
           </div>
         </section>
@@ -725,6 +810,7 @@
           <div class="p-[var(--spacing-4)]">
             <ImpactPanel
               :impact="composition.impact.value"
+              :degradation-reason="impactReason"
               @retry="retryImpact"
             />
           </div>

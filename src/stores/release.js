@@ -337,16 +337,36 @@ export const useReleaseStore = defineStore('release', {
     composeResources() {
       const resources = []
 
+      // Scenario A/B baseline: the effective DS's active release pre-fills each
+      // singleton card WITHOUT seeding `resNames` (the view's display falls back to
+      // it). Mirror that fallback here so re-releasing a deployment unchanged still
+      // ships its resources — otherwise the payload is an empty `resources[]`, which
+      // the API rejects with a Zod `too_small`. An explicit pick (`resNames`) wins.
+      const activeResources = Array.isArray(this.activeReleaseByDs[this.effDsId]?.resources)
+        ? this.activeReleaseByDs[this.effDsId].resources
+        : []
+      const baseResourceIdFor = (type) => {
+        const match = activeResources.find((resource) => resource?.resource_type === type)
+        return match ? (match.resource_id ?? match.global_id ?? null) : null
+      }
+
       SINGLETON_TYPES.forEach((type) => {
         const isOptional = OPTIONAL_SINGLETON_TYPES.includes(type)
         if (isOptional && this.resEnabled[type] === false) return
 
-        const resourceId = this.resNames[type]
+        const explicitId = this.resNames[type]
+        const resourceId =
+          explicitId != null && explicitId !== '' ? explicitId : baseResourceIdFor(type)
         if (resourceId == null || resourceId === '') return
 
+        // Default to the LATEST_READY sentinel (what the card shows) when the user
+        // hasn't pinned a version, so it resolves to a concrete latest id below.
+        // `?? LATEST_READY` is the single LATEST-default rule shared with the
+        // scoped `composePayload` branch (a null/undefined pick → LATEST).
+        const selectedVersion = this.resVers[type] ?? LATEST_READY
         resources.push({
           resource_id: resourceId,
-          resource_version: this.resolveVersion(type, resourceId, this.resVers[type]),
+          resource_version: this.resolveVersion(type, resourceId, selectedVersion),
           resource_type: type
         })
       })
@@ -367,13 +387,43 @@ export const useReleaseStore = defineStore('release', {
     },
 
     // PURE description of the current selection for dispatch (no I/O, no service
-    // import — Property 6: the 'LATEST' sentinel never leaves the store). Returns
-    // the flat `resources[]` plus the raw canary inputs; the composable turns this
-    // into the adapter payload (`buildStrategy` + `transformBuildAndActivatePayload`)
-    // and fans it out, because the composable is the layer allowed to call services.
+    // import — Property 6: the 'LATEST' sentinel never leaves the store). The shape
+    // is DISCRIMINATED by entry context (req 5.6/5.7/5.8); the composable branches
+    // on `scoped` to choose the write path:
+    //
+    //   non-scoped (Scenario A — opened from one Deployment) → the full composed
+    //     payload fanned out as a single body: `{ scoped: false, resources,
+    //     canary, canaryForm }` (current behaviour; `composeResources` already
+    //     carries the active-release fallback so re-releasing unchanged still ships).
+    //
+    //   scoped (Scenario B — opened from one Resource version) → only the OVERRIDE
+    //     intent: `{ scoped: true, override: { resource_type, resource_id, version },
+    //     canary, canaryForm }`. The composable preserves each selected DS's active
+    //     composition and swaps ONLY this resource's version per DS (no per-DS data
+    //     leaks into the store — it stays pure). `version` is resolved from the
+    //     LATEST sentinel HERE so the sentinel never leaves the store (Property 6);
+    //     `resource_id` is the explicit pick (`resNames`) or the scoped entry id.
     composePayload() {
+      if (!this.scopedType) {
+        return {
+          scoped: false,
+          resources: this.composeResources(),
+          canary: this.canary,
+          canaryForm: { ...this.canaryForm }
+        }
+      }
+
+      const scopedType = this.scopedType
+      const resourceId = this.resNames[scopedType] ?? this.resourceId
+      const selectedVersion = this.resVers[scopedType] ?? LATEST_READY
+
       return {
-        resources: this.composeResources(),
+        scoped: true,
+        override: {
+          resource_type: scopedType,
+          resource_id: resourceId,
+          version: this.resolveVersion(scopedType, resourceId, selectedVersion)
+        },
         canary: this.canary,
         canaryForm: { ...this.canaryForm }
       }

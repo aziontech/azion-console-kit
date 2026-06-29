@@ -30,6 +30,7 @@
  */
 import { describe, it, expect } from 'vitest'
 import { createFanoutResolver } from './fanout-resolver'
+import { createResourceUsageResolver } from './resource-usage-resolver'
 import { assertConsumingDeploymentsShape, resourceKey } from './contract'
 
 // ---------------------------------------------------------------------------
@@ -73,6 +74,39 @@ const fanoutServicesFor = (scenario) => ({
   deploymentReleaseService: {
     getActiveReleaseComposition: (dsId) =>
       Promise.resolve(scenario.releaseByDs[dsId] ?? { resources: [] })
+  }
+})
+
+// Drive the resource-usage resolver from the SAME ContractScenario: the fake
+// `listResourceUsage` derives the endpoint's per-deployment rows from each DS's
+// active release (single-type per call, `application` matched by `global_id`).
+const resourceUsageServicesFor = (scenario) => ({
+  resourceUsageService: {
+    listResourceUsage: ({ resourceType, resourceIds }) => {
+      const wanted = new Set(resourceIds.map(String))
+      const rows = scenario.dsIds
+        .map((dsId) => {
+          const releaseResources = scenario.releaseByDs[dsId]?.resources ?? []
+          const matched = releaseResources.filter((resource) => {
+            if (resource.resource_type !== resourceType) return false
+            const idField =
+              resourceType === 'application' ? resource.global_id : resource.resource_id
+            return wanted.has(String(idField))
+          })
+          if (matched.length === 0) return null
+          return {
+            deployment_id: dsId,
+            resources: matched.map((resource) => ({
+              resource_type: resource.resource_type,
+              resource_id: resource.resource_id,
+              global_id: resource.global_id,
+              resource_version: resource.version_id
+            }))
+          }
+        })
+        .filter(Boolean)
+      return Promise.resolve({ body: rows, count: rows.length })
+    }
   }
 })
 
@@ -327,4 +361,9 @@ export const runConsumingDeploymentsContract = ({ name, makeResolver }) => {
 runConsumingDeploymentsContract({
   name: 'fanoutResolver',
   makeResolver: (scenario) => createFanoutResolver(fanoutServicesFor(scenario))
+})
+
+runConsumingDeploymentsContract({
+  name: 'resourceUsageResolver',
+  makeResolver: (scenario) => createResourceUsageResolver(resourceUsageServicesFor(scenario))
 })
