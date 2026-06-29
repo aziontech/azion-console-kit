@@ -78,11 +78,11 @@
     wafVersionService.useLoadVersionQuery(props.resourceId, props.versionId)
 
   // WAF is versioned-only: no Deploy/Promote/Rollback. The shell resolves this
-  // from resourceType="waf", so no deploy context is built nor a drawer mounted.
+  // from resourceType="waf", so no deploy context is built nor a composer routed.
   const shellRef = ref(null)
-  const openDeployDrawer = () => shellRef.value?.openDeployDrawer()
+  const openRelease = () => shellRef.value?.openRelease()
 
-  defineExpose({ openDeployDrawer })
+  defineExpose({ openRelease })
 </script>
 
 <template>

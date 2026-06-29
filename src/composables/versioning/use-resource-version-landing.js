@@ -4,6 +4,7 @@ import { useToast } from '@aziontech/webkit/use-toast'
 import { VERSION_ACTIONS } from '@/composables/versioning/version-machine'
 import { toDeployableVersionOptions } from '@/composables/versioning/to-version-options'
 import { getVersionCapability } from '@/composables/versioning/version-capability'
+import { releaseComposerRouteFromResource } from '@/templates/release-composition/release-composer-route'
 
 export const LANDING_TAB = { VERSIONS: 0, SETTINGS: 1 }
 
@@ -20,9 +21,11 @@ const SUCCESS_SUMMARY = {
  * useResourceVersionLanding — the shared logic for the TABBED landing screen
  * (Versions listing + Settings = Main Settings of the latest version), used by
  * Custom Pages and Firewall. Owns: resource load + provide, the latest-version
- * resolver, the route-driven active tab, the deploy drawer + its resourceContext
- * (via the shared version-option mapper), toast + navigation, and the
- * command-success/error handlers. Markup lives in <ResourceVersionLanding>.
+ * resolver, the route-driven active tab, the Deploy/Promote entries (which route
+ * to the full-page release composer) plus the legacy drawer's resourceContext
+ * (kept as a rollback fallback, via the shared version-option mapper), toast +
+ * navigation, and the command-success/error handlers. Markup lives in
+ * <ResourceVersionLanding>.
  *
  * @param {{
  *   load: (id: string) => Promise<object>,
@@ -64,7 +67,9 @@ export function useResourceVersionLanding({
     resourceId,
     versionService,
     router,
-    ...(capability.canDeploy ? { openPromoteDrawer: (payload) => openPromoteDrawer(payload) } : {}),
+    ...(capability.canDeploy
+      ? { openPromoteDrawer: (payload) => openPromoteRelease(payload) }
+      : {}),
     onSuccess: () => versionsQuery.refetch?.()
   })
 
@@ -105,23 +110,39 @@ export function useResourceVersionLanding({
     }
   })
 
+  // DeployDrawerBlock stays mounted (rollback fallback); the visible/pinned models
+  // are retained but the Deploy/Promote entries now route to the full-page composer.
   const isDeployDrawerOpen = ref(false)
   // Version pinned by a row-menu Promote; cleared when the drawer closes.
   const pinnedDeployVersionId = ref(null)
-  const openDeployDrawer = () => {
-    pinnedDeployVersionId.value = null
-    isDeployDrawerOpen.value = true
-  }
 
-  // Promote from the row menu: open the release drawer with this version pinned.
-  const openPromoteDrawer = ({ pin } = {}) => {
-    pinnedDeployVersionId.value = pin ?? null
-    isDeployDrawerOpen.value = true
-  }
-
-  // Deployable (Ready) version options for the drawer; the shared mapper orders
-  // them newest-first.
+  // Deployable (Ready) version options; the shared mapper orders them newest-first.
   const deployableVersionOptions = computed(() => toDeployableVersionOptions(rawVersions.value))
+
+  // Heading/footer Deploy: route to the composer scoped to this resource, pinning
+  // the newest Ready version so the composer opens with a concrete selection.
+  const openRelease = () => {
+    router.push(
+      releaseComposerRouteFromResource({
+        resourceType,
+        resourceId: Number(resourceId.value),
+        version: null,
+        versions: deployableVersionOptions.value
+      })
+    )
+  }
+
+  // Promote from the row menu: route to the composer with this version pinned.
+  const openPromoteRelease = ({ pin } = {}) => {
+    router.push(
+      releaseComposerRouteFromResource({
+        resourceType,
+        resourceId: Number(resourceId.value),
+        version: pin ? { id: pin } : null,
+        versions: deployableVersionOptions.value
+      })
+    )
+  }
 
   // A row-menu Promote pins a version; otherwise default to the latest deployable
   // one so the drawer always references a concrete version (the banner and the
@@ -153,7 +174,7 @@ export function useResourceVersionLanding({
 
   const handleCommandSuccess = ({ action, result }) => {
     if (action === VERSION_ACTIONS.DEPLOY) {
-      openDeployDrawer()
+      openRelease()
       return
     }
 
@@ -200,8 +221,8 @@ export function useResourceVersionLanding({
     latestVersionId,
     activeTab,
     isDeployDrawerOpen,
-    openDeployDrawer,
-    openPromoteDrawer,
+    openRelease,
+    openPromoteRelease,
     deployResourceContext,
     handleCommandSuccess,
     handleCommandError,

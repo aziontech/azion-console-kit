@@ -1,12 +1,12 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
-import CanaryStrategyField from '@/templates/deploy-drawer-block/components/CanaryStrategyField.vue'
+import CanaryStrategyField from '@/templates/release-composition/components/CanaryStrategyField.vue'
 import {
   ROLLOUT_MODE_OPTIONS,
   canaryStrategyValidationSchema,
   buildCanaryInitialValues
-} from '@/templates/deploy-drawer-block/components/canary-strategy-validation'
+} from '@/templates/release-composition/components/canary-strategy-validation'
 
 const fieldStub = (testid) => ({
   name: testid,
@@ -35,8 +35,8 @@ describe('CanaryStrategyField', () => {
   it('renders the toggle and hides the gradual_rollout inputs while disabled', () => {
     const wrapper = makeWrapper()
 
-    expect(wrapper.find('[data-testid="deploy-drawer__canary-toggle"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="deploy-drawer__canary-fields"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="release-composition__canary-toggle"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="release-composition__canary-fields"]').exists()).toBe(false)
   })
 
   it('emits the disabled state and the canary form on mount', () => {
@@ -55,13 +55,19 @@ describe('CanaryStrategyField', () => {
 
     await enableCanary(wrapper)
 
-    expect(wrapper.find('[data-testid="deploy-drawer__canary-fields"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="deploy-drawer__canary-rollout-mode"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="release-composition__canary-fields"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="release-composition__canary-rollout-mode"]').exists()).toBe(
+      true
+    )
     expect(
-      wrapper.find('[data-testid="deploy-drawer__canary-candidate-percentage"]').exists()
+      wrapper.find('[data-testid="release-composition__canary-candidate-percentage"]').exists()
     ).toBe(true)
-    expect(wrapper.find('[data-testid="deploy-drawer__canary-cookie-name"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="deploy-drawer__canary-cookie-max-age"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="release-composition__canary-cookie-name"]').exists()).toBe(
+      true
+    )
+    expect(
+      wrapper.find('[data-testid="release-composition__canary-cookie-max-age"]').exists()
+    ).toBe(true)
 
     expect(wrapper.emitted('update:enabled')?.at(-1)).toEqual([true])
   })
