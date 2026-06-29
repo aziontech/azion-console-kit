@@ -131,26 +131,37 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
     expect(result.hasSelection).toBe(true)
     expect(result.impactUnavailable).toBe(false)
 
-    // Per-DS tree: name resolved from the deployments listing, env from the
-    // first env of the injected ref, domains/wlCount derived per DS, and one row
-    // per workload carrying its domain count.
+    // Per-DS tree: name from the deployments listing; workloads grouped under
+    // `environments[]` (DS → environment → workload rows); domains/wlCount per DS.
     expect(result.perDs).toEqual([
       {
         name: 'Storefront',
-        env: 'Production',
         domains: 3,
         wlCount: 2,
-        rows: [
-          { name: 'web-a', domains: 2 },
-          { name: 'web-b', domains: 1 }
+        environments: [
+          {
+            name: 'Production',
+            wlCount: 2,
+            domains: 3,
+            rows: [
+              { name: 'web-a', domains: 2 },
+              { name: 'web-b', domains: 1 }
+            ]
+          }
         ]
       },
       {
         name: 'Checkout',
-        env: 'Staging',
         domains: 1,
         wlCount: 1,
-        rows: [{ name: 'api-c', domains: 1 }]
+        environments: [
+          {
+            name: 'Staging',
+            wlCount: 1,
+            domains: 1,
+            rows: [{ name: 'api-c', domains: 1 }]
+          }
+        ]
       }
     ])
 
@@ -166,7 +177,7 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
     setDeployments([{ id: 'ds-1', name: 'Multi-env DS' }])
 
     // Two workloads in distinct environments under the SAME DS: the engine groups
-    // by `environmentId`, and the per-DS `env` shows the FIRST environment only.
+    // by `environmentId` into `environments[]` (one entry per environment).
     const reverseLookupByDs = ref({
       'ds-1': [
         row({
@@ -193,13 +204,12 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
     })
 
     const entry = impact.value.perDs[0]
-    expect(entry.env).toBe('Production')
     expect(entry.wlCount).toBe(2)
     expect(entry.domains).toBe(3)
-    // Rows preserve workload order across environments (flattened tree).
-    expect(entry.rows).toEqual([
-      { name: 'prod-wl', domains: 2 },
-      { name: 'stage-wl', domains: 1 }
+    // Grouped by environment: one entry per env, each carrying its own rows.
+    expect(entry.environments).toEqual([
+      { name: 'Production', wlCount: 1, domains: 2, rows: [{ name: 'prod-wl', domains: 2 }] },
+      { name: 'Staging', wlCount: 1, domains: 1, rows: [{ name: 'stage-wl', domains: 1 }] }
     ])
   })
 
@@ -277,10 +287,11 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
     expect(result.perDs).toEqual([
       {
         name: 'Storefront',
-        env: 'Production',
         domains: 2,
         wlCount: 1,
-        rows: [{ name: 'web-a', domains: 2 }]
+        environments: [
+          { name: 'Production', wlCount: 1, domains: 2, rows: [{ name: 'web-a', domains: 2 }] }
+        ]
       }
     ])
     expect(result.totals).toEqual({ dsCount: 1, totalWorkloads: 1, totalDomains: 2 })
@@ -301,9 +312,7 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
 
     const result = impact.value
     expect(result.impactUnavailable).toBe(false)
-    expect(result.perDs).toEqual([
-      { name: 'Empty DS', env: null, domains: 0, wlCount: 0, rows: [] }
-    ])
+    expect(result.perDs).toEqual([{ name: 'Empty DS', domains: 0, wlCount: 0, environments: [] }])
     expect(result.totals).toEqual({ dsCount: 1, totalWorkloads: 0, totalDomains: 0 })
   })
 
@@ -330,7 +339,7 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
 
     const entry = impact.value.perDs[0]
     expect(entry.name).toBe('ds-orphan')
-    expect(entry.env).toBe('Env One')
+    expect(entry.environments[0].name).toBe('Env One')
     expect(entry.domains).toBe(1)
   })
 })
