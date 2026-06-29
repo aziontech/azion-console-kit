@@ -39,7 +39,7 @@ describe('ResourceVersionField', () => {
 
     expect(groups[0].items[0].value).toBe(LATEST_READY)
     expect(groups[0].items[0].isLatest).toBe(true)
-    expect(groups[1].label).toBe('PIN A READY VERSION')
+    expect(groups[1].label).toBe('Pin a Ready version')
     expect(groups[1].items).toEqual(versions)
   })
 

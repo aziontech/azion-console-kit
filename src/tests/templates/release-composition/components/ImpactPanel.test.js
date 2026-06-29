@@ -93,15 +93,21 @@ describe('ImpactPanel', () => {
         {
           name: 'production-edge',
           domains: 5,
-          env: 'production',
           wlCount: 2,
-          rows: [
-            { name: 'workload-a', domains: 3 },
-            { name: 'workload-b', domains: 2 }
+          environments: [
+            {
+              name: 'production',
+              wlCount: 2,
+              domains: 5,
+              rows: [
+                { name: 'workload-a', domains: 3 },
+                { name: 'workload-b', domains: 2 }
+              ]
+            }
           ]
         }
       ],
-      totals: { domains: 5, workloads: 2, dsCount: 1 }
+      totals: { totalDomains: 5, totalWorkloads: 2, dsCount: 1 }
     }
 
     it('renders the per-DS tree with the environment and workload rows', () => {
