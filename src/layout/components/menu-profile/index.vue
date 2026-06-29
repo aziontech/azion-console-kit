@@ -367,6 +367,10 @@
     return user.value.kind === 'client'
   })
 
+  const hasAccessToEnvironments = computed(() => {
+    return user.value?.client_flags?.includes('use_v6_configurations') ?? false
+  })
+
   onBeforeMount(() => {
     switch (user.value.kind) {
       case 'brand':
@@ -396,6 +400,11 @@
     {
       label: 'Account Settings',
       to: '/account/settings'
+    },
+    {
+      label: 'Environments',
+      to: '/environments',
+      visible: hasAccessToEnvironments.value
     },
     {
       label: 'Users Management',
