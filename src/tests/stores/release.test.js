@@ -380,3 +380,82 @@ describe('seedColl — inherit dependency instances from the active release', ()
     expect(store.coll).toEqual({ function: [], connector: [], waf: [], network_list: [] })
   })
 })
+
+// ---------------------------------------------------------------------------
+// composePayload — DISCRIMINATED by entry context (task 17.1, req 5.6/5.7/5.8).
+// Non-scoped → the full composed `resources[]` (Scenario A, fanned out as one
+// body). Scoped → only the override intent `{ resource_type, resource_id,
+// version }` (Scenario B, the composable preserves & swaps per DS). The store
+// stays PURE: it never reads per-DS data and the LATEST sentinel is resolved
+// here so it never leaves the store (Property 6).
+// ---------------------------------------------------------------------------
+describe('composePayload — discriminated by entry context', () => {
+  it('non-scoped → { scoped:false, resources, canary, canaryForm } (Scenario A)', () => {
+    const store = useReleaseStore()
+    store.openRelease({ deploymentIds: ['ds-1'] })
+    store.setResName(APPLICATION_TYPE, 'app-1')
+    store.setResVer(APPLICATION_TYPE, 'app-v1')
+    store.setVersionsByResource(APPLICATION_TYPE, 'app-1', [{ value: 'app-v1', isCurrent: true }])
+
+    const payload = store.composePayload()
+
+    expect(payload.scoped).toBe(false)
+    expect(payload).not.toHaveProperty('override')
+    expect(payload.resources).toEqual([
+      { resource_id: 'app-1', resource_version: 'app-v1', resource_type: APPLICATION_TYPE }
+    ])
+    expect(payload.canary).toBe(false)
+    expect(payload.canaryForm).toEqual({})
+  })
+
+  it('scoped → { scoped:true, override:{ type, id, version }, canary, canaryForm } (Scenario B)', () => {
+    const store = useReleaseStore()
+    // Scenario B: opened from one resource version. `resourceId` is the route
+    // string id; `versionId` is the promoted version pinned into the scoped slot.
+    store.openRelease({
+      fromVersion: true,
+      scopedType: APPLICATION_TYPE,
+      resourceId: '521846',
+      versionId: 'app-promoted'
+    })
+
+    const payload = store.composePayload()
+
+    expect(payload.scoped).toBe(true)
+    expect(payload).not.toHaveProperty('resources')
+    expect(payload.override).toEqual({
+      resource_type: APPLICATION_TYPE,
+      resource_id: '521846',
+      version: 'app-promoted'
+    })
+  })
+
+  it('scoped → resolves the LATEST sentinel to a concrete version before it leaves the store', () => {
+    const store = useReleaseStore()
+    store.openRelease({ scopedType: 'firewall', resourceId: 'fw-1' })
+    // No pinned version → defaults to the LATEST sentinel, which composePayload
+    // must resolve against the loaded options (Property 6: no 'LATEST' escapes).
+    store.setVersionsByResource('firewall', 'fw-1', [
+      { value: 'fw-v1', isCurrent: false },
+      { value: 'fw-v9', isCurrent: true }
+    ])
+
+    const payload = store.composePayload()
+
+    expect(payload.scoped).toBe(true)
+    expect(payload.override.version).toBe('fw-v9')
+    expect(payload.override.version).not.toBe(LATEST_READY)
+  })
+
+  it('scoped → an explicit instance pick (resNames) overrides the route resourceId', () => {
+    const store = useReleaseStore()
+    store.openRelease({ scopedType: 'firewall', resourceId: 'fw-route' })
+    store.setResName('firewall', 'fw-picked')
+    store.setVersionsByResource('firewall', 'fw-picked', [{ value: 'fw-vX', isCurrent: true }])
+
+    const payload = store.composePayload()
+
+    expect(payload.override.resource_id).toBe('fw-picked')
+    expect(payload.override.version).toBe('fw-vX')
+  })
+})

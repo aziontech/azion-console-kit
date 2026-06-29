@@ -51,6 +51,20 @@
     set: (value) => emit('update:modelValue', value)
   })
 
+  // Selection is driven by the ROW click (single source of truth) and the visual
+  // Checkbox is a controlled, non-interactive reflection of `modelValue`. This
+  // avoids the double-toggle a label-wrapped self-toggling Checkbox produced — a
+  // click on the box fired PrimeVue's own toggle AND the wrapping <label>
+  // forwarded a second toggle to the native input, netting to no change (the
+  // reported "first click does nothing", with the box left visually checked but
+  // the model — and so the counter/impact — never updated).
+  const toggle = (id) => {
+    const isSelected = props.modelValue.some((item) => String(item) === String(id))
+    selectedIds.value = isSelected
+      ? props.modelValue.filter((item) => String(item) !== String(id))
+      : [...props.modelValue, id]
+  }
+
   const searchTerm = computed({
     get: () => props.query,
     set: (value) => emit('update:query', value)
@@ -62,6 +76,37 @@
   const searchPlaceholder = computed(() => `Search ${total.value} Deployment Settings`)
 
   const hasDeployments = computed(() => total.value > 0)
+
+  // Select-all / clear-all over the LISTED candidate set (req 1.9 / NRS §4.5).
+  // `deployments` may be a filtered/capped view (search term, display cap), so
+  // these operate ONLY on the currently LISTED rows and never disturb selections
+  // hidden by the search. They emit through the array contract
+  // (`update:modelValue`) exactly like a row toggle, so the parent's selection
+  // wiring stays single-sourced.
+  const isSelected = (id) => props.modelValue.some((item) => String(item) === String(id))
+
+  // `allSelected` reflects whether every LISTED row is already in the selection
+  // (so it disables select-all once the visible set is fully picked), regardless
+  // of selections hidden by the current search.
+  const allSelected = computed(
+    () => hasDeployments.value && props.deployments.every((deployment) => isSelected(deployment.id))
+  )
+
+  // Select-all UNIONS the listed ids with the existing selection so rows hidden
+  // by the search/cap stay selected (never dropped).
+  const selectAll = () => {
+    const listedToAdd = props.deployments
+      .map((deployment) => deployment.id)
+      .filter((id) => !isSelected(id))
+    selectedIds.value = [...props.modelValue, ...listedToAdd]
+  }
+
+  // Clear-all removes ONLY the listed rows from the selection, preserving any
+  // selections hidden by the search/cap.
+  const clearAll = () => {
+    const listedIds = new Set(props.deployments.map((deployment) => String(deployment.id)))
+    selectedIds.value = props.modelValue.filter((item) => !listedIds.has(String(item)))
+  }
 </script>
 
 <template>
@@ -112,6 +157,24 @@
       >
         {{ selectedCount }} selected
       </span>
+      <span class="flex items-center gap-[var(--spacing-2)]">
+        <PrimeButton
+          label="Select all"
+          link
+          size="small"
+          :disabled="allSelected"
+          data-testid="release-composition__ds-select-all"
+          @click="selectAll"
+        />
+        <PrimeButton
+          label="Clear all"
+          link
+          size="small"
+          :disabled="selectedCount === 0"
+          data-testid="release-composition__ds-clear-all"
+          @click="clearAll"
+        />
+      </span>
     </div>
 
     <div
@@ -119,9 +182,13 @@
       class="flex flex-col gap-[var(--spacing-3)] overflow-y-auto max-h-[var(--container-xs)] pr-[var(--spacing-1)]"
       data-testid="release-composition__ds-list"
     >
-      <label
+      <div
         v-for="ds in deployments"
         :key="ds.id"
+        role="checkbox"
+        :aria-checked="selectedIds.includes(ds.id)"
+        :aria-label="ds.name"
+        tabindex="0"
         class="flex cursor-pointer items-start gap-[var(--spacing-3)] rounded-[var(--shape-card)] border px-[var(--spacing-4)] py-[var(--spacing-4)] transition-colors"
         :class="
           selectedIds.includes(ds.id)
@@ -129,10 +196,15 @@
             : 'border-[var(--surface-border)]'
         "
         :data-testid="`release-composition__ds-row-${ds.id}`"
+        @click="toggle(ds.id)"
+        @keydown.enter.prevent="toggle(ds.id)"
+        @keydown.space.prevent="toggle(ds.id)"
       >
         <Checkbox
-          v-model="selectedIds"
-          :value="ds.id"
+          :modelValue="selectedIds.includes(ds.id)"
+          binary
+          tabindex="-1"
+          class="pointer-events-none"
           :inputId="`release-composition__ds-checkbox-${ds.id}`"
           :data-testid="`release-composition__ds-checkbox-${ds.id}`"
         />
@@ -163,7 +235,7 @@
         >
           {{ ds.policyLabel }}
         </span>
-      </label>
+      </div>
     </div>
 
     <div

@@ -82,6 +82,42 @@ const releaseResourceId = (resource) => resource?.resource_id ?? resource?.globa
 const releaseResourceVersion = (resource) =>
   resource?.version_id ?? resource?.resource_version_id ?? resource?.resource_version ?? null
 
+// Does an active-release resource match the scoped override? `application` is
+// matched by `global_id`, every other type by `resource_id` (req 1.5) — the same
+// rule the HOP 1 contract encodes, reused here so it is never re-derived.
+const matchesOverride = (releaseResource, override) =>
+  releaseResource?.resource_type === override.resource_type &&
+  releaseResource?.[matchFieldFor(override)] != null &&
+  String(releaseResource[matchFieldFor(override)]) === String(override.resource_id)
+
+// Map a DS's active-release resources (deployment-api shape: `application` keyed
+// by `global_id`, others by `resource_id`, version pinned in `version_id`) into
+// the FLAT `{ resource_id, resource_version, resource_type }` shape the adapter
+// consumes — the same shape `store.composeResources()` produces, so
+// `transformBuildAndActivatePayload` re-keys `application` back to `global_id`
+// uniformly. Every non-scoped resource is carried over BYTE-FOR-BYTE: same id,
+// same pinned version (req 5.6).
+const toAdapterResources = (releaseResources) =>
+  (Array.isArray(releaseResources) ? releaseResources : []).map((resource) => ({
+    resource_id: releaseResourceId(resource),
+    resource_version: releaseResourceVersion(resource),
+    resource_type: resource?.resource_type
+  }))
+
+// Per-DS outcome markers for the scoped preserve-&-swap path: a DS whose active
+// composition is unavailable is DEGRADED and excluded (req 5.7); a DS whose
+// composition does not contain the scoped resource is a no-op MISMATCH and is
+// never injected (req 5.8). A scoped override whose version did NOT resolve to a
+// concrete id (the LATEST sentinel had no loaded versions, so it resolved to
+// `null`) is UNRESOLVED_VERSION: it is a hard error surfaced to the consumer,
+// never published as `version_id: null` (the API rejects that). All three are
+// reported to the consumer, never published.
+export const SCOPED_PUBLISH_SKIP_REASONS = Object.freeze({
+  DEGRADED: 'degraded',
+  MISMATCH: 'mismatch',
+  UNRESOLVED_VERSION: 'unresolved_version'
+})
+
 /**
  * @param {object} options
  * @param {import('vue').Ref<boolean>|(() => boolean)} [options.enabled] - Gates
@@ -486,55 +522,167 @@ export function useReleaseComposition({
   // --- Dispatch: build_and_activate fan-out (Property 7) -------------------
 
   // The composable is the layer allowed to call services, so the per-DS dispatch
-  // lives here (mirrors `use-deploy-drawer.js` `deploy()`). The store hands over
-  // a PURE `composePayload()` (`{ resources, canary, canaryForm }`); this builds
-  // the canary strategy and the adapter payload, then fans out one independent
-  // `build_and_activate` per selected DS via `Promise.allSettled` — a per-DS
-  // settled `{ id, ok, traceId, value, error, errorType }`, NO retry (req 5.1,
-  // 5.3). The payload is built once (resources are DS-agnostic). Each success
-  // carries the async `trace_id` (req 5.2/11.1); the API `422 43007` is the
-  // versioned-URLs limit barrier, surfaced as a typed `errorType` (req 5.5/7.2).
+  // lives here (mirrors `use-deploy-drawer.js` `deploy()`). The store hands over a
+  // PURE, DISCRIMINATED `composePayload()`; this branches on `payload.scoped`:
+  //
+  //   non-scoped (Scenario A) → build ONE adapter payload from `payload.resources`
+  //     (resources are DS-agnostic) and fan it out to every DS unchanged (req 5.1).
+  //
+  //   scoped (Scenario B) → build a PER-DS body: each DS's own active composition
+  //     with ONLY the scoped resource's version swapped (preserve & swap, req 5.6).
+  //     A DS whose active composition is unavailable is DEGRADED and excluded
+  //     (req 5.7); a DS that does not contain the scoped resource is a no-op
+  //     MISMATCH and is never injected (req 5.8). Both are reported, never published.
+  //
+  // Either way the dispatch fans out one independent `build_and_activate` per DS
+  // via `Promise.allSettled` — a per-DS settled `{ id, ok, traceId, value, error,
+  // errorType }`, NO retry (req 5.3). Each success carries the async `trace_id`
+  // (req 5.2/11.1); the API `422 43007` is the versioned-URLs limit barrier,
+  // surfaced as a typed `errorType` (req 5.5/7.2).
   const isDeploying = ref(false)
+
+  // Read a DS's active composition for the scoped swap: prefer the already-loaded
+  // (cached) release (req 2.3), else fetch it on demand (req 2.1). A read failure
+  // (req 2.4) returns `null` so the caller degrades the DS — never fabricated.
+  const activeReleaseResourcesFor = async (dsId) => {
+    const loaded = activeReleaseByDs.value[dsId]
+    if (loaded !== undefined) {
+      return Array.isArray(loaded?.resources) ? loaded.resources : null
+    }
+    try {
+      const release = await deploymentReleaseService.getActiveReleaseComposition(dsId)
+      activeReleaseByDs.value = { ...activeReleaseByDs.value, [dsId]: release ?? null }
+      return Array.isArray(release?.resources) ? release.resources : null
+    } catch {
+      return null
+    }
+  }
+
+  // Settle one DS's `build_and_activate` call into the per-DS outcome shape (the
+  // fulfilled/rejected fold shared by both write paths). No retry — classify only.
+  const settleOutcome = (id, settled) => {
+    if (settled.status === 'fulfilled') {
+      return {
+        id,
+        ok: true,
+        traceId: extractTraceId(settled.value),
+        value: settled.value,
+        error: null,
+        errorType: null
+      }
+    }
+    return {
+      id,
+      ok: false,
+      traceId: null,
+      value: null,
+      error: settled.reason,
+      errorType: classifyBuildAndActivateError(settled.reason)
+    }
+  }
+
+  // Non-scoped (Scenario A): one DS-agnostic adapter payload fanned out unchanged.
+  const buildAndActivateShared = async (ids, resources, strategy) => {
+    const payload = DeploymentAdapter.transformBuildAndActivatePayload(resources, strategy)
+    const settled = await Promise.allSettled(
+      ids.map((id) => deploymentReleaseService.buildAndActivate(id, payload))
+    )
+    return ids.map((id, index) => settleOutcome(id, settled[index]))
+  }
+
+  // Scoped (Scenario B): per-DS preserve & swap. For each DS, take its active
+  // composition, swap ONLY the scoped resource's version, preserve everything
+  // else byte-for-byte, and POST a per-DS body. DSs that degrade (no composition)
+  // or mismatch (scoped resource absent) are excluded from the fan-out and
+  // reported as `{ id, ok: false, skipped: true, skipReason }`.
+  const buildAndActivateScoped = async (ids, override, strategy) => {
+    // Guard the null-version leak: the store resolves the LATEST sentinel to a
+    // concrete `version_id` in `composePayload()` (Property 6), but when the
+    // scoped resource's versions were never loaded that resolution yields `null`.
+    // Posting `version_id: null` is rejected by the API, so NEVER dispatch it:
+    // surface every target DS as an UNRESOLVED_VERSION hard error instead of a
+    // null pin. The consumer branches on `skipReason` exactly as for degraded /
+    // mismatch.
+    if (override?.version == null) {
+      return ids.map((id) => ({
+        id,
+        ok: false,
+        skipped: true,
+        skipReason: SCOPED_PUBLISH_SKIP_REASONS.UNRESOLVED_VERSION,
+        traceId: null,
+        value: null,
+        error: null,
+        errorType: null
+      }))
+    }
+
+    const skipped = []
+    const targets = []
+
+    for (const id of ids) {
+      const base = await activeReleaseResourcesFor(id)
+      // req 5.7: no composition → degraded, excluded, never borrowed/fabricated.
+      if (base == null) {
+        skipped.push({ id, skipReason: SCOPED_PUBLISH_SKIP_REASONS.DEGRADED })
+        continue
+      }
+      // req 5.8: scoped resource absent → no-op mismatch, never injected.
+      if (!base.some((resource) => matchesOverride(resource, override))) {
+        skipped.push({ id, skipReason: SCOPED_PUBLISH_SKIP_REASONS.MISMATCH })
+        continue
+      }
+      // Preserve & swap: only the scoped resource's pinned version changes.
+      const swapped = base.map((resource) =>
+        matchesOverride(resource, override)
+          ? { ...resource, version_id: override.version }
+          : resource
+      )
+      const payload = DeploymentAdapter.transformBuildAndActivatePayload(
+        toAdapterResources(swapped),
+        strategy
+      )
+      targets.push({ id, payload })
+    }
+
+    const settled = await Promise.allSettled(
+      targets.map((target) => deploymentReleaseService.buildAndActivate(target.id, target.payload))
+    )
+
+    const published = targets.map((target, index) => settleOutcome(target.id, settled[index]))
+    const excluded = skipped.map(({ id, skipReason }) => ({
+      id,
+      ok: false,
+      skipped: true,
+      skipReason,
+      traceId: null,
+      value: null,
+      error: null,
+      errorType: null
+    }))
+
+    // Return in the caller's original `ids` order so the consumer can correlate.
+    const byId = new Map(
+      [...published, ...excluded].map((outcome) => [String(outcome.id), outcome])
+    )
+    return ids.map((id) => byId.get(String(id)))
+  }
 
   const buildAndActivate = async (composedPayload = {}, dsIds = []) => {
     const ids = Array.isArray(dsIds) ? dsIds.filter((id) => id != null && id !== '') : []
     if (!ids.length) return []
 
-    const { resources = [], canary = false, canaryForm = {} } = composedPayload ?? {}
+    const { scoped = false, canary = false, canaryForm = {} } = composedPayload ?? {}
 
     const strategy = canary
       ? buildStrategy({ ...canaryForm, gradual_rollout_enabled: true })
       : undefined
 
-    const payload = DeploymentAdapter.transformBuildAndActivatePayload(resources, strategy)
-
     isDeploying.value = true
     try {
-      const settled = await Promise.allSettled(
-        ids.map((id) => deploymentReleaseService.buildAndActivate(id, payload))
-      )
-
-      return ids.map((id, index) => {
-        const outcome = settled[index]
-        if (outcome.status === 'fulfilled') {
-          return {
-            id,
-            ok: true,
-            traceId: extractTraceId(outcome.value),
-            value: outcome.value,
-            error: null,
-            errorType: null
-          }
-        }
-        return {
-          id,
-          ok: false,
-          traceId: null,
-          value: null,
-          error: outcome.reason,
-          errorType: classifyBuildAndActivateError(outcome.reason)
-        }
-      })
+      if (scoped) {
+        return await buildAndActivateScoped(ids, composedPayload.override ?? {}, strategy)
+      }
+      return await buildAndActivateShared(ids, composedPayload.resources ?? [], strategy)
     } finally {
       isDeploying.value = false
     }
@@ -579,6 +727,9 @@ export function useReleaseComposition({
     // matches on it without re-encoding the magic code.
     isDeploying,
     buildAndActivate,
-    buildAndActivateErrorTypes: BUILD_AND_ACTIVATE_ERROR_TYPES
+    buildAndActivateErrorTypes: BUILD_AND_ACTIVATE_ERROR_TYPES,
+    // Per-DS skip reasons for the scoped preserve-&-swap path (req 5.7/5.8) so the
+    // consumer can branch on `degraded` vs `mismatch` without re-encoding them.
+    scopedPublishSkipReasons: SCOPED_PUBLISH_SKIP_REASONS
   }
 }

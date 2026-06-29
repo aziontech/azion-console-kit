@@ -24,11 +24,12 @@
    *
    * @emits retry Request to recompute the impact (only from the unavailable state).
    */
+  import { computed } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({ name: 'release-impact-panel' })
 
-  defineProps({
+  const props = defineProps({
     impact: {
       type: Object,
       default: () => ({
@@ -37,12 +38,35 @@
         perDs: [],
         totals: { domains: 0, workloads: 0, dsCount: 0 }
       })
+    },
+    // Machine-readable reason the blast radius couldn't be computed (req 11.2):
+    // 'fetch_failed' | 'legacy_no_bindings' | 'capped' | null. Drives the
+    // unavailable-state copy so the operator knows WHY (and whether Retry helps).
+    degradationReason: {
+      type: String,
+      default: null
     }
   })
 
   const emit = defineEmits(['retry'])
 
   const onRetry = () => emit('retry')
+
+  // Reason-specific copy for the unavailable state; falls back to the generic
+  // message when no machine-readable reason is provided.
+  const UNAVAILABLE_MESSAGES = {
+    fetch_failed:
+      "Couldn't load the workloads needed to compute the impact. Retry, or publish anyway — the impact won't be shown.",
+    legacy_no_bindings:
+      "These deployments' workloads have no environment bindings yet, so the blast radius can't be computed. You can still publish.",
+    capped:
+      'The workloads list was truncated, so the impact shown is partial. You can still publish.'
+  }
+  const unavailableMessage = computed(
+    () =>
+      UNAVAILABLE_MESSAGES[props.degradationReason] ??
+      "The blast radius (environments · workloads · domains) couldn't be computed. You can still publish, but the impact won't be shown."
+  )
 </script>
 
 <template>
@@ -68,8 +92,7 @@
         <span class="text-body-sm font-semibold text-[var(--text-color)]">Impact unavailable</span>
       </div>
       <p class="mb-[var(--spacing-3)] text-body-xs text-[var(--text-color-secondary)]">
-        The blast radius (environments · workloads · domains) couldn't be computed. You can still
-        publish, but the impact won't be shown.
+        {{ unavailableMessage }}
       </p>
       <div
         class="flex items-center gap-[var(--spacing-2)] rounded-[var(--shape-card)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-3)] py-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
