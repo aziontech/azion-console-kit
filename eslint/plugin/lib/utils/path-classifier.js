@@ -53,6 +53,20 @@ function classifyPath(filePath) {
     }
   }
 
+  // Canonical release-composition module: src/templates/release-composition/...
+  // This is the single, surface-agnostic home of the shared composition blocks
+  // (spec new-release-screen). Templates are not classified by default, so the
+  // architecture rules would never fire there; classify this one module so its
+  // components/composables are gated like legacy code (warn). Scoped to this
+  // path only — other src/templates/** directories are intentionally untouched.
+  if (/src\/templates\/release-composition\//.test(normalized)) {
+    return {
+      zone: 'legacy',
+      role: inferRole(normalized.replace(/.*src\/templates\/release-composition\//, '')),
+      moduleName: null
+    }
+  }
+
   // Legacy services: src/services/<name>/... (excluding v2/ and axios/)
   if (/src\/services\/(?!v2\/|axios\/)([^/]+)\//.test(normalized)) {
     return {

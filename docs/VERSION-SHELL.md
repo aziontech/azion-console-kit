@@ -1,636 +1,1435 @@
-# VersionShell — Arquitetura, Máquina de Estados e Command Bus
+# VersionShell — Deep Dive (referência completa)
 
-Documentação de referência do framework de versionamento de recursos do Console
-(contas v6, flag `use_v6_configurations`). Cobre o `<VersionShell>`, a máquina de
-estados, a comunicação via command bus, o fluxo de dados completo e o roteiro para
-plugar novos recursos.
+> Documento de referência do framework de versionamento de recursos do Azion Console
+> Kit (contas v6, flag `use_v6_configurations`). Cobre filosofia, padrões, hierarquia
+> de abstrações, todos os arquivos, todos os fluxos, o catálogo de recursos plugados, e
+> o passo-a-passo para criar um recurso novo.
+>
+> Base de código: `azion-console-kit`. Implementação de referência: **Application**
+> (`src/views/EdgeApplications/v6/`).
 
-> Implementação de referência: **Application** (`src/views/EdgeApplications/v6/`).
-> Consumidores em produção: Application, Workload, Custom Page, Firewall, Deployment,
-> Edge Connector, Edge Function e — adicionados pelo spec
-> `version-shell-network-lists-waf` — **Network List** (atômico) e **WAF**
-> (composto, com exceptions/allowed rules versionadas).
-> **Classe de capability** (spec `versioned-only-subresources`): cada recurso é
-> `deployable` (default) ou `versioned-only`. **Edge Function, Network List e WAF**
-> são `versioned-only` — **sem Deploy/Promote/Rollback/Release** (§12). Tudo o mais
-> permanece byte-idêntico ao default.
-> Specs do desenvolvimento: `specs/version-shell-command-bus-fix/`,
-> `specs/version-shell-connector-functions/`,
-> `specs/version-shell-network-lists-waf/`,
-> `specs/versioned-only-subresources/` e
-> `docs/superpowers/specs/2026-06-11-version-shell-command-bus-design.md`.
+## Índice
+
+- [0. Glossário](#0-glossario)
+- [1. Filosofia e o problema que resolve](#1-filosofia)
+- [2. Conceitos fundamentais](#2-conceitos)
+- [3. Índice completo de arquivos](#3-indice-arquivos)
+- [4. Padrões de projeto adotados](#4-padroes)
+- [5. Hierarquia de abstrações](#5-hierarquia)
+- [6. Convenções de nomenclatura](#6-convencoes)
+- [7. Domínio — máquina de estados e capability](#7-dominio)
+- [8. Comunicação — command bus, command, context](#8-bus)
+- [9. Shell — VersionShell e action bar](#9-shell)
+- [10. Form-adapter — o filho do shell](#10-form-adapter)
+- [11. Apresentação — version-actions](#11-apresentacao)
+- [12. Orquestração de página](#12-orquestracao)
+- [13. Listagem — VersionListDataView](#13-listagem)
+- [14. Service/adapter — a base HTTP](#14-service)
+- [15. Sub-recursos versionados](#15-subrecursos)
+- [16. View + roteamento (2 variantes de landing)](#16-view-router)
+- [17. Release — composer full-page](#17-release)
+- [18. Quatro canais de dados e ciclo de cache](#18-dados)
+- [19. Catálogo de recursos plugados](#19-catalogo)
+- [20. Fluxos completos (sequência)](#20-fluxos)
+- [21. Como criar um recurso novo](#21-criar-recurso)
+- [22. Invariantes e armadilhas](#22-armadilhas)
+- [23. Comparação com o padrão legado](#23-legado)
+- [24. Mapa de testes](#24-testes)
 
 ---
 
-## 1. Visão geral
+<a name="0-glossario"></a>
 
-O VersionShell padroniza a edição **versionada** de qualquer recurso: o usuário
-edita um *draft*, dispara *build*, e versões `ready` podem ser ativadas, arquivadas
-ou forkadas em novos drafts. A arquitetura inverte o despacho clássico:
+## 0. Glossário
 
-- O **shell** é dono da máquina de estados, da action bar, do dialog de comment e
-  do overlay — e **não conhece nenhum recurso**.
-- O **filho** (adapter do recurso, ex.: `ApplicationVersionAdapter`) é dono do form
-  e da execução: registra handlers num **command bus** provido pelo shell.
-- O **service** do recurso é dono de HTTP, queryKey, e invalidação de cache.
+| Termo                           | Significado                                                                                   |
+| ------------------------------- | --------------------------------------------------------------------------------------------- |
+| **Recurso**                     | Entidade de negócio versionável (Application, Workload, WAF…). Tem um id próprio              |
+| **Versão**                      | Snapshot do recurso num ponto do tempo. Identidade = `version_id` (ULID), **≠** id do recurso |
+| **Draft**                       | Versão editável (`draft`, ou recuperáveis `canceled`/`error`)                                 |
+| **Build**                       | Transição assíncrona (HTTP 202) que congela um draft num artefato imutável                    |
+| **Estado**                      | Um dos 8 valores da Version API (ver §7)                                                      |
+| **Capability**                  | Classe imutável `{canDeploy, canPromote, canRollback}` do recurso (§7.4)                      |
+| **Command**                     | Intenção (`SAVE`, `ARCHIVE`, `DEPLOY`…) despachada pelo bus                                   |
+| **Handler**                     | Função registrada pelo filho que executa um command                                           |
+| **Shell**                       | `<VersionShell>` — o componente agnóstico que orquestra estado+UI                             |
+| **Filho**                       | O adapter do recurso (`<ResourceVersionAdapter>`) que hospeda o form                          |
+| **config**                      | Subconjunto do snapshot que vira valores do form (extraído por `normalizeConfig`)             |
+| **ctx**                         | Payload que viaja no bus: `{ resourceId, versionId, comment? }`                               |
+| **deployable / versioned-only** | As duas classes de recurso (§7.4)                                                             |
+| **Landing**                     | Tela de listagem de versões (`EditView`)                                                      |
+| **Editor**                      | Tela full-page de edição de uma versão (`VersionEditView`)                                    |
+| **Composer**                    | Tela full-page "Review & deploy" (rota `release-composer`)                                    |
 
-Adicionar um recurso versionável **não altera uma linha** do shell, do bus ou da
-máquina de estados.
+---
+
+<a name="1-filosofia"></a>
+
+## 1. Filosofia e o problema que resolve
+
+**Problema:** vários recursos passaram a ter ciclo de vida versionado (draft → build →
+ready → active/archived). As ações disponíveis **dependem do estado**. Resolver recurso
+a recurso geraria N telas quase iguais, cada uma reimplementando barra de ações, gates
+por estado, dialogs e invalidação — com divergência garantida.
+
+**Solução — inversão de despacho:** três donos com fronteiras rígidas.
+
+| Dono                | Responsabilidade                                          | **NÃO** faz                      |
+| ------------------- | --------------------------------------------------------- | -------------------------------- |
+| **Shell**           | máquina de estados, action bar, dialog, overlay, contexto | não conhece recurso/form/service |
+| **Filho** (adapter) | hospeda o form, registra handlers no bus                  | não conhece a máquina de estados |
+| **Service**         | HTTP, queryKey, invalidação de cache                      | não importa composables (lint)   |
+
+Consequência: **adicionar um recurso não altera uma linha** do shell/bus/máquina
+(Open-Closed garantido por gate de CI).
+
+O aninhamento de containment (quem renderiza dentro de quem):
+
+```mermaid
+flowchart TB
+  subgraph HOST["host — EditView / VersionEditView"]
+    HN["toasts · navegação pós-comando · carrega o recurso pai"]
+    subgraph SHELL["VersionShell — agnóstico"]
+      SN["state machine · action bar · dialog · overlay · command bus"]
+      subgraph CHILD["ResourceVersionAdapter — thin, específico"]
+        CN["useVersionFormAdapter: useForm + 7 handlers no bus"]
+        subgraph FORM["form fields / tabs"]
+          FN["useField auto-conecta · readOnly via useVersionContext()"]
+        end
+      end
+    end
+  end
+```
+
+---
+
+<a name="2-conceitos"></a>
+
+## 2. Conceitos fundamentais
+
+A cadeia mental que amarra tudo:
 
 ```
-┌────────────────────────── EditView (caller) ──────────────────────────┐
-│ toasts • navegação pós-comando • carrega o recurso pai                │
-│  ┌──────────────────── <VersionShell> (agnóstico) ─────────────────┐  │
-│  │ state machine • action bar • dialog de comment • overlay • bus  │  │
-│  │  ┌─── <ResourceVersionAdapter> thin (específico) ───────────┐  │  │
-│  │  │ useVersionFormAdapter: useForm + 7 handlers no bus        │  │  │
-│  │  │  ┌──────────────── form fields / tabs ─────────────────┐  │  │  │
-│  │  │  │ useField auto-conecta • readOnly via versionContext │  │  │  │
-│  │  │  └──────────────────────────────────────────────────────┘ │  │  │
-│  │  └────────────────────────────────────────────────────────────┘  │  │
-│  └──────────────────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────────────────┘
+estado → ações permitidas → botões → command → handler → service → HTTP
+       → invalidação → refetch → novo estado
 ```
 
----
-
-## 2. Responsabilidade de cada entidade
-
-| Entidade | Arquivo | Responsabilidade | NÃO faz |
-|---|---|---|---|
-| **VersionShell** | `src/templates/version-shell-block/index.vue` | Cria/provê o bus; lê a versão via factory `useVersionQuery`; deriva `state`/`readOnly`; renderiza ActionBar/Overlay; provê `VERSION_CONTEXT_KEY`; captura erro de comando e emite `updated`/`command-error` | Não conhece recurso, form ou service de mutação; **não toca cache** |
-| **useVersionShell** | `src/templates/version-shell-block/use-version-shell.js` | Deriva `version`, `state`, `readOnly`, `availableActions` (estado ∩ registrados), `disabledActions` (via `ready`); `dispatch()` com state-gate e retorno do resultado do handler | Não abre dialog (é a ActionBar), não invalida cache |
-| **Command bus** | `src/composables/versioning/use-version-command-bus.js` | Registro único por comando (throw em duplicado); `emit` (throw sem handler); `registered` reativo via `shallowRef<Map>` | Não valida estado (é o dispatch), não conhece comandos específicos |
-| **onVersionCommand** | `src/composables/versioning/use-version-command.js` | API do filho: registra handler (atalho `fn` ou `{ execute, ready }`); desregistra em `onBeforeUnmount`; throw fora do shell | Não executa nada por conta própria |
-| **version-machine** | `src/composables/versioning/version-machine.js` | Fonte da verdade do domínio: `VERSION_STATES`, `VERSION_ACTIONS`, matriz `STATE_ACTIONS`, predicados (`isEditable`, `isProcessing`, `isImmutable`, `isTerminal`) | Não tem estado próprio; só funções/constantes puras |
-| **useVersionContext** | `src/composables/versioning/use-version-context.js` | Inject de `{ state, readOnly, version }` com default seguro (`readOnly=false`) fora do shell | Não provê (quem provê é o shell) |
-| **VersionActionBar** | `.../components/VersionActionBar.vue` | Renderiza botões por `availableActions`/`disabledActions`; decide ação primária por estado (`PRIMARY_BY_STATE`); abre o dialog quando o comando exige comment (`REQUIRES_COMMENT`); emite `dispatch(action, { comment? })` | Não executa comandos; não conhece services |
-| **VersionActionDialog** | `.../components/VersionActionDialog.vue` | Coleta o comment (obrigatório ou opcional); confirma/cancela | Não sabe qual comando está confirmando |
-| **ProcessingOverlay** | `.../components/ProcessingOverlay.vue` | Bloqueia a UI quando `isProcessing(state)` (`building`); botão Cancel quando `CANCEL_BUILD` está disponível | Não despacha direto (emite `cancel` pro shell) |
-| **VersionStateBadge** | `.../components/VersionStateBadge.vue` | Badge visual do estado | — |
-| **useVersionFormAdapter** | `src/composables/versioning/use-version-form-adapter.js` | **Fonte única** do filho do shell: hospeda o `useForm` (schema do recurso); merge `recurso ⊕ version.config` como initial values; re-sync via `watch` + `resetForm`; registra **7 handlers** (os 6 do ciclo + `DEPLOY` no-op) chamando o service via `saveStrategy`; expõe `ready: isFormValid` (gate dos botões SAVE) | Não renderiza UI; não toca cache; não mostra toast |
-| **`<Recurso>VersionAdapter.vue`** (ex.: `CustomPageVersionAdapter`) | `src/views/<Recurso>/v6/<Recurso>VersionAdapter.vue` | **Thin** (≤35 linhas, template `<slot/>`): só chama `useVersionFormAdapter({ resource, resourceId, versionId, versionService, validationSchema, saveStrategy })`. Cada recurso fornece apenas essas 3 especializações | Não tem handler inline; não conhece bus/máquina |
-| **Version service** (ex.: `edgeAppVersionService`) | `src/services/v2/edge-app/edge-app-version-service.js` | HTTP dos endpoints `/versions` (herdado de `VersionServiceBase`); `useLoadVersionQuery`/`useListVersionsQuery` (lista aceita `params`/`skipCache`) com queryKey canônico; **toda mutação chama o hook `invalidateAfterMutation(rid)`** (default: `removeQueries(versionKeys.all(rid))`, sobrescrevível) | Não importa composables (regra ESLint `services-http-only`) |
-| **Version adapter** (ex.: `EdgeAppVersionAdapter`) | `src/services/v2/edge-app/edge-app-version-adapter.js` | Único ponto que conhece o contrato de payload, criado por `createVersionAdapter({ normalizeConfig, mapResourceFields, mapMeta? })`: form values → campos do recurso **no nível raiz** + `comment?`/`source_version?` (strip de `undefined`); `GET` → `{ id, state, comment, timestamps, ...mapMeta, config }`, onde `config` extrai os campos do recurso do raiz do snapshot no shape de form UI (descarta `null`). `mapMeta` adiciona campos extras de meta (ex.: Workload: `deploymentId`/`environmentId`/`lastError`) | Não chama HTTP; não reimplementa `stripUndefinedDeep`/`normalizeVersion` |
-| **EditView** (caller) | `src/views/EdgeApplications/v6/EditView.vue` | Carrega o recurso pai; passa a factory `useVersionQuery`; guarda de rota sem `versionId`; toasts de sucesso/erro; navegação pós-comando; `:key="versionId"` no shell e no badge | Não executa comandos; não conhece o bus |
+Cada elo é dono de uma única coisa e não conhece os vizinhos distantes: os botões não
+sabem o que o handler faz; o handler não sabe que botão o disparou; o service não sabe
+que existe um shell.
 
 ---
 
-## 3. Hierarquia de componentes e dependências
+<a name="3-indice-arquivos"></a>
 
-### 3.1 Árvore de componentes (runtime)
+## 3. Índice completo de arquivos
+
+### Domínio + comunicação (`src/composables/versioning/`)
+
+| Arquivo                                | Responsabilidade                                                             |
+| -------------------------------------- | ---------------------------------------------------------------------------- |
+| `version-machine.js`                   | Estados, transições, predicados, `STATE_ACTIONS`, `getAvailableActions`      |
+| `version-capability.js`                | Classes `deployable`/`versioned-only`; `getVersionCapability`                |
+| `use-version-command-bus.js`           | Bus push-only (`register`/`emit`/`registered` reativo)                       |
+| `use-version-command.js`               | `onVersionCommand` — API do filho para registrar handlers                    |
+| `use-version-context.js`               | `useVersionContext()` — inject de estado/readOnly/dispatch/capability        |
+| `use-version-form-adapter.js`          | Fonte única do filho: `useForm` + 7 handlers + `saveStrategy`                |
+| `version-actions.js`                   | Apresentação: `ACTION_META`, `getVersionBarActions`, `buildVersionMenuItems` |
+| `use-version-edit-screen.js`           | Lógica da tela de editor full-page (rota, load, nav, toasts)                 |
+| `use-resource-version-landing.js`      | Lógica da landing tabbed (Versions+Settings)                                 |
+| `use-version-menu-actions.js`          | Roteador único das 5 ações do kebab                                          |
+| `use-version-row-actions.js`           | Archive/Delete da lista (fora do bus)                                        |
+| `use-version-list.js`                  | Search/filter/sort headless da lista                                         |
+| `to-version-options.js`                | Versões → opções deployáveis (`DEPLOYABLE_STATES`)                           |
+| `use-deploy-resource-context.js`       | Monta o `resourceContext` do DeployDrawer no heading                         |
+| `use-deployment-release-drawer.js`     | Drawer de detalhe de release de Deployment                                   |
+| `use-workload-version-environments.js` | Resolve environments das versões `ready` de Workload                         |
+
+### Shell (`src/templates/version-shell-block/`)
+
+| Arquivo                                | Responsabilidade                                                                |
+| -------------------------------------- | ------------------------------------------------------------------------------- |
+| `index.vue`                            | `<VersionShell>` — cria/provê bus+contexto, deriva estado, teleporta action bar |
+| `use-version-shell.js`                 | Deriva `version/state/readOnly/availableActions/disabledActions/dispatch`       |
+| `components/VersionActionBar.vue`      | Footer fixo (banner + botões por estado)                                        |
+| `components/VersionHeadingActions.vue` | Botões no heading (teleport); Deploy → composer                                 |
+| `components/VersionActionDialog.vue`   | Dialog de comment / confirmação destrutiva                                      |
+| `components/ProcessingOverlay.vue`     | Overlay de building (com Cancel)                                                |
+| `components/VersionStateBadge.vue`     | Badge dos 8 estados (`active` = "Current")                                      |
+| `VersionEditScreen.vue`                | Chrome do editor full-page (loading/erro/heading + slot `editor`)               |
+| `ResourceVersionLanding.vue`           | Chrome da landing tabbed (Versions+Settings+DeployDrawer)                       |
+| `VersionEditorTabsShell.vue`           | Scaffold: shell → adapter → TabView dirigido por `tabs[]`                       |
+
+### Base service/adapter (`src/services/v2/`)
+
+| Arquivo                                                       | Responsabilidade                                      |
+| ------------------------------------------------------------- | ----------------------------------------------------- |
+| `versioning/version-service-base.js`                          | Template Method: ciclo de vida HTTP + invalidação     |
+| `versioning/version-adapter.js`                               | Factory `createVersionAdapter` + `stripUndefinedDeep` |
+| `edge-app/versioned/create-versioned-sub-resource-service.js` | Factory de CRUDL de sub-recurso versionado            |
+| `base/query/queryKeys.js`                                     | Namespaces de queryKey (`<recurso>.version.*`)        |
+| `<recurso>/<recurso>-version-service.js`                      | Subclasse thin (`adapter`/`baseURL`/`versionKeys`)    |
+| `<recurso>/<recurso>-version-adapter.js`                      | `createVersionAdapter` com os campos do recurso       |
+
+### View + componentes
+
+| Arquivo                                                   | Responsabilidade                                          |
+| --------------------------------------------------------- | --------------------------------------------------------- |
+| `components/VersionListDataView/index.vue`                | Tabela de versões (grid + kebab + estados + mobile cards) |
+| `views/<R>/v6/EditView.vue`                               | Landing (lista de versões)                                |
+| `views/<R>/v6/VersionEditView.vue`                        | Editor full-page (thin, via `useVersionEditScreen`)       |
+| `views/<R>/v6/<R>VersionAdapter.vue`                      | Filho thin (via `useVersionFormAdapter`)                  |
+| `views/EdgeApplications/v6/tabs/VersionEditorTabs.vue`    | Corpo de abas do Application                              |
+| `views/EdgeApplications/v6/tabs/use-versioned-facades.js` | Facades dos sub-recursos pré-amarrados                    |
+| `views/EdgeApplications/v6/tabs/VersionTabAddButton.vue`  | Botão "+ Add" da aba ativa                                |
+| `router/routes/<recurso>-routes/index.js`                 | Fork de rota (flag) + rota de versão                      |
+
+### Release (`src/templates/release-composition/` e `src/views/Deployments/`)
+
+| Arquivo                                              | Responsabilidade                              |
+| ---------------------------------------------------- | --------------------------------------------- |
+| `release-composition/release-composer-route.js`      | Builder puro da rota do composer              |
+| `release-composition/use-release-composition.js`     | Orquestração de dados do composer             |
+| `views/Deployments/v6/ReleaseComposerView.vue`       | Tela full-page "Review & deploy"              |
+| `views/Deployments/utils/resolveReleaseResources.js` | `RESOURCE_RESOLVERS` (nomes/labels na árvore) |
+
+---
+
+<a name="4-padroes"></a>
+
+## 4. Padrões de projeto adotados
+
+| Padrão                               | Onde                                                                      | Para quê                                         |
+| ------------------------------------ | ------------------------------------------------------------------------- | ------------------------------------------------ |
+| **Dependency Inversion / IoC**       | Shell depende do bus, nunca do recurso                                    | desacoplar shell de N recursos                   |
+| **Command**                          | `use-version-command-bus.js` (`{execute, ready}`)                         | ações despacháveis sem conhecer a implementação  |
+| **Mediator**                         | Bus medeia Shell ↔ filho                                                  | comunicação push-only sem props                  |
+| **State Machine (pura)**             | `version-machine.js`                                                      | fonte única das regras; fail-closed              |
+| **Template Method**                  | `VersionServiceBase` (hook `invalidateAfterMutation`)                     | reuso de HTTP/cache entre recursos               |
+| **Factory Method**                   | `createVersionAdapter`, `createVersionedSubResourceService`               | gerar adapters/services por config               |
+| **Strategy**                         | `saveStrategy` (default/workload/customPage/deployment)                   | variar a semântica de _write_                    |
+| **Adapter**                          | adapters de recurso + `useVersionedFacades`                               | isolar payload; reusar ListViews legadas         |
+| **Provide/Inject (scoped)**          | bus, contexto, seam `versionMenuHost`                                     | passar dependências sem prop-drilling            |
+| **Single Source of Truth**           | regras em `version-machine`; UI em `version-actions`                      | footer/heading/kebab nunca divergem              |
+| **Capability config over fork**      | `version-capability.js`                                                   | divergência por dado, não por código             |
+| **Headless composable**              | `use-version-list.js`                                                     | lógica de lista reusável e testável              |
+| **Teleport / Portal**                | action bar → `#action-bar`; heading → `#version-lifecycle-action`         | renderizar no chrome a partir da árvore do shell |
+| **Null Object / Fail-safe defaults** | DEPLOY no-op; defaults de `useVersionContext`; estado desconhecido → `[]` | nunca quebrar fora do shell; nunca botão errado  |
+| **Registry**                         | `RESOURCE_VERSION_ROUTES`, `RESOURCE_RESOLVERS`, `RESOURCE_CAPABILITY`    | extensão por entrada, sem `switch` espalhado     |
+
+---
+
+<a name="5-hierarquia"></a>
+
+## 5. Hierarquia de abstrações
+
+Do mais abstrato (não sabe de UI nem de recurso) ao mais concreto. **A dependência só
+aponta para baixo** — o framework nunca importa do recurso.
 
 ```mermaid
 flowchart TD
-  EV["EditView (v6)<br/>rota: edit/:id/versions/:versionId/:tab?"]
-  EV --> AVB["ApplicationVersionBadge<br/>:key=versionId — query canônica p/ o badge"]
-  EV --> VS["VersionShell<br/>:key=versionId — cria bus, provide(BUS_KEY, CONTEXT_KEY)"]
-  VS --> PO["ProcessingOverlay<br/>(v-if isProcessing)"]
-  VS --> VAB["VersionActionBar"]
-  VAB --> VAD["VersionActionDialog<br/>(comment)"]
-  VS -->|slot| AD["ApplicationVersionAdapter (thin)<br/>useVersionFormAdapter (7 handlers)"]
-  AD -->|slot| TV["TabView"]
-  TV --> TP["TabPanel Main Settings"]
-  TP --> FF["FormFieldsEditEdgeApplications"]
-  FF --> B1["generalEdgeApp (name)"]
-  FF --> B2["moduleEdgeApp (módulos)"]
-  FF --> B3["debugEdgeApp (debug)"]
-  FF --> B4["statusEdgeApp (isActive)"]
-```
-
-### 3.2 Dependências de módulo (imports)
-
-```mermaid
-flowchart LR
-  subgraph shell["templates/version-shell-block (agnóstico)"]
-    IDX["index.vue"] --> UVS["use-version-shell.js"]
-    IDX --> BAR["VersionActionBar"] --> DLG["VersionActionDialog"]
-    IDX --> OVL["ProcessingOverlay"]
-  end
-
-  subgraph composables["composables/versioning (agnóstico)"]
-    BUS["use-version-command-bus.js"]
-    CMD["use-version-command.js"] --> BUS
-    CTX["use-version-context.js"]
+  subgraph N0["NÍVEL 0 — Domínio puro (sem Vue, sem I/O)"]
     VM["version-machine.js"]
-    UFA["use-version-form-adapter.js<br/>(useForm + 7 handlers)"]
+    CAP["version-capability.js"]
   end
-
-  subgraph base["camada base (agnóstico)"]
-    VSB["version-service-base.js<br/>(lifecycle + invalidateAfterMutation)"]
-    FACT["version-adapter.js<br/>(createVersionAdapter + mapMeta)"]
+  subgraph N1["NÍVEL 1 — Comunicação (Vue, sem recurso)"]
+    BUS["command-bus"]
+    CMD["command"]
+    CTX["context"]
+    VA["version-actions"]
   end
-
-  subgraph resource["camada do recurso (específico, thin)"]
-    ADP["ApplicationVersionAdapter.vue"]
-    SVC["edge-app-version-service.js"] --> SAD["edge-app-version-adapter.js"]
-    SAD --> EAD["edge-app-adapter.js (transformPayload, DRY)"]
+  subgraph N2["NÍVEL 2 — Shell agnóstico"]
+    IDX["index.vue + use-version-shell"]
+    BAR["ActionBar / Heading / Overlay / Dialog / Badge"]
   end
-
-  IDX --> BUS & CTX
-  UVS --> VM
-  BAR --> VM
-  OVL --> VM
-  UFA --> CMD & CTX
-  SVC --> VSB
-  SAD --> FACT
-  ADP --> UFA & SVC
-  EV2["EditView.vue"] --> IDX & ADP & SVC & VM
+  subgraph N3["NÍVEL 3 — Contratos de write/HTTP (base)"]
+    VSB["version-service-base"]
+    FACT["version-adapter (factory)"]
+    SUB["sub-resource factory"]
+    UFA["use-version-form-adapter + saveStrategy"]
+  end
+  subgraph N4["NÍVEL 4 — Orquestração de página (compartilhada)"]
+    UES["use-version-edit-screen"]
+    URL["use-resource-version-landing"]
+    UMA["use-version-menu-actions / row-actions / list"]
+    CHROME["EditScreen / Landing / TabsShell / VersionListDataView"]
+  end
+  subgraph N5["NÍVEL 5 — Recurso concreto (thin)"]
+    SVC["<r>-version-service / <r>-version-adapter"]
+    THIN["<R>VersionAdapter.vue"]
+    TABS["VersionEditorTabs + facades"]
+    VIEW["EditView / VersionEditView + rota"]
+  end
+  N1 --> N0
+  N2 --> N1 & N0
+  N3 --> N1
+  N4 --> N2 & N3
+  N5 --> N4 & N3
 ```
 
-Regras de direção: a camada do recurso depende do framework (composables + shell);
-o framework **nunca** depende do recurso. Services **nunca** importam de
-`src/composables/**` (lint `azion-architecture/services-http-only`).
+Tudo que um recurso novo escreve está no **Nível 5**.
 
 ---
 
-## 4. Máquina de estados
+<a name="6-convencoes"></a>
 
-Fonte da verdade: `src/composables/versioning/version-machine.js`, espelhando a
-Version API (`docs/edge-api/APPLICATIONS.md`).
+## 6. Convenções de nomenclatura
 
-### 4.1 Estados e transições
+| Convenção           | Exemplo                                                   | Regra                            |
+| ------------------- | --------------------------------------------------------- | -------------------------------- |
+| Composable          | `use-version-*.js` → `useVersion*`                        | lógica reativa, prefixo `use`    |
+| Service de versão   | `<recurso>-version-service.js`                            | `extends VersionServiceBase`     |
+| Adapter de versão   | `<recurso>-version-adapter.js`                            | `createVersionAdapter(...)`      |
+| Adapter `.vue` thin | `<Recurso>VersionAdapter.vue`                             | só chama `useVersionFormAdapter` |
+| Rota de versão      | `edit-<recurso>-version`                                  | em `RESOURCE_VERSION_ROUTES`     |
+| Provide key         | string literal (`'edgeApplication'`)                      | injetada por `provideKey`        |
+| Constante de ação   | `VERSION_ACTIONS.SAVE` etc.                               | UPPER_SNAKE                      |
+| Idioma              | código/identificadores em EN; **toda a copy de UI em EN** | padrão do shell host             |
+
+---
+
+<a name="7-dominio"></a>
+
+## 7. Domínio — máquina de estados e capability
+
+Arquivo: `version-machine.js`. **Módulo puro** (constantes + funções; sem Vue, sem I/O).
+
+### 7.1 Estados e predicados
+
+```js
+VERSION_STATES = { DRAFT, QUEUED, BUILDING, READY, ACTIVE, ARCHIVED, CANCELED, ERROR }
+
+isEditable(state) // draft | canceled | error   → readOnly = !isEditable
+isProcessing(state) // queued | building          → mostra overlay
+isImmutable(state) // ready | active | archived
+isReady(state) // ready                       → habilita Promote no kebab
+canArchive(state) // ready | error | canceled    → habilita Archive no kebab
+canDelete(state) // ≠ 'deleted'
+```
 
 ```mermaid
 stateDiagram-v2
   direction LR
-  [*] --> draft : clone
-  draft --> building : build
+  [*] --> draft : clone (POST /versions)
+  draft --> queued : build
+  queued --> building
   building --> ready : ok
-  building --> failed : erro
-  building --> cancelled : cancel
-  failed --> building : build
-  cancelled --> building : build
-  ready --> active : ativação
+  building --> error : falha
+  building --> canceled : cancel
+  error --> queued : build (retoma o mesmo draft)
+  canceled --> queued : build (retoma o mesmo draft)
+  ready --> active : ativação (plataforma)
   ready --> archived : archive
   active --> archived : archive
   draft --> [*] : delete
   archived --> [*] : delete
 ```
 
-Legenda das transições (endpoint por trás de cada label):
-
-| Label | Endpoint / origem |
-|---|---|
-| `clone` | `POST .../versions` (com `source_version` opcional) |
-| `build` | `POST .../versions/{vid}/build` — assíncrono (202); de `failed`/`cancelled` retoma o mesmo draft |
-| `ok` / `erro` | desfecho assíncrono do build na plataforma |
-| `cancel` | `POST .../versions/{vid}/cancel` |
-| `archive` | `POST .../versions/{vid}/archive` (comment obrigatório) |
-| `ativação` | feita pela plataforma (fora do shell) |
-| `delete` | `DELETE .../versions/{vid}` |
-
-### 4.2 Matriz `STATE_ACTIONS` (estado → comandos permitidos)
-
-| Estado | SAVE | SAVE_AND_BUILD | CANCEL_BUILD | NEW_DRAFT_FROM | ARCHIVE | DELETE | `readOnly`? |
-|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| `draft` | ✔ | ✔ | — | ✔ | — | ✔ | não |
-| `building` | — | — | ✔ | — | — | — | sim (overlay) |
-| `ready` | — | — | — | ✔ | ✔ | ✔ | sim |
-| `active` | — | — | — | ✔ | ✔ | ✔ | sim |
-| `archived` | — | — | — | ✔ | — | ✔ | sim |
-| `cancelled` | ✔ | ✔ | — | ✔ | — | ✔ | não |
-| `failed` | ✔ | ✔ | — | ✔ | — | ✔ | não |
-
-- `cancelled`/`failed` herdam o set de `draft` (estados recuperáveis — usuário retoma o trabalho).
-- Estado desconhecido → `getAvailableActions` retorna `[]` (**fail-closed**: nenhum botão errado).
-- `readOnly = !isEditable(state)`; `isEditable = draft | cancelled | failed`.
-- Comment por comando (UI, `REQUIRES_COMMENT` na ActionBar): **ARCHIVE obrigatório**;
-  CANCEL_BUILD e NEW_DRAFT_FROM opcionais; SAVE/SAVE_AND_BUILD/DELETE sem dialog.
-  O service de archive revalida o comment (defesa em profundidade).
-
-### 4.3 O que o shell deriva da máquina
+### 7.2 Matriz autoritativa `STATE_ACTIONS`
 
 ```js
-availableActions = getAvailableActions(state) ∩ bus.registered        // botões visíveis
-disabledActions  = comandos registrados com ready.value === false      // botões desabilitados
-readOnly         = !isEditable(state)                                  // provido via VERSION_CONTEXT_KEY
-showOverlay      = isProcessing(state)                                 // overlay de building
+STATE_ACTIONS = {
+  draft: ['SAVE', 'SAVE_AND_BUILD', 'NEW_DRAFT_FROM', 'DELETE'],
+  queued: ['CANCEL_BUILD'],
+  building: ['CANCEL_BUILD'],
+  ready: ['NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE', 'DEPLOY'],
+  active: ['NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE', 'DEPLOY'],
+  archived: ['NEW_DRAFT_FROM', 'DELETE'],
+  canceled: ['SAVE', 'SAVE_AND_BUILD', 'NEW_DRAFT_FROM', 'DELETE'], // herda de draft
+  error: ['SAVE', 'SAVE_AND_BUILD', 'NEW_DRAFT_FROM', 'DELETE'] // herda de draft
+}
 ```
+
+### 7.3 Gate de capability
+
+```js
+CAPABILITY_GATED_ACTIONS = { DEPLOY:'canDeploy', PROMOTE:'canPromote', ROLLBACK:'canRollback' }
+
+getAvailableActions(state, capability = DEFAULT_CAPABILITY) =>
+  (STATE_ACTIONS[state] ?? [])                       // estado desconhecido = [] (FAIL-CLOSED)
+    .filter(a => isAllowedByCapability(a, capability)) // só DEPLOY/PROMOTE/ROLLBACK são filtradas
+```
+
+### 7.4 Capability (`version-capability.js`)
+
+```js
+DEFAULT_CAPABILITY = Object.freeze({ canDeploy:true,  canPromote:true,  canRollback:true })  // deployable
+VERSIONED_ONLY     = Object.freeze({ canDeploy:false, canPromote:false, canRollback:false })
+
+RESOURCE_CAPABILITY = Object.freeze({ function:VERSIONED_ONLY, network_list:VERSIONED_ONLY, waf:VERSIONED_ONLY })
+
+getVersionCapability(resourceType) => RESOURCE_CAPABILITY[resourceType] ?? DEFAULT_CAPABILITY
+```
+
+Só as divergências são listadas; qualquer recurso é deployable **até ser declarado o
+contrário**. É a única forma de divergência suportada — **sem fork** do shell.
+
+### 7.5 O que muda para `versioned-only` (e o que NÃO muda)
+
+`versioned-only` (Function/Network List/WAF) remove **todas** as affordances de deploy
+**por capability** — sem tocar `STATE_ACTIONS` nem `version-actions`:
+
+| Superfície         | Comportamento `versioned-only`                                                                                                                     |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Footer (ActionBar) | DEPLOY não chega (interseção `availableActions ∩ registered`); banners `ready`/`active` ramificam só a **copy** (`subtitleVersionedOnly`)          |
+| Heading            | botão Deploy é `v-if=capability.canDeploy`; `DeployDrawerBlock` só monta com `canDeploy && resourceContext`                                        |
+| Form adapter       | `onVersionCommand('DEPLOY')` é condicional a `canDeploy` — versioned-only **nem registra** (belt-and-suspenders com o filtro da máquina)           |
+| Landing            | não constrói `deployResourceContext` (null), não provê `openPromoteDrawer`, drawer não monta                                                       |
+| Kebab da lista     | `!canPromote` → omite PROMOTE/ROLLBACK e insere NEW_DRAFT_FROM ("New version from this") → `[OPEN_CONFIGURATION, NEW_DRAFT_FROM, ARCHIVE, DELETE]` |
+| Release picker     | Function/Network List/WAF filtrados para fora do seletor de recursos deployáveis (frontend/BFF; sem tocar a API)                                   |
+
+**Mantido (não regride):** máquina de estados, bus, comment-gate, read-only/fork-on-edit,
+ciclo de cache e todos os comandos não-deploy (SAVE/SAVE_AND_BUILD/CANCEL_BUILD/
+NEW_DRAFT_FROM/ARCHIVE/DELETE). Garantia: teste de enumeração `(classe, estado) → ações`
+nos 8 estados × {deployable, versioned-only} (§24).
 
 ---
 
-## 5. Comunicação pelo command bus
+<a name="8-bus"></a>
 
-### 5.1 Contrato
+## 8. Comunicação — command bus, command, context
+
+### 8.1 O bus (`use-version-command-bus.js`)
 
 ```js
-// Shell (provê)
-const bus = createVersionCommandBus()
-provide(VERSION_COMMAND_BUS_KEY, bus)
+createVersionCommandBus() {
+  const registered = shallowRef(new Map())          // shallowRef, NÃO ref (ver §22.1)
 
-// Filho (consome) — atalho ou forma completa
-onVersionCommand('DELETE', (ctx) => service.deleteVersion(ctx.resourceId, ctx.versionId))
-onVersionCommand('SAVE', {
-  ready: isFormValid,            // Ref<boolean> — gate do botão; opcional (default: sempre habilitado)
-  execute: async (ctx) => { ... } // retorno viaja de volta pro caller via evento `updated`
+  register(command, { execute, ready = null }) {
+    if (registered.value.has(command)) throw …       // 1 handler por comando
+    const next = new Map(registered.value)            // substitui o Map → dispara reatividade
+    next.set(command, { execute, ready }); registered.value = next
+    return () => { /* unregister: delete + novo Map */ }
+  }
+  emit(command, ctx) {
+    const entry = registered.value.get(command)
+    if (!entry) throw …                               // emitir sem handler lança
+    return entry.execute(ctx)
+  }
+  return { register, emit, registered: shallowReadonly(registered) }
+}
+```
+
+**Contrato:** push-only; 1 handler por comando (duplicado lança → filho único); reatividade
+pela substituição do Map inteiro.
+
+### 8.2 API do filho (`use-version-command.js`)
+
+```js
+onVersionCommand(command, options) {
+  const bus = inject(VERSION_COMMAND_BUS_KEY, null)
+  if (!bus) throw 'use inside <VersionShell>'
+  const config = typeof options === 'function' ? { execute: options } : options
+  onBeforeUnmount(bus.register(command, config))     // cleanup automático
+}
+```
+
+### 8.3 O contexto (`use-version-context.js`)
+
+```js
+useVersionContext() => inject(VERSION_CONTEXT_KEY, {
+  state: readonly(ref('draft')), readOnly: readonly(ref(false)), version: readonly(ref(null)),
+  availableActions: readonly(ref([])), disabledActions: readonly(ref([])),
+  isVersioned: readonly(ref(false)), capability: DEFAULT_CAPABILITY, dispatch: async () => {}
 })
 ```
 
-- **Push-only**: o shell empurra `bus.emit(command, ctx)`; o filho nunca expõe API por props.
-- **Um handler por comando** — duplicado lança erro (filho único por shell).
-- **Cleanup automático** em `onBeforeUnmount`.
-- `ctx = { resourceId, versionId, comment? }` — form values **não** viajam no ctx; o
-  handler coleta do form local.
-
-### 5.2 ⚠️ Armadilha de reatividade (decisão gravada em código)
-
-O bus usa `shallowRef(new Map())` + `shallowReadonly` — **nunca** `ref`/`readonly`.
-`ref()` converteria o Map num proxy reativo profundo, e proxies reativos
-**desembrulham refs no acesso à propriedade**: ao iterar, `entry.ready` viraria o
-boolean (não a ref) e `entry.ready.value` daria `undefined`, **invertendo o gate**
-(form válido → botão desabilitado). A reatividade vem da substituição do Map
-inteiro a cada register/unregister. Regressão coberta em
-`src/tests/templates/version-shell-block/version-shell-events.test.js`.
+Defaults **seguros** fora do shell: `readOnly=false` (fluxo legado intacto), `deployable`,
+`dispatch` no-op.
 
 ---
 
-## 6. Fluxo de dados e chamadas
+<a name="9-shell"></a>
 
-Quatro canais, cada um com uma direção única:
+## 9. Shell — VersionShell e action bar
 
-| Canal | Direção | O que carrega |
-|---|---|---|
-| **Props** | EditView → Shell → Adapter | `useVersionQuery` (factory), `resourceId`, `versionId`, `application` |
-| **Provide/inject** | Shell → descendentes | `VERSION_COMMAND_BUS_KEY` (bus) e `VERSION_CONTEXT_KEY` (`{ state, readOnly, version }`) |
-| **Bus (push)** | Shell → Adapter | `emit(command, ctx)`; resultado do handler retorna pelo `await` |
-| **Eventos** | Shell → EditView | `updated { action, result }` e `command-error { action, error }` |
+### 9.1 `index.vue` — o orquestrador
+
+```js
+const capability = readonly(ref(getVersionCapability(props.resourceType))) // resolve 1× no mount
+const bus = createVersionCommandBus()
+provide(VERSION_COMMAND_BUS_KEY, bus)
+const {
+  version,
+  state,
+  readOnly,
+  availableActions,
+  disabledActions,
+  dispatch,
+  isLoading,
+  isError
+} = useVersionShell({ useVersionQuery, resourceId, versionId, bus })
+
+const handleDispatch = async (action, payload) => {
+  // NUNCA rejeita
+  try {
+    emit('updated', { action, result: await dispatch(action, payload) })
+  } catch (error) {
+    emit('command-error', { action, error })
+  }
+}
+provide(VERSION_CONTEXT_KEY, {
+  state,
+  readOnly,
+  version,
+  availableActions,
+  disabledActions,
+  isVersioned: readonly(ref(true)),
+  capability,
+  dispatch: handleDispatch
+})
+// overlay quando isProcessing(state); <teleport to="#action-bar"> da VersionActionBar (guard isMounted)
+```
+
+O shell **não toca cache** e **não conhece service**. A action bar é teleportada para a
+`<div id="action-bar">` que o `ContentBlock` fornece.
+
+### 9.2 `use-version-shell.js` — a derivação reativa
+
+```js
+const versionQuery = useVersionQuery() // factory passada por prop
+const version = computed(() => versionQuery.data.value ?? null)
+const state = computed(() => version.value?.state ?? 'draft')
+const readOnly = computed(() => !isEditable(state.value))
+
+const availableActions = computed(() =>
+  // INTERSEÇÃO crucial:
+  getAvailableActions(state.value).filter((c) => bus.registered.value.has(c))
+) // estado ∩ registrados
+
+const disabledActions = computed(() => {
+  // visível mas desabilitado:
+  const out = []
+  for (const [cmd, e] of bus.registered.value) if (e.ready && !e.ready.value) out.push(cmd)
+  return out
+})
+
+const dispatch = async (action, payload = {}) => {
+  if (!isActionAvailable(state.value, action)) return warn // GATE 1: estado
+  if (!bus.registered.value.has(action)) return warn // GATE 2: handler existe
+  return bus.emit(action, { resourceId, versionId, comment: payload.comment }) // ctx mínimo
+}
+```
+
+`availableActions = getAvailableActions(state) ∩ registered` é o coração: um botão só
+aparece se **o estado permite** E **o filho registrou um handler**.
+
+### 9.3 Componentes do shell
+
+| Componente              | Pontos-chave                                                                                                                                                                                                                 |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VersionActionBar`      | `BANNER[state]` (cópia; `subtitleVersionedOnly` quando `!canDeploy`); botões = `getVersionBarActions(state, cap) ∩ availableActions`; ações com `ACTION_META.dialog` abrem o dialog antes de emitir                          |
+| `VersionHeadingActions` | Mesmos botões, teleportados a `#version-lifecycle-action`; **Deploy → `openRelease` (router.push composer)**; demais → `dispatch` do contexto; `DeployDrawerBlock` só se `canDeploy && resourceContext`; expõe `openRelease` |
+| `ProcessingOverlay`     | Bloqueia a UI em `isProcessing(state)`; Cancel emite `cancel`                                                                                                                                                                |
+| `VersionActionDialog`   | comment obrigatório/opcional (`requireComment`) ou confirmação (`showComment:false`, `confirmSeverity:'danger'`)                                                                                                             |
+| `VersionStateBadge`     | 8 estados; `active` rotulado **"Current"**; prop `isCurrent` marca uma `ready`/`active` como Current quando a API não tem campo de "atual"                                                                                   |
+
+---
+
+<a name="10-form-adapter"></a>
+
+## 10. Form-adapter — o filho do shell
+
+Arquivo: `use-version-form-adapter.js`. **Fonte única** do filho; todo recurso usa este
+mesmo composable, mudando só `versionService`/`validationSchema`/`saveStrategy`.
+
+### 10.1 Form + re-sync
+
+```js
+const { version, capability: contextCapability } = useVersionContext()
+const mergedValues = computed(() => ({
+  ...(toValue(resource) ?? {}),
+  ...(version.value?.config ?? {})
+})) // versão vence
+const { values, meta, validate, resetForm } = useForm({
+  validationSchema,
+  initialValues: mergedValues.value
+})
+
+watch(mergedValues, (next) => {
+  if (!meta.value.dirty) resetForm({ values: next })
+}) // re-sync só se não-sujo
+watch(
+  () => toValue(versionId),
+  () => resetForm({ values: mergedValues.value })
+) // troca de versão: incondicional
+const isFormValid = computed(() => meta.value.valid)
+```
+
+### 10.2 Os 7 handlers
+
+```js
+const runSave = async ({ build, comment }) => {
+  const { valid } = await validate()
+  if (!valid) throw new Error('Please review the highlighted fields and try again.') // THROW, não return
+  const ctx = { service: versionService, resourceId, versionId, resource, values, comment }
+  const result = build ? await saveStrategy.saveAndBuild(ctx) : await saveStrategy.save(ctx)
+  resetForm({ values: { ...values } }) // novo baseline limpo
+  return result
+}
+onVersionCommand('SAVE', { ready: isFormValid, execute: () => runSave({ build: false }) })
+onVersionCommand('SAVE_AND_BUILD', {
+  ready: isFormValid,
+  execute: ({ comment }) => runSave({ build: true, comment })
+})
+onVersionCommand('ARCHIVE', ({ resourceId, versionId, comment }) =>
+  versionService.archive(resourceId, versionId, { comment })
+)
+onVersionCommand('CANCEL_BUILD', ({ resourceId, versionId, comment }) =>
+  versionService.cancelBuild(resourceId, versionId, { comment })
+)
+onVersionCommand('NEW_DRAFT_FROM', ({ resourceId, versionId, comment }) =>
+  versionService.createDraft(resourceId, { sourceVersionId: versionId, comment })
+)
+onVersionCommand('DELETE', ({ resourceId, versionId }) =>
+  versionService.deleteVersion(resourceId, versionId)
+)
+if (resolvedCapability.value.canDeploy) onVersionCommand('DEPLOY', () => {}) // Null Object, só deployable
+```
+
+- **SAVE inválido lança** (não retorna): senão o shell emitiria `updated` (falso sucesso → toast+nav sem nada salvo).
+- **DEPLOY é Null Object** (registra só p/ deployable); o trabalho real (rotear ao composer) é do heading/host. `versioned-only` nem registra → interseção exclui + dispatch fail-closes.
+
+### 10.3 Strategy de write (`saveStrategy`)
+
+| Strategy                 | `save`                                         | `saveAndBuild`                         |
+| ------------------------ | ---------------------------------------------- | -------------------------------------- |
+| `defaultSaveStrategy`    | `updateDraft` (PUT)                            | `updateDraft` → `build`                |
+| `workloadSaveStrategy`   | `updateDraft`                                  | `updateDraft` (build implícito no PUT) |
+| `customPageSaveStrategy` | salva conteúdo no **endpoint base**            | base → `build` no endpoint de versão   |
+| `deploymentSaveStrategy` | `updateDeploymentAdapter` (mutação do recurso) | recurso → `build`                      |
+
+É o **ponto de variação** do _write_; o ciclo (validar → salvar → opcional build →
+resetForm → retornar) é fixo.
+
+---
+
+<a name="11-apresentacao"></a>
+
+## 11. Apresentação — version-actions
+
+Arquivo: `version-actions.js`. Separa **apresentação** (labels/ícones/dialog/ordem) das
+**regras** (em `version-machine`). Garante que footer, heading e kebab nunca divirjam.
+
+### 11.1 `ACTION_META` + dialogs
+
+| Ação                               | Dialog                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------ |
+| `ARCHIVE`                          | comment **obrigatório** (`required:true`)                                |
+| `CANCEL_BUILD`, `NEW_DRAFT_FROM`   | comment **opcional**                                                     |
+| `DELETE`                           | confirmação destrutiva (`showComment:false`, `confirmSeverity:'danger'`) |
+| `SAVE`, `SAVE_AND_BUILD`, `DEPLOY` | sem dialog                                                               |
+
+### 11.2 Botões da barra (footer + heading)
+
+```js
+VERSION_BAR_ACTIONS = {
+  draft:[SAVE,SAVE_AND_BUILD], canceled:[SAVE,SAVE_AND_BUILD], error:[SAVE,SAVE_AND_BUILD],
+  building:[CANCEL_BUILD], queued:[CANCEL_BUILD],
+  ready:[NEW_VERSION, DEPLOY], active:[NEW_VERSION, REDEPLOY], archived:[NEW_VERSION]
+}
+getVersionBarActions(state, cap) => (VERSION_BAR_ACTIONS[state] ?? [NEW_VERSION])
+  .filter(a => !BAR_CAPABILITY_FLAG[a.key] || cap[BAR_CAPABILITY_FLAG[a.key]])
+```
+
+> O footer mostra um **subconjunto** de `STATE_ACTIONS`: em `ready` a matriz permite
+> ARCHIVE/DELETE, mas o footer só renderiza New Version + Deploy — Archive/Delete vivem
+> no **kebab da lista**.
+
+### 11.3 Kebab da lista (`buildVersionMenuItems`)
+
+```
+deployable (canPromote):  [OPEN_CONFIGURATION, PROMOTE, ROLLBACK(disabled), ARCHIVE, DELETE]
+versioned-only:           [OPEN_CONFIGURATION, NEW_DRAFT_FROM("New version from this"), ARCHIVE, DELETE]
+```
+
+Padrão "never hide": itens ficam visíveis+desabilitados com tooltip (ex.: ROLLBACK
+diferido); só `DELETE` é omitido se já `deleted`. `mapVersionMenuItemsToMenu` converte
+para o modelo PrimeVue (separador antes do Delete, `stopPropagation` para não borbulhar
+na linha).
+
+---
+
+<a name="12-orquestracao"></a>
+
+## 12. Orquestração de página
+
+Composables **compartilhados** que cuidam de tudo **fora** do shell: rota, load do recurso
+pai, navegação pós-comando, toasts, e o roteador das ações de lista.
+
+### 12.1 `use-version-edit-screen.js` — o editor full-page
+
+Config: `{ load, provideKey?, listRoute, versionRouteName, titleWithVersion?, supportsDeployDrawer? }`.
+
+```js
+const versionId = computed(() => route.params.versionId ? String(...) : null)
+if (!versionId.value) router.replace(listRoute(resourceId.value))   // guard: sem versionId → lista
+if (provideKey) provide(provideKey, resource)                        // form fields injetam o recurso
+watch(resourceId, loadResource, { immediate: true })
+
+handleCommandSuccess({ action, result }) {
+  if (action === DEPLOY && supportsDeployDrawer) return editorRef.value?.openRelease()  // → composer
+  toast.add(SUCCESS_SUMMARY[action])
+  if (action ∈ {DELETE, SAVE_AND_BUILD}) goToVersionsList()
+  if (action === NEW_DRAFT_FROM && result?.id) router.push({ name: versionRouteName, params:{ versionId: result.id }})
+  if (action === SAVE) loadResource()   // recarrega título/recurso pai
+}
+```
+
+### 12.2 `use-resource-version-landing.js` — a landing tabbed
+
+Config: `{ load, provideKey, versionService, resourceType, routeName, versionRouteName }`.
+
+- **Seam `versionMenuHost`** (provide): a aba Versions slottada consome isso para ligar o
+  roteador de ações de lista, sem lógica de menu por recurso. `openPromoteDrawer` só é
+  provido se `capability.canDeploy`.
+- `latestVersionId`; `activeTab` dirigido pela rota (`?tab=settings`).
+- **Deploy/Promote → composer**; `deployResourceContext` é `null` para `versioned-only`.
+
+### 12.3 `use-version-menu-actions.js` — roteador único do kebab
+
+```js
+RESOURCE_VERSION_ROUTES = { application:'edit-application-version', firewall:'…', custom_page:'…', … }
+handleRowAction({ action, item }) {
+  OPEN_CONFIGURATION → router.push(editor de resourceType, { id, versionId })
+  PROMOTE            → openPromoteDrawer({ scopedType, pin:item.id, workloadId })  // → composer
+  NEW_DRAFT_FROM     → versionService.createDraft(rid, { sourceVersionId:item.id }) → push novo draft
+  ROLLBACK           → no-op (fase 2)
+  ARCHIVE | DELETE   → delega a useVersionRowActions
+}
+```
+
+### 12.4 `use-version-row-actions.js` — Archive/Delete fora do bus
+
+A lista gerencia **muitas** versões e roda **fora** da árvore do shell → o bus (escopo de
+1 shell/1 versão) não existe aqui. Mutações vão **direto ao service**:
+
+- `ARCHIVE` imediato (comment default `'Archived from the versions list'`) + toast.
+- `DELETE` abre dialog de confirmação.
+- **Backend é a autoridade** sobre "em uso": rejeição vira toast, lista intacta (sem
+  remoção otimista, sem navegação em falha). Guard `isExecuting`. O service já invalida →
+  a lista refetcha.
+
+### 12.5 Headless (`use-version-list.js` / `to-version-options.js`)
+
+- `use-version-list`: search/filter/sort puro (campos pesquisáveis, dropdown de status de
+  `VERSION_STATES`, comparadores). Sem service/HTTP.
+- `to-version-options`: versões → opções deployáveis (`DEPLOYABLE_STATES = [ready, active]`),
+  com flag `isCurrent`.
+
+### 12.6 Composables auxiliares
+
+- `use-deploy-resource-context.js`: monta o `resourceContext` do DeployDrawer no heading do
+  **editor** (lê o recurso do `provide` via `injectionKey`; null para versioned-only;
+  fallback p/ a versão corrente quando não há deployáveis).
+- `use-deployment-release-drawer.js`: drawer de **detalhe** de release de Deployment
+  (visibilidade, fetch, resolução de nomes, botão Rollback/Redeploy por `isCurrent`).
+- `use-workload-version-environments.js`: para Workload, resolve em quais environments as
+  versões `ready` estão (agrupa por `environmentId`, mantém a maior versão por environment).
+
+---
+
+<a name="13-listagem"></a>
+
+## 13. Listagem — VersionListDataView
+
+Arquivo: `src/components/VersionListDataView/index.vue`. Componente **genérico** (grid
+sobre `DataView`) que toda landing usa para exibir versões.
+
+### 13.1 Props principais
+
+| Prop                                                               | Função                                                                                            |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `items`                                                            | versões já filtradas/ordenadas (vindas de `use-version-list`)                                     |
+| `columns`                                                          | descritores `{ key, label, size, align?, optional?, mobileSlot?, mobileLabel? }`                  |
+| `loading` / `isError` / `errorKind`                                | estados; `errorKind`: `network`→Retry, `forbidden`(403)→sem retry, `notFound`(404)→voltar à lista |
+| `hasVersions`                                                      | distingue "nenhuma versão" de "filtro sem resultado"                                              |
+| `emptyState` / `errorState`                                        | `{ title, description, buttonLabel, buttonAction }`                                               |
+| `searchTerm` / `filters` / `filterValues` / `sort` / `sortOptions` | v-model de volta ao host                                                                          |
+| `showRowActions`                                                   | renderiza o kebab                                                                                 |
+| `resourceType`                                                     | passado a `buildVersionMenuItems` (capability)                                                    |
+| `paginatorRows` / `lazy` / `totalRecords`                          | paginação                                                                                         |
+
+### 13.2 Comportamentos embutidos
+
+- **Clique na linha** → emite `row-action { action:'OPEN_CONFIGURATION', item }` (+ `row-click`
+  legado). Abrir a versão = mesmo resultado do "Open configuration" do menu.
+- **Kebab** → `mapVersionMenuItemsToMenu(state, { resourceType }, onAction, item)`; `stopPropagation`
+  para não borbular na linha; tooltip + estilo danger.
+- **Renderers de célula por `key`**: `version` (hash + tag "Current" se `active` + comment),
+  `status` (`VersionStateBadge`), `created` (data + `lastEditor`), `inUse` (`referenceCount`,
+  `'--'` se ausente).
+- **Auto-hide de coluna**: coluna `optional` sem slot e sem dados sai (`isColumnVisible`) —
+  é assim que "In use" desaparece para recursos que não expõem `referenceCount` (Network
+  List/WAF).
+- **Responsivo**: grid no desktop; **card layout** no mobile (slots `mobileSlot`: primary/
+  secondary/badge/body/footer).
+- Emits: `update:searchTerm/filterValues/sort`, `refresh`, `page`, `row-click`, `row-action`.
+
+---
+
+<a name="14-service"></a>
+
+## 14. Service/adapter — a base HTTP
+
+### 14.1 `VersionServiceBase` (Template Method)
+
+```js
+class VersionServiceBase extends BaseService {
+  getUrl(rid, vid, suffix='') => `${baseURL}/${rid}/versions[/${vid}]${suffix}`
+  invalidateAfterMutation(rid) { queryClient.removeQueries({ queryKey: this.versionKeys.all(rid) }) }  // HOOK
+
+  // queries
+  loadVersion(rid, vid)              // useEnsureQueryData, persist:false (one-shot)
+  useLoadVersionQuery(rid, vid)      // useQuery, persist:false (detalhe reativo — o shell usa esta)
+  useListVersionsQuery(rid, params)  // useQuery; #splitListParams separa skipCache do queryKey/HTTP
+  listVersions(rid, params)          // async p/ watchers; retorna result.body ?? []
+
+  // mutações — TODAS chamam invalidateAfterMutation(rid)
+  createDraft(rid, body)        // POST                 → transformCreateDraftPayload
+  updateDraft(rid, vid, values) // PUT (full replace)   → transformDraftPayload
+  patchDraft(rid, vid, partial) // PATCH                → transformDraftPayload
+  deleteVersion(rid, vid)       // DELETE
+  build(rid, vid, body)         // POST …/build         → transformBuildPayload
+  archive(rid, vid, body)       // POST …/archive       → exige comment não-vazio (throw)
+  cancelBuild(rid, vid, body)   // POST …/cancel
+}
+```
+
+A subclasse de Application é só isto:
+
+```js
+class EdgeAppVersionService extends VersionServiceBase {
+  constructor() {
+    super()
+    this.adapter = EdgeAppVersionAdapter
+    this.baseURL = 'v4/workspace/applications'
+    this.versionKeys = queryKeys.application.version
+  }
+}
+export const edgeAppVersionService = new EdgeAppVersionService()
+```
+
+> **O único ponto que invalida cache é o service.** Shell e host nunca invalidam. Em erro,
+> não invalida (tela permanece consistente).
+
+### 14.2 `createVersionAdapter` (Factory)
+
+```js
+createVersionAdapter({ normalizeConfig, mapResourceFields, mapMeta }) => {
+  normalizeVersion(raw) => ({                  // meta.* vence; senão chaves flat
+    id: meta?.version_id ?? raw.version_id ?? raw.id,   // ULID da VERSÃO, não do recurso
+    state, version, comment, createdAt, readyAt, lastModified, lastEditor,
+    sourceVersionId, referenceCount,            // informativo; null quando a API omite
+    ...(mapMeta ? mapMeta(raw) : {}),            // meta extra (ex.: Workload: deploymentId)
+    config: normalizeConfig(raw)                 // o que vira valores do form
+  })
+  transformLoadVersion(raw)   => normalizeVersion(raw?.data ?? raw)
+  transformListVersions(raw)  => { count, body: results.map(normalizeVersion) }
+  transformCreateDraftPayload(body) => { source_version?, comment?, ...stripUndefinedDeep(mapResourceFields(body)) }
+  transformDraftPayload(values)     => { comment?, source_version?, ...stripUndefinedDeep(mapResourceFields(values)) }
+  transformArchivePayload({comment})=> ({ comment })
+  transformBuildPayload({trace_id,comment}) => { trace_id?, comment? }
+}
+```
+
+**Contrato de payload:** campos do recurso vão **no nível raiz** do body (sem wrapper);
+`comment`/`source_version` na raiz. O `GET` é snapshot; `normalizeConfig` extrai os campos
+para `version.config`. `stripUndefinedDeep` remove `undefined`, **preserva `null` e arrays**.
+
+Adapter de Application:
+
+```js
+const normalizeConfig = (raw) => {
+  // descarta chaves ausentes (não envia null ao form)
+  const ui = {},
+    modules = raw.modules ?? {}
+  if (raw.name != null) ui.name = raw.name
+  if (modules.cache?.enabled != null) ui.edgeCacheEnabled = modules.cache.enabled
+  if (modules.functions?.enabled != null) ui.edgeFunctionsEnabled = modules.functions.enabled
+  // … application_accelerator, image_processor, tiered_cache …
+  if (raw.active != null) ui.isActive = raw.active
+  if (raw.debug != null) ui.debug = raw.debug
+  return ui
+}
+export const EdgeAppVersionAdapter = createVersionAdapter({
+  normalizeConfig,
+  mapResourceFields: (values) => EdgeAppAdapter.transformPayload(values) // reusa o adapter não-versionado (DRY)
+})
+```
+
+---
+
+<a name="15-subrecursos"></a>
+
+## 15. Sub-recursos versionados
+
+Recursos compostos têm coleções aninhadas também versionadas (Cache Settings, Device
+Groups, Functions, Rules Engine no Application; Exceptions no WAF), em
+`{baseURL}/{id}/versions/{vid}/{path}`.
+
+### 15.1 `createVersionedSubResourceService` (Factory)
+
+```js
+createVersionedSubResourceService({ path, adapter, queryKeyGroup, baseURL, idKey, createdMessage, updatedMessage })
+  → { list, load, create, edit, remove }   // todos invalidam queryKeyGroup.all(appId, versionId)
+```
+
+`create`/`edit` retornam **no mesmo shape** dos irmãos não-versionados (`{ [idKey]: id,
+feedback }` / a string de mensagem), para reusar o `CreateDrawerBlock` compartilhado sem
+mudança. WAF usa a mesma factory com `baseURL:'v4/workspace/wafs'`, `path:'exceptions'`.
+
+### 15.2 `useVersionedFacades` (Adapter de assinatura)
+
+Pré-amarra `(resourceId, versionId)` e expõe **a mesma assinatura** que as ListViews
+legadas já esperam (`props.service.list(appId, …)`), tornando a ListView legada um _drop-in_
+dentro do editor versionado:
+
+```js
+useVersionedFacades(resourceId, versionId) => ({
+  cacheSettings: { list:(q)=>svc.list(resourceId, versionId, q), load, create, edit, remove },
+  deviceGroups: {…}, functions: {…}, rulesEngine: {…}   // versionId injetado em todas
+})
+```
+
+### 15.3 queryKeys aninhados
+
+```js
+queryKeys.application.version = {
+  all:(id)=>[...detail(id),'versions'], list:(id,p)=>…, detail:(id,vid)=>[...all(id),'detail',vid],
+  cacheSettings:{ all:(id,vid)=>[...detail(id,vid),'cache-settings'], list, detail },
+  deviceGroups:{…}, functions:{…}, rulesEngine:{…}
+}
+```
+
+O queryKey do sub-recurso descende de `version.detail` → invalidação precisa e localizada.
+
+---
+
+<a name="16-view-router"></a>
+
+## 16. View + roteamento (2 variantes de landing)
+
+### 16.1 Fork de rota (flag `use_v6_configurations`)
+
+```js
+// src/router/routes/edge-application-routes/index.js
+{ path:'edit/:id/:tab?', name:'edit-application',
+  component: () => hasFlagUseV6Configurations()
+    ? import('@views/EdgeApplications/v6/EditView.vue')   // landing v6
+    : import('@views/EdgeApplications/TabsView.vue') },    // legado
+{ path:'edit/:id/versions/:versionId/:tab?', name:'edit-application-version',
+  component: () => import('@views/EdgeApplications/v6/VersionEditView.vue'),
+  meta: { flag:'use_v6_configurations' } }                  // editor full-page
+```
+
+O fork é **no router**; componentes nunca leem `user-flag.js`.
+
+### 16.2 Duas variantes de **landing**
+
+**(A) Direta** — usada pelo Application (`EdgeApplications/v6/EditView.vue`): a view orquestra
+tudo:
+
+```js
+provide('edgeApplication', application)
+watch(id, loadApplication, { immediate: true })
+const versionsQuery = edgeAppVersionService.useListVersionsQuery(id)
+const { items, searchTerm, filterValues, sort, filters, sortOptions } = useVersionList(rawVersions)
+const {
+  handleRowAction,
+  dialogConfig,
+  dialogProps,
+  dialogVisible,
+  handleConfirm,
+  handleVisibility
+} = useVersionMenuActions({
+  resourceType: 'application',
+  resourceId: id,
+  versionService,
+  router,
+  openPromoteDrawer: openPromoteRelease,
+  onSuccess: () => versionsQuery.refetch?.()
+})
+// heading "Deploy" → openRelease (composer); toolbar "New Version" → createDraft → goToVersion
+// <VersionListDataView> + <VersionActionDialog> + <DeployDrawerBlock>
+```
+
+**(B) Composable** — usada por Custom Page/Firewall (`CustomPages/v6/EditView.vue`), thin:
+
+```js
+const { resource, resourceId, isLoading, loadError, isDeployDrawerOpen, deployResourceContext } =
+  useResourceVersionLanding({
+    load,
+    provideKey: 'customPage',
+    versionService,
+    resourceType: 'custom_page',
+    routeName: 'edit-custom-pages',
+    versionRouteName: 'edit-custom-pages-version'
+  })
+// <ResourceVersionLanding> com slot #versions = <VersionsTab> (que consome o seam versionMenuHost)
+```
+
+> Diferença: (A) inlineia a lógica de lista; (B) delega ao composable + chrome e injeta a
+> aba via slot. Ambas terminam no mesmo `VersionListDataView`.
+
+### 16.3 O **editor** full-page
+
+`VersionEditView.vue` (thin) → `useVersionEditScreen(...)` → `<VersionEditScreen>` (chrome)
+envolvendo `<VersionEditorTabs :key="versionId">` → `<VersionEditorTabsShell>` → `<VersionShell>`
+→ `<ApplicationVersionAdapter>` (filho) → TabView.
+
+`VersionEditorTabs.vue` (especificidade do Application):
+
+- `useVersionedFacades(rid, vid)` → services dos sub-recursos.
+- Lê os **módulos da VERSÃO** (config merged sobre a Application, mesma query do shell,
+  deduplicada por queryKey) para gatear a aba Functions e os avisos do Rules Engine.
+- `applicationTabs`: Main Settings (`FormFieldsEditEdgeApplications`, `canCreate:false`,
+  persiste via SAVE do bus) + Cache/Device/Functions(gated)/Rules (ListViews com `service:
+facade.*`).
+- `useVersionQuery = () => edgeAppVersionService.useLoadVersionQuery(rid, vid)`.
+
+`ApplicationVersionAdapter.vue` (filho, ≤35 linhas):
+
+```vue
+<script setup>
+  import * as yup from 'yup'
+  import { useVersionFormAdapter } from '@/composables/versioning/use-version-form-adapter'
+  import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
+  const props = defineProps({ resource: Object, resourceId: [String, Number], versionId: String })
+  useVersionFormAdapter({
+    resource: () => props.resource,
+    resourceId: () => props.resourceId,
+    versionId: () => props.versionId,
+    versionService: edgeAppVersionService,
+    validationSchema: yup.object({ name: yup.string().required() })
+  })
+</script>
+<template><slot /></template>
+```
+
+### 16.4 Composição de componentes (runtime)
+
+```mermaid
+flowchart TD
+  RT["rota edit/:id/versions/:versionId/:tab?"] --> VEV["VersionEditView (thin)"]
+  VEV --> VES["VersionEditScreen (chrome)"]
+  VES --> VET["VersionEditorTabs (recurso: facades + tabs + query)"]
+  VET --> VETS["VersionEditorTabsShell (scaffold)"]
+  VETS --> VS["VersionShell (agnóstico: bus + contexto + action bar + overlay)"]
+  VS --> ADP["ApplicationVersionAdapter (filho: 7 handlers)"]
+  ADP --> TV["TabView / TabPanel"]
+  TV --> MS["Main Settings (FormFields)"]
+  TV --> CS["Cache Settings (ListView + facade)"]
+  TV --> RE["Rules Engine (ListView + facade)"]
+  VS -.teleport.-> HEAD["HeadingActions → #version-lifecycle-action"]
+  VS -.teleport.-> BAR["ActionBar → #action-bar"]
+```
+
+---
+
+<a name="17-release"></a>
+
+## 17. Release — composer full-page
+
+A evolução mais recente: **Deploy e Promote não usam mais drawer** — roteiam para uma tela
+full-page ("Review & deploy", rota `release-composer`, path `releases/new`). O
+`DeployDrawerBlock` fica montado só como fallback.
+
+```js
+// release-composer-route.js (builder PURO de rota)
+releaseComposerRouteFromResource({ resourceType, resourceId, version, versions }) {
+  const versionId = version?.id ?? versions?.[0]?.value ?? null
+  if (!SCOPED_RESOURCE_TYPES.includes(resourceType) || resourceId == null || versionId == null)
+    return releaseComposerRouteFromDeployment()    // cai p/ DS-first
+  return { name:'release-composer', query:{ fromVersion:'true', scopedType, versionId, resourceId } }
+}
+// SCOPED_RESOURCE_TYPES = ['application','firewall','custom_page']
+```
+
+Entradas que convergem para a mesma tela:
+
+- **Heading/footer DEPLOY** → `VersionHeadingActions.openRelease()` (o footer dispara o
+  no-op DEPLOY → `handleCommandSuccess` chama `editorRef.openRelease()`).
+- **Kebab PROMOTE** → `use-version-menu-actions.promote` → `openPromoteDrawer({ pin })`.
+- **Deployments → New Release** → `releaseComposerRouteFromDeployment(dsId?)`.
+
+`RESOURCE_RESOLVERS` (`resolveReleaseResources.js`): registry por `resource_type` com
+`{ listNames(), resolveVersionName(id, versionId) }` (7 tipos: application, firewall,
+connector, function, custom_page, network_list, waf). Resolve nomes de recurso + labels de
+versão exibidos na árvore do composer; tipos não-registrados passam intactos.
+
+`versioned-only` (Function/Network List/WAF) é filtrado para fora do seletor de recursos
+deployáveis (sem tocar a API).
+
+---
+
+<a name="18-dados"></a>
+
+## 18. Quatro canais de dados e ciclo de cache
+
+| Canal              | Direção                | Carrega                                                                                                        |
+| ------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Props**          | host → Shell → Adapter | `useVersionQuery` (factory), `resourceId`, `versionId`, `resourceType`, `resource`                             |
+| **Provide/Inject** | Shell → descendentes   | `VERSION_COMMAND_BUS_KEY` (bus), `VERSION_CONTEXT_KEY` (`{state, readOnly, version, capability, dispatch, …}`) |
+| **Bus (push)**     | Shell → Adapter        | `emit(command, ctx)`; resultado volta pelo `await`                                                             |
+| **Eventos**        | Shell → host           | `updated {action, result}`, `command-error {action, error}`                                                    |
 
 ### Ciclo de cache (dono: service)
 
 ```
-mutação no service (updateDraft/build/...)
+mutação (updateDraft/build/archive/…)
   → HTTP
-  → this.invalidateAfterMutation(rid)   // default: removeQueries(versionKeys.all(rid))
+  → invalidateAfterMutation(rid)        // removeQueries(versionKeys.all(rid))
   → o useQuery canônico (shell + badge, deduplicado por queryKey) refetcha sozinho
-  → version.value atualiza → state recomputa → action bar / readOnly / overlay reagem
+  → version.value muda → state recomputa → action bar / readOnly / overlay reagem
 ```
 
-`invalidateAfterMutation` é o hook sobrescrevível da base — recursos que mudam
-mais de um cache estendem-no (ex.: Deployment invalida também `deployments.detail`).
-
-O shell e a EditView **nunca** invalidam cache. Não há polling: o estado atualiza
-por invalidação pós-mutação e por ação do usuário (decisão de produto — pós-build
-o usuário é levado à listagem de versões).
+**Sem polling.** Em **erro**, o service **não** invalida.
 
 ---
 
-## 7. Encadeamento de métodos (cadeia completa de um comando)
+<a name="19-catalogo"></a>
 
+## 19. Catálogo de recursos plugados
+
+| Recurso        | `resource_type` | baseURL das versões              | Classe             | saveStrategy | Particularidade do adapter                                                      |
+| -------------- | --------------- | -------------------------------- | ------------------ | ------------ | ------------------------------------------------------------------------------- |
+| Application    | `application`   | `v4/workspace/applications`      | deployable         | `default`    | recurso de referência; reusa `EdgeAppAdapter`                                   |
+| Workload       | `workload`      | `v4/workspace/workloads`         | deployable         | `workload`   | `mapMeta` (deploymentId/environmentId/lastError); `rollback`; auto-build no PUT |
+| Custom Page    | `custom_page`   | `v4/workspace/custom_pages`      | deployable         | `customPage` | salva conteúdo no endpoint base; composto (pages[])                             |
+| Firewall       | `firewall`      | `v4/workspace/firewalls`         | deployable         | `default`    | —                                                                               |
+| Edge Connector | `connector`     | `v4/workspace/connectors`        | deployable         | `default`    | polimórfico HTTP/Storage/LiveIngest                                             |
+| Edge Function  | `function`      | `v4/workspace/functions`         | **versioned-only** | `default`    | coalesce de campos legados; `reference_count` → coluna "In use"                 |
+| Network List   | `network_list`  | `v4/workspace/network_lists`     | **versioned-only** | `default`    | atômico (IP/ASN/Country no snapshot)                                            |
+| WAF            | `waf`           | `v4/workspace/wafs`              | **versioned-only** | `default`    | composto: exceptions versionadas (sub-recurso)                                  |
+| Deployment     | —               | `/deployment-api/v4/deployments` | deployable         | `deployment` | invalida `deployments.detail`; desembrulha envelopes                            |
+
+### 19.1 Workload — auto-build e rollback
+
+```js
+class WorkloadVersionService extends VersionServiceBase {
+  // baseURL='v4/workspace/workloads'; versionKeys=queryKeys.workload.version
+  rollback(rid, vid, body) // POST …/rollback (Workload tem endpoint próprio)
+}
+// adapter: createVersionAdapter({ normalizeConfig (guarda protocols/tls/mtls; reusa WorkloadAdapter.transformLoadWorkload),
+//                                 mapResourceFields (guarda name/protocols; reusa transformCreateWorkload),
+//                                 mapMeta (deploymentId, environmentId, lastError) })
+//          + override transformDraftPayload (payload completo na raiz), transformActionPayload (rollback: só comment)
+// workloadSaveStrategy: save = saveAndBuild = updateDraft (não há endpoint /build; o PUT já builda)
 ```
-1. Click no botão
-   VersionActionBar.handleClick(action)
-2. Comment gate (UI)
-   REQUIRES_COMMENT[action]? → abre VersionActionDialog → handleDialogConfirm(comment)
-3. Emissão pra cima
-   VersionActionBar emit('dispatch', action, { comment? })
-4. Shell captura
-   index.vue → handleDispatch(action, payload)        [try/catch — nunca rejeita]
-5. State gate + ctx
-   use-version-shell.dispatch(action, payload)
-     ├─ isActionAvailable(state, action)?  senão: warn + return
-     ├─ bus.registered.has(action)?        senão: warn + return
-     └─ ctx = { resourceId, versionId, comment }
-6. Bus
-   return await bus.emit(action, ctx) → entry.execute(ctx)
-7. Handler (useVersionFormAdapter) — exemplo SAVE
-   validate() → inválido? throw (shell emite command-error; nenhum HTTP)
-   saveStrategy.save(ctx) → service.updateDraft(rid, vid, values)  // SAVE = PUT (full replace)
-     └─ EdgeAppVersionAdapter.transformDraftPayload(values)   // form → campos no raiz
-     └─ PUT /v4/workspace/applications/{rid}/versions/{vid}
-     └─ this.invalidateAfterMutation(rid)                     // removeQueries(versionKeys.all)
-   resetForm({ values })                                      // baseline novo, limpa dirty
-   return result                                              // volta pelo bus
-8. Shell emite o desfecho
-   sucesso → emit('updated', { action, result })
-   falha   → emit('command-error', { action, error })
-9. EditView decide UI
-   toast por ação; navegação: DELETE/SAVE_AND_BUILD → listagem; NEW_DRAFT_FROM → novo draft (result.id)
+
+### 19.2 Deployment — envelope + invalidação dupla
+
+```js
+class DeploymentVersionService extends VersionServiceBase {
+  // baseURL='/deployment-api/v4/deployments'; versionKeys=queryKeys.deployments.versions
+  invalidateAfterMutation(id) { super.invalidateAfterMutation(id);
+    queryClient.invalidateQueries({ queryKey: queryKeys.deployments.detail(id) }) }  // muda a linha do deployment também
+  useListVersionsQuery / useLoadVersionQuery   // override: desembrulha { results|data, count } / { data }
+  listVersionsService / createVersionService   // wrappers thin que preservam o shape { body, count } / { data }
+}
 ```
 
 ---
 
-## 8. Diagramas de sequência
+<a name="20-fluxos"></a>
 
-### 8.1 SAVE (caminho feliz)
+## 20. Fluxos completos
+
+### 20.1 SAVE (caminho feliz)
 
 ```mermaid
 sequenceDiagram
   actor U as Usuário
-  participant AB as VersionActionBar
+  participant BAR as VersionActionBar
   participant SH as VersionShell
   participant BUS as CommandBus
-  participant AD as ApplicationVersionAdapter
-  participant SV as edgeAppVersionService
+  participant AD as Adapter
+  participant SV as versionService
   participant API as Edge API
-  participant EV as EditView
-
-  U->>AB: click "Save Draft"
-  AB->>SH: emit dispatch('SAVE', {})
-  SH->>SH: isActionAvailable('draft','SAVE') ✓
-  SH->>BUS: emit('SAVE', {resourceId, versionId})
+  participant H as host
+  U->>BAR: click "Save"
+  BAR->>SH: emit dispatch('SAVE', {})
+  SH->>SH: gate estado ✓ + handler ✓
+  SH->>BUS: emit('SAVE', { resourceId, versionId })
   BUS->>AD: execute(ctx)
-  AD->>AD: validate() ✓
+  AD->>AD: validate() ✓ (inválido → throw → command-error)
   AD->>SV: updateDraft(rid, vid, values)
-  SV->>API: PUT .../versions/{vid} { name, modules, active, debug }
-  API-->>SV: 200 (versão)
-  SV->>SV: invalidateAfterMutation(rid) → refetch automático
+  SV->>API: PUT …/versions/{vid} { campos na raiz }
+  API-->>SV: 200
+  SV->>SV: invalidateAfterMutation(rid) → refetch
   SV-->>AD: versão normalizada
-  AD->>AD: resetForm({ values }) — limpa dirty
+  AD->>AD: resetForm({ values })  // limpa dirty
   AD-->>SH: result
-  SH->>EV: emit updated {action:'SAVE', result}
-  EV->>U: toast "Version saved" (+ reload do título)
+  SH->>H: updated { action:'SAVE', result }
+  H->>U: toast "Version saved" + reload do recurso
 ```
 
-### 8.2 SAVE_AND_BUILD (com navegação pós-build)
+### 20.2 SAVE_AND_BUILD
 
 ```mermaid
 sequenceDiagram
-  actor U as Usuário
   participant SH as VersionShell
   participant AD as Adapter
   participant SV as Service
-  participant EV as EditView
-
-  U->>SH: dispatch SAVE_AND_BUILD
-  SH->>AD: bus.emit(ctx)
-  AD->>SV: patchDraft(rid, vid, values)
+  participant H as host
+  SH->>AD: bus.emit('SAVE_AND_BUILD', {comment})
+  AD->>SV: updateDraft(rid, vid, values)
   SV-->>AD: ok
-  AD->>SV: build(rid, vid, {comment})  — só após o patch
-  SV-->>AD: 202 (building, assíncrono)
+  AD->>SV: build(rid, vid, {comment})   // só após o save
+  SV-->>AD: 202 (building)
   AD-->>SH: result
-  SH->>EV: updated {action:'SAVE_AND_BUILD'}
-  EV->>U: toast "Build started" + router.push(listagem de versões)
-  Note over EV: Sem polling — o progresso do build é consultado na lista via refresh
+  SH->>H: updated { action:'SAVE_AND_BUILD' }
+  H->>H: toast "Build started" + push(listagem)
 ```
 
-### 8.3 NEW_DRAFT_FROM (navegação in-place + remount)
+### 20.3 NEW_DRAFT_FROM (remount via :key)
 
 ```mermaid
 sequenceDiagram
-  actor U as Usuário
   participant SH as VersionShell
   participant AD as Adapter
   participant SV as Service
-  participant EV as EditView
+  participant H as host
   participant R as Router
-
-  U->>SH: dispatch NEW_DRAFT_FROM (comment opcional)
-  SH->>AD: bus.emit(ctx)
-  AD->>SV: createDraft(rid, {sourceVersionId, comment})
+  SH->>AD: bus.emit('NEW_DRAFT_FROM', {comment?})
+  AD->>SV: createDraft(rid, { sourceVersionId: vid, comment })
   SV-->>AD: draft { id: ULID, state:'draft' }
-  AD-->>SH: result (o draft)
-  SH->>EV: updated {action, result}
-  EV->>R: push edit-application-version { versionId: result.id }
-  Note over EV,R: Mesma rota, param novo → Vue REUSA a instância.<br/>:key="versionId" no shell e no badge força remount:<br/>nova factory de query, novo ctx, novo form.
+  AD-->>SH: result
+  SH->>H: updated { action, result }
+  H->>R: push 'edit-…-version' { versionId: result.id }
+  Note over H,R: :key="versionId" remonta shell+adapter (nova query, novo ctx, novo form)
 ```
 
-### 8.4 Caminho de erro (qualquer comando)
+### 20.4 DEPLOY (footer/heading → composer)
+
+```mermaid
+sequenceDiagram
+  participant SH as VersionShell
+  participant AD as Adapter (DEPLOY no-op)
+  participant H as host
+  participant HEAD as HeadingActions
+  participant R as Router
+  SH->>AD: bus.emit('DEPLOY')  // só existe se canDeploy
+  AD-->>SH: undefined
+  SH->>H: updated { action:'DEPLOY' }
+  H->>HEAD: editorRef.openRelease()
+  HEAD->>R: push(releaseComposerRouteFromResource(ctx))
+```
+
+### 20.5 Ação de lista (ARCHIVE/DELETE — fora do bus)
+
+```mermaid
+sequenceDiagram
+  participant LV as VersionListDataView
+  participant MA as menu-actions
+  participant RA as row-actions
+  participant SV as versionService
+  LV->>MA: row-action { action:'DELETE', item }
+  MA->>RA: handleRowAction(...)
+  RA->>RA: dialog de confirmação
+  RA->>SV: deleteVersion(rid, item.id)   // direto, sem bus
+  SV-->>RA: ok → invalidação → lista refetcha
+  Note over SV: rejeição (em uso) → toast de erro, lista intacta
+```
+
+### 20.6 Erro (qualquer comando do bus)
 
 ```mermaid
 sequenceDiagram
   participant SH as VersionShell
   participant AD as Adapter
   participant SV as Service
-  participant EV as EditView
-
+  participant H as host
   SH->>AD: bus.emit(action, ctx)
   AD->>SV: mutação
   SV--xAD: HTTP 4xx/5xx (lança)
-  AD--xSH: rejeição propaga pelo bus
-  SH->>SH: try/catch em handleDispatch — engole a rejeição
-  SH->>EV: emit command-error {action, error}
-  EV->>EV: toast de erro (error.showErrors ?? message)
-  Note over SV: Em erro o service NÃO invalida cache —<br/>estado da tela permanece consistente
+  AD--xSH: rejeição propaga
+  SH->>SH: try/catch em handleDispatch — engole
+  SH->>H: command-error { action, error }
+  H->>H: toast (error.showErrors ?? message)
+  Note over SV: em erro NÃO invalida cache
 ```
 
 ---
 
-## 9. Armadilhas conhecidas (lições da implementação de Application)
+<a name="21-criar-recurso"></a>
 
-1. **`shallowRef` no bus** (§5.2) — nunca trocar por `ref`/`readonly`; proxies
-   reativos desembrulham a ref `ready` e invertem o gate de disabled.
-2. **`:key="versionId"` obrigatório** no `<VersionShell>` e no componente de badge:
-   o `BaseService.useQuery` exige queryKey **estático** (array), e o
-   `useVersionShell` captura `resourceId`/`versionId` por valor no setup. Navegação
-   in-place (pós-NEW_DRAFT_FROM) sem remount deixaria query e ctx presos à versão
-   antiga — comandos atingiriam a versão errada.
-3. **Re-sync do form**: initialValues são snapshot; a sincronização é explícita —
-   `watch(mergedValues)` com guard `!meta.dirty` (preserva edição pendente) +
-   `watch(versionId)` incondicional. Pós-save, `resetForm({ values })` zera o dirty
-   para liberar o re-sync do refetch.
-4. **`normalizeConfig` descarta `null`** — a API pode devolver campos de config
-   com valor nulo no snapshot da versão; `null` no merge esvaziaria campos válidos
-   do form (e derrubaria a validação silenciosamente).
-5. **Contrato de payload no nível raiz** (confirmado com o time de API em 2026-06-12):
-   `POST`/`PUT`/`PATCH` de versão recebem os campos da Application (`name`, `modules`,
-   `active`, `debug`) **no raiz** do body — não há wrapper `override`. O `GET` da
-   versão é um snapshot do recurso e expõe esses campos no raiz; `normalizeConfig`
-   os extrai para `version.config`. Se o `GET` retornar só metadados, `config` é `{}`
-   e o form inicializa a partir do recurso pai.
-5. **Spinner global só no load inicial** da EditView — religar o spinner em
-   re-loads desmontaria o shell/form e perderia estado de tabs.
-6. **readOnly nos form fields** vem exclusivamente de `useVersionContext()` —
-   default seguro `false` mantém o fluxo não-versionado intacto. Componentes nunca
-   leem `user-flag.js` (fork é no router — `docs/V6-GUIDELINES.md`).
+## 21. Como criar um recurso novo
 
----
+A API expõe versionamento com o **mesmo contrato** sob `v4/workspace/<recurso>`. Plugar =
+fornecer artefatos thin; **zero linha** no shell/bus/máquina/form-adapter.
 
-## 10. Testes existentes
+> **Único ponto de pensamento real:** os campos do recurso (passo 3). Resto é cópia
+> (Custom Page = simples; Edge Connector = polimórfico; WAF = composto com sub-recurso).
 
-| Suite | Cobre |
-|---|---|
-| `src/tests/services/v2/edge-app/edge-app-version-adapter.test.js` | P2 — form→payload no raiz (campo a campo, strip de `undefined`, `comment`/`source_version` na raiz), `transformCreateDraftPayload` (clone puro/com alterações), `transformLoadVersion.config` com/sem/parcial/`null` no snapshot |
-| `src/tests/templates/version-shell-block/version-shell-events.test.js` | P3 — `updated`/`command-error` sem unhandled rejection; retorno do handler; **regressão do `ready` desembrulhado** (disabledActions reativo) |
-| `src/tests/views/EdgeApplications/v6/application-version-adapter.test.js` | SAVE inválido não muta; SAVE válido + payload; ordem patch→build; re-sync pristine/dirty; retorno do NEW_DRAFT_FROM |
-| `src/tests/views/EdgeApplications/FormFields/block/*.test.js` | P4 — `readOnly=true` desabilita os 4 blocks; default mantém habilitado |
-| `src/tests/services/v2/edge-connectors/edge-connector-version-{service,adapter}.test.js` | Connector polimórfico (HTTP/Storage/LiveIngest): `baseURL`, queryKeys, herança da base; form→payload no raiz e `config` do snapshot |
-| `src/tests/services/v2/edge-function/edge-function-version-{service,adapter}.test.js` | Function: `baseURL`, herança da base; mapeamento `runtime`/`execution_environment`/`default_args`/`code`; `config` do snapshot |
-| `src/tests/views/EdgeFunctions/v6/code-editor-readonly.test.js` | P6 — `code-editor` não-editável em estado imutável via `useVersionContext().readOnly` |
-
----
-
-## 11. Adicionar um recurso ao VersionShell
-
-A API expõe versionamento com o **mesmo contrato** para todos os recursos sob
-`v4/workspace/<recurso>`: estados `draft/building/ready/archived`, clone com
-`source_version`/`comment` + campos do recurso **no nível raiz**, PATCH de draft,
-archive/build/cancel. Plugar um recurso é só fornecer os artefatos **thin** abaixo
-— **zero linha** no shell/bus/máquina/`use-version-form-adapter` (gate P8 em CI).
-
-### 11.0 Recursos já plugados
-
-| Recurso | Base URL das versões | Adapter component |
-|---|---|---|
-| Application | `v4/workspace/applications` | `EdgeApplications/v6/ApplicationVersionAdapter.vue` |
-| Workload | `v4/workspace/workloads` | (via `useVersionFormAdapter` + `workloadSaveStrategy`) |
-| Custom Page | `v4/workspace/custom_pages` | `CustomPages/v6/CustomPageVersionAdapter.vue` |
-| Firewall | `v4/workspace/firewalls` | — |
-| Edge Connector | `v4/workspace/connectors` | `EdgeConnectors/v6/EdgeConnectorVersionAdapter.vue` |
-| Edge Function | `v4/workspace/functions` | `EdgeFunctions/v6/EdgeFunctionVersionAdapter.vue` |
-| Network List (atômico) | `v4/workspace/network_lists` | `NetworkLists/v6/NetworkListVersionAdapter.vue` |
-| WAF (composto) | `v4/workspace/wafs` | `WafRules/v6/WafVersionAdapter.vue` |
-| Deployment | `/deployment-api/v4/deployments` | — (consome a base direto) |
-
-> **Network List** é atômico (itens IP/ASN/Country no snapshot da versão), espelha
-> `EdgeConnectors/v6`. **WAF** é composto (espelha `EdgeFirewall/v6`): Main Settings no
-> snapshot + sub-resource **exceptions** (allowed rules) versionado em
-> `v4/workspace/wafs/{id}/versions/{vid}/exceptions`, via
-> `versionedWafExceptionsService` (`createVersionedSubResourceService`); Tuning fica fora
-> do escopo de versão.
-
-### 11.1 Checklist por recurso (nada no framework muda)
-
-| # | Entrega | Base de cópia | Esforço |
-|---|---|---|---|
-| 1 | Namespace em `queryKeys` (`<recurso>.version.all/list/detail`) | `queryKeys.application.version` | Trivial |
-| 2 | `<recurso>-version-service.js` — `extends VersionServiceBase`, seta `adapter`/`baseURL = 'v4/workspace/<recurso>'`/`versionKeys`. Ciclo de vida + invalidação herdados; sobrescreva `invalidateAfterMutation` só se precisar invalidar cache extra (ex.: Deployment) | `custom-page-version-service.js` | Trivial |
-| 3 | `<recurso>-version-adapter.js` — `createVersionAdapter({ normalizeConfig, mapResourceFields, mapMeta? })`; **não** reimplemente `stripUndefinedDeep`/`normalizeVersion` | `custom-page-version-adapter.js` | **Único ponto de pensamento real** — campos do recurso são específicos |
-| 4 | `<Recurso>VersionAdapter.vue` (thin, ≤35 linhas) — só chama `useVersionFormAdapter` com `versionService`/`validationSchema`/`saveStrategy` | `CustomPageVersionAdapter.vue` | Trivial — o schema yup já existe nas telas atuais |
-| 5 | `v6/EditView.vue` + `v6/VersionEditView.vue` + `v6/tabs/*` (landing + edit screen compartilhados) | os de Custom Page | Baixo — já trazem as lições do §9 embutidas |
-| 6 | Fork no router (`hasFlagUseV6Configurations` / `meta.flag`) + rota `edit/:id/versions/:versionId` | `workload-routes` | Trivial |
-| 7 | readOnly nos form fields do recurso (`useVersionContext` + `:disabled`) | os blocks de Connector/Function | Baixo |
-| 8 | Entrada no `RESOURCE_RESOLVERS` do Release Drawer (`resolveReleaseResources.js`, chave = `resource_type`) | entradas `connector`/`function` | Trivial |
-| 9 | Testes (espelhar as suites do §10) | suites de Custom Page/Connector/Function | Baixo |
-
-> `saveStrategy` é o ponto de variação do write: `defaultSaveStrategy` (SAVE = PUT;
-> SAVE_AND_BUILD = PUT + build). Recursos com semântica própria fornecem o seu
-> (ex.: `workloadSaveStrategy` — build implícito no PUT; Custom Page —
-> `customPageSaveStrategy`, salva conteúdo via endpoint base).
-
-### 11.2 Network List (atômico) e WAF (composto) — status real
-
-Ambos plugados pelo spec `version-shell-network-lists-waf`, espelhando padrões já em
-produção:
-
-- **Network List** (atômico, espelha `EdgeConnectors/v6`): itens (IP/ASN/Country),
-  tipo e nome viajam no snapshot da versão; sem sub-resource. Service
-  `network-list-version-service.js` (`baseURL='v4/workspace/network_lists'`), adapter
-  `network-list-version-adapter.js` (`createVersionAdapter`, reusa `NetworkListsAdapter`),
-  views em `src/views/NetworkLists/v6/`. Network List **global** (`client_id:'global'`)
-  versiona por linha do snapshot, sem vazamento de tenant.
-- **WAF** (composto, espelha `EdgeFirewall/v6`): Main Settings (thresholds por módulo)
-  no snapshot + sub-resource **exceptions** (allowed rules) versionado. Service
-  `waf-version-service.js` (`baseURL='v4/workspace/wafs'`), adapter
-  `waf-version-adapter.js`, sub-resource `versioned-waf-exceptions-service.js`
-  (`createVersionedSubResourceService`, endpoint
-  `v4/workspace/wafs/{id}/versions/{vid}/exceptions`, invalida
-  `queryKeys.waf.version.exceptions`). O `ListWafRulesAllowed` é drop-in com o `service`
-  versionado injetado via `use-versioned-facades`. A aba **Tuning** fica fora do escopo
-  de versão (não é snapshot). Views em `src/views/WafRules/v6/`.
-
-> Certificates (cert + CRL) seguem **fora de escopo** — sem versionamento no backend.
-
-### 11.3 Mudanças no framework: nenhuma obrigatória, uma a vigiar
-
-`STATE_ACTIONS`, `PRIMARY_BY_STATE` (ActionBar) e `REQUIRES_COMMENT` (ActionBar)
-são **constantes globais compartilhadas** por todos os recursos. Hoje isso é
-correto — os lifecycles dos recursos plugados são idênticos. **Se** um recurso divergir um dia
-(ex.: archive sem comment obrigatório, recurso sem etapa de build), esses três
-mapas precisam ser promovidos a props/configuração do `<VersionShell>`, com os
-valores atuais como default. Não parametrizar antes da divergência existir
-(YAGNI) — o custo da promoção é pequeno e localizado.
-
-> A primeira divergência já existe e foi resolvida **por configuração** (capability),
-> não por fork: a classe `versioned-only` (§12). Deploy/Promote/Rollback são
-> filtrados por `capability`, sem tocar `STATE_ACTIONS`/`PRIMARY_BY_STATE`/`REQUIRES_COMMENT`.
-
----
-
-## 12. Classe de recurso: `deployable` vs `versioned-only`
-
-Spec: `specs/versioned-only-subresources/`. Todo recurso versionado pertence a uma
-**classe**, expressa por uma **capability** imutável
-`{ canDeploy, canPromote, canRollback }`. A classe é a única forma de divergência
-suportada hoje — **não há fork do shell, do bus nem da máquina de estados**.
-
-| Classe | Capability | Deploy/Promote/Rollback/Release | Recursos |
-|---|---|---|---|
-| `deployable` (default) | `{ canDeploy:true, canPromote:true, canRollback:true }` | **Sim** | Application, Workload, Custom Page, Firewall, Edge Connector, Deployment, **e o modo legacy/v3** |
-| `versioned-only` | `{ canDeploy:false, canPromote:false, canRollback:false }` | **Não** | **Edge Function, Network List, WAF** |
-
-O default é byte-idêntico ao comportamento anterior: deployáveis e o modo legacy/v3
-**não regridem**.
-
-### 12.1 Capability central (`version-capability.js`)
-
-Fonte única: `src/composables/versioning/version-capability.js`. Módulo puro
-(dados + lookup; sem estado, sem I/O, sem Vue).
+**Passo 1 — queryKeys** (`base/query/queryKeys.js`, dentro de `<recurso>`):
 
 ```js
-export const DEFAULT_CAPABILITY = { canDeploy: true,  canPromote: true,  canRollback: true }  // deployable
-export const VERSIONED_ONLY     = { canDeploy: false, canPromote: false, canRollback: false }
-
-// Só as divergências do default são listadas; o resto cai no fallback.
-export const RESOURCE_CAPABILITY = { function: VERSIONED_ONLY, network_list: VERSIONED_ONLY, waf: VERSIONED_ONLY }
-
-// Fallback deployable → qualquer recurso é deployável até ser declarado o contrário.
-getVersionCapability(resourceType) => RESOURCE_CAPABILITY[resourceType] ?? DEFAULT_CAPABILITY
+version: {
+  all:(id)=>[...queryKeys.<r>.detail(id),'versions'],
+  list:(id,p)=> p===undefined ? [...all(id),'list'] : [...all(id),'list',normalizeParams(p)],
+  detail:(id,vid)=>[...all(id),'detail',vid]
+  // + sub-recursos aninhados se houver
+}
 ```
 
-A capability é **sempre** o objeto `{ canDeploy, canPromote, canRollback }`. As chaves
-de `RESOURCE_CAPABILITY` são `resource_type` (`function`, `network_list`, `waf`).
+**Passo 2 — Version service** (`<recurso>-version-service.js`):
 
-### 12.2 Como a capability flui (provide in-shell + argumento fora do shell)
+```js
+export class FooVersionService extends VersionServiceBase {
+  constructor() {
+    super()
+    this.adapter = FooVersionAdapter
+    this.baseURL = 'v4/workspace/foos'
+    this.versionKeys = queryKeys.foo.version
+  }
+  // sobrescreva invalidateAfterMutation SÓ se invalidar cache extra
+}
+export const fooVersionService = new FooVersionService()
+```
 
-A lista de versões e `buildVersionMenuItems` rodam **fora** da árvore de provide do
-shell, então a capability viaja por dois canais:
+**Passo 3 — Version adapter** (← o trabalho real):
 
-- **In-shell (provide/inject)**: `VersionShell` recebe `resourceType` por prop, resolve
-  a capability e a **provê** no `VERSION_CONTEXT_KEY`. `useVersionContext()` expõe
-  `capability` com default `DEFAULT_CAPABILITY` (fora do shell → deployable).
-  Consumidores: `VersionActionBar`, `VersionHeadingActions`.
-- **Fora do shell (argumento puro)**: as funções puras recebem a capability por
-  parâmetro, com default que preserva a saída atual:
-  - `getAvailableActions(state, capability = DEFAULT_CAPABILITY)` e
-    `isActionAvailable(state, action, capability)` filtram `DEPLOY`/`PROMOTE`/`ROLLBACK`
-    quando a capability nega.
-  - `buildVersionMenuItems(state, ctx, capability = getVersionCapability(ctx.resourceType))`.
+```js
+const normalizeConfig = (raw) => {
+  const ui = {}
+  if (raw.name != null) ui.name = raw.name
+  /* só chaves presentes; descarte null */ return ui
+}
+export const FooVersionAdapter = createVersionAdapter({
+  normalizeConfig,
+  mapResourceFields: (values) => FooAdapter.transformPayload(values) // reuse o adapter não-versionado (DRY)
+  // mapMeta: (raw) => ({ … })  // só se precisar de meta extra
+})
+```
 
-### 12.3 O que muda para `versioned-only` (e o que NÃO muda)
+**Passo 4 — Adapter `.vue` thin** (`<Recurso>VersionAdapter.vue`): chama `useVersionFormAdapter`
+com `versionService`/`validationSchema` (e `saveStrategy` só se o write divergir).
 
-**Removido da UI** (não há Deploy/Promote/Rollback/Release):
+**Passo 5 — Views:** landing (`EditView` direta **ou** via `useResourceVersionLanding`) +
+editor (`VersionEditView` via `useVersionEditScreen` + `<VersionEditScreen>` + um
+`<…VersionEditorTabs :key="versionId">` usando `<VersionEditorTabsShell>`).
 
-- **Heading**: o botão Deploy é `v-if="capability.canDeploy"`; o deploy drawer só monta
-  quando `canDeploy && resourceContext`.
-- **Footer (ActionBar)**: como o footer filtra por `availableActions` e DEPLOY já não
-  chega (interseção), os banners `ready`/`active` ramificam só a **copy** (sem menção a
-  Deploy).
-- **Form adapter**: `onVersionCommand('DEPLOY', …)` vira **condicional** a `canDeploy` —
-  versioned-only **não registra** DEPLOY. Belt-and-suspenders com o filtro da máquina
-  (§12.2): `availableActions = getAvailableActions ∩ registered` o exclui e o `dispatch`
-  fail-closes.
-- **Landing**: para versioned-only não se constrói `deployResourceContext`, não se provê
-  `openPromoteDrawer`, e o deploy drawer não monta.
-- **Kebab da lista** (`buildVersionMenuItems`): quando `!canPromote`, **omite** PROMOTE e
-  ROLLBACK e **insere** `NEW_DRAFT_FROM` com label **"New version from this"** (override no
-  item, sem mutar `ACTION_META`). Menu versioned-only:
-  `[OPEN_CONFIGURATION, NEW_DRAFT_FROM, ARCHIVE, DELETE]`.
-- **Release picker**: Function/Network List/WAF são filtrados para fora do seletor de
-  recursos deployáveis (frontend/BFF; sem tocar a API).
+**Passo 6 — Fork de rota** + registrar o nome em `RESOURCE_VERSION_ROUTES`:
 
-**Mantido (não regride)**: máquina de estados, bus, comment-gate, read-only/fork-on-edit,
-ciclo de cache e todos os comandos não-deploy (SAVE/SAVE_AND_BUILD/CANCEL_BUILD/
-NEW_DRAFT_FROM/ARCHIVE/DELETE). Archive/Delete **respeitam o erro da API** quando a
-versão está em uso (sem trava própria de UI; sem falso sucesso/navegação em rejeição).
+```js
+{ path:'edit/:id/:tab?', name:'edit-foo',
+  component:()=> hasFlagUseV6Configurations()? import('…/v6/EditView.vue'): import('…/Legacy.vue') },
+{ path:'edit/:id/versions/:versionId/:tab?', name:'edit-foo-version',
+  component:()=> import('…/v6/VersionEditView.vue'), meta:{ flag:'use_v6_configurations' } }
+```
 
-### 12.4 Os três consumidores `versioned-only`
+**Passo 7 — readOnly nos blocks:** ler `useVersionContext().readOnly` e aplicar `:disabled`.
+Nunca ler `user-flag.js`.
 
-| Recurso | `resource_type` | Base URL das versões | Notas |
-|---|---|---|---|
-| Edge Function | `function` | `v4/workspace/functions` | `reference_count` exposto pela API → coluna **"In use"** apenas informativa |
-| Network List | `network_list` | `v4/workspace/network_lists` | atômico; sem `reference_count` → coluna "In use" omitida |
-| WAF | `waf` | `v4/workspace/wafs` | composto (exceptions versionadas); `versioned-only` não altera exceptions/Tuning |
+**Passo 8 — Classe (se versioned-only):** adicionar `foo: VERSIONED_ONLY` em
+`RESOURCE_CAPABILITY`. Nada mais muda.
 
-A versão em uso é rotulada **"Current"** (heurística frontend-only: estado `active` se a
-API retornar, senão a latest Ready); a **habilitação** do recurso continua exibida como
-**Active/Inactive**, em tag distinta. Toda a copy nova é em **EN** (padrão do shell host).
+**Passo 9 — Sub-recursos (se composto):** `createVersionedSubResourceService(...)` + facade.
 
-### 12.5 Garantia de não-regressão
+**Passo 10 — Registry de release (se deployável):** entrada em `RESOURCE_RESOLVERS`.
 
-Teste de enumeração `(classe, estado) → ações` cobre os 8 estados × {`deployable`,
-`versioned-only`} sobre `getAvailableActions` + `buildVersionMenuItems`
-(`src/tests/composables/versioning/version-capability.enumeration.test.js`): deployável
-idêntico ao atual; versioned-only **nunca** contém DEPLOY/PROMOTE/ROLLBACK em nenhum
-estado.
+**Passo 11 — Testes:** espelhar as suites do §24.
 
+### Checklist
+
+| #   | Entrega                                  | Esforço            | Base de cópia                            |
+| --- | ---------------------------------------- | ------------------ | ---------------------------------------- |
+| 1   | `queryKeys.<r>.version`                  | trivial            | `application.version`                    |
+| 2   | `<r>-version-service.js`                 | trivial            | `edge-app-version-service`               |
+| 3   | `<r>-version-adapter.js`                 | **médio (campos)** | `edge-app-version-adapter`               |
+| 4   | `<R>VersionAdapter.vue`                  | trivial            | `ApplicationVersionAdapter`              |
+| 5   | views v6 (landing + editor)              | baixo              | Custom Pages/v6                          |
+| 6   | fork de rota + `RESOURCE_VERSION_ROUTES` | trivial            | `edge-application-routes`                |
+| 7   | readOnly nos blocks                      | baixo              | blocks de Connector                      |
+| 8   | capability (se versioned-only)           | trivial            | `version-capability`                     |
+| 9   | sub-recursos (se composto)               | médio              | `versioned-cache-settings-service` / WAF |
+| 10  | registry de release (se deployável)      | trivial            | `resolveReleaseResources`                |
+| 11  | testes                                   | baixo              | suites de Custom Page                    |
+
+---
+
+<a name="22-armadilhas"></a>
+
+## 22. Invariantes e armadilhas (decisões gravadas em código)
+
+1. **`shallowRef` no bus — nunca `ref`/`readonly`.** Um proxy reativo profundo desembrulha
+   refs no acesso: `entry.ready` viraria o boolean e `entry.ready.value` daria `undefined`,
+   **invertendo o gate** (form válido → botão desabilitado). Regressão em
+   `version-shell-events.test.js`.
+2. **`:key="versionId"` obrigatório** no editor/shell e no badge. O `useQuery` exige queryKey
+   estático e o `use-version-shell` captura `resourceId`/`versionId` por valor no setup. Sem
+   remount, comandos atingiriam a versão antiga.
+3. **Re-sync explícito do form.** `watch(mergedValues)` com guard `!meta.dirty` + `watch(versionId)`
+   incondicional; pós-save `resetForm({ values })`.
+4. **`normalizeConfig` descarta `null`.** `null` no merge esvaziaria campos válidos. Copie só
+   chaves `!= null`.
+5. **Payload no nível raiz** (sem wrapper); `comment`/`source_version` na raiz.
+6. **SAVE inválido lança** (não retorna) — senão `updated` = falso sucesso.
+7. **Fail-closed:** estado desconhecido → `[]`; `dispatch` com duplo gate.
+8. **DEPLOY é Null Object** (só deployable); o trabalho real é rotear ao composer.
+9. **readOnly vem só de `useVersionContext()`** (default `false`); fork é no router.
+10. **Cache só é tocado pelo service.** Em erro, não invalida.
+11. **Ações de lista ficam fora do bus** (escopo de N versões) — vão direto ao service.
+12. **Coluna "In use" auto-some** quando `referenceCount` é null (Network List/WAF).
+13. **Loading global só no load inicial.** `use-version-edit-screen`/landing fazem
+    `if (!resource.value) isLoading = true` — re-loads (ex.: pós-SAVE) **não** religam o
+    spinner; religá-lo desmontaria shell/form e perderia o estado das tabs.
+
+---
+
+<a name="23-legado"></a>
+
+## 23. Comparação com o padrão legado (não-versionado)
+
+Fora das telas v6, o Console usa um padrão **plano e form-cêntrico**: `EditView` →
+`ContentBlock` → `PageHeadingBlock` + `EditFormBlock` (hospeda `useForm`, `loadInitialData`,
+e no `onSubmit` chama **direto** `editService(values)` → toast → `goBackToList`). A action
+bar (`action-bar-block`) é **estática** (`Save` + `Cancel`). Ações de linha são um **array
+literal embutido na view**, cada uma com seu `service`/`dialog`.
+
+| Dimensão                    | Legado                                  | VersionShell                                                  |
+| --------------------------- | --------------------------------------- | ------------------------------------------------------------- |
+| Conjunto de ações           | Estático (`Save`/`Cancel`)              | Derivado (`getVersionBarActions ∩ availableActions`), gateado |
+| Ações de lista              | Array literal por view                  | Kebab central (`buildVersionMenuItems`), mapper único         |
+| Quem executa                | `EditFormBlock` chama o service direto  | Inversão via bus; shell não conhece service                   |
+| Estado de ciclo de vida     | Inexistente (só dirty/loading)          | Explícito (8 estados), readOnly, overlay, fail-closed         |
+| Cache / pós-ação            | Toast → sai da tela; cache ad-hoc       | Service invalida → refetch; permanece na tela (SAVE)          |
+| Lógica de UI das ações      | Espalhada (view + template + block)     | Centralizada (version-actions + machine + form-adapter)       |
+| Custo por recurso           | ~constante (copiar EditView + ações)    | Decrescente (~4 thin files; zero no framework)                |
+| Coerência entre superfícies | Tendem a divergir                       | Fonte única → nunca divergem                                  |
+| Unsaved changes             | Central (`DialogUnsaved` + route guard) | Menos central (modelo de draft salva incremental)             |
+
+**Veredito.** O VersionShell **não substitui** o legado — resolve um problema que o legado
+não modela (ciclo de vida versionado com ações sensíveis a estado). Aplicá-lo a um CRUD
+simples seria super-engenharia; manter o CRUD no `edit-form-block` continua correto.
+
+| Use o **legado** quando…        | Use o **VersionShell** quando…                     |
+| ------------------------------- | -------------------------------------------------- |
+| edição direta sem ciclo de vida | há estados de ciclo de vida (draft→build→ready)    |
+| sem build/deploy/promote        | ações condicionais a estado/capability             |
+| tela isolada                    | múltiplas superfícies que precisam concordar       |
+| otimizar simplicidade           | otimizar extensibilidade/correção entre N recursos |
+
+---
+
+<a name="24-testes"></a>
+
+## 24. Mapa de testes
+
+| Suite                                                                     | Cobre                                                                                                    |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `services/v2/.../<r>-version-adapter.test.js`                             | form→payload na raiz (strip de `undefined`; `comment`/`source_version`); `config` com/sem/parcial/`null` |
+| `templates/version-shell-block/version-shell-events.test.js`              | `updated`/`command-error` sem unhandled rejection; **regressão do `ready` desembrulhado**                |
+| `templates/version-shell-block/versioned-only-deploy-affordances.test.js` | versioned-only não expõe Deploy/Promote/Rollback em nenhuma superfície                                   |
+| `views/.../v6/...-version-adapter.test.js`                                | SAVE inválido não muta; payload; ordem save→build; re-sync; retorno do NEW_DRAFT_FROM                    |
+| `composables/versioning/version-capability.enumeration.test.js`           | `(classe, estado) → ações` nos 8 estados × {deployable, versioned-only}                                  |
+| `composables/versioning/no-version-shell-fork.test.js`                    | gate: recurso novo não altera o framework                                                                |
+| `views/.../code-editor-readonly.test.js`                                  | campos não-editáveis em estado imutável via `useVersionContext().readOnly`                               |
+
+---
+
+> **Revisão:** reflete o estado atual — **release composer full-page** (Deploy/Promote →
+> `releases/new`, não mais drawer), capability `deployable`/`versioned-only`, e os
+> composables de orquestração de página/lista.

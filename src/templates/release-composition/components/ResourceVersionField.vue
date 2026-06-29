@@ -1,18 +1,19 @@
 <script setup>
   /**
-   * ResourceVersionField — pairs the source resource (read-only, with icon) with
-   * the "Version (Ready)" picker. The picker offers a sentinel "Track latest
-   * Ready" option (`LATEST_READY`) above the pinnable Ready versions, each shown
-   * with its short_id, relative age, author and a "Current" flag. Generic: all
-   * data comes from props; the parent owns selection and validity.
+   * ResourceVersionField — pick a Ready version. Built on the webkit `Dropdown`
+   * (`@aziontech/webkit/inputs/dropdown`, a first-class webkit component — NOT the
+   * raw PrimeVue wrapper), using its `#value`/`#option` slots for the rich
+   * rendering: a sentinel "Track latest Ready" (`LATEST_READY`) on top, then a
+   * "Pin a Ready version" group with each version's short_id, relative age,
+   * author and a "Current" flag. Generic: all data comes from props; the parent
+   * owns selection and validity.
    */
   import { computed } from 'vue'
-  import Dropdown from '@aziontech/webkit/dropdown'
-  import LabelBlock from '@aziontech/webkit/label'
+  import Dropdown from '@aziontech/webkit/inputs/dropdown'
   import { convertToRelativeTime } from '@/helpers/convert-date'
-  import { LATEST_READY } from '@/composables/deploy/use-deploy-drawer'
+  import { LATEST_READY } from '@/templates/release-composition/version-options'
 
-  defineOptions({ name: 'deploy-drawer-resource-version-field' })
+  defineOptions({ name: 'release-resource-version-field' })
 
   const props = defineProps({
     resourceName: {
@@ -20,6 +21,14 @@
       default: ''
     },
     showResource: {
+      type: Boolean,
+      default: true
+    },
+    label: {
+      type: String,
+      default: 'Version (Ready)'
+    },
+    required: {
       type: Boolean,
       default: true
     },
@@ -46,10 +55,10 @@
   const onChange = (value) => emit('update:modelValue', value)
 
   // Grouped: the sentinel "Track latest Ready" on top, then a labelled
-  // "PIN A READY VERSION" group with the pinnable Ready versions.
+  // "Pin a Ready version" group with the pinnable Ready versions.
   const dropdownOptions = computed(() => [
     { label: '', items: [{ value: LATEST_READY, label: 'Track latest Ready', isLatest: true }] },
-    { label: 'PIN A READY VERSION', items: props.versions }
+    { label: 'Pin a Ready version', items: props.versions }
   ])
 
   const isLatest = computed(() => props.modelValue === LATEST_READY)
@@ -57,25 +66,27 @@
   const selectedOption = computed(
     () => props.versions.find((option) => option.value === props.modelValue) ?? null
   )
-
-  const dropdownPt = {
-    panel: { class: 'deploy-version-dropdown-panel' }
-  }
 </script>
 
 <template>
-  <div class="flex flex-col gap-[var(--spacing-4)]">
+  <div class="flex min-w-0 flex-col gap-[var(--spacing-2)]">
     <div
       v-if="showResource"
       class="flex flex-col gap-[var(--spacing-2)]"
     >
-      <LabelBlock
-        label="Resource"
-        isRequired
-      />
+      <label
+        class="flex items-center gap-[var(--spacing-1)] text-body-sm font-medium text-[var(--text-color-secondary)]"
+      >
+        Resource
+        <span
+          class="text-[var(--color-orange-500)]"
+          aria-hidden="true"
+          >*</span
+        >
+      </label>
       <span
         class="flex items-center gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-3)] py-[var(--spacing-2)] text-body-sm text-[var(--text-color)]"
-        data-testid="deploy-drawer__resource-name"
+        data-testid="release-composition__resource-name"
       >
         <i class="pi pi-box text-[var(--text-color-secondary)]" />
         {{ resourceName }}
@@ -83,13 +94,18 @@
     </div>
 
     <div class="flex flex-col gap-[var(--spacing-2)]">
-      <LabelBlock
-        label="Version (Ready)"
-        name="deploy-drawer-version-select"
-        isRequired
-      />
+      <label
+        class="flex items-center gap-[var(--spacing-1)] text-body-sm font-medium text-[var(--text-color-secondary)]"
+      >
+        {{ label }}
+        <span
+          v-if="required"
+          class="text-[var(--color-orange-500)]"
+          aria-hidden="true"
+          >*</span
+        >
+      </label>
       <Dropdown
-        inputId="deploy-drawer-version-select"
         :modelValue="modelValue"
         :options="dropdownOptions"
         optionLabel="label"
@@ -97,21 +113,11 @@
         optionGroupLabel="label"
         optionGroupChildren="items"
         placeholder="Select a version"
-        appendTo="body"
-        :pt="dropdownPt"
         :disabled="disabled"
-        :class="['w-full', { 'p-invalid': invalid }]"
-        data-testid="deploy-drawer__version-select"
+        :class="['release-composition-control', 'w-full', { 'p-invalid': invalid }]"
+        data-testid="release-composition__version-select"
         @update:modelValue="onChange"
       >
-        <template #optiongroup="{ option }">
-          <span
-            v-if="option.label"
-            class="text-[11px] uppercase tracking-[0.04em] text-[var(--text-color-secondary)]"
-          >
-            {{ option.label }}
-          </span>
-        </template>
         <template #value>
           <span
             v-if="isLatest"
@@ -127,6 +133,12 @@
             {{ selectedOption.label }}
           </span>
           <span
+            v-else-if="modelValue"
+            class="font-mono text-body-sm text-[var(--text-color)]"
+          >
+            {{ modelValue }}
+          </span>
+          <span
             v-else
             class="text-body-sm text-[var(--text-color-secondary)]"
             >Select a version</span
@@ -136,7 +148,7 @@
           <div
             v-if="option.isLatest"
             class="flex w-full flex-col gap-[var(--spacing-1)]"
-            data-testid="deploy-drawer__version-latest"
+            data-testid="release-composition__version-latest"
           >
             <span
               class="flex w-full items-center gap-[var(--spacing-2)] text-body-sm text-[var(--text-color)]"
@@ -155,7 +167,7 @@
           <div
             v-else
             class="flex w-full items-center gap-[var(--spacing-3)]"
-            :data-testid="`deploy-drawer__version-option-${option.value}`"
+            :data-testid="`release-composition__version-option-${option.value}`"
           >
             <span class="flex min-w-0 flex-col gap-[var(--spacing-1)]">
               <span class="flex items-center gap-[var(--spacing-2)]">
@@ -164,7 +176,7 @@
                 }}</span>
                 <span
                   v-if="option.isCurrent"
-                  class="text-body-xs text-[var(--info-contrast)]"
+                  class="inline-flex items-center rounded-[var(--shape-elements)] bg-[var(--surface-200)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm text-[var(--text-color-secondary)]"
                 >
                   Current
                 </span>
@@ -190,7 +202,7 @@
       <small
         v-if="invalid"
         class="p-error text-body-xs font-normal"
-        data-testid="deploy-drawer__version-error"
+        data-testid="release-composition__version-error"
       >
         Version is required
       </small>
@@ -198,61 +210,13 @@
   </div>
 </template>
 
-<style>
-  .deploy-version-dropdown-panel {
-    border: 1px solid var(--surface-border);
-    border-radius: 0.5rem;
-    background: var(--surface-section);
-    color: var(--text-color);
-    box-shadow: 0 8px 24px color-mix(in srgb, var(--surface-900, #111827) 16%, transparent);
-    /* Cap the panel to the drawer content width so it never spills outside the
-       drawer. 52rem = max-w-4xl (56rem) − p-8 (2rem ×2); calc covers narrow viewports. */
-    max-width: min(52rem, calc(100vw - 4rem));
-  }
-  /* Keep items at the panel width so long ids/authors truncate instead of widening it. */
-  .deploy-version-dropdown-panel .p-dropdown-items-wrapper,
-  .deploy-version-dropdown-panel .p-dropdown-items {
-    width: 100%;
-    max-width: 100%;
-  }
-  .deploy-version-dropdown-panel .p-dropdown-items {
-    padding: 0.5rem;
-  }
-  .deploy-version-dropdown-panel .p-dropdown-item {
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-    overflow: hidden;
-    align-items: flex-start !important;
-    height: auto !important;
-    min-height: 3rem !important;
-    border-radius: 0.5rem;
-    padding: 0.75rem 0.875rem;
-    margin-bottom: 0.25rem;
-    color: var(--text-color);
-    line-height: 1.5rem;
-  }
-  .deploy-version-dropdown-panel .p-dropdown-item > * {
-    min-width: 0;
-    max-width: 100%;
-  }
-  .deploy-version-dropdown-panel .p-dropdown-item:last-child {
-    margin-bottom: 0;
-  }
-  .deploy-version-dropdown-panel .p-dropdown-item:hover {
-    background: var(--surface-hover);
-    color: var(--text-color);
-  }
-  .deploy-version-dropdown-panel .p-dropdown-item.p-highlight {
-    background: var(--surface-hover);
-    color: var(--text-color);
-    font-weight: 500;
-  }
-  .deploy-version-dropdown-panel .p-dropdown-item-group {
-    padding: 0.75rem 0.875rem 0.375rem;
-    background: transparent;
-  }
-  .deploy-version-dropdown-panel li.p-dropdown-item-group:first-child {
-    display: none;
+<style scoped>
+  /* Tune the webkit Dropdown control to the app's surface tokens (the webkit
+     defaults — --bg-surface / --border-default — are a different DS layer). The
+     focus ring is left to the webkit component itself (its --ring-color token);
+     no per-component ring override here. */
+  :deep(.release-composition-control) {
+    background: var(--surface-section) !important;
+    border-color: var(--surface-border) !important;
   }
 </style>

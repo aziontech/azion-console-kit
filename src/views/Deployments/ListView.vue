@@ -10,6 +10,7 @@
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { deploymentService } from '@/services/v2/deployment/deployment-service'
   import { documentationDeployProducts } from '@/helpers/azion-documentation-catalog'
+  import { releaseComposerRouteFromDeployment } from '@/templates/release-composition/release-composer-route'
   import MessageCard from '@/components/MessageCard'
 
   defineOptions({ name: 'deployments-list-view' })
@@ -18,9 +19,11 @@
 
   const listTableRef = ref(null)
 
+  // DeployDrawerBlock stays mounted (rollback fallback). The visible model is held
+  // but the trigger now routes to the full-page composer (DS-first).
   const isDeployDrawerOpen = ref(false)
-  const openDeployDrawer = () => {
-    isDeployDrawerOpen.value = true
+  const openRelease = () => {
+    router.push(releaseComposerRouteFromDeployment())
   }
 
   const columns = computed(() => [
@@ -55,12 +58,25 @@
     router.push({ name: 'deployments-edit', params: { id: deployment.id, tab: 'versions' } })
   }
 
+  // Entry "from a Deployment Settings": pre-selects this DS so the composer
+  // loads its full Release Composition + inherited dependencies on mount.
+  const newReleaseFromDeployment = (deployment) => {
+    if (!deployment?.id) return
+    router.push(releaseComposerRouteFromDeployment(deployment.id))
+  }
+
   const cloneDeployment = (deployment) => {
     if (!deployment?.id) return
     router.push({ path: '/deployments/create', query: { cloneFrom: deployment.id } })
   }
 
   const actions = [
+    {
+      type: 'action',
+      label: 'New release',
+      icon: 'pi pi-cloud-upload',
+      commandAction: (deployment) => newReleaseFromDeployment(deployment)
+    },
     {
       type: 'action',
       label: 'Edit',
@@ -98,7 +114,7 @@
             size="small"
             outlined
             data-testid="deployments__deploy"
-            @click="openDeployDrawer"
+            @click="openRelease"
           />
           <DataTableActionsButtons
             size="small"

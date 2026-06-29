@@ -1,8 +1,8 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
-import ResourceVersionField from '@/templates/deploy-drawer-block/components/ResourceVersionField.vue'
-import { LATEST_READY } from '@/composables/deploy/use-deploy-drawer'
+import ResourceVersionField from '@/templates/release-composition/components/ResourceVersionField.vue'
+import { LATEST_READY } from '@/templates/release-composition/version-options'
 
 const versions = [
   {
@@ -28,7 +28,7 @@ const makeWrapper = (props = {}) =>
 describe('ResourceVersionField', () => {
   it('renders the resource name with an icon', () => {
     const wrapper = makeWrapper()
-    expect(wrapper.find('[data-testid="deploy-drawer__resource-name"]').text()).toContain(
+    expect(wrapper.find('[data-testid="release-composition__resource-name"]').text()).toContain(
       'my-application'
     )
   })
@@ -39,7 +39,7 @@ describe('ResourceVersionField', () => {
 
     expect(groups[0].items[0].value).toBe(LATEST_READY)
     expect(groups[0].items[0].isLatest).toBe(true)
-    expect(groups[1].label).toBe('PIN A READY VERSION')
+    expect(groups[1].label).toBe('Pin a Ready version')
     expect(groups[1].items).toEqual(versions)
   })
 
@@ -56,6 +56,6 @@ describe('ResourceVersionField', () => {
 
   it('shows the required error when invalid', () => {
     const wrapper = makeWrapper({ invalid: true })
-    expect(wrapper.find('[data-testid="deploy-drawer__version-error"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="release-composition__version-error"]').exists()).toBe(true)
   })
 })

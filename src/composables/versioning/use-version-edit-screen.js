@@ -17,9 +17,9 @@ const SUCCESS_SUMMARY = {
  * screen shared by every resource (CustomPage / Application / Firewall / Workload).
  *
  * Owns: route params, the missing-versionId redirect, resource load + watch, the
- * page title, the editor ref (so the footer DEPLOY can open the heading's deploy
- * drawer), toast + navigation, and the command-success/error handlers. Each view
- * specializes via config; the markup lives in the shared <VersionEditScreen>.
+ * page title, the editor ref (so the footer DEPLOY routes to the release composer
+ * via the heading's entry), toast + navigation, and the command-success/error
+ * handlers. Each view specializes via config; markup lives in <VersionEditScreen>.
  *
  * @param {{
  *   load: (id: string) => Promise<object>,
@@ -82,10 +82,11 @@ export function useVersionEditScreen({
   const handleCancel = () => goToVersionsList()
 
   const handleCommandSuccess = ({ action, result }) => {
-    // DEPLOY opens the SAME deploy drawer the heading Deploy button owns. Resources
-    // without a deploy drawer (Workload) fall through to the generic toast.
+    // DEPLOY routes to the full-page composer, the SAME entry the heading Deploy
+    // owns. Resources without a deploy affordance (Workload) fall through to the
+    // generic toast.
     if (action === VERSION_ACTIONS.DEPLOY && supportsDeployDrawer) {
-      editorRef.value?.openDeployDrawer()
+      editorRef.value?.openRelease()
       return
     }
 

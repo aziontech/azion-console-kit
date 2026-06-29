@@ -6,8 +6,8 @@
   //
   // Everything resource-specific arrives as props: the `adapter` component, the
   // `tabs` array (built per resource with its own gating/facades), the deploy
-  // `resourceContext`, and a `testidPrefix`. `openDeployDrawer` is exposed so the
-  // host VersionEditView can open the SAME drawer on a footer DEPLOY.
+  // `resourceContext`, and a `testidPrefix`. `openRelease` is exposed so the
+  // host VersionEditView can route to the composer on a footer DEPLOY.
   import { computed, ref } from 'vue'
   import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
@@ -53,9 +53,9 @@
   const activeTabComponent = computed(() => componentsRefs.value[activeTabIndex.value] ?? null)
 
   const headingActionsRef = ref(null)
-  const openDeployDrawer = () => headingActionsRef.value?.openDeployDrawer()
+  const openRelease = () => headingActionsRef.value?.openRelease()
 
-  defineExpose({ openDeployDrawer })
+  defineExpose({ openRelease })
 </script>
 
 <template>

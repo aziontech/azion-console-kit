@@ -50,9 +50,9 @@
   ]
 
   const shellRef = ref(null)
-  const openDeployDrawer = () => shellRef.value?.openDeployDrawer()
+  const openRelease = () => shellRef.value?.openRelease()
 
-  defineExpose({ openDeployDrawer })
+  defineExpose({ openRelease })
 </script>
 
 <template>
