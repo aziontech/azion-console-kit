@@ -29,16 +29,6 @@ function createDeploymentsItem() {
   }
 }
 
-function createEnvironmentsItem() {
-  return {
-    label: 'Environments',
-    icon: 'pi pi-server',
-    to: '/environments',
-    id: 'environments',
-    clientFlag: 'use_v6_configurations'
-  }
-}
-
 function createDomainsItem() {
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   const menuOption = {
@@ -235,7 +225,6 @@ export function getMenuItens(showMarketplaceProductsItens) {
     createHomeItem(),
     createMarketplaceItem(),
     createDeploymentsItem(),
-    createEnvironmentsItem(),
     {
       label: 'Build',
       items: createBuildItems()
