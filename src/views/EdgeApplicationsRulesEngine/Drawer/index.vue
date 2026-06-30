@@ -9,9 +9,12 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
   import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   import { refDebounced } from '@vueuse/core'
   defineOptions({ name: 'drawer-rules-engine' })
+
+  const { readOnly } = useVersionContext()
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -364,6 +367,7 @@
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
+    :readOnly="readOnly"
     @onSuccess="handleEditRulesEngine"
     :showBarGoBack="true"
     @onError="handleFailedToEdit"

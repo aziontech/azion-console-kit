@@ -427,7 +427,6 @@
   }
 
   function openEditRulesEngineDrawer(item) {
-    if (isReadOnly.value) return
     currentPhase.value = item.phase.content.toLowerCase()
     drawerRulesEngineRef.value.openDrawerEdit(item)
   }
