@@ -29,7 +29,9 @@ const storeState = reactive({
   collOpen: {},
   activeReleaseByDs: {},
   deployments: [{ id: 'ds-1', name: 'production-edge', deployment_policy: 'single_version' }],
-  scopedType: null
+  scopedType: null,
+  versionId: '',
+  pendingDependencySelections: []
 })
 
 // The store mock delegates every state key back to the SAME reactive
@@ -90,7 +92,9 @@ vi.mock('pinia', async () => {
         'collOpen',
         'activeReleaseByDs',
         'deployments',
-        'scopedType'
+        'scopedType',
+        'versionId',
+        'pendingDependencySelections'
       ]
       const refs = {}
       keys.forEach((key) => {
@@ -230,7 +234,7 @@ vi.mock('@/templates/release-composition/components/ImpactPanel.vue', () => ({
 
 import ReleaseComposerView from '@/views/Deployments/v6/ReleaseComposerView.vue'
 
-const mountView = () => mount(ReleaseComposerView)
+const mountView = () => mount(ReleaseComposerView, { global: { stubs: { teleport: true } } })
 
 beforeEach(() => {
   storeState.deploymentIds = ['ds-1']

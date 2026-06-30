@@ -35,6 +35,7 @@
     :isOverlapped="isOverlapped"
     :editService="editService"
     :schema="validationSchema"
+    :readOnly="readOnly"
     :showShareUrl="true"
     @onSuccess="handleSuccessEdit"
     @onError="handleFailedToEdit"
@@ -48,6 +49,13 @@
     </template>
     <template #action-bar="{ onSubmit, onCancel, loading }">
       <ActionBarBlock
+        v-if="readOnly"
+        @onCancel="onCancel"
+        :hideSubmit="true"
+        secondaryActionLabel="Close"
+      />
+      <ActionBarBlock
+        v-else
         @onSubmit="formSubmit(onSubmit)"
         @onCancel="onCancel"
         :loading="isLoading || loading"
@@ -71,8 +79,11 @@
   const tracker = inject('tracker')
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'drawer-origin' })
+
+  const { readOnly } = useVersionContext()
 
   const emit = defineEmits(['onSuccess'])
 

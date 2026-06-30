@@ -2,7 +2,6 @@
   import { onMounted, computed, ref, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import PrimeButton from '@aziontech/webkit/button'
-  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
   import { useVersionContext } from '@/composables/versioning/use-version-context'
@@ -58,15 +57,8 @@
       {
         field: 'name',
         header: 'Name',
-        type: 'component',
         filterPath: 'name.text',
-        style: 'max-width: 300px',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-format-with-popup'
-          })
-        }
+        style: 'max-width: 300px'
       },
       {
         field: 'functionInstanced',
@@ -145,7 +137,7 @@
     ]
   })
 
-  const editInDrawer = computed(() => (readOnly.value ? undefined : openEditFunctionDrawer))
+  const editInDrawer = openEditFunctionDrawer
 
   const handleTrackClickToCreate = () => {
     tracker.product
@@ -207,6 +199,14 @@
     }"
     @on-before-go-to-edit="handleBeforeGoToEdit"
   >
+    <template #column-name="{ data }">
+      <span
+        class="block truncate"
+        data-testid="list-table-block__column__name__row"
+      >
+        {{ data.name?.text ?? data.name }}
+      </span>
+    </template>
     <template #emptyBlockButton>
       <PrimeButton
         v-if="!readOnly"

@@ -108,6 +108,12 @@
       props: {
         edgeFirewallId: firewallId.value,
         service: facades.rulesEngine,
+        enabledModules: {
+          webApplicationFirewall: !!moduleSource.value.wafEnabled,
+          networkProtectionLayer: !!moduleSource.value.networkProtectionEnabled,
+          edgeFunctions: !!moduleSource.value.edgeFunctionsEnabled,
+          debugRules: !!moduleSource.value.debugRules
+        },
         documentationService: documentationCatalog.edgeFirewallRulesEngine,
         createEdgeFirewallRulesEngineService:
           facades.rulesEngine.createEdgeFirewallRulesEngineService,

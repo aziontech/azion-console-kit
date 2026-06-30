@@ -88,24 +88,13 @@ describe('ReleaseDependenciesSection', () => {
     )
   })
 
-  it('renders a per-group "Add" control that emits add-instance with the collection type', async () => {
+  it('does not render a per-group "Add" control (instances are seeded automatically)', () => {
     const wrapper = makeWrapper()
 
-    const add = wrapper.find('[data-testid="release-composition__deps-add-function"]')
-    expect(add.exists()).toBe(true)
-    expect(add.text()).toContain('Add')
-
-    await add.trigger('click')
-    expect(wrapper.emitted('add-instance')?.at(-1)).toEqual(['function'])
-  })
-
-  it('keeps Add separate from the toggle header so clicking it does not collapse the group', async () => {
-    const wrapper = makeWrapper()
-
-    await wrapper.find('[data-testid="release-composition__deps-add-function"]').trigger('click')
-
-    // Adding emits add-instance, never toggle-group (they are distinct controls).
-    expect(wrapper.emitted('toggle-group')).toBeFalsy()
+    expect(wrapper.find('[data-testid="release-composition__deps-add-function"]').exists()).toBe(
+      false
+    )
+    expect(wrapper.emitted('add-instance')).toBeFalsy()
   })
 
   it('renders a row with an instance select, a version field and a remove control per instance', () => {
@@ -150,7 +139,7 @@ describe('ReleaseDependenciesSection', () => {
 
     const empty = wrapper.find('[data-testid="release-composition__deps-empty-waf"]')
     expect(empty.exists()).toBe(true)
-    expect(empty.text()).toBe('No WAF Rule instances — Add one to include it.')
+    expect(empty.text()).toBe('No WAF Rule instances in this release.')
   })
 
   it('emits toggle-group with the collection type when the group header is clicked', async () => {

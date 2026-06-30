@@ -9,18 +9,29 @@ export const LATEST_READY = 'LATEST'
 // A version is deployable when it is built — `ready` or `active` (serving).
 const DEPLOYABLE_STATES = ['ready', 'active']
 
+const toOption = (version) => ({
+  label: version.comment || version.id,
+  value: version.id,
+  createdAt: version.createdAt ?? null,
+  author: version.lastEditor || null,
+  isCurrent: Boolean(version.isCurrent)
+})
+
+const mapVersions = (versions, isAllowed) =>
+  (Array.isArray(versions) ? versions : [])
+    .filter((version) => isAllowed(version?.state))
+    .map(toOption)
+
 // Maps raw version records to the picker option shape consumed by
 // ResourceVersionField (label/value + metadata for the option row).
 export const toVersionOptions = (versions) =>
-  (Array.isArray(versions) ? versions : [])
-    .filter((version) => DEPLOYABLE_STATES.includes(version?.state))
-    .map((version) => ({
-      label: version.comment || version.id,
-      value: version.id,
-      createdAt: version.createdAt ?? null,
-      author: version.lastEditor || null,
-      isCurrent: Boolean(version.isCurrent)
-    }))
+  mapVersions(versions, (state) => DEPLOYABLE_STATES.includes(state))
+
+// App-managed dependency versions (functions, connectors) are only selectable
+// when strictly `ready`; `active`, `draft`, `building`, etc. are excluded
+// (requirement 2.2).
+export const toReadyVersionOptions = (versions) =>
+  mapVersions(versions, (state) => state === 'ready')
 
 // Resolves a chosen version to a concrete id for dispatch: the LATEST_READY
 // sentinel maps to the newest Ready option (first `isCurrent`, else the first

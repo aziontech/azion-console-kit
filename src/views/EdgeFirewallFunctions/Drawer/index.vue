@@ -36,6 +36,7 @@
     :isOverlapped="isOverlapped"
     :editService="editService"
     :schema="validationSchema"
+    :readOnly="readOnly"
     :showBarGoBack="true"
     :showShareUrl="true"
     @onSuccess="handleSuccessEdit"
@@ -52,6 +53,13 @@
     </template>
     <template #action-bar="{ onSubmit, onCancel, loading }">
       <ActionBarBlock
+        v-if="readOnly"
+        @onCancel="onCancel"
+        :hideSubmit="true"
+        secondaryActionLabel="Close"
+      />
+      <ActionBarBlock
+        v-else
         @onSubmit="formSubmit(onSubmit)"
         @onCancel="onCancel"
         :loading="isLoading || loading"
@@ -69,6 +77,9 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import FormFieldsDrawerFunction from '@/views/EdgeFirewallFunctions/FormFields/FormFieldsEdgeApplicationsFunctions'
   import ActionBarBlock from '@/templates/action-bar-block'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
+
+  const { readOnly } = useVersionContext()
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
