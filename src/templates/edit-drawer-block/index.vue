@@ -58,6 +58,10 @@
     showShareUrl: {
       type: Boolean,
       default: false
+    },
+    readOnly: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -232,11 +236,12 @@
           <form
             @submit.prevent="handleSubmit"
             class="w-full flex flex-col gap-8"
+            :class="{ 'pointer-events-none opacity-60': readOnly }"
           >
             <slot
               name="formFields"
               :errors="errors"
-              :disabledFields="isLoading"
+              :disabledFields="isLoading || readOnly"
             />
           </form>
         </div>
@@ -257,6 +262,13 @@
             :goBack="handleGoBack"
             v-if="showGoBack"
             :inDrawer="true"
+          />
+          <ActionBarBlock
+            v-else-if="readOnly"
+            @onCancel="closeDrawer"
+            :inDrawer="true"
+            :hideSubmit="true"
+            secondaryActionLabel="Close"
           />
           <ActionBarBlock
             v-else

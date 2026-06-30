@@ -1,6 +1,22 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { RulesEngineAdapter } from './edge-app-rules-engine-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { versionedRulesEngineService } from '@/services/v2/edge-app/versioned/versioned-rules-engine-service'
+
+const extractConnectorDependencies = (rules) => {
+  const countById = new Map()
+  for (const rule of Array.isArray(rules) ? rules : []) {
+    const behaviors = Array.isArray(rule?.behaviors) ? rule.behaviors : []
+    for (const behavior of behaviors) {
+      const behaviorName = behavior?.type ?? behavior?.name
+      if (behaviorName !== 'set_connector') continue
+      const connectorId = behavior?.attributes?.value ?? behavior?.edgeConnectorId
+      if (connectorId === null || connectorId === undefined) continue
+      countById.set(connectorId, (countById.get(connectorId) ?? 0) + 1)
+    }
+  }
+  return Array.from(countById, ([connectorId, ruleCount]) => ({ connectorId, ruleCount }))
+}
 
 export class RulesEngineService extends BaseService {
   constructor() {
@@ -188,6 +204,25 @@ export class RulesEngineService extends BaseService {
         skipCache
       }
     )
+  }
+
+  async listConnectorDependencies(edgeApplicationId) {
+    const { body } = await this.listRulesEngineRequestAndResponsePhase({
+      edgeApplicationId,
+      params: { fields: ['id', 'name', 'behaviors', 'phase'], ordering: 'id' }
+    })
+
+    return extractConnectorDependencies(body)
+  }
+
+  async listConnectorDependenciesByVersion(edgeApplicationId, versionId) {
+    const { body } = await versionedRulesEngineService.listRulesEngineRequestAndResponsePhase({
+      edgeApplicationId,
+      versionId,
+      params: { fields: ['id', 'name', 'behaviors', 'phase'], ordering: 'id' }
+    })
+
+    return extractConnectorDependencies(body)
   }
 
   /**

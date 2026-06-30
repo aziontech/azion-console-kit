@@ -63,6 +63,10 @@
     service: {
       type: Object,
       default: null
+    },
+    enabledModules: {
+      type: Object,
+      default: null
     }
   })
 
@@ -395,6 +399,7 @@
     ref="drawerRef"
     :edgeFirewallId="edgeFirewallId"
     :service="service"
+    :enabledModules="enabledModules"
     :createService="createEdgeFirewallRulesEngineService"
     :listFunctionsService="listFunctionsService"
     :loadService="loadEdgeFirewallRulesEngineService"

@@ -144,11 +144,37 @@ export const useReleaseStore = defineStore('release', {
       return value === LATEST_READY || Boolean(value)
     },
 
-    // The Build & activate button gate (req 8.1): a valid context that can deploy,
-    // a target DS, and a chosen application version.
+    appManagedVersionsChosen: (state) => {
+      return COLLECTION_TYPES.every((type) => {
+        const list = Array.isArray(state.coll[type]) ? state.coll[type] : []
+        return list
+          .filter((item) => item?.required)
+          .every((item) => item.version != null && item.version !== LATEST_READY)
+      })
+    },
+
+    pendingDependencySelections: (state) => {
+      const pending = []
+      COLLECTION_TYPES.forEach((type) => {
+        const list = Array.isArray(state.coll[type]) ? state.coll[type] : []
+        list.forEach((item) => {
+          if (item?.required && (item.version == null || item.version === LATEST_READY)) {
+            pending.push({ type, resourceId: item.resourceId })
+          }
+        })
+      })
+      return pending
+    },
+
     deployEnabled() {
       const ctx = this.deployCtx()
-      return Boolean(ctx.ok && ctx.canDeploy && this.effDsId && this.appVersionChosen)
+      return Boolean(
+        ctx.ok &&
+        ctx.canDeploy &&
+        this.effDsId &&
+        this.appVersionChosen &&
+        this.appManagedVersionsChosen
+      )
     }
   },
 
@@ -266,6 +292,46 @@ export const useReleaseStore = defineStore('release', {
       })
 
       this.coll = next
+    },
+
+    seedApplicationFunctions(functionDeps = []) {
+      const source = Array.isArray(functionDeps) ? functionDeps : []
+      const seen = new Set()
+      const next = []
+
+      source.forEach((dep) => {
+        const functionId = dep?.functionId
+        if (functionId == null || seen.has(functionId)) return
+        seen.add(functionId)
+        next.push({
+          resourceId: functionId,
+          version: null,
+          locked: true,
+          required: true
+        })
+      })
+
+      this.coll = { ...this.coll, function: next }
+    },
+
+    seedApplicationConnectors(connectorDeps = []) {
+      const source = Array.isArray(connectorDeps) ? connectorDeps : []
+      const seen = new Set()
+      const next = []
+
+      source.forEach((dep) => {
+        const connectorId = dep?.connectorId
+        if (connectorId == null || seen.has(connectorId)) return
+        seen.add(connectorId)
+        next.push({
+          resourceId: connectorId,
+          version: null,
+          locked: true,
+          required: true
+        })
+      })
+
+      this.coll = { ...this.coll, connector: next }
     },
 
     // Pick an instance for a dependency collection item; reset that instance's
@@ -417,6 +483,19 @@ export const useReleaseStore = defineStore('release', {
       const resourceId = this.resNames[scopedType] ?? this.resourceId
       const selectedVersion = this.resVers[scopedType] ?? LATEST_READY
 
+      const dependencyOverrides = []
+      COLLECTION_TYPES.forEach((type) => {
+        const list = Array.isArray(this.coll[type]) ? this.coll[type] : []
+        list.forEach((item) => {
+          if (item?.resourceId == null) return
+          dependencyOverrides.push({
+            resource_id: item.resourceId,
+            resource_type: type,
+            version: this.resolveVersion(type, item.resourceId, item.version)
+          })
+        })
+      })
+
       return {
         scoped: true,
         override: {
@@ -424,6 +503,7 @@ export const useReleaseStore = defineStore('release', {
           resource_id: resourceId,
           version: this.resolveVersion(scopedType, resourceId, selectedVersion)
         },
+        dependencyOverrides,
         canary: this.canary,
         canaryForm: { ...this.canaryForm }
       }

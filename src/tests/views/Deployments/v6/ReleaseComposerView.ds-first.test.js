@@ -107,6 +107,43 @@ vi.mock('@/templates/release-composition/use-release-composition', async () => {
   }
 })
 
+vi.mock('@/templates/release-composition/use-release-impact', async () => {
+  const { ref, computed } = await import('vue')
+  return {
+    useReleaseImpact: () => ({
+      reverseLookupByDs: ref({}),
+      dsMetaFor: () => ({}),
+      degradationReason: computed(() => null),
+      retry: vi.fn()
+    })
+  }
+})
+
+vi.mock('@/templates/release-composition/use-application-function-dependencies', async () => {
+  const { ref } = await import('vue')
+  return {
+    useApplicationFunctionDependencies: () => ({
+      functionDependencies: ref([]),
+      isModuleEnabled: ref(false),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+
+vi.mock('@/templates/release-composition/use-application-connector-dependencies', async () => {
+  const { ref } = await import('vue')
+  return {
+    useApplicationConnectorDependencies: () => ({
+      connectorDependencies: ref([]),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+
 // --- router + toast -----------------------------------------------------------
 const routerPush = vi.fn()
 const routerResolve = vi.fn(() => ({ href: '/deployments' }))
@@ -124,6 +161,7 @@ const findCard = (wrapper, type) =>
 
 const mountView = () =>
   mount(ReleaseComposerView, {
+    attachTo: document.body,
     global: {
       stubs: {
         // Stub the heavy/irrelevant peripheral blocks so the test focuses on the
@@ -236,10 +274,9 @@ describe('ReleaseComposerView — DS-first flow (Scenario A)', () => {
       wrapper.find('[data-testid="release-composition__deps-group-network_list"]').exists()
     ).toBe(true)
 
-    // An empty dependency group (connector — no inherited instance) shows the
-    // "No {type} instances — Add one to include it." empty state + Add button.
+    // Dependency instances are seeded automatically; there is no manual Add control.
     const connectorAdd = wrapper.find('[data-testid="release-composition__deps-add-connector"]')
-    expect(connectorAdd.exists()).toBe(true)
+    expect(connectorAdd.exists()).toBe(false)
   })
 
   it('defaults the Version picker to "latest Ready" (LATEST sentinel) on a fresh DS-first selection', async () => {
@@ -253,10 +290,14 @@ describe('ReleaseComposerView — DS-first flow (Scenario A)', () => {
 
     // The version field of every singleton card binds LATEST_READY ('LATEST') —
     // the target's "latest Ready" default, NOT the active release's pinned id.
-    const versionFields = wrapper.findAllComponents({ name: 'release-resource-version-field' })
-    expect(versionFields.length).toBeGreaterThanOrEqual(3)
-    versionFields.forEach((field) => {
-      expect(field.props('modelValue')).toBe('LATEST')
+    // (Inherited dependency instances keep their pinned version, so only the
+    // singleton cards' own version fields are asserted here.)
+    ;['application', 'firewall', 'custom_page'].forEach((type) => {
+      const card = findCard(wrapper, type)
+      expect(card.exists()).toBe(true)
+      const versionField = card.findComponent({ name: 'release-resource-version-field' })
+      expect(versionField.exists()).toBe(true)
+      expect(versionField.props('modelValue')).toBe('LATEST')
     })
   })
 

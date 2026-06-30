@@ -42,6 +42,10 @@
     loadNetworkListService: {
       type: Function,
       required: true
+    },
+    enabledModules: {
+      type: Object,
+      default: null
     }
   })
   const route = useRoute()
@@ -65,7 +69,8 @@
   }
 
   const YEAR_IN_SECONDS = 31536000
-  const enabledModules = ref({})
+  const loadedModules = ref({})
+  const enabledModules = computed(() => props.enabledModules ?? loadedModules.value)
   const DEFAULT_CRITERIA_OPTION = {
     variable: '',
     operator: '',
@@ -81,7 +86,7 @@
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
   const hasWafAccess = ref(true)
   onMounted(async () => {
-    loaderEdgeFirewall()
+    if (!props.enabledModules) loaderEdgeFirewall()
   })
 
   const listWafRulesServiceOptions = async (query) => {
@@ -448,7 +453,7 @@
       edgeFunctionsEnabled: edgeFunctions
     } = edgeFirewall
 
-    enabledModules.value = {
+    loadedModules.value = {
       webApplicationFirewall,
       debugRules,
       networkProtectionLayer,

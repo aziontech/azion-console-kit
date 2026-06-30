@@ -35,6 +35,9 @@
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { LATEST_READY } from '@/templates/release-composition/version-options'
   import { useReleaseComposition } from '@/templates/release-composition/use-release-composition'
+  import { useApplicationFunctionDependencies } from '@/templates/release-composition/use-application-function-dependencies'
+  import { useApplicationConnectorDependencies } from '@/templates/release-composition/use-application-connector-dependencies'
+  import { useApplicationVersionReady } from '@/templates/release-composition/use-application-version-ready'
   import { useReleaseImpact } from '@/templates/release-composition/use-release-impact'
   import { resolveConsumingDeployments } from '@/services/v2/release-impact/consuming-deployments'
   import {
@@ -119,7 +122,8 @@
     deployments,
     scopedType,
     fromVersion,
-    versionId
+    versionId,
+    pendingDependencySelections
   } = storeToRefs(store)
 
   // Resources the version pickers must keep Ready versions loaded for. It tracks
@@ -180,6 +184,80 @@
     resolveConsumingDeployments
   })
 
+  // The application id the composition is built around: the explicit Application
+  // pick first, else the scoped entry id when the screen is scoped to an
+  // application version, else the application pinned by the effective DS's active
+  // release. Coerced to a stable string so the composable's gate/cache key never
+  // thrashes between numeric and string ids.
+  const composedApplicationId = computed(() => {
+    const explicit = resNames.value['application']
+    const scopedAppId =
+      scopedType.value === 'application' && store.resourceId != null && store.resourceId !== ''
+        ? store.resourceId
+        : null
+    const activeAppId = (activeReleaseByDs.value[effDsId.value]?.resources ?? []).find(
+      (resource) => resource?.resource_type === 'application'
+    )
+    const candidate =
+      explicit != null && explicit !== ''
+        ? explicit
+        : scopedAppId != null
+          ? scopedAppId
+          : (activeAppId?.resource_id ?? activeAppId?.global_id ?? null)
+    return candidate == null || candidate === '' ? null : String(candidate)
+  })
+
+  // The application-release flow is active whenever there IS a composed
+  // application id — that's what makes the function-dependency detection
+  // authoritative for `coll['function']` (§7.2).
+  const isApplicationFlow = computed(() => composedApplicationId.value != null)
+
+  // Dependencies are discovered from the application VERSION passed in the URL
+  // (the version being released), not the application's current/live state — and
+  // only when that version is `ready` (deployable). `versionId` is the scoped
+  // entry's version (route → store).
+  const composedVersionId = computed(() =>
+    versionId.value != null && versionId.value !== '' ? String(versionId.value) : null
+  )
+
+  const versionReady = useApplicationVersionReady({
+    applicationId: composedApplicationId,
+    versionId: composedVersionId,
+    enabled: isApplicationFlow
+  })
+
+  const dependenciesEnabled = computed(() => isApplicationFlow.value && versionReady.isReady.value)
+
+  const functionDeps = useApplicationFunctionDependencies({
+    applicationId: composedApplicationId,
+    versionId: composedVersionId,
+    enabled: dependenciesEnabled
+  })
+
+  const connectorDeps = useApplicationConnectorDependencies({
+    applicationId: composedApplicationId,
+    versionId: composedVersionId,
+    enabled: dependenciesEnabled
+  })
+
+  const dependenciesLoading = computed(
+    () =>
+      isApplicationFlow.value &&
+      (versionReady.isLoading.value ||
+        functionDeps.isLoading.value ||
+        connectorDeps.isLoading.value)
+  )
+  const dependenciesError = computed(
+    () =>
+      isApplicationFlow.value &&
+      (versionReady.hasError.value || functionDeps.hasError.value || connectorDeps.hasError.value)
+  )
+  const retryDependencies = () => {
+    versionReady.retry()
+    functionDeps.retry()
+    connectorDeps.retry()
+  }
+
   // --- Feed composable-loaded data back into the store (single source of truth) ---
 
   watch(composition.deployments, (list) => store.setDeployments(list), {
@@ -212,12 +290,26 @@
 
   // Seed the nested dependency section from the effective DS's active release
   // (spec: no "Add" — the instance set is INHERITED). Re-runs when the effective
-  // DS changes OR its release finishes loading; `store.seedColl` fully replaces
-  // `coll`, so switching DS never leaves stale instances behind.
+  // DS changes, its release finishes loading, OR the application's function/
+  // connector dependencies resolve. `store.seedColl` fully replaces `coll`, so it
+  // must run FIRST; then the application's functions and connectors are re-applied
+  // as the authoritative source of `coll['function']`/`coll['connector']` (§7.2)
+  // so the active-release seed never clobbers them regardless of which input changed.
   watch(
-    [effDsId, activeReleaseByDs],
+    [
+      effDsId,
+      activeReleaseByDs,
+      functionDeps.functionDependencies,
+      connectorDeps.connectorDependencies
+    ],
     () => {
       store.seedColl(composition.dependencyResourcesFor(effDsId.value))
+      if (functionDeps.functionDependencies.value?.length) {
+        store.seedApplicationFunctions(functionDeps.functionDependencies.value)
+      }
+      if (connectorDeps.connectorDependencies.value?.length) {
+        store.seedApplicationConnectors(connectorDeps.connectorDependencies.value)
+      }
     },
     { immediate: true, deep: true }
   )
@@ -382,7 +474,9 @@
           label,
         options,
         version: instance.version,
-        versionOptions: composition.versionOptionsFor(type, instance.resourceId)
+        versionOptions: composition.versionOptionsFor(type, instance.resourceId),
+        locked: instance.locked,
+        required: instance.required
       }))
       return {
         type,
@@ -755,6 +849,37 @@
                 </span>
               </div>
 
+              <div
+                v-if="dependenciesLoading"
+                class="flex items-center gap-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
+                data-testid="release-composition__dependencies-loading"
+              >
+                <i class="pi pi-spinner pi-spin" />
+                <span>Detecting Functions and Connectors used by this Application…</span>
+              </div>
+
+              <div
+                v-else-if="dependenciesError"
+                class="flex flex-col gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-50)] px-[var(--spacing-4)] py-[var(--spacing-3)]"
+                data-testid="release-composition__dependencies-error"
+              >
+                <span
+                  class="flex items-center gap-[var(--spacing-2)] text-body-sm text-[var(--text-color-secondary)]"
+                >
+                  <i class="pi pi-exclamation-triangle text-[var(--warning-contrast)]" />
+                  Couldn't detect the dependencies used by this Application.
+                </span>
+                <PrimeButton
+                  label="Retry"
+                  icon="pi pi-refresh"
+                  severity="secondary"
+                  size="small"
+                  class="self-start"
+                  data-testid="release-composition__dependencies-retry"
+                  @click="retryDependencies"
+                />
+              </div>
+
               <ReleaseCompositionTree
                 :resources="resources"
                 @toggle="toggleOptional"
@@ -841,6 +966,13 @@
           data-testid="release-composition__footer-blocked"
         >
           {{ blockingDs.name }} has no Application — resolve it to publish.
+        </span>
+        <span
+          v-else-if="pendingDependencySelections.length"
+          class="text-body-xs text-[var(--text-color-secondary)]"
+          data-testid="release-composition__footer-pending-dependencies"
+        >
+          Select a version for each Function and Connector to publish.
         </span>
         <PrimeButton
           label="Cancel"

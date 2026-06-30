@@ -127,3 +127,43 @@ describe('EdgeFirewall v6 — post-save reactivity', () => {
     expect(mocks.query.refetch).not.toHaveBeenCalled()
   })
 })
+
+describe('EdgeFirewall v6 — Rules Engine module propagation', () => {
+  const rulesTab = () => capturedTabs.find((tab) => tab.key === 'rules-engine')
+
+  it('passes enabledModules built from the version config to the Rules Engine tab', () => {
+    mocks.query.data.value = {
+      config: {
+        wafEnabled: true,
+        networkProtectionEnabled: true,
+        edgeFunctionsEnabled: false,
+        debugRules: false
+      }
+    }
+    mountTabs({ id: FIREWALL_ID, name: 'fw', wafEnabled: false })
+
+    expect(rulesTab().props.enabledModules).toEqual({
+      webApplicationFirewall: true,
+      networkProtectionLayer: true,
+      edgeFunctions: false,
+      debugRules: false
+    })
+  })
+
+  it('falls back to the parent firewall flag when the version config omits it', () => {
+    mocks.query.data.value = { config: {} }
+    mountTabs({ id: FIREWALL_ID, name: 'fw', wafEnabled: true })
+
+    expect(rulesTab().props.enabledModules.webApplicationFirewall).toBe(true)
+  })
+
+  it('reacts to a saved WAF toggle without a remount', async () => {
+    mocks.query.data.value = { config: { wafEnabled: false } }
+    mountTabs({ id: FIREWALL_ID, name: 'fw', wafEnabled: false })
+    expect(rulesTab().props.enabledModules.webApplicationFirewall).toBe(false)
+
+    mocks.query.data.value = { config: { wafEnabled: true } }
+    await nextTick()
+    expect(rulesTab().props.enabledModules.webApplicationFirewall).toBe(true)
+  })
+})

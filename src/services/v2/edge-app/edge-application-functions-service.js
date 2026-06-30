@@ -2,6 +2,17 @@ import { enrichByMatchingReference } from '../utils/enrichByMatchingReference'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeApplicationFunctionsAdapter } from './edge-application-functions-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { versionedFunctionService } from '@/services/v2/edge-app/versioned/versioned-function-service'
+
+const dedupeFunctionInstances = (instances) => {
+  const countById = new Map()
+  for (const item of Array.isArray(instances) ? instances : []) {
+    const functionId = item?.function ?? item?.edgeFunction
+    if (functionId === null || functionId === undefined) continue
+    countById.set(functionId, (countById.get(functionId) ?? 0) + 1)
+  }
+  return Array.from(countById, ([functionId, instanceCount]) => ({ functionId, instanceCount }))
+}
 
 export class EdgeApplicationFunctionService extends BaseService {
   constructor() {
@@ -29,6 +40,32 @@ export class EdgeApplicationFunctionService extends BaseService {
       body,
       count
     }
+  }
+
+  listFunctionDependencies = async (edgeApplicationId) => {
+    const pageSize = 100
+    const { body, count } = await this.listFunctions(edgeApplicationId, {
+      fields: ['function'],
+      pageSize
+    })
+
+    if (count > pageSize) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `listFunctionDependencies: edge application ${edgeApplicationId} has ${count} function instances, ` +
+          `result is capped to the first ${pageSize}.`
+      )
+    }
+
+    return dedupeFunctionInstances(body)
+  }
+
+  listFunctionDependenciesByVersion = async (edgeApplicationId, versionId) => {
+    const { body } = await versionedFunctionService.list(edgeApplicationId, versionId, {
+      pageSize: 100
+    })
+
+    return dedupeFunctionInstances(body)
   }
 
   listFunctionsDropdown = async (edgeApplicationId, params = { pageSize: 10, fields: [] }) => {

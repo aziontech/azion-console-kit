@@ -6,9 +6,12 @@
   import * as yup from 'yup'
   import { ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
   import { wafService } from '@/services/v2/waf/waf-service'
+
+  const { readOnly } = useVersionContext()
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -47,6 +50,10 @@
     // Optional versioned facade (drop-in): when present, create/load/edit route
     // through it instead of the non-versioned edgeFirewallRulesEngineService.
     service: {
+      type: Object,
+      default: null
+    },
+    enabledModules: {
       type: Object,
       default: null
     }
@@ -238,6 +245,7 @@
   >
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
+        :enabledModules="enabledModules"
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :listWafRulesService="wafService.listWafRules"
         :listNetworkListService="listNetworkListService"
@@ -255,6 +263,7 @@
     :loadService="loadEdgeFirewallRulesEngineServiceWithDecorator"
     :editService="editEdgeFirewallRulesEngineServiceWithDecorator"
     :schema="validationSchema"
+    :readOnly="readOnly"
     :isOverlapped="isOverlapped"
     @onError="handleFailedEditEdgeFirewallRules"
     @onSuccess="handleEditWithSuccess"
@@ -262,7 +271,7 @@
   >
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
-        :enabledModules="edgeFirewallModules"
+        :enabledModules="enabledModules"
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :listWafRulesService="wafService.listWafRules"
         :listNetworkListService="listNetworkListService"

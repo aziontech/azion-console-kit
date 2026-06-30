@@ -16,7 +16,12 @@ import { deploymentReleaseService } from '@/services/v2/deployment/deployment-re
 import { DeploymentAdapter } from '@/services/v2/deployment/deployment-adapter'
 import { buildStrategy } from '@/services/v2/deployment/strategy-builder'
 import { RESOURCE_CATALOG_REGISTRY } from '@/services/v2/deployment/resource-catalog-registry'
-import { toVersionOptions } from '@/templates/release-composition/version-options'
+import {
+  toVersionOptions,
+  toReadyVersionOptions
+} from '@/templates/release-composition/version-options'
+
+const READY_ONLY_DEPENDENCY_TYPES = ['function', 'connector']
 import {
   APPLICATION_RESOURCE_TYPE,
   matchFieldFor,
@@ -211,7 +216,10 @@ export function useReleaseComposition({
     versionsLoadingByResource.value = { ...versionsLoadingByResource.value, [key]: true }
     try {
       const raw = await registry.listVersions(resourceId)
-      versionsByResource.value = { ...versionsByResource.value, [key]: toVersionOptions(raw) }
+      const mapVersions = READY_ONLY_DEPENDENCY_TYPES.includes(resourceType)
+        ? toReadyVersionOptions
+        : toVersionOptions
+      versionsByResource.value = { ...versionsByResource.value, [key]: mapVersions(raw) }
     } catch {
       versionsByResource.value = { ...versionsByResource.value, [key]: [] }
     } finally {
@@ -595,7 +603,43 @@ export function useReleaseComposition({
   // else byte-for-byte, and POST a per-DS body. DSs that degrade (no composition)
   // or mismatch (scoped resource absent) are excluded from the fan-out and
   // reported as `{ id, ok: false, skipped: true, skipReason }`.
-  const buildAndActivateScoped = async (ids, override, strategy) => {
+  const applyDependencyOverrides = (base, dependencyOverrides) => {
+    let next = base
+    ;(Array.isArray(dependencyOverrides) ? dependencyOverrides : []).forEach(
+      (dependencyOverride) => {
+        if (dependencyOverride?.resource_id == null || dependencyOverride.resource_id === '') return
+        if (dependencyOverride?.version == null) return
+        if (!dependencyOverride?.resource_type) return
+
+        let matched = false
+        next = next.map((resource) => {
+          if (
+            resource?.resource_type === dependencyOverride.resource_type &&
+            releaseResourceId(resource) != null &&
+            String(releaseResourceId(resource)) === String(dependencyOverride.resource_id)
+          ) {
+            matched = true
+            return { ...resource, version_id: dependencyOverride.version }
+          }
+          return resource
+        })
+
+        if (!matched) {
+          next = [
+            ...next,
+            {
+              resource_id: dependencyOverride.resource_id,
+              resource_type: dependencyOverride.resource_type,
+              version_id: dependencyOverride.version
+            }
+          ]
+        }
+      }
+    )
+    return next
+  }
+
+  const buildAndActivateScoped = async (ids, override, dependencyOverrides, strategy) => {
     // Guard the null-version leak: the store resolves the LATEST sentinel to a
     // concrete `version_id` in `composePayload()` (Property 6), but when the
     // scoped resource's versions were never loaded that resolution yields `null`.
@@ -637,8 +681,9 @@ export function useReleaseComposition({
           ? { ...resource, version_id: override.version }
           : resource
       )
+      const withDependencies = applyDependencyOverrides(swapped, dependencyOverrides)
       const payload = DeploymentAdapter.transformBuildAndActivatePayload(
-        toAdapterResources(swapped),
+        toAdapterResources(withDependencies),
         strategy
       )
       targets.push({ id, payload })
@@ -680,7 +725,12 @@ export function useReleaseComposition({
     isDeploying.value = true
     try {
       if (scoped) {
-        return await buildAndActivateScoped(ids, composedPayload.override ?? {}, strategy)
+        return await buildAndActivateScoped(
+          ids,
+          composedPayload.override ?? {},
+          composedPayload.dependencyOverrides ?? [],
+          strategy
+        )
       }
       return await buildAndActivateShared(ids, composedPayload.resources ?? [], strategy)
     } finally {

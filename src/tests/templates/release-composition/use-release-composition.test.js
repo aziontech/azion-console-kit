@@ -390,7 +390,7 @@ describe('useReleaseComposition - versionOptionsFor (registry toVersionOptions m
       { id: 'fw-1', comment: '', state: 'ready', isCurrent: false }
     ])
     RESOURCE_CATALOG_REGISTRY.function.listVersions.mockResolvedValue([
-      { id: 'fn-1', state: 'active', lastEditor: 'alice', isCurrent: false }
+      { id: 'fn-1', state: 'ready', lastEditor: 'alice', isCurrent: false }
     ])
 
     const { versionOptionsFor } = useReleaseComposition({
@@ -868,5 +868,349 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS preserve & 
     expect(deploymentReleaseService.getActiveReleaseComposition).toHaveBeenCalledWith('ds-lazy')
     expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
     expect(results[0]).toMatchObject({ id: 'ds-lazy', ok: true })
+  })
+})
+
+describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-version injection)', () => {
+  const findByType = (payload, type) =>
+    payload.resources.find((resource) => resource.resource_type === type)
+
+  const findById = (payload, type, resourceId) =>
+    payload.resources.find(
+      (resource) =>
+        resource.resource_type === type && String(resource.resource_id) === String(resourceId)
+    )
+
+  const findFunctionById = (payload, resourceId) => findById(payload, 'function', resourceId)
+  const findConnectorById = (payload, resourceId) => findById(payload, 'connector', resourceId)
+
+  const lastPayloadFor = (dsId) => {
+    const call = deploymentReleaseService.buildAndActivate.mock.calls.find(([id]) => id === dsId)
+    return call?.[1]
+  }
+
+  // ds-with-fn already pins function fn-1 plus a connector that must survive untouched;
+  // ds-no-fn has the scoped application but NO function, so the override is INSERTED.
+  const wireFunctionReleases = () => {
+    deploymentReleaseService.getActiveReleaseComposition.mockImplementation((dsId) => {
+      if (dsId === 'ds-with-fn') {
+        return Promise.resolve(
+          release([
+            { resource_type: 'application', global_id: 42, version_id: 'app-old' },
+            { resource_type: 'connector', resource_id: 'conn-1', version_id: 'conn-keep' },
+            { resource_type: 'function', resource_id: 'fn-1', version_id: 'fn-old' }
+          ])
+        )
+      }
+      if (dsId === 'ds-no-fn') {
+        return Promise.resolve(
+          release([
+            { resource_type: 'application', global_id: 42, version_id: 'app-old' },
+            { resource_type: 'connector', resource_id: 'conn-9', version_id: 'conn-keep-9' }
+          ])
+        )
+      }
+      return Promise.resolve(null)
+    })
+  }
+
+  const scopedPayload = (dependencyOverrides) => ({
+    scoped: true,
+    override: { resource_type: 'application', resource_id: 42, version: 'app-new' },
+    dependencyOverrides,
+    canary: false,
+    canaryForm: {}
+  })
+
+  const mountFor = (ids) => {
+    const composable = useReleaseComposition({
+      enabled: ref(true),
+      selectedDsIds: ref(ids),
+      versionedResources: ref([])
+    })
+    return composable
+  }
+
+  it('OVERRIDES the version_id of a matching function and swaps the application, preserving the connector byte-for-byte', async () => {
+    wireFunctionReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = mountFor(['ds-with-fn'])
+    await flushPromises()
+
+    const results = await buildAndActivate(
+      scopedPayload([{ resource_id: 'fn-1', resource_type: 'function', version: 'fn-new' }]),
+      ['ds-with-fn']
+    )
+
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
+    const payload = lastPayloadFor('ds-with-fn')
+
+    expect(findByType(payload, 'application')).toEqual({
+      global_id: 42,
+      version_id: 'app-new',
+      resource_type: 'application'
+    })
+    expect(findFunctionById(payload, 'fn-1')).toEqual({
+      resource_id: 'fn-1',
+      version_id: 'fn-new',
+      resource_type: 'function'
+    })
+    expect(findByType(payload, 'connector')).toEqual({
+      resource_id: 'conn-1',
+      version_id: 'conn-keep',
+      resource_type: 'connector'
+    })
+    expect(
+      payload.resources.filter((resource) => resource.resource_type === 'function')
+    ).toHaveLength(1)
+
+    expect(results[0]).toMatchObject({ id: 'ds-with-fn', ok: true })
+  })
+
+  it('INSERTS the function as { resource_id, resource_type: function, version_id } when the active release does not contain it', async () => {
+    wireFunctionReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = mountFor(['ds-no-fn'])
+    await flushPromises()
+
+    const results = await buildAndActivate(
+      scopedPayload([{ resource_id: 'fn-7', resource_type: 'function', version: 'fn-fresh' }]),
+      ['ds-no-fn']
+    )
+
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
+    const payload = lastPayloadFor('ds-no-fn')
+
+    expect(findFunctionById(payload, 'fn-7')).toEqual({
+      resource_id: 'fn-7',
+      version_id: 'fn-fresh',
+      resource_type: 'function'
+    })
+    expect(findByType(payload, 'application')).toEqual({
+      global_id: 42,
+      version_id: 'app-new',
+      resource_type: 'application'
+    })
+    expect(findByType(payload, 'connector')).toEqual({
+      resource_id: 'conn-9',
+      version_id: 'conn-keep-9',
+      resource_type: 'connector'
+    })
+
+    expect(results[0]).toMatchObject({ id: 'ds-no-fn', ok: true })
+  })
+
+  it('NULL SAFETY: a function dependencyOverride with null version is never POSTed as version_id:null', async () => {
+    wireFunctionReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = mountFor(['ds-with-fn'])
+    await flushPromises()
+
+    await buildAndActivate(
+      scopedPayload([{ resource_id: 'fn-1', resource_type: 'function', version: null }]),
+      ['ds-with-fn']
+    )
+
+    const payload = lastPayloadFor('ds-with-fn')
+
+    const fnRef = findFunctionById(payload, 'fn-1')
+    expect(fnRef.version_id).toBe('fn-old')
+    expect(fnRef.version_id).not.toBeNull()
+    expect(payload.resources.some((resource) => resource.version_id === null)).toBe(false)
+  })
+
+  it('applies MULTIPLE function dependencyOverrides per DS (override + insert in the same body)', async () => {
+    wireFunctionReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = mountFor(['ds-with-fn'])
+    await flushPromises()
+
+    await buildAndActivate(
+      scopedPayload([
+        { resource_id: 'fn-1', resource_type: 'function', version: 'fn-new' },
+        { resource_id: 'fn-2', resource_type: 'function', version: 'fn-2-new' }
+      ]),
+      ['ds-with-fn']
+    )
+
+    const payload = lastPayloadFor('ds-with-fn')
+
+    expect(findFunctionById(payload, 'fn-1')).toEqual({
+      resource_id: 'fn-1',
+      version_id: 'fn-new',
+      resource_type: 'function'
+    })
+    expect(findFunctionById(payload, 'fn-2')).toEqual({
+      resource_id: 'fn-2',
+      version_id: 'fn-2-new',
+      resource_type: 'function'
+    })
+    expect(
+      payload.resources.filter((resource) => resource.resource_type === 'function')
+    ).toHaveLength(2)
+  })
+
+  it('OVERRIDES the version_id of a matching connector and swaps the application, preserving the function byte-for-byte', async () => {
+    wireFunctionReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = mountFor(['ds-with-fn'])
+    await flushPromises()
+
+    const results = await buildAndActivate(
+      scopedPayload([{ resource_id: 'conn-1', resource_type: 'connector', version: 'conn-new' }]),
+      ['ds-with-fn']
+    )
+
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
+    const payload = lastPayloadFor('ds-with-fn')
+
+    expect(findByType(payload, 'application')).toEqual({
+      global_id: 42,
+      version_id: 'app-new',
+      resource_type: 'application'
+    })
+    expect(findConnectorById(payload, 'conn-1')).toEqual({
+      resource_id: 'conn-1',
+      version_id: 'conn-new',
+      resource_type: 'connector'
+    })
+    expect(findFunctionById(payload, 'fn-1')).toEqual({
+      resource_id: 'fn-1',
+      version_id: 'fn-old',
+      resource_type: 'function'
+    })
+    expect(
+      payload.resources.filter((resource) => resource.resource_type === 'connector')
+    ).toHaveLength(1)
+
+    expect(results[0]).toMatchObject({ id: 'ds-with-fn', ok: true })
+  })
+
+  it('INSERTS the connector as { resource_id, resource_type: connector, version_id } when the active release does not contain it', async () => {
+    wireFunctionReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = mountFor(['ds-no-fn'])
+    await flushPromises()
+
+    const results = await buildAndActivate(
+      scopedPayload([
+        { resource_id: 'conn-77', resource_type: 'connector', version: 'conn-fresh' }
+      ]),
+      ['ds-no-fn']
+    )
+
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
+    const payload = lastPayloadFor('ds-no-fn')
+
+    expect(findConnectorById(payload, 'conn-77')).toEqual({
+      resource_id: 'conn-77',
+      version_id: 'conn-fresh',
+      resource_type: 'connector'
+    })
+    expect(findByType(payload, 'application')).toEqual({
+      global_id: 42,
+      version_id: 'app-new',
+      resource_type: 'application'
+    })
+    // The pre-existing connector conn-9 (a different id) survives untouched.
+    expect(findConnectorById(payload, 'conn-9')).toEqual({
+      resource_id: 'conn-9',
+      version_id: 'conn-keep-9',
+      resource_type: 'connector'
+    })
+
+    expect(results[0]).toMatchObject({ id: 'ds-no-fn', ok: true })
+  })
+
+  it('applies a MIXED function + connector dependencyOverride set in one body', async () => {
+    wireFunctionReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = mountFor(['ds-with-fn'])
+    await flushPromises()
+
+    await buildAndActivate(
+      scopedPayload([
+        { resource_id: 'fn-1', resource_type: 'function', version: 'fn-new' },
+        { resource_id: 'conn-1', resource_type: 'connector', version: 'conn-new' }
+      ]),
+      ['ds-with-fn']
+    )
+
+    const payload = lastPayloadFor('ds-with-fn')
+
+    expect(findByType(payload, 'application')).toEqual({
+      global_id: 42,
+      version_id: 'app-new',
+      resource_type: 'application'
+    })
+    expect(findFunctionById(payload, 'fn-1')).toEqual({
+      resource_id: 'fn-1',
+      version_id: 'fn-new',
+      resource_type: 'function'
+    })
+    expect(findConnectorById(payload, 'conn-1')).toEqual({
+      resource_id: 'conn-1',
+      version_id: 'conn-new',
+      resource_type: 'connector'
+    })
+    expect(
+      payload.resources.filter((resource) => resource.resource_type === 'function')
+    ).toHaveLength(1)
+    expect(
+      payload.resources.filter((resource) => resource.resource_type === 'connector')
+    ).toHaveLength(1)
+  })
+
+  it('NULL SAFETY: a connector dependencyOverride with null version is never POSTed as version_id:null', async () => {
+    wireFunctionReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = mountFor(['ds-with-fn'])
+    await flushPromises()
+
+    await buildAndActivate(
+      scopedPayload([{ resource_id: 'conn-1', resource_type: 'connector', version: null }]),
+      ['ds-with-fn']
+    )
+
+    const payload = lastPayloadFor('ds-with-fn')
+
+    const connRef = findConnectorById(payload, 'conn-1')
+    expect(connRef.version_id).toBe('conn-keep')
+    expect(connRef.version_id).not.toBeNull()
+    expect(payload.resources.some((resource) => resource.version_id === null)).toBe(false)
+  })
+
+  it('keeps application MISMATCH/DEGRADED handling unchanged — a DS with no composition is skipped, never published with fabricated dependencies', async () => {
+    wireFunctionReleases()
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = mountFor(['ds-with-fn', 'ds-gone'])
+    await flushPromises()
+
+    const results = await buildAndActivate(
+      scopedPayload([{ resource_id: 'fn-9', resource_type: 'function', version: 'fn-9-new' }]),
+      ['ds-with-fn', 'ds-gone']
+    )
+
+    // Only the DS with a composition is published; the degraded DS is excluded and
+    // never receives a fabricated body carrying the dependency override.
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
+    expect(deploymentReleaseService.buildAndActivate.mock.calls[0][0]).toBe('ds-with-fn')
+    expect(lastPayloadFor('ds-gone')).toBeUndefined()
+
+    expect(
+      results.map((entry) => ({ id: entry.id, ok: entry.ok, skip: entry.skipReason }))
+    ).toEqual([
+      { id: 'ds-with-fn', ok: true, skip: undefined },
+      { id: 'ds-gone', ok: false, skip: SCOPED_PUBLISH_SKIP_REASONS.DEGRADED }
+    ])
   })
 })
