@@ -60,6 +60,11 @@
   }))
   const isEdgeFunctionEnabled = computed(() => !!moduleSource.value.edgeFunctionsEnabled)
 
+  const onCommandSuccess = (event) => {
+    if (event?.action === 'SAVE') versionModuleQuery.refetch?.()
+    emit('command-success', event)
+  }
+
   const firewallTabs = computed(() => {
     if (!props.firewall) return []
 
@@ -150,7 +155,7 @@
     :tabs="firewallTabs"
     :resource-context="resourceContext"
     testid-prefix="firewall-v6-edit"
-    @command-success="emit('command-success', $event)"
+    @command-success="onCommandSuccess"
     @command-error="emit('command-error', $event)"
     @cancel="emit('cancel')"
   />

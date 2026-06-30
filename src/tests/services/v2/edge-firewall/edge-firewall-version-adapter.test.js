@@ -37,6 +37,32 @@ describe('EdgeFirewallVersionAdapter - transformLoadVersion', () => {
     })
   })
 
+  it('reads module flags from the nested `modules` snapshot shape', () => {
+    const result = EdgeFirewallVersionAdapter.transformLoadVersion({
+      version_id: 'AVFW0003',
+      state: 'draft',
+      name: 'nested-fw',
+      active: true,
+      debug: true,
+      modules: {
+        ddos_protection: { enabled: true },
+        functions: { enabled: false },
+        network_protection: { enabled: true },
+        waf: { enabled: false }
+      }
+    })
+
+    expect(result.config).toEqual({
+      name: 'nested-fw',
+      isActive: true,
+      edgeFunctionsEnabled: false,
+      networkProtectionEnabled: true,
+      wafEnabled: false,
+      ddosProtectionUnmetered: true,
+      debugRules: true
+    })
+  })
+
   it('prefers the `meta` envelope for version_id/state when present', () => {
     const result = EdgeFirewallVersionAdapter.transformLoadVersion({
       id: 999,
@@ -92,7 +118,7 @@ describe('EdgeFirewallVersionAdapter - transformListVersions', () => {
 })
 
 describe('EdgeFirewallVersionAdapter - payloads', () => {
-  it('maps create-draft payload to snake_case root fields with source/comment', () => {
+  it('maps create-draft payload to the nested modules shape with source/comment', () => {
     const payload = EdgeFirewallVersionAdapter.transformCreateDraftPayload({
       sourceVersionId: 'SRC',
       comment: 'clone',
@@ -107,8 +133,10 @@ describe('EdgeFirewallVersionAdapter - payloads', () => {
       comment: 'clone',
       name: 'fw',
       active: false,
-      edge_functions_enabled: true,
-      waf_enabled: false
+      modules: {
+        functions: { enabled: true },
+        waf: { enabled: false }
+      }
     })
   })
 
@@ -118,7 +146,7 @@ describe('EdgeFirewallVersionAdapter - payloads', () => {
       wafEnabled: true
     })
 
-    expect(payload).toEqual({ name: 'fw', waf_enabled: true })
+    expect(payload).toEqual({ name: 'fw', modules: { waf: { enabled: true } } })
     expect(payload).not.toHaveProperty('active')
   })
 

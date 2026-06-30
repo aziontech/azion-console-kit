@@ -71,8 +71,9 @@
   // (deduped by queryKey), so no extra request and no validation in the shell.
   // Plain values (not getters): the parent keys this component by `versionId`,
   // so it remounts on a version switch — there is no in-place id change to track,
-  // and plain args keep the query key stable. Post-mutation refetch still happens
-  // because the service invalidates the version cache on every write.
+  // and plain args keep the query key stable. The service removes (not refetches)
+  // the version cache on write, so after SAVE this query is refetched explicitly
+  // in `onCommandSuccess` to keep the Functions tab gating reactive.
   const versionModuleQuery = edgeAppVersionService.useLoadVersionQuery(
     props.resourceId,
     props.versionId
@@ -87,6 +88,11 @@
   )
   const isImageOptimizationEnabled = computed(() => !!moduleSource.value.imageProcessorEnabled)
   const isEdgeFunctionEnabled = computed(() => !!moduleSource.value.edgeFunctionsEnabled)
+
+  const onCommandSuccess = (event) => {
+    if (event?.action === 'SAVE') versionModuleQuery.refetch?.()
+    emit('command-success', event)
+  }
 
   const activeTabIndex = ref(0)
 
@@ -224,7 +230,7 @@
     :tabs="applicationTabs"
     :resource-context="resourceContext"
     testid-prefix="application-v6-edit"
-    @command-success="emit('command-success', $event)"
+    @command-success="onCommandSuccess"
     @command-error="emit('command-error', $event)"
     @cancel="emit('cancel')"
   />
