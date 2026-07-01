@@ -38,6 +38,10 @@
   import { useApplicationFunctionDependencies } from '@/templates/release-composition/use-application-function-dependencies'
   import { useApplicationConnectorDependencies } from '@/templates/release-composition/use-application-connector-dependencies'
   import { useApplicationVersionReady } from '@/templates/release-composition/use-application-version-ready'
+  import { useFirewallFunctionDependencies } from '@/templates/release-composition/use-firewall-function-dependencies'
+  import { useFirewallWafDependencies } from '@/templates/release-composition/use-firewall-waf-dependencies'
+  import { useFirewallNetworkListDependencies } from '@/templates/release-composition/use-firewall-network-list-dependencies'
+  import { useFirewallVersionReady } from '@/templates/release-composition/use-firewall-version-ready'
   import { useReleaseImpact } from '@/templates/release-composition/use-release-impact'
   import { resolveConsumingDeployments } from '@/services/v2/release-impact/consuming-deployments'
   import {
@@ -58,7 +62,7 @@
   // re-keyed to the real resource types: `function`/`connector`/`network_list`).
   const OWNED_COLLECTIONS = {
     application: ['function', 'connector'],
-    firewall: ['network_list', 'waf'],
+    firewall: ['function', 'network_list', 'waf'],
     custom_page: []
   }
 
@@ -240,22 +244,91 @@
     enabled: dependenciesEnabled
   })
 
+  // The firewall id the composition is built around: mirrors `composedApplicationId`
+  // (explicit Firewall pick → scoped firewall entry id → firewall pinned by the
+  // effective DS's active release). Firewall dependencies (functions, WAF, network
+  // lists) are discovered from the firewall VERSION passed in the URL, only when
+  // that version is `ready` (deployable) — mirroring the application flow (§7.2).
+  const composedFirewallId = computed(() => {
+    const explicit = resNames.value['firewall']
+    const scopedFirewallId =
+      scopedType.value === 'firewall' && store.resourceId != null && store.resourceId !== ''
+        ? store.resourceId
+        : null
+    const activeFirewallId = (activeReleaseByDs.value[effDsId.value]?.resources ?? []).find(
+      (resource) => resource?.resource_type === 'firewall'
+    )
+    const candidate =
+      explicit != null && explicit !== ''
+        ? explicit
+        : scopedFirewallId != null
+          ? scopedFirewallId
+          : (activeFirewallId?.resource_id ?? activeFirewallId?.global_id ?? null)
+    return candidate == null || candidate === '' ? null : String(candidate)
+  })
+
+  const isFirewallFlow = computed(() => composedFirewallId.value != null)
+
+  const firewallVersionReady = useFirewallVersionReady({
+    firewallId: composedFirewallId,
+    versionId: composedVersionId,
+    enabled: isFirewallFlow
+  })
+
+  const firewallDependenciesEnabled = computed(
+    () => isFirewallFlow.value && firewallVersionReady.isReady.value
+  )
+
+  const firewallFunctionDeps = useFirewallFunctionDependencies({
+    firewallId: composedFirewallId,
+    versionId: composedVersionId,
+    enabled: firewallDependenciesEnabled
+  })
+
+  const firewallWafDeps = useFirewallWafDependencies({
+    firewallId: composedFirewallId,
+    versionId: composedVersionId,
+    enabled: firewallDependenciesEnabled
+  })
+
+  const firewallNetworkListDeps = useFirewallNetworkListDependencies({
+    firewallId: composedFirewallId,
+    versionId: composedVersionId,
+    enabled: firewallDependenciesEnabled
+  })
+
   const dependenciesLoading = computed(
     () =>
-      isApplicationFlow.value &&
-      (versionReady.isLoading.value ||
-        functionDeps.isLoading.value ||
-        connectorDeps.isLoading.value)
+      (isApplicationFlow.value &&
+        (versionReady.isLoading.value ||
+          functionDeps.isLoading.value ||
+          connectorDeps.isLoading.value)) ||
+      (isFirewallFlow.value &&
+        (firewallVersionReady.isLoading.value ||
+          firewallFunctionDeps.isLoading.value ||
+          firewallWafDeps.isLoading.value ||
+          firewallNetworkListDeps.isLoading.value))
   )
   const dependenciesError = computed(
     () =>
-      isApplicationFlow.value &&
-      (versionReady.hasError.value || functionDeps.hasError.value || connectorDeps.hasError.value)
+      (isApplicationFlow.value &&
+        (versionReady.hasError.value ||
+          functionDeps.hasError.value ||
+          connectorDeps.hasError.value)) ||
+      (isFirewallFlow.value &&
+        (firewallVersionReady.hasError.value ||
+          firewallFunctionDeps.hasError.value ||
+          firewallWafDeps.hasError.value ||
+          firewallNetworkListDeps.hasError.value))
   )
   const retryDependencies = () => {
     versionReady.retry()
     functionDeps.retry()
     connectorDeps.retry()
+    firewallVersionReady.retry()
+    firewallFunctionDeps.retry()
+    firewallWafDeps.retry()
+    firewallNetworkListDeps.retry()
   }
 
   // --- Feed composable-loaded data back into the store (single source of truth) ---
@@ -300,7 +373,10 @@
       effDsId,
       activeReleaseByDs,
       functionDeps.functionDependencies,
-      connectorDeps.connectorDependencies
+      connectorDeps.connectorDependencies,
+      firewallFunctionDeps.functionDependencies,
+      firewallWafDeps.wafDependencies,
+      firewallNetworkListDeps.networkListDependencies
     ],
     () => {
       store.seedColl(composition.dependencyResourcesFor(effDsId.value))
@@ -309,6 +385,15 @@
       }
       if (connectorDeps.connectorDependencies.value?.length) {
         store.seedApplicationConnectors(connectorDeps.connectorDependencies.value)
+      }
+      if (firewallFunctionDeps.functionDependencies.value?.length) {
+        store.seedFirewallFunctions(firewallFunctionDeps.functionDependencies.value)
+      }
+      if (firewallWafDeps.wafDependencies.value?.length) {
+        store.seedFirewallWafs(firewallWafDeps.wafDependencies.value)
+      }
+      if (firewallNetworkListDeps.networkListDependencies.value?.length) {
+        store.seedFirewallNetworkLists(firewallNetworkListDeps.networkListDependencies.value)
       }
     },
     { immediate: true, deep: true }

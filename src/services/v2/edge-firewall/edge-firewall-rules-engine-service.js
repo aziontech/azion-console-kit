@@ -1,6 +1,40 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeFirewallRulesEngineAdapter } from './edge-firewall-rules-engine-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { versionedFirewallRulesEngineService } from '@/services/v2/edge-firewall/versioned/versioned-firewall-rules-engine-service'
+
+const extractWafDependencies = (rules) => {
+  const countById = new Map()
+  for (const rule of Array.isArray(rules) ? rules : []) {
+    const behaviors = Array.isArray(rule?.behaviors) ? rule.behaviors : []
+    for (const behavior of behaviors) {
+      const behaviorName = behavior?.type ?? behavior?.name
+      if (behaviorName !== 'set_waf') continue
+      const wafId = behavior?.attributes?.waf_id ?? behavior?.id
+      if (wafId === null || wafId === undefined) continue
+      countById.set(wafId, (countById.get(wafId) ?? 0) + 1)
+    }
+  }
+  return Array.from(countById, ([wafId, ruleCount]) => ({ wafId, ruleCount }))
+}
+
+const extractNetworkListDependencies = (rules) => {
+  const countById = new Map()
+  for (const rule of Array.isArray(rules) ? rules : []) {
+    const groups = Array.isArray(rule?.criteria) ? rule.criteria : []
+    for (const group of groups) {
+      const criteria = Array.isArray(group) ? group : [group]
+      for (const criterion of criteria) {
+        const variable = criterion?.variable ?? criterion?.subject
+        if (variable !== '${network}') continue
+        const networkListId = criterion?.argument
+        if (networkListId === null || networkListId === undefined || networkListId === '') continue
+        countById.set(networkListId, (countById.get(networkListId) ?? 0) + 1)
+      }
+    }
+  }
+  return Array.from(countById, ([networkListId, ruleCount]) => ({ networkListId, ruleCount }))
+}
 
 export class EdgeFirewallRulesEngineService extends BaseService {
   constructor() {
@@ -72,6 +106,26 @@ export class EdgeFirewallRulesEngineService extends BaseService {
     return await this.listEdgeFirewallRulesEngineService({
       id: edgeFirewallId
     })
+  }
+
+  listWafDependenciesByVersion = async (edgeFirewallId, versionId) => {
+    const { body } = await versionedFirewallRulesEngineService.listRequestRulesRaw({
+      firewallId: edgeFirewallId,
+      versionId,
+      fields: ['id', 'name', 'behaviors']
+    })
+
+    return extractWafDependencies(body)
+  }
+
+  listNetworkListDependenciesByVersion = async (edgeFirewallId, versionId) => {
+    const { body } = await versionedFirewallRulesEngineService.listRequestRulesRaw({
+      firewallId: edgeFirewallId,
+      versionId,
+      fields: ['id', 'name', 'criteria']
+    })
+
+    return extractNetworkListDependencies(body)
   }
 
   createEdgeFirewallRulesEngineService = async (edgeFirewallId, payload) => {

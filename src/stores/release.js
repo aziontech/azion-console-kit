@@ -334,6 +334,66 @@ export const useReleaseStore = defineStore('release', {
       this.coll = { ...this.coll, connector: next }
     },
 
+    seedFirewallFunctions(functionDeps = []) {
+      const source = Array.isArray(functionDeps) ? functionDeps : []
+      const seen = new Set()
+      const next = []
+
+      source.forEach((dep) => {
+        const functionId = dep?.functionId
+        if (functionId == null || seen.has(functionId)) return
+        seen.add(functionId)
+        next.push({
+          resourceId: functionId,
+          version: null,
+          locked: true,
+          required: true
+        })
+      })
+
+      this.coll = { ...this.coll, function: next }
+    },
+
+    seedFirewallWafs(wafDeps = []) {
+      const source = Array.isArray(wafDeps) ? wafDeps : []
+      const seen = new Set()
+      const next = []
+
+      source.forEach((dep) => {
+        const wafId = dep?.wafId
+        if (wafId == null || seen.has(wafId)) return
+        seen.add(wafId)
+        next.push({
+          resourceId: wafId,
+          version: null,
+          locked: true,
+          required: true
+        })
+      })
+
+      this.coll = { ...this.coll, waf: next }
+    },
+
+    seedFirewallNetworkLists(networkListDeps = []) {
+      const source = Array.isArray(networkListDeps) ? networkListDeps : []
+      const seen = new Set()
+      const next = []
+
+      source.forEach((dep) => {
+        const networkListId = dep?.networkListId
+        if (networkListId == null || seen.has(networkListId)) return
+        seen.add(networkListId)
+        next.push({
+          resourceId: networkListId,
+          version: null,
+          locked: true,
+          required: true
+        })
+      })
+
+      this.coll = { ...this.coll, network_list: next }
+    },
+
     // Pick an instance for a dependency collection item; reset that instance's
     // version to LATEST so a stale pinned id from the previous instance never
     // carries over (mirrors `setResName` for singletons).
