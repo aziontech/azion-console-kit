@@ -235,11 +235,6 @@
         "phase": "response"
       },
       {
-        "id": 563188,
-        "name": "Route Edge API Requests",
-        "phase": "request"
-      },
-      {
         "id": 563632,
         "name": "Route Edge API Requests",
         "phase": "request"

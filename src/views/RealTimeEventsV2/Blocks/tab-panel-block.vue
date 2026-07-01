@@ -201,6 +201,7 @@
     handleAddRangeFilter,
     handleExcludeFilter,
     handleRemoveFilter,
+    pruneIncompatibleFilters,
     getHistoryParts
   } = useFilterActions({
     filterData,
@@ -225,6 +226,20 @@
     // Inactive tab: reload data without touching the URL hash
     loadData()
   }
+
+  // When the dataset changes, its filter-field catalogue (props.filterFields)
+  // is reloaded. Drop any active filter that the new dataset doesn't support
+  // (e.g. `status` when moving to Functions) and re-sync the encoded `filters=`
+  // URL param + reload — otherwise the stale filter leaks into the request and
+  // the API errors. Reference change of props.filterFields is the trigger.
+  watch(
+    () => props.filterFields,
+    () => {
+      if (pruneIncompatibleFilters()) {
+        reloadListTableWithHash()
+      }
+    }
+  )
 
   /* ── Chart config ── */
   const {

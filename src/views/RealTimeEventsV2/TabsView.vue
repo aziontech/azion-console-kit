@@ -322,21 +322,34 @@
   // settles before the click handler returns — and so future enhancements
   // (analytics, focus restoration) can chain off the resolved promise.
   const handleShare = async () => {
-    let viewState = {}
-    let eventsTab = null
+    try {
+      let viewState = {}
+      let eventsTab = null
 
-    if (tabPanelBlockRef.value?.getCurrentShareState) {
-      viewState = tabPanelBlockRef.value.getCurrentShareState()
-    }
-
-    if (activeTabId.value && isEventsTabId(activeTabId.value)) {
-      const tab = eventsTabs.value.find((entry) => entry.id === activeTabId.value)
-      if (tab) {
-        eventsTab = { id: tab.id, label: tab.label, dataset: tab.dataset }
+      if (tabPanelBlockRef.value?.getCurrentShareState) {
+        viewState = tabPanelBlockRef.value.getCurrentShareState()
       }
-    }
 
-    await shareCurrentView({ viewState, eventsTab })
+      if (activeTabId.value && isEventsTabId(activeTabId.value)) {
+        const tab = eventsTabs.value.find((entry) => entry.id === activeTabId.value)
+        if (tab) {
+          eventsTab = { id: tab.id, label: tab.label, dataset: tab.dataset }
+        }
+      }
+
+      await shareCurrentView({ viewState, eventsTab })
+    } catch (err) {
+      // Surface failures that happen before shareCurrentView's own try/catch
+      // (e.g. building the share state) instead of letting the async handler
+      // reject silently — which looks like "the button does nothing".
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error generating share URL',
+        detail: String(err).slice(0, 100),
+        life: 5000
+      })
+    }
   }
 
   // ── Watch pendingEventsTabState from useSessionManager (Share_State import) ──
