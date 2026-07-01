@@ -1,5 +1,10 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeWorkloadsBaseUrl } from './make-workloads-base-url'
+import {
+  HTTP_PORT_LIST_OPTIONS,
+  HTTPS_PORT_LIST_OPTIONS,
+  HTTP3_PORT_LIST_OPTIONS
+} from '@/helpers/workload-protocol-settings'
 
 export const loadWorkloadService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -11,30 +16,6 @@ export const loadWorkloadService = async ({ id }) => {
 
   return parseHttpResponse(httpResponse)
 }
-
-// Constants for port list options
-const HTTP3_PORT_LIST_OPTIONS = [{ name: '443 (Default)', value: 443 }]
-
-const HTTP_PORT_LIST_OPTIONS = [
-  { name: '80 (Default)', value: 80 },
-  { name: '8008', value: 8008 },
-  { name: '8080', value: 8080 },
-  { name: '8880', value: 8880 }
-]
-const HTTPS_PORT_LIST_OPTIONS = [
-  { name: '443 (Default)', value: 443 },
-  { name: '8443', value: 8443 },
-  { name: '9440', value: 9440 },
-  { name: '9441', value: 9441 },
-  { name: '9442', value: 9442 },
-  { name: '9443', value: 9443 },
-  { name: '7777', value: 7777 },
-  { name: '8888', value: 8888 },
-  { name: '9553', value: 9553 },
-  { name: '9653', value: 9653 },
-  { name: '8035', value: 8035 },
-  { name: '8090', value: 8090 }
-]
 
 /**
  *
