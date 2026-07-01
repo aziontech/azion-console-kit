@@ -37,6 +37,17 @@ const transformMap = {
   pages: (value) => value.pages
 }
 
+export const extractCustomPageConnectorDependencies = (pages) => {
+  const countById = new Map()
+  for (const page of Array.isArray(pages) ? pages : []) {
+    if (page?.type !== 'page_connector') continue
+    const connectorId = page?.connector
+    if (connectorId === null || connectorId === undefined) continue
+    countById.set(connectorId, (countById.get(connectorId) ?? 0) + 1)
+  }
+  return Array.from(countById, ([connectorId, pageCount]) => ({ connectorId, pageCount }))
+}
+
 export const transformPageItem = (item) => ({
   id: item.code === 'default' ? 0 : item.code,
   code: { value: nullable(item.code) },

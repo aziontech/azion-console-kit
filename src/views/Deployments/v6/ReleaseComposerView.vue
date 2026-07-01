@@ -42,6 +42,8 @@
   import { useFirewallWafDependencies } from '@/templates/release-composition/use-firewall-waf-dependencies'
   import { useFirewallNetworkListDependencies } from '@/templates/release-composition/use-firewall-network-list-dependencies'
   import { useFirewallVersionReady } from '@/templates/release-composition/use-firewall-version-ready'
+  import { useCustomPageConnectorDependencies } from '@/templates/release-composition/use-custom-page-connector-dependencies'
+  import { useCustomPageVersionReady } from '@/templates/release-composition/use-custom-page-version-ready'
   import { useReleaseImpact } from '@/templates/release-composition/use-release-impact'
   import { resolveConsumingDeployments } from '@/services/v2/release-impact/consuming-deployments'
   import {
@@ -63,7 +65,7 @@
   const OWNED_COLLECTIONS = {
     application: ['function', 'connector'],
     firewall: ['function', 'network_list', 'waf'],
-    custom_page: []
+    custom_page: ['connector']
   }
 
   // Composition labels follow the Azion product names (plural for the dependency
@@ -297,6 +299,47 @@
     enabled: firewallDependenciesEnabled
   })
 
+  // The custom page id the composition is built around: mirrors
+  // `composedApplicationId` (explicit Custom Page pick → scoped custom_page entry
+  // id → custom page pinned by the effective DS's active release). Connector
+  // dependencies are discovered from the custom page VERSION passed in the URL,
+  // only when that version is `ready` (deployable) — mirroring the application flow.
+  const composedCustomPageId = computed(() => {
+    const explicit = resNames.value['custom_page']
+    const scopedCustomPageId =
+      scopedType.value === 'custom_page' && store.resourceId != null && store.resourceId !== ''
+        ? store.resourceId
+        : null
+    const activeCustomPageId = (activeReleaseByDs.value[effDsId.value]?.resources ?? []).find(
+      (resource) => resource?.resource_type === 'custom_page'
+    )
+    const candidate =
+      explicit != null && explicit !== ''
+        ? explicit
+        : scopedCustomPageId != null
+          ? scopedCustomPageId
+          : (activeCustomPageId?.resource_id ?? activeCustomPageId?.global_id ?? null)
+    return candidate == null || candidate === '' ? null : String(candidate)
+  })
+
+  const isCustomPageFlow = computed(() => composedCustomPageId.value != null)
+
+  const customPageVersionReady = useCustomPageVersionReady({
+    customPageId: composedCustomPageId,
+    versionId: composedVersionId,
+    enabled: isCustomPageFlow
+  })
+
+  const customPageDependenciesEnabled = computed(
+    () => isCustomPageFlow.value && customPageVersionReady.isReady.value
+  )
+
+  const customPageConnectorDeps = useCustomPageConnectorDependencies({
+    customPageId: composedCustomPageId,
+    versionId: composedVersionId,
+    enabled: customPageDependenciesEnabled
+  })
+
   const dependenciesLoading = computed(
     () =>
       (isApplicationFlow.value &&
@@ -307,7 +350,9 @@
         (firewallVersionReady.isLoading.value ||
           firewallFunctionDeps.isLoading.value ||
           firewallWafDeps.isLoading.value ||
-          firewallNetworkListDeps.isLoading.value))
+          firewallNetworkListDeps.isLoading.value)) ||
+      (isCustomPageFlow.value &&
+        (customPageVersionReady.isLoading.value || customPageConnectorDeps.isLoading.value))
   )
   const dependenciesError = computed(
     () =>
@@ -319,7 +364,9 @@
         (firewallVersionReady.hasError.value ||
           firewallFunctionDeps.hasError.value ||
           firewallWafDeps.hasError.value ||
-          firewallNetworkListDeps.hasError.value))
+          firewallNetworkListDeps.hasError.value)) ||
+      (isCustomPageFlow.value &&
+        (customPageVersionReady.hasError.value || customPageConnectorDeps.hasError.value))
   )
   const retryDependencies = () => {
     versionReady.retry()
@@ -329,6 +376,8 @@
     firewallFunctionDeps.retry()
     firewallWafDeps.retry()
     firewallNetworkListDeps.retry()
+    customPageVersionReady.retry()
+    customPageConnectorDeps.retry()
   }
 
   // --- Feed composable-loaded data back into the store (single source of truth) ---
@@ -376,7 +425,8 @@
       connectorDeps.connectorDependencies,
       firewallFunctionDeps.functionDependencies,
       firewallWafDeps.wafDependencies,
-      firewallNetworkListDeps.networkListDependencies
+      firewallNetworkListDeps.networkListDependencies,
+      customPageConnectorDeps.connectorDependencies
     ],
     () => {
       store.seedColl(composition.dependencyResourcesFor(effDsId.value))
@@ -394,6 +444,9 @@
       }
       if (firewallNetworkListDeps.networkListDependencies.value?.length) {
         store.seedFirewallNetworkLists(firewallNetworkListDeps.networkListDependencies.value)
+      }
+      if (customPageConnectorDeps.connectorDependencies.value?.length) {
+        store.seedCustomPageConnectors(customPageConnectorDeps.connectorDependencies.value)
       }
     },
     { immediate: true, deep: true }

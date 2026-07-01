@@ -334,6 +334,26 @@ export const useReleaseStore = defineStore('release', {
       this.coll = { ...this.coll, connector: next }
     },
 
+    seedCustomPageConnectors(connectorDeps = []) {
+      const source = Array.isArray(connectorDeps) ? connectorDeps : []
+      const seen = new Set()
+      const next = []
+
+      source.forEach((dep) => {
+        const connectorId = dep?.connectorId
+        if (connectorId == null || seen.has(connectorId)) return
+        seen.add(connectorId)
+        next.push({
+          resourceId: connectorId,
+          version: null,
+          locked: true,
+          required: true
+        })
+      })
+
+      this.coll = { ...this.coll, connector: next }
+    },
+
     seedFirewallFunctions(functionDeps = []) {
       const source = Array.isArray(functionDeps) ? functionDeps : []
       const seen = new Set()
