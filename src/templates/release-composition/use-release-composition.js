@@ -21,7 +21,7 @@ import {
   toReadyVersionOptions
 } from '@/templates/release-composition/version-options'
 
-const READY_ONLY_DEPENDENCY_TYPES = ['function', 'connector']
+const READY_ONLY_DEPENDENCY_TYPES = ['function', 'connector', 'waf', 'network_list']
 import {
   APPLICATION_RESOURCE_TYPE,
   matchFieldFor,

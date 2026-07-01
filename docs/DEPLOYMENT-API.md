@@ -1,192 +1,72 @@
 # Deployment API — Endpoints
 
-Human-readable map of the HTTP + GraphQL surface with inline JSON examples. **The authoritative request/response shapes live in [`../openapi-schema.yaml`](../openapi-schema.yaml)** — this doc captures semantics, contracts, and gotchas the OpenAPI alone does not convey.
+curl-first map of the HTTP + GraphQL surface. **Authoritative shapes: [`../openapi-schema.yaml`](../openapi-schema.yaml)**; error codes: [`ERRORS.md`](./ERRORS.md); outbox payloads: [`OUTBOX-EVENTS.md`](./OUTBOX-EVENTS.md). `*` = required field, `?` = optional.
 
-Error codes referenced below come from [`ERRORS.md`](./ERRORS.md). Outbox event payloads emitted by lifecycle transitions are documented in [`OUTBOX-EVENTS.md`](./OUTBOX-EVENTS.md).
+## Setup for examples
 
-## How to query state
-
-| Use case | Recommended channel | Endpoint |
-|---|---|---|
-| State of a single deployment | **GraphQL** | `getResourceState([{resourceType:'deployment', resourceId:<did>}])` |
-| State of a single release | **GraphQL** | `getResourceState([{resourceType:'release', resourceId:<did>, resourceVersion:<rid>}])` |
-| Batch state lookup (N resources, mixed types) | **GraphQL** | `getResourceState([...])` |
-| Paginated release listing for a deployment | **HTTP REST** | `GET /v4/deployments/{did}/releases` (filters: `?state=`, `?traffic_role=active`) |
-| Paginated release history of a deployment (state-only) | **GraphQL** | `getDeploymentHistory(clientId, deploymentId, page, pageSize)` |
-| Full resource (not just state) | **HTTP REST** | `GET /v4/deployments/{id}` or `GET /v4/deployments/{did}/releases/{rid}` |
-
-GraphQL is the optimized state-only channel for service-to-service callers (Data Plane, edge-api, Config Builder). HTTP GETs return the resource in full (state + metadata + audit + composition) for end-user / SDK consumers.
+```bash
+export API=https://api.azion.com   # host
+export TOKEN=<personal-token>      # Authorization: Token <TOKEN>
+```
 
 ## Conventions
 
 | Aspect | Value |
 |---|---|
-| Base path | `/v4/` |
-| IDs | Bare **short_id** strings (version char + base36 payload; A=8 chars). Pattern `^[A-Z][A-Z0-9]+$`. DTOs accept up to 26 chars (DB columns are `VARCHAR(26)`). |
-| Multi-tenant | Every entity carries `client_id` from `auth.account.clientId` |
-| Single response envelope | `{ "data": { ...flat resource } }` |
-| List response envelope (Azion V4) | `{ count, total_pages, page, page_size, next, previous, results: [...] }` |
-| Pagination | `?page` (1-based, default 1, max 1000) + `?page_size` (default 20, max 100) |
-| Ordering | `?ordering=<field>` — **azion-django-extensions / DRF OrderingFilter** convention: prefix with `-` for descending, comma-separate multiple fields. Unknown fields are silently ignored; default ordering used as fallback. Example: `?ordering=-created_at,name` |
-| Error envelope | `{ "errors": [{ status, code, title, detail, meta }] }` — `meta.source.pointer` = `/<field>` |
-| Request body | **Flat** — no `{data:{type,attributes}}` wrapper |
+| Base path | `/v4/` (auth: `Authorization: Token <TOKEN>`). `/health*` + `/api/graphql` are outside `/v4` (secret-gated). |
+| IDs | short_id `^[A-Z][A-Z0-9]+$` (A=8 chars), `VARCHAR(26)`. |
+| Multi-tenant | `client_id` from `auth.account.clientId` (never from body). |
+| Single response | `{ "data": { ...flat } }` (no `{data:{type,attributes}}`). |
+| List response | `{ count, total_pages, page, page_size, next, previous, results: [...] }`. |
+| Pagination | `?page` (1-based, ≤1000) · `?page_size` (default 20, ≤100). |
+| Ordering | `?ordering=-field,field2` (DRF style: `-` = desc, comma = multi, unknown ignored). |
+| Errors | `{ "errors":[{ status, code, title, detail, meta:{source:{pointer:"/field"}} }] }`. Codes numeric `43000-43005`. |
+| Audit | `created_by`/`last_modified_by` = requester email (or `null`); derived server-side, never sent in body. |
 
-`created_by` / `last_modified_by` on **responses** (and on outbox payloads) are a **plain email string** — the requester's email or `null` for service-to-service / dev. Clients never supply these fields in **request** bodies either; they are derived server-side from the authenticated session.
+**Auth** (`/v4/*`, only when `AUTH_ENABLED=true`): SSO token/JWT/cookie → `401`/`403`; plus `requireV6FlagMiddleware` (`use_v6_configurations` flag) → `403`. Dev (`AUTH_ENABLED=false`): no auth, `client_id` = `DEV_CLIENT_ID` (`1234567`). `/health*` + `/api/graphql` failures → `404` empty (security-by-obscurity).
 
-Internally each value is persisted as a JSONB **Actor snapshot** `{ user_id, trigger, email }` (mirrors `@azion/versioning` lib's shape) for audit purposes. The wire contract projects only `email` — `user_id` (always equal to `client_id`) and `trigger` (the lowercased `X-Trigger` header: `api | cli | console | terraform | sdk`) stay in the database to answer "who made this change and how" without leaking implementation noise on the public surface. The same `audit.trigger` field is exposed on `release` rows (releases) inside their `audit` JSONB.
-
-## Authentication
-
-`/v4/*` is gated by two middlewares (mounted only when `AUTH_ENABLED=true`):
-
-1. **`azionAuthMiddleware`** — validates SSO credential (API token, JWT Bearer, or session cookie). Sets `c.set('auth', ...)` and `c.set('clientId', ...)`. Failures: `401 AZN-AUTH-NOT_AUTHENTICATED-001` or `403 AZN-AUTH-PERMISSION_DENIED-001`.
-2. **`requireV6FlagMiddleware`** — checks `auth.account.flags` for `'use_v6_configurations'`. Failure: `403 AZN-AUTH-PERMISSION_DENIED-001` with `title: "v6 Flag Required"`. Skipped when env `V6_FLAG_REQUIRED !== 'true'`.
-
-In dev (`AUTH_ENABLED=false`) neither middleware runs; `clientIdOf(c)` falls back to `DEV_CLIENT_ID` (default `'1234567'`).
-
-`/health`, `/health/db`, and `/api/graphql` live **outside** `/v4/*`. They are gated by a shared-secret middleware: `/health` + `/health/db` use `Authorization: Bearer <SSO_GQL_SECRET>` (constant-time compare); `/api/graphql` uses an `X-Secret` header validated against the `graphql_secrets` table. Any failure returns **`404`** with empty body (security-through-obscurity).
+**State channel**: GraphQL `getResourceState` = state-only, service-to-service, batch. HTTP GET = full resource for SDK/end-user.
 
 ---
 
-## Service endpoints
+## Service
 
 ### GET /health
-
-Liveness probe. No SSO; gated by the shared-secret middleware when `AUTH_ENABLED=true`.
-
-**Response 200**
-
-```json
-{ "status": "ok", "timestamp": "2026-06-08T14:22:01.812Z" }
+Liveness probe.
+```bash
+curl -s "$API/health" -H "Authorization: Bearer $SSO_GQL_SECRET"
 ```
+**200** `{ status:"ok", timestamp }`
 
 ### GET /health/db
-
-Readiness probe — executes `SELECT 1` against the configured Postgres pool. On failure surfaces both the Drizzle wrapper (`error`/`errorName`) and the underlying driver error (`cause`/`causeName`).
-
-**Response 200**
-
-```json
-{ "status": "ok", "database": "connected", "responseTime": "4ms", "timestamp": "2026-06-08T14:22:01.812Z" }
+Readiness probe (`SELECT 1`).
+```bash
+curl -s "$API/health/db" -H "Authorization: Bearer $SSO_GQL_SECRET"
 ```
-
-**Response 503**
-
-```json
-{ "status": "error", "database": "disconnected", "error": "...", "errorName": "Error", "cause": "...", "responseTime": "39ms", "timestamp": "2026-06-08T14:22:01.812Z" }
-```
+**200** `{ status:"ok", database:"connected", responseTime, timestamp }`
+**503** `{ status:"error", database:"disconnected", error, errorName, cause, responseTime }`
 
 ---
 
-## GraphQL — `POST /api/graphql`
+## GraphQL — POST /api/graphql
 
-Yoga endpoint mounted **outside** `/v4/*`. Schema lives at `src/infrastructure/graphql/schema.ts`. Gated by an `X-Secret` header validated against the `graphql_secrets` table — **service-to-service only**. Auth failure returns `404` empty body. GraphQL execution errors return `200` with `{data:null, errors:[...]}` per GraphQL spec.
-
-The SDL is inlined in `schema.ts` (the Edge bundle can't `readFileSync` a `.graphql` at runtime). A canonical copy is generated to `schema.graphql` at the repo root via `npm run generate-graphql-schema`; the `Generate GraphQL schema` workflow keeps it in sync on PRs.
-
-State on the GraphQL boundary is **UPPERCASE** (`READY`, `QUEUED`, `BUILDING`, etc) — converted in the resolver. The underlying DB column stays lowercase. Aligns with edge-api convention.
-
-### Query: `resourceVersionInUse`
-
-```graphql
-query Q($cid:String!, $rt:String!, $rv:String!) {
-  resourceVersionInUse(clientId: $cid, resourceType: $rt, resourceVersion: $rv)
-}
-```
-
-Returns `true` when ≥1 READY `release` in the given tenant references `(resource_type, resource_version)`. Backed by `idx_resource_lookup_by_type` on `resource_versions`. Used by edge-api to gate hard-delete.
-
-**Example response**
-
-```json
-{ "data": { "resourceVersionInUse": true } }
-```
-
-### Query: `getResourceState`
-
-```graphql
-query Q($r:[ResourceStateInput!]!) {
-  getResourceState(resources: $r) {
-    resourceType resourceId resourceVersion state
-  }
-}
-```
-
-Batch state lookup. Input semantics per `resourceType`:
-- `deployment` → `resourceId` = deployment_id (required); `resourceVersion` must be null.
-- `release` → `resourceVersion` = release_id (required); `resourceId` is ignored and may be omitted.
-- `environment` → returns `state: null` (moved to environment-api).
-
-Output preserves input order (1:1). `state` is null when the resource is not found, the required key is omitted, or the `resourceType` is unrecognized. Both lookups bypass `client_id` filtering — `/api/graphql` is the secret-gated service-to-service carve-out.
-
-**Example request variables**
-
-```json
-{
-  "r": [
-    { "resourceType": "deployment", "resourceId": "ADEPSTG1" },
-    { "resourceType": "release", "resourceVersion": "ARELACT1" }
-  ]
-}
-```
-
-**Example response**
-
-```json
-{
-  "data": {
-    "getResourceState": [
-      { "resourceType": "deployment", "resourceId": "ADEPSTG1", "resourceVersion": null, "state": "READY" },
-      { "resourceType": "release", "resourceId": "ADEPSTG1", "resourceVersion": "ARELACT1", "state": "READY" }
-    ]
-  }
-}
-```
-
-### Query: `getDeploymentHistory`
-
-```graphql
-query Q($cid:String!, $did:String!, $page:Int, $pageSize:Int) {
-  getDeploymentHistory(clientId: $cid, deploymentId: $did, page: $page, pageSize: $pageSize) {
-    count page pageSize totalPages
-    results { id deploymentId state trafficRole createdAt }
-  }
-}
-```
-
-Paginated release history (`releases`) for a single deployment. State-focused and shaped for service-to-service consumers (full release records are served by HTTP `GET /v4/deployments/{did}/releases`). `clientId` is **required** (no auth context inside `/api/graphql`). State is UPPERCASE on the boundary.
-
-**Example response**
-
-```json
-{
-  "data": {
-    "getDeploymentHistory": {
-      "count": 3, "page": 1, "pageSize": 10, "totalPages": 1,
-      "results": [
-        { "id": "ARELACT1", "deploymentId": "ADEPSTG1", "state": "READY", "trafficRole": "ACTIVE", "createdAt": "2026-06-08T14:00:00.000Z" },
-        { "id": "ARELOL01", "deploymentId": "ADEPSTG1", "state": "ARCHIVED", "trafficRole": "INACTIVE", "createdAt": "2026-06-07T10:00:00.000Z" }
-      ]
-    }
-  }
-}
-```
-
-### Mapping: GraphQL ↔ use case ↔ HTTP equivalent
-
-| GraphQL query | Use case | HTTP equivalent |
-|---|---|---|
-| `resourceVersionInUse` | `CheckResourceVersionUsageUseCase` | none (cross-service hook) |
-| `getResourceState` (deployment) | `GetDeploymentStateUseCase` | `GET /v4/deployments/{id}` (returns full resource) |
-| `getResourceState` (release) | `GetReleaseStateUseCase` | `GET /v4/deployments/{did}/releases/{rid}` (returns full resource) |
-| `getDeploymentHistory` | `GetDeploymentHistoryUseCase` | `GET /v4/deployments/{did}/releases` (HTTP returns full Release records) |
-
-### cURL example
+Yoga endpoint, **service-to-service only** (`X-Secret` validated against `graphql_secrets`; auth failure → `404` empty). Execution errors → `200 {data:null, errors:[...]}`. State is **UPPERCASE** on this boundary. SDL in `src/infrastructure/graphql/schema.ts` (mirrored to `schema.graphql`). Both lookups bypass `client_id` filtering (secret-gated carve-out).
 
 ```bash
-curl -X POST -H 'X-Secret: <secret>' -H 'Content-Type: application/json' \
-  https://api.azion.net/api/graphql \
-  -d '{"query":"{ getDeploymentHistory(clientId:\"1234567\", deploymentId:\"ADEPSTG1\", page:1, pageSize:5) { count results { id state trafficRole } } }"}'
+curl -sX POST "$API/api/graphql" -H 'X-Secret: <secret>' -H 'Content-Type: application/json' \
+  -d '{"query":"query($r:[ResourceStateInput!]!){getResourceState(resources:$r){resourceType resourceId resourceVersion state}}","variables":{"r":[{"resourceType":"deployment","resourceId":"ADEPSTG1"},{"resourceType":"release","resourceVersion":"ARELACT1"}]}}'
+```
+
+| Query | Args | Returns |
+|---|---|---|
+| `resourceVersionInUse` | `clientId*, resourceType*, resourceVersion*` | `Boolean` — true if ≥1 READY release in tenant references `(type, version)`. Gates edge-api hard-delete. |
+| `getResourceState` | `resources: [{resourceType*, resourceId, resourceVersion}]` | `[{resourceType, resourceId, resourceVersion, state}]` (input order). `deployment`→key `resourceId`; `release`→key `resourceVersion`; `environment`→`null`. `state:null` if missing/unknown. |
+| `getDeploymentHistory` | `clientId*, deploymentId*, page?, pageSize?` | `{count,page,pageSize,totalPages, results:[{id,deploymentId,state,trafficRole,createdAt}]}` — state-only release history. |
+
+```bash
+# getDeploymentHistory
+curl -sX POST "$API/api/graphql" -H 'X-Secret: <secret>' -H 'Content-Type: application/json' \
+  -d '{"query":"{getDeploymentHistory(clientId:\"1234567\",deploymentId:\"ADEPSTG1\",page:1,pageSize:5){count results{id state trafficRole}}}"}'
 ```
 
 ---
@@ -194,416 +74,315 @@ curl -X POST -H 'X-Secret: <secret>' -H 'Content-Type: application/json' \
 ## Deployments (CRUD on the base)
 
 ### POST /v4/deployments
-
-Creates a deployment (base row + a v1 version-row in `state='draft'`). **Does not emit an outbox event** and has **no effect on the edge** — by design, a deployment stays purely local until its first release becomes ACTIVE (via `/build_and_activate` or `POST /releases/:rid/activate`). Mirrors the env-api / edge-api convention: drafts are local, only the activation of a release publishes the deployment to the edge.
-
-**Request**
-
-```json
-{
-  "name": "public-api",
-  "description": "optional",
-  "binding_policy": "FLEXIBLE",
-  "deployment_policy": "single_version",
-  "strategy_defaults": {}
-}
+Create deployment (base + draft v1). No outbox / no edge effect until a release activates.
+```bash
+curl -sX POST "$API/v4/deployments" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"name":"public-api","binding_policy":"FLEXIBLE","deployment_policy":"single_version"}'
 ```
-
-**Response 201**
-
-```json
-{
-  "data": {
-    "id": "ADEPSTG1",
-    "name": "public-api",
-    "description": null,
-    "binding_policy": "FLEXIBLE",
-    "deployment_policy": "single_version",
-    "strategy_defaults": {},
-    "state": "draft",
-    "state_detail": null,
-    "client_id": "1234567",
-    "created_at": "2026-06-08T14:22:01.812Z",
-    "updated_at": null,
-    "created_by": "alice@example.com",
-    "last_modified_by": "alice@example.com"
-  }
-}
-```
-
-- **400** — Zod validation failed
-- **422** — domain validation (e.g., invalid enum)
+**Body** `name*` `binding_policy*`(FLEXIBLE|STRICT) `deployment_policy*`(single_version|versioned_urls) `description?` `strategy_defaults?`
+**201** `{ data:{ id, name, binding_policy, deployment_policy, state:"draft", client_id, created_at, created_by, … } }`
+**Errors** `400 malformed` · `409 DUPLICATE_NAME` · `422 validation`
 
 ### GET /v4/deployments
-
-Lists deployments (Azion V4 pagination). One row per deployment (base + latest version row). Each result includes `version_id` (the latest `deployment_versions.id` projected into the response) alongside `id` (the base `deployments.id`); `state` is the version's state.
-
-**Query parameters:**
-
-| Parameter | Type | Description |
-|---|---|---|
-| `page` | integer | Page number (1-based, default 1, max 1000) |
-| `page_size` | integer | Items per page (default 20, max 100) |
-| `name` | string | Case-insensitive substring filter on deployment name |
-| `ordering` | string | Comma-separated sort fields. Prefix with `-` for descending. **Allowed:** `id`, `name`, `created_at`, `updated_at`, `state`. **Default:** `-created_at,-id` (newest first). Example: `?ordering=-state,name` |
-
-**Response 200**
-
-```json
-{
-  "count": 42,
-  "total_pages": 3,
-  "page": 1,
-  "page_size": 20,
-  "next": "http://localhost:3000/v4/deployments?page=2&page_size=20",
-  "previous": null,
-  "results": [ { "id": "ADEPSTG1", "version_id": "AVERS001", "name": "public-api", "state": "ready", "...": "..." } ]
-}
+List (one row per deployment: base + latest version row).
+```bash
+curl -s "$API/v4/deployments?page=1&page_size=20&ordering=-created_at" -H "Authorization: Token $TOKEN"
 ```
+**Query** `page?` `page_size?` `name?`(substring) `ordering?`(id|name|created_at|updated_at|state; default `-created_at,-id`)
+**200** list envelope; `results[]` = `{ id, version_id, name, state, … }`
 
 ### GET /v4/deployments/{id}
-
-Reads a deployment. **Resolves a base-row to its latest READY version** (fallback to latest if none ready). Returns the same resource shape as POST 201.
-
-- **404** — `43000 DEPLOYMENT_NOT_FOUND` if no row matches `(client_id, id)`
+Read deployment — resolves base → latest READY version (fallback latest).
+```bash
+curl -s "$API/v4/deployments/ADEPSTG1" -H "Authorization: Token $TOKEN"
+```
+**200** `{ data:{ …same shape as POST 201 } }`
+**Errors** `404 DEPLOYMENT_NOT_FOUND`
 
 ### PATCH /v4/deployments/{id}
-
-Updates a deployment. **State-aware**: if the latest `deployment_versions` row is in `state='draft'`, PATCH refines that row in place (no clone). If the latest row is in any other state (`ready`/`error`/`queued`/`building`/`archiving`/`archived`/`canceled`), PATCH **clones** the latest into a new draft and applies the patch there — the existing row is preserved. Successive PATCHes against a deployment whose head is `draft` keep editing the same row; the first PATCH after a finalized version forks a new draft. Returns the draft with `meta`. Accepts `name`, `description`, `binding_policy`, `deployment_policy` (idempotent), `strategy_defaults`.
-
-**Request**
-
-```json
-{ "name": "public-api-v2", "description": "renamed" }
+State-aware update: head `draft` → edit in place; else → clone latest into a new draft.
+```bash
+curl -sX PATCH "$API/v4/deployments/ADEPSTG1" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"name":"public-api-v2","description":"renamed"}'
 ```
-
-**Response 200** — single resource envelope (base-row path includes a `meta` object alongside the resource).
-
-- **404** — not found
-- **409** — `43004 IMMUTABLE_FIELD` on `deployment_policy` mismatch; `43005 CANNOT_TIGHTEN_POLICY` for FLEXIBLE→STRICT against non-homogeneous history
+**Body** `name?` `description?` `binding_policy?` `deployment_policy?`(idempotent) `strategy_defaults?`
+**200** `{ data:{ … }, meta:{ version_id, state, … } }`
+**Errors** `404` · `409 IMMUTABLE_FIELD`(deployment_policy mismatch) · `409 CANNOT_TIGHTEN_POLICY`(FLEXIBLE→STRICT on mixed history) · `409 DUPLICATE_NAME`
 
 ### DELETE /v4/deployments/{id}
-
-Soft-deletes a deployment (async, edge parity). The base + its `deployment_versions` + its `releases` all transition to `deleting` (cascade) and a base-level `deployment / delete` outbox event is emitted; the worker drives them to `deleted` (state-aware trigger `sync_outbox_base_delete_to_deployment`). Blocked (`RESOURCE_IN_USE`) while the deployment is bound to a workload on the edge.
-
-**Response 204** — no content
-- **404** — not found
-- **409** — `RESOURCE_IN_USE`
+Soft-delete (cascade base + versions + releases → `deleting`; worker → `deleted`).
+```bash
+curl -sX DELETE "$API/v4/deployments/ADEPSTG1" -H "Authorization: Token $TOKEN"
+```
+**200** `{ state:"executed", data:null }`
+**Errors** `404` · `409 RESOURCE_IN_USE`(bound to a workload)
 
 ### POST /v4/deployments/{id}/archive
-
-Soft-archives a deployment (async). Same cascade shape as delete but to `archiving` → `archived`: the base + its `deployment_versions` + its `releases` transition to `archiving`, a base-level `deployment / delete` outbox event is emitted, and the worker drives them to `archived` (state-aware trigger). Only deployments in an archivable state (`ready`/`draft`/`error`/`canceled`, per `@azion/versioning` v2.4) may be archived. Blocked (`RESOURCE_IN_USE`) while bound to a workload on the edge.
-
-Body: `{ "reason": "SUPERSEDED" | "SECURITY_ISSUE" | "POLICY_VIOLATION" | "MANUAL", "comment"?: string }`.
-
-**Response 202** — `{ "data": { "id": "<id>", "state": "archiving" } }`
-- **404** — not found
-- **409** — `RESOURCE_IN_USE`; `InvalidStateTransition` when not archivable
+Soft-archive (cascade → `archiving` → `archived`). Archivable: `ready`/`draft`/`error`/`canceled`.
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/archive" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"reason":"SUPERSEDED"}'
+```
+**Body** `reason*`(SUPERSEDED|SECURITY_ISSUE|POLICY_VIOLATION|MANUAL) `comment?`
+**202** `{ data:{ id, state:"archiving" } }`
+**Errors** `404` · `409 RESOURCE_IN_USE` · `409 InvalidStateTransition`(not archivable)
 
 ---
 
-## Deployments — Build-config versioning (`/v4/deployments/{id}/versions/*`)
+## Deployment versions — build-config (`/v4/deployments/{id}/versions/*`)
 
-Powered by the external lib `@azion/versioning` mounted under `/v4/deployments`. Version rows live in the sibling `deployment_versions` table — one row per `(deployment_id, version_number)`. The `deployments` table holds identity + denormalized state only. See [DATABASE.md](./DATABASE.md).
+`@azion/versioning` lib. One row per `(deployment_id, version_number)` in `deployment_versions`; lifecycle on the row.
 
 ### GET /v4/deployments/{id}/versions
-
-Lists version-rows of a deployment with their lifecycle state (now carried directly on the `deployment_versions` row). Pagination + `?fields=` sparse fieldset.
+List version rows + lifecycle state.
+```bash
+curl -s "$API/v4/deployments/ADEPSTG1/versions?page=1&page_size=20" -H "Authorization: Token $TOKEN"
+```
+**Query** `page?` `page_size?` `fields?`(sparse) **200** list envelope
 
 ### POST /v4/deployments/{id}/versions
-
-Creates a new DRAFT by cloning the latest READY version-row. Limit: `MAX_VERSIONING_DRAFTS_PER_RESOURCE` per `(client_id, base_id)` (default 20).
-
-**Response 202**
-
-```json
-{ "data": { "id": "ADEPVRD1", "state": "draft" } }
+Create DRAFT by cloning latest READY. Cap `MAX_VERSIONING_DRAFTS_PER_RESOURCE` (20).
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/versions" -H "Authorization: Token $TOKEN"
 ```
+**202** `{ data:{ id, state:"draft" } }` · **422** `DRAFT_LIMIT_EXCEEDED`
 
 ### GET /v4/deployments/{id}/versions/{vid}
-
-Reads a specific version-row by `:version_id` (the `deployment_versions.id`). Response wraps the deployment resource + a `meta` object carrying the lifecycle fields (incl. `version_id` = the version-row id) — **no `resource_type`** as of lib v2.
+Read one version row.
+```bash
+curl -s "$API/v4/deployments/ADEPSTG1/versions/ADEPVRD1" -H "Authorization: Token $TOKEN"
+```
+**200** `{ data:{ …, meta:{ version_id, state, … } } }`
 
 ### PATCH /v4/deployments/{id}/versions/{vid}
-
-Edits a DRAFT version-row's build-config fields. Only valid while the version row's `state='draft'`.
-
-- **409** — version is not a draft
+Edit a DRAFT row's build-config (only while `state='draft'`).
+```bash
+curl -sX PATCH "$API/v4/deployments/ADEPSTG1/versions/ADEPVRD1" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' -d '{...}'
+```
+**200** version row · **409** not a draft
 
 ### POST /v4/deployments/{id}/versions/{vid}/cancel
-
-Cancels a queued/building version-row.
+Cancel a queued/building version row.
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/versions/ADEPVRD1/cancel" -H "Authorization: Token $TOKEN"
+```
+**202** `{ data:{ id, state:"canceled" } }`
 
 ### POST /v4/deployments/{id}/versions/{vid}/archive
-
-Transitions a READY version-row → archiving (worker drives the rest).
+READY version row → `archiving` (worker drives the rest).
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/versions/ADEPVRD1/archive" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' -d '{"reason":"SUPERSEDED"}'
+```
+**202** `{ data:{ id, state:"archiving" } }`
 
 ### DELETE /v4/deployments/{id}/versions/{vid}
-
-Soft-deletes all rows: transitions state to `deleted` (draft/error/canceled — direct, no outbox) or emits a delete outbox event for the worker to drive `deleting → deleted` (ready/queued/building). Blocked while traffic_role ≠ INACTIVE.
-
----
-
-## Releases — Build and Activate (one-shot)
-
-### POST /v4/deployments/{id}/build_and_activate _(internal — not in public OpenAPI spec)_
-
-**Optimistic activation** (lib v3 + migration 0052). Creates a release in `state=queued` AND **synchronously** flips routing in the same transaction:
-
-- `releases.traffic_role` of the new release → `ACTIVE` (single_version) or `VALID_URL` (versioned_urls).
-- Previous ACTIVE demoted to `VALID_URL` (skew protection on) or `INACTIVE` (otherwise).
-- New `deployment_versions` row materialized (reused pending draft OR cloned from latest READY) and stamped with `activated_release_id`.
-- Two outbox rows emitted: `release/install` (carrying a `prior_state_snapshot` for rollback) + `deployment/install` (new routing).
-
-The release returns from the API already marked as routing-active — a subsequent `GET` reflects the new state immediately. If the worker reports `outbox.status='error'` (or the user `/cancel`s the build), the lib's dispatcher trigger calls `fn_revert_deployment_build_activate` which restores `traffic_role`, prior ACTIVE, and cleans up the auto-created `deployment_versions` row. The failed release stays in `state=error` (or `state=canceled` for cancel) for inspection and PATCH-and-retry — same semantic as the Python workload pattern.
-
-Atomic equivalent of `POST /releases` + `POST /releases/:rid/build` + `POST /releases/:rid/activate` — without client polling and without waiting for the build to finish before routing flips. Use this for the first upload of a deployment to the edge and any subsequent rollout that should be visible immediately on the API surface.
-
-**Request**
-
-```json
-{
-  "resources": [
-    { "global_id": 521846, "resource_type": "application", "version_id": "AAPV0001" },
-    { "resource_id": 318420, "resource_type": "connector", "version_id": "ARSV0001" }
-  ],
-  "strategy":              { /* optional */ },
-  "origin":                { /* optional */ },
-  "deployment_version_id": "ADEPVTGT"  /* optional — see below */
-}
+Soft-delete: `draft`/`error`/`canceled` → `deleted` (direct); `ready`/`queued`/`building` → `deleting` (outbox). Blocked while `traffic_role ≠ INACTIVE`.
+```bash
+curl -sX DELETE "$API/v4/deployments/ADEPSTG1/versions/ADEPVRD1" -H "Authorization: Token $TOKEN"
 ```
-
-Each resource carries its identity explicitly. The **application** is sent by `global_id` (its external REST identity) plus `resource_type: "application"` and `version_id` (the resource version short_id); it does **not** carry `resource_id` — the edge-api is the source of truth and resolves the internal `resource_id` from `global_id` via `getResourceStateByGlobalIds`, which we store and pass on the outbox. **Other resources** carry `resource_id` directly: `{ resource_id, resource_type, version_id }`. Composition (exactly one `application`, at-most-one singletons) is validated after resolution. The application's resolved `resource_id` is internal — never echoed in the response (which shows `global_id` + `resource_type` + `version_id` for the application; `resource_id` + `resource_type` + `version_id` for the others). A `global_id` the edge can't confirm → **404**; invalid composition → **422**.
-
-`deployment_version_id` (optional) lets the caller pick **which** `deployment_versions` draft becomes the activated row. Default behavior is "pick the head" (highest `version_number`). With multiple drafts on a deployment, the head may not be the one the caller wants to ship — supply this field to target a specific draft. Validated server-side: the row must belong to `:id` AND be in `state='draft'` (else 422). The use case threads it into `ReleaseSnapshotService.snapshotForActivation` synchronously.
-
-**Response 202**
-
-```json
-{ "data": { "id": "ARELNEW1", "state": "queued", "trace_id": "fdf67102-a2eb-45ce-92fb-c7dbf1d8e8d2" } }
-```
-
-`trace_id` is an auto-generated UUIDv4 persisted on `outbox.trace_id` for this build. Both the `release/install` and `deployment/install` rows emitted in the same tx share this id so the entire build → activate chain can be correlated downstream.
-
-- **404** — deployment not found
-- **409** — `ConcurrentActivation` when another `/build_and_activate` (or `/activate`) is racing on the same deployment and won the partial UNIQUE `idx_unique_active_version`. Caller can retry once the in-flight save commits.
-- **422** — catalog rejected (resource missing/blocked/unknown type), composition invalid, or `VERSIONED_URLS_ACTIVE_LIMIT` reached (the new slot would exceed the cap).
-
-> The compensating `deployment/install` event emitted by `fn_revert_deployment_build_activate` on rollback is also stripped (no skew/candidate cookies) and re-emits the restored routing. A subsequent `/activate` or `PATCH /strategy` re-emits the full doc.
+**200** `{ state:"executed", data:null }`
 
 ---
 
 ## Releases (`/v4/deployments/{did}/releases/*`)
 
-Operations on the `releases` table — the URL says **releases**, the table stays `releases`. `:did` is the parent deployment id; `:rid` is the release id. Every handler validates `release.deployment_id === did` AND `release.client_id === auth.client_id` (404 on mismatch).
+Ops on the `releases` table. Every handler enforces `release.deployment_id == did` AND `release.client_id == auth.client_id` (404 on mismatch). **Resource identity:** `application` sent by `global_id` (no `resource_id`); every other type by `resource_id`. `traffic_role ∈ {ACTIVE, CANDIDATE, VALID_URL, INACTIVE}` (one ACTIVE per deployment — partial UNIQUE).
 
 ### POST /v4/deployments/{did}/releases
-
-Creates a release in `state="draft"`. The API resolves the application's `global_id` against the edge-api at CREATE and validates composition, then persists the draft. Other resources are stored as supplied (their state is validated later at `/build`). No outbox event is emitted at draft time. Refine via PATCH; finalize via POST on `/releases/:rid/build`. Limit: `DRAFT_LIMIT_PER_DEPLOYMENT` per `(client_id, deployment_id)` (default 20).
-
-**Request**
-
-```json
-{
-  "resources": [
-    { "global_id": 521846, "resource_type": "application", "version_id": "AAPV0001" },
-    { "resource_id": 318420, "resource_type": "connector", "version_id": "ARSV0001" }
-  ],
-  "strategy": { /* optional */ },
-  "origin":   { /* optional */ }
-}
+Create release `state="draft"` (validates composition; no outbox). Cap `DRAFT_LIMIT_PER_DEPLOYMENT` (20).
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/releases" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"resources":[{"global_id":521846,"resource_type":"application","version_id":"AAPV0001"},{"resource_id":318420,"resource_type":"connector","version_id":"ARSV0001"}]}'
 ```
-
-The application is sent by `global_id`; other resources by `resource_id` (see Build-and-Activate above for the full resolution contract).
-
-**Response 202** — `{ "data": { "id": "ARELDRF1", "state": "draft" } }`
-
-- **400** — malformed resource: application sent by `resource_id`, a standard resource sent by `global_id`, missing `version_id`, non-positive-int id, or an unknown key (strict)
-- **404** — deployment not found, or an application `global_id` the edge can't confirm (`43000`)
-- **422** — composition invalid (`43002`), or `43003 DRAFT_LIMIT_EXCEEDED`
+**Body** `resources*`(app by `global_id`; others by `resource_id`; each + `resource_type*` `version_id*`) `strategy?` `origin?`
+**202** `{ data:{ id, state:"draft" } }`
+**Errors** `400 malformed resource` · `404 deployment / unknown global_id` · `422 composition / DRAFT_LIMIT_EXCEEDED`
 
 ### GET /v4/deployments/{did}/releases
-
-Lists releases for a deployment. Pagination + optional filters + optional ordering.
-
-**Query parameters:**
-
-| Parameter | Type | Description |
-|---|---|---|
-| `page` | integer | Page number (1-based, default 1, max 1000) |
-| `page_size` | integer | Items per page (default 20, max 100) |
-| `state` | enum | Exact match on `releases.state`: `draft` / `queued` / `building` / `ready` / `error` / `canceled` / `archiving` / `archived` |
-| `traffic_role` | `"active"` | **Semantic** filter — returns only what is currently serving traffic. Actual roles depend on `deployment_policy`: `single_version` → `ACTIVE` + `CANDIDATE`; `versioned_urls` → `ACTIVE` + `VALID_URL`. Only the literal `'active'` is accepted (raw enum not exposed). |
-| `ordering` | string | Comma-separated sort fields. Prefix with `-` for descending. **Allowed:** `id`, `created_at`, `state`, `traffic_role`. **Default:** `-created_at,-id` (newest first). Example: `?ordering=state,-created_at` |
-
-`?state` and `?traffic_role` can be combined and intersect (e.g. `?state=ready&traffic_role=active`).
-
-- **404** — `?traffic_role=active` requires a deployment lookup; unknown `:did` returns `43000 DEPLOYMENT_NOT_FOUND`. Without `traffic_role=active` the list returns an empty page for unknown ids (current behavior).
+List releases (filters intersect).
+```bash
+curl -s "$API/v4/deployments/ADEPSTG1/releases?state=ready&traffic_role=active&ordering=-created_at" -H "Authorization: Token $TOKEN"
+```
+**Query** `page?` `page_size?` `state?`(draft|queued|building|ready|error|canceled|archiving|archived) `traffic_role?`=`active`(serving set: single_version→ACTIVE+CANDIDATE, versioned_urls→ACTIVE+VALID_URL) `ordering?`(id|created_at|state|traffic_role)
+**200** list envelope
+**Errors** `404 DEPLOYMENT_NOT_FOUND`(only with `traffic_role=active`; else empty page)
 
 ### GET /v4/deployments/{did}/releases/{rid}
-
-Reads a single release. Response includes `resources` (each `{ global_id, resource_id, resource_type, version_id }` — the application carries `global_id` with `resource_id: null` since its internal id stays hidden; other resources carry `resource_id` with `global_id: null`), `strategy`, `urls`, `kivo`, `origin`, `audit`, `traffic_role`, `state`, etc.
+Read one release (full composition).
+```bash
+curl -s "$API/v4/deployments/ADEPSTG1/releases/ARELACT1" -H "Authorization: Token $TOKEN"
+```
+**200** `{ data:{ id, resources:[{global_id,resource_id,resource_type,version_id}], strategy, urls, kivo, origin, audit, traffic_role, state, … } }`
 
 ### PATCH /v4/deployments/{did}/releases/{rid}
-
-**State-aware** full-replace patch (`resources` — same union shape as create: application by `global_id`, others by `resource_id`; plus `strategy`, `origin`; fields absent are inherited):
-
-- **draft** → edited **in place** (iterate on the draft before `/build`); stays `draft`.
-- **ready / error / canceled / archived** → **cloned** into a brand-new `draft` carrying the source's composition + the override. The source row is left untouched. Build + activate the clone afterward (or use `/patch_and_activate`). Subject to the draft cap.
-- **queued / building** → **409** (in-flight, racing the worker).
-- **deleting / deleted** → hidden → **404**.
-
-Returns the (in-place or newly-cloned) draft.
-- **404** — release not found (or in a gone state)
-- **409** — in-flight (`queued`/`building`)
-
-### POST /v4/deployments/{did}/releases/{rid}/patch_and_activate _(internal — not in public OpenAPI spec)_
-
-One-shot "edit + roll out": **clone** the release with the payload override (`resources?`/`strategy?`/`origin?`), **build** it, and **activate** the clone — in a single call. Delegates to `/build_and_activate` and inherits its optimistic-activation semantic (the clone becomes `ACTIVE` synchronously; rollback on worker error or cancel). Works for both policies (single_version swaps the active pointer; versioned_urls adds the clone to the valid-URL set). Equivalent to PATCH-clone + `/build_and_activate` in one request.
-
-**Response 202** — `{ "data": { "id": "ARELNEW1", "state": "queued", "trace_id": "..." } }`
-- **404** — source release not found
-- **422** — catalog/composition validation failed
+State-aware full-replace (`draft`→in place; `ready`/`error`/`canceled`/`archived`→clone to new draft; `queued`/`building`→409; gone→404).
+```bash
+curl -sX PATCH "$API/v4/deployments/ADEPSTG1/releases/ARELDRF1" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"resources":[{"global_id":521846,"resource_type":"application","version_id":"AAPV0002"}]}'
+```
+**Body** `resources?` `strategy?` `origin?` (absent fields inherited)
+**200** the (in-place or cloned) draft · **404** not found/gone · **409** in-flight
 
 ### POST /v4/deployments/{did}/releases/{rid}/build
-
-**Finalize**: transitions `draft → queued` (or `error → queued` for an in-place rebuild) + emits INSTALL outbox so the worker builds the artifact at the edge. Calls the resource catalog, runs STRICT baseline checks. On any failure, the release transitions to `state="error"` — the caller can PATCH new resources and call /build again without going through delete + recreate. Mirrors edge-api's `/build` verb. Routing is a separate, later step (`/activate`).
-
-**Response 202** — `{ "data": { "id": "ARELQ001", "state": "queued", "trace_id": "fdf67102-a2eb-45ce-92fb-c7dbf1d8e8d2" } }`
-
-`trace_id` is an auto-generated UUIDv4 persisted on `outbox.trace_id`, mirrored into `message.trace_id`. Use it to correlate the async build downstream.
-- **404** — release not found
-- **409** — release is not in `draft` nor `error`
-- **422** — catalog/composition validation failed
-
-### DELETE /v4/deployments/{did}/releases/{rid}
-
-Soft-deletes a release, with **canonical (Python-aligned, `@azion/versioning` v2.5) routing**:
-
-- `ready` / `queued` / `building` (present/about-to-be on the edge) → `deleting` + emit `release / delete`; the state-sync trigger drives `deleting → deleted` on worker success.
-- `draft` / `error` / `canceled` / `archived` (never on the edge or already superseded) → **direct** to `deleted` (no outbox; metadata cleanup).
-- `deleting` / `deleted` → hidden → **404**.
-
-**In-use gate (policy-aware)** — a release that is currently routing cannot be deleted:
-
-- **single_version**: `ACTIVE` or `CANDIDATE` → **409 `VersionStillReferenced`**. `VALID_URL` (a parked previous active) and `INACTIVE` are deletable.
-- **versioned_urls**: a release with role `ACTIVE`/`VALID_URL` is blocked **only when it is the last valid release** (deleting it would empty `valid_releases`); if other valid releases remain, it can be deleted.
-
-`queued`/`building` no longer require `/cancel` first — they soft-delete via the outbox.
-
----
-
-## Releases — Lifecycle
+Finalize: `draft|error → queued` + INSTALL outbox (worker builds at edge). On failure → `state="error"` (PATCH + rebuild, no recreate). Routing is separate (`/activate`).
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/releases/ARELDRF1/build" -H "Authorization: Token $TOKEN"
+```
+**202** `{ data:{ id, state:"queued", trace_id } }`
+**Errors** `404` · `409 not draft|error` · `422 catalog/composition`
 
 ### POST /v4/deployments/{did}/releases/{rid}/cancel
-
-Cancels a queued or building release.
-
-**Request** — `{ "reason": "optional" }`
-- **202** — `{ "data": { ...resource, "state": "canceled" } }`
-- **409** — invalid state transition
+Cancel a queued/building release.
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/releases/ARELQ001/cancel" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' -d '{"reason":"optional"}'
+```
+**202** `{ data:{ id, state:"canceled" } }` · **409** invalid transition
 
 ### POST /v4/deployments/{did}/releases/{rid}/archive
+Archive (`ready`→`archiving`+outbox; `draft`/`error`/`canceled`→`archived` direct). Policy-aware in-use gate.
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/releases/ARELOL01/archive" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' -d '{"reason":"SUPERSEDED"}'
+```
+**Body** `reason*`(SUPERSEDED|SECURITY_ISSUE|POLICY_VIOLATION|MANUAL) `comment?`
+**202** `{ data:{ id, state:"archiving"|"archived" } }`
+**Errors** `409 VersionStillReferenced`(still routing) · `409 InvalidStateTransition`
 
-Archives a release in an archivable state (`ready`/`draft`/`error`/`canceled`, per `@azion/versioning` v2.5). Canonical routing: `ready` → `archiving` + emit `release / delete` (worker reclaims edge artifacts; trigger drives `archiving → archived`); `draft`/`error`/`canceled` → **direct** to `archived` (no outbox). Same **policy-aware in-use gate** as delete (an ACTIVE/CANDIDATE single_version release, or the last valid versioned_urls release, cannot be archived). Required body: `reason` (`SUPERSEDED | SECURITY_ISSUE | POLICY_VIOLATION | MANUAL`) + optional `comment`.
-
-- **202** — async transition (returns `{data: {id, state: "archiving" | "archived"}}`)
-- **409** — release is still routing → `VersionStillReferenced`; or not archivable → `InvalidStateTransition`
+### DELETE /v4/deployments/{did}/releases/{rid}
+Soft-delete: `ready`/`queued`/`building`→`deleting`+outbox; `draft`/`error`/`canceled`/`archived`→`deleted` direct. **In-use gate**: single_version ACTIVE/CANDIDATE → 409; versioned_urls blocked only if it's the **last** valid release.
+```bash
+curl -sX DELETE "$API/v4/deployments/ADEPSTG1/releases/ARELOL01" -H "Authorization: Token $TOKEN"
+```
+**200** `{ state:"executed", data:null }` · **409 VersionStillReferenced**
 
 ### POST /v4/deployments/{did}/releases/{rid}/promote
-
-Clones the release into another deployment. Always **clones** (creates a brand-new row + new `resource_versions` rows pointing at the same `(resource_id, resource_version)` pairs) — never a reference.
-
-**Request** — `{ "target_deployment_id": "ATGTDEP1" }`
-- **202** — `{ "data": { "id": "ARELCLN1", "deployment_id": "ATGTDEP1", "state": "queued" } }`
-- **404** — target deployment or source release not found
+Clone the release into another deployment (always a fresh row, never a reference).
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/releases/ARELACT1/promote" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' -d '{"target_deployment_id":"ATGTDEP1"}'
+```
+**Body** `target_deployment_id*`
+**202** `{ data:{ id, deployment_id, state:"queued" } }` · **404** target/source not found
 
 ---
 
-## Releases — Routing
-
-`traffic_role` controls which release serves traffic for a given deployment. `{ ACTIVE | CANDIDATE | VALID_URL | INACTIVE }`. The partial UNIQUE index `idx_unique_active_version` enforces **one `ACTIVE` per `deployment_id`**.
+## Releases — routing
 
 ### POST /v4/deployments/{did}/releases/{rid}/activate
-
-Routes traffic to this release. `single_version` deployments swap `ACTIVE` instantly (INSTANT) or stage CANDIDATE (GRADUAL); `versioned_urls` appends a `VALID_URL` slot.
-
-In addition to the routing update, every INSTANT activate (and `versioned_urls` slot append) snapshots the deployment build-config into a new (or reused) deployment version-row carrying `activated_release_id = <rid>`. The rule:
-
-- If `deployment_version_id` is supplied and points at a draft on this deployment → **that draft** is promoted to `ready` + stamped with `activated_release_id`. No new row created. Same override the trigger consumes for `/build_and_activate`.
-- Else if the latest deployment version-row's `state = 'draft'` (a pending PATCH or POST /versions draft) → the head draft is **promoted to `ready`** + stamped with `activated_release_id`. No new row created.
-- Otherwise → the latest READY version-row (fallback latest, fallback base) is cloned into a new version-row directly in `state='ready'`, with `activated_release_id` set (the lifecycle is on the row itself — no separate meta).
-
-GRADUAL activations (CANDIDATE only) skip the snapshot — it fires when the candidate is later promoted to ACTIVE.
-
-The same `ReleaseSnapshotService.snapshotForActivation` is reused by `/build_and_activate` (which inlines it into the optimistic-save transaction).
-
-**Request** — `{ "strategy": { /* optional override */ }, "deployment_version_id": "ADEPVTGT" /* optional */ }`
-
-When omitted, the head (highest `version_number`) is used. When provided, must reference a `deployment_versions` row of `:did` in `state='draft'` (else 422 Validation). Both sync `/activate` and `/build_and_activate` validate this loud (the request fails on a stale id).
-
-**CANDIDATE uniqueness invariant** — a deployment has **at most one** active `CANDIDATE` at a time. Activating with `strategy.rollout_mode = GRADUAL` when a different release is already `CANDIDATE` returns **422 `CandidateAlreadyExists`**. Re-issuing GRADUAL on the same `:rid` (idempotent strategy refresh) is allowed. To start a new canary you must first either **promote** the existing candidate (INSTANT activate) or **rollback** it (see below).
-
-- **202** — `{ "data": { "id": "ARELACT1", "state": "ready" } }`
-- **409** — `ConcurrentActivation` when another activate/build_and_activate is racing on the same deployment (partial UNIQUE `idx_unique_active_version`). Caller can retry.
-- **422** — `VERSIONED_URLS_ACTIVE_LIMIT` exceeded; `deployment_version_id` unknown / cross-deployment / not `draft`; or `CandidateAlreadyExists` when a concurrent CANDIDATE blocks a new GRADUAL activate.
+Route traffic. single_version: INSTANT swaps ACTIVE / GRADUAL stages CANDIDATE; versioned_urls appends a VALID_URL. INSTANT (and slot append) snapshots build-config into a version row stamped `activated_release_id`.
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/releases/ARELQ001/activate" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' -d '{}'
+```
+**Body** `strategy?`(override) `deployment_version_id?`(must be a `draft` of `:did`, else 422; default = head)
+**202** `{ data:{ id, state:"ready" } }`
+**Errors** `409 ConcurrentActivation` · `422 VERSIONED_URLS_ACTIVE_LIMIT` · `422 deployment_version_id invalid` · `422 CandidateAlreadyExists`(one CANDIDATE per deployment)
 
 ### POST /v4/deployments/{did}/releases/{rid}/rollback
-
-Single_version only. Two semantically distinct flows share the verb, dispatched by the target release's current `traffic_role`:
-
-1. **Restore a previously-routed release** (`:rid` in `VALID_URL`/`INACTIVE`, or idempotent on the current `ACTIVE`) → make `:rid` the new ACTIVE. Demotes the current ACTIVE to `VALID_URL` (if skew on) or `INACTIVE`. Snapshots the deployment build-config under the same rule as `/activate`.
-2. **Abandon an active canary** (`:rid` in `CANDIDATE`) → demote `:rid` to `VALID_URL` (if the current ACTIVE has skew on) or `INACTIVE`. The current ACTIVE stays put; the deployment doc is re-emitted with `candidate: null`. No snapshot is taken (no new release becomes active). Pair this with `/activate` again for a fresh canary attempt.
-
-**Request** — `{ "reason": "operator-supplied", "comment": "optional" }`
-- **422** — deployment policy is `versioned_urls`
+single_version only. `:rid` in VALID_URL/INACTIVE/ACTIVE → make it ACTIVE (demote current). `:rid` in CANDIDATE → abandon canary (re-emit `candidate:null`, no snapshot).
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/releases/ARELOL01/rollback" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' -d '{"reason":"operator-supplied"}'
+```
+**Body** `reason*` `comment?`
+**202** `{ data:{ id, state:"ready" } }` · **422** policy is versioned_urls
 
 ### PATCH /v4/deployments/{did}/releases/{rid}/strategy
+Mutate `strategy` of the ACTIVE release (single_version only). Partial merge of `gradual_rollout`/`skew_protection`.
+```bash
+curl -sX PATCH "$API/v4/deployments/ADEPSTG1/releases/ARELACT1/strategy" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"gradual_rollout":{"enabled":true,"candidate_percentage":10}}'
+```
+**Body** ≥1 of `gradual_rollout?` `skew_protection?` (empty `{}` → 400)
+**200** `{ data:{ deployment_id, release_id, version_id, strategy } }`
+**Errors** `422 not ACTIVE / versioned_urls` · `422 candidate_from_release_id cross-deployment`(must reference a release of `:did`)
 
-Mutates `releases.strategy` for the ACTIVE release (`single_version` only). Partial merge of `gradual_rollout` / `skew_protection`.
+---
 
-- **200** — `{ "data": { "deployment_id": "...", "release_id": "...", "strategy": {...} } }`
-- **422** — release is not ACTIVE or deployment is `versioned_urls`; or `strategy.gradual_rollout.candidate_from_release_id` references a release of a different deployment.
+## Releases — one-shot _(internal — not in public OpenAPI spec)_
 
-> **Cross-resource invariant:** any persisted `strategy.gradual_rollout.candidate_from_release_id` (here, on `/strategy`, `/activate`, `/build_and_activate`, `POST /releases`, and `PATCH /releases/:rid`) must point at a release of the same `:did`. Cross-deployment references are rejected with **422 Validation** (`field: strategy.gradual_rollout.candidate_from_release_id`).
+### POST /v4/deployments/{id}/build_and_activate
+Optimistic activation: creates a release `state=queued` and **synchronously** flips routing in the same tx (new → ACTIVE/VALID_URL; prior ACTIVE demoted; materializes the `deployment_versions` row; emits `release/install`+`deployment/install`). GET reflects it immediately. On worker `error` / `/cancel`, the lib dispatcher (`fn_revert_deployment_build_activate`) restores prior routing; failed release stays `error`/`canceled` for PATCH-and-retry.
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/build_and_activate" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"resources":[{"global_id":521846,"resource_type":"application","version_id":"AAPV0001"},{"resource_id":318420,"resource_type":"connector","version_id":"ARSV0001"}]}'
+```
+**Body** `resources*`(as in POST /releases) `strategy?` `origin?` `deployment_version_id?`(target draft of `:id`, else 422)
+**202** `{ data:{ id, state:"queued", trace_id } }` (`trace_id` shared by both outbox rows)
+**Errors** `404 deployment / unknown global_id` · `409 ConcurrentActivation` · `422 catalog/composition / VERSIONED_URLS_ACTIVE_LIMIT`
+
+### POST /v4/deployments/{did}/releases/{rid}/patch_and_activate
+Clone `:rid` with the override, build, and activate the clone — one call. Delegates to `build_and_activate` (same optimistic semantic + rollback).
+```bash
+curl -sX POST "$API/v4/deployments/ADEPSTG1/releases/ARELACT1/patch_and_activate" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"resources":[{"resource_id":318420,"resource_type":"connector","version_id":"ARSV0002"}]}'
+```
+**Body** `resources?` `strategy?` `origin?`
+**202** `{ data:{ id, state:"queued", trace_id } }` · **404** source not found · **422** catalog/composition
+
+---
+
+## Resource usage
+
+Cross-deployment view of which deployments use an upstream resource + bulk version migration. "Active link" = serving set, excluding gone/archived releases. `application` matched by `global_id`; others by `resource_id`.
+
+### GET /v4/resource_usage
+Deployments with a live link to one+ resources of a type, paginated **by deployment**.
+```bash
+curl -s "$API/v4/resource_usage?resource_type=connector&resource_id=318420,318421&page=1" -H "Authorization: Token $TOKEN"
+```
+**Query** `resource_type*`(application|firewall|custom_page|waf|function|connector|network_list) `resource_id*`(1–100; `global_id` for application; repeated `resource_id[]=a&resource_id[]=b` **or** `resource_id=a,b`) `page?` `page_size?`
+**200** list envelope; `results[]` = `{ deployment_id, name, state, deployment_policy, resources:[{ resource_type, resource_id, global_id, resource_version, product_version, name, release_id, traffic_role }] }`
+**Notes** no matches → 200 empty `results`; excludes releases in `deleting`/`deleted`/`archiving`/`archived` even if `traffic_role` still reads ACTIVE/VALID_URL.
+
+### GET /v4/deployments/{id}/resource_hierarchy
+Resource composition of the deployment's ACTIVE release, grouped by type.
+```bash
+curl -s "$API/v4/deployments/ADEPSTG1/resource_hierarchy" -H "Authorization: Token $TOKEN"
+```
+**200** `{ data:{ deployment_id, active_release_id, resources:{ application|firewall|custom_page: entry|null, waf|function|connector|network_list: entry[] } } }` (entry = `{resource_type,resource_id,global_id,resource_version,product_version,name}`)
+**Errors** `404 DEPLOYMENT_NOT_FOUND` · no ACTIVE → 200 with `active_release_id:null` + empty groups
+
+### POST /v4/resource_usage/rerelease _(internal — not in public OpenAPI spec)_
+Bulk version bump: for each **single_version + ACTIVE** deployment using `(type, id, from_version)`, build+activate a new release with that resource bumped to `to_version` (reuses `build_and_activate`). Synchronous fan-out, best-effort, capped at `RERELEASE_MAX_DEPLOYMENTS` (default **20**). Targets exclude versioned_urls, CANDIDATE-only, and gone/archived.
+```bash
+curl -sX POST "$API/v4/resource_usage/rerelease" \
+  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"resource_type":"connector","resource_id":"318420","from_version":"ACNV0001","to_version":"ACNV0002","deployment_ids":["ADEP0001"]}'
+```
+**Body** `resource_type*` (`resource_id*` | `global_id*` if application — exactly one) `from_version*` `to_version*`(≠ from) `deployment_ids?`(≤100, narrows targets)
+**200** `{ requested, succeeded, skipped, failed, results:[{ deployment_id, status, new_release_id?, trace_id?, reason? }] }`
+**Notes** `status ∈ {success, skipped_already_on_z, skipped_not_single_version, error}`; matched set > cap → **422**(`field: deployment_ids`).
 
 ---
 
 ## State machine
 
-The 10-state enum applies to `releases.state` and `deployment_versions.state` (lifecycle of base+version rows):
-
+10-state enum on `releases.state` and `deployment_versions.state`:
 ```
 draft → queued → building → ready
-              ↘ canceled
-              ↘ error
+              ↘ canceled / error
 ready → archiving → archived
 ready → deleting → deleted
-draft/error/canceled → archived | deleted    (direct, no outbox)
+draft/error/canceled → archived | deleted   (direct, no outbox)
 ```
-
-API-driven transitions: `create draft`, `finalize` (POST on `:vid/build` or `:rid/build`), `cancel`, `archive`, `delete`, `activate`, `rollback`, `promote`. Worker drives `queued → building → ready` (and `archiving → archived`, `deleting → deleted`) via `outbox.status` updates; the `sync_outbox_to_version_meta` trigger (vendored from `azion-api-libs/azion-versioning`) mirrors onto `deployment_versions.state`.
-
-For `releases`, `traffic_role` is orthogonal to `state` and controls routing. The partial UNIQUE index `idx_unique_active_version` enforces **one `ACTIVE` per `deployment_id`**.
-
-The one-shot `POST /build_and_activate` is **optimistic** (lib v3 + migration 0052): the synchronous save flips `traffic_role` + materializes the `deployment_versions` row + emits both `release/install` (with a `prior_state_snapshot` carrying everything needed to undo) and `deployment/install`. If the worker writes `outbox.status='error'` (or the user `/cancel`s the build), the lib's generic dispatcher trigger calls `fn_revert_deployment_build_activate` which atomically restores the pre-save state. The failed release stays in `state=error` (or `state=canceled`) for inspection and PATCH-and-retry — same semantic as the Python `workload` pattern.
-
----
+API verbs: create draft · build (`/build`) · cancel · archive · delete · activate · rollback · promote. Worker drives `queued→building→ready` (+ `archiving→archived`, `deleting→deleted`) via `outbox.status`; `sync_outbox_to_version_meta` mirrors onto the version row. For `releases`, `traffic_role` is orthogonal to `state` (one ACTIVE per deployment — `idx_unique_active_version`). `build_and_activate` flips routing optimistically in-tx; the lib dispatcher reverts on `error`/`canceled`.
 
 ## Error envelope
-
-All error responses follow the JSON:API shape via `@azion/js-api-errors`:
-
 ```json
-{
-  "errors": [{
-    "status": "409",
-    "code": "43004",
-    "title": "Field Cannot Be Modified",
-    "detail": "The field 'deployment_policy' is immutable after creation.",
-    "meta": { "source": { "pointer": "/deployment_policy" } }
-  }]
-}
+{ "errors":[{ "status":"409", "code":"43004", "title":"Field Cannot Be Modified",
+  "detail":"The field 'deployment_policy' is immutable after creation.",
+  "meta":{ "source":{ "pointer":"/deployment_policy" } } }] }
 ```
-
-The pointer convention is **flat** (`/<field>`) — lifted from `meta.source.pointer` by `app.onError` in `src/main.ts`. Codes are numeric, in the `43000-43005` range. Full catalog in [`ERRORS.md`](./ERRORS.md).
+Flat pointer `/<field>`; numeric codes `43000-43005` ([`ERRORS.md`](./ERRORS.md)).

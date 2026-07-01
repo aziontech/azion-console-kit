@@ -69,6 +69,29 @@ export class VersionedFirewallRulesEngineService extends BaseService {
     )
   }
 
+  listRequestRulesRaw = async ({ firewallId, versionId, fields = [] }) => {
+    const allData = []
+    let page = 1
+    let totalCount = 0
+
+    do {
+      const { data } = await this.http.request({
+        method: 'GET',
+        url: this.#getUrl(firewallId, versionId),
+        params: { fields, ordering: 'id', page, pageSize: 100, search: '' }
+      })
+
+      const results = data?.results ?? []
+      allData.push(...results)
+      totalCount = data?.count ?? allData.length
+      page++
+
+      if (!results.length) break
+    } while (allData.length < totalCount)
+
+    return { body: allData, count: totalCount }
+  }
+
   createEdgeFirewallRulesEngineService = async (
     firewallId,
     payload,
