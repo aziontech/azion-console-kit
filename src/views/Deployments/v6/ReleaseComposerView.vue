@@ -35,6 +35,7 @@
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { LATEST_READY } from '@/templates/release-composition/version-options'
   import { useReleaseComposition } from '@/templates/release-composition/use-release-composition'
+  import { classifyDeploymentsForResource } from '@/templates/release-composition/classify-deployments-for-resource'
   import { useApplicationFunctionDependencies } from '@/templates/release-composition/use-application-function-dependencies'
   import { useApplicationConnectorDependencies } from '@/templates/release-composition/use-application-connector-dependencies'
   import { useApplicationVersionReady } from '@/templates/release-composition/use-application-version-ready'
@@ -159,9 +160,11 @@
         add(type, resource?.resource_id ?? resource?.global_id)
       }
     })
-    // Dependency instances.
-    Object.entries(coll.value).forEach(([type, instances]) => {
-      ;(instances ?? []).forEach((instance) => add(type, instance?.resourceId))
+    // Dependency instances (nested by parent → depType).
+    Object.values(coll.value).forEach((byType) => {
+      Object.entries(byType ?? {}).forEach(([type, instances]) => {
+        ;(instances ?? []).forEach((instance) => add(type, instance?.resourceId))
+      })
     })
     return pairs
   })
@@ -180,6 +183,11 @@
     selectedDsIds: deploymentIds,
     versionedResources,
     reverseLookupByDs: impact.reverseLookupByDs,
+    // Loading/failure signals so the impact VM can show a zero branch for a DS
+    // with no bindings (real zero) yet still degrade to "unavailable" only on a
+    // genuine fetch failure — and avoid flashing zeros while the lookup loads.
+    impactLoading: impact.isLoading,
+    impactFailed: computed(() => impact.degradationReason.value === 'fetch_failed'),
     // HOP 1 (req 1.2 / 8.3): inject the REAL consuming-deployments resolver so a
     // scoped entry resolves its candidate set over the full tenant inventory
     // (resource-usage endpoint, falling back to the client-side fan-out) instead
@@ -213,36 +221,66 @@
     return candidate == null || candidate === '' ? null : String(candidate)
   })
 
-  // The application-release flow is active whenever there IS a composed
-  // application id — that's what makes the function-dependency detection
-  // authoritative for `coll['function']` (§7.2).
-  const isApplicationFlow = computed(() => composedApplicationId.value != null)
+  // The version pinned for a resource type by the effective DS's active release —
+  // the fallback used when the user hasn't picked a version and no catalog version
+  // has resolved yet.
+  const activeReleaseVersionFor = (type) => {
+    const match = (activeReleaseByDs.value[effDsId.value]?.resources ?? []).find(
+      (resource) => resource?.resource_type === type
+    )
+    return match?.version_id ?? match?.resource_version_id ?? match?.resource_version ?? null
+  }
 
-  // Dependencies are discovered from the application VERSION passed in the URL
-  // (the version being released), not the application's current/live state — and
-  // only when that version is `ready` (deployable). `versionId` is the scoped
-  // entry's version (route → store).
-  const composedVersionId = computed(() =>
-    versionId.value != null && versionId.value !== '' ? String(versionId.value) : null
+  // The version whose dependencies each singleton exposes. Dependencies are always
+  // discovered from the VERSION being released, and it is REACTIVE to the user's
+  // pick in BOTH scenarios: `resVers[type]` (a scoped entry seeds it from the URL
+  // version, so changing the version re-checks deps), resolved to a concrete id
+  // (LATEST → latest Ready), falling back to the URL version / the version pinned
+  // by the effective DS's active release.
+  const composedApplicationVersionId = computed(() => {
+    if (composedApplicationId.value == null) return null
+    const isScopedApp = scopedType.value === 'application'
+    const selected =
+      resVers.value['application'] ??
+      (isScopedApp && versionId.value ? versionId.value : LATEST_READY)
+    const resolved = store.resolveVersion('application', composedApplicationId.value, selected)
+    if (resolved != null) return String(resolved)
+    if (isScopedApp && versionId.value) return String(versionId.value)
+    const pin = activeReleaseVersionFor('application')
+    return pin != null ? String(pin) : null
+  })
+
+  // A singleton is "composed" (its own deps must load) when its id + version
+  // resolve AND it is part of the current composition: in a scoped entry ONLY the
+  // scoped type; in the global flow the application (always) plus each enabled
+  // optional singleton. Runs the per-resource dependency endpoints in BOTH
+  // scenarios so every card shows only its OWN dependencies.
+  const isApplicationComposed = computed(
+    () =>
+      composedApplicationId.value != null &&
+      composedApplicationVersionId.value != null &&
+      (scopedType.value ? scopedType.value === 'application' : true)
   )
 
   const versionReady = useApplicationVersionReady({
     applicationId: composedApplicationId,
-    versionId: composedVersionId,
-    enabled: isApplicationFlow
+    versionId: composedApplicationVersionId,
+    enabled: isApplicationComposed
   })
 
-  const dependenciesEnabled = computed(() => isApplicationFlow.value && versionReady.isReady.value)
+  const dependenciesEnabled = computed(
+    () => isApplicationComposed.value && versionReady.isReady.value
+  )
 
   const functionDeps = useApplicationFunctionDependencies({
     applicationId: composedApplicationId,
-    versionId: composedVersionId,
+    versionId: composedApplicationVersionId,
     enabled: dependenciesEnabled
   })
 
   const connectorDeps = useApplicationConnectorDependencies({
     applicationId: composedApplicationId,
-    versionId: composedVersionId,
+    versionId: composedApplicationVersionId,
     enabled: dependenciesEnabled
   })
 
@@ -269,33 +307,51 @@
     return candidate == null || candidate === '' ? null : String(candidate)
   })
 
-  const isFirewallFlow = computed(() => composedFirewallId.value != null)
+  const composedFirewallVersionId = computed(() => {
+    if (composedFirewallId.value == null) return null
+    const isScopedFirewall = scopedType.value === 'firewall'
+    const selected =
+      resVers.value['firewall'] ??
+      (isScopedFirewall && versionId.value ? versionId.value : LATEST_READY)
+    const resolved = store.resolveVersion('firewall', composedFirewallId.value, selected)
+    if (resolved != null) return String(resolved)
+    if (isScopedFirewall && versionId.value) return String(versionId.value)
+    const pin = activeReleaseVersionFor('firewall')
+    return pin != null ? String(pin) : null
+  })
+
+  const isFirewallComposed = computed(
+    () =>
+      composedFirewallId.value != null &&
+      composedFirewallVersionId.value != null &&
+      (scopedType.value ? scopedType.value === 'firewall' : resEnabled.value['firewall'] !== false)
+  )
 
   const firewallVersionReady = useFirewallVersionReady({
     firewallId: composedFirewallId,
-    versionId: composedVersionId,
-    enabled: isFirewallFlow
+    versionId: composedFirewallVersionId,
+    enabled: isFirewallComposed
   })
 
   const firewallDependenciesEnabled = computed(
-    () => isFirewallFlow.value && firewallVersionReady.isReady.value
+    () => isFirewallComposed.value && firewallVersionReady.isReady.value
   )
 
   const firewallFunctionDeps = useFirewallFunctionDependencies({
     firewallId: composedFirewallId,
-    versionId: composedVersionId,
+    versionId: composedFirewallVersionId,
     enabled: firewallDependenciesEnabled
   })
 
   const firewallWafDeps = useFirewallWafDependencies({
     firewallId: composedFirewallId,
-    versionId: composedVersionId,
+    versionId: composedFirewallVersionId,
     enabled: firewallDependenciesEnabled
   })
 
   const firewallNetworkListDeps = useFirewallNetworkListDependencies({
     firewallId: composedFirewallId,
-    versionId: composedVersionId,
+    versionId: composedFirewallVersionId,
     enabled: firewallDependenciesEnabled
   })
 
@@ -322,50 +378,70 @@
     return candidate == null || candidate === '' ? null : String(candidate)
   })
 
-  const isCustomPageFlow = computed(() => composedCustomPageId.value != null)
+  const composedCustomPageVersionId = computed(() => {
+    if (composedCustomPageId.value == null) return null
+    const isScopedCustomPage = scopedType.value === 'custom_page'
+    const selected =
+      resVers.value['custom_page'] ??
+      (isScopedCustomPage && versionId.value ? versionId.value : LATEST_READY)
+    const resolved = store.resolveVersion('custom_page', composedCustomPageId.value, selected)
+    if (resolved != null) return String(resolved)
+    if (isScopedCustomPage && versionId.value) return String(versionId.value)
+    const pin = activeReleaseVersionFor('custom_page')
+    return pin != null ? String(pin) : null
+  })
+
+  const isCustomPageComposed = computed(
+    () =>
+      composedCustomPageId.value != null &&
+      composedCustomPageVersionId.value != null &&
+      (scopedType.value
+        ? scopedType.value === 'custom_page'
+        : resEnabled.value['custom_page'] !== false)
+  )
 
   const customPageVersionReady = useCustomPageVersionReady({
     customPageId: composedCustomPageId,
-    versionId: composedVersionId,
-    enabled: isCustomPageFlow
+    versionId: composedCustomPageVersionId,
+    enabled: isCustomPageComposed
   })
 
   const customPageDependenciesEnabled = computed(
-    () => isCustomPageFlow.value && customPageVersionReady.isReady.value
+    () => isCustomPageComposed.value && customPageVersionReady.isReady.value
   )
 
   const customPageConnectorDeps = useCustomPageConnectorDependencies({
     customPageId: composedCustomPageId,
-    versionId: composedVersionId,
+    versionId: composedCustomPageVersionId,
     enabled: customPageDependenciesEnabled
   })
 
   const dependenciesLoading = computed(
     () =>
-      (isApplicationFlow.value &&
+      (isApplicationComposed.value &&
         (versionReady.isLoading.value ||
           functionDeps.isLoading.value ||
           connectorDeps.isLoading.value)) ||
-      (isFirewallFlow.value &&
+      (isFirewallComposed.value &&
         (firewallVersionReady.isLoading.value ||
           firewallFunctionDeps.isLoading.value ||
           firewallWafDeps.isLoading.value ||
           firewallNetworkListDeps.isLoading.value)) ||
-      (isCustomPageFlow.value &&
+      (isCustomPageComposed.value &&
         (customPageVersionReady.isLoading.value || customPageConnectorDeps.isLoading.value))
   )
   const dependenciesError = computed(
     () =>
-      (isApplicationFlow.value &&
+      (isApplicationComposed.value &&
         (versionReady.hasError.value ||
           functionDeps.hasError.value ||
           connectorDeps.hasError.value)) ||
-      (isFirewallFlow.value &&
+      (isFirewallComposed.value &&
         (firewallVersionReady.hasError.value ||
           firewallFunctionDeps.hasError.value ||
           firewallWafDeps.hasError.value ||
           firewallNetworkListDeps.hasError.value)) ||
-      (isCustomPageFlow.value &&
+      (isCustomPageComposed.value &&
         (customPageVersionReady.hasError.value || customPageConnectorDeps.hasError.value))
   )
   const retryDependencies = () => {
@@ -410,17 +486,20 @@
     { immediate: true, deep: true }
   )
 
-  // Seed the nested dependency section from the effective DS's active release
-  // (spec: no "Add" — the instance set is INHERITED). Re-runs when the effective
-  // DS changes, its release finishes loading, OR the application's function/
-  // connector dependencies resolve. `store.seedColl` fully replaces `coll`, so it
-  // must run FIRST; then the application's functions and connectors are re-applied
-  // as the authoritative source of `coll['function']`/`coll['connector']` (§7.2)
-  // so the active-release seed never clobbers them regardless of which input changed.
+  // Seed each COMPOSED singleton's OWN dependency slots from its per-version
+  // dependency endpoints, keyed by parent so one resource's deps never bleed into
+  // another's card. Each seed runs UNCONDITIONALLY (empty array when the parent
+  // isn't composed or has no deps) so a stale/other-resource slot is always
+  // CLEARED, never retained — this is what stops the leak in both scenarios.
+  // `restoreCollVersions` re-applies the user's picked versions across re-runs.
+  // Non-scoped singletons' inherited deps are preserved by the composable's per-DS
+  // read at dispatch, so they never enter `coll` here.
   watch(
     [
       effDsId,
-      activeReleaseByDs,
+      isApplicationComposed,
+      isFirewallComposed,
+      isCustomPageComposed,
       functionDeps.functionDependencies,
       connectorDeps.connectorDependencies,
       firewallFunctionDeps.functionDependencies,
@@ -429,25 +508,41 @@
       customPageConnectorDeps.connectorDependencies
     ],
     () => {
-      store.seedColl(composition.dependencyResourcesFor(effDsId.value))
-      if (functionDeps.functionDependencies.value?.length) {
-        store.seedApplicationFunctions(functionDeps.functionDependencies.value)
-      }
-      if (connectorDeps.connectorDependencies.value?.length) {
-        store.seedApplicationConnectors(connectorDeps.connectorDependencies.value)
-      }
-      if (firewallFunctionDeps.functionDependencies.value?.length) {
-        store.seedFirewallFunctions(firewallFunctionDeps.functionDependencies.value)
-      }
-      if (firewallWafDeps.wafDependencies.value?.length) {
-        store.seedFirewallWafs(firewallWafDeps.wafDependencies.value)
-      }
-      if (firewallNetworkListDeps.networkListDependencies.value?.length) {
-        store.seedFirewallNetworkLists(firewallNetworkListDeps.networkListDependencies.value)
-      }
-      if (customPageConnectorDeps.connectorDependencies.value?.length) {
-        store.seedCustomPageConnectors(customPageConnectorDeps.connectorDependencies.value)
-      }
+      const pickedVersions = {}
+      Object.entries(coll.value).forEach(([parent, byType]) => {
+        Object.entries(byType ?? {}).forEach(([type, instances]) => {
+          ;(instances ?? []).forEach((instance) => {
+            if (instance?.resourceId != null && instance.version != null) {
+              pickedVersions[`${parent}:${type}:${instance.resourceId}`] = instance.version
+            }
+          })
+        })
+      })
+
+      store.seedApplicationFunctions(
+        isApplicationComposed.value ? (functionDeps.functionDependencies.value ?? []) : []
+      )
+      store.seedApplicationConnectors(
+        isApplicationComposed.value ? (connectorDeps.connectorDependencies.value ?? []) : []
+      )
+      store.seedFirewallFunctions(
+        isFirewallComposed.value ? (firewallFunctionDeps.functionDependencies.value ?? []) : []
+      )
+      store.seedFirewallWafs(
+        isFirewallComposed.value ? (firewallWafDeps.wafDependencies.value ?? []) : []
+      )
+      store.seedFirewallNetworkLists(
+        isFirewallComposed.value
+          ? (firewallNetworkListDeps.networkListDependencies.value ?? [])
+          : []
+      )
+      store.seedCustomPageConnectors(
+        isCustomPageComposed.value
+          ? (customPageConnectorDeps.connectorDependencies.value ?? [])
+          : []
+      )
+
+      store.restoreCollVersions(pickedVersions)
     },
     { immediate: true, deep: true }
   )
@@ -604,7 +699,7 @@
       const meta = resolveResourceMeta(type)
       const label = labelFor(type)
       const options = composition.catalogOptionsFor(type)
-      const instances = (coll.value[type] ?? []).map((instance, index) => ({
+      const instances = (coll.value[parentType]?.[type] ?? []).map((instance, index) => ({
         id: index,
         resourceId: instance.resourceId,
         name:
@@ -622,7 +717,7 @@
         icon: meta.icon,
         count: instances.length,
         // Expanded by default (mock); collapse only when explicitly toggled off.
-        open: collOpen.value[type] !== false,
+        open: collOpen.value[`${parentType}:${type}`] !== false,
         instances
       }
     })
@@ -732,16 +827,20 @@
   const onTreeVersion = ({ type, value }) => store.setResVer(type, value)
   const toggleOptional = (type) => store.toggleResource(type)
 
-  const onToggleGroup = ({ group }) => store.toggleCollOpen(group)
-  const onInstanceResource = ({ group, id, value }) =>
-    store.setCollResource({ type: group, id, resourceId: value })
-  const onInstanceVersion = ({ group, id, value }) => store.setCollVer(group, id, value)
-  const onRemoveInstance = ({ group, id }) => store.removeCollItem(group, id)
+  const onToggleGroup = ({ type, group }) => store.toggleCollOpen(type, group)
+  const onInstanceResource = ({ type, group, id, value }) =>
+    store.setCollResource({ parent: type, type: group, id, resourceId: value })
+  const onInstanceVersion = ({ type, group, id, value }) => store.setCollVer(type, group, id, value)
+  const onRemoveInstance = ({ type, group, id }) => store.removeCollItem(type, group, id)
   // Append a blank instance the user then configures (resource + version); keep
   // the group open so the new row is visible immediately.
-  const onAddInstance = ({ group }) => {
-    store.addCollItem(group, { resourceId: null, version: LATEST_READY })
-    if (collOpen.value[group] === false) store.toggleCollOpen(group)
+  const onAddInstance = ({ type, group }) => {
+    store.addCollItem({
+      parent: type,
+      type: group,
+      item: { resourceId: null, version: LATEST_READY }
+    })
+    if (collOpen.value[`${type}:${group}`] === false) store.toggleCollOpen(type, group)
   }
 
   const onCanaryEnabled = (value) => store.toggleCanary(value)
@@ -766,18 +865,7 @@
   const dsQuery = ref('')
   const enrichedDeployments = computed(() => {
     const term = dsQuery.value.trim().toLowerCase()
-    // Scoped (Scenario B): restrict the picker to the resolved consuming-DS
-    // candidate set (req 1.9). Non-scoped flows list every Deployment Settings.
-    // On a candidate-resolution FAILURE (§7.4) do NOT filter — an empty Set would
-    // match nothing and block the user; fall back to the FULL list (null = no
-    // filter) so the user can still pick. A genuine-empty resolution keeps the
-    // (empty) candidate filter.
-    const candidateSet =
-      isScoped.value && !candidateResolutionFailed.value
-        ? new Set(scopedCandidateDsIds.value)
-        : null
     return deployments.value
-      .filter((ds) => !candidateSet || candidateSet.has(String(ds.id)))
       .filter(
         (ds) =>
           !term ||
@@ -789,13 +877,36 @@
       .map((ds) => ({
         id: ds.id,
         name: ds.name,
+        binding_policy: ds.binding_policy,
         policyLabel: ds.policyLabel ?? mapPolicyToLabel(ds.deployment_policy),
         // SEAM 3: spread the per-DS meta only when known. `dsMetaFor` already
         // omits any field it cannot derive (returns `{}` for an unresolved DS),
-        // so the picker renders `environmentName` / `workloadsCount` ONLY when
+        // so the picker renders `environmentNames` / `workloadsCount` ONLY when
         // present — never fabricated (req 3.6, 7.3, 9.2).
         ...impact.dsMetaFor(ds.id)
       }))
+  })
+
+  const enrichedDeploymentIds = computed(() => enrichedDeployments.value.map((ds) => String(ds.id)))
+
+  watch(enrichedDeploymentIds, (ids) => composition.ensureActiveReleases(ids), { immediate: true })
+
+  const deploymentGroups = computed(() => {
+    const { groups } = classifyDeploymentsForResource({
+      deployments: enrichedDeployments.value,
+      activeReleaseByDs: activeReleaseByDs.value,
+      scopedType: scopedType.value,
+      scopedResourceId: store.resourceId
+    })
+    const LABELS = {
+      linked: 'Already using this resource',
+      available: 'Available — not linked yet'
+    }
+    return groups.map((group) => ({
+      key: group.key,
+      label: LABELS[group.key],
+      deployments: group.deployments
+    }))
   })
 
   const onPickDs = (ids) => {
@@ -846,24 +957,39 @@
     confirmVisible.value = true
   }
 
+  const SKIP_MESSAGES = {
+    degraded: 'Could not read the active release; deployment skipped.',
+    mismatch: 'The resource is not part of this deployment; skipped.',
+    unresolved_version: 'No ready version resolved for the resource; skipped.'
+  }
+
   const surfaceOutcome = (outcome) => {
     const match = deployments.value.find((ds) => String(ds.id) === String(outcome.id))
     const name = match?.name ?? String(outcome.id)
     if (outcome.ok) {
       toast.add({ closable: true, severity: 'success', summary: 'Build started', detail: name })
-    } else {
-      const error = outcome.error
-      if (error && typeof error.showErrors === 'function') {
-        error.showErrors(toast)
-        return
-      }
+      return
+    }
+    if (outcome.skipped) {
       toast.add({
         closable: true,
-        severity: 'error',
-        summary: 'Build failed',
-        detail: `${name}: ${error?.message ?? 'Something went wrong'}`
+        severity: 'warn',
+        summary: 'Deployment skipped',
+        detail: `${name}: ${SKIP_MESSAGES[outcome.skipReason] ?? 'Skipped.'}`
       })
+      return
     }
+    const error = outcome.error
+    if (error && typeof error.showErrors === 'function') {
+      error.showErrors(toast)
+      return
+    }
+    toast.add({
+      closable: true,
+      severity: 'error',
+      summary: 'Build failed',
+      detail: `${name}: ${error?.message ?? 'Something went wrong'}`
+    })
   }
 
   // Async (202), no polling: surface a per-DS toast on the settled outcome and
@@ -1031,26 +1157,28 @@
               />
             </div>
 
-            <CanaryStrategyField
-              v-if="showComposition"
-              class="order-2 border-t border-[var(--surface-border)] pt-[var(--spacing-6)]"
-              @update:enabled="onCanaryEnabled"
-              @update:form="onCanaryForm"
-            />
-
-            <!-- The Deployment Settings picker is the FINAL section: it sits below
-                 the composition (and canary), never the opening element (req 4.5 /
-                 NRS §1.4). `order-3` + source-last keeps it last regardless of
-                 which sibling sections render. -->
+            <!-- The Deployment Settings picker sits directly below the composition
+                 (never the opening element; req 4.5 / NRS §1.4). Canary rollout
+                 follows it as the final, optional strategy section. `order-2/3` +
+                 source order keep this arrangement regardless of which sibling
+                 sections render. -->
             <DeploymentSettingsPicker
               v-if="!isFromDeployment"
-              class="order-3"
-              :deployments="enrichedDeployments"
+              class="order-2"
+              :groups="deploymentGroups"
               :model-value="deploymentIds"
               :query="dsQuery"
+              :is-loading-meta="impact.isLoading.value"
               @update:model-value="onPickDs"
               @update:query="dsQuery = $event"
               @bind-environment="onBindEnvironment"
+            />
+
+            <CanaryStrategyField
+              v-if="showComposition"
+              class="order-3 border-t border-[var(--surface-border)] pt-[var(--spacing-6)]"
+              @update:enabled="onCanaryEnabled"
+              @update:form="onCanaryForm"
             />
           </div>
         </section>
@@ -1121,7 +1249,7 @@
           @click="onCancel"
         />
         <PrimeButton
-          label="Build & activate"
+          label="Deploy release"
           icon="pi pi-cloud-upload"
           size="small"
           :disabled="!canBuildAndActivate"

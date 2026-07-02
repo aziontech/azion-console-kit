@@ -106,7 +106,7 @@ function shouldLint(relativePath) {
   if (normalizedPath.startsWith('node_modules/')) return false
   if (normalizedPath.includes('/node_modules/')) return false
   if (/cypress\.config\.(js|cjs|mjs)$/.test(normalizedPath)) return false
-  if (/(^|\/).*\.test\.(js|jsx|cjs|mjs)$/.test(normalizedPath)) return false
+  if (/(^|\/).*\.(test|spec)\.(js|jsx|cjs|mjs)$/.test(normalizedPath)) return false
 
   return true
 }

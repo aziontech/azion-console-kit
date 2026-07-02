@@ -55,7 +55,7 @@ export const buildReverseLookupByDs = (workloads, envNameById) => {
       const environmentId = binding?.environment_id ?? null
       const row = {
         id: workload.id,
-        name: workload.name,
+        name: workload.name?.text ?? workload.name,
         domains: Array.isArray(binding?.domains) ? binding.domains : [],
         environmentId,
         environmentName: envMap.get(environmentId) ?? null

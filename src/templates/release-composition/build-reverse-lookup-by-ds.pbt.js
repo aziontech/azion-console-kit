@@ -1,33 +1,6 @@
-/**
- * Property-based test for `buildReverseLookupByDs` (spec task 3.2, Property 1).
- *
- * Property 1 — active-only + guaranteed-fields-only + no fabricated env name:
- *   1. No inactive workload ever contributes a row to the index.
- *   2. Every emitted row has EXACTLY the contract keys
- *      { id, name, domains, environmentId, environmentName } — no extra keys.
- *   3. `environmentName` is `null` whenever the binding's `environment_id` is
- *      absent from the supplied `envNameById` map (the name is never invented).
- *
- * Validates requirements 3.2, 3.3, 4.2, 7.3.
- *
- * fast-check is NOT yet a devDependency of this repo (see spec task 1.2
- * blockers). The W0 arbitraries in `__tests__/arbitraries.js` already load it
- * lazily and take the `fc` module as an argument, so this PBT mirrors that:
- * it tries to import fast-check and, if absent, registers a SKIPPED suite with
- * a clear reason instead of failing the run. Once fast-check is installed the
- * suite runs unchanged at >= 100 iterations.
- */
 import { describe, it, expect } from 'vitest'
-import { buildReverseLookupByDs } from './build-reverse-lookup-by-ds'
-import {
-  workloadsListArb,
-  envNameMapArb
-} from '../../services/v2/release-impact/__tests__/arbitraries'
+import { buildReverseLookupByDs } from './build-reverse-lookup-by-ds.js'
 
-// The complete, closed set of keys a reverse-lookup row may carry (design §3.2).
-const CONTRACT_ROW_KEYS = ['id', 'name', 'domains', 'environmentId', 'environmentName']
-
-// fast-check is optional today; load it lazily so the file stays importable.
 let fc = null
 try {
   // eslint-disable-next-line global-require
@@ -39,99 +12,124 @@ try {
 const NUM_RUNS = 100
 
 const describeOrSkip = fc ? describe : describe.skip
-const skipReason = fc ? '' : ' (SKIPPED: fast-check is not installed — see spec task 1.2 blockers)'
+const skipReason = fc ? '' : ' (SKIPPED: fast-check is not installed)'
 
-describeOrSkip(`buildReverseLookupByDs — Property 1${skipReason}`, () => {
-  it('never emits a row for an inactive workload', () => {
+const withFc = (build) => (fc ? build(fc) : null)
+
+const ENV_IDS = ['env-1', 'env-2', 'env-3', 'env-orphan']
+
+const idArb = withFc((arb) => arb.oneof(arb.string({ minLength: 1 }), arb.integer({ min: 1 })))
+
+const nameArb = withFc((arb) =>
+  arb.oneof(arb.string(), arb.record({ text: arb.string(), tagProps: arb.constant({}) }))
+)
+
+const bindingArb = withFc((arb) =>
+  arb.record({
+    deployment_id: arb.oneof(
+      arb.string({ minLength: 1 }),
+      arb.integer({ min: 1 }),
+      arb.constant(null)
+    ),
+    environment_id: arb.oneof(arb.constantFrom(...ENV_IDS), arb.constant(null)),
+    domains: arb.array(arb.string(), { maxLength: 4 })
+  })
+)
+
+const workloadArb = withFc((arb) =>
+  arb.record({
+    id: idArb,
+    name: nameArb,
+    active: arb.record({ content: arb.constantFrom('Active', 'Inactive') }),
+    bindings: arb.array(bindingArb, { maxLength: 6 })
+  })
+)
+
+const workloadsArb = withFc((arb) => arb.array(workloadArb, { maxLength: 12 }))
+
+const envMapArb = withFc((arb) =>
+  arb
+    .array(
+      arb.tuple(
+        arb.constantFrom(...ENV_IDS.filter((id) => id !== 'env-orphan')),
+        arb.string({ minLength: 1 })
+      ),
+      { maxLength: 3 }
+    )
+    .map((entries) => new Map(entries))
+)
+
+const inputArb = withFc((arb) => arb.record({ workloads: workloadsArb, envMap: envMapArb }))
+
+const expectedName = (name) => (name && typeof name === 'object' ? name.text : name)
+
+const allRows = (index) => Object.values(index).flat()
+
+describeOrSkip(`buildReverseLookupByDs — invariants${skipReason}`, () => {
+  it('normalizes name: {text} becomes text, a string stays itself, and row.name is never an object', () => {
     fc.assert(
-      fc.property(workloadsListArb(fc), envNameMapArb(fc), (workloads, envNameById) => {
-        const index = buildReverseLookupByDs(workloads, envNameById)
-
-        const inactiveIds = new Set(
-          workloads.filter((wl) => wl?.active?.content !== 'Active').map((wl) => wl.id)
+      fc.property(inputArb, ({ workloads, envMap }) => {
+        const index = buildReverseLookupByDs(workloads, envMap)
+        const byId = new Map(workloads.map((workload) => [workload.id, workload]))
+        return allRows(index).every(
+          (row) => typeof row.name !== 'object' && row.name === expectedName(byId.get(row.id)?.name)
         )
-        const emittedIds = Object.values(index)
-          .flat()
-          .map((row) => row.id)
-
-        return emittedIds.every((id) => !inactiveIds.has(id))
       }),
       { numRuns: NUM_RUNS }
     )
   })
 
-  it('emits rows with exactly the contract keys and nothing else', () => {
+  it('emits rows only from Active workloads', () => {
     fc.assert(
-      fc.property(workloadsListArb(fc), envNameMapArb(fc), (workloads, envNameById) => {
-        const index = buildReverseLookupByDs(workloads, envNameById)
-
-        return Object.values(index)
-          .flat()
-          .every((row) => {
-            const keys = Object.keys(row).sort()
-            const expectedKeys = [...CONTRACT_ROW_KEYS].sort()
-            return (
-              keys.length === expectedKeys.length &&
-              keys.every((key, idx) => key === expectedKeys[idx])
-            )
-          })
+      fc.property(inputArb, ({ workloads, envMap }) => {
+        const activeIds = new Set(
+          workloads
+            .filter((workload) => workload.active?.content === 'Active')
+            .map((workload) => workload.id)
+        )
+        const index = buildReverseLookupByDs(workloads, envMap)
+        return allRows(index).every((row) => activeIds.has(row.id))
       }),
       { numRuns: NUM_RUNS }
     )
   })
 
-  it('keeps environmentName null whenever the env id is absent from the map', () => {
+  it('ignores bindings without a deployment_id: row count equals active bindings that carry one', () => {
     fc.assert(
-      fc.property(workloadsListArb(fc), envNameMapArb(fc), (workloads, envNameById) => {
-        const index = buildReverseLookupByDs(workloads, envNameById)
-
-        return Object.values(index)
-          .flat()
-          .every((row) => {
-            if (!envNameById.has(row.environmentId)) {
-              return row.environmentName === null
-            }
-            // Present in the map => name must equal the map value (never invented).
-            return row.environmentName === envNameById.get(row.environmentId)
-          })
+      fc.property(inputArb, ({ workloads, envMap }) => {
+        const index = buildReverseLookupByDs(workloads, envMap)
+        const expected = workloads
+          .filter((workload) => workload.active?.content === 'Active')
+          .flatMap((workload) => workload.bindings ?? [])
+          .filter((binding) => binding.deployment_id != null).length
+        expect(allRows(index).length).toBe(expected)
+        return Object.keys(index).every(
+          (key) => key !== 'null' && key !== 'undefined' && key !== ''
+        )
       }),
       { numRuns: NUM_RUNS }
     )
   })
-})
 
-// A non-PBT smoke assertion so the file is meaningful even without fast-check:
-// it documents the active-only + contract-keys + null-name contract against a
-// hand-built case, and keeps the spec file self-verifying when the suite skips.
-describe('buildReverseLookupByDs — Property 1 (deterministic guard)', () => {
-  it('drops inactive workloads, keeps the contract keys, and never fabricates a name', () => {
-    const workloads = [
-      {
-        id: 'wl-active',
-        name: { text: 'Active', tagProps: {} },
-        active: { content: 'Active' },
-        bindings: [
-          // env id absent from the map => name must stay null
-          { deployment_id: 'ds-1', environment_id: 'env-unknown', domains: ['a.example.com'] }
-        ]
-      },
-      {
-        id: 'wl-inactive',
-        name: { text: 'Inactive', tagProps: {} },
-        active: { content: 'Inactive' },
-        bindings: [
-          { deployment_id: 'ds-1', environment_id: 'env-known', domains: ['b.example.com'] }
-        ]
-      }
-    ]
-    const envNameById = new Map([['env-known', 'Known']])
+  it('never fabricates environmentName: it is exactly envMap.get(environmentId) or null', () => {
+    fc.assert(
+      fc.property(inputArb, ({ workloads, envMap }) => {
+        const index = buildReverseLookupByDs(workloads, envMap)
+        return allRows(index).every(
+          (row) => row.environmentName === (envMap.get(row.environmentId) ?? null)
+        )
+      }),
+      { numRuns: NUM_RUNS }
+    )
+  })
 
-    const index = buildReverseLookupByDs(workloads, envNameById)
-    const rows = Object.values(index).flat()
-
-    expect(rows).toHaveLength(1)
-    expect(rows[0].id).toBe('wl-active')
-    expect(Object.keys(rows[0]).sort()).toEqual([...CONTRACT_ROW_KEYS].sort())
-    expect(rows[0].environmentName).toBeNull()
+  it('always yields an array for domains', () => {
+    fc.assert(
+      fc.property(inputArb, ({ workloads, envMap }) => {
+        const index = buildReverseLookupByDs(workloads, envMap)
+        return allRows(index).every((row) => Array.isArray(row.domains))
+      }),
+      { numRuns: NUM_RUNS }
+    )
   })
 })

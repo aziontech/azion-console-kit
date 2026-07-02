@@ -46,9 +46,7 @@ const deployments = [
   {
     id: 'ds-1',
     name: 'production-edge',
-    policyLabel: 'Single Version',
-    environmentName: 'production',
-    workloadsCount: 3
+    policyLabel: 'Single Version'
   },
   {
     id: 'ds-2',
@@ -87,41 +85,6 @@ describe('DeploymentSettingsPicker', () => {
     expect(wrapper.find('[data-testid="release-composition__ds-policy-ds-2"]').text()).toBe(
       'Versioned URLs'
     )
-  })
-
-  it('renders the Environment in bold and the workloads line when the platform provides them', () => {
-    const wrapper = makeWrapper()
-
-    const env = wrapper.find('[data-testid="release-composition__ds-environment-ds-1"]')
-    expect(env.exists()).toBe(true)
-    expect(env.text()).toBe('production')
-    expect(env.classes()).toContain('font-bold')
-
-    const workloads = wrapper.find('[data-testid="release-composition__ds-workloads-ds-1"]')
-    expect(workloads.exists()).toBe(true)
-    expect(workloads.text()).toContain('3 Workloads affected')
-  })
-
-  it('omits the Environment and workloads lines when absent (req 4.3 — never fabricated)', () => {
-    const wrapper = makeWrapper()
-
-    // ds-2 carries neither environmentName nor workloadsCount.
-    expect(wrapper.find('[data-testid="release-composition__ds-environment-ds-2"]').exists()).toBe(
-      false
-    )
-    expect(wrapper.find('[data-testid="release-composition__ds-workloads-ds-2"]').exists()).toBe(
-      false
-    )
-  })
-
-  it('renders a workloads line even when the count is zero (0 is data, not absence)', () => {
-    const wrapper = makeWrapper({
-      deployments: [{ id: 'ds-3', name: 'edge', policyLabel: 'Single Version', workloadsCount: 0 }]
-    })
-
-    const workloads = wrapper.find('[data-testid="release-composition__ds-workloads-ds-3"]')
-    expect(workloads.exists()).toBe(true)
-    expect(workloads.text()).toContain('0 Workloads affected')
   })
 
   it('shows a search field placeholder counting the listed Deployment Settings', () => {

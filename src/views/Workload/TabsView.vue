@@ -15,6 +15,7 @@
   import WorkloadReleasesSection from './Tabs/sections/WorkloadReleasesSection.vue'
   import CreateDeploymentVersionDrawer from './FormFields/components/CreateDeploymentVersionDrawer.vue'
   import { workloadService } from '@/services/v2/workload/workload-service'
+  import { releaseComposerRouteFromDeployment } from '@/templates/release-composition/release-composer-route'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
@@ -114,8 +115,8 @@
   const releasesRefreshKey = ref(0)
 
   const isDeployDrawerOpen = ref(false)
-  const openDeployDrawer = () => {
-    isDeployDrawerOpen.value = true
+  const openRelease = () => {
+    router.push(releaseComposerRouteFromDeployment(workload.value?.workloadDeploymentId))
   }
 
   const onVersionCreated = () => {
@@ -143,7 +144,7 @@
             icon="pi pi-cloud-upload"
             size="small"
             data-testid="workload-edit__deploy"
-            @click="openDeployDrawer"
+            @click="openRelease"
           />
         </template>
       </PageHeadingBlock>

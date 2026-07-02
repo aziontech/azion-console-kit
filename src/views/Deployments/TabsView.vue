@@ -12,6 +12,7 @@
   import VersionsTab from '@/views/Deployments/tabs/VersionsTab.vue'
   import ReleasesTab from '@/views/Deployments/tabs/ReleasesTab.vue'
   import { loadDeploymentByIdAdapter } from '@/views/Deployments/Config/adapters'
+  import { releaseComposerRouteFromDeployment } from '@/templates/release-composition/release-composer-route'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
@@ -73,8 +74,8 @@
   const isDeployDrawerOpen = ref(false)
   const releasesRefreshKey = ref(0)
 
-  const openDeployDrawer = () => {
-    isDeployDrawerOpen.value = true
+  const openRelease = () => {
+    router.push(releaseComposerRouteFromDeployment(deploymentId.value))
   }
 
   const onDeployed = () => {
@@ -121,7 +122,7 @@
             icon="pi pi-cloud-upload"
             size="small"
             data-testid="deployments-edit__deploy"
-            @click="openDeployDrawer"
+            @click="openRelease"
           />
         </template>
       </PageHeadingBlock>

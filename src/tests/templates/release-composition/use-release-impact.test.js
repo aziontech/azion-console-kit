@@ -110,7 +110,7 @@ describe('useReleaseImpact - dsMetaFor omits unknown fields', () => {
     expect(dsMetaFor('ds-absent')).toEqual({})
   })
 
-  it('reports workloadsCount but OMITS environmentName when the DS spans multiple environments', async () => {
+  it('reports workloadsCount and lists BOTH environmentNames when the DS spans multiple environments', async () => {
     const lookupService = fakeLookupService({
       index: {
         'ds-1': [
@@ -125,11 +125,10 @@ describe('useReleaseImpact - dsMetaFor omits unknown fields', () => {
     await flushPromises()
 
     const meta = dsMetaFor('ds-1')
-    expect(meta).toEqual({ workloadsCount: 2 })
-    expect('environmentName' in meta).toBe(false)
+    expect(meta).toEqual({ workloadsCount: 2, environmentNames: ['Production', 'Staging'] })
   })
 
-  it('reports workloadsCount but OMITS environmentName when the only name is unknown (null)', async () => {
+  it('reports workloadsCount but OMITS environmentNames when the only name is unknown (null)', async () => {
     const lookupService = fakeLookupService({
       index: { 'ds-1': [row({ environmentName: null })] },
       isPartial: false
@@ -140,10 +139,10 @@ describe('useReleaseImpact - dsMetaFor omits unknown fields', () => {
 
     const meta = dsMetaFor('ds-1')
     expect(meta).toEqual({ workloadsCount: 1 })
-    expect('environmentName' in meta).toBe(false)
+    expect('environmentNames' in meta).toBe(false)
   })
 
-  it('includes environmentName when the DS resolves to exactly one non-null env name', async () => {
+  it('includes environmentNames when the DS resolves to exactly one non-null env name', async () => {
     const lookupService = fakeLookupService({
       index: {
         'ds-1': [
@@ -157,7 +156,7 @@ describe('useReleaseImpact - dsMetaFor omits unknown fields', () => {
     const { dsMetaFor } = useReleaseImpact({ lookupService })
     await flushPromises()
 
-    expect(dsMetaFor('ds-1')).toEqual({ workloadsCount: 2, environmentName: 'Production' })
+    expect(dsMetaFor('ds-1')).toEqual({ workloadsCount: 2, environmentNames: ['Production'] })
   })
 })
 

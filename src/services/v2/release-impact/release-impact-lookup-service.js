@@ -27,6 +27,11 @@ const WORKLOAD_PAGE_SIZE = 100
 // §7.4). 100 pages * 100/page = 10k workloads covered before degrading.
 const MAX_FANOUT_PAGES = 100
 
+// Upper bound on concurrent fan-out requests: pages are processed by a small
+// worker pool so we never hold more than this many `listWorkloads` calls in
+// flight at once, protecting the API from a burst on large inventories.
+const MAX_CONCURRENT_FANOUT = 3
+
 const FIRST_PAGE = 1
 
 const listResponseBody = (response) => (Array.isArray(response?.body) ? response.body : [])
@@ -83,21 +88,28 @@ export const createReleaseImpactLookupService = ({
     }
 
     // Independent fan-out (mirrors the active-release fan-out in
-    // use-release-composition): a single failed page must not drop the rest.
-    const settled = await Promise.allSettled(
-      extraPages.map((page) =>
-        workloadService.listWorkloads({
-          page,
-          pageSize: WORKLOAD_PAGE_SIZE,
-          ordering: '-last_modified'
-        })
-      )
-    )
-
-    const rows = settled.flatMap((outcome) =>
-      outcome.status === 'fulfilled' ? listResponseBody(outcome.value) : []
-    )
-    const anyPageFailed = settled.some((outcome) => outcome.status === 'rejected')
+    // use-release-composition) capped at MAX_CONCURRENT_FANOUT in-flight
+    // requests: a single failed page must not drop the rest.
+    const rows = []
+    let anyPageFailed = false
+    let cursor = 0
+    const worker = async () => {
+      while (cursor < extraPages.length) {
+        const page = extraPages[cursor++]
+        try {
+          const response = await workloadService.listWorkloads({
+            page,
+            pageSize: WORKLOAD_PAGE_SIZE,
+            ordering: '-last_modified'
+          })
+          rows.push(...listResponseBody(response))
+        } catch {
+          anyPageFailed = true
+        }
+      }
+    }
+    const poolSize = Math.min(MAX_CONCURRENT_FANOUT, extraPages.length)
+    await Promise.all(Array.from({ length: poolSize }, () => worker()))
 
     return { rows, isPartial: isPartial || anyPageFailed }
   }
@@ -132,10 +144,15 @@ export const createReleaseImpactLookupService = ({
     })
     const environmentsQuery = environmentService.useEnvironmentsListQuery({ enabled })
 
-    const [workloadsFirstPage, environmentsResponse] = await Promise.all([
+    const [workloadsResult, environmentsResult] = await Promise.all([
       workloadsQuery.suspense(),
       environmentsQuery.suspense()
     ])
+
+    // vue-query's suspense() resolves to the QueryObserverResult; the service
+    // payload ({ body, count }) lives under `.data`.
+    const workloadsFirstPage = workloadsResult?.data ?? workloadsResult
+    const environmentsResponse = environmentsResult?.data ?? environmentsResult
 
     const firstPageRows = listResponseBody(workloadsFirstPage)
     const count = listResponseCount(workloadsFirstPage)
