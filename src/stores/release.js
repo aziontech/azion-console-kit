@@ -20,6 +20,15 @@ const SINGLETON_TYPES = [APPLICATION_TYPE, ...OPTIONAL_SINGLETON_TYPES]
 // payload is a flat `resources[]`). `function_instance` is never serialized.
 const COLLECTION_TYPES = ['function', 'connector', 'waf', 'network_list']
 
+// Which dependency collections each parent singleton owns. `coll` is keyed by
+// parent → depType so a dependency of one singleton never bleeds into another.
+const OWNED_COLLECTIONS = {
+  [APPLICATION_TYPE]: ['function', 'connector'],
+  firewall: ['function', 'network_list', 'waf'],
+  custom_page: ['connector']
+}
+const PARENT_TYPES = Object.keys(OWNED_COLLECTIONS)
+
 const VERSIONED_URLS = 'versioned_urls'
 const MAX_DEPLOYS = 20
 
@@ -27,6 +36,9 @@ const isObject = (value) => value !== null && typeof value === 'object' && !Arra
 
 // Key for `versionsByResource`: `${resource_type}:${resource_id}`.
 const versionsKey = (type, id) => `${type}:${id}`
+
+// Key capturing a user's picked version per parent-scoped dependency instance.
+const collKey = (parent, type, id) => `${parent}:${type}:${id}`
 
 // The release endpoint pins version in `version_id`; the active-release payload
 // keys `application` by `global_id` and every other type by `resource_id`.
@@ -144,23 +156,37 @@ export const useReleaseStore = defineStore('release', {
       return value === LATEST_READY || Boolean(value)
     },
 
+    // A scoped (Scenario B) entry gates on the SCOPED resource's version, not the
+    // application's: the application card is not rendered in a firewall/custom_page
+    // scope (it is preserved from each DS's active release), so `resVers[APPLICATION_TYPE]`
+    // is never set and `appVersionChosen` would block deploy forever.
+    scopedVersionChosen: (state) => {
+      if (!state.scopedType) return false
+      const value = state.resVers[state.scopedType]
+      return value === LATEST_READY || Boolean(value)
+    },
+
     appManagedVersionsChosen: (state) => {
-      return COLLECTION_TYPES.every((type) => {
-        const list = Array.isArray(state.coll[type]) ? state.coll[type] : []
-        return list
-          .filter((item) => item?.required)
-          .every((item) => item.version != null && item.version !== LATEST_READY)
-      })
+      return PARENT_TYPES.every((parent) =>
+        (OWNED_COLLECTIONS[parent] ?? []).every((type) => {
+          const list = Array.isArray(state.coll[parent]?.[type]) ? state.coll[parent][type] : []
+          return list
+            .filter((item) => item?.required)
+            .every((item) => item.version != null && item.version !== LATEST_READY)
+        })
+      )
     },
 
     pendingDependencySelections: (state) => {
       const pending = []
-      COLLECTION_TYPES.forEach((type) => {
-        const list = Array.isArray(state.coll[type]) ? state.coll[type] : []
-        list.forEach((item) => {
-          if (item?.required && (item.version == null || item.version === LATEST_READY)) {
-            pending.push({ type, resourceId: item.resourceId })
-          }
+      PARENT_TYPES.forEach((parent) => {
+        ;(OWNED_COLLECTIONS[parent] ?? []).forEach((type) => {
+          const list = Array.isArray(state.coll[parent]?.[type]) ? state.coll[parent][type] : []
+          list.forEach((item) => {
+            if (item?.required && (item.version == null || item.version === LATEST_READY)) {
+              pending.push({ type, resourceId: item.resourceId })
+            }
+          })
         })
       })
       return pending
@@ -168,12 +194,12 @@ export const useReleaseStore = defineStore('release', {
 
     deployEnabled() {
       const ctx = this.deployCtx()
+      const versionChosen =
+        this.scopedType && this.scopedType !== APPLICATION_TYPE
+          ? this.scopedVersionChosen
+          : this.appVersionChosen
       return Boolean(
-        ctx.ok &&
-        ctx.canDeploy &&
-        this.effDsId &&
-        this.appVersionChosen &&
-        this.appManagedVersionsChosen
+        ctx.ok && ctx.canDeploy && this.effDsId && versionChosen && this.appManagedVersionsChosen
       )
     }
   },
@@ -258,39 +284,39 @@ export const useReleaseStore = defineStore('release', {
 
     // --- dependency composition (editable; no "Add" — set inherited from parent) ---
 
-    addCollItem(type, item = {}) {
-      if (!COLLECTION_TYPES.includes(type)) return
-      const list = Array.isArray(this.coll[type]) ? this.coll[type] : []
-      this.coll[type] = [
+    // Merge a single parent's dependency slot, keeping `coll` reactive and every
+    // other parent/type untouched. All coll writers go through here.
+    _setParentColl(parent, depType, list) {
+      const current = this.coll[parent] ?? {}
+      this.coll = { ...this.coll, [parent]: { ...current, [depType]: list } }
+    },
+
+    addCollItem({ parent, type, item = {} } = {}) {
+      if (!OWNED_COLLECTIONS[parent]?.includes(type)) return
+      const list = Array.isArray(this.coll[parent]?.[type]) ? this.coll[parent][type] : []
+      this._setParentColl(parent, type, [
         ...list,
         {
           resourceId: item.resourceId ?? null,
           version: item.version ?? LATEST_READY
         }
-      ]
+      ])
     },
 
-    // Seed `coll` from the active release's dependency-type resources (spec: no
-    // "Add" — the instance set is INHERITED from the active release). `byType` is
-    // `{ [type]: [{ resourceId, version }] }`; only the four COLLECTION_TYPES are
-    // kept and each instance's `version` is the release's pinned `version_id`
-    // (NOT the LATEST sentinel, since it comes from a real release). Idempotent:
-    // it fully REPLACES `coll`, so re-running on a DS change never accumulates
-    // stale instances.
-    seedColl(byType = {}) {
-      const source = isObject(byType) ? byType : {}
+    restoreCollVersions(versionByKey = {}) {
+      const source = isObject(versionByKey) ? versionByKey : {}
       const next = {}
-
-      COLLECTION_TYPES.forEach((type) => {
-        const instances = Array.isArray(source[type]) ? source[type] : []
-        next[type] = instances
-          .filter((instance) => instance?.resourceId != null)
-          .map((instance) => ({
-            resourceId: instance.resourceId,
-            version: instance.version ?? null
-          }))
+      Object.keys(this.coll).forEach((parent) => {
+        const byType = {}
+        Object.keys(this.coll[parent] ?? {}).forEach((type) => {
+          const list = Array.isArray(this.coll[parent][type]) ? this.coll[parent][type] : []
+          byType[type] = list.map((instance) => {
+            const kept = source[collKey(parent, type, instance?.resourceId)]
+            return kept != null ? { ...instance, version: kept } : instance
+          })
+        })
+        next[parent] = byType
       })
-
       this.coll = next
     },
 
@@ -311,7 +337,7 @@ export const useReleaseStore = defineStore('release', {
         })
       })
 
-      this.coll = { ...this.coll, function: next }
+      this._setParentColl(APPLICATION_TYPE, 'function', next)
     },
 
     seedApplicationConnectors(connectorDeps = []) {
@@ -331,7 +357,7 @@ export const useReleaseStore = defineStore('release', {
         })
       })
 
-      this.coll = { ...this.coll, connector: next }
+      this._setParentColl(APPLICATION_TYPE, 'connector', next)
     },
 
     seedCustomPageConnectors(connectorDeps = []) {
@@ -351,7 +377,7 @@ export const useReleaseStore = defineStore('release', {
         })
       })
 
-      this.coll = { ...this.coll, connector: next }
+      this._setParentColl('custom_page', 'connector', next)
     },
 
     seedFirewallFunctions(functionDeps = []) {
@@ -371,7 +397,7 @@ export const useReleaseStore = defineStore('release', {
         })
       })
 
-      this.coll = { ...this.coll, function: next }
+      this._setParentColl('firewall', 'function', next)
     },
 
     seedFirewallWafs(wafDeps = []) {
@@ -391,7 +417,7 @@ export const useReleaseStore = defineStore('release', {
         })
       })
 
-      this.coll = { ...this.coll, waf: next }
+      this._setParentColl('firewall', 'waf', next)
     },
 
     seedFirewallNetworkLists(networkListDeps = []) {
@@ -411,34 +437,50 @@ export const useReleaseStore = defineStore('release', {
         })
       })
 
-      this.coll = { ...this.coll, network_list: next }
+      this._setParentColl('firewall', 'network_list', next)
     },
 
     // Pick an instance for a dependency collection item; reset that instance's
     // version to LATEST so a stale pinned id from the previous instance never
     // carries over (mirrors `setResName` for singletons).
-    setCollResource({ type, id, resourceId } = {}) {
-      const list = this.coll[type]
+    setCollResource({ parent, type, id, resourceId } = {}) {
+      const list = this.coll[parent]?.[type]
       if (!Array.isArray(list) || !list[id]) return
-      list[id] = { ...list[id], resourceId, version: LATEST_READY }
+      this._setParentColl(
+        parent,
+        type,
+        list.map((entry, index) =>
+          index === id ? { ...entry, resourceId, version: LATEST_READY } : entry
+        )
+      )
     },
 
-    setCollVer(type, index, version) {
-      const list = this.coll[type]
+    setCollVer(parent, type, index, version) {
+      const list = this.coll[parent]?.[type]
       if (!Array.isArray(list) || !list[index]) return
-      list[index] = { ...list[index], version }
+      this._setParentColl(
+        parent,
+        type,
+        list.map((entry, position) => (position === index ? { ...entry, version } : entry))
+      )
     },
 
-    // Toggle a dependency collection group open/closed (UI grouping only).
-    toggleCollOpen(type) {
-      if (!COLLECTION_TYPES.includes(type)) return
-      this.collOpen = { ...this.collOpen, [type]: !this.collOpen[type] }
+    // Toggle a dependency collection group open/closed (UI grouping only). Keyed
+    // by `parent:type` so collapsing one card never collapses another's same type.
+    toggleCollOpen(parent, type) {
+      if (!OWNED_COLLECTIONS[parent]?.includes(type)) return
+      const key = `${parent}:${type}`
+      this.collOpen = { ...this.collOpen, [key]: !this.collOpen[key] }
     },
 
-    removeCollItem(type, index) {
-      const list = this.coll[type]
+    removeCollItem(parent, type, index) {
+      const list = this.coll[parent]?.[type]
       if (!Array.isArray(list)) return
-      this.coll[type] = list.filter((entry, position) => Boolean(entry) && position !== index)
+      this._setParentColl(
+        parent,
+        type,
+        list.filter((entry, position) => Boolean(entry) && position !== index)
+      )
     },
 
     // --- canary (CanaryStrategyField → buildStrategy) ---
@@ -517,14 +559,23 @@ export const useReleaseStore = defineStore('release', {
         })
       })
 
-      COLLECTION_TYPES.forEach((type) => {
-        const list = Array.isArray(this.coll[type]) ? this.coll[type] : []
-        list.forEach((item) => {
-          if (item?.resourceId == null) return
-          resources.push({
-            resource_id: item.resourceId,
-            resource_version: this.resolveVersion(type, item.resourceId, item.version),
-            resource_type: type
+      // Flatten per-parent dependency instances into the flat payload, DEDUPING by
+      // `(resource_id, type)`: a resource pins a single version in a flat release,
+      // so the same dependency referenced by two parents ships exactly once.
+      const seenDeps = new Set()
+      PARENT_TYPES.forEach((parent) => {
+        ;(OWNED_COLLECTIONS[parent] ?? []).forEach((type) => {
+          const list = Array.isArray(this.coll[parent]?.[type]) ? this.coll[parent][type] : []
+          list.forEach((item) => {
+            if (item?.resourceId == null) return
+            const key = versionsKey(type, item.resourceId)
+            if (seenDeps.has(key)) return
+            seenDeps.add(key)
+            resources.push({
+              resource_id: item.resourceId,
+              resource_version: this.resolveVersion(type, item.resourceId, item.version),
+              resource_type: type
+            })
           })
         })
       })
@@ -563,11 +614,18 @@ export const useReleaseStore = defineStore('release', {
       const resourceId = this.resNames[scopedType] ?? this.resourceId
       const selectedVersion = this.resVers[scopedType] ?? LATEST_READY
 
+      // Only the SCOPED singleton's own dependencies are editable overrides; every
+      // other singleton's deps are preserved byte-for-byte by the composable's
+      // per-DS read, so they must never leak into `dependencyOverrides` here.
       const dependencyOverrides = []
-      COLLECTION_TYPES.forEach((type) => {
-        const list = Array.isArray(this.coll[type]) ? this.coll[type] : []
+      const seenDeps = new Set()
+      ;(OWNED_COLLECTIONS[scopedType] ?? []).forEach((type) => {
+        const list = Array.isArray(this.coll[scopedType]?.[type]) ? this.coll[scopedType][type] : []
         list.forEach((item) => {
           if (item?.resourceId == null) return
+          const key = versionsKey(type, item.resourceId)
+          if (seenDeps.has(key)) return
+          seenDeps.add(key)
           dependencyOverrides.push({
             resource_id: item.resourceId,
             resource_type: type,
@@ -592,4 +650,11 @@ export const useReleaseStore = defineStore('release', {
 })
 
 // Exposed for the composable/tests that derive ids from the active release.
-export { SINGLETON_TYPES, OPTIONAL_SINGLETON_TYPES, COLLECTION_TYPES, releaseResourceId }
+export {
+  SINGLETON_TYPES,
+  OPTIONAL_SINGLETON_TYPES,
+  COLLECTION_TYPES,
+  OWNED_COLLECTIONS,
+  PARENT_TYPES,
+  releaseResourceId
+}

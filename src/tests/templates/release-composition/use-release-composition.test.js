@@ -625,19 +625,27 @@ describe('useReleaseComposition - Property 7 (buildAndActivate fan-out, no retry
 })
 
 // ---------------------------------------------------------------------------
-// Property 8 (scoped publish) — buildAndActivate's PER-DS preserve & swap path.
+// Property 8 (scoped publish) — buildAndActivate's PER-DS singleton reconcile.
 // In a scoped (Scenario B) entry the store hands over `{ scoped: true, override:
-// { resource_type, resource_id, version } }`. The composable builds a SEPARATE
-// body per selected DS: that DS's OWN active composition with ONLY the scoped
-// resource's version swapped; every other resource/subresource is carried over
-// byte-for-byte (req 5.6). A DS missing the scoped resource is a no-op MISMATCH
-// (req 5.8); a DS with no active composition is DEGRADED and excluded (req 5.7).
+// { resource_type, resource_id, version } }`. The scoped resource is a SINGLETON
+// (application/firewall/custom_page). The composable builds a SEPARATE body per
+// selected DS from that DS's OWN active composition and reconciles the scoped
+// singleton against it:
+//   - same type + same id (matchesOverride) → preserve every field, swap only
+//     `version_id` (unchanged swap behaviour, other resources carried byte-for-byte);
+//   - same type but a DIFFERENT id → replace the whole entry with the scoped
+//     `{ resource_id, resource_type, version_id }` (flexible swap);
+//   - no resource of that type → ADD the scoped entry (create/link).
+// DEGRADED excludes a DS ONLY when reading its active release actually FAILS
+// (`getActiveReleaseComposition` rejects). A DS whose read resolves `null` (no
+// release) is NOT degraded — it is the CREATE path. MISMATCH survives in the
+// enum for back-compat but is never produced.
 // `DeploymentAdapter` stays real so the genuine deployment-api body is asserted.
 // ---------------------------------------------------------------------------
-describe('useReleaseComposition - Property 8 (scoped publish: per-DS preserve & swap)', () => {
+describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton reconcile)', () => {
   // ds-keep holds the scoped application (global_id 42) plus other resources that
-  // must survive untouched; ds-other holds a different app (mismatch); ds-gone has
-  // no active composition (degraded).
+  // must survive untouched; ds-other holds a different app (flexible swap); ds-gone
+  // has no active release (create path).
   const wireScopedReleases = () => {
     deploymentReleaseService.getActiveReleaseComposition.mockImplementation((dsId) => {
       if (dsId === 'ds-keep') {
@@ -725,7 +733,7 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS preserve & 
     expect(appRef.version_id).toBe('app-new')
   })
 
-  it('reports a no-op MISMATCH (never injects) when the scoped resource is absent (req 5.8)', async () => {
+  it('SWAPS the scoped singleton onto a DS holding a different resource of the same type', async () => {
     wireScopedReleases()
     deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
 
@@ -736,25 +744,23 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS preserve & 
     })
     await flushPromises()
 
-    // ds-other holds app 99, not the scoped app 42 → mismatch, never published.
+    // ds-other holds app 99 (a different application). The scoped singleton
+    // replaces it wholesale — the DS ends up with the scoped app 42 and no
+    // duplicate application entry.
     const results = await buildAndActivate(scopedAppOverride(), ['ds-other'])
 
-    expect(deploymentReleaseService.buildAndActivate).not.toHaveBeenCalled()
-    expect(results).toEqual([
-      {
-        id: 'ds-other',
-        ok: false,
-        skipped: true,
-        skipReason: SCOPED_PUBLISH_SKIP_REASONS.MISMATCH,
-        traceId: null,
-        value: null,
-        error: null,
-        errorType: null
-      }
-    ])
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
+    const [calledId, payload] = deploymentReleaseService.buildAndActivate.mock.calls[0]
+    expect(calledId).toBe('ds-other')
+
+    expect(
+      payload.resources.filter((resource) => resource.resource_type === 'application')
+    ).toEqual([{ global_id: 42, version_id: 'app-new', resource_type: 'application' }])
+
+    expect(results[0]).toMatchObject({ id: 'ds-other', ok: true })
   })
 
-  it('EXCLUDES a DEGRADED DS (no active composition) and never borrows another DS body (req 5.7)', async () => {
+  it('ADDS the scoped resource (creates a release) when the DS has no active composition', async () => {
     wireScopedReleases()
     deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
 
@@ -765,12 +771,39 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS preserve & 
     })
     await flushPromises()
 
+    // ds-gone resolves `null` (no release) → the scoped singleton is ADDED,
+    // creating a fresh composition instead of being skipped.
     const results = await buildAndActivate(scopedAppOverride(), ['ds-gone'])
+
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
+    const [calledId, payload] = deploymentReleaseService.buildAndActivate.mock.calls[0]
+    expect(calledId).toBe('ds-gone')
+    expect(payload.resources).toEqual([
+      { global_id: 42, version_id: 'app-new', resource_type: 'application' }
+    ])
+
+    expect(results[0]).toMatchObject({ id: 'ds-gone', ok: true })
+  })
+
+  it('EXCLUDES a DEGRADED DS whose active release cannot be READ', async () => {
+    deploymentReleaseService.getActiveReleaseComposition.mockRejectedValue(new Error('read failed'))
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
+
+    const { buildAndActivate } = useReleaseComposition({
+      enabled: ref(true),
+      selectedDsIds: ref(['ds-fail-read']),
+      versionedResources: ref([])
+    })
+    await flushPromises()
+
+    // The read genuinely rejects → the DS is DEGRADED and excluded; nothing is
+    // published and no body is borrowed from another DS.
+    const results = await buildAndActivate(scopedAppOverride(), ['ds-fail-read'])
 
     expect(deploymentReleaseService.buildAndActivate).not.toHaveBeenCalled()
     expect(results).toEqual([
       {
-        id: 'ds-gone',
+        id: 'ds-fail-read',
         ok: false,
         skipped: true,
         skipReason: SCOPED_PUBLISH_SKIP_REASONS.DEGRADED,
@@ -782,7 +815,7 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS preserve & 
     ])
   })
 
-  it('fans out per-DS: each selected DS gets its OWN composition, mismatch/degraded excluded', async () => {
+  it('fans out per-DS: swap-same, swap-different and create all publish their OWN body', async () => {
     wireScopedReleases()
     deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
 
@@ -795,17 +828,19 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS preserve & 
 
     const results = await buildAndActivate(scopedAppOverride(), ['ds-keep', 'ds-other', 'ds-gone'])
 
-    // Only ds-keep is published (its own body); the other two are excluded.
-    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
-    expect(deploymentReleaseService.buildAndActivate.mock.calls[0][0]).toBe('ds-keep')
+    // ds-keep swaps the same app, ds-other swaps a different app, ds-gone creates:
+    // all three publish their own body.
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(3)
+    const calledIds = deploymentReleaseService.buildAndActivate.mock.calls.map(([id]) => id)
+    expect(calledIds).toContain('ds-keep')
+    expect(calledIds).toContain('ds-other')
+    expect(calledIds).toContain('ds-gone')
 
     // Results preserve the caller's id order with per-DS outcome.
-    expect(
-      results.map((entry) => ({ id: entry.id, ok: entry.ok, skip: entry.skipReason }))
-    ).toEqual([
-      { id: 'ds-keep', ok: true, skip: undefined },
-      { id: 'ds-other', ok: false, skip: SCOPED_PUBLISH_SKIP_REASONS.MISMATCH },
-      { id: 'ds-gone', ok: false, skip: SCOPED_PUBLISH_SKIP_REASONS.DEGRADED }
+    expect(results.map((entry) => ({ id: entry.id, ok: entry.ok }))).toEqual([
+      { id: 'ds-keep', ok: true },
+      { id: 'ds-other', ok: true },
+      { id: 'ds-gone', ok: true }
     ])
   })
 
@@ -1188,7 +1223,7 @@ describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-
     expect(payload.resources.some((resource) => resource.version_id === null)).toBe(false)
   })
 
-  it('keeps application MISMATCH/DEGRADED handling unchanged — a DS with no composition is skipped, never published with fabricated dependencies', async () => {
+  it('a DS with no composition now CREATES a release with the scoped app and the dependency override', async () => {
     wireFunctionReleases()
     deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
 
@@ -1200,17 +1235,26 @@ describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-
       ['ds-with-fn', 'ds-gone']
     )
 
-    // Only the DS with a composition is published; the degraded DS is excluded and
-    // never receives a fabricated body carrying the dependency override.
-    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
-    expect(deploymentReleaseService.buildAndActivate.mock.calls[0][0]).toBe('ds-with-fn')
-    expect(lastPayloadFor('ds-gone')).toBeUndefined()
+    // Both DSs publish: ds-with-fn reconciles its existing composition, while
+    // ds-gone (no release) CREATES one carrying the scoped app plus the dependency
+    // override.
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(2)
 
-    expect(
-      results.map((entry) => ({ id: entry.id, ok: entry.ok, skip: entry.skipReason }))
-    ).toEqual([
-      { id: 'ds-with-fn', ok: true, skip: undefined },
-      { id: 'ds-gone', ok: false, skip: SCOPED_PUBLISH_SKIP_REASONS.DEGRADED }
+    const gonePayload = lastPayloadFor('ds-gone')
+    expect(findByType(gonePayload, 'application')).toEqual({
+      global_id: 42,
+      version_id: 'app-new',
+      resource_type: 'application'
+    })
+    expect(findFunctionById(gonePayload, 'fn-9')).toEqual({
+      resource_id: 'fn-9',
+      version_id: 'fn-9-new',
+      resource_type: 'function'
+    })
+
+    expect(results.map((entry) => ({ id: entry.id, ok: entry.ok }))).toEqual([
+      { id: 'ds-with-fn', ok: true },
+      { id: 'ds-gone', ok: true }
     ])
   })
 })

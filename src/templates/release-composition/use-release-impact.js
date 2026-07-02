@@ -1,6 +1,6 @@
 // Sibling composable (design §3.1 / §7.3) that owns the release blast-radius
 // DATA — the per-DS reverse-lookup index the existing impact engine reads, plus
-// the per-DS meta (`environmentName` / `workloadsCount`) the DS picker rows
+// the per-DS meta (`environmentNames` / `workloadsCount`) the DS picker rows
 // spread in. It performs NO IO itself: it drives the injected `lookupService`
 // (task 5.1), which is the only place that touches the tenant workloads /
 // environments services (req 9.2). The engine in `use-release-composition.js`
@@ -50,7 +50,7 @@ const isEmptyIndex = (index) => !isPlainObject(index) || Object.keys(index).leng
  *   service (closed never fetches, reopen reuses the cache).
  * @returns {{
  *   reverseLookupByDs: import('vue').Ref<object>,
- *   dsMetaFor: (dsId: (string|number)) => ({ environmentName?: string, workloadsCount?: number }),
+ *   dsMetaFor: (dsId: (string|number)) => ({ environmentNames?: string[], workloadsCount?: number }),
  *   activeVersionHintFor: (dsId: (string|number)) => (string|number|null),
  *   isLoading: import('vue').ComputedRef<boolean>,
  *   isPartial: import('vue').ComputedRef<boolean>,
@@ -120,25 +120,28 @@ export function useReleaseImpact({
   }
 
   /**
-   * Per-DS meta for the picker row: `{ environmentName, workloadsCount }`, with
-   * every field OMITTED when it cannot be derived (req 3.6 / 7.3). `environmentName`
-   * is included only when the DS resolves to exactly one non-null environment name
-   * across its rows — a multi-env DS leaves it out rather than guess.
+   * Per-DS meta for the picker row: `{ environmentNames, workloadsCount }`, with
+   * every field OMITTED when it cannot be derived (req 3.6 / 7.3). `workloadsCount`
+   * counts DISTINCT workloads (by `row.id`), and `environmentNames` lists every
+   * distinct non-null environment name in first-occurrence order — included only
+   * when at least one such name exists.
    *
    * @param {(string|number)} dsId
-   * @returns {{ environmentName?: string, workloadsCount?: number }}
+   * @returns {{ environmentNames?: string[], workloadsCount?: number }}
    */
   const dsMetaFor = (dsId) => {
     const rows = rowsFor(dsId)
     if (!rows) return {}
 
-    const meta = { workloadsCount: rows.length }
+    const meta = { workloadsCount: new Set(rows.map((row) => row?.id)).size }
 
-    const envNames = new Set(
-      rows.map((row) => row?.environmentName).filter((name) => name != null && name !== '')
-    )
-    if (envNames.size === 1) {
-      meta.environmentName = [...envNames][0]
+    const environmentNames = [
+      ...new Set(
+        rows.map((row) => row?.environmentName).filter((name) => name != null && name !== '')
+      )
+    ]
+    if (environmentNames.length) {
+      meta.environmentNames = environmentNames
     }
 
     return meta

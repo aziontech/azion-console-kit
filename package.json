@@ -28,7 +28,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "lint:architecture": "eslint src/ --ext .vue,.js,.ts --ignore-path .gitignore --no-fix --no-eslintrc -c .eslintrc-architecture.cjs",
     "lint:architecture:changed": "node scripts/lint-architecture-changed.cjs",
-    "lint:security-check": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore --ignore-pattern 'cypress/**' --ignore-pattern 'cypress.config.*' --ignore-pattern '**/*.test.js' --no-eslintrc -c .eslintrc-security.cjs",
+    "lint:security-check": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore --ignore-pattern 'cypress/**' --ignore-pattern 'cypress.config.*' --ignore-pattern '**/*.test.js' --ignore-pattern '**/*.spec.js' --no-eslintrc -c .eslintrc-security.cjs",
     "lint:security-check:changed": "node scripts/lint-security-changed.cjs",
     "package-audit": "yarn audit --groups dependencies",
     "format": "prettier --write src/",

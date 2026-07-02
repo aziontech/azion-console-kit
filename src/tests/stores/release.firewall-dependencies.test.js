@@ -7,12 +7,12 @@ beforeEach(() => {
 })
 
 describe('seedFirewallFunctions — firewall-required function dependencies', () => {
-  it('maps each functionId to a locked, required, version:null entry under coll.function', () => {
+  it('maps each functionId to a locked, required, version:null entry under coll.firewall.function', () => {
     const store = useReleaseStore()
 
     store.seedFirewallFunctions([{ functionId: 'fn-100' }, { functionId: 'fn-200' }])
 
-    expect(store.coll.function).toEqual([
+    expect(store.coll.firewall.function).toEqual([
       { resourceId: 'fn-100', version: null, locked: true, required: true },
       { resourceId: 'fn-200', version: null, locked: true, required: true }
     ])
@@ -27,25 +27,27 @@ describe('seedFirewallFunctions — firewall-required function dependencies', ()
       { functionId: 'fn-100' }
     ])
 
-    expect(store.coll.function).toEqual([
+    expect(store.coll.firewall.function).toEqual([
       { resourceId: 'fn-100', version: null, locked: true, required: true }
     ])
   })
 
-  it('replaces ONLY coll.function and leaves other coll keys untouched', () => {
+  it('seeds firewall.function without disturbing the application.function slot', () => {
     const store = useReleaseStore()
-    store.seedColl({
-      connector: [{ resourceId: 'cn-9', version: 'cn-v1' }],
-      waf: [{ resourceId: 'waf-2', version: 'waf-v5' }]
-    })
+    store.seedApplicationFunctions([{ functionId: 'fn-app' }])
+    store.seedFirewallWafs([{ wafId: 'waf-2' }])
 
     store.seedFirewallFunctions([{ functionId: 'fn-100' }])
 
-    expect(store.coll.function).toEqual([
+    expect(store.coll.firewall.function).toEqual([
       { resourceId: 'fn-100', version: null, locked: true, required: true }
     ])
-    expect(store.coll.connector).toEqual([{ resourceId: 'cn-9', version: 'cn-v1' }])
-    expect(store.coll.waf).toEqual([{ resourceId: 'waf-2', version: 'waf-v5' }])
+    expect(store.coll.application.function).toEqual([
+      { resourceId: 'fn-app', version: null, locked: true, required: true }
+    ])
+    expect(store.coll.firewall.waf).toEqual([
+      { resourceId: 'waf-2', version: null, locked: true, required: true }
+    ])
   })
 })
 
@@ -58,7 +60,7 @@ describe('seedFirewallWafs — firewall-required waf dependencies', () => {
       { wafId: 'waf-200', ruleCount: 1 }
     ])
 
-    expect(store.coll.waf).toEqual([
+    expect(store.coll.firewall.waf).toEqual([
       { resourceId: 'waf-100', version: null, locked: true, required: true },
       { resourceId: 'waf-200', version: null, locked: true, required: true }
     ])
@@ -69,7 +71,7 @@ describe('seedFirewallWafs — firewall-required waf dependencies', () => {
 
     store.seedFirewallWafs([{ wafId: 'waf-1' }, { wafId: null }, { wafId: 'waf-1' }])
 
-    expect(store.coll.waf).toEqual([
+    expect(store.coll.firewall.waf).toEqual([
       { resourceId: 'waf-1', version: null, locked: true, required: true }
     ])
   })
@@ -80,7 +82,7 @@ describe('seedFirewallWafs — firewall-required waf dependencies', () => {
 
     store.seedFirewallWafs(null)
 
-    expect(store.coll.waf).toEqual([])
+    expect(store.coll.firewall.waf).toEqual([])
   })
 })
 
@@ -90,7 +92,7 @@ describe('seedFirewallNetworkLists — firewall-required network list dependenci
 
     store.seedFirewallNetworkLists([{ networkListId: 30, ruleCount: 2 }, { networkListId: 40 }])
 
-    expect(store.coll.network_list).toEqual([
+    expect(store.coll.firewall.network_list).toEqual([
       { resourceId: 30, version: null, locked: true, required: true },
       { resourceId: 40, version: null, locked: true, required: true }
     ])
@@ -105,7 +107,7 @@ describe('seedFirewallNetworkLists — firewall-required network list dependenci
       { networkListId: 30 }
     ])
 
-    expect(store.coll.network_list).toEqual([
+    expect(store.coll.firewall.network_list).toEqual([
       { resourceId: 30, version: null, locked: true, required: true }
     ])
   })
@@ -125,9 +127,10 @@ describe('firewall dependencies — deploy gate getters', () => {
     store.seedFirewallWafs([{ wafId: 'waf-1' }])
     store.seedFirewallNetworkLists([{ networkListId: 30 }])
 
+    // Order follows OWNED_COLLECTIONS.firewall (function, network_list, waf).
     expect(store.pendingDependencySelections).toEqual([
-      { type: 'waf', resourceId: 'waf-1' },
-      { type: 'network_list', resourceId: 30 }
+      { type: 'network_list', resourceId: 30 },
+      { type: 'waf', resourceId: 'waf-1' }
     ])
   })
 
@@ -136,8 +139,8 @@ describe('firewall dependencies — deploy gate getters', () => {
     store.seedFirewallWafs([{ wafId: 'waf-1' }])
     store.seedFirewallNetworkLists([{ networkListId: 30 }])
 
-    store.setCollVer('waf', 0, 'waf-v2')
-    store.setCollVer('network_list', 0, 'nl-v5')
+    store.setCollVer('firewall', 'waf', 0, 'waf-v2')
+    store.setCollVer('firewall', 'network_list', 0, 'nl-v5')
 
     expect(store.appManagedVersionsChosen).toBe(true)
     expect(store.pendingDependencySelections).toEqual([])
@@ -158,9 +161,9 @@ describe('composePayload — scoped firewall carries dependencyOverrides', () =>
     store.seedFirewallWafs([{ wafId: 'waf-1' }])
     store.seedFirewallNetworkLists([{ networkListId: 30 }])
 
-    store.setCollVer('function', 0, 'fn-v3')
-    store.setCollVer('waf', 0, 'waf-v2')
-    store.setCollVer('network_list', 0, 'nl-v5')
+    store.setCollVer('firewall', 'function', 0, 'fn-v3')
+    store.setCollVer('firewall', 'waf', 0, 'waf-v2')
+    store.setCollVer('firewall', 'network_list', 0, 'nl-v5')
 
     const payload = store.composePayload()
 

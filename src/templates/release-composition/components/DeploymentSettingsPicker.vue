@@ -6,16 +6,23 @@
    * already enriched from the composable, `query` is owned by the parent, and
    * selection is a plain array of ids surfaced through `modelValue`.
    *
-   * A Deployment Setting row never fabricates data: the Environment name and
-   * the "{N} Workloads affected" line are rendered only when the platform
-   * actually provides them (`environmentName` / `workloadsCount`); otherwise
-   * they are omitted (req 4.3).
+   * A Deployment Setting row never fabricates data: it renders only the icon,
+   * `name`, the `policyLabel` tag and, when present, the impact metadata
+   * (`workloadsCount`, `environmentNames`) that already arrives on each object.
    *
-   * @prop {Array<{ id, name, policyLabel, environmentName?, workloadsCount? }>} deployments
-   *   The Deployment Settings to list. `environmentName` and `workloadsCount`
-   *   are optional and rendered only when present.
+   * @prop {Array<{ id, name, policyLabel, workloadsCount?, environmentNames? }>} deployments
+   *   Flat list of Deployment Settings. Used as a fallback when `groups` is empty.
+   *   `workloadsCount` (number) renders a "{N} Workloads affected" line and is
+   *   omitted when absent (never fabricated to 0). `environmentNames` (string[])
+   *   renders up to three tags plus a "+K" overflow chip.
+   * @prop {Array<{ key: 'linked'|'available', label: string, deployments: Array<{ id, name, policyLabel, workloadsCount?, environmentNames? }> }>} groups
+   *   Sectioned Deployment Settings. When populated, rows render grouped under
+   *   `label` headers (empty groups omitted) and the listed set — driving the
+   *   counter, select-all/clear-all and search — is the union of all groups.
    * @prop {Array<string|number>} modelValue Selected Deployment Setting ids.
    * @prop {string} query Search string (owned by the parent).
+   * @prop {boolean} isLoadingMeta When true, the impact metadata (workloads
+   *   count and environment tags) is replaced by a discrete skeleton placeholder.
    *
    * @emits update:modelValue When the selection changes.
    * @emits update:query When the search string changes.
@@ -34,6 +41,10 @@
       type: Array,
       default: () => []
     },
+    groups: {
+      type: Array,
+      default: () => []
+    },
     modelValue: {
       type: Array,
       default: () => []
@@ -41,8 +52,19 @@
     query: {
       type: String,
       default: ''
+    },
+    isLoadingMeta: {
+      type: Boolean,
+      default: false
     }
   })
+
+  const MAX_ENV_TAGS = 3
+
+  const visibleEnvNames = (ds) => (ds.environmentNames ?? []).slice(0, MAX_ENV_TAGS)
+  const remainingEnvNames = (ds) => (ds.environmentNames ?? []).slice(MAX_ENV_TAGS)
+  const extraEnvCount = (ds) => remainingEnvNames(ds).length
+  const hasWorkloadsCount = (ds) => Number.isFinite(ds.workloadsCount)
 
   const emit = defineEmits(['update:modelValue', 'update:query', 'bind-environment'])
 
@@ -70,12 +92,37 @@
     set: (value) => emit('update:query', value)
   })
 
-  const total = computed(() => props.deployments.length)
+  // When `groups` is populated the picker renders sectioned rows; the flat
+  // "listed" set is the union of every group's deployments in group order.
+  // With no groups it falls back to the plain `deployments` prop.
+  const visibleGroups = computed(() =>
+    props.groups.filter((group) => group.deployments && group.deployments.length > 0)
+  )
+
+  const hasGroups = computed(() => visibleGroups.value.length > 0)
+
+  const listedDeployments = computed(() =>
+    hasGroups.value ? visibleGroups.value.flatMap((group) => group.deployments) : props.deployments
+  )
+
+  const total = computed(() => listedDeployments.value.length)
   const selectedCount = computed(() => props.modelValue.length)
 
   const searchPlaceholder = computed(() => `Search ${total.value} Deployment Settings`)
 
   const hasDeployments = computed(() => total.value > 0)
+
+  // Normalized render model: grouped mode yields one section per non-empty
+  // group (with a header), flat mode yields a single header-less section.
+  const sections = computed(() =>
+    hasGroups.value
+      ? visibleGroups.value.map((group) => ({
+          key: group.key,
+          label: group.label,
+          deployments: group.deployments
+        }))
+      : [{ key: null, label: null, deployments: props.deployments }]
+  )
 
   // Select-all / clear-all over the LISTED candidate set (req 1.9 / NRS §4.5).
   // `deployments` may be a filtered/capped view (search term, display cap), so
@@ -89,13 +136,15 @@
   // (so it disables select-all once the visible set is fully picked), regardless
   // of selections hidden by the current search.
   const allSelected = computed(
-    () => hasDeployments.value && props.deployments.every((deployment) => isSelected(deployment.id))
+    () =>
+      hasDeployments.value &&
+      listedDeployments.value.every((deployment) => isSelected(deployment.id))
   )
 
   // Select-all UNIONS the listed ids with the existing selection so rows hidden
   // by the search/cap stay selected (never dropped).
   const selectAll = () => {
-    const listedToAdd = props.deployments
+    const listedToAdd = listedDeployments.value
       .map((deployment) => deployment.id)
       .filter((id) => !isSelected(id))
     selectedIds.value = [...props.modelValue, ...listedToAdd]
@@ -104,7 +153,7 @@
   // Clear-all removes ONLY the listed rows from the selection, preserving any
   // selections hidden by the search/cap.
   const clearAll = () => {
-    const listedIds = new Set(props.deployments.map((deployment) => String(deployment.id)))
+    const listedIds = new Set(listedDeployments.value.map((deployment) => String(deployment.id)))
     selectedIds.value = props.modelValue.filter((item) => !listedIds.has(String(item)))
   }
 </script>
@@ -182,60 +231,110 @@
       class="flex flex-col gap-[var(--spacing-3)] overflow-y-auto max-h-[var(--container-xs)] pr-[var(--spacing-1)]"
       data-testid="release-composition__ds-list"
     >
-      <div
-        v-for="ds in deployments"
-        :key="ds.id"
-        role="checkbox"
-        :aria-checked="selectedIds.includes(ds.id)"
-        :aria-label="ds.name"
-        tabindex="0"
-        class="flex cursor-pointer items-start gap-[var(--spacing-3)] rounded-[var(--shape-card)] border px-[var(--spacing-4)] py-[var(--spacing-4)] transition-colors"
-        :class="
-          selectedIds.includes(ds.id)
-            ? 'border-[var(--border-selected)] bg-[var(--surface-50)]'
-            : 'border-[var(--surface-border)]'
-        "
-        :data-testid="`release-composition__ds-row-${ds.id}`"
-        @click="toggle(ds.id)"
-        @keydown.enter.prevent="toggle(ds.id)"
-        @keydown.space.prevent="toggle(ds.id)"
+      <template
+        v-for="section in sections"
+        :key="section.key ?? '__flat'"
       >
-        <Checkbox
-          :modelValue="selectedIds.includes(ds.id)"
-          binary
-          tabindex="-1"
-          class="pointer-events-none"
-          :inputId="`release-composition__ds-checkbox-${ds.id}`"
-          :data-testid="`release-composition__ds-checkbox-${ds.id}`"
-        />
-        <div class="flex flex-1 flex-col gap-[var(--spacing-1)]">
-          <span class="flex flex-wrap items-center gap-[var(--spacing-2)]">
-            <i class="pi pi-send text-[var(--text-color-secondary)]" />
-            <span class="text-body-sm text-[var(--text-color)]">{{ ds.name }}</span>
-            <span
-              v-if="ds.environmentName"
-              class="text-body-sm font-bold text-[var(--text-color)]"
-              :data-testid="`release-composition__ds-environment-${ds.id}`"
-            >
-              {{ ds.environmentName }}
+        <span
+          v-if="section.label"
+          class="text-body-xs font-semibold text-[var(--text-color-secondary)]"
+          :data-testid="`release-composition__ds-group-${section.key}`"
+        >
+          {{ section.label }}
+        </span>
+        <div
+          v-for="ds in section.deployments"
+          :key="ds.id"
+          role="checkbox"
+          :aria-checked="selectedIds.includes(ds.id)"
+          :aria-label="ds.name"
+          tabindex="0"
+          class="flex cursor-pointer items-start gap-[var(--spacing-3)] rounded-[var(--shape-card)] border px-[var(--spacing-4)] py-[var(--spacing-4)] transition-colors"
+          :class="
+            selectedIds.includes(ds.id)
+              ? 'border-[var(--border-selected)] bg-[var(--surface-50)]'
+              : 'border-[var(--surface-border)]'
+          "
+          :data-testid="`release-composition__ds-row-${ds.id}`"
+          @click="toggle(ds.id)"
+          @keydown.enter.prevent="toggle(ds.id)"
+          @keydown.space.prevent="toggle(ds.id)"
+        >
+          <Checkbox
+            :modelValue="selectedIds.includes(ds.id)"
+            binary
+            tabindex="-1"
+            class="pointer-events-none"
+            :inputId="`release-composition__ds-checkbox-${ds.id}`"
+            :data-testid="`release-composition__ds-checkbox-${ds.id}`"
+          />
+          <div class="flex flex-1 flex-col gap-[var(--spacing-1)]">
+            <span class="flex flex-wrap items-center gap-[var(--spacing-2)]">
+              <i class="pi pi-send text-[var(--text-color-secondary)]" />
+              <span class="text-body-sm text-[var(--text-color)]">{{ ds.name }}</span>
+
+              <span
+                v-if="!isLoadingMeta && visibleEnvNames(ds).length"
+                class="flex flex-wrap items-center gap-[var(--spacing-1)]"
+                :data-testid="`release-composition__ds-envs-${ds.id}`"
+              >
+                <span
+                  v-for="envName in visibleEnvNames(ds)"
+                  :key="envName"
+                  class="inline-flex items-center rounded-[var(--shape-elements)] bg-[var(--surface-200)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm text-[var(--text-color-secondary)]"
+                  :data-testid="`release-composition__ds-env-${ds.id}`"
+                >
+                  {{ envName }}
+                </span>
+                <span
+                  v-if="extraEnvCount(ds) > 0"
+                  v-tooltip.top="remainingEnvNames(ds).join(', ')"
+                  tabindex="0"
+                  role="button"
+                  :aria-label="`${extraEnvCount(ds)} more Environments: ${remainingEnvNames(ds).join(', ')}`"
+                  class="inline-flex cursor-default items-center rounded-[var(--shape-elements)] bg-[var(--surface-200)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm text-[var(--text-color-secondary)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--border-selected)]"
+                  :data-testid="`release-composition__ds-env-more-${ds.id}`"
+                >
+                  +{{ extraEnvCount(ds) }}
+                </span>
+              </span>
             </span>
-          </span>
+
+            <div
+              v-if="isLoadingMeta"
+              class="flex flex-col gap-[var(--spacing-1)]"
+              :data-testid="`release-composition__ds-meta-skeleton-${ds.id}`"
+            >
+              <span class="flex items-center gap-[var(--spacing-2)]">
+                <span
+                  class="inline-block h-[var(--spacing-4)] w-[var(--spacing-16)] rounded-[var(--shape-elements)] bg-[var(--surface-200)] animate-pulse"
+                />
+                <span
+                  class="inline-block h-[var(--spacing-4)] w-[var(--spacing-16)] rounded-[var(--shape-elements)] bg-[var(--surface-200)] animate-pulse"
+                />
+              </span>
+              <span
+                class="inline-block h-[var(--spacing-3)] w-[var(--spacing-24)] rounded-[var(--shape-elements)] bg-[var(--surface-200)] animate-pulse"
+              />
+            </div>
+
+            <span
+              v-else-if="hasWorkloadsCount(ds)"
+              class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
+              :data-testid="`release-composition__ds-workloads-${ds.id}`"
+            >
+              <i class="pi pi-globe" />
+              {{ ds.workloadsCount }} Workloads affected
+            </span>
+          </div>
           <span
-            v-if="ds.workloadsCount != null"
-            class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
-            :data-testid="`release-composition__ds-workloads-${ds.id}`"
+            class="inline-flex shrink-0 items-center self-start rounded-[var(--shape-elements)] bg-[var(--surface-200)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm text-[var(--text-color-secondary)]"
+            :data-testid="`release-composition__ds-policy-${ds.id}`"
           >
-            <i class="pi pi-globe text-[length:inherit]" />
-            {{ ds.workloadsCount }} Workloads affected
+            {{ ds.policyLabel }}
           </span>
         </div>
-        <span
-          class="inline-flex shrink-0 items-center self-start rounded-[var(--shape-elements)] bg-[var(--surface-200)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm text-[var(--text-color-secondary)]"
-          :data-testid="`release-composition__ds-policy-${ds.id}`"
-        >
-          {{ ds.policyLabel }}
-        </span>
-      </div>
+      </template>
     </div>
 
     <div

@@ -109,14 +109,14 @@ const toAdapterResources = (releaseResources) =>
     resource_type: resource?.resource_type
   }))
 
-// Per-DS outcome markers for the scoped preserve-&-swap path: a DS whose active
-// composition is unavailable is DEGRADED and excluded (req 5.7); a DS whose
-// composition does not contain the scoped resource is a no-op MISMATCH and is
-// never injected (req 5.8). A scoped override whose version did NOT resolve to a
-// concrete id (the LATEST sentinel had no loaded versions, so it resolved to
-// `null`) is UNRESOLVED_VERSION: it is a hard error surfaced to the consumer,
-// never published as `version_id: null` (the API rejects that). All three are
-// reported to the consumer, never published.
+// Per-DS outcome markers for the scoped swap/add path: a DS whose active
+// composition cannot be READ is DEGRADED and excluded. A scoped override whose
+// version did NOT resolve to a concrete id (the LATEST sentinel had no loaded
+// versions, so it resolved to `null`) is UNRESOLVED_VERSION: a hard error
+// surfaced to the consumer, never published as `version_id: null` (the API
+// rejects that). MISMATCH is retained for back-compat but no longer produced —
+// a DS lacking the scoped resource now RECEIVES it (add/link) instead of being
+// skipped. Reported to the consumer, never published.
 export const SCOPED_PUBLISH_SKIP_REASONS = Object.freeze({
   DEGRADED: 'degraded',
   MISMATCH: 'mismatch',
@@ -150,7 +150,9 @@ export function useReleaseComposition({
   selectedDsIds,
   versionedResources,
   reverseLookupByDs = ref({}),
-  resolveConsumingDeployments
+  resolveConsumingDeployments,
+  impactLoading,
+  impactFailed
 } = {}) {
   const isEnabled = computed(() => Boolean(toValue(enabled) ?? true))
 
@@ -186,6 +188,19 @@ export function useReleaseComposition({
     } finally {
       activeReleaseLoadingByDs.value = { ...activeReleaseLoadingByDs.value, [dsId]: false }
     }
+  }
+
+  const ensureActiveReleases = (ids) => {
+    if (!Array.isArray(ids) || ids.length === 0) return
+    const seen = new Set()
+    ids.forEach((id) => {
+      if (id == null) return
+      const key = String(id)
+      if (seen.has(key)) return
+      seen.add(key)
+      if (loadedDsIds.value.has(id)) return
+      Promise.resolve(loadActiveRelease(id)).catch(() => {})
+    })
   }
 
   // Load the active release for each newly selected DS once. Deselecting a DS
@@ -418,8 +433,6 @@ export function useReleaseComposition({
   // SEAM 1: `reverseLookupByDs` is the engine's input ref. It is an optional
   // factory argument (default `ref({})`) so an injected, populated ref feeds the
   // engine below with zero logic change (req 9.5).
-  const hasReverseLookup = (dsId) => Array.isArray(reverseLookupByDs.value[dsId])
-
   const buildDsImpact = (dsId) => {
     const workloads = reverseLookupByDs.value[dsId] ?? []
     const environments = new Map()
@@ -446,7 +459,7 @@ export function useReleaseComposition({
     return {
       deploymentId: dsId,
       environments: [...environments.values()],
-      totalWorkloads: workloads.length,
+      totalWorkloads: new Set(workloads.map((workload) => workload?.id)).size,
       totalDomains: domainCount
     }
   }
@@ -454,35 +467,45 @@ export function useReleaseComposition({
   const impact = computed(() => {
     const dsIds = toValue(selectedDsIds) ?? []
 
-    // req 7.1: nothing selected => no impact to preview (not "unavailable").
-    // `totals` is always a non-null object so the panel can read it unguarded.
+    // Nothing selected => no impact to preview (not "unavailable"). `totals` is
+    // always a non-null object so the panel can read it unguarded.
     if (dsIds.length === 0) {
       return {
         hasSelection: false,
+        isLoading: false,
         impactUnavailable: false,
         perDs: [],
         totals: { dsCount: 0, totalDomains: 0, totalWorkloads: 0 }
       }
     }
 
-    // req 7.3 / 11.2: degrade unless EVERY selected DS has reverse-lookup data.
-    // Today that source is unreachable, so this always degrades — zero synthetic
-    // rows, but `totals.dsCount` still reflects the REAL selection so the panel
-    // can show "{N} Deployment Settings selected" (Property 8: no fabrication).
-    const allResolved = dsIds.every((dsId) => hasReverseLookup(dsId))
-    if (!allResolved) {
+    // While the tenant-wide lookup is in flight we can't tell "zero bindings"
+    // from "not loaded yet" — surface a loading state instead of flashing zeros.
+    if (toValue(impactLoading)) {
       return {
         hasSelection: true,
+        isLoading: true,
+        impactUnavailable: false,
+        perDs: [],
+        totals: { dsCount: dsIds.length, totalDomains: 0, totalWorkloads: 0 }
+      }
+    }
+
+    // Only a genuine lookup FAILURE degrades to "unavailable" (retry may help).
+    // A successful load with no rows for a DS is a real zero, not a failure.
+    if (toValue(impactFailed)) {
+      return {
+        hasSelection: true,
+        isLoading: false,
         impactUnavailable: true,
         perDs: [],
         totals: { dsCount: dsIds.length, totalDomains: 0, totalWorkloads: 0 }
       }
     }
 
-    // Available: shape each DS into what ImpactPanel renders — the deployment with
-    // its environments grouped (DS → environments[] → workloads). Scenario A (a
-    // single deployment) surfaces every affected environment; Scenario B's per-DS
-    // tree benefits from the same grouping. Totals come from the full lists.
+    // Loaded: build a branch for EVERY selected DS. A DS with no workload
+    // bindings yet is a real zero (no environments, 0 workloads/domains) — shown
+    // as such (Property 8: still no fabrication), never blanking the whole panel.
     const perDs = dsIds.map((dsId) => {
       const built = buildDsImpact(dsId)
       const deployment = deployments.value.find((item) => String(item.id) === String(dsId))
@@ -499,6 +522,7 @@ export function useReleaseComposition({
         }
       })
       return {
+        deploymentId: dsId,
         name: deployment?.name ?? String(dsId),
         domains: built.totalDomains,
         wlCount: built.totalWorkloads,
@@ -507,6 +531,7 @@ export function useReleaseComposition({
     })
     return {
       hasSelection: true,
+      isLoading: false,
       impactUnavailable: false,
       perDs,
       totals: {
@@ -537,10 +562,11 @@ export function useReleaseComposition({
   //     (resources are DS-agnostic) and fan it out to every DS unchanged (req 5.1).
   //
   //   scoped (Scenario B) → build a PER-DS body: each DS's own active composition
-  //     with ONLY the scoped resource's version swapped (preserve & swap, req 5.6).
-  //     A DS whose active composition is unavailable is DEGRADED and excluded
-  //     (req 5.7); a DS that does not contain the scoped resource is a no-op
-  //     MISMATCH and is never injected (req 5.8). Both are reported, never published.
+  //     with the scoped singleton REPLACED (same resource → swap version; different
+  //     resource of the same type → swap the entry) or ADDED when the DS is not
+  //     linked yet (create/link), preserving every other resource byte-for-byte.
+  //     A DS whose active composition cannot be READ is DEGRADED and excluded,
+  //     reported and never published.
   //
   // Either way the dispatch fans out one independent `build_and_activate` per DS
   // via `Promise.allSettled` — a per-DS settled `{ id, ok, traceId, value, error,
@@ -549,20 +575,24 @@ export function useReleaseComposition({
   // surfaced as a typed `errorType` (req 5.5/7.2).
   const isDeploying = ref(false)
 
-  // Read a DS's active composition for the scoped swap: prefer the already-loaded
-  // (cached) release (req 2.3), else fetch it on demand (req 2.1). A read failure
-  // (req 2.4) returns `null` so the caller degrades the DS — never fabricated.
+  // Read a DS's active composition for the scoped swap/add. Returns
+  // `{ ok: true, resources }` (empty array when the DS has no active release, so
+  // the caller can CREATE) or `{ ok: false }` only on a genuine read failure (so
+  // the caller degrades). A definitively-loaded DS is keyed off `loadedDsIds`, so
+  // a cached `null` from a prior failed prefetch is re-fetched, not mistaken for
+  // "no release".
   const activeReleaseResourcesFor = async (dsId) => {
-    const loaded = activeReleaseByDs.value[dsId]
-    if (loaded !== undefined) {
-      return Array.isArray(loaded?.resources) ? loaded.resources : null
+    if (loadedDsIds.value.has(dsId)) {
+      const loaded = activeReleaseByDs.value[dsId]
+      return { ok: true, resources: Array.isArray(loaded?.resources) ? loaded.resources : [] }
     }
     try {
       const release = await deploymentReleaseService.getActiveReleaseComposition(dsId)
       activeReleaseByDs.value = { ...activeReleaseByDs.value, [dsId]: release ?? null }
-      return Array.isArray(release?.resources) ? release.resources : null
+      loadedDsIds.value = new Set(loadedDsIds.value).add(dsId)
+      return { ok: true, resources: Array.isArray(release?.resources) ? release.resources : [] }
     } catch {
-      return null
+      return { ok: false }
     }
   }
 
@@ -664,23 +694,35 @@ export function useReleaseComposition({
     const targets = []
 
     for (const id of ids) {
-      const base = await activeReleaseResourcesFor(id)
-      // req 5.7: no composition → degraded, excluded, never borrowed/fabricated.
-      if (base == null) {
+      const result = await activeReleaseResourcesFor(id)
+      // A genuine read failure → degraded, excluded, never fabricated.
+      if (!result.ok) {
         skipped.push({ id, skipReason: SCOPED_PUBLISH_SKIP_REASONS.DEGRADED })
         continue
       }
-      // req 5.8: scoped resource absent → no-op mismatch, never injected.
-      if (!base.some((resource) => matchesOverride(resource, override))) {
-        skipped.push({ id, skipReason: SCOPED_PUBLISH_SKIP_REASONS.MISMATCH })
-        continue
+      const base = result.resources
+      // The scoped type is a singleton (application/firewall/custom_page): at most
+      // one resource of that type per release. Replace the existing one when
+      // present (same resource → preserve fields, swap version; different resource
+      // → swap the whole entry), or ADD it when the DS is not linked yet.
+      const scopedEntry = {
+        resource_id: override.resource_id,
+        resource_type: override.resource_type,
+        version_id: override.version
       }
-      // Preserve & swap: only the scoped resource's pinned version changes.
-      const swapped = base.map((resource) =>
-        matchesOverride(resource, override)
-          ? { ...resource, version_id: override.version }
-          : resource
+      const sameTypeIndex = base.findIndex(
+        (resource) => resource?.resource_type === override.resource_type
       )
+      let swapped
+      if (sameTypeIndex < 0) {
+        swapped = [...base, scopedEntry]
+      } else {
+        const existing = base[sameTypeIndex]
+        const replacement = matchesOverride(existing, override)
+          ? { ...existing, version_id: override.version }
+          : scopedEntry
+        swapped = base.map((resource, index) => (index === sameTypeIndex ? replacement : resource))
+      }
       const withDependencies = applyDependencyOverrides(swapped, dependencyOverrides)
       const payload = DeploymentAdapter.transformBuildAndActivatePayload(
         toAdapterResources(withDependencies),
@@ -748,6 +790,7 @@ export function useReleaseComposition({
     activeReleaseByDs,
     isLoadingActiveRelease,
     loadActiveRelease,
+    ensureActiveReleases,
     // versions per resource
     versionsByResource,
     versionOptionsFor,

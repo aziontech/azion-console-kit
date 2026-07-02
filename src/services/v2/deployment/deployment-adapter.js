@@ -14,6 +14,16 @@ const pickDefined = (payload) => {
   }, {})
 }
 
+// The deployment-api expects the resource ids (`application.global_id` and every
+// other type's `resource_id`) as numbers; the scoped entry point and catalog
+// picks may carry them as strings. Coerce numeric-looking ids to Number, leaving
+// non-numeric/nullish values untouched.
+const toNumericId = (value) => {
+  if (value == null) return value
+  const numeric = Number(value)
+  return Number.isFinite(numeric) ? numeric : value
+}
+
 const STATE_TO_STATUS = {
   ready: { content: 'Ready', severity: 'success' },
   queued: { content: 'Queued', severity: 'info' },
@@ -231,8 +241,8 @@ export const DeploymentAdapter = {
       // `name`/`resource_version` are rejected as unrecognized keys.
       const isApplication = resource?.resource_type === 'application'
       return pickDefined({
-        global_id: isApplication ? resource?.resource_id : undefined,
-        resource_id: isApplication ? undefined : resource?.resource_id,
+        global_id: isApplication ? toNumericId(resource?.resource_id) : undefined,
+        resource_id: isApplication ? undefined : toNumericId(resource?.resource_id),
         version_id: resource?.resource_version,
         resource_type: resource?.resource_type
       })

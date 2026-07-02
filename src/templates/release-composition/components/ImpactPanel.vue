@@ -67,6 +67,8 @@
       UNAVAILABLE_MESSAGES[props.degradationReason] ??
       "The blast radius (environments · workloads · domains) couldn't be computed. You can still publish, but the impact won't be shown."
   )
+
+  const isPartial = computed(() => props.degradationReason === 'capped')
 </script>
 
 <template>
@@ -80,6 +82,15 @@
       data-testid="release-composition__impact-empty"
     >
       Select Deployment Settings to preview the impact.
+    </div>
+
+    <div
+      v-else-if="impact.isLoading"
+      class="flex items-center gap-[var(--spacing-2)] rounded-[var(--shape-card)] border border-[var(--surface-border)] bg-[var(--surface-50)] p-[var(--spacing-4)] text-body-xs text-[var(--text-color-secondary)]"
+      data-testid="release-composition__impact-loading"
+    >
+      <i class="pi pi-spinner pi-spin" />
+      <span>Computing impact…</span>
     </div>
 
     <div
@@ -117,8 +128,19 @@
       data-testid="release-composition__impact-tree"
     >
       <div
+        v-if="isPartial"
+        class="flex items-center gap-[var(--spacing-2)] rounded-[var(--shape-card)] border border-[var(--surface-border)] bg-[var(--surface-50)] px-[var(--spacing-3)] py-[var(--spacing-2)]"
+        data-testid="release-composition__impact-partial"
+      >
+        <i class="pi pi-exclamation-triangle text-[var(--warning-contrast)]" />
+        <span class="text-body-xs text-[var(--text-color-secondary)]">
+          Partial impact — the workloads list was truncated, so these numbers may be incomplete.
+        </span>
+      </div>
+
+      <div
         v-for="ds in impact.perDs"
-        :key="ds.name"
+        :key="ds.deploymentId ?? ds.name"
         class="flex flex-col gap-[var(--spacing-3)]"
         :data-testid="`release-composition__impact-ds-${ds.name}`"
       >
@@ -133,6 +155,7 @@
         </div>
 
         <div
+          v-if="ds.environments.length"
           class="flex flex-col gap-[var(--spacing-3)] ml-[var(--spacing-1)] pl-[var(--spacing-4)] border-l border-[var(--surface-border)]"
         >
           <div
@@ -166,6 +189,13 @@
               </div>
             </div>
           </div>
+        </div>
+        <div
+          v-else
+          class="ml-[var(--spacing-1)] pl-[var(--spacing-4)] border-l border-[var(--surface-border)] py-[var(--spacing-1)] text-body-xxs text-[var(--text-color-secondary)]"
+          :data-testid="`release-composition__impact-ds-empty-${ds.name}`"
+        >
+          No workloads are bound to this Deployment Settings yet.
         </div>
       </div>
 
