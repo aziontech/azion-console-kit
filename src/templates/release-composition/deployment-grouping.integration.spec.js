@@ -3,7 +3,8 @@ import { classifyDeploymentsForResource } from '@/templates/release-composition/
 
 const GROUP_LABELS = {
   linked: 'Already using this resource',
-  available: 'Available — not linked yet'
+  available: 'Available — not linked yet',
+  needsFirstRelease: 'Needs a first release'
 }
 
 const labelFor = (group) => GROUP_LABELS[group.key]
@@ -63,7 +64,8 @@ describe('release-composition deployment grouping (integration)', () => {
 
       expect(groups.map(labelFor)).toEqual([
         'Already using this resource',
-        'Available — not linked yet'
+        'Available — not linked yet',
+        'Needs a first release'
       ])
     })
 
@@ -165,7 +167,8 @@ describe('release-composition deployment grouping (integration)', () => {
 
       expect(groups.map(labelFor)).toEqual([
         'Already using this resource',
-        'Available — not linked yet'
+        'Available — not linked yet',
+        'Needs a first release'
       ])
     })
 
@@ -198,6 +201,60 @@ describe('release-composition deployment grouping (integration)', () => {
       expect(selectedIds.has(dsStrictLinked.id)).toBe(true)
       expect(selectedIds.has(dsFlexibleOther.id)).toBe(true)
       expect(selectedIds.size).toBe(2)
+    })
+  })
+
+  describe('needs-first-release (no active release to override)', () => {
+    const scopedType = 'firewall'
+    const scopedResourceId = 'fw-7'
+
+    const dsWithRelease = { id: 'ds-has-release', binding_policy: 'FLEXIBLE' }
+    const dsNoRelease = { id: 'ds-no-release', binding_policy: 'FLEXIBLE' }
+
+    // `dsNoRelease` has NO entry — a scoped override has nothing to anchor to.
+    const activeReleaseByDs = {
+      [dsWithRelease.id]: { resources: [{ resource_type: 'application', global_id: 'app-1' }] }
+    }
+
+    const idsOf = (group) => group.deployments.map((deployment) => deployment.id)
+
+    it('routes a DS with no active release into needsFirstRelease in scoped mode', () => {
+      const { groups } = classifyDeploymentsForResource({
+        deployments: [dsWithRelease, dsNoRelease],
+        activeReleaseByDs,
+        scopedType,
+        scopedResourceId
+      })
+      const [, available, needsFirstRelease] = groups
+
+      expect(idsOf(needsFirstRelease)).toEqual([dsNoRelease.id])
+      expect(idsOf(available)).toEqual([dsWithRelease.id])
+    })
+
+    it('keeps a DS whose release lacks this resource in available, not needsFirstRelease', () => {
+      const { groups } = classifyDeploymentsForResource({
+        deployments: [dsWithRelease],
+        activeReleaseByDs,
+        scopedType,
+        scopedResourceId
+      })
+      const [, available, needsFirstRelease] = groups
+
+      expect(idsOf(available)).toEqual([dsWithRelease.id])
+      expect(needsFirstRelease.deployments).toEqual([])
+    })
+
+    it('does NOT segregate in non-scoped mode: a DS with no release stays available', () => {
+      const { groups } = classifyDeploymentsForResource({
+        deployments: [dsNoRelease],
+        activeReleaseByDs,
+        scopedType: null,
+        scopedResourceId: undefined
+      })
+      const [, available, needsFirstRelease] = groups
+
+      expect(idsOf(available)).toEqual([dsNoRelease.id])
+      expect(needsFirstRelease.deployments).toEqual([])
     })
   })
 })

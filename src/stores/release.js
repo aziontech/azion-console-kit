@@ -252,6 +252,17 @@ export const useReleaseStore = defineStore('release', {
         if (source.resourceId != null) this.resNames[source.scopedType] = source.resourceId
         if (source.versionId) this.resVers[source.scopedType] = source.versionId
       }
+
+      // Seed a resource into its singleton slot for a FULL (non-scoped) first
+      // release opened via the "Compose first release" CTA: pre-fills the
+      // resource + version the user came from while the composition stays full,
+      // so the Application card renders and stays editable (Case 4 in deployCtx).
+      const seed = source.seed
+      if (seed && SINGLETON_TYPES.includes(seed.type)) {
+        this.resEnabled[seed.type] = true
+        if (seed.resourceId != null) this.resNames[seed.type] = seed.resourceId
+        if (seed.versionId) this.resVers[seed.type] = seed.versionId
+      }
     },
 
     // Toggle a DS in the multi-select and keep the singular pointer in sync

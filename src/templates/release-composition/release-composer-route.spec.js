@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   RELEASE_COMPOSER_ROUTE,
   releaseComposerRouteFromDeployment,
-  releaseComposerRouteFromWorkload
+  releaseComposerRouteFromWorkload,
+  releaseComposerRouteFirstRelease
 } from '@/templates/release-composition/release-composer-route'
 
 describe('releaseComposerRouteFromDeployment', () => {
@@ -53,5 +54,83 @@ describe('releaseComposerRouteFromWorkload', () => {
       name: RELEASE_COMPOSER_ROUTE,
       query: { deploymentIds: 'ds-1' }
     })
+  })
+})
+
+describe('releaseComposerRouteFirstRelease', () => {
+  it('opens the global entry when no deployment id is supplied', () => {
+    expect(releaseComposerRouteFirstRelease()).toEqual({ name: RELEASE_COMPOSER_ROUTE })
+    expect(releaseComposerRouteFirstRelease({ deploymentId: '' })).toEqual({
+      name: RELEASE_COMPOSER_ROUTE
+    })
+  })
+
+  it('carries the DS plus the scoped resource + version as a seed when fully formed', () => {
+    expect(
+      releaseComposerRouteFirstRelease({
+        deploymentId: 'ds-1',
+        scopedType: 'firewall',
+        resourceId: 'fw-7',
+        versionId: 'v-42'
+      })
+    ).toEqual({
+      name: RELEASE_COMPOSER_ROUTE,
+      query: {
+        deploymentIds: 'ds-1',
+        seedType: 'firewall',
+        seedResourceId: 'fw-7',
+        seedVersionId: 'v-42'
+      }
+    })
+  })
+
+  it('stringifies numeric seed ids', () => {
+    expect(
+      releaseComposerRouteFirstRelease({
+        deploymentId: 5,
+        scopedType: 'application',
+        resourceId: 42,
+        versionId: 7
+      })
+    ).toEqual({
+      name: RELEASE_COMPOSER_ROUTE,
+      query: {
+        deploymentIds: '5',
+        seedType: 'application',
+        seedResourceId: '42',
+        seedVersionId: '7'
+      }
+    })
+  })
+
+  it('falls back to a plain DS-first entry when the version is missing', () => {
+    expect(
+      releaseComposerRouteFirstRelease({
+        deploymentId: 'ds-1',
+        scopedType: 'firewall',
+        resourceId: 'fw-7'
+      })
+    ).toEqual({ name: RELEASE_COMPOSER_ROUTE, query: { deploymentIds: 'ds-1' } })
+  })
+
+  it('falls back to a plain DS-first entry when the resource id is missing', () => {
+    expect(
+      releaseComposerRouteFirstRelease({
+        deploymentId: 'ds-1',
+        scopedType: 'firewall',
+        versionId: 'v-42'
+      })
+    ).toEqual({ name: RELEASE_COMPOSER_ROUTE, query: { deploymentIds: 'ds-1' } })
+  })
+
+  it('falls back to a plain DS-first entry for an unsupported scoped type', () => {
+    expect(
+      releaseComposerRouteFirstRelease({
+        deploymentId: 'ds-1',
+        scopedType: 'function',
+        resourceId: 'fn-1',
+        versionId: 'v-1'
+      })
+    ).toEqual({ name: RELEASE_COMPOSER_ROUTE, query: { deploymentIds: 'ds-1' } })
   })
 })

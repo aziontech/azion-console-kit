@@ -15,10 +15,13 @@
    *   `workloadsCount` (number) renders a "{N} Workloads affected" line and is
    *   omitted when absent (never fabricated to 0). `environmentNames` (string[])
    *   renders up to three tags plus a "+K" overflow chip.
-   * @prop {Array<{ key: 'linked'|'available', label: string, deployments: Array<{ id, name, policyLabel, workloadsCount?, environmentNames? }> }>} groups
+   * @prop {Array<{ key: string, label: string, selectable?: boolean, deployments: Array<{ id, name, policyLabel, workloadsCount?, environmentNames? }> }>} groups
    *   Sectioned Deployment Settings. When populated, rows render grouped under
-   *   `label` headers (empty groups omitted) and the listed set — driving the
-   *   counter, select-all/clear-all and search — is the union of all groups.
+   *   `label` headers (empty groups omitted). A group with `selectable: false`
+   *   (default true) renders read-only rows with a "Compose first release" action
+   *   instead of a checkbox and is excluded from the counter, select-all/clear-all
+   *   and union math — the selectable set driving those is the union of the
+   *   selectable groups only.
    * @prop {Array<string|number>} modelValue Selected Deployment Setting ids.
    * @prop {string} query Search string (owned by the parent).
    * @prop {boolean} isLoadingMeta When true, the impact metadata (workloads
@@ -27,6 +30,8 @@
    * @emits update:modelValue When the selection changes.
    * @emits update:query When the search string changes.
    * @emits bind-environment When the empty-state action is triggered.
+   * @emits compose-first-release (dsId) When a non-selectable row's "Compose
+   *   first release" action is triggered.
    */
   import { computed } from 'vue'
   import Checkbox from '@aziontech/webkit/checkbox'
@@ -66,7 +71,12 @@
   const extraEnvCount = (ds) => remainingEnvNames(ds).length
   const hasWorkloadsCount = (ds) => Number.isFinite(ds.workloadsCount)
 
-  const emit = defineEmits(['update:modelValue', 'update:query', 'bind-environment'])
+  const emit = defineEmits([
+    'update:modelValue',
+    'update:query',
+    'bind-environment',
+    'compose-first-release'
+  ])
 
   const selectedIds = computed({
     get: () => props.modelValue,
@@ -101,8 +111,22 @@
 
   const hasGroups = computed(() => visibleGroups.value.length > 0)
 
+  // Every listed row — selectable or not — drives the list vs empty-state and the
+  // search count. A `selectable: false` group still lists its rows (they surface
+  // an inline action instead of a checkbox), so they must count here or a picker
+  // showing only non-selectable rows would fall through to the empty-state.
   const listedDeployments = computed(() =>
     hasGroups.value ? visibleGroups.value.flatMap((group) => group.deployments) : props.deployments
+  )
+
+  // Only the SELECTABLE rows — drives the counter, select-all/clear-all and the
+  // union math, so bulk selection never picks a row the parent can't accept.
+  const selectableListed = computed(() =>
+    hasGroups.value
+      ? visibleGroups.value
+          .filter((group) => group.selectable !== false)
+          .flatMap((group) => group.deployments)
+      : props.deployments
   )
 
   const total = computed(() => listedDeployments.value.length)
@@ -111,6 +135,7 @@
   const searchPlaceholder = computed(() => `Search ${total.value} Deployment Settings`)
 
   const hasDeployments = computed(() => total.value > 0)
+  const hasSelectable = computed(() => selectableListed.value.length > 0)
 
   // Normalized render model: grouped mode yields one section per non-empty
   // group (with a header), flat mode yields a single header-less section.
@@ -119,9 +144,10 @@
       ? visibleGroups.value.map((group) => ({
           key: group.key,
           label: group.label,
+          selectable: group.selectable !== false,
           deployments: group.deployments
         }))
-      : [{ key: null, label: null, deployments: props.deployments }]
+      : [{ key: null, label: null, selectable: true, deployments: props.deployments }]
   )
 
   // Select-all / clear-all over the LISTED candidate set (req 1.9 / NRS §4.5).
@@ -137,23 +163,22 @@
   // of selections hidden by the current search.
   const allSelected = computed(
     () =>
-      hasDeployments.value &&
-      listedDeployments.value.every((deployment) => isSelected(deployment.id))
+      hasSelectable.value && selectableListed.value.every((deployment) => isSelected(deployment.id))
   )
 
-  // Select-all UNIONS the listed ids with the existing selection so rows hidden
-  // by the search/cap stay selected (never dropped).
+  // Select-all UNIONS the listed SELECTABLE ids with the existing selection so
+  // rows hidden by the search/cap stay selected (never dropped).
   const selectAll = () => {
-    const listedToAdd = listedDeployments.value
+    const listedToAdd = selectableListed.value
       .map((deployment) => deployment.id)
       .filter((id) => !isSelected(id))
     selectedIds.value = [...props.modelValue, ...listedToAdd]
   }
 
-  // Clear-all removes ONLY the listed rows from the selection, preserving any
-  // selections hidden by the search/cap.
+  // Clear-all removes ONLY the listed selectable rows from the selection,
+  // preserving any selections hidden by the search/cap.
   const clearAll = () => {
-    const listedIds = new Set(listedDeployments.value.map((deployment) => String(deployment.id)))
+    const listedIds = new Set(selectableListed.value.map((deployment) => String(deployment.id)))
     selectedIds.value = props.modelValue.filter((item) => !listedIds.has(String(item)))
   }
 </script>
@@ -211,7 +236,7 @@
           label="Select all"
           link
           size="small"
-          :disabled="allSelected"
+          :disabled="allSelected || !hasSelectable"
           data-testid="release-composition__ds-select-all"
           @click="selectAll"
         />
@@ -242,8 +267,12 @@
         >
           {{ section.label }}
         </span>
+        <!-- Selectable groups render the checkbox row; the empty-array branch
+             stops this loop from rendering non-selectable rows, which use the
+             action row below instead (a DS with no active release can't be
+             scoped-overridden — it needs a full first release). -->
         <div
-          v-for="ds in section.deployments"
+          v-for="ds in section.selectable ? section.deployments : []"
           :key="ds.id"
           role="checkbox"
           :aria-checked="selectedIds.includes(ds.id)"
@@ -333,6 +362,46 @@
           >
             {{ ds.policyLabel }}
           </span>
+        </div>
+
+        <div
+          v-for="ds in section.selectable ? [] : section.deployments"
+          :key="`needs-first-${ds.id}`"
+          class="flex items-start gap-[var(--spacing-3)] rounded-[var(--shape-card)] border border-dashed border-[var(--surface-border)] bg-[var(--surface-50)] px-[var(--spacing-4)] py-[var(--spacing-4)]"
+          :data-testid="`release-composition__ds-row-${ds.id}`"
+        >
+          <i
+            class="pi pi-exclamation-circle mt-[var(--spacing-1)] text-[var(--text-color-secondary)]"
+          />
+          <div class="flex flex-1 flex-col gap-[var(--spacing-1)]">
+            <span class="flex flex-wrap items-center gap-[var(--spacing-2)]">
+              <i class="pi pi-send text-[var(--text-color-secondary)]" />
+              <span class="text-body-sm text-[var(--text-color)]">{{ ds.name }}</span>
+              <span
+                class="inline-flex shrink-0 items-center rounded-[var(--shape-elements)] bg-[var(--surface-200)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm text-[var(--text-color-secondary)]"
+                :data-testid="`release-composition__ds-policy-${ds.id}`"
+              >
+                {{ ds.policyLabel }}
+              </span>
+            </span>
+            <span
+              class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
+              :data-testid="`release-composition__ds-needs-release-${ds.id}`"
+            >
+              No active release — compose a full first release (with an Application) to publish
+              here.
+            </span>
+          </div>
+          <PrimeButton
+            label="Compose first release"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            link
+            size="small"
+            class="shrink-0 self-start"
+            :data-testid="`release-composition__ds-compose-first-${ds.id}`"
+            @click="emit('compose-first-release', ds.id)"
+          />
         </div>
       </template>
     </div>

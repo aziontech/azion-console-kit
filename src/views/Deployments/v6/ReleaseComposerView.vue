@@ -36,6 +36,10 @@
   import { LATEST_READY } from '@/templates/release-composition/version-options'
   import { useReleaseComposition } from '@/templates/release-composition/use-release-composition'
   import { classifyDeploymentsForResource } from '@/templates/release-composition/classify-deployments-for-resource'
+  import {
+    RELEASE_COMPOSER_ROUTE,
+    releaseComposerRouteFirstRelease
+  } from '@/templates/release-composition/release-composer-route'
   import { useApplicationFunctionDependencies } from '@/templates/release-composition/use-application-function-dependencies'
   import { useApplicationConnectorDependencies } from '@/templates/release-composition/use-application-connector-dependencies'
   import { useApplicationVersionReady } from '@/templates/release-composition/use-application-version-ready'
@@ -559,7 +563,14 @@
 
   // --- Entry: open the release from the route, full reset (spec §A, req 1.2) ----
 
-  onMounted(() => {
+  const openFromRoute = () => {
+    // Reset the entry-derived refs so a re-entry (same-route navigation) never
+    // inherits the previous entry's scenario/candidate state.
+    entryScenario.value = 'global'
+    scopedCandidateDsIds.value = []
+    workloadCandidateDsIds.value = []
+    candidateResolutionFailed.value = false
+
     const query = route.query
     const params = route.params
     const incomingScopedType = query.scopedType ?? params.scopedType ?? null
@@ -572,6 +583,19 @@
       : rawDeploymentIds
         ? String(rawDeploymentIds).split(',').filter(Boolean)
         : []
+
+    // "Compose first release" CTA seed: a resource + version carried into a FULL
+    // (non-scoped) composition so it arrives pre-filled. Distinct from `scopedType`
+    // (which would collapse the composition), so reading it never triggers a scoped
+    // Scenario B — the DS opens DS-first with the Application editable.
+    const seedType = query.seedType ?? params.seedType ?? null
+    const seed = seedType
+      ? {
+          type: seedType,
+          resourceId: query.seedResourceId ?? params.seedResourceId ?? '',
+          versionId: query.seedVersionId ?? params.seedVersionId ?? ''
+        }
+      : null
 
     // A Workload entry with several bound Deployment Settings carries `pickTarget`
     // so the composer shows the picker (scoped to those DSs) instead of treating a
@@ -634,7 +658,8 @@
       scopedType: incomingScopedType,
       versionId: query.versionId ?? params.versionId ?? '',
       resourceId,
-      deploymentIds: incomingScopedType ? [] : preselectedDsIds
+      deploymentIds: incomingScopedType ? [] : preselectedDsIds,
+      seed
     })
 
     // Prime the selectable instance catalogs the singleton selectors render:
@@ -642,9 +667,24 @@
     // type, so this never refetches on reopen).
     composition.loadCatalog('application')
     OPTIONAL_SINGLETON_TYPES.forEach((type) => composition.loadCatalog(type))
+  }
 
+  onMounted(() => {
+    openFromRoute()
     isMounted.value = true
   })
+
+  // Same-route navigation (e.g. the "Compose first release" CTA re-targets the
+  // composer with new query params) reuses this component instance, so onMounted
+  // never fires again. Re-run the entry logic on every location change so the
+  // screen re-initialises for the new deployment/seed. Guard on the route name so
+  // navigating AWAY (to deployments/edit) never re-opens the release.
+  watch(
+    () => route.fullPath,
+    () => {
+      if (route.name === RELEASE_COMPOSER_ROUTE) openFromRoute()
+    }
+  )
 
   // --- Composition view-models (translate store state → tree props) ------------
 
@@ -928,11 +968,13 @@
     })
     const LABELS = {
       linked: 'Already using this resource',
-      available: 'Available — not linked yet'
+      available: 'Available — not linked yet',
+      needsFirstRelease: 'Needs a first release'
     }
     return groups.map((group) => ({
       key: group.key,
       label: LABELS[group.key],
+      selectable: group.key !== 'needsFirstRelease',
       deployments: group.deployments
     }))
   })
@@ -948,6 +990,20 @@
     const { href } = router.resolve({ name: 'deployments' })
     window.open(href, '_blank', 'noopener')
   }
+
+  // A scoped entry can't override a DS with no active release. The picker offers
+  // that DS a "Compose first release" action instead — reopen the composer DS-first
+  // (full composition) for it, carrying the scoped resource + version forward as a
+  // seed so only the Application is left to pick.
+  const onComposeFirstRelease = (dsId) =>
+    router.push(
+      releaseComposerRouteFirstRelease({
+        deploymentId: dsId,
+        scopedType: scopedType.value,
+        resourceId: store.resourceId,
+        versionId: versionId.value
+      })
+    )
 
   // --- Multi-DS gate (req 5.5): fold deployCtx over ALL selected DS, strictest --
 
@@ -1210,6 +1266,7 @@
               @update:model-value="onPickDs"
               @update:query="dsQuery = $event"
               @bind-environment="onBindEnvironment"
+              @compose-first-release="onComposeFirstRelease"
             />
 
             <CanaryStrategyField

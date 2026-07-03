@@ -29,7 +29,7 @@ afterEach(() => {
 })
 
 describe('DeploymentReleaseService - getActiveReleaseComposition', () => {
-  it('reads ready releases and returns the one serving traffic (traffic_role === ACTIVE)', async () => {
+  it('reads recent releases and returns the one serving traffic (traffic_role === ACTIVE)', async () => {
     stubEnsureQueryData()
     const activeRelease = { id: 'rel-active', traffic_role: 'ACTIVE', resources: [] }
     const requestSpy = vi.spyOn(httpService, 'request').mockResolvedValueOnce({
@@ -48,8 +48,21 @@ describe('DeploymentReleaseService - getActiveReleaseComposition', () => {
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'GET',
       url: `/deployment-api/v4/deployments/${DEPLOYMENT_ID}/releases`,
-      params: { traffic_role: 'active' }
+      params: { ordering: '-created_at,-id' }
     })
+  })
+
+  it('falls back to the most recent release when none is ACTIVE (versioned_urls: traffic_role stays "valid")', async () => {
+    stubEnsureQueryData()
+    const latest = { id: 'rel-latest', traffic_role: 'valid', resources: [] }
+    vi.spyOn(httpService, 'request').mockResolvedValueOnce({
+      data: {
+        // Ordered -created_at,-id, so the first item is the most recent release.
+        results: [latest, { id: 'rel-older', traffic_role: 'valid' }]
+      }
+    })
+
+    await expect(service.getActiveReleaseComposition(DEPLOYMENT_ID)).resolves.toBe(latest)
   })
 
   it('keys the read with queryKeys.release.activeComposition for the target deployment', async () => {
@@ -74,16 +87,18 @@ describe('DeploymentReleaseService - getActiveReleaseComposition', () => {
     await expect(service.getActiveReleaseComposition(DEPLOYMENT_ID)).resolves.toBe(active)
   })
 
-  it('returns null when no ready release is serving traffic (never-deployed / removed)', async () => {
+  it('prefers the ACTIVE release over a more recent non-active one (single_version)', async () => {
     stubEnsureQueryData()
+    const active = { id: 'rel-active', traffic_role: 'ACTIVE' }
     vi.spyOn(httpService, 'request').mockResolvedValueOnce({
-      data: { results: [{ id: 'rel-old', traffic_role: 'PREVIOUS' }] }
+      // Newest first: a fresh CANDIDATE precedes the ACTIVE release, which must win.
+      data: { results: [{ id: 'rel-candidate', traffic_role: 'CANDIDATE' }, active] }
     })
 
-    await expect(service.getActiveReleaseComposition(DEPLOYMENT_ID)).resolves.toBeNull()
+    await expect(service.getActiveReleaseComposition(DEPLOYMENT_ID)).resolves.toBe(active)
   })
 
-  it('returns null when the release list is empty', async () => {
+  it('returns null only when the DS has no release at all', async () => {
     stubEnsureQueryData()
     vi.spyOn(httpService, 'request').mockResolvedValueOnce({ data: { results: [] } })
 

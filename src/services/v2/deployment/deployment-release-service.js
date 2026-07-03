@@ -349,18 +349,23 @@ export class DeploymentReleaseService extends BaseService {
         const { data } = await this.http.request({
           method: 'GET',
           url: `${this.#baseURL}/${deploymentShortId}/releases`,
-          params: { traffic_role: 'active' }
+          params: { ordering: DEFAULT_RELEASES_ORDERING }
         })
 
         const releases = parseReleaseList(data)
 
-        // The endpoint already filters to the active release; keep a defensive
-        // case-insensitive match so only an ACTIVE release is ever returned.
-        return (
-          releases.find(
-            (release) => String(release?.traffic_role).toUpperCase() === ACTIVE_TRAFFIC_ROLE
-          ) ?? null
+        // A new release inherits the composition of the DS's CURRENT release.
+        // A single_version DS has exactly one release serving traffic
+        // (traffic_role ACTIVE); a versioned_urls DS has NONE — several versions
+        // can be live at once, so its releases stay 'valid'. Prefer the ACTIVE
+        // release, else fall back to the most recent one (the list is ordered
+        // -created_at,-id) — the composition a new release inherits from. Only a
+        // DS with no release at all resolves to null.
+        const active = releases.find(
+          (release) => String(release?.traffic_role).toUpperCase() === ACTIVE_TRAFFIC_ROLE
         )
+
+        return active ?? releases[0] ?? null
       }
     )
   }

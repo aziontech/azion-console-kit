@@ -485,6 +485,47 @@ describe('composePayload — discriminated by entry context', () => {
   })
 })
 
+describe('openRelease — seed for a full first-release composition', () => {
+  it('seeds the resource into its singleton slot WITHOUT entering scoped mode', () => {
+    const store = useReleaseStore()
+    store.openRelease({
+      deploymentIds: ['ds-new'],
+      seed: { type: 'firewall', resourceId: 'fw-7', versionId: 'v-42' }
+    })
+
+    expect(store.scopedType).toBe(null)
+    expect(store.resNames.firewall).toBe('fw-7')
+    expect(store.resVers.firewall).toBe('v-42')
+    expect(store.resEnabled.firewall).toBe(true)
+  })
+
+  it('composes a NON-scoped payload that includes the seeded resource', () => {
+    const store = useReleaseStore()
+    store.openRelease({
+      deploymentIds: ['ds-new'],
+      seed: { type: 'firewall', resourceId: 'fw-7', versionId: 'v-42' }
+    })
+    store.setVersionsByResource('firewall', 'fw-7', [{ value: 'v-42', isCurrent: true }])
+
+    const payload = store.composePayload()
+
+    expect(payload.scoped).toBe(false)
+    expect(
+      payload.resources.find((resource) => resource.resource_type === 'firewall')
+    ).toMatchObject({ resource_id: 'fw-7', resource_version: 'v-42' })
+  })
+
+  it('ignores a seed for a non-singleton resource type', () => {
+    const store = useReleaseStore()
+    store.openRelease({
+      deploymentIds: ['ds-new'],
+      seed: { type: 'network_list', resourceId: 'nl-1', versionId: 'v-1' }
+    })
+
+    expect(store.resNames.network_list).toBeUndefined()
+  })
+})
+
 describe('seedApplicationFunctions — app-required function dependencies', () => {
   it('maps each functionId to a locked, required, version:null entry under coll.function', () => {
     const store = useReleaseStore()

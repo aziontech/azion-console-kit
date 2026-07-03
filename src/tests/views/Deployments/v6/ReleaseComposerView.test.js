@@ -30,6 +30,7 @@ const storeState = reactive({
   activeReleaseByDs: {},
   deployments: [{ id: 'ds-1', name: 'production-edge', deployment_policy: 'single_version' }],
   scopedType: null,
+  resourceId: '',
   versionId: '',
   pendingDependencySelections: []
 })
@@ -248,6 +249,8 @@ beforeEach(() => {
   storeState.deploymentIds = ['ds-1']
   storeState.deployEnabled = true
   storeState.scopedType = null
+  storeState.resourceId = ''
+  storeState.versionId = ''
   isDeploying.value = false
   deployCtx.mockReturnValue({ ok: true, canDeploy: true })
   // `clearAllMocks` (afterEach) wipes implementations too; re-arm the resolved
@@ -400,5 +403,30 @@ describe('ReleaseComposerView — cancel', () => {
     await wrapper.find('[data-testid="release-composition__cancel"]').trigger('click')
 
     expect(routerPush).toHaveBeenCalledWith({ name: 'deployments' })
+  })
+})
+
+describe('ReleaseComposerView — first-release CTA', () => {
+  it('pushes the first-release route carrying the scoped resource seed when the picker asks', async () => {
+    storeState.scopedType = 'firewall'
+    storeState.resourceId = 'fw-7'
+    storeState.versionId = 'v-42'
+
+    const wrapper = mountView()
+    await flushPromises()
+
+    const picker = wrapper.findComponent({ name: 'DeploymentSettingsPicker' })
+    picker.vm.$emit('compose-first-release', 'ds-new')
+    await flushPromises()
+
+    expect(routerPush).toHaveBeenCalledWith({
+      name: 'release-composer',
+      query: {
+        deploymentIds: 'ds-new',
+        seedType: 'firewall',
+        seedResourceId: 'fw-7',
+        seedVersionId: 'v-42'
+      }
+    })
   })
 })

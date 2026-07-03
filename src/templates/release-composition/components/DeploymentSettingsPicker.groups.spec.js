@@ -153,3 +153,74 @@ describe('DeploymentSettingsPicker (grouped mode)', () => {
     expect(spaceWrapper.emitted('update:modelValue')?.at(-1)).toEqual([[]])
   })
 })
+
+describe('DeploymentSettingsPicker (non-selectable group)', () => {
+  const needsFirstReleaseGroup = {
+    key: 'needsFirstRelease',
+    label: 'Needs a first release',
+    selectable: false,
+    deployments: [{ id: 'ds-new', name: 'brand-new-edge', policyLabel: 'Versioned URLs' }]
+  }
+
+  const withNeedsFirst = (props = {}) =>
+    mount(DeploymentSettingsPicker, {
+      props: {
+        groups: [availableGroup, needsFirstReleaseGroup],
+        modelValue: [],
+        query: '',
+        ...props
+      },
+      global: { stubs }
+    })
+
+  it('renders the row read-only with a compose-first-release action instead of a checkbox', () => {
+    const wrapper = withNeedsFirst()
+
+    const row = wrapper.find('[data-testid="release-composition__ds-row-ds-new"]')
+    expect(row.exists()).toBe(true)
+    expect(row.attributes('role')).toBeUndefined()
+    expect(
+      wrapper.find('[data-testid="release-composition__ds-compose-first-ds-new"]').exists()
+    ).toBe(true)
+    expect(
+      wrapper.find('[data-testid="release-composition__ds-needs-release-ds-new"]').exists()
+    ).toBe(true)
+  })
+
+  it('emits compose-first-release with the DS id when the action is clicked', async () => {
+    const wrapper = withNeedsFirst()
+
+    await wrapper
+      .find('[data-testid="release-composition__ds-compose-first-ds-new"]')
+      .trigger('click')
+
+    expect(wrapper.emitted('compose-first-release')?.at(-1)).toEqual(['ds-new'])
+  })
+
+  it('does not toggle selection when a non-selectable row is clicked', async () => {
+    const wrapper = withNeedsFirst()
+
+    await wrapper.find('[data-testid="release-composition__ds-row-ds-new"]').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  })
+
+  it('select-all adds only selectable rows, never the non-selectable group', async () => {
+    const wrapper = withNeedsFirst({ modelValue: [] })
+
+    await wrapper.find('[data-testid="release-composition__ds-select-all"]').trigger('click')
+
+    const selection = wrapper.emitted('update:modelValue')?.at(-1)?.[0] ?? []
+    expect(selection).toContain('ds-3')
+    expect(selection).not.toContain('ds-new')
+  })
+
+  it('shows the list (not the empty-state) when only a non-selectable group is present', () => {
+    const wrapper = withNeedsFirst({ groups: [needsFirstReleaseGroup] })
+
+    expect(wrapper.find('[data-testid="release-composition__ds-empty"]').exists()).toBe(false)
+    expect(
+      wrapper.find('[data-testid="release-composition__ds-compose-first-ds-new"]').exists()
+    ).toBe(true)
+  })
+})

@@ -3,7 +3,8 @@ import { releaseResourceId } from '@/stores/release'
 const emptyResult = () => ({
   groups: [
     { key: 'linked', deployments: [] },
-    { key: 'available', deployments: [] }
+    { key: 'available', deployments: [] },
+    { key: 'needsFirstRelease', deployments: [] }
   ],
   hidden: []
 })
@@ -31,10 +32,20 @@ export const classifyDeploymentsForResource = ({
   const target = String(scopedResourceId)
 
   const result = emptyResult()
-  const [linkedGroup, availableGroup] = result.groups
+  const [linkedGroup, availableGroup, needsFirstReleaseGroup] = result.groups
 
   deployments.forEach((deployment) => {
     const release = releasesByDs[deployment?.id] ?? null
+
+    // A scoped entry publishes an override that preserves each DS's active
+    // composition; a DS with no active release has nothing to anchor it and
+    // needs a full first release instead. Only segregates in scoped mode —
+    // non-scoped entries compose a full release and handle the zero-state.
+    if (scopedType && release == null) {
+      needsFirstReleaseGroup.deployments.push(deployment)
+      return
+    }
+
     const scopedResources = scopedResourcesOf(release, scopedType)
 
     const linkedToThis = scopedResources.some((resource) => matchesResource(resource, target))
