@@ -117,9 +117,12 @@
   // targets only that Workload's environments, never the whole tenant list).
   const workloadCandidateDsIds = ref([])
 
-  // The consuming Deployment Settings resolved for a scoped (Scenario B) entry —
-  // the SELECTABLE CANDIDATE set the picker lists (req 1.9). Populated async on
-  // mount via the HOP 1 strategy; the user picks from it (nothing pre-selected).
+  // The consuming Deployment Settings resolved for a scoped (Scenario B) entry.
+  // Populated async on mount via the HOP 1 strategy. It is NOT used to FILTER the
+  // picker — filtering to these would drop the `available` and `needsFirstRelease`
+  // groups (HOP 1 only returns DSs that ALREADY consume the resource). Instead it
+  // is used to SORT: the consuming DSs float to the top so they land inside the
+  // display cap (`DS_DISPLAY_CAP`) instead of being cut off in a large tenant.
   const scopedCandidateDsIds = ref([])
 
   // Whether the scoped candidate resolution FAILED (vs genuinely resolving to an
@@ -144,7 +147,8 @@
     scopedType,
     fromVersion,
     versionId,
-    pendingDependencySelections
+    pendingDependencySelections,
+    versionGateSatisfied
   } = storeToRefs(store)
 
   // Resources the version pickers must keep Ready versions loaded for. It tracks
@@ -456,7 +460,12 @@
           firewallWafDeps.hasError.value ||
           firewallNetworkListDeps.hasError.value)) ||
       (isCustomPageComposed.value &&
-        (customPageVersionReady.hasError.value || customPageConnectorDeps.hasError.value))
+        (customPageVersionReady.hasError.value || customPageConnectorDeps.hasError.value)) ||
+      // A failed version-catalog or instance-catalog load (cached as an error, not
+      // an empty list) also surfaces the retryable banner — otherwise the empty
+      // pickers would look like "nothing to pick" with no way to recover.
+      composition.hasAnyVersionsError.value ||
+      composition.hasAnyCatalogError.value
   )
   const retryDependencies = () => {
     versionReady.retry()
@@ -468,6 +477,10 @@
     firewallNetworkListDeps.retry()
     customPageVersionReady.retry()
     customPageConnectorDeps.retry()
+    // Re-fetch the version + instance catalogs whose loads failed (no-op when none
+    // failed, since a successful load stays cached).
+    composition.retryResourceVersions()
+    composition.retryCatalogs()
   }
 
   // --- Feed composable-loaded data back into the store (single source of truth) ---
@@ -482,6 +495,19 @@
     (byDs) => {
       Object.entries(byDs ?? {}).forEach(([dsId, release]) =>
         store.setActiveReleaseByDs(dsId, release)
+      )
+    },
+    { immediate: true, deep: true }
+  )
+
+  // Feed the per-DS active-release READ-failure flag into the store so `deployCtx`
+  // blocks publish on a degraded DS. Iterate ALL entries (including `false`) so a
+  // recovered read clears the store flag and re-enables the deploy.
+  watch(
+    composition.activeReleaseErrorByDs,
+    (byDs) => {
+      Object.entries(byDs ?? {}).forEach(([dsId, failed]) =>
+        store.setActiveReleaseError(dsId, failed)
       )
     },
     { immediate: true, deep: true }
@@ -563,13 +589,25 @@
 
   // --- Entry: open the release from the route, full reset (spec §A, req 1.2) ----
 
+  // Monotonic entry token: bumped on every `openFromRoute`. The async HOP 1
+  // resolution captures the token at call time and only writes its result if the
+  // token is still current — a same-route re-entry (e.g. the "Compose first
+  // release" CTA) thus discards a stale resolution from the previous entry instead
+  // of letting it overwrite the new entry's candidate set.
+  let entrySeq = 0
+
   const openFromRoute = () => {
+    const seq = ++entrySeq
+
     // Reset the entry-derived refs so a re-entry (same-route navigation) never
-    // inherits the previous entry's scenario/candidate state.
+    // inherits the previous entry's scenario/candidate state. `dsQuery` is view-local
+    // (not part of the store's `openRelease` reset), so clear the picker search here
+    // too, or a term typed in the previous entry would persist.
     entryScenario.value = 'global'
     scopedCandidateDsIds.value = []
     workloadCandidateDsIds.value = []
     candidateResolutionFailed.value = false
+    dsQuery.value = ''
 
     const query = route.query
     const params = route.params
@@ -618,12 +656,15 @@
         })
       )
         .then((result) => {
+          // Ignore a resolution that belongs to a superseded entry (Fix 4).
+          if (seq !== entrySeq) return
           candidateResolutionFailed.value = false
           scopedCandidateDsIds.value = (result?.deployments ?? []).map((entry) =>
             String(entry.deploymentId)
           )
         })
         .catch(() => {
+          if (seq !== entrySeq) return
           // A resolution FAILURE must not block the screen (req 7.4). It is NOT a
           // genuine-empty candidate set: filtering the picker to `[]` would hide
           // every row. Flag the failure so `enrichedDeployments` lists the FULL DS
@@ -721,6 +762,13 @@
   //   Scenario A → leads with the deployment ("a new release to <deployment>");
   //   Scenario B / global → the scoped resource (or "resources") + DS count.
   const scopedLabel = computed(() => (scopedType.value ? labelFor(scopedType.value) : ''))
+
+  // The resource whose version the footer's version-gate hint asks the user to
+  // confirm: the scoped resource in a scoped non-application entry, else the
+  // Application (mirrors the store's `versionGateSatisfied` branch).
+  const versionGateLabel = computed(() =>
+    scopedType.value && scopedType.value !== 'application' ? scopedLabel.value : 'Application'
+  )
   const selectedDsCount = computed(() => deploymentIds.value.length)
   const compositionIntro = computed(() => {
     if (isFromDeployment.value) {
@@ -932,7 +980,14 @@
     // 'from-workload': the picker is restricted to the Workload's bound DSs, so a
     // release started from a Workload never lists unrelated tenant deployments.
     const candidateIds = isFromWorkload.value ? new Set(workloadCandidateDsIds.value) : null
-    return deployments.value
+    // Scoped entry: float the HOP 1 consuming DSs to the top so they survive the
+    // display cap. A stable sort keeps the original order within each partition, and
+    // it's skipped on a failed resolution (the candidate set is empty/unreliable).
+    const priorityIds =
+      isScoped.value && !candidateResolutionFailed.value
+        ? new Set(scopedCandidateDsIds.value)
+        : null
+    const filtered = deployments.value
       .filter((ds) => !candidateIds || candidateIds.has(String(ds.id)))
       .filter(
         (ds) =>
@@ -941,40 +996,71 @@
             .toLowerCase()
             .includes(term)
       )
-      .slice(0, DS_DISPLAY_CAP)
-      .map((ds) => ({
-        id: ds.id,
-        name: ds.name,
-        binding_policy: ds.binding_policy,
-        policyLabel: ds.policyLabel ?? mapPolicyToLabel(ds.deployment_policy),
-        // SEAM 3: spread the per-DS meta only when known. `dsMetaFor` already
-        // omits any field it cannot derive (returns `{}` for an unresolved DS),
-        // so the picker renders `environmentNames` / `workloadsCount` ONLY when
-        // present — never fabricated (req 3.6, 7.3, 9.2).
-        ...impact.dsMetaFor(ds.id)
-      }))
+    const ordered = priorityIds
+      ? filtered
+          .map((ds, index) => ({ ds, index, priority: priorityIds.has(String(ds.id)) ? 0 : 1 }))
+          .sort((left, right) => left.priority - right.priority || left.index - right.index)
+          .map((entry) => entry.ds)
+      : filtered
+    return ordered.slice(0, DS_DISPLAY_CAP).map((ds) => ({
+      id: ds.id,
+      name: ds.name,
+      binding_policy: ds.binding_policy,
+      policyLabel: ds.policyLabel ?? mapPolicyToLabel(ds.deployment_policy),
+      // SEAM 3: spread the per-DS meta only when known. `dsMetaFor` already
+      // omits any field it cannot derive (returns `{}` for an unresolved DS),
+      // so the picker renders `environmentNames` / `workloadsCount` ONLY when
+      // present — never fabricated (req 3.6, 7.3, 9.2).
+      ...impact.dsMetaFor(ds.id)
+    }))
   })
 
   const enrichedDeploymentIds = computed(() => enrichedDeployments.value.map((ds) => String(ds.id)))
 
   watch(enrichedDeploymentIds, (ids) => composition.ensureActiveReleases(ids), { immediate: true })
 
+  // DS ids whose active-release read FAILED — fed to the classifier so a scoped
+  // entry segregates them into `loadFailed` (Retry) instead of `needsFirstRelease`
+  // (which would offer a first release that overwrites the unread composition).
+  const failedDsIds = computed(() =>
+    Object.entries(store.activeReleaseErrorByDs)
+      .filter(([, failed]) => failed)
+      .map(([dsId]) => dsId)
+  )
+
+  const NON_SELECTABLE_GROUPS = ['needsFirstRelease', 'loadFailed']
+
   const deploymentGroups = computed(() => {
     const { groups } = classifyDeploymentsForResource({
       deployments: enrichedDeployments.value,
       activeReleaseByDs: activeReleaseByDs.value,
       scopedType: scopedType.value,
-      scopedResourceId: store.resourceId
+      scopedResourceId: store.resourceId,
+      failedDsIds: failedDsIds.value
     })
     const LABELS = {
       linked: 'Already using this resource',
       available: 'Available — not linked yet',
-      needsFirstRelease: 'Needs a first release'
+      needsFirstRelease: 'Needs a first release',
+      loadFailed: "Couldn't load the active release"
+    }
+    // Per-group notice + inline action for the non-selectable rows (the picker is
+    // presentational and renders whatever arrives here).
+    const NOTICES = {
+      needsFirstRelease:
+        'No active release — compose a full first release (with an Application) to publish here.',
+      loadFailed: "Couldn't read the active release — retry before publishing here."
+    }
+    const ACTIONS = {
+      needsFirstRelease: { label: 'Compose first release', icon: 'pi pi-arrow-right' },
+      loadFailed: { label: 'Retry', icon: 'pi pi-refresh' }
     }
     return groups.map((group) => ({
       key: group.key,
       label: LABELS[group.key],
-      selectable: group.key !== 'needsFirstRelease',
+      selectable: !NON_SELECTABLE_GROUPS.includes(group.key),
+      notice: NOTICES[group.key] ?? null,
+      action: ACTIONS[group.key] ?? null,
       deployments: group.deployments
     }))
   })
@@ -1005,22 +1091,47 @@
       })
     )
 
+  // The picker emits a single generic `group-action`; route it by group key. A DS
+  // whose active-release read failed offers Retry (re-fetch just the failed reads);
+  // one with no release at all offers "Compose first release".
+  const onGroupAction = ({ groupKey, dsId }) => {
+    if (groupKey === 'loadFailed') {
+      composition.retryActiveReleases()
+      return
+    }
+    if (groupKey === 'needsFirstRelease') onComposeFirstRelease(dsId)
+  }
+
   // --- Multi-DS gate (req 5.5): fold deployCtx over ALL selected DS, strictest --
 
+  // The strictest blocking DS, carrying WHY (`reason`) so the footer explains it:
+  //   'degraded' → its active release couldn't be read (offer Retry)
+  //   'no_app'   → it has no Application to publish
   const blockingDs = computed(() => {
     for (const id of deploymentIds.value) {
       const ctx = store.deployCtx(id)
       if (!ctx.ok || !ctx.canDeploy) {
         const match = deployments.value.find((ds) => String(ds.id) === String(id))
-        return { id, name: match?.name ?? String(id) }
+        return { id, name: match?.name ?? String(id), reason: ctx.degraded ? 'degraded' : 'no_app' }
       }
     }
     return null
   })
 
+  // Versions still loading for a composed resource: the LATEST sentinel resolves to
+  // `null` mid-load, which the dispatch guard would turn into an "unresolved" skip.
+  // Gate the button on that so a too-early click can't misfire (footer shows a hint).
+  const versionsStillLoading = computed(() =>
+    versionedResources.value.some((resource) =>
+      composition.isLoadingVersionsFor(resource.resourceType, resource.resourceId)
+    )
+  )
+
   // `deployEnabled` already gates on the effective DS; combine with the multi-DS
   // fold so any blocking DS disables the button (the store covers app/version).
-  const canBuildAndActivate = computed(() => deployEnabled.value && !blockingDs.value)
+  const canBuildAndActivate = computed(
+    () => deployEnabled.value && !blockingDs.value && !versionsStillLoading.value
+  )
 
   // --- Confirm + Build & activate (spec §G) ------------------------------------
 
@@ -1266,7 +1377,7 @@
               @update:model-value="onPickDs"
               @update:query="dsQuery = $event"
               @bind-environment="onBindEnvironment"
-              @compose-first-release="onComposeFirstRelease"
+              @group-action="onGroupAction"
             />
 
             <CanaryStrategyField
@@ -1321,8 +1432,26 @@
         Build &amp; activate creates, builds and activates in one action.
       </span>
       <div class="flex items-center justify-end gap-[var(--spacing-3)]">
+        <!-- A degraded DS (active-release read failed) is recoverable in the
+             from-deployment flow too, where the picker isn't shown — so the footer
+             carries the Retry itself so the user is never stuck. -->
         <span
-          v-if="blockingDs"
+          v-if="blockingDs && blockingDs.reason === 'degraded'"
+          class="flex items-center gap-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
+          data-testid="release-composition__footer-degraded"
+        >
+          Couldn't read the active release for {{ blockingDs.name }} — retry before publishing.
+          <PrimeButton
+            label="Retry"
+            icon="pi pi-refresh"
+            link
+            size="small"
+            data-testid="release-composition__footer-degraded-retry"
+            @click="composition.retryActiveReleases()"
+          />
+        </span>
+        <span
+          v-else-if="blockingDs"
           class="text-body-xs text-[var(--text-color-secondary)]"
           data-testid="release-composition__footer-blocked"
         >
@@ -1334,6 +1463,21 @@
           data-testid="release-composition__footer-pending-dependencies"
         >
           Select a version for each Function and Connector to publish.
+        </span>
+        <span
+          v-else-if="versionsStillLoading"
+          class="flex items-center gap-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
+          data-testid="release-composition__footer-loading-versions"
+        >
+          <i class="pi pi-spinner pi-spin" />
+          Loading versions…
+        </span>
+        <span
+          v-else-if="!versionGateSatisfied"
+          class="text-body-xs text-[var(--text-color-secondary)]"
+          data-testid="release-composition__footer-confirm-version"
+        >
+          Confirm the {{ versionGateLabel }} version to publish.
         </span>
         <PrimeButton
           label="Cancel"

@@ -1,10 +1,14 @@
 import { releaseResourceId } from '@/stores/release'
 
+// `loadFailed` is appended LAST so the positional destructuring below
+// (`[linkedGroup, availableGroup, needsFirstReleaseGroup]`) — and any consumer
+// that reads the first three groups by index — stays intact.
 const emptyResult = () => ({
   groups: [
     { key: 'linked', deployments: [] },
     { key: 'available', deployments: [] },
-    { key: 'needsFirstRelease', deployments: [] }
+    { key: 'needsFirstRelease', deployments: [] },
+    { key: 'loadFailed', deployments: [] }
   ],
   hidden: []
 })
@@ -23,19 +27,31 @@ export const classifyDeploymentsForResource = ({
   deployments,
   activeReleaseByDs,
   scopedType,
-  scopedResourceId
+  scopedResourceId,
+  failedDsIds
 } = {}) => {
   if (!Array.isArray(deployments)) return emptyResult()
 
   const releasesByDs =
     activeReleaseByDs && typeof activeReleaseByDs === 'object' ? activeReleaseByDs : {}
+  const failed = failedDsIds instanceof Set ? failedDsIds : new Set(failedDsIds ?? [])
   const target = String(scopedResourceId)
 
   const result = emptyResult()
-  const [linkedGroup, availableGroup, needsFirstReleaseGroup] = result.groups
+  const [linkedGroup, availableGroup, needsFirstReleaseGroup, loadFailedGroup] = result.groups
 
   deployments.forEach((deployment) => {
     const release = releasesByDs[deployment?.id] ?? null
+
+    // A scoped entry whose active-release READ failed (null + flagged) must NOT be
+    // treated as "needs a first release": its composition may well exist and a
+    // full first release would overwrite it. Segregate it so the picker offers a
+    // Retry instead of the "Compose first release" CTA. Checked BEFORE the
+    // genuine-null branch below.
+    if (scopedType && release == null && failed.has(String(deployment?.id))) {
+      loadFailedGroup.deployments.push(deployment)
+      return
+    }
 
     // A scoped entry publishes an override that preserves each DS's active
     // composition; a DS with no active release has nothing to anchor it and

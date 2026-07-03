@@ -4,7 +4,8 @@ import { classifyDeploymentsForResource } from '@/templates/release-composition/
 const GROUP_LABELS = {
   linked: 'Already using this resource',
   available: 'Available — not linked yet',
-  needsFirstRelease: 'Needs a first release'
+  needsFirstRelease: 'Needs a first release',
+  loadFailed: "Couldn't load the active release"
 }
 
 const labelFor = (group) => GROUP_LABELS[group.key]
@@ -65,7 +66,8 @@ describe('release-composition deployment grouping (integration)', () => {
       expect(groups.map(labelFor)).toEqual([
         'Already using this resource',
         'Available — not linked yet',
-        'Needs a first release'
+        'Needs a first release',
+        "Couldn't load the active release"
       ])
     })
 
@@ -168,7 +170,8 @@ describe('release-composition deployment grouping (integration)', () => {
       expect(groups.map(labelFor)).toEqual([
         'Already using this resource',
         'Available — not linked yet',
-        'Needs a first release'
+        'Needs a first release',
+        "Couldn't load the active release"
       ])
     })
 
@@ -255,6 +258,65 @@ describe('release-composition deployment grouping (integration)', () => {
 
       expect(idsOf(available)).toEqual([dsNoRelease.id])
       expect(needsFirstRelease.deployments).toEqual([])
+    })
+  })
+
+  describe('load-failed (active-release read failed, not a genuine first-release)', () => {
+    const scopedType = 'firewall'
+    const scopedResourceId = 'fw-7'
+
+    const dsWithRelease = { id: 'ds-has-release', binding_policy: 'FLEXIBLE' }
+    const dsReadFailed = { id: 'ds-read-failed', binding_policy: 'FLEXIBLE' }
+    const dsNoRelease = { id: 'ds-no-release', binding_policy: 'FLEXIBLE' }
+
+    // Both `dsReadFailed` and `dsNoRelease` are absent from the map (null release);
+    // only `dsReadFailed` is flagged as a failed READ.
+    const activeReleaseByDs = {
+      [dsWithRelease.id]: { resources: [{ resource_type: scopedType, resource_id: 'fw-7' }] }
+    }
+
+    const groupsByKey = (groups) =>
+      Object.fromEntries(
+        groups.map((group) => [group.key, group.deployments.map((deployment) => deployment.id)])
+      )
+
+    it('routes a failed-read DS into loadFailed, not needsFirstRelease', () => {
+      const { groups } = classifyDeploymentsForResource({
+        deployments: [dsWithRelease, dsReadFailed, dsNoRelease],
+        activeReleaseByDs,
+        scopedType,
+        scopedResourceId,
+        failedDsIds: [dsReadFailed.id]
+      })
+      const byKey = groupsByKey(groups)
+
+      expect(byKey.loadFailed).toEqual([dsReadFailed.id])
+      expect(byKey.needsFirstRelease).toEqual([dsNoRelease.id])
+      expect(byKey.linked).toEqual([dsWithRelease.id])
+    })
+
+    it('accepts a Set for failedDsIds', () => {
+      const { groups } = classifyDeploymentsForResource({
+        deployments: [dsReadFailed],
+        activeReleaseByDs,
+        scopedType,
+        scopedResourceId,
+        failedDsIds: new Set([dsReadFailed.id])
+      })
+
+      expect(groupsByKey(groups).loadFailed).toEqual([dsReadFailed.id])
+    })
+
+    it('never produces loadFailed in non-scoped mode even with failedDsIds', () => {
+      const { groups } = classifyDeploymentsForResource({
+        deployments: [dsReadFailed],
+        activeReleaseByDs,
+        scopedType: null,
+        scopedResourceId: undefined,
+        failedDsIds: [dsReadFailed.id]
+      })
+
+      expect(groupsByKey(groups).loadFailed).toEqual([])
     })
   })
 })

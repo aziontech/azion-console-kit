@@ -172,6 +172,14 @@ export function useReleaseComposition({
   const activeReleaseByDs = ref({})
   const activeReleaseLoadingByDs = ref({})
   const loadedDsIds = ref(new Set())
+  // Keyed by DS id; `true` when the active-release READ failed. A failure keeps
+  // `activeReleaseByDs[dsId] === null` (so existing readers don't break) but this
+  // flag lets the consumer tell a genuine "no release" apart from "couldn't read":
+  // the former is a real first-release case, the latter must BLOCK publish (a
+  // re-release would drop resources the failed read never saw). A failed DS is NOT
+  // added to `loadedDsIds`, so a selection change re-attempts it; `retryActiveReleases`
+  // forces an immediate re-attempt without a selection change.
+  const activeReleaseErrorByDs = ref({})
 
   const loadActiveRelease = async (dsId) => {
     if (dsId == null || activeReleaseLoadingByDs.value[dsId]) return
@@ -181,13 +189,31 @@ export function useReleaseComposition({
       const release = await deploymentReleaseService.getActiveReleaseComposition(dsId)
       activeReleaseByDs.value = { ...activeReleaseByDs.value, [dsId]: release ?? null }
       loadedDsIds.value = new Set(loadedDsIds.value).add(dsId)
+      // A successful read clears the failure flag for this DS. Always written
+      // (even when it was already clear) so the store watcher propagates `false`
+      // and a previously-degraded DS re-enables — see `retryActiveReleases`.
+      activeReleaseErrorByDs.value = { ...activeReleaseErrorByDs.value, [dsId]: false }
     } catch {
       // A per-DS read failure must not block the others (independent fan-out,
-      // §7.3): record `null` and move on; never fabricate a composition.
+      // §7.3): keep `null` (never fabricate a composition) but FLAG the failure so
+      // it is not mistaken for "no active release".
       activeReleaseByDs.value = { ...activeReleaseByDs.value, [dsId]: null }
+      activeReleaseErrorByDs.value = { ...activeReleaseErrorByDs.value, [dsId]: true }
     } finally {
       activeReleaseLoadingByDs.value = { ...activeReleaseLoadingByDs.value, [dsId]: false }
     }
+  }
+
+  // Explicit retry for DSs whose active-release read failed: re-attempt each (a
+  // failed DS was never added to `loadedDsIds`, so the guard doesn't short-circuit).
+  // The flag is NOT pre-cleared here — `loadActiveRelease` writes `false` on success
+  // or `true` on a repeat failure, so the store watcher always sees the resolved
+  // state (pre-clearing to `{}` would drop the entry and never propagate `false`).
+  const retryActiveReleases = () => {
+    const failedDsIds = Object.keys(activeReleaseErrorByDs.value).filter(
+      (dsId) => activeReleaseErrorByDs.value[dsId]
+    )
+    failedDsIds.forEach((dsId) => loadActiveRelease(dsId))
   }
 
   const ensureActiveReleases = (ids) => {
@@ -222,10 +248,26 @@ export function useReleaseComposition({
   // Keyed `${type}:${id}`; each value is the picker options from `toVersionOptions`.
   const versionsByResource = ref({})
   const versionsLoadingByResource = ref({})
+  // Keyed `${type}:${id}`; `true` once a load FAILED. A failed load does NOT
+  // write an (empty) entry into `versionsByResource` — otherwise the empty array
+  // would be indistinguishable from a resource that genuinely has no versions and
+  // the sentinel `LATEST` would silently resolve to `null` (posting an invalid
+  // `version_id: null`). The flag both blocks the reactive watcher from retrying
+  // in a loop AND is what `retryResourceVersions()` clears to re-fetch on demand.
+  const versionsErrorByResource = ref({})
 
   const loadResourceVersions = async (resourceType, resourceId) => {
     const key = versionsKey(resourceType, resourceId)
-    if (versionsByResource.value[key] || versionsLoadingByResource.value[key]) return
+    // Retry is EXPLICIT: a key already loaded, in flight, or failed is skipped so
+    // the reactive watcher never re-fires it. `retryResourceVersions()` clears the
+    // error flag to allow a fresh attempt.
+    if (
+      key in versionsByResource.value ||
+      versionsLoadingByResource.value[key] ||
+      versionsErrorByResource.value[key]
+    ) {
+      return
+    }
     const registry = RESOURCE_CATALOG_REGISTRY[resourceType]
     if (!registry?.listVersions) return
     versionsLoadingByResource.value = { ...versionsLoadingByResource.value, [key]: true }
@@ -236,7 +278,9 @@ export function useReleaseComposition({
         : toVersionOptions
       versionsByResource.value = { ...versionsByResource.value, [key]: mapVersions(raw) }
     } catch {
-      versionsByResource.value = { ...versionsByResource.value, [key]: [] }
+      // Record the FAILURE (not an empty result) so the consumer can surface a
+      // retryable error instead of treating it as "no versions available".
+      versionsErrorByResource.value = { ...versionsErrorByResource.value, [key]: true }
     } finally {
       versionsLoadingByResource.value = { ...versionsLoadingByResource.value, [key]: false }
     }
@@ -264,6 +308,25 @@ export function useReleaseComposition({
   const isLoadingVersionsFor = (resourceType, resourceId) =>
     Boolean(versionsLoadingByResource.value[versionsKey(resourceType, resourceId)])
 
+  const hasVersionsErrorFor = (resourceType, resourceId) =>
+    Boolean(versionsErrorByResource.value[versionsKey(resourceType, resourceId)])
+
+  const hasAnyVersionsError = computed(() =>
+    Object.values(versionsErrorByResource.value).some(Boolean)
+  )
+
+  // Explicit retry (req 7.4-style): clear every version error flag so the reactive
+  // watcher re-fetches the currently-tracked resources on its next run, and kick
+  // the currently-tracked resources immediately.
+  const retryResourceVersions = () => {
+    versionsErrorByResource.value = {}
+    ;(toValue(versionedResources) ?? []).forEach((resource) => {
+      if (resource?.resourceType && resource?.resourceId != null) {
+        loadResourceVersions(resource.resourceType, resource.resourceId)
+      }
+    })
+  }
+
   // --- Per-type instance catalog (registry) --------------------------------
 
   // Keyed by resource type; each value is the picker options
@@ -272,10 +335,22 @@ export function useReleaseComposition({
   // raw HTTP, cached once per type.
   const catalogByType = ref({})
   const catalogLoadingByType = ref({})
+  // Keyed by resource type; `true` once a catalog load FAILED. As with versions,
+  // a failure does NOT write an empty catalog (which would look like "no resources
+  // exist" and never recover) — it records a retryable error instead.
+  const catalogErrorByType = ref({})
 
   const loadCatalog = async (resourceType) => {
     if (!resourceType) return
-    if (catalogByType.value[resourceType] || catalogLoadingByType.value[resourceType]) return
+    // Retry is EXPLICIT: loaded, in flight, or failed types are skipped so the
+    // reactive watcher never loops. `retryCatalogs()` clears the error to re-fetch.
+    if (
+      resourceType in catalogByType.value ||
+      catalogLoadingByType.value[resourceType] ||
+      catalogErrorByType.value[resourceType]
+    ) {
+      return
+    }
     const registry = RESOURCE_CATALOG_REGISTRY[resourceType]
     if (!registry?.listCatalog) return
     catalogLoadingByType.value = { ...catalogLoadingByType.value, [resourceType]: true }
@@ -284,8 +359,8 @@ export function useReleaseComposition({
       catalogByType.value = { ...catalogByType.value, [resourceType]: raw ?? [] }
     } catch {
       // A per-type catalog failure must not break the others or the screen:
-      // record an empty catalog and let the selector show no options.
-      catalogByType.value = { ...catalogByType.value, [resourceType]: [] }
+      // record a retryable error and let the selector show no options for now.
+      catalogErrorByType.value = { ...catalogErrorByType.value, [resourceType]: true }
     } finally {
       catalogLoadingByType.value = { ...catalogLoadingByType.value, [resourceType]: false }
     }
@@ -298,6 +373,18 @@ export function useReleaseComposition({
     }))
 
   const isLoadingCatalog = (resourceType) => Boolean(catalogLoadingByType.value[resourceType])
+
+  const hasAnyCatalogError = computed(() => Object.values(catalogErrorByType.value).some(Boolean))
+
+  // Explicit retry: clear the catalog error flags and re-load the failed types
+  // (a type stays skipped once cached, so this only re-fetches the failed ones).
+  const retryCatalogs = () => {
+    const failedTypes = Object.keys(catalogErrorByType.value).filter(
+      (type) => catalogErrorByType.value[type]
+    )
+    catalogErrorByType.value = {}
+    failedTypes.forEach((type) => loadCatalog(type))
+  }
 
   // --- Resource -> consuming Deployment Settings (HOP 1, delegated) ---------
 
@@ -621,7 +708,26 @@ export function useReleaseComposition({
 
   // Non-scoped (Scenario A): one DS-agnostic adapter payload fanned out unchanged.
   const buildAndActivateShared = async (ids, resources, strategy) => {
-    const payload = DeploymentAdapter.transformBuildAndActivatePayload(resources, strategy)
+    // Guard the null-version leak (mirrors the scoped path): the store resolves the
+    // LATEST sentinel to a concrete `version_id` in `composePayload()`, but when a
+    // resource's versions never loaded (or failed) that resolution yields `null`.
+    // Posting `resource_version: null` is rejected by the API, so NEVER dispatch it:
+    // surface every target DS as an UNRESOLVED_VERSION skip instead — the consumer
+    // branches on `skipReason` exactly as for the scoped degraded / mismatch cases.
+    const list = Array.isArray(resources) ? resources : []
+    if (list.some((resource) => resource?.resource_version == null)) {
+      return ids.map((id) => ({
+        id,
+        ok: false,
+        skipped: true,
+        skipReason: SCOPED_PUBLISH_SKIP_REASONS.UNRESOLVED_VERSION,
+        traceId: null,
+        value: null,
+        error: null,
+        errorType: null
+      }))
+    }
+    const payload = DeploymentAdapter.transformBuildAndActivatePayload(list, strategy)
     const settled = await Promise.allSettled(
       ids.map((id) => deploymentReleaseService.buildAndActivate(id, payload))
     )
@@ -788,19 +894,26 @@ export function useReleaseComposition({
     refetchDeployments,
     // active release per DS
     activeReleaseByDs,
+    activeReleaseErrorByDs,
     isLoadingActiveRelease,
     loadActiveRelease,
     ensureActiveReleases,
+    retryActiveReleases,
     // versions per resource
     versionsByResource,
     versionOptionsFor,
     isLoadingVersionsFor,
+    hasVersionsErrorFor,
+    hasAnyVersionsError,
     loadResourceVersions,
+    retryResourceVersions,
     // instance catalog per type
     catalogByType,
     catalogOptionsFor,
     isLoadingCatalog,
+    hasAnyCatalogError,
     loadCatalog,
+    retryCatalogs,
     // resource -> consuming DS: the backwards-compatible `string[]` shim (req 1.3)
     resolveConsumingDsIds,
     // resource -> consuming deployments: the full HOP 1 result (de-duped union +

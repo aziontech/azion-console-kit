@@ -159,6 +159,9 @@ describe('DeploymentSettingsPicker (non-selectable group)', () => {
     key: 'needsFirstRelease',
     label: 'Needs a first release',
     selectable: false,
+    notice:
+      'No active release — compose a full first release (with an Application) to publish here.',
+    action: { label: 'Compose first release', icon: 'pi pi-arrow-right' },
     deployments: [{ id: 'ds-new', name: 'brand-new-edge', policyLabel: 'Versioned URLs' }]
   }
 
@@ -173,28 +176,32 @@ describe('DeploymentSettingsPicker (non-selectable group)', () => {
       global: { stubs }
     })
 
-  it('renders the row read-only with a compose-first-release action instead of a checkbox', () => {
+  it('renders the row read-only with a group action instead of a checkbox', () => {
     const wrapper = withNeedsFirst()
 
     const row = wrapper.find('[data-testid="release-composition__ds-row-ds-new"]')
     expect(row.exists()).toBe(true)
     expect(row.attributes('role')).toBeUndefined()
     expect(
-      wrapper.find('[data-testid="release-composition__ds-compose-first-ds-new"]').exists()
+      wrapper
+        .find('[data-testid="release-composition__ds-action-needsFirstRelease-ds-new"]')
+        .exists()
     ).toBe(true)
-    expect(
-      wrapper.find('[data-testid="release-composition__ds-needs-release-ds-new"]').exists()
-    ).toBe(true)
+    expect(wrapper.find('[data-testid="release-composition__ds-notice-ds-new"]').exists()).toBe(
+      true
+    )
   })
 
-  it('emits compose-first-release with the DS id when the action is clicked', async () => {
+  it('emits group-action with the group key and DS id when the action is clicked', async () => {
     const wrapper = withNeedsFirst()
 
     await wrapper
-      .find('[data-testid="release-composition__ds-compose-first-ds-new"]')
+      .find('[data-testid="release-composition__ds-action-needsFirstRelease-ds-new"]')
       .trigger('click')
 
-    expect(wrapper.emitted('compose-first-release')?.at(-1)).toEqual(['ds-new'])
+    expect(wrapper.emitted('group-action')?.at(-1)).toEqual([
+      { groupKey: 'needsFirstRelease', dsId: 'ds-new' }
+    ])
   })
 
   it('does not toggle selection when a non-selectable row is clicked', async () => {
@@ -220,7 +227,9 @@ describe('DeploymentSettingsPicker (non-selectable group)', () => {
 
     expect(wrapper.find('[data-testid="release-composition__ds-empty"]').exists()).toBe(false)
     expect(
-      wrapper.find('[data-testid="release-composition__ds-compose-first-ds-new"]').exists()
+      wrapper
+        .find('[data-testid="release-composition__ds-action-needsFirstRelease-ds-new"]')
+        .exists()
     ).toBe(true)
   })
 })

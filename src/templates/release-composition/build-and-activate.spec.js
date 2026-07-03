@@ -269,3 +269,52 @@ describe('build_and_activate write path — Property 7 (integration)', () => {
     expect(payload.strategy).toBeTruthy()
   })
 })
+
+// A resource whose version never resolved (LATEST over an empty/failed catalog)
+// arrives as `resource_version: null`. Posting that is rejected by the API, so the
+// non-scoped path must skip-all instead of dispatching — mirroring the scoped
+// guard (Fix 2).
+describe('build_and_activate write path — non-scoped unresolved-version guard (Fix 2)', () => {
+  it('skips ALL DS with unresolved_version and issues NO service call when a resource has a null version', async () => {
+    const { buildAndActivate } = mountComposable()
+    await flushPromises()
+
+    const results = await buildAndActivate(
+      {
+        resources: [{ resource_id: 'app-1', resource_version: null, resource_type: 'application' }],
+        canary: false,
+        canaryForm: {}
+      },
+      ['ds-1', 'ds-2']
+    )
+
+    expect(deploymentReleaseService.buildAndActivate).not.toHaveBeenCalled()
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: 'ds-1',
+        ok: false,
+        skipped: true,
+        skipReason: 'unresolved_version'
+      }),
+      expect.objectContaining({
+        id: 'ds-2',
+        ok: false,
+        skipped: true,
+        skipReason: 'unresolved_version'
+      })
+    ])
+    expect(httpSpy).not.toHaveBeenCalled()
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  it('dispatches normally when every resource carries a concrete version', async () => {
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 'trace' } })
+    const { buildAndActivate } = mountComposable()
+    await flushPromises()
+
+    const results = await buildAndActivate(composedPayload(), ['ds-1'])
+
+    expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
+    expect(results[0]).toMatchObject({ id: 'ds-1', ok: true })
+  })
+})

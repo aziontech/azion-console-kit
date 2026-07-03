@@ -983,3 +983,95 @@ describe('composePayload scoped — dependencyOverrides', () => {
     expect(payload.dependencyOverrides).toEqual([])
   })
 })
+
+// ---------------------------------------------------------------------------
+// deployCtx.degraded — a failed active-release READ blocks publish (Fix 1).
+// A DS whose active release couldn't be read is DISTINCT from one with no
+// release: publishing anyway would drop resources the failed read never saw.
+// ---------------------------------------------------------------------------
+describe('deployCtx.degraded — a failed active-release read blocks canDeploy', () => {
+  const setupSelectedDs = (store) => {
+    store.setDeployments([{ id: 'ds-1', deployment_policy: VERSIONED_URLS }])
+    store.setActiveReleaseByDs('ds-1', releaseWithApp(true))
+    store.pickDs('ds-1')
+    store.setResName(APPLICATION_TYPE, 'app-1')
+    store.setResVer(APPLICATION_TYPE, 'app-v1')
+  }
+
+  it('defaults degraded=false and allows canDeploy when the read succeeded', () => {
+    const store = useReleaseStore()
+    setupSelectedDs(store)
+
+    const ctx = store.deployCtx('ds-1')
+    expect(ctx.degraded).toBe(false)
+    expect(ctx.canDeploy).toBe(true)
+    expect(store.deployEnabled).toBe(true)
+  })
+
+  it('sets degraded=true and blocks canDeploy/deployEnabled when the read failed', () => {
+    const store = useReleaseStore()
+    setupSelectedDs(store)
+
+    store.setActiveReleaseError('ds-1', true)
+
+    const ctx = store.deployCtx('ds-1')
+    expect(ctx.degraded).toBe(true)
+    expect(ctx.canDeploy).toBe(false)
+    expect(store.deployEnabled).toBe(false)
+  })
+
+  it('recovers once the error flag is cleared (read succeeds on retry)', () => {
+    const store = useReleaseStore()
+    setupSelectedDs(store)
+    store.setActiveReleaseError('ds-1', true)
+    expect(store.deployEnabled).toBe(false)
+
+    store.setActiveReleaseError('ds-1', false)
+    expect(store.deployCtx('ds-1').degraded).toBe(false)
+    expect(store.deployEnabled).toBe(true)
+  })
+
+  it('preserves the activeReleaseErrorByDs slot across openRelease (loaded data is not wiped)', () => {
+    const store = useReleaseStore()
+    store.setActiveReleaseError('ds-1', true)
+
+    store.openRelease({ deploymentId: 'ds-1' })
+
+    expect(store.activeReleaseErrorByDs['ds-1']).toBe(true)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// versionGateSatisfied — the extracted version gate (Fix 3). It lets the view
+// tell WHEN only the version confirmation is missing (to show a hint) without
+// re-deriving the branch.
+// ---------------------------------------------------------------------------
+describe('versionGateSatisfied — the extracted version gate', () => {
+  it('non-scoped: gates on the application version', () => {
+    const store = useReleaseStore()
+    expect(store.versionGateSatisfied).toBe(false)
+
+    store.setResVer(APPLICATION_TYPE, LATEST_READY)
+    expect(store.versionGateSatisfied).toBe(true)
+  })
+
+  it('scoped application: gates on the application version', () => {
+    const store = useReleaseStore()
+    store.openRelease({ fromVersion: true, scopedType: APPLICATION_TYPE, resourceId: 'app-1' })
+    // openRelease seeds resVers[application] only when a versionId is present; here
+    // none is passed, so the gate is unmet until the app version is chosen.
+    store.setResVer(APPLICATION_TYPE, 'app-v9')
+    expect(store.versionGateSatisfied).toBe(true)
+  })
+
+  it('scoped non-application: gates on the SCOPED resource version, not the app', () => {
+    const store = useReleaseStore()
+    store.openRelease({ fromVersion: true, scopedType: 'firewall', resourceId: 'fw-1' })
+    // The application card is not rendered in a firewall scope, so the app version
+    // is never chosen — the gate must read the firewall (scoped) version instead.
+    expect(store.versionGateSatisfied).toBe(false)
+
+    store.setResVer('firewall', 'fw-v3')
+    expect(store.versionGateSatisfied).toBe(true)
+  })
+})

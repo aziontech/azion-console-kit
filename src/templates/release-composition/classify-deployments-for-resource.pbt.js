@@ -153,9 +153,11 @@ describeOrSkip(`classifyDeploymentsForResource — invariants${skipReason}`, () 
         const result = classify(deployments, activeReleaseByDs)
         const linked = groupOf(result, 'linked')
         const available = groupOf(result, 'available')
+        const needsFirstRelease = groupOf(result, 'needsFirstRelease')
+        const loadFailed = groupOf(result, 'loadFailed')
         const hidden = result.hidden
 
-        const all = [...linked, ...available, ...hidden]
+        const all = [...linked, ...available, ...needsFirstRelease, ...loadFailed, ...hidden]
 
         expect(all.length).toBe(deployments.length)
 
@@ -163,6 +165,8 @@ describeOrSkip(`classifyDeploymentsForResource — invariants${skipReason}`, () 
           const occurrences =
             (linked.includes(deployment) ? 1 : 0) +
             (available.includes(deployment) ? 1 : 0) +
+            (needsFirstRelease.includes(deployment) ? 1 : 0) +
+            (loadFailed.includes(deployment) ? 1 : 0) +
             (hidden.includes(deployment) ? 1 : 0)
           return occurrences === 1
         })

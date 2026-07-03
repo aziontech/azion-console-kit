@@ -55,6 +55,11 @@ const releaseResourceId = (resource) =>
 const freshLoadedData = () => ({
   deployments: [],
   activeReleaseByDs: {},
+  // Keyed by DS id; `true` when the composable's active-release READ failed for
+  // that DS (distinct from a genuine "no release", which stays absent here). The
+  // composable owns it and feeds it through `setActiveReleaseError`; `deployCtx`
+  // reads it to BLOCK publish on a degraded DS.
+  activeReleaseErrorByDs: {},
   versionsByResource: {}
 })
 
@@ -114,6 +119,14 @@ export const useReleaseStore = defineStore('release', {
         const isVersioned = deployment?.deployment_policy === VERSIONED_URLS
         const deployed = Boolean(activeRelease)
 
+        // The active-release read FAILED for this DS (not a genuine "no release").
+        // Publishing anyway is unsafe: a non-scoped re-release falls back to the
+        // active release to fill the singletons (`composeResources`), so a failed
+        // read would silently ship a release MISSING firewall/custom_page; a scoped
+        // override has no base composition to preserve. Block until the read
+        // recovers (the picker/footer offer a Retry).
+        const degraded = Boolean(this.activeReleaseErrorByDs[dsId])
+
         const resources = Array.isArray(activeRelease?.resources) ? activeRelease.resources : []
         const releaseHasApp = resources.some(
           (resource) => resource?.resource_type === APPLICATION_TYPE
@@ -134,13 +147,14 @@ export const useReleaseStore = defineStore('release', {
         // `atLimit` is best-effort: no reliable active-count client-side, so the
         // front never blocks preventively — the API 422 is the real barrier.
         const atLimit = false
-        const canDeploy = hasApp && !atLimit
+        const canDeploy = hasApp && !atLimit && !degraded
 
         return {
           ok,
           isVersioned,
           hasApp,
           deployed,
+          degraded,
           maxDeploys: MAX_DEPLOYS,
           atLimit,
           appEditable,
@@ -192,15 +206,21 @@ export const useReleaseStore = defineStore('release', {
       return pending
     },
 
-    deployEnabled() {
-      const ctx = this.deployCtx()
+    // The version gate alone (extracted so the view can tell WHEN only the version
+    // confirmation is missing and surface a hint, instead of a silently-disabled
+    // button). A scoped non-application entry gates on the scoped resource's
+    // version; every other entry gates on the application's.
+    versionGateSatisfied() {
       const versionChosen =
         this.scopedType && this.scopedType !== APPLICATION_TYPE
           ? this.scopedVersionChosen
           : this.appVersionChosen
-      return Boolean(
-        ctx.ok && ctx.canDeploy && this.effDsId && versionChosen && this.appManagedVersionsChosen
-      )
+      return Boolean(versionChosen && this.appManagedVersionsChosen)
+    },
+
+    deployEnabled() {
+      const ctx = this.deployCtx()
+      return Boolean(ctx.ok && ctx.canDeploy && this.effDsId && this.versionGateSatisfied)
     }
   },
 
@@ -512,6 +532,12 @@ export const useReleaseStore = defineStore('release', {
 
     setActiveReleaseByDs(dsId, release) {
       this.activeReleaseByDs = { ...this.activeReleaseByDs, [dsId]: release ?? null }
+    },
+
+    // The composable feeds the per-DS active-release read failure flag here so
+    // `deployCtx` can block publish on a degraded DS (see `activeReleaseErrorByDs`).
+    setActiveReleaseError(dsId, failed) {
+      this.activeReleaseErrorByDs = { ...this.activeReleaseErrorByDs, [dsId]: Boolean(failed) }
     },
 
     setVersionsByResource(type, resourceId, options) {

@@ -15,13 +15,15 @@
    *   `workloadsCount` (number) renders a "{N} Workloads affected" line and is
    *   omitted when absent (never fabricated to 0). `environmentNames` (string[])
    *   renders up to three tags plus a "+K" overflow chip.
-   * @prop {Array<{ key: string, label: string, selectable?: boolean, deployments: Array<{ id, name, policyLabel, workloadsCount?, environmentNames? }> }>} groups
+   * @prop {Array<{ key: string, label: string, selectable?: boolean, notice?: string, action?: { label: string, icon?: string }, deployments: Array<{ id, name, policyLabel, workloadsCount?, environmentNames? }> }>} groups
    *   Sectioned Deployment Settings. When populated, rows render grouped under
    *   `label` headers (empty groups omitted). A group with `selectable: false`
-   *   (default true) renders read-only rows with a "Compose first release" action
-   *   instead of a checkbox and is excluded from the counter, select-all/clear-all
-   *   and union math — the selectable set driving those is the union of the
-   *   selectable groups only.
+   *   (default true) renders read-only rows — a per-group `notice` line and, when
+   *   `action` is present, a single button that emits `group-action` — instead of a
+   *   checkbox, and is excluded from the counter, select-all/clear-all and union
+   *   math (the selectable set driving those is the union of the selectable groups
+   *   only). The picker is presentational: it never derives `notice`/`action`, they
+   *   arrive per group from the parent.
    * @prop {Array<string|number>} modelValue Selected Deployment Setting ids.
    * @prop {string} query Search string (owned by the parent).
    * @prop {boolean} isLoadingMeta When true, the impact metadata (workloads
@@ -30,8 +32,8 @@
    * @emits update:modelValue When the selection changes.
    * @emits update:query When the search string changes.
    * @emits bind-environment When the empty-state action is triggered.
-   * @emits compose-first-release (dsId) When a non-selectable row's "Compose
-   *   first release" action is triggered.
+   * @emits group-action ({ groupKey, dsId }) When a non-selectable row's action
+   *   button is triggered (e.g. "Compose first release" or "Retry").
    */
   import { computed } from 'vue'
   import Checkbox from '@aziontech/webkit/checkbox'
@@ -75,7 +77,7 @@
     'update:modelValue',
     'update:query',
     'bind-environment',
-    'compose-first-release'
+    'group-action'
   ])
 
   const selectedIds = computed({
@@ -145,9 +147,20 @@
           key: group.key,
           label: group.label,
           selectable: group.selectable !== false,
+          notice: group.notice ?? null,
+          action: group.action ?? null,
           deployments: group.deployments
         }))
-      : [{ key: null, label: null, selectable: true, deployments: props.deployments }]
+      : [
+          {
+            key: null,
+            label: null,
+            selectable: true,
+            notice: null,
+            action: null,
+            deployments: props.deployments
+          }
+        ]
   )
 
   // Select-all / clear-all over the LISTED candidate set (req 1.9 / NRS §4.5).
@@ -366,7 +379,7 @@
 
         <div
           v-for="ds in section.selectable ? [] : section.deployments"
-          :key="`needs-first-${ds.id}`"
+          :key="`nonselectable-${section.key}-${ds.id}`"
           class="flex items-start gap-[var(--spacing-3)] rounded-[var(--shape-card)] border border-dashed border-[var(--surface-border)] bg-[var(--surface-50)] px-[var(--spacing-4)] py-[var(--spacing-4)]"
           :data-testid="`release-composition__ds-row-${ds.id}`"
         >
@@ -385,22 +398,23 @@
               </span>
             </span>
             <span
+              v-if="section.notice"
               class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
-              :data-testid="`release-composition__ds-needs-release-${ds.id}`"
+              :data-testid="`release-composition__ds-notice-${ds.id}`"
             >
-              No active release — compose a full first release (with an Application) to publish
-              here.
+              {{ section.notice }}
             </span>
           </div>
           <PrimeButton
-            label="Compose first release"
-            icon="pi pi-arrow-right"
+            v-if="section.action"
+            :label="section.action.label"
+            :icon="section.action.icon"
             iconPos="right"
             link
             size="small"
             class="shrink-0 self-start"
-            :data-testid="`release-composition__ds-compose-first-${ds.id}`"
-            @click="emit('compose-first-release', ds.id)"
+            :data-testid="`release-composition__ds-action-${section.key}-${ds.id}`"
+            @click="emit('group-action', { groupKey: section.key, dsId: ds.id })"
           />
         </div>
       </template>
