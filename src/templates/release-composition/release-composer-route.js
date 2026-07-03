@@ -69,3 +69,30 @@ export const releaseComposerRouteFromDeployment = (deploymentId) => {
     query: { deploymentIds: String(deploymentId) }
   }
 }
+
+/**
+ * Route location for opening the composer from a Workload ("Deploy"). A Workload
+ * may be bound to several environments — one Deployment Settings each — so the
+ * entry carries EVERY bound DS id, not just the first.
+ *
+ * With no bound DS it opens the global "Deploy" entry; with exactly one it is the
+ * single-DS Scenario A (delegates to `releaseComposerRouteFromDeployment`); with
+ * more than one it carries all ids plus `pickTarget` so the composer presents the
+ * Deployment Settings picker (scoped to these ids) instead of silently targeting
+ * one environment.
+ *
+ * @param {{ deploymentIds?: Array<string|number> }} [context]
+ * @returns {{ name: string, query?: Record<string, string> }}
+ */
+export const releaseComposerRouteFromWorkload = ({ deploymentIds } = {}) => {
+  const ids = (Array.isArray(deploymentIds) ? deploymentIds : [])
+    .filter((id) => id != null && id !== '')
+    .map(String)
+
+  if (ids.length <= 1) return releaseComposerRouteFromDeployment(ids[0])
+
+  return {
+    name: RELEASE_COMPOSER_ROUTE,
+    query: { deploymentIds: ids.join(','), pickTarget: 'true' }
+  }
+}

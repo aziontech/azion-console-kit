@@ -256,10 +256,12 @@ export class WorkloadService extends BaseService {
       await this.#ensureCertificateForEditLegacy(payload)
     }
     await this.#updateWorkload(payload)
-    if (payload.workloadDeploymentId) {
-      await this.#updateDeployment(payload)
-    } else {
-      await this.#ensureDeployment(payload, payload.id)
+    if (!isV6) {
+      if (payload.workloadDeploymentId) {
+        await this.#updateDeployment(payload)
+      } else {
+        await this.#ensureDeployment(payload, payload.id)
+      }
     }
 
     this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })

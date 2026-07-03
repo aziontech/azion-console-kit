@@ -4,23 +4,7 @@ import { deploymentReleaseService } from '@/services/v2/deployment/deployment-re
 import { deploymentService } from '@/services/v2/deployment/deployment-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
 import { aggregateReleasesByBindings } from '@/views/Workload/utils/aggregateReleasesByBindings'
-
-const resolveDeploymentIds = (bindings) => {
-  const ids = []
-  const seen = new Set()
-
-  for (const binding of bindings) {
-    const deploymentId = binding?.deployment_id
-    if (deploymentId == null) continue
-
-    const key = String(deploymentId)
-    if (seen.has(key)) continue
-    seen.add(key)
-    ids.push(key)
-  }
-
-  return ids
-}
+import { resolveDeploymentIds } from '@/views/Workload/utils/resolveDeploymentIds'
 
 export function useWorkloadReleases({ workloadId, getWorkload } = {}) {
   const toast = useToast()

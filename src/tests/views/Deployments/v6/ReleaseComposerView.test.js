@@ -348,7 +348,8 @@ describe('ReleaseComposerView — confirm + dispatch', () => {
     )
   })
 
-  it('navigates to the first DS releases tab after a confirmed dispatch', async () => {
+  it('navigates to the first successful DS releases tab after a confirmed dispatch', async () => {
+    buildAndActivate.mockResolvedValue([{ id: 'ds-1', ok: true }])
     const wrapper = mountView()
 
     await wrapper.find('[data-testid="release-composition__build-and-activate"]').trigger('click')
@@ -358,6 +359,36 @@ describe('ReleaseComposerView — confirm + dispatch', () => {
     expect(routerPush).toHaveBeenCalledWith({
       name: 'deployments-edit',
       params: { id: 'ds-1', tab: 'releases' }
+    })
+  })
+
+  it('does not navigate when every build_and_activate outcome failed', async () => {
+    buildAndActivate.mockResolvedValue([
+      { id: 'ds-1', ok: false, error: new Error('boom'), errorType: null }
+    ])
+    const wrapper = mountView()
+
+    await wrapper.find('[data-testid="release-composition__build-and-activate"]').trigger('click')
+    await wrapper.find('[data-testid="release-composition__confirm-build"]').trigger('click')
+    await flushPromises()
+
+    expect(routerPush).not.toHaveBeenCalled()
+  })
+
+  it('navigates to the first successful DS when an earlier target failed', async () => {
+    buildAndActivate.mockResolvedValue([
+      { id: 'ds-1', ok: false, error: new Error('boom'), errorType: null },
+      { id: 'ds-2', ok: true }
+    ])
+    const wrapper = mountView()
+
+    await wrapper.find('[data-testid="release-composition__build-and-activate"]').trigger('click')
+    await wrapper.find('[data-testid="release-composition__confirm-build"]').trigger('click')
+    await flushPromises()
+
+    expect(routerPush).toHaveBeenCalledWith({
+      name: 'deployments-edit',
+      params: { id: 'ds-2', tab: 'releases' }
     })
   })
 })

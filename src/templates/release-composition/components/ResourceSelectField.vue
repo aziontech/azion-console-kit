@@ -69,7 +69,7 @@
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-col gap-[var(--spacing-2)]">
+  <div class="flex w-full flex-col gap-[var(--spacing-2)]">
     <label
       class="flex items-center gap-[var(--spacing-1)] text-body-sm font-medium text-[var(--text-color-secondary)]"
     >

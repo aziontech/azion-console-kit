@@ -146,7 +146,7 @@
         class="flex flex-col gap-[var(--spacing-2)]"
       >
         <div
-          class="release-composition-tree__grid grid gap-[var(--spacing-3)]"
+          class="flex w-full gap-[var(--spacing-3)]"
           :data-testid="`release-composition__fields-${resource.type}`"
         >
           <ResourceSelectField
@@ -209,15 +209,5 @@
      lines up flush with the "Resource" label and the field column below it. */
   .release-composition__card-icon {
     margin-left: -2px;
-  }
-
-  .release-composition-tree__grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @media (max-width: 600px) {
-    .release-composition-tree__grid {
-      grid-template-columns: 1fr;
-    }
   }
 </style>

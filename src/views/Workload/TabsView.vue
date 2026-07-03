@@ -15,7 +15,8 @@
   import WorkloadReleasesSection from './Tabs/sections/WorkloadReleasesSection.vue'
   import CreateDeploymentVersionDrawer from './FormFields/components/CreateDeploymentVersionDrawer.vue'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { releaseComposerRouteFromDeployment } from '@/templates/release-composition/release-composer-route'
+  import { releaseComposerRouteFromWorkload } from '@/templates/release-composition/release-composer-route'
+  import { resolveDeploymentIds } from '@/views/Workload/utils/resolveDeploymentIds'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
@@ -116,7 +117,13 @@
 
   const isDeployDrawerOpen = ref(false)
   const openRelease = () => {
-    router.push(releaseComposerRouteFromDeployment(workload.value?.workloadDeploymentId))
+    const resolvedIds = resolveDeploymentIds(workload.value?.bindings)
+    const deploymentIds = resolvedIds.length
+      ? resolvedIds
+      : workload.value?.workloadDeploymentId != null
+        ? [workload.value.workloadDeploymentId]
+        : []
+    router.push(releaseComposerRouteFromWorkload({ deploymentIds }))
   }
 
   const onVersionCreated = () => {

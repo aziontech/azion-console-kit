@@ -83,17 +83,11 @@
         >
           <button
             type="button"
-            class="flex flex-1 items-center gap-[var(--spacing-3)] text-left bg-transparent border-0 cursor-pointer min-w-0"
+            class="flex flex-1 items-center gap-[var(--spacing-2)] text-left bg-transparent border-0 cursor-pointer min-w-0"
             :aria-expanded="collection.open"
             :data-testid="`release-composition__deps-group-header-${collection.type}`"
             @click="onToggleGroup(collection.type)"
           >
-            <i
-              :class="[
-                'pi text-[var(--text-color-secondary)] transition-transform',
-                collection.open ? 'pi-chevron-down' : 'pi-chevron-right'
-              ]"
-            />
             <i
               :class="[collection.icon, 'shrink-0 text-body-md text-[var(--text-color-secondary)]']"
             />
@@ -107,11 +101,17 @@
           >
             {{ collection.count }}
           </span>
+          <i
+            :class="[
+              'pi text-[var(--text-color-secondary)] transition-transform',
+              collection.open ? 'pi-chevron-down' : 'pi-chevron-right'
+            ]"
+          />
         </div>
 
         <div
           v-if="collection.open"
-          class="flex flex-col gap-[var(--spacing-2)] border-t border-[var(--surface-border)] py-[var(--spacing-3)] pr-[var(--spacing-3)] pl-[var(--spacing-7)]"
+          class="flex flex-col gap-[var(--spacing-2)] border-t border-[var(--surface-border)] p-[var(--spacing-3)]"
           :data-testid="`release-composition__deps-body-${collection.type}`"
         >
           <p
@@ -126,40 +126,42 @@
             <div
               v-for="instance in collection.instances"
               :key="instance.id"
-              :class="[
-                'release-composition__deps-row grid items-end gap-[var(--spacing-3)]',
-                instance.locked && 'release-composition__deps-row--locked'
-              ]"
+              class="flex flex-col gap-[var(--spacing-2)]"
               :data-testid="`release-composition__deps-row-${collection.type}-${instance.id}`"
             >
               <div
-                v-if="instance.locked"
-                class="flex min-w-0 flex-col gap-[var(--spacing-2)]"
+                :class="[
+                  'release-composition__deps-row flex w-full items-end gap-[var(--spacing-3)]',
+                  instance.locked && 'release-composition__deps-row--locked'
+                ]"
               >
-                <label
-                  class="flex items-center gap-[var(--spacing-1)] text-body-sm font-medium text-[var(--text-color-secondary)]"
+                <div
+                  v-if="instance.locked"
+                  class="flex w-full flex-col gap-[var(--spacing-2)]"
                 >
-                  {{ collection.label }}
-                </label>
-                <span
-                  class="flex items-center gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-3)] py-[var(--spacing-2)] text-body-sm text-[var(--text-color)]"
-                  :data-testid="`release-composition__deps-fixed-${collection.type}-${instance.id}`"
-                >
-                  <i class="pi pi-lock text-[var(--text-color-secondary)]" />
-                  <span class="truncate">{{ instance.name }}</span>
-                </span>
-              </div>
-              <ResourceSelectField
-                v-else
-                :modelValue="instance.resourceId"
-                :options="instance.options"
-                :label="collection.label"
-                :required="false"
-                :placeholder="`Select a ${collection.label}`"
-                @update:modelValue="onResourceChange(collection.type, instance.id, $event)"
-              />
+                  <label
+                    class="flex items-center gap-[var(--spacing-1)] text-body-sm font-medium text-[var(--text-color-secondary)]"
+                  >
+                    {{ collection.label }}
+                  </label>
+                  <div
+                    class="flex justify-between items-center gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-3)] py-[var(--spacing-2)] text-body-sm text-[var(--text-color)]"
+                    :data-testid="`release-composition__deps-fixed-${collection.type}-${instance.id}`"
+                  >
+                    <span class="truncate">{{ instance.name }}</span>
+                    <i class="pi pi-lock text-[var(--text-color-secondary)]" />
+                  </div>
+                </div>
+                <ResourceSelectField
+                  v-else
+                  :modelValue="instance.resourceId"
+                  :options="instance.options"
+                  :label="collection.label"
+                  :required="false"
+                  :placeholder="`Select a ${collection.label}`"
+                  @update:modelValue="onResourceChange(collection.type, instance.id, $event)"
+                />
 
-              <div class="flex min-w-0 flex-col gap-[var(--spacing-1)]">
                 <ResourceVersionField
                   :modelValue="instance.version"
                   :versions="instance.versionOptions"
@@ -169,27 +171,36 @@
                   :disabled="instance.required && !instance.versionOptions.length"
                   @update:modelValue="onVersionChange(collection.type, instance.id, $event)"
                 />
+
+                <PrimeButton
+                  v-if="!instance.locked"
+                  type="button"
+                  icon="pi pi-trash"
+                  severity="secondary"
+                  text
+                  :aria-label="`Remove ${instance.name || collection.label} instance`"
+                  class="shrink-0"
+                  :data-testid="`release-composition__deps-remove-${collection.type}-${instance.id}`"
+                  @click="onRemove(collection.type, instance.id)"
+                />
+              </div>
+
+              <div
+                v-if="instance.required && !instance.versionOptions.length"
+                :class="[
+                  'release-composition__deps-row grid gap-[var(--spacing-3)]',
+                  instance.locked && 'release-composition__deps-row--locked'
+                ]"
+              >
+                <span aria-hidden="true" />
                 <p
-                  v-if="instance.required && !instance.versionOptions.length"
-                  class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--color-orange-500)]"
+                  class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--color-orange-500)] mt-[var(--spacing-2)]"
                   :data-testid="`release-composition__deps-no-versions-${collection.type}-${instance.id}`"
                 >
                   <i class="pi pi-exclamation-triangle" />
                   No Ready version available — publish is blocked.
                 </p>
               </div>
-
-              <PrimeButton
-                v-if="!instance.locked"
-                type="button"
-                icon="pi pi-trash"
-                severity="secondary"
-                text
-                :aria-label="`Remove ${instance.name || collection.label} instance`"
-                class="shrink-0"
-                :data-testid="`release-composition__deps-remove-${collection.type}-${instance.id}`"
-                @click="onRemove(collection.type, instance.id)"
-              />
             </div>
           </template>
         </div>

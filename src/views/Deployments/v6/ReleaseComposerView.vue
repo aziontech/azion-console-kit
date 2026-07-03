@@ -98,10 +98,20 @@
   // it never changes as the user edits the selection:
   //   'from-resource'   = Scenario B (scoped resource + Deployment Settings picker)
   //   'from-deployment' = Scenario A (one fixed deployment, no picker, impact only)
+  //   'from-workload'   = opened from a Workload bound to MANY Deployment Settings
+  //                       (one per environment) — keeps the picker, scoped to those
+  //                       DSs, with all of them pre-selected so the impact is the
+  //                       true aggregate across every environment (user may narrow)
   //   'global'          = opened with neither (top-of-list "Deploy" button — keeps
   //                       the picker so the user chooses targets)
   const entryScenario = ref('global')
   const isFromDeployment = computed(() => entryScenario.value === 'from-deployment')
+  const isFromWorkload = computed(() => entryScenario.value === 'from-workload')
+
+  // The Workload's bound Deployment Settings — the CANDIDATE set the picker is
+  // restricted to in the 'from-workload' flow (a release started from a Workload
+  // targets only that Workload's environments, never the whole tenant list).
+  const workloadCandidateDsIds = ref([])
 
   // The consuming Deployment Settings resolved for a scoped (Scenario B) entry —
   // the SELECTABLE CANDIDATE set the picker lists (req 1.9). Populated async on
@@ -563,6 +573,11 @@
         ? String(rawDeploymentIds).split(',').filter(Boolean)
         : []
 
+    // A Workload entry with several bound Deployment Settings carries `pickTarget`
+    // so the composer shows the picker (scoped to those DSs) instead of treating a
+    // single pre-selected deployment as the fixed target.
+    const isPickTarget = String(query.pickTarget ?? params.pickTarget ?? '') === 'true'
+
     // Resource-scoped entry (Scenario B): resolve the consuming Deployment
     // Settings as the selectable CANDIDATE set and present them in the picker,
     // but pre-select NONE — the user must explicitly choose which DSs to publish
@@ -594,17 +609,26 @@
         })
     }
 
-    // Capture the entry flow once: a scoped resource is Scenario B; a deployment
-    // pre-selected with no scoped resource is Scenario A; neither is the global
-    // "Deploy" entry (the user picks a Deployment Settings first).
+    // Capture the entry flow once: a scoped resource is Scenario B; a Workload
+    // with many bound DSs (`pickTarget`) is the multi-environment picker flow; a
+    // single deployment pre-selected with no scoped resource is Scenario A; none of
+    // the above is the global "Deploy" entry (the user picks a DS first).
     entryScenario.value = incomingScopedType
       ? 'from-resource'
-      : preselectedDsIds.length
-        ? 'from-deployment'
-        : 'global'
+      : isPickTarget && preselectedDsIds.length
+        ? 'from-workload'
+        : preselectedDsIds.length
+          ? 'from-deployment'
+          : 'global'
 
-    // Scenario B opens with ZERO selected DSs (req 1.9); only Scenario A carries
-    // its single pre-selected deployment forward.
+    // The 'from-workload' flow restricts the picker to the Workload's bound DSs.
+    if (entryScenario.value === 'from-workload') {
+      workloadCandidateDsIds.value = preselectedDsIds.map(String)
+    }
+
+    // Scenario B opens with ZERO selected DSs (req 1.9); Scenario A and the
+    // 'from-workload' flow carry their pre-selected deployment(s) forward — the
+    // latter pre-selects EVERY bound DS so the impact opens as the aggregate.
     store.openRelease({
       fromVersion: isFromVersion,
       scopedType: incomingScopedType,
@@ -865,7 +889,11 @@
   const dsQuery = ref('')
   const enrichedDeployments = computed(() => {
     const term = dsQuery.value.trim().toLowerCase()
+    // 'from-workload': the picker is restricted to the Workload's bound DSs, so a
+    // release started from a Workload never lists unrelated tenant deployments.
+    const candidateIds = isFromWorkload.value ? new Set(workloadCandidateDsIds.value) : null
     return deployments.value
+      .filter((ds) => !candidateIds || candidateIds.has(String(ds.id)))
       .filter(
         (ds) =>
           !term ||
@@ -993,9 +1021,11 @@
   }
 
   // Async (202), no polling: surface a per-DS toast on the settled outcome and
-  // navigate to the (first) deployment's releases — never await completion. The
-  // store only describes the selection (pure `composePayload`); the composable
-  // owns the per-DS dispatch. Fall back to the effective DS when no multi-select.
+  // navigate to the first deployment whose build actually started — never await
+  // completion. The store only describes the selection (pure `composePayload`);
+  // the composable owns the per-DS dispatch. Fall back to the effective DS when
+  // no multi-select. If every target failed or was skipped, stay on the composer
+  // so the user can read the errors and retry.
   const confirmBuildAndActivate = async () => {
     confirmVisible.value = false
     const targetDsIds = deploymentIds.value.length
@@ -1003,9 +1033,9 @@
       : effDsId.value
         ? [effDsId.value]
         : []
-    const navigateTarget = targetDsIds[0]
     const outcomes = await composition.buildAndActivate(store.composePayload(), targetDsIds)
     outcomes.forEach(surfaceOutcome)
+    const navigateTarget = outcomes.find((outcome) => outcome?.ok)?.id
     if (navigateTarget != null) {
       router.push({ name: 'deployments-edit', params: { id: navigateTarget, tab: 'releases' } })
     }
@@ -1100,6 +1130,14 @@
                     }}</strong>
                     and reaches every environment that uses it — review the impact on the right
                     before activating.
+                  </template>
+                  <template v-else-if="isFromWorkload">
+                    This Workload is bound to
+                    <strong class="font-semibold text-[var(--text-color)]">{{
+                      workloadCandidateDsIds.length
+                    }}</strong>
+                    Deployment Settings — one per environment. The release goes live on each
+                    selected one; deselect any you want to skip and review the impact on the right.
                   </template>
                   <template v-else>
                     Only the
@@ -1286,7 +1324,7 @@
           @click="confirmVisible = false"
         />
         <PrimeButton
-          label="Build & activate"
+          label="Deploy release"
           icon="pi pi-cloud-upload"
           size="small"
           :loading="composition.isDeploying.value"

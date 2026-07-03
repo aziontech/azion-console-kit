@@ -69,7 +69,7 @@
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-col gap-[var(--spacing-2)]">
+  <div class="flex w-full flex-col gap-[var(--spacing-2)]">
     <div
       v-if="showResource"
       class="flex flex-col gap-[var(--spacing-2)]"
