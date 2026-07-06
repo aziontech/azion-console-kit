@@ -1,0 +1,11 @@
+{
+  "id": 654321,
+  "is_account_owner": true,
+  "client_id": "mock-client-id",
+  "timezone": "UTC",
+  "utc_offset": "+0000",
+  "first_name": "Cypress",
+  "last_name": "Mock",
+  "permissions": [],
+  "email": "teste@gmail.com"
+}

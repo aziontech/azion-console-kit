@@ -36,6 +36,36 @@ Cypress.on('uncaught:exception', () => {
 })
 
 /**
+ * Mocked login for `e2mock` specs — bypasses the real authentication UI/backend.
+ *
+ * The router's `accountGuard` only lets a private route render when
+ * `accountStore.hasSession` is truthy AND `loadUserAndAccountInfo()` resolves.
+ * So we (1) seed the persisted `account` store with `hasSession: true` before
+ * the app boots, and (2) stub the three endpoints that guard awaits:
+ *   - GET /api/account/info      -> account fixture (needs `id` for hasActiveUserId)
+ *   - GET /api/user/me           -> user fixture
+ *   - GET /api/v4/iam/account    -> job-role fixture ({ data: { job_function } })
+ * The account fixture uses status REGULAR so the billingGuard does not redirect.
+ * Any other background/prefetch call that 401s is harmless: there is no global
+ * 401->logout interceptor, and the guard only logs out if the three above throw.
+ */
+Cypress.Commands.add('loginMock', () => {
+  cy.intercept('GET', '**/api/account/info', { fixture: 'auth/account-info.json' }).as(
+    'mockAccountInfo'
+  )
+  cy.intercept('GET', '**/api/user/me', { fixture: 'auth/user-me.json' }).as('mockUserMe')
+  cy.intercept('GET', '**/api/v4/iam/account', { fixture: 'auth/account-job-role.json' }).as(
+    'mockJobRole'
+  )
+
+  cy.visit('/', {
+    onBeforeLoad(win) {
+      win.localStorage.setItem('account', JSON.stringify({ hasSession: true }))
+    }
+  })
+})
+
+/**
  * Custom command to log in a user based on the current environment.
  *
  * This command determines the environment from Cypress environment variables and retrieves

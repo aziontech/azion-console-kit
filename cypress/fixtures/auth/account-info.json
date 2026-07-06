@@ -1,0 +1,10 @@
+{
+  "id": 123456,
+  "name": "Cypress Mock Account",
+  "kind": "client",
+  "status": "REGULAR",
+  "client_id": "mock-client-id",
+  "client_flags": [],
+  "first_login": false,
+  "email": "teste@gmail.com"
+}
