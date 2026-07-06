@@ -318,3 +318,80 @@ describe('build_and_activate write path — non-scoped unresolved-version guard 
     expect(results[0]).toMatchObject({ id: 'ds-1', ok: true })
   })
 })
+
+// The `onOutcome` seam lets a progress consumer flag each DS AS IT SETTLES, without
+// changing the parallel dispatch, the positional return, or the skip semantics.
+describe('build_and_activate write path — onOutcome progress seam', () => {
+  it('reports every settled DS to onOutcome exactly once, matching the returned outcomes', async () => {
+    deploymentReleaseService.buildAndActivate.mockImplementation((id) =>
+      Promise.resolve({ data: { trace_id: `trace-${id}` } })
+    )
+    const { buildAndActivate } = mountComposable()
+    await flushPromises()
+
+    const reported = []
+    const results = await buildAndActivate(composedPayload(), ['ds-1', 'ds-2', 'ds-3'], {
+      onOutcome: (outcome) => reported.push(outcome)
+    })
+
+    expect(reported).toHaveLength(3)
+    expect(reported.map((entry) => entry.id).sort()).toEqual(['ds-1', 'ds-2', 'ds-3'])
+    expect(reported.every((entry) => entry.ok)).toBe(true)
+    // The reported object is the SAME instance the batch returns (no divergence).
+    results.forEach((result) => expect(reported).toContain(result))
+  })
+
+  it('reports the failed DS with its error, isolated from succeeding siblings', async () => {
+    const boom = new Error('build_and_activate failed')
+    deploymentReleaseService.buildAndActivate.mockImplementation((id) =>
+      id === 'ds-fail'
+        ? Promise.reject(boom)
+        : Promise.resolve({ data: { trace_id: `trace-${id}` } })
+    )
+    const { buildAndActivate } = mountComposable()
+    await flushPromises()
+
+    const reported = []
+    await buildAndActivate(composedPayload(), ['ds-ok', 'ds-fail'], {
+      onOutcome: (outcome) => reported.push(outcome)
+    })
+
+    const failed = reported.find((entry) => entry.id === 'ds-fail')
+    expect(failed.ok).toBe(false)
+    expect(failed.error).toBe(boom)
+    expect(reported.find((entry) => entry.id === 'ds-ok').ok).toBe(true)
+  })
+
+  it('reports skipped DSs to onOutcome when a version is unresolved (no service call)', async () => {
+    const { buildAndActivate } = mountComposable()
+    await flushPromises()
+
+    const reported = []
+    const results = await buildAndActivate(
+      {
+        resources: [{ resource_id: 'app-1', resource_version: null, resource_type: 'application' }],
+        canary: false,
+        canaryForm: {}
+      },
+      ['ds-1', 'ds-2'],
+      { onOutcome: (outcome) => reported.push(outcome) }
+    )
+
+    expect(deploymentReleaseService.buildAndActivate).not.toHaveBeenCalled()
+    expect(reported).toHaveLength(2)
+    expect(
+      reported.every((entry) => entry.skipped && entry.skipReason === 'unresolved_version')
+    ).toBe(true)
+    expect(results).toEqual(reported)
+  })
+
+  it('is fully optional — omitting onOutcome preserves the returned outcomes', async () => {
+    deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 'trace' } })
+    const { buildAndActivate } = mountComposable()
+    await flushPromises()
+
+    const results = await buildAndActivate(composedPayload(), ['ds-1', 'ds-2'])
+    expect(results.map((entry) => entry.id)).toEqual(['ds-1', 'ds-2'])
+    expect(results.every((entry) => entry.ok)).toBe(true)
+  })
+})

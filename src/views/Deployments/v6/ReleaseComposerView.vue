@@ -30,11 +30,13 @@
   import DeploymentSettingsPicker from '@/templates/release-composition/components/DeploymentSettingsPicker.vue'
   import CanaryStrategyField from '@/templates/release-composition/components/CanaryStrategyField.vue'
   import ImpactPanel from '@/templates/release-composition/components/ImpactPanel.vue'
+  import DeploymentProgressDialog from '@/templates/release-composition/components/DeploymentProgressDialog.vue'
 
   import { useReleaseStore } from '@/stores/release'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { LATEST_READY } from '@/templates/release-composition/version-options'
   import { useReleaseComposition } from '@/templates/release-composition/use-release-composition'
+  import { useReleaseDeployProgress } from '@/templates/release-composition/use-release-deploy-progress'
   import { classifyDeploymentsForResource } from '@/templates/release-composition/classify-deployments-for-resource'
   import {
     RELEASE_COMPOSER_ROUTE,
@@ -723,7 +725,9 @@
   watch(
     () => route.fullPath,
     () => {
-      if (route.name === RELEASE_COMPOSER_ROUTE) openFromRoute()
+      if (route.name !== RELEASE_COMPOSER_ROUTE) return
+      openFromRoute()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   )
 
@@ -1137,6 +1141,19 @@
 
   const confirmVisible = ref(false)
 
+  const deployProgress = useReleaseDeployProgress({
+    dispatch: (ids, onOutcome) =>
+      composition.buildAndActivate(store.composePayload(), ids, { onOutcome }),
+    resolveRow: (id) => {
+      const match = deployments.value.find((ds) => String(ds.id) === String(id))
+      return {
+        name: match?.name ?? String(id),
+        policyLabel: match?.policyLabel ?? mapPolicyToLabel(match?.deployment_policy),
+        ...impact.dsMetaFor(id)
+      }
+    }
+  })
+
   const impactSummary = computed(() => {
     const count = deploymentIds.value.length
     const dsWord = count === 1 ? 'Deployment Setting' : 'Deployment Settings'
@@ -1200,11 +1217,30 @@
       : effDsId.value
         ? [effDsId.value]
         : []
+    // A multi-DS release hands off to the progress dialog (per-DS status, no toasts,
+    // no auto-navigation): the user watches every release settle and closes when done.
+    if (targetDsIds.length > 1) {
+      await deployProgress.run(targetDsIds)
+      return
+    }
     const outcomes = await composition.buildAndActivate(store.composePayload(), targetDsIds)
     outcomes.forEach(surfaceOutcome)
     const navigateTarget = outcomes.find((outcome) => outcome?.ok)?.id
     if (navigateTarget != null) {
       router.push({ name: 'deployments-edit', params: { id: navigateTarget, tab: 'releases' } })
+    }
+  }
+
+  // Closing the progress dialog after a fully successful multi-DS release sends the
+  // user to that deployment's releases tab (the single-DS path navigates the same
+  // way). A partial/failed batch stays put so the user can read the failures.
+  const onDeployProgressClose = () => {
+    const items = deployProgress.items.value
+    const allSucceeded = items.length > 0 && items.every((item) => item.status === 'done')
+    const target = allSucceeded ? items[0]?.id : null
+    deployProgress.close()
+    if (target != null) {
+      router.push({ name: 'deployments-edit', params: { id: target, tab: 'releases' } })
     }
   }
 
@@ -1535,6 +1571,16 @@
       </div>
     </template>
   </PrimeDialog>
+
+  <DeploymentProgressDialog
+    :visible="deployProgress.visible.value"
+    :items="deployProgress.items.value"
+    :counts="deployProgress.counts.value"
+    :is-running="deployProgress.isRunning.value"
+    :active-name="deployProgress.activeName.value"
+    @retry-failed="deployProgress.retryFailed"
+    @close="onDeployProgressClose"
+  />
 </template>
 
 <style scoped>

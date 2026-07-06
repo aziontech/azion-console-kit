@@ -396,6 +396,75 @@ describe('ReleaseComposerView — confirm + dispatch', () => {
   })
 })
 
+describe('ReleaseComposerView — multi-DS progress dialog', () => {
+  const selectTwoDs = () => {
+    storeState.deploymentIds = ['ds-1', 'ds-2']
+    storeState.deployments = [
+      { id: 'ds-1', name: 'staging-edge', deployment_policy: 'single_version' },
+      { id: 'ds-2', name: 'production-edge', deployment_policy: 'single_version' }
+    ]
+  }
+
+  const reportAllOk = (payload, ids, opts) => {
+    ;(ids ?? []).forEach((id) => opts?.onOutcome?.({ id, ok: true }))
+    return Promise.resolve((ids ?? []).map((id) => ({ id, ok: true })))
+  }
+
+  const confirmDeploy = async (wrapper) => {
+    await wrapper.find('[data-testid="release-composition__build-and-activate"]').trigger('click')
+    await wrapper.find('[data-testid="release-composition__confirm-build"]').trigger('click')
+    await flushPromises()
+  }
+
+  it('opens the progress dialog (no auto-navigation) when confirming a multi-DS release', async () => {
+    selectTwoDs()
+    buildAndActivate.mockImplementation(reportAllOk)
+    const wrapper = mountView()
+
+    await confirmDeploy(wrapper)
+
+    expect(buildAndActivate).toHaveBeenCalledWith(
+      { resources: [], canary: false, canaryForm: {} },
+      ['ds-1', 'ds-2'],
+      expect.objectContaining({ onOutcome: expect.any(Function) })
+    )
+    expect(wrapper.find('[data-testid="deployment-progress__dialog"]').exists()).toBe(true)
+    expect(routerPush).not.toHaveBeenCalled()
+  })
+
+  it('navigates to the first deployment releases tab when closed after full success', async () => {
+    selectTwoDs()
+    buildAndActivate.mockImplementation(reportAllOk)
+    const wrapper = mountView()
+
+    await confirmDeploy(wrapper)
+    await wrapper.find('[data-testid="deployment-progress__close"]').trigger('click')
+
+    expect(routerPush).toHaveBeenCalledWith({
+      name: 'deployments-edit',
+      params: { id: 'ds-1', tab: 'releases' }
+    })
+  })
+
+  it('does NOT navigate on close when any DS failed', async () => {
+    selectTwoDs()
+    buildAndActivate.mockImplementation((payload, ids, opts) => {
+      opts?.onOutcome?.({ id: 'ds-1', ok: true })
+      opts?.onOutcome?.({ id: 'ds-2', ok: false, error: new Error('boom') })
+      return Promise.resolve([
+        { id: 'ds-1', ok: true },
+        { id: 'ds-2', ok: false }
+      ])
+    })
+    const wrapper = mountView()
+
+    await confirmDeploy(wrapper)
+    await wrapper.find('[data-testid="deployment-progress__close"]').trigger('click')
+
+    expect(routerPush).not.toHaveBeenCalled()
+  })
+})
+
 describe('ReleaseComposerView — cancel', () => {
   it('navigates back to deployments when Cancel is clicked', async () => {
     const wrapper = mountView()

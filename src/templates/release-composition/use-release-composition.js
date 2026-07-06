@@ -706,8 +706,42 @@ export function useReleaseComposition({
     }
   }
 
+  const skipOutcome = (id, skipReason) => ({
+    id,
+    ok: false,
+    skipped: true,
+    skipReason,
+    traceId: null,
+    value: null,
+    error: null,
+    errorType: null
+  })
+
+  // Fan out one call per target, reporting each settled outcome to `onOutcome` as it
+  // resolves. Every service call is issued synchronously in the `map` before any
+  // await (parallel dispatch, positional order, no retry) — unchanged from before,
+  // plus the per-settle `onOutcome` seam.
+  const dispatchFanOut = async (targets, onOutcome) => {
+    const outcomes = new Array(targets.length)
+    const report = (index, outcome) => {
+      outcomes[index] = outcome
+      onOutcome?.(outcome)
+    }
+    await Promise.all(
+      targets.map((target, index) =>
+        deploymentReleaseService
+          .buildAndActivate(target.id, target.payload)
+          .then((value) => report(index, settleOutcome(target.id, { status: 'fulfilled', value })))
+          .catch((reason) =>
+            report(index, settleOutcome(target.id, { status: 'rejected', reason }))
+          )
+      )
+    )
+    return outcomes
+  }
+
   // Non-scoped (Scenario A): one DS-agnostic adapter payload fanned out unchanged.
-  const buildAndActivateShared = async (ids, resources, strategy) => {
+  const buildAndActivateShared = async (ids, resources, strategy, onOutcome) => {
     // Guard the null-version leak (mirrors the scoped path): the store resolves the
     // LATEST sentinel to a concrete `version_id` in `composePayload()`, but when a
     // resource's versions never loaded (or failed) that resolution yields `null`.
@@ -716,22 +750,17 @@ export function useReleaseComposition({
     // branches on `skipReason` exactly as for the scoped degraded / mismatch cases.
     const list = Array.isArray(resources) ? resources : []
     if (list.some((resource) => resource?.resource_version == null)) {
-      return ids.map((id) => ({
-        id,
-        ok: false,
-        skipped: true,
-        skipReason: SCOPED_PUBLISH_SKIP_REASONS.UNRESOLVED_VERSION,
-        traceId: null,
-        value: null,
-        error: null,
-        errorType: null
-      }))
+      return ids.map((id) => {
+        const outcome = skipOutcome(id, SCOPED_PUBLISH_SKIP_REASONS.UNRESOLVED_VERSION)
+        onOutcome?.(outcome)
+        return outcome
+      })
     }
     const payload = DeploymentAdapter.transformBuildAndActivatePayload(list, strategy)
-    const settled = await Promise.allSettled(
-      ids.map((id) => deploymentReleaseService.buildAndActivate(id, payload))
+    return dispatchFanOut(
+      ids.map((id) => ({ id, payload })),
+      onOutcome
     )
-    return ids.map((id, index) => settleOutcome(id, settled[index]))
   }
 
   // Scoped (Scenario B): per-DS preserve & swap. For each DS, take its active
@@ -775,7 +804,13 @@ export function useReleaseComposition({
     return next
   }
 
-  const buildAndActivateScoped = async (ids, override, dependencyOverrides, strategy) => {
+  const buildAndActivateScoped = async (
+    ids,
+    override,
+    dependencyOverrides,
+    strategy,
+    onOutcome
+  ) => {
     // Guard the null-version leak: the store resolves the LATEST sentinel to a
     // concrete `version_id` in `composePayload()` (Property 6), but when the
     // scoped resource's versions were never loaded that resolution yields `null`.
@@ -784,16 +819,11 @@ export function useReleaseComposition({
     // null pin. The consumer branches on `skipReason` exactly as for degraded /
     // mismatch.
     if (override?.version == null) {
-      return ids.map((id) => ({
-        id,
-        ok: false,
-        skipped: true,
-        skipReason: SCOPED_PUBLISH_SKIP_REASONS.UNRESOLVED_VERSION,
-        traceId: null,
-        value: null,
-        error: null,
-        errorType: null
-      }))
+      return ids.map((id) => {
+        const outcome = skipOutcome(id, SCOPED_PUBLISH_SKIP_REASONS.UNRESOLVED_VERSION)
+        onOutcome?.(outcome)
+        return outcome
+      })
     }
 
     const skipped = []
@@ -803,7 +833,9 @@ export function useReleaseComposition({
       const result = await activeReleaseResourcesFor(id)
       // A genuine read failure → degraded, excluded, never fabricated.
       if (!result.ok) {
-        skipped.push({ id, skipReason: SCOPED_PUBLISH_SKIP_REASONS.DEGRADED })
+        const outcome = skipOutcome(id, SCOPED_PUBLISH_SKIP_REASONS.DEGRADED)
+        skipped.push(outcome)
+        onOutcome?.(outcome)
         continue
       }
       const base = result.resources
@@ -837,30 +869,14 @@ export function useReleaseComposition({
       targets.push({ id, payload })
     }
 
-    const settled = await Promise.allSettled(
-      targets.map((target) => deploymentReleaseService.buildAndActivate(target.id, target.payload))
-    )
-
-    const published = targets.map((target, index) => settleOutcome(target.id, settled[index]))
-    const excluded = skipped.map(({ id, skipReason }) => ({
-      id,
-      ok: false,
-      skipped: true,
-      skipReason,
-      traceId: null,
-      value: null,
-      error: null,
-      errorType: null
-    }))
+    const published = await dispatchFanOut(targets, onOutcome)
 
     // Return in the caller's original `ids` order so the consumer can correlate.
-    const byId = new Map(
-      [...published, ...excluded].map((outcome) => [String(outcome.id), outcome])
-    )
+    const byId = new Map([...published, ...skipped].map((outcome) => [String(outcome.id), outcome]))
     return ids.map((id) => byId.get(String(id)))
   }
 
-  const buildAndActivate = async (composedPayload = {}, dsIds = []) => {
+  const buildAndActivate = async (composedPayload = {}, dsIds = [], { onOutcome } = {}) => {
     const ids = Array.isArray(dsIds) ? dsIds.filter((id) => id != null && id !== '') : []
     if (!ids.length) return []
 
@@ -877,10 +893,11 @@ export function useReleaseComposition({
           ids,
           composedPayload.override ?? {},
           composedPayload.dependencyOverrides ?? [],
-          strategy
+          strategy,
+          onOutcome
         )
       }
-      return await buildAndActivateShared(ids, composedPayload.resources ?? [], strategy)
+      return await buildAndActivateShared(ids, composedPayload.resources ?? [], strategy, onOutcome)
     } finally {
       isDeploying.value = false
     }
