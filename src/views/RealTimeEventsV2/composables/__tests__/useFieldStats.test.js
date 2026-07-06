@@ -1,6 +1,20 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { ref, nextTick } from 'vue'
-import { useFieldStats } from '../useFieldStats'
+
+// Testing outside a component — stub the keep-alive lifecycle hooks
+// (useFieldStats releases/rehydrates via useKeepAliveResource, task 9.9).
+vi.mock('vue', async () => {
+  const actual = await vi.importActual('vue')
+  return {
+    ...actual,
+    onMounted: vi.fn(),
+    onActivated: vi.fn(),
+    onBeforeUnmount: vi.fn(),
+    onDeactivated: vi.fn()
+  }
+})
+
+import { useFieldStats, TOP_K } from '../useFieldStats'
 
 const makeRow = (summaryEntries) => ({
   summary: Object.entries(summaryEntries).map(([key, value]) => ({ key, value }))
@@ -119,7 +133,10 @@ describe('useFieldStats', () => {
       expect(result.fieldStats.value.status.total).toBe(1)
     })
 
-    it('limits topValues to 5 entries', async () => {
+    // FLIPPED (task 9.2): the cap moved from a magic 5 to the named TOP_K=50
+    // constant, with an `other` bucket carrying the tail so `total` stays exact.
+    // Below K, every distinct value is returned (no truncation).
+    it('returns every distinct value when uniqueCount <= TOP_K', async () => {
       const rows = []
       // eslint-disable-next-line id-length
       for (let i = 0; i < 10; i++) {
@@ -128,8 +145,33 @@ describe('useFieldStats', () => {
       const { fieldStats } = setup(rows)
       await nextTick()
 
-      expect(fieldStats.value.code.topValues).toHaveLength(5)
+      expect(fieldStats.value.code.topValues).toHaveLength(10)
       expect(fieldStats.value.code.uniqueCount).toBe(10)
+      expect(fieldStats.value.code.total).toBe(10)
+      expect(fieldStats.value.code.other).toBe(0)
+    })
+
+    it('caps topValues at TOP_K and carries the tail in `other` (total stays exact)', async () => {
+      const rows = []
+      const distinct = TOP_K + 25
+      // eslint-disable-next-line id-length
+      for (let i = 0; i < distinct; i++) {
+        // give lower-index values higher counts so the top-K is deterministic
+        const repeat = distinct - i
+        // eslint-disable-next-line id-length
+        for (let r = 0; r < repeat; r++) rows.push(makeRow({ code: `val_${i}` }))
+      }
+      const { fieldStats } = setup(rows)
+      await nextTick()
+
+      const stats = fieldStats.value.code
+      expect(stats.topValues).toHaveLength(TOP_K)
+      expect(stats.uniqueCount).toBe(distinct)
+
+      const topSum = stats.topValues.reduce((sum, entry) => sum + entry.count, 0)
+      // P5 invariant: total === Σ topValues.count + other (exact).
+      expect(stats.total).toBe(topSum + stats.other)
+      expect(stats.other).toBeGreaterThan(0)
     })
 
     it('resets to empty when data is cleared', async () => {

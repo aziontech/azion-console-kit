@@ -1,10 +1,13 @@
 <template>
   <div class="flex flex-col gap-3">
     <!-- Filter Row Content
-         Mobile (<640px): stacks vertically — each dropdown/input gets its
-         own row, action buttons wrap to a final row.
-         Tablet+: horizontal layout as designed. -->
-    <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full min-w-0">
+         The row is a single wrapping flex line: field / operator / value
+         controls each carry a min-width floor (via `.filter-row__control`)
+         so that when the popover narrows (tablet band ~640-780px, mobile),
+         they WRAP to the next line instead of overflowing and being clipped
+         by the panel. `min-w-0` on each control lets long labels truncate
+         rather than push the row wider than the panel. -->
+    <div class="flex flex-wrap items-center gap-3 w-full min-w-0">
       <Dropdown
         ref="fieldDropdownRef"
         id="filter-field"
@@ -16,7 +19,7 @@
         autoFilterFocus
         optionLabel="label"
         optionValue="value"
-        class="flex-1 min-w-0"
+        class="filter-row__control flex-1 min-w-0"
         placeholder="Select a field"
         filterIcon="pi pi-search"
         @show="onDropdownShow"
@@ -30,20 +33,20 @@
         :options="listOperators"
         optionLabel="label"
         placeholder="Select an operator"
-        class="flex-1 min-w-0 sm:flex-0"
+        class="filter-row__control flex-1 min-w-0"
       />
 
       <component
         :is="componentRender"
         v-model:value="filterValue"
         v-bind="selectedOperator?.props"
-        class="flex-1 min-w-0"
+        class="filter-row__control flex-1 min-w-0"
         :placeholder="selectedField ? 'Enter value...' : 'Please select a field first...'"
         :disabled="!selectedField"
       />
 
       <!-- Action Buttons — wrap so they reflow on tight viewports -->
-      <div class="flex flex-wrap gap-1 sm:flex-shrink-0 sm:ml-auto">
+      <div class="flex flex-wrap gap-1 flex-shrink-0 ml-auto">
         <!-- Add OR Button -->
         <PrimeButton
           outlined
@@ -78,7 +81,7 @@
     <!-- Operator Dropdown (hidden by default) -->
     <div
       v-if="showOperatorDropdown"
-      class="absolute z-50 mt-1"
+      class="filter-row__operator-overlay absolute z-50 mt-1 max-w-full"
     >
       <Dropdown
         v-model="selectedOperator"
@@ -233,3 +236,25 @@
     filterValue.value = modelValue.value.rawValue ?? modelValue.value.value ?? null
   }
 </script>
+
+<style scoped>
+  /* Wrapping floor for the field / operator / value controls.
+     Each control keeps a minimum comfortable width; once three controls
+     no longer fit on one line (narrow popover / tablet band / mobile) they
+     wrap to the next line instead of overflowing the panel and being
+     clipped by its `overflow: hidden`. `flex-basis: 0` + `flex-grow: 1`
+     (from the utility `flex-1`) lets them share the remaining width evenly
+     while `min-width` provides the wrap threshold. */
+  .filter-row__control {
+    min-width: 11rem;
+  }
+
+  /* The floating operator dropdown is absolutely positioned; without a
+     width cap it can escape the panel horizontally. Keep it inside the
+     row's box. */
+  .filter-row__operator-overlay {
+    left: 0;
+    right: 0;
+    max-width: 100%;
+  }
+</style>

@@ -5,7 +5,9 @@ import {
   loadMetricsFallback,
   loadMetricsSeries,
   loadFromEventsApi,
-  loadMetricsAggregation
+  loadMetricsAggregation,
+  buildInlineFilterFragments,
+  mergeFilterFragments
 } from '../metrics-chart-service'
 
 vi.mock('@/services/axios/AxiosHttpClientAdapter', () => ({
@@ -393,5 +395,117 @@ describe('loadMetricsAggregation', () => {
     expect(AxiosHttpClientAdapter.request).toHaveBeenCalledWith(
       expect.objectContaining({ url: 'v4/metrics/graphql' })
     )
+  })
+})
+
+const lastQuery = () => JSON.parse(AxiosHttpClientAdapter.request.mock.calls.at(-1)[0].body).query
+
+describe('buildInlineFilterFragments', () => {
+  it('returns [] for empty / non-object input', () => {
+    expect(buildInlineFilterFragments(undefined)).toEqual([])
+    expect(buildInlineFilterFragments(null)).toEqual([])
+    expect(buildInlineFilterFragments({})).toEqual([])
+    expect(buildInlineFilterFragments('nope')).toEqual([])
+  })
+
+  it('inlines and-group scalars', () => {
+    expect(buildInlineFilterFragments({ and: { statusGte: 400, host: 'a.com' } })).toEqual([
+      'statusGte: 400',
+      'host: "a.com"'
+    ])
+  })
+
+  it('normalizes in-group keys to <field>In and inlines arrays', () => {
+    expect(buildInlineFilterFragments({ in: { host: ['a', 'b'], schemeIn: ['https'] } })).toEqual([
+      'hostIn: ["a", "b"]',
+      'schemeIn: ["https"]'
+    ])
+  })
+
+  it('renders an or-group as a nested or: [ ... ] fragment', () => {
+    const built = { or: [{ and: { status: 200 } }, { and: { status: 404 } }] }
+    expect(buildInlineFilterFragments(built)).toEqual(['or: [ { status: 200 }, { status: 404 } ]'])
+  })
+})
+
+describe('mergeFilterFragments', () => {
+  it('concatenates static config filters with the dynamic subset', () => {
+    const fragments = mergeFilterFragments(
+      { wafBlock: '1', wafLearning: '0' },
+      { and: { statusGte: 500 } }
+    )
+    expect(fragments).toEqual(['wafBlock: "1"', 'wafLearning: "0"', 'statusGte: 500'])
+  })
+
+  it('is byte-equivalent to static-only when no dynamic filter is given', () => {
+    expect(mergeFilterFragments({ wafBlock: '1' })).toEqual(['wafBlock: "1"'])
+    expect(mergeFilterFragments({ wafBlock: '1' }, undefined)).toEqual(['wafBlock: "1"'])
+    expect(mergeFilterFragments({ wafBlock: '1' }, {})).toEqual(['wafBlock: "1"'])
+  })
+})
+
+describe('dynamicFilter merge into queries', () => {
+  beforeEach(() => {
+    AxiosHttpClientAdapter.request.mockResolvedValue({ statusCode: 200, body: { data: {} } })
+  })
+
+  it('leaves the query unchanged when no dynamicFilter is supplied', async () => {
+    const config = { metricsDataset: 'httpMetrics', aggregation: 'requests' }
+    await loadMetricsAggregation(config, 'b', 'e', { loadAggregableFields: () => new Set() })
+    const withoutDynamic = lastQuery()
+    await loadMetricsAggregation(config, 'b', 'e', {
+      loadAggregableFields: () => new Set(),
+      dynamicFilter: {}
+    })
+    expect(lastQuery()).toBe(withoutDynamic)
+  })
+
+  it('merges the supported subset into loadMetricsAggregation filter block', async () => {
+    const config = {
+      metricsDataset: 'httpMetrics',
+      aggregation: 'requests',
+      filters: { host: 'x' }
+    }
+    await loadMetricsAggregation(config, 'b', 'e', {
+      loadAggregableFields: () => new Set(),
+      dynamicFilter: { and: { statusGte: 400 } }
+    })
+    const query = lastQuery()
+    expect(query).toContain('host: "x"')
+    expect(query).toContain('statusGte: 400')
+  })
+
+  it('merges the subset into every loadMetricsSeries alias', async () => {
+    const config = {
+      metricsApiSeries: {
+        metricsDataset: 'botManagerMetrics',
+        series: [{ name: 'bad bot', filters: { classifiedEq: 'bad bot' } }]
+      }
+    }
+    await loadMetricsSeries(config, 'b', 'e', { dynamicFilter: { and: { requests: 5 } } })
+    const query = lastQuery()
+    expect(query).toContain('classifiedEq: "bad bot"')
+    expect(query).toContain('requests: 5')
+  })
+
+  it('merges the subset into loadFromEventsApi series filter block', async () => {
+    const config = {
+      eventsApi: {
+        dataset: 'workloadEvents',
+        series: [{ name: 's1', filters: { wafBlockEq: '1' } }]
+      }
+    }
+    await loadFromEventsApi(config, 'b', 'e', { dynamicFilter: { in: { host: ['a.com'] } } })
+    const query = lastQuery()
+    expect(query).toContain('wafBlockEq: "1"')
+    expect(query).toContain('hostIn: ["a.com"]')
+  })
+
+  it('merges the subset into loadMetricsFallback filter block', async () => {
+    const config = {
+      metricsApiFallback: { metricsDataset: 'httpMetrics', fields: ['wafRequestsBlocked'] }
+    }
+    await loadMetricsFallback(config, 'b', 'e', { dynamicFilter: { and: { status: 200 } } })
+    expect(lastQuery()).toContain('status: 200')
   })
 })

@@ -139,7 +139,10 @@
 </template>
 
 <style scoped>
+  /* Container queries: breakpoints track the toolbar's own width (panel-driven),
+     not the viewport, so buttons don't clip on mid-width windows. */
   .discover-toolbar {
+    container-type: inline-size;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -226,7 +229,7 @@
     display: inline-flex;
   }
 
-  @media (max-width: 1100px) {
+  @container (max-width: 1100px) {
     .discover-toolbar__btn-hide-sm {
       display: none;
     }
@@ -240,7 +243,7 @@
     }
   }
 
-  @media (max-width: 900px) {
+  @container (max-width: 900px) {
     .discover-toolbar__search {
       display: none;
     }

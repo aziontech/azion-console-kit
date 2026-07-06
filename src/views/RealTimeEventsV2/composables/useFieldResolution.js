@@ -1,32 +1,71 @@
-import { computed, watch, ref } from 'vue'
+import { computed, watch, ref, shallowRef } from 'vue'
 import { AGGREGATION_OPERATORS } from '@/services/real-time-events-service-v2/_shared/aggregation-operators'
 
 /**
  * Resolves the unified list of available field options by merging 4 sources
  * (filterFields, liveDatasetFields, selectedFields, tableData row keys) with
- * case-insensitive deduplication.
- *
- * Implements incremental field tracking: an internal Set of known field keys
- * is maintained so that on tableData growth only newly appended rows are
- * scanned for new keys.
+ * case-insensitive dedup. Incremental: only newly appended rows are scanned for
+ * new keys on tableData growth.
  *
  * @param {Object} deps
  * @param {import('vue').Ref<Array>|import('vue').ComputedRef<Array>} deps.filterFields
  * @param {import('vue').Ref<Array>|import('vue').ComputedRef<Array>} deps.liveDatasetFields
  * @param {import('vue').Ref<Array>} deps.selectedFields
  * @param {import('vue').Ref<Array>} deps.tableData
+ * @param {import('vue').Ref<number>} [deps.resetToken] dataset resetToken; a bump
+ *   (new query/filter/dataset) drops the discovered keys and forces a full
+ *   rescan. A plain length shrink (FIFO eviction) does NOT reset.
  * @returns {{ availableFieldOptions: import('vue').ComputedRef<Array<{label:string,value:string}>> }}
  */
-export function useFieldResolution({ filterFields, liveDatasetFields, selectedFields, tableData }) {
+export function useFieldResolution({
+  filterFields,
+  liveDatasetFields,
+  selectedFields,
+  tableData,
+  resetToken
+}) {
   // ── Incremental tracking for tableData row keys ──
-  // We keep a running Set of lowercase keys discovered from tableData rows
-  // and a Map of lowercase → preferred display name. On tableData growth we
-  // only scan newly appended rows.
-  const knownRowKeys = new Map() // lowercase → display name
+  // Discovered display names (lowercase → display) live in a `shallowRef` Map;
+  // discovery reassigns `.value` so `availableFieldOptions` tracks it via a
+  // GENUINE reactive read (no version-counter touch; task 9.8, req 4.8).
+  const knownRowKeys = shallowRef(new Map()) // lowercase → display name
   const scannedLength = ref(0)
-  // Bump a version counter so the computed re-evaluates when we discover new
-  // keys from incremental scans.
-  const rowKeysVersion = ref(0)
+
+  /**
+   * Scans rows in `[scannedLength, data.length)` for new field keys and advances
+   * the cursor. Shared by the tableData watch (append growth) and the resetToken
+   * watch (full rescan after a reset). Reassigns `knownRowKeys` only when a new
+   * key landed so the computed re-runs on a real dependency change.
+   */
+  const scanNewRows = (data) => {
+    if (!Array.isArray(data)) return
+    const len = data.length
+    if (len <= scannedLength.value) return
+
+    const discovered = new Map(knownRowKeys.value)
+    let added = false
+    for (let idx = scannedLength.value; idx < len; idx++) {
+      const row = data[idx]
+      const summary = Array.isArray(row?.summary)
+        ? row.summary
+        : Array.isArray(row?.data)
+          ? row.data
+          : []
+      for (let jdx = 0; jdx < summary.length; jdx++) {
+        const key = summary[jdx]?.key
+        if (!key) continue
+        const display = String(key)
+        if (AGGREGATION_OPERATORS.has(display)) continue
+        const lower = display.toLowerCase()
+        if (!discovered.has(lower)) {
+          discovered.set(lower, display)
+          added = true
+        }
+      }
+    }
+    scannedLength.value = len
+    if (added) knownRowKeys.value = discovered
+  }
 
   watch(
     tableData,
@@ -35,44 +74,39 @@ export function useFieldResolution({ filterFields, liveDatasetFields, selectedFi
       const len = data.length
 
       if (len < scannedLength.value) {
-        // tableData was reset (e.g. new query) — clear and rescan
-        knownRowKeys.clear()
-        scannedLength.value = 0
-      }
-
-      if (len <= scannedLength.value) return
-
-      let added = false
-      for (let idx = scannedLength.value; idx < len; idx++) {
-        const row = data[idx]
-        const summary = Array.isArray(row?.summary)
-          ? row.summary
-          : Array.isArray(row?.data)
-            ? row.data
-            : []
-        for (let jdx = 0; jdx < summary.length; jdx++) {
-          const key = summary[jdx]?.key
-          if (!key) continue
-          const display = String(key)
-          if (AGGREGATION_OPERATORS.has(display)) continue
-          const lower = display.toLowerCase()
-          if (!knownRowKeys.has(lower)) {
-            knownRowKeys.set(lower, display)
-            added = true
-          }
+        if (resetToken) {
+          // Wired path: a shrink is FIFO eviction, NOT a new query (a real reset
+          // is signalled by `resetToken` below). Field names are fixed after page
+          // 1, so keep `knownRowKeys` and just clamp the cursor (no O(buffer)
+          // rescan on every loadMore past the cap).
+          scannedLength.value = len
+        } else {
+          // Fallback path (no resetToken wired — legacy/unit callers): keep the
+          // original heuristic where a shrink reads as a NEW QUERY, dropping the
+          // discovered keys and rescanning from 0 so nothing regresses.
+          knownRowKeys.value = new Map()
+          scannedLength.value = 0
         }
       }
-      scannedLength.value = len
-      if (added) rowKeysVersion.value++
+
+      scanNewRows(data)
     },
     { immediate: true }
   )
 
-  const availableFieldOptions = computed(() => {
-    // Touch the version counter so Vue tracks it as a dependency.
-    // eslint-disable-next-line no-unused-expressions
-    rowKeysVersion.value
+  // A `resetToken` bump ("new query/filter/dataset") drops the discovered keys
+  // and rescans the current buffer. The rescan matters: the tableData watch may
+  // run first in the same flush (clamping the cursor, scanning nothing), so
+  // without it the new query's rows stay undiscovered. Eviction (above) does not.
+  if (resetToken) {
+    watch(resetToken, () => {
+      knownRowKeys.value = new Map()
+      scannedLength.value = 0
+      scanNewRows(tableData.value)
+    })
+  }
 
+  const availableFieldOptions = computed(() => {
     const byKey = new Map() // lowercase → { display, preferred }
 
     const add = (value, preferred = false) => {
@@ -101,10 +135,11 @@ export function useFieldResolution({ filterFields, liveDatasetFields, selectedFi
     const selArr = Array.isArray(sf) ? sf : []
     selArr.forEach((field) => add(field))
 
-    // Source 4: row-discovered keys (from incremental scan)
-    // Row-discovered names win because they reflect what the backend actually
-    // emits, including any casing drift vs the curated docs list.
-    for (const display of knownRowKeys.values()) {
+    // Source 4: row-discovered keys (from incremental scan). These win because
+    // they reflect what the backend actually emits, incl. casing drift vs the
+    // curated docs list. Reading `.value` is the genuine reactive dependency that
+    // re-runs this computed when discovery reassigns the map (task 9.8).
+    for (const display of knownRowKeys.value.values()) {
       add(display, /* preferred */ true)
     }
 

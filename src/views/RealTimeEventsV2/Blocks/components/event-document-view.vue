@@ -246,9 +246,14 @@
               <span
                 class="doc-compact__value"
                 :title="String(entry.value).length > 100 ? String(entry.value) : undefined"
+                :role="isValidValue(entry.value) ? 'button' : undefined"
+                :tabindex="isValidValue(entry.value) ? 0 : undefined"
+                :aria-label="isValidValue(entry.value) ? `Filter for ${entry.key}` : undefined"
                 @mousedown="onValueMouseDown"
                 @mouseup="onValueMouseUp"
                 @click.stop="(e) => onValueClick(e, entry.key, entry.value)"
+                @keydown.enter.stop.prevent="(e) => onValueClick(e, entry.key, entry.value)"
+                @keydown.space.stop.prevent="(e) => onValueClick(e, entry.key, entry.value)"
                 >{{ formatDisplayValue(entry.value)
                 }}<span class="doc-compact__actions">
                   <PrimeButton
@@ -317,9 +322,14 @@
               <span
                 class="doc-list__value"
                 :title="String(entry.value).length > 30 ? String(entry.value) : undefined"
+                :role="isValidValue(entry.value) ? 'button' : undefined"
+                :tabindex="isValidValue(entry.value) ? 0 : undefined"
+                :aria-label="isValidValue(entry.value) ? `Filter for ${entry.key}` : undefined"
                 @mousedown="onValueMouseDown"
                 @mouseup="onValueMouseUp"
                 @click.stop="(e) => onValueClick(e, entry.key, entry.value)"
+                @keydown.enter.stop.prevent="(e) => onValueClick(e, entry.key, entry.value)"
+                @keydown.space.stop.prevent="(e) => onValueClick(e, entry.key, entry.value)"
                 ><span class="doc-list__value-text">{{
                   formatDisplayValue(entry.value)
                 }}</span></span
@@ -656,6 +666,13 @@
     text-decoration: underline;
     text-decoration-style: dotted;
     text-underline-offset: 2px;
+  }
+
+  .doc-compact__value:focus-visible,
+  .doc-list__value:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -1px;
+    border-radius: 2px;
   }
 
   .doc-compact__actions {

@@ -4,7 +4,7 @@ import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import { buildSummary } from '@/helpers'
-import * as Errors from '@/services/axios/errors'
+import { parseGraphQLResponse } from '@/services/real-time-events-service-v2/_shared/service/parse-graphql-response'
 import { getCurrentTimezone } from '@/helpers'
 
 const shouldShowTsColumn = false
@@ -25,7 +25,7 @@ export const listDataStream = async (filter) => {
     body: payload
   })
 
-  return parseHttpResponse(response)
+  return parseGraphQLResponse(response, adaptResponse)
 }
 
 const adapt = (filter) => {
@@ -59,28 +59,5 @@ const adaptResponse = (response) => {
 
   return {
     data
-  }
-}
-
-const parseHttpResponse = (response) => {
-  const { body, statusCode } = response
-
-  switch (statusCode) {
-    case 200:
-      return adaptResponse(body)
-    case 400:
-      const apiError = body.detail
-      throw new Error(apiError).message
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
-    case 403:
-      const forbiddenError = body.detail
-      throw new Error(forbiddenError).message
-    case 404:
-      throw new Errors.NotFoundError().message
-    case 500:
-      throw new Errors.InternalServerError().message
-    default:
-      throw new Errors.UnexpectedError().message
   }
 }

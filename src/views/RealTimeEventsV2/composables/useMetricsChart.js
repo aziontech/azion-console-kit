@@ -1,6 +1,8 @@
-import { ref } from 'vue'
+import { ref, computed, onScopeDispose } from 'vue'
 import { loadAggregableFields } from '@/modules/filter-loaders/dataset-fields-loader'
 import { resolveChartApi } from '@/services/real-time-events-service-v2/chart-api-router'
+import { buildForTarget } from '@/services/real-time-events-service-v2/_shared/filter/adapters'
+import { resolveCapabilityTarget } from '@/services/real-time-events-service-v2/_shared/filter/field-capability'
 import {
   loadMetricsFallback,
   loadMetricsSeries,
@@ -8,6 +10,7 @@ import {
   loadMetricsAggregation,
   pivotGroupedData
 } from '@/services/real-time-events-service-v2/metrics-chart-service'
+import { normalizeTsBounds } from '@/services/real-time-events-service-v2/_shared/ts-normalize'
 
 export { pivotGroupedData }
 
@@ -29,12 +32,24 @@ export class MetricsChartError extends Error {
  * @param {(err: MetricsChartError, config: Object) => void} [options.onError]
  *   Invoked when a load is rejected (invalid time range, schema mismatch,
  *   network/API error). Callers typically pipe this to a toast.
+ * @param {import('vue').ComputedRef<string|null>} [options.selectedDashboard]
+ *   The active metrics selection, INJECTED as a read-only computed derived from
+ *   the single writable View source (`selectedView`, task 9.4 / design §3.6).
+ *   This composable no longer owns the selection; it consumes what the View SoT
+ *   derives. When omitted (isolated unit tests), a local read-only computed of
+ *   `null` is used so the shape stays stable and no write path exists.
  */
-export function useMetricsChart(filterData, { onError } = {}) {
+export function useMetricsChart(filterData, { onError, selectedDashboard } = {}) {
   const data = ref([])
   const isLoading = ref(false)
   const configKey = ref(null)
-  const selectedDashboard = ref(null)
+  // Selection is derived elsewhere and injected; never owned here (no writable
+  // ref). Fall back to a constant read-only computed when not injected.
+  const activeDashboard = selectedDashboard || computed(() => null)
+  // `true` iff at least one events-applicable filter field was dropped when
+  // building the metrics query for the active config (i.e. the chart does not
+  // reflect every active filter). Drives the divergence indicator (§3.13).
+  const partial = ref(false)
 
   const emitError = (err, config) => {
     if (typeof onError === 'function') {
@@ -46,32 +61,49 @@ export function useMetricsChart(filterData, { onError } = {}) {
     }
   }
 
+  // Monotonic supersession token: each runLoad captures the token it started
+  // with; a load that has been superseded by a newer one must never write to
+  // `data.value`/`isLoading.value`.
+  let loadToken = 0
+  let loadDebounceTimer = null
+
   /**
    * Load chart data for a given metrics config.
    * @param {Object} config - { metricsDataset, fields, groupBy?, aggregation?, filters?, label?, eventsApi? }
    */
-  const load = async (config) => {
+  const runLoad = async (config) => {
+    const myToken = ++loadToken
+
     if (!config || !filterData.value?.tsRange) {
       data.value = []
+      partial.value = false
       return
     }
+
+    // Include only the AQL filter fields expressible in the target Metrics
+    // dataset (supported-or-drop — never send a key the Metrics API would
+    // reject). Fields applicable to Events but not to this dataset are dropped
+    // and flip `partial`, so the UI can flag the chart/list divergence.
+    const { filter: metricsFilter, partial: isPartial } = buildForTarget(
+      filterData.value.fields,
+      resolveCapabilityTarget(config)
+    )
+    partial.value = isPartial
+    const activeConfig = { ...config, metricsFilter }
 
     isLoading.value = true
     try {
       const tsRange = filterData.value.tsRange
-      const begin =
-        tsRange.tsRangeBegin instanceof Date
-          ? tsRange.tsRangeBegin.toISOString()
-          : String(tsRange.tsRangeBegin)
-      const end =
-        tsRange.tsRangeEnd instanceof Date
-          ? tsRange.tsRangeEnd.toISOString()
-          : String(tsRange.tsRangeEnd)
+      const { tsRangeBegin: begin, tsRangeEnd: end } = normalizeTsBounds(tsRange)
 
       // Metrics-only series: datasets that only exist in the Metrics API (e.g. botManagerMetrics).
       // Always routed to the Metrics endpoint regardless of time range.
       if (config.metricsApiSeries?.series?.length || config.metricsApiSeries?.groupByPivot?.field) {
-        data.value = await loadMetricsSeries(config, begin, end)
+        const result = await loadMetricsSeries(activeConfig, begin, end, {
+          dynamicFilter: metricsFilter
+        })
+        if (myToken !== loadToken) return
+        data.value = result
         return
       }
 
@@ -79,19 +111,32 @@ export function useMetricsChart(filterData, { onError } = {}) {
       if (config.eventsApi?.series?.length || config.eventsApi?.groupByPivot?.field) {
         const api = resolveChartApi(begin, end)
         if (api === 'metrics' && config.metricsApiFallback) {
-          const result = await loadMetricsFallback(config, begin, end)
+          const result = await loadMetricsFallback(activeConfig, begin, end, {
+            dynamicFilter: metricsFilter
+          })
+          if (myToken !== loadToken) return
           if (result.loaded) {
             data.value = result.data ?? []
           }
           return
         }
-        data.value = await loadFromEventsApi(config, begin, end)
+        const result = await loadFromEventsApi(activeConfig, begin, end, {
+          dynamicFilter: metricsFilter
+        })
+        if (myToken !== loadToken) return
+        data.value = result
         return
       }
 
       // Default aggregation path via Metrics API with schema guard.
-      data.value = await loadMetricsAggregation(config, begin, end, { loadAggregableFields })
+      const result = await loadMetricsAggregation(activeConfig, begin, end, {
+        loadAggregableFields,
+        dynamicFilter: metricsFilter
+      })
+      if (myToken !== loadToken) return
+      data.value = result
     } catch (err) {
+      if (myToken !== loadToken) return
       // eslint-disable-next-line no-console
       console.warn('useMetricsChart: failed to load', err)
       data.value = []
@@ -104,11 +149,30 @@ export function useMetricsChart(filterData, { onError } = {}) {
             })
       emitError(typed, config)
     } finally {
-      isLoading.value = false
+      // A superseded runLoad must not flip isLoading off for the newer one.
+      if (myToken === loadToken) {
+        isLoading.value = false
+      }
     }
   }
 
-  return { data, isLoading, configKey, selectedDashboard, load }
+  /**
+   * Debounced entry point: clears any pending run and schedules a trailing
+   * runLoad after 50ms so bursts of reactive changes coalesce into one load.
+   * @param {Object} config
+   */
+  const load = (config) => {
+    clearTimeout(loadDebounceTimer)
+    loadDebounceTimer = setTimeout(() => {
+      runLoad(config)
+    }, 50)
+  }
+
+  onScopeDispose(() => {
+    clearTimeout(loadDebounceTimer)
+  })
+
+  return { data, isLoading, configKey, selectedDashboard: activeDashboard, partial, load }
 }
 
 /**

@@ -27,30 +27,29 @@
       }"
     >
       <div class="relative">
-        <div
-          v-if="activeTab === 0"
-          class="absolute right-0 top-0 z-10 flex items-center gap-1"
-        >
-          <PrimeButton
-            icon="pi pi-chevron-left"
-            size="small"
-            outlined
-            @click="shiftQuick(-1)"
-          />
-          <PrimeButton
-            icon="pi pi-chevron-right"
-            size="small"
-            outlined
-            @click="shiftQuick(1)"
-          />
-        </div>
         <TabView
           v-model:activeIndex="activeTab"
           :pt="{
-            navcontent: { class: ['mb-2 pb-1', activeTab === 0 ? 'pr-16' : ''] }
+            navcontent: { class: 'mb-2 pb-1' }
           }"
         >
           <TabPanel header="Quick">
+            <div class="flex items-center justify-end gap-1 mb-2">
+              <PrimeButton
+                icon="pi pi-chevron-left"
+                size="small"
+                outlined
+                aria-label="Shift quick range earlier"
+                @click="shiftQuick(-1)"
+              />
+              <PrimeButton
+                icon="pi pi-chevron-right"
+                size="small"
+                outlined
+                aria-label="Shift quick range later"
+                @click="shiftQuick(1)"
+              />
+            </div>
             <QuickSelect
               panelOnly
               v-model="model"

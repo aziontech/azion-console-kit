@@ -67,6 +67,8 @@
     <div
       v-if="visible && data"
       class="detail-sidebar"
+      role="complementary"
+      aria-label="Event details"
       data-testid="detail-sidebar-panel"
     >
       <!-- Header -->
@@ -91,6 +93,7 @@
             text
             size="small"
             class="!w-8 !h-8"
+            aria-label="Previous event"
             v-tooltip.top="{ value: 'Previous', showDelay: 300 }"
             @click="emit('navigate', -1)"
             data-testid="detail-sidebar-prev"
@@ -100,6 +103,7 @@
             text
             size="small"
             class="!w-8 !h-8"
+            aria-label="Next event"
             v-tooltip.top="{ value: 'Next', showDelay: 300 }"
             @click="emit('navigate', 1)"
             data-testid="detail-sidebar-next"
@@ -109,6 +113,7 @@
             text
             size="small"
             class="!w-8 !h-8"
+            aria-label="Close details"
             @click="emit('close')"
             data-testid="detail-sidebar-close"
           />

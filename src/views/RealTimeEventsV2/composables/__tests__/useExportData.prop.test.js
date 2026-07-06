@@ -89,17 +89,16 @@ describe('Feature: real-time-events-refactor, Property 13: Export output determi
     })
   })
 
-  it('JSON export blob content equals JSON.stringify(tableData, null, 2) for any tableData', () => {
-    fc.assert(
-      fc.property(arbTableData, arbDataset, (rows, dataset) => {
+  it('JSON export blob content equals JSON.stringify(tableData, null, 2) for any tableData', async () => {
+    await fc.assert(
+      fc.asyncProperty(arbTableData, arbDataset, async (rows, dataset) => {
         const tableData = ref(rows)
         const tabSelected = ref({ dataset })
 
-        const { exportMenuItems } = useExportData({ tableData, tabSelected })
+        const { exportJson } = useExportData({ tableData, tabSelected })
 
-        // Trigger the JSON export command (second menu item)
-        const jsonExportCommand = exportMenuItems.value[1].command
-        jsonExportCommand()
+        // Chunked/async JSON export must stay byte-identical to JSON.stringify.
+        await exportJson()
 
         const expected = JSON.stringify(rows, null, 2)
         expect(capturedBlobContent).toBe(expected)
@@ -108,21 +107,18 @@ describe('Feature: real-time-events-refactor, Property 13: Export output determi
     )
   })
 
-  it('JSON export produces identical output for the same input across two invocations', () => {
-    fc.assert(
-      fc.property(arbTableData, arbDataset, (rows, dataset) => {
+  it('JSON export produces identical output for the same input across two invocations', async () => {
+    await fc.assert(
+      fc.asyncProperty(arbTableData, arbDataset, async (rows, dataset) => {
         const tableData = ref(rows)
         const tabSelected = ref({ dataset })
 
-        const { exportMenuItems } = useExportData({ tableData, tabSelected })
-        const jsonExportCommand = exportMenuItems.value[1].command
+        const { exportJson } = useExportData({ tableData, tabSelected })
 
-        // First invocation
-        jsonExportCommand()
+        await exportJson()
         const firstOutput = capturedBlobContent
 
-        // Second invocation with same data
-        jsonExportCommand()
+        await exportJson()
         const secondOutput = capturedBlobContent
 
         expect(firstOutput).toBe(secondOutput)
@@ -131,14 +127,13 @@ describe('Feature: real-time-events-refactor, Property 13: Export output determi
     )
   })
 
-  it('JSON export skips when tableData is empty', () => {
+  it('JSON export skips when tableData is empty', async () => {
     const tableData = ref([])
     const tabSelected = ref({ dataset: 'httpEvents' })
 
-    const { exportMenuItems } = useExportData({ tableData, tabSelected })
-    const jsonExportCommand = exportMenuItems.value[1].command
+    const { exportJson } = useExportData({ tableData, tabSelected })
 
-    jsonExportCommand()
+    await exportJson()
 
     // Blob should not have been created for empty data
     expect(capturedBlobContent).toBeNull()

@@ -36,7 +36,8 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted, onActivated, onBeforeUnmount, watch, nextTick } from 'vue'
+  import { ref, computed, watch, nextTick } from 'vue'
+  import { useKeepAliveResource } from '@/composables/useKeepAliveResource'
   const props = defineProps({
     panelSizes: {
       type: Array,
@@ -74,7 +75,6 @@
   const isHorizontal = computed(() => props.direction === 'horizontal')
   const currentSizes = ref([props.panelSizes[0], props.panelSizes[1]])
   let hasAppliedInitial = false
-  let resizeObserver = null
   watch(
     () => props.panelSizes,
     (val) => {
@@ -216,26 +216,41 @@
     emit('resizeend', { sizes: [sizeA, sizeB] })
     hasAppliedInitial = true
   }
-  onMounted(() => {
+  // Keep-alive-safe lifecycle: acquire on mount/activate, release on
+  // unmount/deactivate. `applyInitialSizes` runs once per live period (before it
+  // ran on both onMounted and onActivated, doubling up on the first mount).
+  // KeepAlive reactivation matters here because the container may have had zero
+  // dimensions while deactivated, so the percentage-to-pixel conversion in
+  // panelAStyle would have produced 0px — re-applying restores the widths.
+  const acquireResources = () => {
     applyInitialSizes()
     // Re-apply once when the element becomes visible and has dimensions (e.g., after tab switch)
     if ('ResizeObserver' in window && root.value) {
-      resizeObserver = new ResizeObserver((entries) => {
+      const ro = new ResizeObserver((entries) => {
         const entry = entries[0]
         const cr = entry?.contentRect
         if (!hasAppliedInitial && cr && (cr.width > 0 || cr.height > 0)) {
           applyInitialSizes()
         }
       })
-      resizeObserver.observe(root.value)
+      ro.observe(root.value)
+      return ro
     }
-  })
-  // KeepAlive reactivation: the container may have had zero dimensions while
-  // deactivated, so the percentage-to-pixel conversion in panelAStyle would
-  // have produced 0px. Re-apply sizes so the panels regain their widths.
-  onActivated(() => {
-    applyInitialSizes()
-  })
+    return null
+  }
+  const releaseResources = (ro) => {
+    onPointerUp()
+    if (ro) {
+      const el = root.value
+      if (typeof ro.unobserve === 'function' && el) {
+        ro.unobserve(el)
+      }
+      if (typeof ro.disconnect === 'function') {
+        ro.disconnect()
+      }
+    }
+  }
+  useKeepAliveResource(acquireResources, releaseResources)
   watch(
     () => props.direction,
     async () => {
@@ -250,20 +265,6 @@
       applyInitialSizes()
     }
   )
-  onBeforeUnmount(() => {
-    onPointerUp()
-    if (resizeObserver && root.value) {
-      // Safely cleanup ResizeObserver without empty catch blocks
-      const el = root.value
-      if (typeof resizeObserver.unobserve === 'function' && el) {
-        resizeObserver.unobserve(el)
-      }
-      if (typeof resizeObserver.disconnect === 'function') {
-        resizeObserver.disconnect()
-      }
-      resizeObserver = null
-    }
-  })
 </script>
 <style scoped>
   .resizable-splitter {

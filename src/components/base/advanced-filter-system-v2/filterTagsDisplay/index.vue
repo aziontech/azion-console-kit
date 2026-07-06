@@ -37,14 +37,24 @@
 
         return {
           ...item,
-          field: label
+          field: label,
+          // Keep a reference to the raw filter this chip was projected from.
+          // `processedFilters` is a FILTERED + projected view: any raw filter
+          // whose field/operator isn't in `fieldsInFilter` (or is disabled) is
+          // dropped, so a chip's position here does NOT map to its position in
+          // `props.filters`. Removal must therefore identify the exact raw
+          // filter by reference — not by the rendered index — otherwise the
+          // wrong chip is removed whenever a raw filter is hidden (C6/SR-4).
+          __source: item
         }
       })
       .filter(Boolean)
   })
 
-  const removeFilter = (index) => {
-    emit('removeFilter', index)
+  // Emits the SOURCE raw filter (by identity), not the rendered index, so the
+  // consumer removes exactly the clicked chip regardless of any hidden filters.
+  const removeFilter = (filter) => {
+    emit('removeFilter', filter.__source)
   }
 
   const handleClickFilter = (filter) => {
@@ -116,7 +126,7 @@
         class="filter-tag__remove pl-1 cursor-pointer text-sm flex-shrink-0"
         :aria-label="filterAriaLabel(filter)"
         data-testid="rte-chip-remove-button"
-        @click.stop="removeFilter(index)"
+        @click.stop="removeFilter(filter)"
         @focus.stop="onChipFocus"
       >
         <i

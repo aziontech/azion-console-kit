@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, defineModel, computed, watch } from 'vue'
+  import { ref, onMounted, defineModel, computed, watch, toRaw } from 'vue'
   import DataTimeRange from '@/components/base/dataTimeRange-v2'
   import FilterFields from '@/components/base/advanced-filter-system-v2/filterFields/index.vue'
   import AzionQueryLanguage from '@/components/base/advanced-filter-system-v2/filterAQL/azion-query-language.vue'
@@ -212,6 +212,18 @@
     hasPendingDateUpdate.value = false
   }
 
+  /**
+   * Silent variant of `applyFilters` for keep-alive reactivation: re-resolves the
+   * applied tsRange from the picker state (so a relative range moves with now())
+   * WITHOUT emitting `updatedFilter`, letting the caller decide reload via input
+   * snapshots (RTE task 9.6). Uncommitted AQL drafts stay pending.
+   */
+  const refreshAppliedTimeRange = () => {
+    if (hasAqlValidationError.value) return
+    updatedTime()
+    hasPendingDateUpdate.value = false
+  }
+
   const commitQueryToHistory = () => {
     aqlRef.value?.markAsApplied?.()
   }
@@ -265,8 +277,18 @@
     emitUpdatedFilter()
   }
 
-  const removeFilter = (index) => {
-    filterData.value.fields.splice(index, 1)
+  // FilterTagsDisplay emits the SOURCE raw filter by identity, not the rendered
+  // index — its chip list is a filtered/projected view of `filterData.fields`, so
+  // hidden filters make the indexes diverge (C6/SR-4). Drop by reference and
+  // rebuild immutably so we never splice the wrong slot.
+  const removeFilter = (target) => {
+    if (target === undefined || target === null) return
+    const fields = filterData.value.fields
+    if (!Array.isArray(fields)) return
+    const rawTarget = toRaw(target)
+    const next = fields.filter((filterField) => toRaw(filterField) !== rawTarget)
+    if (next.length === fields.length) return
+    filterData.value.fields = next
     applyFilters()
   }
 
@@ -356,7 +378,13 @@
     hasPendingDateUpdate.value = false
   }
 
-  defineExpose({ removeFilter, applyFilters, commitQueryToHistory, syncDateRangeFromExternal })
+  defineExpose({
+    removeFilter,
+    applyFilters,
+    refreshAppliedTimeRange,
+    commitQueryToHistory,
+    syncDateRangeFromExternal
+  })
 </script>
 
 <template>
@@ -462,11 +490,10 @@
     min-width: 0;
   }
 
-  /* Actions group (DataTimeRange + Refresh) is clearly detached from the
-     AQL input via a wider gap (1.25rem) + a vertical separator to its
-     left. Without these, the dark backgrounds of the input and the
-     time-range control merge into one continuous strip and the user
-     can't tell where filtering ends and time/refresh controls begin. */
+  /* Actions group (DataTimeRange + Refresh) is detached from the AQL input via a
+     wider gap + a left separator; without them the dark backgrounds merge into
+     one strip and the user can't tell where filtering ends and time/refresh
+     controls begin. */
   .afs-filter-row__actions {
     display: flex;
     gap: 0.5rem;
@@ -496,11 +523,10 @@
       align-items: center;
       max-width: 100%;
       overflow: hidden;
-      /* Keep border-left + padding-left at all viewports: when the actions
-         row stays on the same line as the query (no actual wrap), the
-         divider is the only visual separation between them. Suppressing it
-         here was making the AQL input visually merge with the date picker
-         whenever the actions did NOT wrap to row 2. */
+      /* Keep border-left + padding-left at all viewports: when the actions row
+         stays on the same line as the query, the divider is the only separation.
+         Suppressing it made the AQL input merge with the date picker whenever the
+         actions did NOT wrap to row 2. */
     }
     .afs-filter-row__actions > * {
       max-width: 100%;

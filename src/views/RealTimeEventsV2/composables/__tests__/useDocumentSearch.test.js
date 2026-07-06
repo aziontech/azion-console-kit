@@ -2,10 +2,13 @@ import { describe, it, expect, vi } from 'vitest'
 import { ref, nextTick, shallowRef } from 'vue'
 
 // Mock Vue lifecycle hooks since we're testing outside a component
+// (useDocumentSearch releases/rehydrates via useKeepAliveResource, task 9.9).
 vi.mock('vue', async () => {
   const actual = await vi.importActual('vue')
   return {
     ...actual,
+    onMounted: vi.fn((cb) => cb),
+    onActivated: vi.fn((cb) => cb),
     onBeforeUnmount: vi.fn((cb) => cb),
     onDeactivated: vi.fn((cb) => cb)
   }

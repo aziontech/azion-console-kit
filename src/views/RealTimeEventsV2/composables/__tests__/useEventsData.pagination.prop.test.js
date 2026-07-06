@@ -146,6 +146,26 @@ describe('Feature: real-time-events-refactor, Property 11: loadMore pagination a
     )
   })
 
+  it('loadMore REPLACES the tableData array reference (never mutates in place)', async () => {
+    // Regression lock: prop-crossing consumers (FieldSidebar field stats) only
+    // re-run when the array identity changes. An in-place push + triggerRef kept
+    // the prop identical and froze the stats at the first page.
+    const pageSize = 10
+    const allRows = buildDescendingRows(pageSize * 3, Date.now())
+    const { instance, totalRowCount } = createEventsDataForPagination(allRows, pageSize)
+
+    await instance.load()
+    instance.setRecordsFound(totalRowCount)
+    instance.hasMoreData.value = true
+
+    const firstPageRef = instance.tableData.value
+    await instance.loadMore()
+
+    expect(instance.tableData.value).not.toBe(firstPageRef)
+    expect(instance.tableData.value.length).toBe(pageSize * 2)
+    expect(firstPageRef.length).toBe(pageSize)
+  })
+
   it('loadMore does not re-fetch already loaded rows (no offset regression)', async () => {
     await fc.assert(
       fc.asyncProperty(arbPageSize, arbNumLoadMoreCalls, async (pageSize, numLoadMore) => {

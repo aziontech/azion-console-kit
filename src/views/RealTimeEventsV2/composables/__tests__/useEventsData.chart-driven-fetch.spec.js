@@ -80,6 +80,23 @@ describe('useEventsData — chart total drives the list fetch strategy', () => {
     expect(new Date(call.tsRange.tsRangeEnd).getTime()).toBeLessThanOrEqual(now + 1000)
     expect(instance.tableData.value.length).toBe(71)
     expect(instance.hasMoreData.value).toBe(false)
+    // Bug 15.6: the chart's accurate, non-partial total drives the DISPLAYED
+    // count so the "Documents found" badge shows a real number on the default
+    // (no active filters) view — not the "—" placeholder it regressed to after
+    // the @total-computed → setRecordsFound bridge was removed.
+    expect(instance.recordsFound.value).toBe('71')
+  })
+
+  it('positive chart total drives the displayed count on the no-filter default view (Bug 15.6)', async () => {
+    const { instance } = setup({ chartTotal: 12345, pageSize: 100, rows: [] })
+
+    await instance.load()
+
+    // Formatted at the display edge, exactly like the active-filter count path.
+    expect(instance.recordsFound.value).toBe(new Intl.NumberFormat('en-US').format(12345))
+    expect(instance.recordsFound.value).toBe('12,345')
+    // Never the not-yet-counted placeholder once a real total is known.
+    expect(instance.recordsFound.value).not.toBe('—')
   })
 
   it('zero total → no list request at all', async () => {

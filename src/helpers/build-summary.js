@@ -9,20 +9,20 @@ import { getCurrentTimezone } from './account-timezone'
 const SUMMARY_FIELD_PRIORITY = [
   'configurationId',
   'host',
+  'requestUri',
+  'requestMethod',
+  'status',
   'httpReferer',
   'httpUserAgent',
   'remoteAddress',
   'requestId',
-  'requestMethod',
   'requestTime',
-  'requestUri',
   'scheme',
   'serverAddr',
   'serverPort',
   'serverProtocol',
   'sslCipher',
   'sslProtocol',
-  'status',
   'upstreamBytesSent',
   'upstreamCacheStatus',
   'wafEvheaders',
@@ -53,22 +53,20 @@ export const buildSummary = (
   shouldShowTs = false,
   includeMissingPriorityFields = false
 ) => {
-  const truncateRequestUri = (input) => {
-    if (!shouldLimitRequestUri) return input
-    if (!input) return input
-
-    const asString = String(input)
-    const limit = 50
-    if (asString.length <= limit) return asString
-    return `${asString.slice(0, limit)}...`
-  }
+  // Task 15.2: the `shouldLimitRequestUri` flag is retained for signature/
+  // back-compat but MUST NOT truncate the stored value anymore. Truncating at
+  // data level cut the real requestUri (e.g. `<first 50 chars>...`), so copy /
+  // add-filter / exclude-filter emitted a value that diverged from the applied
+  // filter. The full value is now preserved end-to-end; visual shortening is
+  // CSS-only (ellipsis) plus a tooltip/title that exposes the complete URI.
+  void shouldLimitRequestUri
 
   const formatEntry = (key, value) => {
     if (key === 'stacktrace' || key === 'requestData') {
       return { key, value: value ? formatEscapedJson(value) : '-' }
     }
     if (key === 'requestUri') {
-      return { key, value: value ? truncateRequestUri(value) : '-' }
+      return { key, value: value !== null && value !== undefined && value !== '' ? value : '-' }
     }
     if (key === 'ts') {
       return { key, value: value ? getCurrentTimezone(value) : '-' }

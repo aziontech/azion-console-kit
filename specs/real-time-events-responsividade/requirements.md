@@ -20,13 +20,13 @@ Esta spec define **contratos testáveis por breakpoint**, edge cases (touch, iOS
 
 ## Breakpoint Contract (referência usada nos critérios)
 
-| Token       | Faixa             | Devices típicos                          |
-|-------------|-------------------|------------------------------------------|
-| `mobile-s`  | `< 375px`         | iPhone SE 1ª gen, telefones antigos      |
-| `mobile`    | `375px – 639px`   | iPhone 12/13/14, Android padrão          |
-| `tablet`    | `640px – 1023px`  | iPad portrait, tablets pequenos, foldables aberto |
-| `desktop`   | `1024px – 1439px` | Laptops 13–14", iPad landscape           |
-| `xl`        | `≥ 1440px`        | Monitores externos, MacBook 16" Retina   |
+| Token      | Faixa             | Devices típicos                                   |
+| ---------- | ----------------- | ------------------------------------------------- |
+| `mobile-s` | `< 375px`         | iPhone SE 1ª gen, telefones antigos               |
+| `mobile`   | `375px – 639px`   | iPhone 12/13/14, Android padrão                   |
+| `tablet`   | `640px – 1023px`  | iPad portrait, tablets pequenos, foldables aberto |
+| `desktop`  | `1024px – 1439px` | Laptops 13–14", iPad landscape                    |
+| `xl`       | `≥ 1440px`        | Monitores externos, MacBook 16" Retina            |
 
 > Os tokens são **o contrato** referenciado pelos critérios EARS. Os valores em px não devem mudar sem revisar esta spec. Implementação pode usar `@media` CSS, `window.matchMedia` ou container queries — mas os limites devem permanecer.
 
@@ -149,18 +149,19 @@ Esta spec define **contratos testáveis por breakpoint**, edge cases (touch, iOS
 7.1 O painel "Saved searches" deve manter `width: 360px` em `tablet`+ e `width: calc(100vw - 1rem)` em `mobile`/`mobile-s` (hoje já tem `max-width: calc(100vw - 2rem)` — esta spec **reduz a margem em mobile** para 0.5rem cada lado).
 7.2 O painel "Query history" deve usar `width: min(400px, calc(100vw - 1rem))` em todos os breakpoints (hoje 400px fixo pode estourar em viewports `< 432px`).
 7.3 Em `mobile-s` e `mobile`, o dropdown "View" do gráfico ([event-chart.vue:480-516](src/views/RealTimeEventsV2/Blocks/components/event-chart.vue#L480-L516)) deve ser apresentado como **bottom-sheet** ancorado à borda inferior do viewport, com:
-   - `position: fixed; bottom: 0; left: 0; right: 0`
-   - `width: 100%` (ignorando a posição do trigger)
-   - `max-height: 60dvh` com scroll vertical interno
-   - Cantos superiores arredondados (`border-radius: 12px 12px 0 0`)
-   - Backdrop escuro semitransparente atrás (`background: rgba(0,0,0,0.4)`) que captura tap-fora para fechar
-   - Indicador visual de arraste (handle) no topo
-   - Botão de fechar visível no canto superior direito do sheet
-   **Restrição de implementação**: usar o mesmo `<Teleport to="body">` atual ([event-chart.vue:480](src/views/RealTimeEventsV2/Blocks/components/event-chart.vue#L480)) alternando estilo via `matchMedia('(max-width: 639px)')`. **Não introduzir nova dependência** (sem libs de bottom-sheet). Em `tablet`+, manter o popover teleportado atual com `updateViewPanelPosition`.
-7.4 Em `tablet`+, o sistema deve recalcular posição do painel View via `updateViewPanelPosition` também em `orientationchange` e `visualViewport.resize` (hoje só `scroll` e `resize`). Quando o usuário rolar a página com o dropdown View aberto, o sistema deve manter o painel alinhado ao trigger ou fechá-lo se o trigger sair do viewport visível.
-7.5 O Dataset Dropdown (PrimeVue, `appendTo="body"`) deve respeitar `max-width: calc(100vw - 1rem)` em todos os breakpoints; o painel teleportado **não deve** ultrapassar a borda direita do viewport em `mobile-s`.
-7.6 Botões de ação dentro dos overlays (save, delete, clear history) devem ter `aria-label` descritivo (hoje **faltam** — ver `saved-searches-overlay.vue` e `query-history-overlay.vue`).
-7.7 Em `mobile-s` e `mobile`, todos os overlays devem ter dismissal por: (a) tap fora, (b) tecla Esc (já implementado para o dropdown View), (c) botão de fechar visível dentro do overlay quando aplicável.
+
+- `position: fixed; bottom: 0; left: 0; right: 0`
+- `width: 100%` (ignorando a posição do trigger)
+- `max-height: 60dvh` com scroll vertical interno
+- Cantos superiores arredondados (`border-radius: 12px 12px 0 0`)
+- Backdrop escuro semitransparente atrás (`background: rgba(0,0,0,0.4)`) que captura tap-fora para fechar
+- Indicador visual de arraste (handle) no topo
+- Botão de fechar visível no canto superior direito do sheet
+  **Restrição de implementação**: usar o mesmo `<Teleport to="body">` atual ([event-chart.vue:480](src/views/RealTimeEventsV2/Blocks/components/event-chart.vue#L480)) alternando estilo via `matchMedia('(max-width: 639px)')`. **Não introduzir nova dependência** (sem libs de bottom-sheet). Em `tablet`+, manter o popover teleportado atual com `updateViewPanelPosition`.
+  7.4 Em `tablet`+, o sistema deve recalcular posição do painel View via `updateViewPanelPosition` também em `orientationchange` e `visualViewport.resize` (hoje só `scroll` e `resize`). Quando o usuário rolar a página com o dropdown View aberto, o sistema deve manter o painel alinhado ao trigger ou fechá-lo se o trigger sair do viewport visível.
+  7.5 O Dataset Dropdown (PrimeVue, `appendTo="body"`) deve respeitar `max-width: calc(100vw - 1rem)` em todos os breakpoints; o painel teleportado **não deve** ultrapassar a borda direita do viewport em `mobile-s`.
+  7.6 Botões de ação dentro dos overlays (save, delete, clear history) devem ter `aria-label` descritivo (hoje **faltam** — ver `saved-searches-overlay.vue` e `query-history-overlay.vue`).
+  7.7 Em `mobile-s` e `mobile`, todos os overlays devem ter dismissal por: (a) tap fora, (b) tecla Esc (já implementado para o dropdown View), (c) botão de fechar visível dentro do overlay quando aplicável.
 
 ---
 
@@ -204,13 +205,14 @@ Esta spec define **contratos testáveis por breakpoint**, edge cases (touch, iOS
 10.5 O sistema deve manter o `buildToken` ([event-chart.vue:159](src/views/RealTimeEventsV2/Blocks/components/event-chart.vue#L159)) para invalidar builds em-vôo durante mudanças rápidas de breakpoint.
 
 10.6 **Zero memory leaks** — regra inviolável. Todo subscribe/listener/observer/timer introduzido por esta entrega deve ter cleanup simétrico garantido:
-   - `window.addEventListener` / `document.addEventListener` → `removeEventListener` correspondente em `onBeforeUnmount` **e** `onDeactivated` (componente está sob `<keep-alive>`).
-   - `setInterval`/`setTimeout` → `clearInterval`/`clearTimeout` em todos os caminhos de unmount/deactivated, com a ref zerada.
-   - `ResizeObserver`/`MutationObserver`/`IntersectionObserver` → `disconnect()` + ref zerada.
-   - `requestAnimationFrame` → `cancelAnimationFrame` no handle salvo.
-   - `matchMedia(...)` → `mql.removeEventListener('change', handler)` simétrico.
-   - Bottom-sheet do critério 7.3 (backdrop, dismiss handlers) → todos os listeners removidos ao fechar/unmount.
-   - Handler de `visibilitychange` do critério 8.6 → removido em unmount/deactivated.
+
+- `window.addEventListener` / `document.addEventListener` → `removeEventListener` correspondente em `onBeforeUnmount` **e** `onDeactivated` (componente está sob `<keep-alive>`).
+- `setInterval`/`setTimeout` → `clearInterval`/`clearTimeout` em todos os caminhos de unmount/deactivated, com a ref zerada.
+- `ResizeObserver`/`MutationObserver`/`IntersectionObserver` → `disconnect()` + ref zerada.
+- `requestAnimationFrame` → `cancelAnimationFrame` no handle salvo.
+- `matchMedia(...)` → `mql.removeEventListener('change', handler)` simétrico.
+- Bottom-sheet do critério 7.3 (backdrop, dismiss handlers) → todos os listeners removidos ao fechar/unmount.
+- Handler de `visibilitychange` do critério 8.6 → removido em unmount/deactivated.
 
 10.7 O sistema deve incluir, em qualquer arquivo tocado por esta entrega, **simetria explícita** entre o setup do listener/observer e o cleanup correspondente, no mesmo arquivo, com nome de handler idêntico (sem `bind` inline anônimo que impossibilita remoção).
 
@@ -223,13 +225,14 @@ Esta spec define **contratos testáveis por breakpoint**, edge cases (touch, iOS
 11.3 Quando o usuário usar teclado para navegar pelos chips em scroll horizontal, o sistema deve garantir que o chip focado fique visível.
 11.4 O sistema deve manter contraste mínimo **4.5:1** para textos da filter bar e do gráfico em todos os breakpoints (sem regressão das cores atuais que dependem de `--text-color` e `--text-color-secondary`).
 11.5 O sistema deve adicionar os `aria-label` faltantes (compilados na exploração):
-   - Botão "saved searches" em [filter-bar.vue:56-62](src/views/RealTimeEventsV2/Blocks/components/filter-bar.vue#L56-L62) → `aria-label="Open saved searches"`.
-   - Botão "View" do gráfico em [event-chart.vue:467-479](src/views/RealTimeEventsV2/Blocks/components/event-chart.vue#L467-L479) → `aria-label="Change chart view"`.
-   - Botão remove em `FilterTagsDisplay` → `aria-label="Remove filter ${field} ${operator} ${value}"`.
-   - Botões save/delete em `saved-searches-overlay.vue` → `aria-label="Save current search"`, `aria-label="Delete saved search"`.
-   - Botão clear em `query-history-overlay.vue` → `aria-label="Clear query history"`.
-11.6 O sistema deve preservar foco visível (`focus-visible`) em todos os controles interativos em mobile (não suprimir `:focus` por preferência estética).
-11.7 Em screen reader, o gráfico deve expor pelo menos: total de eventos, range de tempo, e instrução de uso ("Use the brush selection to zoom into a time range"). Aceitável via `aria-describedby` ou texto visualmente oculto.
+
+- Botão "saved searches" em [filter-bar.vue:56-62](src/views/RealTimeEventsV2/Blocks/components/filter-bar.vue#L56-L62) → `aria-label="Open saved searches"`.
+- Botão "View" do gráfico em [event-chart.vue:467-479](src/views/RealTimeEventsV2/Blocks/components/event-chart.vue#L467-L479) → `aria-label="Change chart view"`.
+- Botão remove em `FilterTagsDisplay` → `aria-label="Remove filter ${field} ${operator} ${value}"`.
+- Botões save/delete em `saved-searches-overlay.vue` → `aria-label="Save current search"`, `aria-label="Delete saved search"`.
+- Botão clear em `query-history-overlay.vue` → `aria-label="Clear query history"`.
+  11.6 O sistema deve preservar foco visível (`focus-visible`) em todos os controles interativos em mobile (não suprimir `:focus` por preferência estética).
+  11.7 Em screen reader, o gráfico deve expor pelo menos: total de eventos, range de tempo, e instrução de uso ("Use the brush selection to zoom into a time range"). Aceitável via `aria-describedby` ou texto visualmente oculto.
 
 ### 12. Compatibilidade de Browsers e Devices
 
@@ -242,17 +245,18 @@ Esta spec define **contratos testáveis por breakpoint**, edge cases (touch, iOS
 ### 13. Observabilidade & QA
 
 13.1 O sistema deve preservar os `data-testid` existentes sem renomear/remover. Lista mínima inviolável:
-   - `event-chart` ([event-chart.vue:426](src/views/RealTimeEventsV2/Blocks/components/event-chart.vue#L426))
-   - `event-chart-view` ([event-chart.vue:462](src/views/RealTimeEventsV2/Blocks/components/event-chart.vue#L462))
-   - `dataset-selector-top` ([filter-bar.vue:51](src/views/RealTimeEventsV2/Blocks/components/filter-bar.vue#L51))
-   - `session-toolbar`, `rte-tab-{id}`, `open-session-browser-button`, `share-current-view-button` ([TabsView.vue](src/views/RealTimeEventsV2/TabsView.vue))
-   - `field-sidebar`
-13.2 Onde novos elementos forem introduzidos (ex: wrapper de scroll de chips, overlay de time range, indicador de overflow lateral), o sistema deve incluir `data-testid` descritivo seguindo a convenção: `rte-<componente>-<elemento>`.
-13.3 O sistema deve adicionar testes E2E (ou unit + Vue Test Utils) que verifiquem para cada breakpoint definido na seção 0:
-   - Altura do `.chart-container` dentro da faixa esperada.
-   - Layout esperado da filter bar (linha única, 2 linhas ou stack).
-   - Scroll horizontal nos chips quando `n_chips × max_chip_width > container_width`.
-13.4 O sistema **não deve** introduzir warnings/erros novos no console durante mudança de viewport em DevTools (validar Chrome + Safari).
+
+- `event-chart` ([event-chart.vue:426](src/views/RealTimeEventsV2/Blocks/components/event-chart.vue#L426))
+- `event-chart-view` ([event-chart.vue:462](src/views/RealTimeEventsV2/Blocks/components/event-chart.vue#L462))
+- `dataset-selector-top` ([filter-bar.vue:51](src/views/RealTimeEventsV2/Blocks/components/filter-bar.vue#L51))
+- `session-toolbar`, `rte-tab-{id}`, `open-session-browser-button`, `share-current-view-button` ([TabsView.vue](src/views/RealTimeEventsV2/TabsView.vue))
+- `field-sidebar`
+  13.2 Onde novos elementos forem introduzidos (ex: wrapper de scroll de chips, overlay de time range, indicador de overflow lateral), o sistema deve incluir `data-testid` descritivo seguindo a convenção: `rte-<componente>-<elemento>`.
+  13.3 O sistema deve adicionar testes E2E (ou unit + Vue Test Utils) que verifiquem para cada breakpoint definido na seção 0:
+- Altura do `.chart-container` dentro da faixa esperada.
+- Layout esperado da filter bar (linha única, 2 linhas ou stack).
+- Scroll horizontal nos chips quando `n_chips × max_chip_width > container_width`.
+  13.4 O sistema **não deve** introduzir warnings/erros novos no console durante mudança de viewport em DevTools (validar Chrome + Safari).
 
 ---
 
@@ -274,13 +278,13 @@ Esta spec define **contratos testáveis por breakpoint**, edge cases (touch, iOS
 
 ## Decisions Log (open questions resolved)
 
-| # | Decisão | Reflexo nos critérios |
-|---|---------|------------------------|
-| D1 | Ticks calculados dinamicamente em função da largura disponível e do rótulo mais longo (gap ≥ 8px), com decimação preservando primeiro/último. Sem caps fixos. | 1.4, 1.5, 1.6 |
-| D2 | Em `tablet`, linha 2 da filter bar (range + refresh) alinha à direita (`flex-end`), consistente com a borda direita do desktop. | 2.2 |
-| D3 | Tooltip em touch usa tap-to-show com auto-dismiss em 3s. | 5.2 |
-| D4 | Dropdown "View" em `mobile-s`/`mobile` vira **bottom-sheet** ancorado na borda inferior, sem nova dependência (reuso do `<Teleport to="body">` com `matchMedia`). Em `tablet`+, mantém popover atual. | 7.3, 7.4 |
-| D5 | Sempre usar tokens de breakpoint desta spec. Field-sidebar passa a esconder em `< 640px` (era 768px). | 9.3 |
-| D6 | `ResizeObserver` loop é **proibido**. Mitigação obrigatória via `requestAnimationFrame` wrap ou flag de re-entrada. Validar com 30s de uso intensivo (zero ocorrências). | 10.3 |
-| D7 | Chips de filtro usam scroll-x apenas em **mobile/tablet** (`< 1024px`). Em desktop/xl preservar comportamento atual (`overflow: hidden`). Sem fade indicator em nenhum breakpoint. Decisão revisada após a fase de design para evitar mudanças visíveis em desktop. | 3.1, 3.2, 3.8 |
-| D8 | Auto-refresh pausa em `visibilityState === 'hidden'` e faz catch-up no retorno se o tick estiver atrasado. | 8.6, 8.7 |
+| #   | Decisão                                                                                                                                                                                                                                                             | Reflexo nos critérios |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| D1  | Ticks calculados dinamicamente em função da largura disponível e do rótulo mais longo (gap ≥ 8px), com decimação preservando primeiro/último. Sem caps fixos.                                                                                                       | 1.4, 1.5, 1.6         |
+| D2  | Em `tablet`, linha 2 da filter bar (range + refresh) alinha à direita (`flex-end`), consistente com a borda direita do desktop.                                                                                                                                     | 2.2                   |
+| D3  | Tooltip em touch usa tap-to-show com auto-dismiss em 3s.                                                                                                                                                                                                            | 5.2                   |
+| D4  | Dropdown "View" em `mobile-s`/`mobile` vira **bottom-sheet** ancorado na borda inferior, sem nova dependência (reuso do `<Teleport to="body">` com `matchMedia`). Em `tablet`+, mantém popover atual.                                                               | 7.3, 7.4              |
+| D5  | Sempre usar tokens de breakpoint desta spec. Field-sidebar passa a esconder em `< 640px` (era 768px).                                                                                                                                                               | 9.3                   |
+| D6  | `ResizeObserver` loop é **proibido**. Mitigação obrigatória via `requestAnimationFrame` wrap ou flag de re-entrada. Validar com 30s de uso intensivo (zero ocorrências).                                                                                            | 10.3                  |
+| D7  | Chips de filtro usam scroll-x apenas em **mobile/tablet** (`< 1024px`). Em desktop/xl preservar comportamento atual (`overflow: hidden`). Sem fade indicator em nenhum breakpoint. Decisão revisada após a fase de design para evitar mudanças visíveis em desktop. | 3.1, 3.2, 3.8         |
+| D8  | Auto-refresh pausa em `visibilityState === 'hidden'` e faz catch-up no retorno se o tick estiver atrasado.                                                                                                                                                          | 8.6, 8.7              |
