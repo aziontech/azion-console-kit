@@ -3,6 +3,7 @@
   import InputText from '@aziontech/webkit/inputtext'
   import Dropdown from '@aziontech/webkit/dropdown'
   import Menu from '@aziontech/webkit/menu'
+  import DivergenceIndicator from './divergence-indicator.vue'
   import { eventsPlaygroundOpener } from '@/helpers'
   import { ref } from 'vue'
 
@@ -11,6 +12,7 @@
   defineProps({
     sidebarVisible: { type: Boolean, default: true },
     recordsFound: { type: [String, Number], default: '' },
+    aggregateDivergence: { type: Boolean, default: false },
     documentSearchQuery: { type: String, default: '' },
     detailViewMode: { type: String, default: 'inline' },
     isFullscreen: { type: Boolean, default: false },
@@ -54,8 +56,13 @@
       <span
         v-if="recordsFound"
         class="discover-docs-badge"
-        >{{ recordsFound }} Documents found</span
       >
+        <span class="discover-docs-badge__text">{{ recordsFound }} Documents found</span>
+        <DivergenceIndicator
+          :visible="aggregateDivergence"
+          message="The chart is built from aggregated data, which is retained longer than raw documents — documents for this period are no longer available."
+        />
+      </span>
     </div>
     <div class="discover-toolbar__right">
       <div class="discover-toolbar__search">
@@ -213,15 +220,27 @@
 
   /* Documents found badge */
   .discover-docs-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
     font-size: 0.8125rem;
     border: 1px solid var(--surface-border);
     background: var(--surface-hover);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     padding: 0.125rem 0.5rem;
     border-radius: 0.375rem;
     max-width: 20vw;
+  }
+
+  .discover-docs-badge__text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Inside the pill the indicator is a compact glyph, not a standalone box. */
+  .discover-docs-badge :deep(.divergence-indicator) {
+    width: auto;
+    height: auto;
   }
 
   /* Hide secondary buttons at smaller widths */

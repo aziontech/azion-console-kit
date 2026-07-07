@@ -88,7 +88,13 @@ describe('useEventsData — chart total drives the list fetch strategy', () => {
   })
 
   it('positive chart total drives the displayed count on the no-filter default view (Bug 15.6)', async () => {
-    const { instance } = setup({ chartTotal: 12345, pageSize: 100, rows: [] })
+    // One row: an EMPTY list now zeroes the badge by design; Bug 15.6 is about
+    // the chart total seeding the count when the default view HAS data.
+    const { instance } = setup({
+      chartTotal: 12345,
+      pageSize: 100,
+      rows: [{ id: 'row-1', ts: 1, tsFormat: 't1', summary: [] }]
+    })
 
     await instance.load()
 
@@ -97,6 +103,16 @@ describe('useEventsData — chart total drives the list fetch strategy', () => {
     expect(instance.recordsFound.value).toBe('12,345')
     // Never the not-yet-counted placeholder once a real total is known.
     expect(instance.recordsFound.value).not.toBe('—')
+  })
+
+  it('aggregate-vs-raw divergence: positive chart total + EMPTY list lights the indicator flag', async () => {
+    const { instance } = setup({ chartTotal: 9700, rows: [] })
+
+    await instance.load()
+
+    expect(instance.tableData.value).toEqual([])
+    expect(instance.recordsFound.value).toBe('0')
+    expect(instance.aggregateDivergence.value).toBe(true)
   })
 
   it('zero total → no list request at all', async () => {

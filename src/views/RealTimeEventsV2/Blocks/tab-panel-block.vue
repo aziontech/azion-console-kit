@@ -148,6 +148,7 @@
     chartData,
     kpis: summaryKpis,
     recordsFound,
+    aggregateDivergence,
     isLoading,
     isChartLoading,
     chartHasError,
@@ -731,6 +732,7 @@
               <DiscoverToolbar
                 :sidebarVisible="sidebarVisible"
                 :recordsFound="recordsFound"
+                :aggregateDivergence="aggregateDivergence"
                 :documentSearchQuery="documentSearchQuery"
                 :detailViewMode="detailViewMode"
                 :isFullscreen="isFullscreen"

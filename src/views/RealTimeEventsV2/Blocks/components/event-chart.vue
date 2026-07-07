@@ -406,7 +406,10 @@
       >
         <span class="chart-header__total">{{ formattedTotal }}</span>
         <span class="chart-header__label">events</span>
-        <DivergenceIndicator :visible="chartDiverges" />
+        <DivergenceIndicator
+          :visible="chartDiverges"
+          side="bottom"
+        />
       </span>
       <div
         v-if="!collapsed"

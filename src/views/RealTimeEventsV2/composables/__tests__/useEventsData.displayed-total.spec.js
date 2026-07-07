@@ -57,7 +57,12 @@ const activeFilterData = () =>
 function createInstance({ locale = 'en-US', filterData } = {}) {
   return useEventsData({
     filterData: filterData ?? activeFilterData(),
-    listService: ref(vi.fn(async () => ({ data: [] }))),
+    // Non-empty list: an EMPTY list now authoritatively zeroes the badge
+    // ("0 Documents found"), which would mask the count-path formatting these
+    // tests exercise.
+    listService: ref(
+      vi.fn(async () => ({ data: [{ id: 'row-1', ts: 1, tsFormat: 't1', summary: [] }] }))
+    ),
     loadChartAggregation: ref(vi.fn()),
     tabSelected: ref({ dataset: 'test' }),
     pageSize: ref(50),

@@ -41,6 +41,10 @@ export function useEventsData({
   // displayed string happens only at the display edge (`recordsFound`), so there
   // is no string→number parse-back inside load().
   const recordsCount = ref(null)
+  // True when the CHART (aggregate tables, longer retention) reports events for
+  // the range but the raw documents no longer exist — drives the badge's (!)
+  // divergence indicator. Reset on every load.
+  const aggregateDivergence = ref(false)
   // Display projection of the numeric count. Consumers (DiscoverToolbar,
   // LoadMoreFooter) read this exactly as before, so the DISPLAYED value is
   // unchanged: `null` → the em-dash placeholder, any number → locale-formatted
@@ -303,29 +307,31 @@ export function useEventsData({
     }
   }
 
+  // Single query over [tsRangeBegin, currentWindowEnd], newest→oldest, with
+  // offset paging. The API skips any empty span on its own, so this both serves
+  // short ranges and acts as the one-shot fallback when the windowed walk hits
+  // an empty window (probing ~96 windows one by one froze the UI for minutes).
+  const fetchWideRemainder = async (target) => {
+    const clamped = {
+      ...filterData.value,
+      tsRange: {
+        ...filterData.value.tsRange,
+        tsRangeEnd: new Date(currentWindowEnd).toISOString()
+      }
+    }
+    const res = await listService.value(
+      { ...clamped, pageSize: target, offset: currentWindowOffset },
+      { onQuery }
+    )
+    const records = res.data || []
+    currentWindowOffset += records.length
+    return records
+  }
+
   const fetchPage = async (target, callId = loadCallId) => {
     const originalBegin = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
     let records = []
-    if (isShortRange) {
-      // Single query over the whole range, newest→oldest, with offset paging.
-      // currentWindowEnd is clamped to "now" (no future preset end leaks in);
-      // tsRangeBegin stays the full range begin — the API returns the newest
-      // `target` rows and skips any empty span between "now" and the data.
-      const clamped = {
-        ...filterData.value,
-        tsRange: {
-          ...filterData.value.tsRange,
-          tsRangeEnd: new Date(currentWindowEnd).toISOString()
-        }
-      }
-      const res = await listService.value(
-        { ...clamped, pageSize: target, offset: currentWindowOffset },
-        { onQuery }
-      )
-      records = res.data || []
-      currentWindowOffset += records.length
-      return records
-    }
+    if (isShortRange) return fetchWideRemainder(target)
     while (records.length < target && currentWindowEnd > originalBegin) {
       // A superseded load must not keep walking windows and corrupting the
       // shared cursor (fix C5).
@@ -338,14 +344,23 @@ export function useEventsData({
       )
       const batch = res.data || []
       records = [...records, ...batch]
-      if (batch.length < remaining) {
-        // Window exhausted or empty — move to the next (older) window.
+      if (batch.length === 0) {
+        // First EMPTY window: stop walking. One wide probe over the remaining
+        // range answers "is there anything older at all" in a single request —
+        // sparse data still loads, and a truly empty tail stops at 2 requests
+        // instead of walking every 2h window to the range start.
         currentWindowEnd = new Date(windowFilter.tsRange.tsRangeBegin).getTime()
         currentWindowOffset = 0
-        // Stop only once every known record is collected. An empty window must
-        // NOT abort the walk: sparse/filtered data has empty windows between
-        // populated ones. While the count is still resolving we keep walking; the
-        // loop is bounded by currentWindowEnd > originalBegin.
+        isShortRange = true
+        if (callId !== loadCallId || currentWindowEnd <= originalBegin) break
+        const wide = await fetchWideRemainder(target - records.length)
+        records = [...records, ...wide]
+        break
+      }
+      if (batch.length < remaining) {
+        // Window exhausted — move to the next (older) window.
+        currentWindowEnd = new Date(windowFilter.tsRange.tsRangeBegin).getTime()
+        currentWindowOffset = 0
         if (knownTotalCount != null && records.length >= knownTotalCount) break
       } else {
         currentWindowOffset += batch.length
@@ -392,6 +407,7 @@ export function useEventsData({
       isLoading.value = true
       tableData.value = []
       hasMoreData.value = false
+      aggregateDivergence.value = false
       // Skip the co-fired chart aggregation when the reload seam flagged it wasted
       // (page-size reload or metrics view). Computed BEFORE the resets below on
       // purpose: clearing chartData/recordsCount while skipping the re-fetch
@@ -471,6 +487,11 @@ export function useEventsData({
           .then((late) => {
             if (callId !== loadCallId) return
             applyChartTotal(late)
+            // The list may have already resolved EMPTY before the slow chart
+            // total landed — light the divergence indicator retroactively.
+            if ((late?.total ?? 0) > 0 && !late?.partialFilter && tableData.value.length === 0) {
+              aggregateDivergence.value = true
+            }
           })
           .catch(() => {})
       }
@@ -479,6 +500,15 @@ export function useEventsData({
       const records = await fetchPage(pageSize.value, callId)
       if (callId !== loadCallId) return
       tableData.value = records
+      if (records.length === 0) {
+        // Empty list for the whole range is the authoritative truth for the
+        // badge ("0 Documents found") even when the AGGREGATE tables still hold
+        // totals for the period (longer retention than raw events). Supersede
+        // any in-flight aggregate count so it cannot overwrite the exact zero.
+        aggregateDivergence.value = (knownTotalCount ?? 0) > 0 || (recordsCount.value ?? 0) > 0
+        countToken++
+        writeAccurateCount(0)
+      }
       // Numeric count end-to-end (design §2.1(5)): the displayed-count value is the
       // numeric ref directly. When not yet counted, preserve the old "—" parse-back
       // result (NaN, not null) so computeHasMoreData's isShortRange predicate is
@@ -554,6 +584,7 @@ export function useEventsData({
     chartData,
     kpis,
     recordsFound,
+    aggregateDivergence,
     isLoading,
     isChartLoading,
     chartHasError,
