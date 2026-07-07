@@ -205,16 +205,6 @@
       class="flex flex-col gap-[var(--spacing-1)]"
       data-testid="release-composition__ds-label"
     >
-      <label
-        class="flex items-center gap-[var(--spacing-1)] text-body-sm font-semibold text-[var(--text-color-secondary)]"
-      >
-        Deployment Settings
-        <span
-          class="text-[var(--color-orange-500)]"
-          aria-hidden="true"
-          >*</span
-        >
-      </label>
       <span
         class="text-body-xs text-[var(--text-color-secondary)]"
         data-testid="release-composition__ds-helper"
@@ -266,7 +256,7 @@
 
     <div
       v-if="hasDeployments"
-      class="flex flex-col gap-[var(--spacing-3)] overflow-y-auto max-h-[var(--container-xs)] pr-[var(--spacing-1)]"
+      class="flex flex-col gap-[var(--spacing-3)] overflow-y-auto max-h-[var(--container-md)] pr-[var(--spacing-1)]"
       data-testid="release-composition__ds-list"
     >
       <template

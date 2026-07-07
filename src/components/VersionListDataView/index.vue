@@ -9,6 +9,7 @@
   import Menu from '@aziontech/webkit/menu'
   import OverlayPanel from '@aziontech/webkit/overlaypanel'
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
   import Illustration from '@/assets/svg/illustration-layers.vue'
 
   import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
@@ -187,6 +188,20 @@
     if (value == null || value === '') return '--'
     return value
   }
+
+  const trafficOverlayRef = ref(null)
+  const trafficPopupVersion = ref(null)
+  const trafficPopupDeployments = computed(
+    () => trafficPopupVersion.value?.activeTraffic?.deployments ?? []
+  )
+
+  const showTrafficPopup = (event, version) => {
+    if (!version?.activeTraffic) return
+    trafficPopupVersion.value = version
+    trafficOverlayRef.value?.show?.(event)
+  }
+
+  const hideTrafficPopup = () => trafficOverlayRef.value?.hide?.()
 
   const resolveSize = (column) => column?.size || 'minmax(0, 1fr)'
 
@@ -597,7 +612,7 @@
                         @click="triggerRowClick(version)"
                       >
                         <span class="inline-flex max-w-full min-w-0 flex-wrap items-center gap-2">
-                          <span class="version-hash font-mono text-sm font-semibold leading-5">
+                          <span class="version-hash text-sm leading-5">
                             {{ version.id }}
                           </span>
                           <span
@@ -661,6 +676,21 @@
                       </button>
 
                       <span
+                        v-else-if="column.key === 'traffic'"
+                        class="traffic-cell inline-flex min-w-0 max-w-full items-center"
+                        :data-testid="`version-list-data-view__row-${version.id}__traffic`"
+                        @mouseenter="showTrafficPopup($event, version)"
+                        @mouseleave="hideTrafficPopup"
+                      >
+                        <PrimeTag
+                          v-if="version.activeTraffic"
+                          severity="success"
+                          icon="pi pi-globe"
+                          value="Live"
+                        />
+                      </span>
+
+                      <span
                         v-else
                         class="cell-default"
                         :class="{ 'cursor-pointer hover:underline': isPrimaryColumn(column) }"
@@ -707,7 +737,7 @@
                       >
                         <template v-if="cardPrimaryColumn.key === 'version'">
                           <span class="inline-flex max-w-full min-w-0 flex-wrap items-center gap-2">
-                            <span class="version-hash font-mono text-sm font-semibold leading-5">
+                            <span class="version-hash text-sm">
                               {{ version.id }}
                             </span>
                             <span
@@ -803,6 +833,24 @@
                           >
                             {{ resolveReferenceCount(version) }}
                           </span>
+                          <template v-else-if="col.key === 'traffic'">
+                            <button
+                              v-if="version.activeTraffic"
+                              type="button"
+                              class="inline-flex items-center border-0 bg-transparent p-0"
+                              @mouseenter="showTrafficPopup($event, version)"
+                              @mouseleave="hideTrafficPopup"
+                              @click.stop="showTrafficPopup($event, version)"
+                            >
+                              <PrimeTag
+                                severity="success"
+                                icon="pi pi-circle-fill"
+                                value="Receiving traffic"
+                                rounded
+                                class="cursor-pointer"
+                              />
+                            </button>
+                          </template>
                           <span v-else>{{ resolveDisplayValue(version, col) }}</span>
                         </slot>
                       </div>
@@ -847,6 +895,43 @@
       :state="actionSheetVersion?.state"
       :items="rowMenuModel"
     />
+
+    <OverlayPanel
+      ref="trafficOverlayRef"
+      appendTo="body"
+      :pt="{ content: { style: 'padding: 10px' } }"
+    >
+      <div
+        class="flex min-w-[200px] max-w-[340px] flex-col gap-3"
+        data-testid="version-list-data-view__traffic-popup"
+      >
+        <span
+          class="text-xs font-semibold uppercase tracking-wide text-[var(--text-color-secondary)]"
+        >
+          Serving deployments
+        </span>
+        <ul class="flex flex-col gap-2">
+          <li
+            v-for="deployment in trafficPopupDeployments"
+            :key="deployment.id"
+            class="flex items-center gap-2"
+          >
+            <span
+              class="truncate text-sm font-medium text-[var(--text-color)]"
+              data-sentry-mask
+            >
+              {{ deployment.name || deployment.id }}
+            </span>
+            <span
+              v-if="deployment.policy"
+              class="shrink-0 rounded bg-[var(--surface-200)] px-1.5 py-0.5 text-[0.625rem] font-semibold uppercase leading-4 text-[var(--text-color-secondary)]"
+            >
+              {{ deployment.policy }}
+            </span>
+          </li>
+        </ul>
+      </div>
+    </OverlayPanel>
   </div>
 </template>
 

@@ -608,6 +608,7 @@
       </template>
       <template #emptyBlockButton>
         <PrimeButton
+          v-if="!isReadOnly"
           icon="pi pi-plus"
           severity="secondary"
           label="Rule"

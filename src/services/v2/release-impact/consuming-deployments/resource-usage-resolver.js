@@ -20,23 +20,8 @@
  */
 
 import { resourceUsageService as defaultResourceUsageService } from '@/services/v2/deployment/resource-usage-service'
-import { emptyResult, matchFieldFor, normalizeResources, resourceKey } from './contract'
-
-const sameId = (left, right) => left != null && right != null && String(left) === String(right)
-
-// A resource_usage row resource carries the active version in `resource_version`
-// (fall back to the other shapes the API has used so the match always pins a real id).
-const rowResourceVersion = (rowResource) =>
-  rowResource?.resource_version ??
-  rowResource?.version_id ??
-  rowResource?.resource_version_id ??
-  null
-
-// Does a resource_usage row resource match the requested ref? `application` by
-// `global_id`, others by `resource_id` (req 1.5) — the same rule as the fan-out.
-const matchesRow = (rowResource, ref) =>
-  rowResource?.resource_type === ref.resource_type &&
-  sameId(rowResource?.[matchFieldFor(ref)], ref.resource_id)
+import { emptyResult, normalizeResources, resourceKey } from './contract'
+import { matchesRow, rowResourceVersion } from './resource-usage-match'
 
 /**
  * Build the resource-usage resolver over the given tenant service.

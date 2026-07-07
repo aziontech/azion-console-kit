@@ -407,6 +407,117 @@ describe('composeResources — dedupes a dependency shared by two parents', () =
 })
 
 // ---------------------------------------------------------------------------
+// STRICT binding policy — each selected STRICT DS locks its binding set, so the
+// dependencies the new version dropped are retained PER DS (pinned byte-for-byte
+// at the active release's version) and shipped via composePayload().retainedByDs.
+// composeResources stays the DS-agnostic base. FLEXIBLE and scoped: nothing kept.
+// ---------------------------------------------------------------------------
+describe('retainedStrictResourcesByDs — STRICT retains dropped bindings per DS', () => {
+  const RETAINED_FN = {
+    resource_type: 'function',
+    resource_id: 'fn-old',
+    resource_name: 'legacy-fn',
+    resource_version: 'fn-old-v7'
+  }
+
+  const seedStrict = (store, { ids = ['ds-1'], deployments } = {}) => {
+    store.openRelease({ deploymentIds: ids })
+    store.setDeployments(deployments ?? [{ id: 'ds-1', binding_policy: 'STRICT' }])
+    store.setActiveReleaseByDs('ds-1', {
+      resources: [
+        {
+          resource_type: APPLICATION_TYPE,
+          global_id: 'app-1',
+          resource_id: 'app-1',
+          resource_version: 'app-v1'
+        },
+        { ...RETAINED_FN }
+      ]
+    })
+    store.setResName(APPLICATION_TYPE, 'app-1')
+    store.setResVer(APPLICATION_TYPE, 'app-v2')
+    store.setVersionsByResource(APPLICATION_TYPE, 'app-1', [{ value: 'app-v2', isCurrent: true }])
+  }
+
+  it('exposes the dropped binding keyed by DS', () => {
+    const store = useReleaseStore()
+    seedStrict(store)
+
+    expect(store.retainedStrictResourcesByDs).toEqual({ 'ds-1': [RETAINED_FN] })
+  })
+
+  it('keeps composeResources as the DS-agnostic base (no retained inlined)', () => {
+    const store = useReleaseStore()
+    seedStrict(store)
+
+    expect(store.composeResources().some((res) => res.resource_type === 'function')).toBe(false)
+  })
+
+  it('carries the retained binding through composePayload().retainedByDs', () => {
+    const store = useReleaseStore()
+    seedStrict(store)
+
+    const payload = store.composePayload()
+    expect(payload.scoped).toBe(false)
+    expect(payload.retainedByDs).toEqual({ 'ds-1': [RETAINED_FN] })
+  })
+
+  it('retains nothing for a FLEXIBLE DS', () => {
+    const store = useReleaseStore()
+    seedStrict(store, { deployments: [{ id: 'ds-1', binding_policy: 'FLEXIBLE' }] })
+
+    expect(store.retainedStrictResourcesByDs).toEqual({})
+  })
+
+  it('computes retained independently per selected DS', () => {
+    const store = useReleaseStore()
+    seedStrict(store, {
+      ids: ['ds-1', 'ds-2'],
+      deployments: [
+        { id: 'ds-1', binding_policy: 'STRICT' },
+        { id: 'ds-2', binding_policy: 'STRICT' }
+      ]
+    })
+    store.setActiveReleaseByDs('ds-2', {
+      resources: [
+        {
+          resource_type: APPLICATION_TYPE,
+          global_id: 'app-1',
+          resource_id: 'app-1',
+          resource_version: 'app-v1'
+        },
+        {
+          resource_type: 'connector',
+          resource_id: 'cn-old',
+          resource_name: 'old-conn',
+          resource_version: 'cn-v3'
+        }
+      ]
+    })
+
+    expect(store.retainedStrictResourcesByDs).toEqual({
+      'ds-1': [RETAINED_FN],
+      'ds-2': [
+        {
+          resource_type: 'connector',
+          resource_id: 'cn-old',
+          resource_name: 'old-conn',
+          resource_version: 'cn-v3'
+        }
+      ]
+    })
+  })
+
+  it('surfaces retained per DS in scoped mode too (scoped dispatch preserves them)', () => {
+    const store = useReleaseStore()
+    seedStrict(store)
+    store.scopedType = APPLICATION_TYPE
+
+    expect(store.retainedStrictResourcesByDs).toEqual({ 'ds-1': [RETAINED_FN] })
+  })
+})
+
+// ---------------------------------------------------------------------------
 // composePayload — DISCRIMINATED by entry context (task 17.1, req 5.6/5.7/5.8).
 // Non-scoped → the full composed `resources[]` (Scenario A, fanned out as one
 // body). Scoped → only the override intent `{ resource_type, resource_id,

@@ -6,6 +6,7 @@ import { useDialog } from '@aziontech/webkit/use-dialog'
 import { useToast } from '@aziontech/webkit/use-toast'
 import { useTableDefinitionsStore } from '@/stores/table-definitions'
 import { getCsvCellContentFromRowData } from '@/helpers'
+import { useVersionContext } from '@/composables/versioning/use-version-context'
 
 export function useDataTable(props, emit) {
   const router = useRouter()
@@ -13,6 +14,7 @@ export function useDataTable(props, emit) {
   const dialog = useDialog()
   const { openDeleteDialog } = useDeleteDialog()
   const tableDefinitions = useTableDefinitionsStore()
+  const { readOnly } = useVersionContext()
 
   // Reactive variables
   const isLoading = ref(!props.loadDisabled)
@@ -62,6 +64,7 @@ export function useDataTable(props, emit) {
 
   // Actions configuration (handle both plain arrays and computed refs)
   const resolvedActions = computed(() => {
+    if (readOnly.value) return []
     const actions = props.actions
     if (Array.isArray(actions)) return actions
     return actions?.value || []
@@ -706,6 +709,7 @@ export function useDataTable(props, emit) {
     savedSearch,
 
     // Computed properties
+    readOnly,
     isRenderActions,
     isRenderOneOption,
     hasExportToCsvMapper,

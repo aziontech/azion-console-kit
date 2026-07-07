@@ -49,3 +49,41 @@ describe('createVersionAdapter — referenceCount normalization', () => {
     expect(version.referenceCount).toBe(5)
   })
 })
+
+describe('createVersionAdapter — state normalization', () => {
+  it('reads meta.version_state when the flat version_state is null', () => {
+    const version = adapter.normalizeVersion({
+      id: 77155,
+      version_id: null,
+      version_state: null,
+      meta: { version_id: 'ATNI2BJ9', version_state: 'ready' }
+    })
+    expect(version.id).toBe('ATNI2BJ9')
+    expect(version.state).toBe('ready')
+  })
+
+  it('prefers meta.version_state over the flat keys', () => {
+    const version = adapter.normalizeVersion({
+      version_id: 'v1',
+      version_state: 'draft',
+      state: 'draft',
+      meta: { version_id: 'v1', version_state: 'ready' }
+    })
+    expect(version.state).toBe('ready')
+  })
+
+  it('falls back to the flat version_state, then state, when meta is absent', () => {
+    expect(adapter.normalizeVersion({ version_id: 'v1', version_state: 'building' }).state).toBe(
+      'building'
+    )
+    expect(adapter.normalizeVersion({ version_id: 'v1', state: 'ready' }).state).toBe('ready')
+  })
+
+  it('still honors meta.state for endpoints that expose it', () => {
+    const version = adapter.normalizeVersion({
+      version_id: 'v1',
+      meta: { version_id: 'v1', state: 'archived' }
+    })
+    expect(version.state).toBe('archived')
+  })
+})

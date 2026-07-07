@@ -164,6 +164,7 @@
   })
 
   const {
+    readOnly,
     isLoading,
     data,
     selectedColumns,
@@ -206,6 +207,14 @@
   // Computed
   const hasEmptyBlock = computed(() => {
     return !!slots.emptyBlock || !!(props.emptyBlock?.title || props.emptyBlock?.createPagePath)
+  })
+
+  const effectiveEmptyBlock = computed(() => {
+    if (!readOnly.value || !props.emptyBlock) return props.emptyBlock
+    const block = { ...props.emptyBlock }
+    delete block.createButtonLabel
+    delete block.createPagePath
+    return block
   })
 
   const hasAllowedFilters = computed(() => props.allowedFilters?.length > 0)
@@ -327,7 +336,7 @@
       :scrollHeight="scrollHeight"
       :reorderableRows="reorderableRows"
       :emptyListMessage="emptyListMessage"
-      :emptyBlock="emptyBlock"
+      :emptyBlock="effectiveEmptyBlock"
       :hasEmptyBlockSlot="!!slots.emptyBlock"
       :notShowEmptyBlock="!hasEmptyBlock"
       :rowClass="getRowClass"
@@ -534,7 +543,10 @@
       <template #emptyBlock>
         <slot name="emptyBlock" />
       </template>
-      <template #emptyBlockButton>
+      <template
+        #emptyBlockButton
+        v-if="!readOnly"
+      >
         <slot name="emptyBlockButton" />
       </template>
     </DataTable>

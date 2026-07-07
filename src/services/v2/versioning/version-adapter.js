@@ -35,7 +35,7 @@ export const createVersionAdapter = ({ normalizeConfig, mapResourceFields, mapMe
 
     const baseMeta = {
       id: meta?.version_id ?? raw.version_id ?? raw.id,
-      state: meta?.state ?? raw.version_state ?? raw.state,
+      state: meta?.version_state ?? meta?.state ?? raw.version_state ?? raw.state,
       version: meta?.version ?? raw.version ?? null,
       comment: meta?.description ?? raw.description ?? raw.comment ?? '',
       createdAt: meta?.created_at ?? raw.created_at ?? null,

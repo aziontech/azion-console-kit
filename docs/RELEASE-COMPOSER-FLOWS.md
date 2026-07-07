@@ -25,6 +25,7 @@ A view é **fina**: nenhum HTTP e nenhuma regra de negócio nela.
 | Impacto | `src/templates/release-composition/use-release-impact.js` + `src/services/v2/release-impact/release-impact-lookup-service.js` | Blast radius (DS → workloads/domains/environments) |
 | HOP 1 | `src/services/v2/release-impact/consuming-deployments/` | Recurso → Deployment Settings consumidores |
 | Dependências | `src/templates/release-composition/use-*-dependencies.js` / `use-*-version-ready.js` | Dependências descobertas da **versão** selecionada + prontidão da versão |
+| Retained (STRICT) | `src/templates/release-composition/retained-strict-bindings.js` + `components/RetainedBindingsNotice.vue` + `use-scoped-connector-attribution.js` | Bindings que um DS **STRICT** mantém quando a nova versão deixa de referenciá-los — computados **por DS** conforme o `binding_policy` de cada DS selecionado |
 
 ```mermaid
 flowchart LR
@@ -349,6 +350,10 @@ Pontos-chave do carregamento:
    `buildDsImpact` do composable agrega por environment. **Nunca fabrica números** (Property 8): sem seleção →
    painel neutro; carregando → loading (nunca pisca zeros); falha de fetch → "unavailable" com motivo
    (`fetch_failed` × `legacy_no_bindings`); zero real → mostrado como zero.
+6. **Retained STRICT (derivado, não é fetch)**: `retainedStrictResourcesByDs` é um getter puro sobre
+   `activeReleaseByDs` × composição efetiva × `binding_policy` de cada DS — recomputa reativamente a cada troca de
+   versão/DS. O único fetch acessório é o **manifesto de conectores do pai scoped**, disparado **lazy e por DS** só
+   quando há conector retido (`use-scoped-connector-attribution.js`). Detalhes em "Retained by policy (STRICT)".
 
 ---
 
@@ -397,21 +402,26 @@ Pontos-chave do carregamento:
 | Versão inicial do card | A versão da URL (pinada) | `LATEST` | `LATEST` | `LATEST` |
 | HOP 1 (consuming DSs) | **Sim**, no mount | Não | Não | Não |
 | Payload de dispatch | **Scoped: preserve & swap por DS** | Compartilhado: 1 payload → N DSs | Compartilhado | Compartilhado |
+| Retained STRICT (payload) | Implícito (preserve & swap) | `retainedByDs` (merge por DS) | `retainedByDs` | `retainedByDs` |
+| Retained STRICT (notice) | **Filtrado** ao escopo | Todos os retidos | Todos os retidos | Todos os retidos |
 | CTA "Compose first release" | Sim (DS sem release ativa) | — | — | — |
 | Grupo `needsFirstRelease` | Sim, não-selecionável | — | — (tudo em `available`) | — (tudo em `available`) |
 | Aviso da tela | "Only the `<tipo>` version below changes…" | "…reaches every environment that uses it" | "Workload bound to N DSs — one per environment" | (genérico) |
 
 ### Dispatch — os dois caminhos do `buildAndActivate`
 
-O `composePayload()` do store é **puro e discriminado** por `scoped` (`release.js:614-659`); o composable é a única
-camada que despacha (`use-release-composition.js:555-781`):
+O `composePayload()` do store é **puro e discriminado** por `scoped` (`release.js:676-722`); o composable é a única
+camada que despacha (`use-release-composition.js:754-929`). O caminho **não-scoped** deixou de ser "um payload
+único DS-agnóstico": a base é DS-agnóstica, mas cada DS recebe seus próprios **bindings retidos por política STRICT**
+(`retainedByDs[id]`) mesclados no corpo — ver "Retained by policy (STRICT)" abaixo.
 
 ```mermaid
 flowchart TD
     A["Deploy release (confirmado)"] --> B{"payload.scoped?"}
 
-    B -->|"não (A/workload/global)"| C["transformBuildAndActivatePayload<br/>UM payload DS-agnóstico<br/>(application re-keyed p/ global_id)"]
-    C --> D["fan-out: POST build_and_activate<br/>para CADA DS (allSettled, sem retry)"]
+    B -->|"não (A/workload/global)"| C["base DS-agnóstica: resources[]<br/>+ retainedByDs (mapa por DS)<br/>(application re-keyed p/ global_id)"]
+    C --> C2["por DS: merge dos bindings STRICT retidos<br/>[...resources, ...retained[id]]<br/>→ transformBuildAndActivatePayload<br/>(DS sem retidos → base inalterada)"]
+    C2 --> D["fan-out: POST build_and_activate<br/>para CADA DS (allSettled, sem retry)"]
 
     B -->|"sim (from-resource)"| E{"override.version<br/>resolvida?"}
     E -->|"não"| F["TODOS os DSs marcados<br/>skipReason=unresolved_version<br/>(nunca posta version_id null)"]
@@ -425,6 +435,107 @@ flowchart TD
     D --> L["por DS: 202 + trace_id<br/>ou erro (422 43007 = limite versioned URLs)"]
     L --> M["toast por DS +<br/>navega p/ releases do 1º sucesso"]
 ```
+
+## Retained by policy (STRICT) — bindings preservados por DS
+
+Um Deployment Settings carrega **duas** políticas independentes (não confundir):
+
+- **`deployment_policy`** (`single` × `versioned_urls`) — governa os 5 casos do `deployCtx` (versão travada × nova
+  release a cada deploy).
+- **`binding_policy`** (`STRICT` × `FLEXIBLE`) — governa **quais recursos podem entrar/sair** da composição. Um DS
+  **STRICT** trava o conjunto de bindings: os recursos vinculados na sua **primeira release** permanecem vinculados em
+  **toda** release seguinte. O produto **não** oferece unlock STRICT→FLEXIBLE — a única saída é criar um **novo
+  Deployment Settings** e reapontar os workloads (CTA "Create new Deployment Settings").
+
+**A verificação** (`retained-strict-bindings.js` → `retainedStrictBindings`): para cada DS selecionado, compara a
+**release ativa** do DS (`activeReleaseByDs[id].resources`) com a **composição efetiva** desta release
+(`composedResourceRefs`). Um recurso que está na release ativa mas **não** na composição nova é um *retained binding*
+— um DS STRICT **não pode largá-lo**, então ele é **mantido na versão atual** (`resource_version` da release ativa,
+byte-a-byte). Regras do cômputo:
+
+- Retorna **`[]`** se `binding_policy !== 'STRICT'` (FLEXIBLE não retém nada) ou se o DS não tem release ativa.
+- **Nunca** retém o singleton `application` (é sempre o recurso composto/trocado, jamais "largado").
+- Ignora entradas sem o campo de match (`resource_id`/`global_id`) e **deduplica** por `resourceKey`.
+- A versão preservada vem de `resource_version ?? version_id ?? resource_version_id`.
+
+**`composedResourceRefs`** (store, `release.js:231`) é o conjunto "o que esta release compõe explicitamente":
+
+- **não-scoped** (A / workload / global) → a composição completa (`composeResources()`);
+- **scoped** (Cenário B) → **só** o singleton scoped + as dependências que ele mesmo edita (todo o resto da release
+  ativa é preservado byte-a-byte pelo *preserve & swap*, então não entra em `composedResourceRefs`).
+
+O getter **`retainedStrictResourcesByDs`** (`release.js:246`) roda o cômputo **por DS selecionado** (lendo o
+`binding_policy` de cada um) e devolve `{ [dsId]: retained[] }` (só DSs com retidos aparecem).
+
+### Como entra no payload / dispatch
+
+| Caminho | Onde os retidos entram |
+|---|---|
+| **não-scoped** (A/workload/global) | `composePayload()` inclui `retainedByDs`; o dispatch (`buildAndActivateShared`) mescla `[...resources, ...retained[id]]` **por DS** antes de transformar o payload. DS sem retidos → base inalterada. |
+| **scoped** (Cenário B) | **Não** usa `retainedByDs`: o *preserve & swap* já lê a release ativa de cada DS e preserva tudo que não é o recurso scoped byte-a-byte, então os retidos são mantidos implicitamente. |
+
+> O guard de `resource_version: null` (skip-all `unresolved_version`) roda **antes** do merge dos retidos — retidos
+> nunca reintroduzem uma versão não resolvida.
+
+### Como aparece na tela
+
+- **`RetainedBindingsNotice.vue`** — painel "Retained by policy (STRICT)" **abaixo do picker de DS**, com um grupo
+  **colapsável por DS**, listando cada recurso retido (ícone, label, nome, versão) e o CTA **"Create new Deployment
+  Settings"** (`onCreateNewDeployment` → rota `deployments-create`).
+- **Diálogo de confirmação** — linha "`N` resource(s) kept by strict policy" (`retainedCount`), somando os retidos de
+  todos os grupos, para o usuário saber que o deploy preserva recursos que a versão nova não referencia.
+
+### Filtragem scoped-aware do que é mostrado
+
+O que é **retido no payload** é sempre o conjunto completo (correção do dado); o que é **mostrado no notice** depende
+do cenário, via `showAllRetained` (`ReleaseComposerView.vue:931`):
+
+- `showAllRetained = !isScoped || isFromWorkload || isFromDeployment` → nos fluxos **não-scoped** o notice mostra
+  **todos** os retidos.
+- No fluxo **scoped** (Cenário B), como a composição só toca o tipo scoped + suas deps, só faz sentido explicar ao
+  usuário os retidos **relacionados** àquele escopo. `filterScopedRetained` (`retained-strict-bindings.js`) filtra:
+  - por **`relatedTypes`** = `{ scopedType, ...OWNED_COLLECTIONS[scopedType] }` (tipos que o escopo possui);
+  - **`function`** — só mantém funções cujo `executionEnvironment` **é igual** ao `scopedType`
+    (`functionBelongsToScope`); exec-env desconhecido → **descartada**. A origem do `executionEnvironment` é o
+    catálogo (`resource-catalog-registry.js` passou a expor esse campo → `functionExecutionEnvironmentFor`);
+  - **`connector`** — só mantém conectores presentes no **manifesto do pai scoped** (um conector pode ser referenciado
+    por `application` **ou** `custom_page`; só é "do escopo" se a versão ativa do pai o referencia). A atribuição vem
+    de `use-scoped-connector-attribution.js` (`ownedConnectorIdsFor`). Enquanto essa atribuição está **carregando ou
+    falhou** (retorna `null`), o conector é **escondido** do notice (nunca exibe atribuição incerta).
+
+**`use-scoped-connector-attribution.js`** é **lazy e por DS**: só dispara quando o escopo possui conector
+**e** aquele DS tem um conector retido — busca o manifesto de conectores da **versão ativa do pai** naquele DS
+(`rulesEngineService.listConnectorDependenciesByVersion` p/ application; `customPageVersionService.…` p/ custom_page),
+cacheado por `${scopedType}:${parentId}:${versionId}` e com erro isolado por DS. DSs sem conector retido nunca
+disparam a request.
+
+```mermaid
+flowchart TD
+    A["Composição efetiva muda<br/>(composedResourceRefs)"] --> B["por DS selecionado"]
+    B --> C{"binding_policy === STRICT<br/>E tem release ativa?"}
+    C -->|"não (FLEXIBLE / sem release)"| Z["retained = [] (nada retido)"]
+    C -->|"sim"| D["diff: release ativa − composição<br/>(ignora application; dedup)"]
+    D --> E["retainedStrictResourcesByDs[dsId]"]
+
+    E --> P{"cenário scoped?"}
+    P -->|"não (A/workload/global)"| P1["payload: retainedByDs<br/>merge [...resources, ...retained[id]] por DS"]
+    P -->|"sim (Cenário B)"| P2["preserve & swap já preserva<br/>tudo byte-a-byte (sem retainedByDs)"]
+
+    E --> Q{"mostrar no notice?"}
+    Q -->|"não-scoped (showAll)"| Q1["mostra TODOS os retidos"]
+    Q -->|"scoped"| Q2["filterScopedRetained:<br/>relatedTypes + function(exec-env)<br/>+ connector(manifesto do pai, lazy)"]
+    Q1 --> R["RetainedBindingsNotice (grupo por DS)<br/>+ contagem no diálogo de confirmação"]
+    Q2 --> R
+```
+
+### Regra por fluxo
+
+| Fluxo | Retido no payload | Mostrado no notice |
+|---|---|---|
+| `from-resource` (B) | Implícito (preserve & swap) | **Filtrado** ao escopo (tipo scoped + deps relacionadas; function por exec-env, connector por manifesto do pai) |
+| `from-deployment` (A) | `retainedByDs` (merge por DS) | **Todos** os retidos do DS |
+| `from-workload` | `retainedByDs` (merge por DS) | **Todos** os retidos, por DS |
+| `global` | `retainedByDs` (merge por DS) | **Todos** os retidos, por DS |
 
 ## Dependências por tipo de recurso
 

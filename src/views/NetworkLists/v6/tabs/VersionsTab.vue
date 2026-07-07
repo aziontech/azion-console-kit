@@ -12,6 +12,8 @@
 
   import { networkListVersionService } from '@/services/v2/network-lists/network-list-version-service'
   import { useVersionList } from '@/composables/versioning/use-version-list'
+  import { useActiveVersions } from '@/composables/versioning/use-active-versions'
+  import { getVersionListColumns } from '@/composables/versioning/version-list-columns'
   import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
 
   defineOptions({ name: 'network-lists-v6-versions-tab' })
@@ -32,14 +34,18 @@
   const versionsQuery = networkListVersionService.useListVersionsQuery(networkListId.value)
   const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
 
-  const { items, searchTerm, filterValues, sort, filters, sortOptions } =
-    useVersionList(rawVersions)
+  const resourceRef = computed(() => ({
+    resourceType: 'network_list',
+    resourceId: networkListId.value
+  }))
+  const { activeVersions, refresh: refreshActiveVersions } = useActiveVersions(resourceRef)
 
-  const columns = [
-    { key: 'version', label: 'Version', size: 'minmax(220px, 1.4fr)' },
-    { key: 'status', label: 'Status', size: 'minmax(140px, 0.8fr)' },
-    { key: 'created', label: 'Created by', size: 'minmax(180px, 1.2fr)' }
-  ]
+  const { items, searchTerm, filterValues, sort, filters, sortOptions } = useVersionList(
+    rawVersions,
+    { activeVersions }
+  )
+
+  const columns = getVersionListColumns()
 
   const goToVersion = (versionIdOrObject) => {
     const id = typeof versionIdOrObject === 'string' ? versionIdOrObject : versionIdOrObject?.id
@@ -67,7 +73,10 @@
     versionService: networkListVersionService,
     router,
     openPromoteDrawer: menuHost.openPromoteDrawer,
-    onSuccess: () => versionsQuery.refetch?.()
+    onSuccess: () => {
+      versionsQuery.refetch?.()
+      refreshActiveVersions()
+    }
   })
 
   const createDraft = async () => {

@@ -45,18 +45,29 @@ const COMPARATORS = {
  * @param {object} [options]
  * @param {string[]} [options.searchableFields] Fields the search term matches against.
  * @param {string} [options.defaultSort] Initial sort value (a `COMPARATORS` key).
+ * @param {import('vue').MaybeRefOrGetter<Map<string, {deployments: Array<object>}>>} [options.activeVersions]
+ *   Lookup of versions currently serving traffic, keyed by `version.id`. When
+ *   present, each item is enriched with `activeTraffic` for the traffic column.
  */
 export function useVersionList(rawVersions, options = {}) {
-  const { searchableFields = ['id', 'state', 'comment'], defaultSort = 'lastModified-desc' } =
-    options
+  const {
+    searchableFields = ['id', 'state', 'comment'],
+    defaultSort = 'lastModified-desc',
+    activeVersions
+  } = options
 
   const searchTerm = ref('')
-  const filterValues = ref({ state: null })
+  const filterValues = ref({ state: null, traffic: null })
   const sort = ref(defaultSort)
 
   const statusOptions = [
     { label: 'All Status', value: null },
     ...Object.values(VERSION_STATES).map((value) => ({ label: STATE_LABELS[value], value }))
+  ]
+
+  const trafficOptions = [
+    { label: 'All Traffic', value: null },
+    { label: 'Receiving traffic', value: 'active' }
   ]
 
   const sortOptions = [
@@ -65,22 +76,42 @@ export function useVersionList(rawVersions, options = {}) {
     { label: 'Status', value: 'state-asc' }
   ]
 
-  const filters = computed(() => [
-    {
-      key: 'state',
-      options: statusOptions,
-      placeholder: 'All Status',
-      defaultValue: null
+  const filters = computed(() => {
+    const base = [
+      {
+        key: 'state',
+        options: statusOptions,
+        placeholder: 'All Status',
+        defaultValue: null
+      }
+    ]
+
+    const active = toValue(activeVersions)
+    if (active instanceof Map && active.size > 0) {
+      base.push({
+        key: 'traffic',
+        options: trafficOptions,
+        placeholder: 'All Traffic',
+        defaultValue: null
+      })
     }
-  ])
+
+    return base
+  })
 
   const items = computed(() => {
     const source = toValue(rawVersions) ?? []
     const term = searchTerm.value.trim().toLowerCase()
     const stateFilter = filterValues.value.state
+    const trafficFilter = filterValues.value.traffic
+    const active = toValue(activeVersions)
+    const activeMap = active instanceof Map ? active : null
+
+    const isReceivingTraffic = (version) => !!activeMap && activeMap.has(String(version.id))
 
     const filtered = source.filter((version) => {
       if (stateFilter && version.state !== stateFilter) return false
+      if (trafficFilter === 'active' && !isReceivingTraffic(version)) return false
       if (!term) return true
       const haystack = searchableFields
         .map((field) => version[field])
@@ -92,7 +123,14 @@ export function useVersionList(rawVersions, options = {}) {
 
     const comparator =
       COMPARATORS[sort.value] || COMPARATORS[defaultSort] || COMPARATORS['lastModified-desc']
-    return [...filtered].sort(comparator)
+    const sorted = [...filtered].sort(comparator)
+
+    if (!activeMap || activeMap.size === 0) return sorted
+
+    return sorted.map((version) => {
+      const entry = activeMap.get(String(version.id))
+      return { ...version, activeTraffic: entry ? { deployments: entry.deployments } : null }
+    })
   })
 
   return {

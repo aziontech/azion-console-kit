@@ -29,6 +29,8 @@
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
   import { useVersionList } from '@/composables/versioning/use-version-list'
+  import { useActiveVersions } from '@/composables/versioning/use-active-versions'
+  import { getVersionListColumns } from '@/composables/versioning/version-list-columns'
   import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
 
   defineOptions({ name: 'application-v6-edit-view' })
@@ -65,14 +67,18 @@
   const versionsQuery = edgeAppVersionService.useListVersionsQuery(edgeApplicationId.value)
   const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
 
-  const { items, searchTerm, filterValues, sort, filters, sortOptions } =
-    useVersionList(rawVersions)
+  const resourceRef = computed(() => ({
+    resourceType: 'application',
+    resourceId: edgeApplicationId.value
+  }))
+  const { activeVersions, refresh: refreshActiveVersions } = useActiveVersions(resourceRef)
 
-  const columns = [
-    { key: 'version', label: 'Version', size: 'minmax(220px, 1.4fr)' },
-    { key: 'status', label: 'Status', size: 'minmax(140px, 0.8fr)' },
-    { key: 'created', label: 'Created by', size: 'minmax(180px, 1.2fr)' }
-  ]
+  const { items, searchTerm, filterValues, sort, filters, sortOptions } = useVersionList(
+    rawVersions,
+    { activeVersions }
+  )
+
+  const columns = getVersionListColumns()
 
   const goToVersion = (versionIdOrObject) => {
     const id = typeof versionIdOrObject === 'string' ? versionIdOrObject : versionIdOrObject?.id
@@ -127,7 +133,10 @@
     versionService: edgeAppVersionService,
     router,
     openPromoteDrawer: openPromoteRelease,
-    onSuccess: () => versionsQuery.refetch?.()
+    onSuccess: () => {
+      versionsQuery.refetch?.()
+      refreshActiveVersions()
+    }
   })
 
   const isCreatingDraft = ref(false)

@@ -27,6 +27,7 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block/index.vue'
   import ReleaseCompositionTree from '@/templates/release-composition/components/ReleaseCompositionTree.vue'
+  import RetainedBindingsNotice from '@/templates/release-composition/components/RetainedBindingsNotice.vue'
   import DeploymentSettingsPicker from '@/templates/release-composition/components/DeploymentSettingsPicker.vue'
   import CanaryStrategyField from '@/templates/release-composition/components/CanaryStrategyField.vue'
   import ImpactPanel from '@/templates/release-composition/components/ImpactPanel.vue'
@@ -36,6 +37,8 @@
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { LATEST_READY } from '@/templates/release-composition/version-options'
   import { useReleaseComposition } from '@/templates/release-composition/use-release-composition'
+  import { filterScopedRetained } from '@/templates/release-composition/retained-strict-bindings'
+  import { useScopedConnectorAttribution } from '@/templates/release-composition/use-scoped-connector-attribution'
   import { useReleaseDeployProgress } from '@/templates/release-composition/use-release-deploy-progress'
   import { classifyDeploymentsForResource } from '@/templates/release-composition/classify-deployments-for-resource'
   import {
@@ -218,6 +221,13 @@
     resolveConsumingDeployments
   })
 
+  // Scoped connector attribution: for a scoped release whose parent owns
+  // connectors (application/custom_page), a retained connector is only truly the
+  // scope's if the parent's ACTIVE version binds it. Resolved lazily per DS from
+  // the parent's active-version connector manifest (functions use the in-memory
+  // catalog's execution_environment instead — no request).
+  const connectorAttribution = useScopedConnectorAttribution()
+
   // The application id the composition is built around: the explicit Application
   // pick first, else the scoped entry id when the screen is scoped to an
   // application version, else the application pinned by the effective DS's active
@@ -244,12 +254,14 @@
   // The version pinned for a resource type by the effective DS's active release —
   // the fallback used when the user hasn't picked a version and no catalog version
   // has resolved yet.
-  const activeReleaseVersionFor = (type) => {
-    const match = (activeReleaseByDs.value[effDsId.value]?.resources ?? []).find(
+  const activeReleaseVersionForDs = (dsId, type) => {
+    const match = (activeReleaseByDs.value[dsId]?.resources ?? []).find(
       (resource) => resource?.resource_type === type
     )
     return match?.version_id ?? match?.resource_version_id ?? match?.resource_version ?? null
   }
+
+  const activeReleaseVersionFor = (type) => activeReleaseVersionForDs(effDsId.value, type)
 
   // The version whose dependencies each singleton exposes. Dependencies are always
   // discovered from the VERSION being released, and it is REACTIVE to the user's
@@ -773,16 +785,6 @@
   const versionGateLabel = computed(() =>
     scopedType.value && scopedType.value !== 'application' ? scopedLabel.value : 'Application'
   )
-  const selectedDsCount = computed(() => deploymentIds.value.length)
-  const compositionIntro = computed(() => {
-    if (isFromDeployment.value) {
-      return deploymentName.value
-        ? `Publishing a new release to ${deploymentName.value}`
-        : 'Publishing a new release'
-    }
-    const label = isScoped.value ? scopedLabel.value : 'resources'
-    return `Publishing ${label} to ${selectedDsCount.value} Deployment Settings`
-  })
 
   // The notice under the intro: Scenario B names the single scoped resource that
   // changes; Scenario A states the release reaches every environment of the
@@ -916,6 +918,106 @@
     })
   })
 
+  const showAllRetained = computed(
+    () => !isScoped.value || isFromWorkload.value || isFromDeployment.value
+  )
+
+  const scopedRelatedTypes = computed(() => {
+    const type = scopedType.value
+    if (!type) return null
+    return new Set([type, ...(OWNED_COLLECTIONS[type] ?? [])])
+  })
+
+  const scopedOwnsConnector = computed(() =>
+    Boolean(scopedType.value && OWNED_COLLECTIONS[scopedType.value]?.includes('connector'))
+  )
+
+  const scopedParentId = computed(() =>
+    scopedType.value ? (resNames.value[scopedType.value] ?? store.resourceId ?? null) : null
+  )
+
+  // Lazy per-DS connector attribution: only when a scoped, connector-owning release
+  // actually has a retained connector for a DS do we fetch that DS's parent
+  // active-version connector manifest. DSs without a retained connector never fire.
+  watch(
+    () =>
+      !showAllRetained.value && scopedOwnsConnector.value
+        ? Object.entries(store.retainedStrictResourcesByDs)
+            .filter(([, resources]) =>
+              (resources ?? []).some((resource) => resource?.resource_type === 'connector')
+            )
+            .map(([dsId]) => `${dsId}:${activeReleaseVersionForDs(dsId, scopedType.value) ?? ''}`)
+            .join('|')
+        : '',
+    () => {
+      if (showAllRetained.value || !scopedOwnsConnector.value) return
+      const parentId = scopedParentId.value
+      Object.entries(store.retainedStrictResourcesByDs).forEach(([dsId, resources]) => {
+        const hasConnector = (resources ?? []).some(
+          (resource) => resource?.resource_type === 'connector'
+        )
+        if (!hasConnector) return
+        connectorAttribution.ensure(dsId, {
+          scopedType: scopedType.value,
+          parentId,
+          versionId: activeReleaseVersionForDs(dsId, scopedType.value)
+        })
+      })
+    },
+    { immediate: true }
+  )
+
+  const retainedGroups = computed(() => {
+    const byDs = store.retainedStrictResourcesByDs
+    const relatedTypes = scopedRelatedTypes.value
+    const showAll = showAllRetained.value
+    return Object.keys(byDs)
+      .map((dsId) => {
+        const deployment = store.deployments.find((item) => String(item?.id) === String(dsId))
+        const resources = filterScopedRetained({
+          resources: byDs[dsId],
+          relatedTypes,
+          scopedType: scopedType.value,
+          showAll,
+          functionExecEnvFor: composition.functionExecutionEnvironmentFor,
+          ownedConnectorIdsFor: () => connectorAttribution.ownedConnectorIdsFor(dsId)
+        }).map((resource) => {
+          const nameMatch = composition
+            .catalogOptionsFor(resource.resource_type)
+            .find((option) => String(option.value) === String(resource.resource_id))
+          return {
+            type: resource.resource_type,
+            id: resource.resource_id,
+            label: labelFor(resource.resource_type),
+            icon: resolveResourceMeta(resource.resource_type).icon,
+            name: nameMatch?.label ?? resource.resource_name ?? String(resource.resource_id),
+            version: resource.resource_version ?? 'current'
+          }
+        })
+        return { dsId, dsName: deployment?.name || dsId, resources }
+      })
+      .filter((group) => group.resources.length > 0)
+  })
+
+  const retainedCount = computed(() =>
+    retainedGroups.value.reduce((total, group) => total + group.resources.length, 0)
+  )
+
+  const showDeploymentSettingsCard = computed(
+    () => !isFromDeployment.value || retainedGroups.value.length > 0 || showComposition.value
+  )
+
+  watch(
+    () =>
+      Object.values(store.retainedStrictResourcesByDs)
+        .flat()
+        .map((resource) => resource.resource_type),
+    (types) => {
+      ;[...new Set(types)].forEach((type) => composition.loadCatalog(type))
+    },
+    { immediate: true }
+  )
+
   // Load the dependency-collection catalogs (function/connector, waf/network_list)
   // for parents whose dependencies are visible — the Application is always
   // required, the optional singletons load their dependencies once enabled. The
@@ -942,6 +1044,8 @@
   const onTreeResource = ({ type, value }) => store.setResName(type, value)
   const onTreeVersion = ({ type, value }) => store.setResVer(type, value)
   const toggleOptional = (type) => store.toggleResource(type)
+
+  const onCreateNewDeployment = () => router.push({ name: 'deployments-create' })
 
   const onToggleGroup = ({ type, group }) => store.toggleCollOpen(type, group)
   const onInstanceResource = ({ type, group, id, value }) =>
@@ -1280,150 +1384,168 @@
         class="release-composer__grid grid gap-[var(--spacing-5)]"
         data-testid="release-composition__grid"
       >
-        <section
-          class="flex flex-col overflow-hidden rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)]"
-          data-testid="release-composition__composition-card"
-        >
-          <div
-            class="flex items-center gap-[var(--spacing-2)] border-b border-[var(--surface-border)] px-[var(--spacing-4)] py-[var(--spacing-3)]"
+        <div class="flex min-w-0 flex-col gap-[var(--spacing-5)]">
+          <section
+            class="flex flex-col overflow-hidden rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)]"
+            data-testid="release-composition__composition-card"
           >
-            <span
-              class="inline-flex h-[var(--spacing-7)] w-[var(--spacing-7)] items-center justify-center rounded-[var(--shape-elements)] bg-[var(--surface-100)] text-[var(--text-color-secondary)]"
-            >
-              <i class="pi pi-sitemap" />
-            </span>
-            <h2 class="text-body-lg font-semibold text-[var(--text-color)]">Composition</h2>
-          </div>
-
-          <div class="flex flex-col gap-[var(--spacing-6)] p-[var(--spacing-4)]">
             <div
-              v-if="showComposition"
-              class="order-1 flex flex-col gap-[var(--spacing-3)]"
-              data-testid="release-composition__composition"
+              class="flex items-center gap-[var(--spacing-2)] border-b border-[var(--surface-border)] px-[var(--spacing-4)] py-[var(--spacing-3)]"
             >
-              <span class="text-overline-xs text-[var(--text-color-secondary)]">
-                Release composition
+              <span
+                class="inline-flex h-[var(--spacing-7)] w-[var(--spacing-7)] items-center justify-center rounded-[var(--shape-elements)] text-[var(--text-color-secondary)]"
+              >
+                <i class="pi pi-sitemap" />
               </span>
-              <div class="flex items-center gap-[var(--spacing-2)]">
-                <span
-                  class="inline-flex h-[var(--spacing-6)] w-[var(--spacing-6)] items-center justify-center rounded-[var(--shape-elements)] bg-[var(--surface-100)] text-[var(--text-color-secondary)]"
-                >
-                  <i class="pi pi-sitemap" />
-                </span>
-                <span
-                  class="text-body-lg font-semibold text-[var(--text-color)]"
-                  data-testid="release-composition__intro"
-                >
-                  {{ compositionIntro }}
-                </span>
-              </div>
-
-              <div
-                class="flex items-start gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-50)] px-[var(--spacing-4)] py-[var(--spacing-3)]"
-                data-testid="release-composition__scoped-notice"
-              >
-                <i
-                  class="pi pi-info-circle mt-[var(--spacing-1)] text-[var(--text-color-secondary)]"
-                />
-                <span class="text-body-sm text-[var(--text-color-secondary)]">
-                  <template v-if="isFromDeployment">
-                    This release applies to
-                    <strong class="font-semibold text-[var(--text-color)]">{{
-                      deploymentName || 'this deployment'
-                    }}</strong>
-                    and reaches every environment that uses it — review the impact on the right
-                    before activating.
-                  </template>
-                  <template v-else-if="isFromWorkload">
-                    This Workload is bound to
-                    <strong class="font-semibold text-[var(--text-color)]">{{
-                      workloadCandidateDsIds.length
-                    }}</strong>
-                    Deployment Settings — one per environment. The release goes live on each
-                    selected one; deselect any you want to skip and review the impact on the right.
-                  </template>
-                  <template v-else>
-                    Only the
-                    <strong class="font-semibold text-[var(--text-color)]">{{
-                      noticeLabel
-                    }}</strong>
-                    version below changes. Every selected Deployment Settings keeps its own
-                    composition and policy — each gets a new Release with just this resource
-                    swapped.
-                  </template>
-                </span>
-              </div>
-
-              <div
-                v-if="dependenciesLoading"
-                class="flex items-center gap-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
-                data-testid="release-composition__dependencies-loading"
-              >
-                <i class="pi pi-spinner pi-spin" />
-                <span>Detecting Functions and Connectors used by this Application…</span>
-              </div>
-
-              <div
-                v-else-if="dependenciesError"
-                class="flex flex-col gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-50)] px-[var(--spacing-4)] py-[var(--spacing-3)]"
-                data-testid="release-composition__dependencies-error"
-              >
-                <span
-                  class="flex items-center gap-[var(--spacing-2)] text-body-sm text-[var(--text-color-secondary)]"
-                >
-                  <i class="pi pi-exclamation-triangle text-[var(--warning-contrast)]" />
-                  Couldn't detect the dependencies used by this Application.
-                </span>
-                <PrimeButton
-                  label="Retry"
-                  icon="pi pi-refresh"
-                  severity="secondary"
-                  size="small"
-                  class="self-start"
-                  data-testid="release-composition__dependencies-retry"
-                  @click="retryDependencies"
-                />
-              </div>
-
-              <ReleaseCompositionTree
-                :resources="resources"
-                @toggle="toggleOptional"
-                @update:resource="onTreeResource"
-                @update:version="onTreeVersion"
-                @toggle-group="onToggleGroup"
-                @add-instance="onAddInstance"
-                @update:instance-resource="onInstanceResource"
-                @update:instance-version="onInstanceVersion"
-                @remove-instance="onRemoveInstance"
-              />
+              <h2 class="text-body-lg font-semibold text-[var(--text-color)]">Composition</h2>
             </div>
 
-            <!-- The Deployment Settings picker sits directly below the composition
-                 (never the opening element; req 4.5 / NRS §1.4). Canary rollout
-                 follows it as the final, optional strategy section. `order-2/3` +
-                 source order keep this arrangement regardless of which sibling
-                 sections render. -->
-            <DeploymentSettingsPicker
-              v-if="!isFromDeployment"
-              class="order-2"
-              :groups="deploymentGroups"
-              :model-value="deploymentIds"
-              :query="dsQuery"
-              :is-loading-meta="impact.isLoading.value"
-              @update:model-value="onPickDs"
-              @update:query="dsQuery = $event"
-              @bind-environment="onBindEnvironment"
-              @group-action="onGroupAction"
-            />
+            <div class="flex flex-col gap-[var(--spacing-6)] p-[var(--spacing-4)]">
+              <div
+                v-if="showComposition"
+                class="flex flex-col gap-[var(--spacing-3)]"
+                data-testid="release-composition__composition"
+              >
+                <div
+                  class="flex items-start gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-50)] px-[var(--spacing-4)] py-[var(--spacing-3)]"
+                  data-testid="release-composition__scoped-notice"
+                >
+                  <i
+                    class="pi pi-info-circle mt-[var(--spacing-1)] text-[var(--text-color-secondary)]"
+                  />
+                  <span class="text-body-sm text-[var(--text-color-secondary)]">
+                    <template v-if="isFromDeployment">
+                      This release applies to
+                      <strong class="font-semibold text-[var(--text-color)]">{{
+                        deploymentName || 'this deployment'
+                      }}</strong>
+                      and reaches every environment that uses it — review the impact on the right
+                      before activating.
+                    </template>
+                    <template v-else-if="isFromWorkload">
+                      This Workload is bound to
+                      <strong class="font-semibold text-[var(--text-color)]">{{
+                        workloadCandidateDsIds.length
+                      }}</strong>
+                      Deployment Settings — one per environment. The release goes live on each
+                      selected one; deselect any you want to skip and review the impact on the
+                      right.
+                    </template>
+                    <template v-else>
+                      Only the
+                      <strong class="font-semibold text-[var(--text-color)]">{{
+                        noticeLabel
+                      }}</strong>
+                      version below changes. Every selected Deployment Settings keeps its own
+                      composition and policy — each gets a new Release with just this resource
+                      swapped.
+                    </template>
+                  </span>
+                </div>
 
-            <CanaryStrategyField
-              v-if="showComposition"
-              class="order-3 border-t border-[var(--surface-border)] pt-[var(--spacing-6)]"
-              @update:enabled="onCanaryEnabled"
-              @update:form="onCanaryForm"
-            />
-          </div>
-        </section>
+                <div
+                  v-if="dependenciesLoading"
+                  class="flex items-center gap-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
+                  data-testid="release-composition__dependencies-loading"
+                >
+                  <i class="pi pi-spinner pi-spin" />
+                  <span>Detecting Functions and Connectors used by this Application…</span>
+                </div>
+
+                <div
+                  v-else-if="dependenciesError"
+                  class="flex flex-col gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-50)] px-[var(--spacing-4)] py-[var(--spacing-3)]"
+                  data-testid="release-composition__dependencies-error"
+                >
+                  <span
+                    class="flex items-center gap-[var(--spacing-2)] text-body-sm text-[var(--text-color-secondary)]"
+                  >
+                    <i class="pi pi-exclamation-triangle text-[var(--warning-contrast)]" />
+                    Couldn't detect the dependencies used by this Application.
+                  </span>
+                  <PrimeButton
+                    label="Retry"
+                    icon="pi pi-refresh"
+                    severity="secondary"
+                    size="small"
+                    class="self-start"
+                    data-testid="release-composition__dependencies-retry"
+                    @click="retryDependencies"
+                  />
+                </div>
+
+                <ReleaseCompositionTree
+                  :resources="resources"
+                  @toggle="toggleOptional"
+                  @update:resource="onTreeResource"
+                  @update:version="onTreeVersion"
+                  @toggle-group="onToggleGroup"
+                  @add-instance="onAddInstance"
+                  @update:instance-resource="onInstanceResource"
+                  @update:instance-version="onInstanceVersion"
+                  @remove-instance="onRemoveInstance"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section
+            v-if="showDeploymentSettingsCard"
+            class="flex flex-col overflow-hidden rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)]"
+            data-testid="release-composition__deployment-settings-card"
+          >
+            <div
+              class="flex items-center gap-[var(--spacing-2)] border-b border-[var(--surface-border)] px-[var(--spacing-4)] py-[var(--spacing-3)]"
+            >
+              <span
+                class="inline-flex h-[var(--spacing-7)] w-[var(--spacing-7)] items-center justify-center rounded-[var(--shape-elements)] text-[var(--text-color-secondary)]"
+              >
+                <i class="pi pi-cog" />
+              </span>
+              <h2 class="text-body-lg font-semibold text-[var(--text-color)]">
+                Deployment Settings
+              </h2>
+            </div>
+
+            <div class="flex flex-col gap-[var(--spacing-6)] p-[var(--spacing-4)]">
+              <DeploymentSettingsPicker
+                v-if="!isFromDeployment"
+                :groups="deploymentGroups"
+                :model-value="deploymentIds"
+                :query="dsQuery"
+                :is-loading-meta="impact.isLoading.value"
+                @update:model-value="onPickDs"
+                @update:query="dsQuery = $event"
+                @bind-environment="onBindEnvironment"
+                @group-action="onGroupAction"
+              />
+
+              <Transition name="retained-collapse">
+                <div
+                  v-if="retainedGroups.length"
+                  class="retained-collapse"
+                >
+                  <div class="retained-collapse__inner">
+                    <RetainedBindingsNotice
+                      :groups="retainedGroups"
+                      @create-new-deployment="onCreateNewDeployment"
+                    />
+                  </div>
+                </div>
+              </Transition>
+
+              <CanaryStrategyField
+                v-if="showComposition"
+                :class="[
+                  (!isFromDeployment || retainedGroups.length) &&
+                    'border-t border-[var(--surface-border)] pt-[var(--spacing-6)]'
+                ]"
+                @update:enabled="onCanaryEnabled"
+                @update:form="onCanaryForm"
+              />
+            </div>
+          </section>
+        </div>
 
         <section
           class="release-composer__impact flex flex-col self-start overflow-hidden rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)]"
@@ -1550,6 +1672,14 @@
     >
       {{ impactSummary }}
     </p>
+    <p
+      v-if="retainedCount"
+      class="mt-[var(--spacing-2)] flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
+      data-testid="release-composition__confirm-retained"
+    >
+      <i class="pi pi-lock" />
+      {{ retainedCount }} resource{{ retainedCount === 1 ? '' : 's' }} kept by strict policy.
+    </p>
     <template #footer>
       <div class="flex items-center justify-end gap-[var(--spacing-3)]">
         <PrimeButton
@@ -1584,6 +1714,35 @@
 </template>
 
 <style scoped>
+  .retained-collapse-enter-active,
+  .retained-collapse-leave-active {
+    display: grid;
+    grid-template-rows: 1fr;
+    overflow: hidden;
+    transition:
+      grid-template-rows 0.25s ease,
+      opacity 0.25s ease;
+  }
+
+  .retained-collapse-enter-from,
+  .retained-collapse-leave-to {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+
+  .retained-collapse-enter-active .retained-collapse__inner,
+  .retained-collapse-leave-active .retained-collapse__inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .retained-collapse-enter-active,
+    .retained-collapse-leave-active {
+      transition: none;
+    }
+  }
+
   .release-composer__grid {
     grid-template-columns: minmax(0, 1fr) minmax(var(--container-xs), var(--container-md));
   }

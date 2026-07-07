@@ -51,7 +51,7 @@ export class ResourceUsageService extends BaseService {
         params?.page ?? 1
       ],
       () => this.#fetchList(params),
-      { persist: true }
+      { persist: true, skipCache: params?.skipCache }
     )
 }
 

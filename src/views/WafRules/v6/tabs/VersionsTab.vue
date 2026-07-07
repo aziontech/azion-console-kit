@@ -16,6 +16,8 @@
 
   import { wafVersionService } from '@/services/v2/waf/waf-version-service'
   import { useVersionList } from '@/composables/versioning/use-version-list'
+  import { useActiveVersions } from '@/composables/versioning/use-active-versions'
+  import { getVersionListColumns } from '@/composables/versioning/version-list-columns'
   import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
 
   defineOptions({ name: 'waf-v6-versions-tab' })
@@ -36,14 +38,15 @@
   const versionsQuery = wafVersionService.useListVersionsQuery(wafId.value)
   const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
 
-  const { items, searchTerm, filterValues, sort, filters, sortOptions } =
-    useVersionList(rawVersions)
+  const resourceRef = computed(() => ({ resourceType: 'waf', resourceId: wafId.value }))
+  const { activeVersions, refresh: refreshActiveVersions } = useActiveVersions(resourceRef)
 
-  const columns = [
-    { key: 'version', label: 'Version', size: 'minmax(220px, 1.4fr)' },
-    { key: 'status', label: 'Status', size: 'minmax(140px, 0.8fr)' },
-    { key: 'created', label: 'Created by', size: 'minmax(180px, 1.2fr)' }
-  ]
+  const { items, searchTerm, filterValues, sort, filters, sortOptions } = useVersionList(
+    rawVersions,
+    { activeVersions }
+  )
+
+  const columns = getVersionListColumns()
 
   const goToVersion = (versionIdOrObject) => {
     const id = typeof versionIdOrObject === 'string' ? versionIdOrObject : versionIdOrObject?.id
@@ -68,7 +71,10 @@
     versionService: wafVersionService,
     router,
     openPromoteDrawer: menuHost.openPromoteDrawer,
-    onSuccess: () => versionsQuery.refetch?.()
+    onSuccess: () => {
+      versionsQuery.refetch?.()
+      refreshActiveVersions()
+    }
   })
 
   const createDraft = async () => {

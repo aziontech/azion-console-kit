@@ -23,7 +23,11 @@ const VERSIONS_PAGE_SIZE = 100
 
 const toName = (name) => (name && typeof name === 'object' ? (name.text ?? '') : (name ?? ''))
 
-const toCatalogItem = (resource) => ({ id: resource.id, name: toName(resource.name) })
+const toCatalogItem = (resource) => ({
+  id: resource.id,
+  name: toName(resource.name),
+  executionEnvironment: resource.executionEnvironment ?? null
+})
 
 const fromBody = (result) => (Array.isArray(result?.body) ? result.body : []).map(toCatalogItem)
 
