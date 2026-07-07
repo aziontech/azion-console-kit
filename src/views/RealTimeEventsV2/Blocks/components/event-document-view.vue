@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, watch, nextTick } from 'vue'
+  import { ref, computed, watch, nextTick, getCurrentInstance } from 'vue'
   import TabView from '@aziontech/webkit/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import PrimeButton from '@aziontech/webkit/button'
@@ -15,14 +15,6 @@
       type: Object,
       required: true
     },
-    onAddFilter: {
-      type: Function,
-      default: null
-    },
-    onExcludeFilter: {
-      type: Function,
-      default: null
-    },
     isLoading: {
       type: Boolean,
       default: false
@@ -37,7 +29,14 @@
     }
   })
 
-  const emit = defineEmits(['notify', 'reset-scroll'])
+  const emit = defineEmits(['notify', 'reset-scroll', 'add-filter', 'exclude-filter'])
+
+  // Render the add/exclude filter buttons only when the parent actually listens
+  // (C1): mirrors the former onAddFilter/onExcludeFilter function-prop gating.
+  // Listeners are static, so a one-shot read of the bound handlers is exact.
+  const instance = getCurrentInstance()
+  const canAddFilter = computed(() => Boolean(instance?.vnode.props?.onAddFilter))
+  const canExcludeFilter = computed(() => Boolean(instance?.vnode.props?.onExcludeFilter))
   const activeTab = ref(0)
   const fieldSearch = ref('')
 
@@ -100,17 +99,9 @@
     })
   }
 
-  const handleAddFilter = (key, value) => {
-    if (props.onAddFilter) {
-      props.onAddFilter(key, value)
-    }
-  }
+  const handleAddFilter = (key, value) => emit('add-filter', key, value)
 
-  const handleExcludeFilter = (key, value) => {
-    if (props.onExcludeFilter) {
-      props.onExcludeFilter(key, value)
-    }
-  }
+  const handleExcludeFilter = (key, value) => emit('exclude-filter', key, value)
 
   const formatDisplayValue = (value) => {
     if (value === null || value === undefined) return '-'
@@ -126,13 +117,19 @@
   }
 
   const { onValueMouseDown, onValueMouseUp, onValueClick } = useClickToFilter({
-    onAdd: (key, value) => handleAddFilter(key, value),
-    onExclude: (key, value) => handleExcludeFilter(key, value)
+    onAdd: (key, value) => emit('add-filter', key, value),
+    onExclude: (key, value) => emit('exclude-filter', key, value)
   })
 
   const clearSearch = () => {
     fieldSearch.value = ''
   }
+
+  // C8: single expression replacing the former nested class ternary. Expanded
+  // only when a non-compact caller opts in via growJsonToFit; otherwise compact.
+  const jsonPreClass = computed(() =>
+    !props.compact && props.growJsonToFit ? 'json-pre--expanded' : 'json-pre--compact'
+  )
 </script>
 
 <template>
@@ -257,7 +254,7 @@
                 >{{ formatDisplayValue(entry.value)
                 }}<span class="doc-compact__actions">
                   <PrimeButton
-                    v-if="onAddFilter && isValidValue(entry.value)"
+                    v-if="canAddFilter && isValidValue(entry.value)"
                     icon="pi pi-plus-circle"
                     text
                     size="small"
@@ -267,7 +264,7 @@
                     data-testid="event-document-add-filter"
                   />
                   <PrimeButton
-                    v-if="onExcludeFilter && isValidValue(entry.value)"
+                    v-if="canExcludeFilter && isValidValue(entry.value)"
                     icon="pi pi-minus-circle"
                     text
                     size="small"
@@ -336,7 +333,7 @@
               >
               <span class="doc-list__actions">
                 <PrimeButton
-                  v-if="onAddFilter && isValidValue(entry.value)"
+                  v-if="canAddFilter && isValidValue(entry.value)"
                   icon="pi pi-plus-circle"
                   text
                   size="small"
@@ -346,7 +343,7 @@
                   data-testid="event-document-add-filter"
                 />
                 <PrimeButton
-                  v-if="onExcludeFilter && isValidValue(entry.value)"
+                  v-if="canExcludeFilter && isValidValue(entry.value)"
                   icon="pi pi-minus-circle"
                   text
                   size="small"
@@ -382,14 +379,8 @@
             data-testid="event-document-copy-json"
           />
           <pre
-            class="json-pre p-4 text-xs text-color surface-ground rounded-md overflow-x-auto leading-5"
-            :class="
-              compact
-                ? 'json-pre--compact'
-                : growJsonToFit
-                  ? 'json-pre--expanded'
-                  : 'json-pre--compact'
-            "
+            class="json-pre p-4 text-xs text-color surface-ground rounded-[var(--border-radius)] overflow-x-auto leading-5"
+            :class="jsonPreClass"
             data-testid="event-document-json"
             >{{ jsonDocument }}</pre
           >
@@ -401,7 +392,6 @@
 
 <style scoped>
   .event-document-view {
-    --rte-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
     border: 1px solid var(--surface-border);
     border-radius: var(--border-radius);
     overflow: hidden;
@@ -478,7 +468,7 @@
   }
 
   .doc-search__count {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.7rem;
     color: var(--text-color-secondary);
     white-space: nowrap;
@@ -532,10 +522,10 @@
   }
 
   .doc-list__key {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.7rem;
     font-weight: 600;
-    color: var(--series-one-color, #fba86f);
+    color: var(--series-one-color);
     user-select: all;
     white-space: nowrap;
     letter-spacing: 0.01em;
@@ -556,7 +546,7 @@
   }
 
   .doc-list__value {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.7rem;
     line-height: 1;
     color: var(--text-color);
@@ -636,10 +626,10 @@
   }
 
   .doc-compact__key {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.7rem;
     font-weight: 600;
-    color: var(--series-one-color, #fba86f);
+    color: var(--series-one-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -649,7 +639,7 @@
   }
 
   .doc-compact__value {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.7rem;
     line-height: 1.4;
     color: var(--text-color);
@@ -701,7 +691,7 @@
     justify-content: flex-start;
     gap: 0.25rem;
     padding: 0.35rem 0.75rem;
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.65rem;
     color: var(--text-color-secondary);
     border-top: 1px solid var(--surface-border);
@@ -716,7 +706,7 @@
 
   /* ── JSON pre block ─────────────────────────────────────────── */
   .json-pre {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
   }
 
   .json-pre--compact {

@@ -7,7 +7,7 @@
 // the whole builder along.
 // ────────────────────────────────────────────────────────────────────────────
 
-import { formatInTimezone, DAY, MIN } from '../useChartBucketing'
+import { formatInTimezone, DAY, MIN } from '../../utils/chart-bucketing'
 
 export function formatBytes(bytes) {
   if (bytes === 0) return '0 B'

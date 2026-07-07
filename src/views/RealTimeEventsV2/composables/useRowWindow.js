@@ -1,4 +1,5 @@
 import { ref, computed, unref, watch } from 'vue'
+import { rowKey } from './utils/row-key'
 
 /**
  * `useRowWindow` — variable-height row windower for the virtualized table
@@ -22,7 +23,8 @@ import { ref, computed, unref, watch } from 'vue'
  * @param {number} [options.overscan=6]
  *   Fixed number of extra rows rendered above AND below the visible range.
  * @param {(row: Row) => (string | number)} [options.keyOf]
- *   Stable identity of a row (defaults to `row.id`).
+ *   Stable identity of a row (defaults to the shared `rowKey`: `row.id` else
+ *   object identity).
  * @param {(row: Row) => boolean} [options.expandedKey]
  *   Whether a row currently shows its inline expansion band (adds its measured
  *   expansion height to the row's total). Defaults to always-false.
@@ -51,7 +53,7 @@ export function useRowWindow({
   viewportHeight = () => 0,
   estimatedRowHeight = 44,
   overscan = 6,
-  keyOf = (row) => row?.id,
+  keyOf = rowKey,
   expandedKey = () => false,
   resetToken = () => 0,
   onAnchorAdjust = () => {}

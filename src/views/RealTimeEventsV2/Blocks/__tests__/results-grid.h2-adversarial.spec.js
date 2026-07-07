@@ -66,7 +66,7 @@ const mountTable = (props = {}) =>
         EmptyResultsBlock: { template: '<div class="empty-stub"><slot /></div>' },
         EventDocumentView: {
           name: 'EventDocumentView',
-          props: ['data', 'onAddFilter', 'onExcludeFilter', 'isLoading', 'compact'],
+          props: ['data', 'isLoading', 'compact'],
           template: '<div class="edv-stub" />'
         },
         LogFieldBadges: {

@@ -218,16 +218,15 @@ export function useChartConfig({
   }
 
   // Reload the active metrics chart when the shared filter's time range or AQL
-  // fields change. Guarded by an active metrics selection so the events-only
-  // path stays untouched. No `immediate`: the `selectedMetricsDashboard` watch
-  // above already covers the initial load when a view is picked.
+  // fields change. Guarded by an active metrics selection; no `immediate` since
+  // the `selectedMetricsDashboard` watch covers the initial load. No `deep`:
+  // `tsRange`/`fields` are replaced by identity, so their refs are enough.
   watch(
     () => [filterData.value?.tsRange, filterData.value?.fields],
     () => {
       if (!selectedMetricsDashboard.value) return
       reloadActiveMetrics()
-    },
-    { deep: true }
+    }
   )
 
   // ── Brush select (zoom into time range) ──

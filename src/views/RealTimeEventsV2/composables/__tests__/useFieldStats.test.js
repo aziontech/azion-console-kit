@@ -186,4 +186,31 @@ describe('useFieldStats', () => {
       expect(fieldStats.value).toEqual({})
     })
   })
+
+  describe('fieldStats — resetToken', () => {
+    it('rebuilds stats on token bump for a same-length dataset replacement', async () => {
+      const data = ref([makeRow({ status: '200' }), makeRow({ status: '200' })])
+      const resetToken = ref(0)
+      const { fieldStats } = useFieldStats({
+        data,
+        availableFields: ref(defaultFields),
+        searchQuery: ref(''),
+        selectedFields: ref([]),
+        resetToken
+      })
+      await nextTick()
+      expect(fieldStats.value.status.topValues[0].value).toBe('200')
+
+      // Same-length replacement: the length-watch does not fire, so the shrink
+      // heuristic misses it and stats stay stale until the token bumps.
+      data.value = [makeRow({ status: '500' }), makeRow({ status: '500' })]
+      await nextTick()
+      expect(fieldStats.value.status.topValues[0].value).toBe('200')
+
+      resetToken.value += 1
+      await nextTick()
+      expect(fieldStats.value.status.topValues[0].value).toBe('500')
+      expect(fieldStats.value.status.total).toBe(2)
+    })
+  })
 })

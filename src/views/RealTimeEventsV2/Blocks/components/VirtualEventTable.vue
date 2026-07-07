@@ -16,19 +16,20 @@
   import LogFieldBadges from './log-field-badges.vue'
   import { useRowWindow } from '../../composables/useRowWindow.js'
   import { useOverflowMeasure } from '../../composables/useOverflowMeasure.js'
+  import { useRowHeightObserver } from '../../composables/useRowHeightObserver.js'
+  import { useColumnResize } from '../../composables/useColumnResize.js'
   import {
     distributeColumnWidths,
     minColumnWidth,
     COLUMN_CLASS_WIDTHS
   } from '../../composables/column-sizing.js'
 
-  defineOptions({ name: 'DiscoverDataTable' })
+  defineOptions({ name: 'VirtualEventTable' })
 
   /**
-   * `VirtualEventTable` — virtualized replacement for `discover-data-table.vue`
-   * (§12.1), owning its own `<table>` since PrimeVue can't virtualize variable-
-   * height rows, while reusing webkit chrome. DROP-IN: props/emits/expose are
-   * byte-identical. Adds windowing (P1/req 1.1), ts sort, resize, inline expansion.
+   * `VirtualEventTable` — virtualized event table owning its own `<table>` since
+   * PrimeVue can't virtualize variable-height rows, while reusing webkit chrome.
+   * Adds windowing (P1/req 1.1), ts sort, column resize and inline expansion.
    */
   const props = defineProps({
     data: { type: Array, default: () => [] },
@@ -37,12 +38,9 @@
     detailViewMode: { type: String, default: 'inline' },
     isLoading: { type: Boolean, default: false },
     isDetailLoading: { type: Boolean, default: false },
-    exportFilename: { type: String, default: 'logs' },
-    exportFunction: { type: Function, default: undefined },
     // The authoritative CSV export command (parent's `useExportData.exportCsv`,
-    // re-fetches the LOGICAL range ≤ EXPORT_MAX_ROWS). The exposed `exportCSV` shim
-    // delegates here so the drop-in contract stays byte-identical (design §2.1(9)/
-    // §3.3, task 3.7). Undefined by legacy/unit callers → the shim is a safe no-op.
+    // re-fetches the LOGICAL range ≤ EXPORT_MAX_ROWS). Kept on the public surface
+    // for the parent binding; the table itself no longer routes export.
     exportCsv: { type: Function, default: undefined },
     rowClass: { type: Function, default: undefined },
     debouncedSearchQuery: { type: String, default: '' },
@@ -52,9 +50,8 @@
     getFieldValue: { type: Function, required: true },
     // The SINGLE data-reset signal (design §2.1(4)/§12.2): the parent passes
     // `dataset.resetToken`, which bumps on a fresh/shorter set, and the window
-    // consumes THAT (not a table-local length heuristic). Undefined by legacy/unit
-    // callers → the table falls back to its own length-shrink heuristic.
-    resetToken: { type: Number, default: undefined }
+    // consumes THAT. Defaults to 0 for unit callers that don't wire a token.
+    resetToken: { type: Number, default: 0 }
   })
 
   const emit = defineEmits([
@@ -161,26 +158,15 @@
 
   // The window's reset signal is the SUM of two resets folded into one monotonic
   // token (design §2.1(4)/§12.2): (1) DATA reset — a fresh/shorter set, owned by
-  // the dataset's `resetToken` (legacy callers fall back to a length-shrink
-  // heuristic); (2) SORT reset — a client-side reorder. Growth must NOT reset.
+  // the dataset's `resetToken`; (2) SORT reset — a client-side reorder. Growth
+  // must NOT reset.
   const dataResetToken = ref(0)
-  let previousLength = props.data.length
   watch(
     () => props.resetToken,
     (current, previous) => {
-      // Wired path: mirror every dataset bump into the window's data-reset.
+      // Mirror every dataset bump into the window's data-reset.
       if (current !== previous) dataResetToken.value += 1
     }
-  )
-  watch(
-    () => (props.data || []).length,
-    (length) => {
-      // Fallback path only: when the parent owns the reset via `resetToken`, the
-      // dataset already signalled it; don't double-count off the length here.
-      if (props.resetToken === undefined && length < previousLength) dataResetToken.value += 1
-      previousLength = length
-    },
-    { flush: 'sync' }
   )
 
   // Sorting re-orders the logical set: drop measured heights so re-materialized
@@ -196,8 +182,6 @@
     logicalRows,
     scrollTop,
     viewportHeight,
-    estimatedRowHeight: 44,
-    overscan: 6,
     keyOf: (row) => row?.id,
     expandedKey: (row) => props.detailViewMode === 'inline' && isRowExpandedById(row),
     resetToken: windowResetToken,
@@ -212,20 +196,17 @@
     scrollParentRef
   })
 
-  // Bind a Document-column row's badge container to the single observer. Only
-  // matters when the Document column exists (selectedFields empty). Passing null
-  // (recycle/unmount) unregisters the row.
-  const setBadgeContainer = (rowId, el) => {
-    // Clean up unconditionally when the ref detaches (row/column unmounted): the
-    // old code returned early on !hasDocumentColumn BEFORE unobserving, so
-    // toggling the Document column off stranded detached badge DOM in the observer
-    // + elByKey (fix L3). unobserveRow is a safe no-op for unknown keys.
-    if (!el) {
+  // Bind a Document-column row's LogFieldBadges container to the single observer,
+  // reading the child's exposed `containerEl` (C2 — no more inline querySelector).
+  // Detach (unmount/recycle) unconditionally unobserves so toggling the Document
+  // column off never strands detached badge DOM in the observer (fix L3).
+  const bindBadgeContainer = (rowId, instance) => {
+    if (!instance) {
       unobserveRow(rowId)
       return
     }
     if (!hasDocumentColumn.value) return
-    observeRow(rowId, el)
+    observeRow(rowId, instance.containerEl ?? null)
   }
 
   // ── Viewport measurement (scroll + resize) ──────────────────────────────────
@@ -283,138 +264,65 @@
   onBeforeUnmount(releaseViewportObserver)
   onDeactivated(releaseViewportObserver)
 
-  // ── Row height measurement (from RO on each mounted <tr>) ───────────────────
-  const rowRefEls = new Map() // rowId -> { base: el, expansion: el|null }
-  const rowIdByEl = new WeakMap() // el -> rowId (O(1) reverse lookup for the RO)
-  let rowHeightObserver = null
+  // ── Row height measurement (single shared RO on each mounted <tr>) ──────────
+  const { setRowBaseEl, setRowExpansionEl, readAllRowHeights } = useRowHeightObserver({
+    measureRow
+  })
 
-  const readRowHeights = (rowId) => {
-    const entry = rowRefEls.get(rowId)
-    if (!entry) return
-    if (entry.base) measureRow(rowId, entry.base.getBoundingClientRect().height)
-    if (entry.expansion) {
-      measureRow(rowId, entry.expansion.getBoundingClientRect().height, { expansion: true })
+  // ── Stable per-row callbacks (C2) ───────────────────────────────────────────
+  // Emit forwarders + ref factories are created ONCE per rowId (memoized in a
+  // Map) so children (LogFieldBadges/EventDocumentView) and Vue's ref system see
+  // a constant identity across re-renders — no tear-down/re-bind churn per frame.
+  // Vue invokes a ref with null on unmount, so entries self-evict when the row
+  // leaves the window.
+  const forwardAddFilter = (field, value) => emit('add-filter', field, value)
+  const forwardExcludeFilter = (field, value) => emit('exclude-filter', field, value)
+
+  const memoRef = (cache, key, make) => {
+    let fn = cache.get(key)
+    if (!fn) {
+      fn = make(key)
+      cache.set(key, fn)
     }
+    return fn
   }
+  const baseRowRefs = new Map()
+  const expansionRowRefs = new Map()
+  const badgeRefs = new Map()
 
-  const setRowEl = (rowId, kind, el) => {
-    if (rowId == null) return
-    let entry = rowRefEls.get(rowId)
-    if (el) {
-      if (!entry) {
-        entry = { base: null, expansion: null }
-        rowRefEls.set(rowId, entry)
-      }
-      // The inline :ref fires on every re-render with the SAME element; short-
-      // circuit so we don't re-observe and re-schedule a measure each render
-      // (fix C8 — kills the per-render nextTick(readRowHeights) churn).
-      if (entry[kind] === el) return
-      entry[kind] = el
-      rowIdByEl.set(el, rowId)
-      rowHeightObserver?.observe(el)
-      nextTick(() => readRowHeights(rowId))
-    } else if (entry) {
-      const prev = entry[kind]
-      if (prev) {
-        rowHeightObserver?.unobserve(prev)
-        rowIdByEl.delete(prev)
-      }
-      entry[kind] = null
-      if (!entry.base && !entry.expansion) rowRefEls.delete(rowId)
-    }
-  }
-
-  const setRowBaseEl = (rowId) => (el) => setRowEl(rowId, 'base', el)
-  const setRowExpansionEl = (rowId) => (el) => setRowEl(rowId, 'expansion', el)
-
-  const acquireRowHeightObserver = () => {
-    if (typeof ResizeObserver === 'undefined') return
-    // Idempotent: never stack observers. Under <KeepAlive> the initial mount fires
-    // BOTH onMounted AND onActivated (runs twice); without release-first the first
-    // observer is orphaned and leaks one RO per instance across tab churn. Mirrors
-    // acquireViewportObserver's release-first pattern.
-    releaseRowHeightObserver()
-    rowHeightObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const rowId = rowIdByEl.get(entry.target)
-        if (rowId !== undefined) readRowHeights(rowId)
+  const baseRowRef = (key) =>
+    memoRef(baseRowRefs, key, (rowId) => {
+      const bind = setRowBaseEl(rowId)
+      return (el) => {
+        bind(el)
+        if (el === null) baseRowRefs.delete(rowId)
       }
     })
-    // Re-observe any rows registered before/around acquire (keep-alive restore).
-    for (const refs of rowRefEls.values()) {
-      if (refs.base) rowHeightObserver.observe(refs.base)
-      if (refs.expansion) rowHeightObserver.observe(refs.expansion)
-    }
-  }
-
-  const releaseRowHeightObserver = () => {
-    rowHeightObserver?.disconnect()
-    rowHeightObserver = null
-  }
-
-  onMounted(acquireRowHeightObserver)
-  onActivated(acquireRowHeightObserver)
-  onBeforeUnmount(releaseRowHeightObserver)
-  onDeactivated(releaseRowHeightObserver)
+  const expansionRowRef = (key) =>
+    memoRef(expansionRowRefs, key, (rowId) => {
+      const bind = setRowExpansionEl(rowId)
+      return (el) => {
+        bind(el)
+        if (el === null) expansionRowRefs.delete(rowId)
+      }
+    })
+  const badgeContainerRef = (key) =>
+    memoRef(badgeRefs, key, (rowId) => (instance) => {
+      bindBadgeContainer(rowId, instance)
+      if (instance === null) badgeRefs.delete(rowId)
+    })
 
   // ── Column resize (mirror columnResizeMode="expand") ────────────────────────
-  let resizeState = null
-  let resizeRaf = 0
-
-  // Apply the pending width from the latest mousemove — one width write per frame.
-  const applyPendingWidth = () => {
-    resizeRaf = 0
-    if (!resizeState || resizeState.pending == null) return
-    const next = resizeState.pending
-    if (resizeState.target === 'time') timeWidth.value = next
-    else fieldWidths.value = { ...fieldWidths.value, [resizeState.target]: next }
-  }
-
-  const cancelResizeRaf = () => {
-    if (resizeRaf) cancelAnimationFrame(resizeRaf)
-    resizeRaf = 0
-  }
-
-  const startResize = (event, target) => {
-    event.preventDefault()
-    const startX = event.clientX
-    const startWidth = target === 'time' ? timeWidth.value : columnWidthOf(target)
-    resizeState = { target, startX, startWidth, pending: null }
-    window.addEventListener('mousemove', onResizeMove)
-    window.addEventListener('mouseup', endResize)
-  }
-
-  // Coalesce raw mousemove into a single rAF write — a per-event width write
-  // forces a full table re-render on every mouse tick.
-  const onResizeMove = (event) => {
-    if (!resizeState) return
-    const delta = event.clientX - resizeState.startX
-    resizeState.pending = Math.max(60, resizeState.startWidth + delta)
-    if (!resizeRaf) resizeRaf = requestAnimationFrame(applyPendingWidth)
-  }
-
-  const endResize = () => {
-    window.removeEventListener('mousemove', onResizeMove)
-    window.removeEventListener('mouseup', endResize)
-    // Flush the last pending width BEFORE remeasuring so heights reflect it.
-    cancelResizeRaf()
-    applyPendingWidth()
-    resizeState = null
-    // Widths changed → row heights may reflow; drop measured heights so rows
-    // re-measure against the new column widths (mirrors §12.2 forceRemeasure).
-    forceRemeasure()
-    nextTick(() => {
-      for (const rowId of rowRefEls.keys()) readRowHeights(rowId)
-    })
-  }
-
-  onBeforeUnmount(() => {
-    cancelResizeRaf()
-    if (resizeState) endResize()
-  })
-  onDeactivated(() => {
-    cancelResizeRaf()
-    if (resizeState) endResize()
+  // On resize end drop measured heights so rows re-measure against the new column
+  // widths (mirrors §12.2 forceRemeasure), then re-read every registered row.
+  const { startResize } = useColumnResize({
+    timeWidth,
+    fieldWidths,
+    columnWidthOf,
+    onResizeEnd: () => {
+      forceRemeasure()
+      nextTick(() => readAllRowHeights())
+    }
   })
 
   // ── Row interaction ─────────────────────────────────────────────────────────
@@ -428,24 +336,6 @@
   // the hovered cell (2×fields×rows always-mounted buttons otherwise). The
   // reserved-width wrapper keeps row heights stable on hover.
   const hoveredCellKey = ref(null)
-
-  // ── Export shim (delegates to the parent's useExportData via exportFunction) ─
-  // The virtual table has no PrimeVue instance, so export runs over the LOGICAL
-  // range in the parent's `useExportData`. Keeps the exposed SHAPE byte-identical:
-  // a STABLE `dataTableRef` shim + top-level `exportCSV` delegate (§2.1(9)/§3.3).
-  const exportCSVShim = () => {
-    // Delegate to the parent's authoritative CSV command (logical range ≤
-    // EXPORT_MAX_ROWS). When no delegate is injected (legacy/unit callers) this
-    // is a safe no-op, honoring the exposed contract without throwing.
-    const result = props.exportCsv?.()
-    // exportCsv is async; swallow rejection so the menu command never leaks.
-    if (result && typeof result.catch === 'function') result.catch(() => {})
-    return result
-  }
-  const dataTableRef = ref({ exportCSV: exportCSVShim })
-  const exportCSV = () => dataTableRef.value?.exportCSV?.()
-
-  defineExpose({ dataTableRef, exportCSV })
 </script>
 
 <template>
@@ -549,7 +439,7 @@
             :key="item.key"
           >
             <tr
-              :ref="setRowBaseEl(item.key)"
+              :ref="baseRowRef(item.key)"
               data-testid="table-body-row"
               :data-row-id="item.key"
               class="virtual-body-row"
@@ -582,72 +472,58 @@
                   @mouseenter="hoveredCellKey = item.key + ':' + fieldName"
                   @mouseleave="hoveredCellKey = null"
                 >
-                  <span
-                    class="dynamic-field-value"
-                    :title="getFieldValue(item.row, dynamicFieldKey(fieldName))"
-                    v-html="highlightText(getFieldValue(item.row, dynamicFieldKey(fieldName)))"
-                  />
-                  <span class="dynamic-field-actions">
-                    <template v-if="hoveredCellKey === item.key + ':' + fieldName">
-                      <PrimeButton
-                        icon="pi pi-filter"
-                        text
-                        size="small"
-                        class="!w-5 !h-5 !p-0"
-                        @click.stop="
-                          emit(
-                            'add-filter',
-                            fieldName,
-                            getFieldValue(item.row, dynamicFieldKey(fieldName))
-                          )
-                        "
-                      />
-                      <PrimeButton
-                        icon="pi pi-filter-slash"
-                        text
-                        size="small"
-                        class="!w-5 !h-5 !p-0"
-                        @click.stop="
-                          emit(
-                            'exclude-filter',
-                            fieldName,
-                            getFieldValue(item.row, dynamicFieldKey(fieldName))
-                          )
-                        "
-                      />
-                    </template>
-                  </span>
+                  <!-- Resolve the cell value ONCE per render (C2) via a 1-item
+                       v-for local, reused by title/v-html and both emit handlers. -->
+                  <template
+                    v-for="cellValue in [getFieldValue(item.row, dynamicFieldKey(fieldName))]"
+                    :key="cellValue"
+                  >
+                    <span
+                      class="dynamic-field-value"
+                      :title="cellValue"
+                      v-html="highlightText(cellValue)"
+                    />
+                    <span class="dynamic-field-actions">
+                      <template v-if="hoveredCellKey === item.key + ':' + fieldName">
+                        <PrimeButton
+                          icon="pi pi-filter"
+                          text
+                          size="small"
+                          class="!w-5 !h-5 !p-0"
+                          @click.stop="emit('add-filter', fieldName, cellValue)"
+                        />
+                        <PrimeButton
+                          icon="pi pi-filter-slash"
+                          text
+                          size="small"
+                          class="!w-5 !h-5 !p-0"
+                          @click.stop="emit('exclude-filter', fieldName, cellValue)"
+                        />
+                      </template>
+                    </span>
+                  </template>
                 </span>
               </td>
               <td
                 v-if="hasDocumentColumn"
                 class="col-document"
               >
-                <div
-                  :ref="
-                    (el) =>
-                      setBadgeContainer(
-                        item.key,
-                        el?.querySelector('.log-badges-container') || null
-                      )
-                  "
-                >
-                  <LogFieldBadges
-                    :summary="item.row.summary"
-                    :highlightFields="selectedFields"
-                    :searchQuery="debouncedSearchQuery"
-                    :dataset="dataset"
-                    :hiddenCount="hiddenCountFor(item.key)"
-                    @toggle-expand="emit('select-row', item.row)"
-                    @add-filter="(f, v) => emit('add-filter', f, v)"
-                    @exclude-filter="(f, v) => emit('exclude-filter', f, v)"
-                  />
-                </div>
+                <LogFieldBadges
+                  :ref="badgeContainerRef(item.key)"
+                  :summary="item.row.summary"
+                  :highlightFields="selectedFields"
+                  :searchQuery="debouncedSearchQuery"
+                  :dataset="dataset"
+                  :hiddenCount="hiddenCountFor(item.key)"
+                  @toggle-expand="emit('select-row', item.row)"
+                  @add-filter="forwardAddFilter"
+                  @exclude-filter="forwardExcludeFilter"
+                />
               </td>
             </tr>
             <tr
               v-if="detailViewMode === 'inline' && isRowExpandedById(item.row)"
-              :ref="setRowExpansionEl(item.key)"
+              :ref="expansionRowRef(item.key)"
               class="virtual-expansion-row"
               :data-row-expansion-id="item.key"
             >
@@ -655,10 +531,10 @@
                 <div class="expansion-content">
                   <EventDocumentView
                     :data="item.row"
-                    :onAddFilter="(f, v) => emit('add-filter', f, v)"
-                    :onExcludeFilter="(f, v) => emit('exclude-filter', f, v)"
                     :isLoading="isDetailLoading"
                     :compact="true"
+                    @add-filter="forwardAddFilter"
+                    @exclude-filter="forwardExcludeFilter"
                     @notify="(payload) => emit('notify', payload)"
                   />
                 </div>
@@ -835,15 +711,7 @@
     transform: rotate(90deg);
   }
   .timestamp-cell {
-    font-family: var(
-      --rte-font-mono,
-      ui-monospace,
-      SFMono-Regular,
-      'SF Mono',
-      Menlo,
-      Consolas,
-      monospace
-    );
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.72rem;
     color: var(--text-color-secondary);
     white-space: nowrap;
@@ -865,15 +733,7 @@
     gap: 4px;
     max-width: 100%;
     position: relative;
-    font-family: var(
-      --rte-font-mono,
-      ui-monospace,
-      SFMono-Regular,
-      'SF Mono',
-      Menlo,
-      Consolas,
-      monospace
-    );
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.75rem;
   }
   .dynamic-field-value {

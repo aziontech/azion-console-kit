@@ -67,7 +67,7 @@ afterEach(() => {
 describe('Feature: real-time-events-v2-refactor, P9: search index lazy + released + id-keyed', () => {
   it('holds ZERO entries while the search is inactive (idle path never materializes the index)', async () => {
     const rows = ref([makeRow('a', { name: 'Alice' }), makeRow('b', { name: 'Bob' })])
-    const search = useDocumentSearch(rows)
+    const search = useDocumentSearch({ rows: rows })
     await nextTick()
 
     // No query → index is empty, and filteredData passes rows through untouched.
@@ -82,7 +82,7 @@ describe('Feature: real-time-events-v2-refactor, P9: search index lazy + release
 
   it('builds the index only while a query is active, then RELEASES it to 0 when cleared', async () => {
     const rows = ref([makeRow('a', { name: 'Alice' }), makeRow('b', { name: 'Bob' })])
-    const search = useDocumentSearch(rows)
+    const search = useDocumentSearch({ rows: rows })
     await nextTick()
     expect(search.indexSize()).toBe(0)
 
@@ -99,7 +99,7 @@ describe('Feature: real-time-events-v2-refactor, P9: search index lazy + release
 
   it('releases the index to 0 on deactivate and rebuilds on activate WHEN the query survives', async () => {
     const rows = ref([makeRow('a', { name: 'Alice' }), makeRow('b', { name: 'Bob' })])
-    const search = useDocumentSearch(rows)
+    const search = useDocumentSearch({ rows: rows })
     fire(hooks.mounted) // acquire once on mount
     await applyQuery(search, 'bob')
     expect(search.indexSize()).toBe(2)
@@ -116,7 +116,7 @@ describe('Feature: real-time-events-v2-refactor, P9: search index lazy + release
 
   it('stays at 0 across a deactivate/activate cycle when the search is inactive', async () => {
     const rows = ref([makeRow('a', { name: 'Alice' })])
-    const search = useDocumentSearch(rows)
+    const search = useDocumentSearch({ rows: rows })
     fire(hooks.mounted)
     await nextTick()
     expect(search.indexSize()).toBe(0)
@@ -131,7 +131,7 @@ describe('Feature: real-time-events-v2-refactor, P9: search index lazy + release
   it('invalidates on resetToken bump: rebuilds if still searching, releases if not', async () => {
     const rows = ref([makeRow('a', { name: 'Alice' }), makeRow('b', { name: 'Bob' })])
     const resetToken = ref(0)
-    const search = useDocumentSearch(rows, resetToken)
+    const search = useDocumentSearch({ rows: rows, resetToken: resetToken })
     await applyQuery(search, 'alice')
     expect(search.indexSize()).toBe(2)
 
@@ -158,7 +158,7 @@ describe('Feature: real-time-events-v2-refactor, P9: id-keyed index survives reo
     const rowB = makeRow('b', { name: 'Bravo' })
     const rowC = makeRow('c', { name: 'Charlie' })
     const rows = ref([rowA, rowB, rowC])
-    const search = useDocumentSearch(rows)
+    const search = useDocumentSearch({ rows: rows })
     await applyQuery(search, 'bravo')
     expect(search.filteredData.value.map((row) => row.id)).toEqual(['b'])
 
@@ -176,7 +176,7 @@ describe('Feature: real-time-events-v2-refactor, P9: id-keyed index survives reo
       makeRow('r2', { name: 'zzz-old' }),
       makeRow('r3', { name: 'keep-me' })
     ])
-    const search = useDocumentSearch(rows)
+    const search = useDocumentSearch({ rows: rows })
     await applyQuery(search, 'keep')
     expect(search.filteredData.value.map((row) => row.id)).toEqual(['r1', 'r3'])
     expect(search.indexSize()).toBe(4)
@@ -198,7 +198,7 @@ describe('Feature: real-time-events-v2-refactor, P9: id-keyed index survives reo
       makeRow('r1', { name: 'match' }),
       makeRow('r2', { name: 'match' })
     ])
-    const search = useDocumentSearch(rows)
+    const search = useDocumentSearch({ rows: rows })
     await applyQuery(search, 'match')
     expect(search.indexSize()).toBe(3)
 

@@ -1,5 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import { useKeepAliveResource } from '@/composables/useKeepAliveResource'
+import { rowKey } from './utils/row-key'
+import { highlightMatch } from './utils/highlight-match'
 
 const DEBOUNCE_MS = 400
 
@@ -23,27 +25,16 @@ function buildRowEntry(row) {
 }
 
 /**
- * Stable identity for a row entry. Real events always carry `row.id`; when a row
- * lacks one we fall back to object identity so the index still keys correctly.
- * Object identity is stable for the lifetime of a row in the buffer, which is all
- * the index needs — it is a derived cache, rebuilt from `rows` on demand.
- */
-function keyOf(row) {
-  return row?.id != null ? row.id : row
-}
-
-/**
  * Debounced document search over an ID-KEYED, LAZY search index (task 9.1, req
  * 4.2 & 4.16, P9). Entries are `Map<row.id, string>` (survives eviction/reorder),
  * built only while a query is active and released on inactive/resetToken/teardown.
  * Filtered result matches the trimmed, lowercased query against each row's text.
  *
- * @param {import('vue').Ref<object[]>} rows dataset rows (source of truth)
- * @param {import('vue').Ref<number>} [resetToken] dataset resetToken; a bump
- *   invalidates the index (new query/filter/dataset). Optional for callers that
- *   do not expose one.
+ * @param {Object} options
+ * @param {import('vue').Ref<object[]>} options.rows dataset rows (source of truth)
+ * @param {import('vue').Ref<number>} [options.resetToken] bump invalidates the index
  */
-export function useDocumentSearch(rows, resetToken) {
+export function useDocumentSearch({ rows, resetToken } = {}) {
   const query = ref('')
   const debouncedQuery = ref('')
   let timer = null
@@ -73,7 +64,7 @@ export function useDocumentSearch(rows, resetToken) {
     if (!Array.isArray(current)) return
     for (const row of current) {
       if (row == null) continue
-      searchIndex.set(keyOf(row), buildRowEntry(row))
+      searchIndex.set(rowKey(row), buildRowEntry(row))
     }
   }
 
@@ -104,7 +95,7 @@ export function useDocumentSearch(rows, resetToken) {
     const liveKeys = new Set()
     for (const row of current) {
       if (row == null) continue
-      const key = keyOf(row)
+      const key = rowKey(row)
       liveKeys.add(key)
       if (!searchIndex.has(key)) searchIndex.set(key, buildRowEntry(row))
     }
@@ -146,43 +137,14 @@ export function useDocumentSearch(rows, resetToken) {
     if (!Array.isArray(current)) return current
     return current.filter((row) => {
       if (row == null) return false
-      const entry = searchIndex.get(keyOf(row))
+      const entry = searchIndex.get(rowKey(row))
       return entry != null && entry.includes(term)
     })
   })
 
-  /**
-   * Wraps the first occurrence of the search term in a <mark> tag.
-   * Uses indexOf instead of regex to avoid escaping issues.
-   */
-  const escapeHtml = (value) =>
-    String(value)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-
-  const highlight = (text) => {
-    const queryValue = debouncedQuery.value
-    if (!queryValue || !queryValue.trim() || !text) return escapeHtml(text)
-    const str = String(text)
-    const trimmedQuery = queryValue.trim()
-    const pos = str.toLowerCase().indexOf(trimmedQuery.toLowerCase())
-    if (pos === -1) return escapeHtml(str)
-    const len = trimmedQuery.length
-    // The wrapped text is untrusted, so each segment is HTML-escaped before it
-    // is concatenated with the fixed <mark> markup; only safe markup is returned.
-    /* eslint-disable xss/no-mixed-html -- segments are HTML-escaped above; only fixed <mark> markup is literal */
-    return (
-      escapeHtml(str.slice(0, pos)) +
-      '<mark class="search-highlight">' +
-      escapeHtml(str.slice(pos, pos + len)) +
-      '</mark>' +
-      escapeHtml(str.slice(pos + len))
-    )
-    /* eslint-enable xss/no-mixed-html */
-  }
+  // Wraps the first occurrence of the active (debounced) search term in a <mark>
+  // tag via the shared util (escape-all; only fixed <mark> markup is literal).
+  const highlight = (text) => highlightMatch(text, debouncedQuery.value)
 
   /**
    * Entry count of the id-keyed search index; zero when search is inactive/

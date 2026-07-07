@@ -114,10 +114,10 @@ describe('HttpRequestServices', () => {
           summary: [
             { key: 'configurationId', value: fixtures.httpRequest.configurationId },
             { key: 'host', value: fixtures.httpRequest.host },
-            { key: 'requestId', value: fixtures.httpRequest.requestId },
-            { key: 'requestMethod', value: fixtures.httpRequest.requestMethod },
             { key: 'requestUri', value: fixtures.httpRequest.requestUri },
-            { key: 'status', value: fixtures.httpRequest.status }
+            { key: 'requestMethod', value: fixtures.httpRequest.requestMethod },
+            { key: 'status', value: fixtures.httpRequest.status },
+            { key: 'requestId', value: fixtures.httpRequest.requestId }
           ],
           ts: fixtures.httpRequest.ts,
           tsFormat: 'February 23, 2024 at 06:07:25 PM'

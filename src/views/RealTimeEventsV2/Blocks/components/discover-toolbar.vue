@@ -214,8 +214,8 @@
   /* Documents found badge */
   .discover-docs-badge {
     font-size: 0.8125rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--surface-border);
+    background: var(--surface-hover);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

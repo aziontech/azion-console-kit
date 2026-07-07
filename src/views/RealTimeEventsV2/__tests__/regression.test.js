@@ -562,31 +562,37 @@ describe('Requirement 13.7: CSV and JSON export output consistency', () => {
     expect(csvItem.command).toBeTypeOf('function')
   })
 
-  it('useExportData exportFunctionMapper maps tsFormat field', () => {
-    const tableData = shallowRef([])
+  it('CSV export maps the tsFormat field to its cell value', async () => {
+    const rows = [
+      { id: 'a', tsFormat: '2024-01-01 00:00:00', summary: [{ key: 'host', value: 'a.com' }] }
+    ]
+    const tableData = shallowRef(rows)
     const tabSelected = computed(() => ({ dataset: 'workloadEvents' }))
-    const { exportFunctionMapper } = useExportData({ tableData, tabSelected })
+    const { buildCsv } = useExportData({ tableData, tabSelected, selectedFields: ref([]) })
 
-    // defaultColumnMapper maps { field, data } → { tsFormat: data, summary: data }
-    // exportFunctionMapper then returns mappedRow[field]
-    const result = exportFunctionMapper({ field: 'tsFormat', data: '2024-01-01 00:00:00' })
-    expect(result).toBe('2024-01-01 00:00:00')
+    // The tsFormat mapping is exercised through the CSV cell serialization.
+    const csv = await buildCsv(rows)
+    expect(csv).toContain('"2024-01-01 00:00:00"')
   })
 
-  it('useExportData exportFunctionMapper maps summary field to pipe-separated string', () => {
-    const tableData = shallowRef([])
-    const tabSelected = computed(() => ({ dataset: 'workloadEvents' }))
-    const { exportFunctionMapper } = useExportData({ tableData, tabSelected })
-
-    // When field is 'summary', data is the summary array
-    const summaryData = [
-      { key: 'host', value: 'a.com' },
-      { key: 'status', value: 200 }
+  it('CSV export maps the summary field to a pipe-separated cell', async () => {
+    const rows = [
+      {
+        id: 'a',
+        tsFormat: 'T1',
+        summary: [
+          { key: 'host', value: 'a.com' },
+          { key: 'status', value: 200 }
+        ]
+      }
     ]
-    const result = exportFunctionMapper({ field: 'summary', data: summaryData })
-    expect(result).toContain('host: a.com')
-    expect(result).toContain('status: 200')
-    expect(result).toContain(' | ')
+    const tableData = shallowRef(rows)
+    const tabSelected = computed(() => ({ dataset: 'workloadEvents' }))
+    const { buildCsv } = useExportData({ tableData, tabSelected, selectedFields: ref([]) })
+
+    // summary array → `key: value` joined by ` | `, quoted as a single cell.
+    const csv = await buildCsv(rows)
+    expect(csv).toContain('"host: a.com | status: 200"')
   })
 
   it('JSON export for same input data is deterministic', () => {
@@ -761,19 +767,19 @@ describe('Requirement 13.8: Keyboard navigation, detail view, search, field stat
     // component context. We test the highlight function via the returned API
     // by manually setting debouncedQuery.
     it('highlight wraps matching text in <mark> tags when debouncedQuery is set', () => {
-      const { highlight, debouncedQuery } = useDocumentSearch(shallowRef([]))
+      const { highlight, debouncedQuery } = useDocumentSearch({ rows: shallowRef([]) })
       debouncedQuery.value = 'test'
       const result = highlight('This is a test string')
       expect(result).toContain('<mark class="search-highlight">test</mark>')
     })
 
     it('highlight returns original text when no query', () => {
-      const { highlight } = useDocumentSearch(shallowRef([]))
+      const { highlight } = useDocumentSearch({ rows: shallowRef([]) })
       expect(highlight('hello world')).toBe('hello world')
     })
 
     it('highlight is case-insensitive', () => {
-      const { highlight, debouncedQuery } = useDocumentSearch(shallowRef([]))
+      const { highlight, debouncedQuery } = useDocumentSearch({ rows: shallowRef([]) })
       debouncedQuery.value = 'TEST'
       const result = highlight('This is a test string')
       expect(result).toContain('<mark class="search-highlight">test</mark>')
@@ -1040,14 +1046,17 @@ describe('Multi-tab coexistence regression', () => {
       expect(labels).toContain('Export as CSV')
     })
 
-    it('exportFunctionMapper maps tsFormat correctly for an httpRequests tab', () => {
-      const tableData = shallowRef([])
+    it('CSV export maps tsFormat correctly for an httpRequests tab', async () => {
+      const rows = [
+        { id: 'a', tsFormat: '2024-06-15 12:34:56', summary: [{ key: 'host', value: 'a.com' }] }
+      ]
+      const tableData = shallowRef(rows)
       const tabSelected = computed(() => ({ dataset: 'httpRequests' }))
 
-      const { exportFunctionMapper } = useExportData({ tableData, tabSelected })
+      const { buildCsv } = useExportData({ tableData, tabSelected, selectedFields: ref([]) })
 
-      const result = exportFunctionMapper({ field: 'tsFormat', data: '2024-06-15 12:34:56' })
-      expect(result).toBe('2024-06-15 12:34:56')
+      const csv = await buildCsv(rows)
+      expect(csv).toContain('"2024-06-15 12:34:56"')
     })
   })
 

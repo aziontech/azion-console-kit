@@ -11,9 +11,6 @@ import { useKeepAliveResource } from '@/composables/useKeepAliveResource.js'
  * @param {import('vue').Ref<Element|null> | (() => Element|null)} [options.scrollParentRef]
  *   The table's scroll viewport element (or a getter/ref of it). Used to skip
  *   measurement when the table is not attached; measurement itself is per-row.
- * @param {number} [options.tolerancePx=0.5]
- *   Sub-pixel slack when comparing a badge's bottom edge against the container's
- *   clipped bottom, matching the v1 measure() threshold.
  * @returns {{
  *   hiddenCountFor: (rowKey: (string|number)) => number,
  *   observeRow: (rowKey: (string|number), el: Element|null) => void,
@@ -23,7 +20,11 @@ import { useKeepAliveResource } from '@/composables/useKeepAliveResource.js'
  *   isActive: import('vue').Ref<boolean>
  * }}
  */
-export function useOverflowMeasure({ scrollParentRef = null, tolerancePx = 0.5 } = {}) {
+// Sub-pixel slack when comparing a badge's bottom against the container's
+// clipped bottom (v1 threshold). Never varied by the single caller (C5).
+const TOLERANCE_PX = 0.5
+
+export function useOverflowMeasure({ scrollParentRef = null } = {}) {
   // rowKey -> hidden badge count. A plain reactive ref of a Map is not deeply
   // reactive on Map mutation, so we swap identity via a version-free pattern:
   // store counts in a plain Map and expose reads through a bumping ref.
@@ -61,7 +62,7 @@ export function useOverflowMeasure({ scrollParentRef = null, tolerancePx = 0.5 }
     const badges = container.querySelectorAll('.log-badge:not(.log-badge--more)')
     badges.forEach((badge) => {
       const rect = badge.getBoundingClientRect()
-      if (rect.bottom > containerBottom + tolerancePx) hidden += 1
+      if (rect.bottom > containerBottom + TOLERANCE_PX) hidden += 1
     })
     return hidden
   }

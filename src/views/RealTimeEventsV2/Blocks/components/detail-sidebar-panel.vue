@@ -18,18 +18,10 @@
     isLoading: {
       type: Boolean,
       default: false
-    },
-    onAddFilter: {
-      type: Function,
-      default: null
-    },
-    onExcludeFilter: {
-      type: Function,
-      default: null
     }
   })
 
-  const emit = defineEmits(['close', 'navigate'])
+  const emit = defineEmits(['close', 'navigate', 'add-filter', 'exclude-filter'])
 
   const toast = useToast()
   const scrollRef = ref(null)
@@ -127,10 +119,10 @@
       >
         <EventDocumentView
           :data="data"
-          :onAddFilter="onAddFilter"
-          :onExcludeFilter="onExcludeFilter"
           :isLoading="isLoading"
           :grow-json-to-fit="true"
+          @add-filter="(field, value) => emit('add-filter', field, value)"
+          @exclude-filter="(field, value) => emit('exclude-filter', field, value)"
           @notify="(payload) => toast.add(payload)"
           @reset-scroll="onResetScroll"
         />
@@ -142,8 +134,6 @@
 <style scoped>
   /* ── Detail Sidebar Panel ─────────────────────────────────────── */
   .detail-sidebar {
-    --rte-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-
     display: flex;
     flex-direction: column;
     border-left: 1px solid var(--surface-border);
@@ -193,7 +183,7 @@
   .detail-sidebar__subtitle {
     font-size: 0.7rem;
     color: var(--text-color-secondary);
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

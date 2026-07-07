@@ -70,7 +70,9 @@ describe('H3 — dataset eviction under the PRODUCTION loadMore mutation pattern
     const { result: dataset } = inScope(() =>
       useEventDataset({ rows, pageSize: 100, evictionEnabled: true })
     )
-    const { result: search } = inScope(() => useDocumentSearch(dataset.rows, dataset.resetToken))
+    const { result: search } = inScope(() =>
+      useDocumentSearch({ rows: dataset.rows, resetToken: dataset.resetToken })
+    )
 
     rows.value = Array.from({ length: 100 }, (_unused, idx) => makeRow(idx))
     await nextTick()

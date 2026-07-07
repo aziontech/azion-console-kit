@@ -8,7 +8,7 @@ import { getBucketInterval, BUCKET_TABLE, SEC, MIN, HOUR, DAY } from '../buckets
  *
  * This is NOT a byte-equivalence oracle. Task 11.6 deliberately unified the two
  * legacy tables (`pickBucketMs` in load-events-aggregation.js vs
- * `getBucketInterval` in useChartBucketing.js) into ONE table using the
+ * `getBucketInterval` in chart-bucketing.js) into ONE table using the
  * HIGHER-granularity value wherever they diverged. The stacked/pivot chart gets
  * finer buckets at 2d and past a year — EXPECTED, not a regression. This suite
  * PINS the NEW behavior (so a future drift is caught) and records the exact

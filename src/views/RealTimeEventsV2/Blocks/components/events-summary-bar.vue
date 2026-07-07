@@ -212,8 +212,6 @@
 
 <style scoped>
   .events-summary-bar {
-    --rte-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-
     padding: 8px 12px 10px;
     display: flex;
     flex-direction: column;
@@ -264,7 +262,7 @@
   }
 
   .events-summary-bar__inline-value {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-weight: 600;
     color: var(--text-color);
   }
@@ -311,7 +309,7 @@
   .events-summary-bar__inline-pct {
     font-size: 0.6875rem;
     color: var(--text-color-secondary);
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     margin-left: 2px;
   }
 
@@ -343,7 +341,7 @@
   }
 
   .events-summary-bar__value {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 1.375rem;
     font-weight: 700;
     color: var(--text-color);

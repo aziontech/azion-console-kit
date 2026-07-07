@@ -89,7 +89,7 @@ describe('keep-alive reclaim (task 9.9, req 4.6)', () => {
       const Child = defineComponent({
         name: 'DocSearchChild',
         setup() {
-          const api = useDocumentSearch(rows)
+          const api = useDocumentSearch({ rows: rows })
           filtered = api.filteredData
           queryRef = api.query
           return () => h('div')
@@ -131,7 +131,7 @@ describe('keep-alive reclaim (task 9.9, req 4.6)', () => {
       const Child = defineComponent({
         name: 'DocSearchIdleChild',
         setup() {
-          const api = useDocumentSearch(rows)
+          const api = useDocumentSearch({ rows: rows })
           filtered = api.filteredData
           return () => h('div')
         }

@@ -5,8 +5,8 @@ import DetailSidebarPanel from '../detail-sidebar-panel.vue'
 // Mock EventDocumentView so we can control when it emits 'reset-scroll'
 const EventDocumentViewStub = {
   name: 'EventDocumentView',
-  props: ['data', 'onAddFilter', 'onExcludeFilter', 'isLoading', 'growJsonToFit'],
-  emits: ['notify', 'reset-scroll'],
+  props: ['data', 'isLoading', 'growJsonToFit'],
+  emits: ['notify', 'reset-scroll', 'add-filter', 'exclude-filter'],
   template: '<div class="event-document-view-stub" />'
 }
 

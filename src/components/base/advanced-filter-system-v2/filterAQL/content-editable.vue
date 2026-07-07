@@ -108,6 +108,10 @@
       ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
     min-height: 2.25rem;
     max-height: 6rem;
+    /* Flex-item shrink permission: without it the single-line (`pre`) content /
+       nowrap placeholder sets min-content and the input overflows the filter
+       card on narrow viewports instead of shrinking with it. */
+    min-width: 0;
     overflow-x: hidden;
     overflow-y: auto;
   }

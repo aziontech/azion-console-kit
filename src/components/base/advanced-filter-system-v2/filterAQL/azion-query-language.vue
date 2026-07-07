@@ -1,10 +1,10 @@
 <template>
   <div
-    class="w-full relative"
+    class="w-full min-w-0 relative"
     ref="ignoreClickOutside"
   >
-    <div class="relative">
-      <div class="flex gap-2 items-center justify-center">
+    <div class="relative min-w-0">
+      <div class="flex gap-2 items-center justify-center min-w-0">
         <ContentEditable
           v-model="query"
           @focus="openSuggestions"

@@ -24,9 +24,9 @@ import VirtualEventTable from '../VirtualEventTable.vue'
  *       (the grep contract the measurement helpers rely on) and data-row-id
  *       (id-based selection, task 3.10).
  *
- * The mount API (props/emits/defineExpose) is byte-identical to the old
- * component, so this file is also the drop-in acceptance gate: only the internal
- * stubs and PrimeVue-prop assertions changed, not the top-level surface.
+ * The mount API (props/emits) is asserted on observable DOM/behavior; the
+ * PrimeVue-era defineExpose shim (dataTableRef/exportCSV) was removed once the
+ * export path moved fully into useExportData.
  *
  * ResizeObserver is stubbed (jsdom lacks it) so the windower/overflow observers
  * do not throw on mount; the windower still renders the full (small) set because
@@ -74,8 +74,8 @@ const mountTable = (props = {}) => {
         EmptyResultsBlock: { template: '<div class="empty-stub"><slot /></div>' },
         EventDocumentView: {
           name: 'EventDocumentView',
-          props: ['data', 'onAddFilter', 'onExcludeFilter', 'isLoading', 'compact'],
-          emits: ['notify'],
+          props: ['data', 'isLoading', 'compact'],
+          emits: ['notify', 'add-filter', 'exclude-filter'],
           template: '<div class="event-document-view-stub" />'
         },
         LogFieldBadges: {
@@ -247,16 +247,5 @@ describe('VirtualEventTable — CHARACTERIZATION (PRESERVE guards)', () => {
     const wrapper = mountTable({ data: [] })
     expect(wrapper.find('.empty-stub').exists()).toBe(true)
     expect(wrapper.find('.virtual-event-table').exists()).toBe(false)
-  })
-
-  // ─── exportCSV / dataTableRef shim (defineExpose contract) ───────────────────
-  it('exposes dataTableRef and a callable exportCSV shim (drop-in defineExpose)', () => {
-    const wrapper = mountTable()
-    // dataTableRef must stay a non-null object exposing exportCSV so the parent's
-    // flush:'post' watch keeps a valid value and the export menu shape survives.
-    expect(wrapper.vm.dataTableRef).toBeTruthy()
-    expect(typeof wrapper.vm.dataTableRef.exportCSV).toBe('function')
-    expect(typeof wrapper.vm.exportCSV).toBe('function')
-    expect(() => wrapper.vm.exportCSV()).not.toThrow()
   })
 })

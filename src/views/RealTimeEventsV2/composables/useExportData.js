@@ -69,10 +69,8 @@ const quoteCsvCell = (value) => `"${value}"`
  * `filterData` are injected it re-fetches the current range/filter up to
  * `EXPORT_MAX_ROWS` (newest→oldest), independent of the mounted virtual window
  * or the retained buffer. Without a `listService` (backward-compatible usage /
- * unit tests) it falls back to the provided `tableData`. It is the delegate
- * target of the virtualized table's `exportCSV` compatibility shim: the table
- * exposes `{ dataTableRef, exportCSV }` where `exportCSV` calls this
- * composable's `exportCsv` (design §2.1(9)/§3.3, task 3.7).
+ * unit tests) it falls back to the provided `tableData`
+ * (design §2.1(9)/§3.3, task 3.7).
  *
  * @param {Object} options
  * @param {import('vue').Ref<Array>} options.tableData
@@ -103,11 +101,7 @@ export function useExportData({
   selectedFields,
   onWarn = () => {}
 }) {
-  const dataTableRef = ref(null)
-  const exportMenuRef = ref(null)
   const exporting = ref(false)
-
-  const toggleExportMenu = (event) => exportMenuRef.value?.toggle(event)
 
   const exportFunctionMapper = (rowData) => {
     const mappedRow = defaultColumnMapper(rowData)
@@ -218,9 +212,9 @@ export function useExportData({
   }
 
   /**
-   * CSV export command / shim delegate target: re-fetches the logical range
-   * (≤ `EXPORT_MAX_ROWS`), builds the CSV and downloads. No-op when empty or
-   * when another export is already in flight (B1).
+   * CSV export command: re-fetches the logical range (≤ `EXPORT_MAX_ROWS`),
+   * builds the CSV and downloads. No-op when empty or when another export is
+   * already in flight (B1).
    */
   const exportCsv = async () => {
     if (exporting.value) return
@@ -280,15 +274,10 @@ export function useExportData({
   ])
 
   return {
-    dataTableRef,
-    exportMenuRef,
-    toggleExportMenu,
     exportMenuItems,
-    exportFunctionMapper,
     exportCsv,
     exportJson,
     fetchExportRows,
-    buildCsv,
-    buildJson
+    buildCsv
   }
 }

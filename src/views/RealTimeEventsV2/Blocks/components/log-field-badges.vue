@@ -1,8 +1,9 @@
 <script setup>
   import { computed, ref } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
-  import { getSeverity } from '../../composables/useSeverityClassifier'
+  import { getSeverity } from '../../composables/utils/severity-classifier'
   import { useClickToFilter } from '../../composables/useClickToFilter.js'
+  import { highlightMatch } from '../../composables/utils/highlight-match'
 
   defineOptions({ name: 'LogFieldBadges' })
 
@@ -68,35 +69,6 @@
     return str.length > maxLen ? `${str.slice(0, maxLen)}…` : str
   }
 
-  const escapeHtml = (value) =>
-    String(value)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-
-  // Returns HTML wrapping the matched substring in <mark>. The badge value is
-  // untrusted log data, so every text segment is HTML-escaped before it is
-  // concatenated with the fixed <mark> markup; only safe markup reaches v-html.
-  const highlightMatch = (text, needleRaw) => {
-    if (!needleRaw || !text) return escapeHtml(text ?? '')
-    const str = String(text)
-    const needle = needleRaw.trim()
-    if (!needle) return escapeHtml(str)
-    const pos = str.toLowerCase().indexOf(needle.toLowerCase())
-    if (pos === -1) return escapeHtml(str)
-    /* eslint-disable xss/no-mixed-html -- every text segment is HTML-escaped above; only fixed <mark> markup is literal */
-    return (
-      escapeHtml(str.slice(0, pos)) +
-      '<mark class="search-highlight">' +
-      escapeHtml(str.slice(pos, pos + needle.length)) +
-      '</mark>' +
-      escapeHtml(str.slice(pos + needle.length))
-    )
-    /* eslint-enable xss/no-mixed-html */
-  }
-
   // Precompute the rendered rows ONCE per input change (summary / highlight /
   // searchQuery), not per re-render. Each badge carries its pre-escaped
   // highlighted HTML so the template's v-html never re-runs highlightMatch on
@@ -123,11 +95,17 @@
   })
 
   const hoveredIndex = ref(-1)
+
+  // Expose the badge container el (C2): the table's single overflow observer
+  // binds it directly, replacing the parent's querySelector-based lookup.
+  const containerRef = ref(null)
+  defineExpose({ containerEl: containerRef })
 </script>
 
 <template>
   <div class="log-badges-row">
     <div
+      ref="containerRef"
       class="log-badges-container"
       role="button"
       tabindex="0"
@@ -138,7 +116,7 @@
     >
       <span
         v-for="(item, index) in badges"
-        :key="index"
+        :key="item.key"
         v-memo="[item, hoveredIndex === index]"
         class="log-badge"
         :class="{
@@ -203,8 +181,6 @@
 
 <style scoped>
   .log-badges-row {
-    --rte-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-
     display: flex;
     align-items: flex-start;
     width: 100%;
@@ -240,7 +216,7 @@
     font-size: 0.72rem;
     line-height: 1;
     height: 20px;
-    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     background: var(--surface-100);
     border: 1px solid var(--surface-200);
     max-width: 100%;

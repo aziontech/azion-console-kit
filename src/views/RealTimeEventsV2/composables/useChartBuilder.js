@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { useBreakpoint } from './useBreakpoint'
-import { formatDetailed } from './useChartBucketing'
+import { formatDetailed } from '../utils/chart-bucketing'
 import { getChartConfig } from '../Blocks/constants/chart-configs'
 import { CHART_KINDS, resolveChartKind, isStackedKind, isMultiSeriesKind } from './chart-kinds'
 import { buildMultiSeries, buildDirectSeries, buildSingleSeries } from './chart-builder/pivot'

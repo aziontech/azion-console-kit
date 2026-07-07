@@ -6,7 +6,7 @@
 // plus the chart-kind dispatch. No behavior change to chart output.
 // ────────────────────────────────────────────────────────────────────────────
 
-import { niceYMax, formatCompact, formatDetailed } from '../useChartBucketing'
+import { niceYMax, formatCompact, formatDetailed } from '../../utils/chart-bucketing'
 import { CHART_KINDS } from '../chart-kinds'
 import { formatBytes } from './formatting'
 import { computeTickPatch } from './scaling'
@@ -262,8 +262,11 @@ export function buildC3Config({
     spline: { interpolation: { type: config?.splineInterpolation || 'monotone' } },
     // Area opacity: semi-transparent fill under the line
     ...(isAreaChart ? { area: { zerobased: true } } : {}),
+    // Left padding sized by the WIDEST Y tick label (≈6.8px/char at the 11px
+    // tick font + 12px gutter), not by viewport: the fixed 35px mobile value
+    // clipped "100.0M" to "00.0M". Clamped so sparse/huge labels stay sane.
     padding: {
-      left: typeof window !== 'undefined' && window.innerWidth < 640 ? 35 : 50,
+      left: Math.min(64, Math.max(35, formatCompact(yMax ?? maxValue ?? 0).length * 6.8 + 12)),
       right: typeof window !== 'undefined' && window.innerWidth < 640 ? 8 : 15,
       top: 8,
       bottom: 0

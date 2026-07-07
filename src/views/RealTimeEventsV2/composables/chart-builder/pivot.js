@@ -6,7 +6,7 @@
 // and the single-series histogram path. No behavior change.
 // ────────────────────────────────────────────────────────────────────────────
 
-import { aggregateIntoBuckets, getBucketInterval } from '../useChartBucketing'
+import { aggregateIntoBuckets, getBucketInterval } from '../../utils/chart-bucketing'
 import { bucketsForBreakpoint } from './buckets'
 import { cachedOrder as defaultCachedOrder } from './series-order'
 import { formatLabel, formatTooltipRange } from './formatting'

@@ -1,5 +1,6 @@
 import { computed, ref, watch } from 'vue'
 import { useKeepAliveResource } from '@/composables/useKeepAliveResource'
+import { rowKey } from './utils/row-key'
 
 const DEFAULT_PINNED_FIELDS = Object.freeze([
   'host',
@@ -23,14 +24,6 @@ const IGNORED_VALUES = new Set(['', '-', 'null', 'undefined'])
 const alphabeticalCompare = (left, right) => left.localeCompare(right)
 
 /**
- * Stable identity for a row. Real events always carry `row.id`; when a row lacks
- * one we fall back to object identity (stable for the row's lifetime in the
- * buffer). Mirrors `useDocumentSearch.keyOf` so the two id-keyed derivations
- * agree under eviction/reorder.
- */
-const keyOf = (row) => (row?.id != null ? row.id : row)
-
-/**
  * Derived state for the FieldSidebar (owns value-counting, search-filter, and
  * pinned/available partitioning). Counts are ID-KEYED and eviction-safe (per-field
  * `Map<value,count>` + per-row contributions by id; P5: total === Σ topK + other),
@@ -42,6 +35,9 @@ const keyOf = (row) => (row?.id != null ? row.id : row)
  * @param {import('vue').Ref<string>}  params.searchQuery
  * @param {import('vue').Ref<Array>}   params.selectedFields
  * @param {string[]} [params.pinnedFields] override for the default pinned list
+ * @param {import('vue').Ref<number>} [params.resetToken] dataset resetToken; a
+ *   bump (new query/filter/dataset) rebuilds counts from the current rows. The
+ *   shrink heuristic stays as fallback for legacy/unit callers with no token.
  * @returns {{
  *   fieldStats:              import('vue').ComputedRef<Record<string, { total: number, uniqueCount: number, topValues: Array<{ value: string, count: number, percent: number }> }>>,
  *   filteredFields:          import('vue').ComputedRef<Array>,
@@ -55,7 +51,8 @@ export function useFieldStats({
   availableFields,
   searchQuery,
   selectedFields,
-  pinnedFields: pinnedFieldsOverride
+  pinnedFields: pinnedFieldsOverride,
+  resetToken
 }) {
   const pinnedList = pinnedFieldsOverride || DEFAULT_PINNED_FIELDS
   const pinnedFieldSet = new Set(pinnedList)
@@ -115,12 +112,12 @@ export function useFieldStats({
 
   /** Counts a single row (idempotent by identity) and records its contribution. */
   const ingestRow = (row) => {
-    const rowKey = keyOf(row)
-    if (ingested.has(rowKey)) return
+    const key = rowKey(row)
+    if (ingested.has(key)) return
     const summary = row?.summary
     if (!Array.isArray(summary)) {
       // Still mark as seen so it is not re-processed; no contribution.
-      ingested.add(rowKey)
+      ingested.add(key)
       return
     }
     const contribution = []
@@ -136,20 +133,20 @@ export function useFieldStats({
       incrementValue(field, strValue)
       contribution.push([field, strValue])
     }
-    ingested.add(rowKey)
-    rowContributions.set(rowKey, contribution)
+    ingested.add(key)
+    rowContributions.set(key, contribution)
   }
 
   /** Removes a single row's contribution (used on FIFO eviction). */
   const removeRow = (row) => {
-    const rowKey = keyOf(row)
-    if (!ingested.has(rowKey)) return
-    const contribution = rowContributions.get(rowKey)
+    const key = rowKey(row)
+    if (!ingested.has(key)) return
+    const contribution = rowContributions.get(key)
     if (contribution) {
       for (const [field, strValue] of contribution) decrementValue(field, strValue)
     }
-    rowContributions.delete(rowKey)
-    ingested.delete(rowKey)
+    rowContributions.delete(key)
+    ingested.delete(key)
   }
 
   const clearCounts = () => {
@@ -190,8 +187,7 @@ export function useFieldStats({
       }
       let changed = false
       for (const row of rows) {
-        const rowKey = keyOf(row)
-        if (!ingested.has(rowKey)) {
+        if (!ingested.has(rowKey(row))) {
           ingestRow(row)
           changed = true
         }
@@ -200,6 +196,13 @@ export function useFieldStats({
     },
     { immediate: true }
   )
+
+  // A `resetToken` bump ("new query/filter/dataset") rebuilds from the current
+  // rows. Catches same-length replacements the length-watch shrink heuristic
+  // misses. The heuristic stays as fallback for callers with no token wired.
+  if (resetToken) {
+    watch(resetToken, () => rebuildFrom(data.value))
+  }
 
   /**
    * Subtracts an evicted batch's contributions by identity so totals stay exact

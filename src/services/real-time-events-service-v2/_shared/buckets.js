@@ -4,7 +4,7 @@
 // Historically two independent tables mapped a range duration to a bucket
 // interval:
 //   • `pickBucketMs`      in services/.../load-events-aggregation.js (events path)
-//   • `getBucketInterval` in views/.../composables/useChartBucketing.js (chart path)
+//   • `getBucketInterval` in views/.../utils/chart-bucketing.js (chart path)
 // They agreed for every duration ≤ 1 day but DIVERGED past that:
 //
 //   duration ≤   | old pickBucketMs | old getBucketInterval | unified (finer)

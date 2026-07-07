@@ -8,7 +8,7 @@
   import EventsSummaryBar from './components/events-summary-bar.vue'
   import ResizableSplitter from '@/components/Splitter/ResizableSplitter.vue'
   import DiscoverToolbar from './components/discover-toolbar.vue'
-  import DiscoverDataTable from './components/VirtualEventTable.vue'
+  import VirtualEventTable from './components/VirtualEventTable.vue'
   import QueryHistoryOverlay from './components/query-history-overlay.vue'
   import SavedSearchesOverlay from './components/saved-searches-overlay.vue'
   import LoadMoreFooter from './components/load-more-footer.vue'
@@ -34,6 +34,8 @@
   import { useFieldResolution } from '../composables/useFieldResolution'
   import { useViewSync } from '../composables/useViewSync'
   import { useEventsExplorer } from '../composables/useEventsExplorer'
+  import { useChartCollapse } from '../composables/useChartCollapse'
+  import { useShareState } from '../composables/useShareState'
   import { useKeepAliveResource } from '@/composables/useKeepAliveResource'
 
   defineOptions({ name: 'TabPanelBlock' })
@@ -121,7 +123,15 @@
   // intent callback + the watchers below. The holder is assigned once the explorer
   // exists; every call site funnels through it.
   const reload = (reason, payload) => reloadImpl(reason, payload)
+  // Single-assignment seam (C6): reloadImpl is wired exactly once (after the
+  // explorer exists). A second assignment throws to surface accidental re-wiring.
   let reloadImpl = () => {}
+  let reloadImplWired = false
+  const setReloadImpl = (fn) => {
+    if (reloadImplWired) throw new Error('reloadImpl already assigned')
+    reloadImpl = fn
+    reloadImplWired = true
+  }
 
   /* ── View sync — single writable View source of truth (design §3.6, task 9.4) ── */
   // `selectedView` is the ONLY writable view state; `stackByField`,
@@ -196,7 +206,7 @@
     debouncedQuery: debouncedSearchQuery,
     filteredData: filteredTableData,
     highlight: highlightText
-  } = useDocumentSearch(dataset.rows, dataset.resetToken)
+  } = useDocumentSearch({ rows: dataset.rows, resetToken: dataset.resetToken })
 
   /* ── Detail view ── */
   const {
@@ -362,7 +372,7 @@
     // a doc-search or field toggle no longer spuriously refetches on re-activation.
     getInputsSnapshot: () => getFetchInputsSnapshot()
   })
-  reloadImpl = explorerReload
+  setReloadImpl(explorerReload)
 
   /* ── Overlay refs ── */
   const queryHistoryOverlayRef = ref(null)
@@ -459,46 +469,9 @@
 
   const { handleLegendFilter } = useLegendFilter({ handleAddFilter, handleAddRangeFilter })
 
-  // ── Chart collapse (fullscreen mode) ─────────────────────────────────
-  // In fullscreen the chart is collapsed by default to maximise table space.
-  // The user can expand it again via the toggle button in the chart header.
-  const CHART_COLLAPSE_KEY = 'rte:chart-collapsed'
-  const isChartCollapsed = ref(false)
-  try {
-    if (localStorage.getItem(CHART_COLLAPSE_KEY) === '1') isChartCollapsed.value = true
-  } catch {
-    /* ignore */
-  }
-  // Fullscreen drives isChartCollapsed programmatically (collapse on enter,
-  // restore on exit). Those writes must NOT clobber the persisted user pref:
-  // `fullscreenDriven` gates the persistence watcher; `preFullscreenCollapsed`
-  // remembers the value to restore on exit. User toggles persist as before.
-  let fullscreenDriven = false
-  let preFullscreenCollapsed = null
-  const setCollapsedProgrammatically = (val) => {
-    fullscreenDriven = true
-    isChartCollapsed.value = val
-    nextTick(() => {
-      fullscreenDriven = false
-    })
-  }
-  watch(isChartCollapsed, (val) => {
-    if (fullscreenDriven) return
-    try {
-      localStorage.setItem(CHART_COLLAPSE_KEY, val ? '1' : '0')
-    } catch {
-      /* ignore */
-    }
-  })
-  watch(isFullscreen, (val) => {
-    if (val) {
-      preFullscreenCollapsed = isChartCollapsed.value
-      setCollapsedProgrammatically(true)
-    } else {
-      setCollapsedProgrammatically(preFullscreenCollapsed ?? false)
-      preFullscreenCollapsed = null
-    }
-  })
+  // ── Chart collapse (fullscreen mode) ──
+  const { isChartCollapsed, toggleCollapse } = useChartCollapse({ isFullscreen })
+
   const handleDatasetChange = (dataset) => emit('dataset-change', dataset)
   const datasetDropdownOptions = computed(() =>
     allDatasets.map((ds) => ({ label: ds.title, value: ds.panel }))
@@ -508,7 +481,7 @@
     if (selectedDataset) emit('dataset-change', selectedDataset)
   }
 
-  const { dataTableRef, exportMenuItems, exportFunctionMapper, exportCsv } = useExportData({
+  const { exportMenuItems, exportCsv } = useExportData({
     // JSON export + CSV fallback source (the retained rows), read through the
     // dataset seam.
     tableData: dataset.rows,
@@ -530,16 +503,7 @@
         life: 5000
       })
   })
-  const discoverDataTableRef = ref(null)
   const eventChartRef = ref(null)
-  // Sync the dataTableRef from useExportData to the inner DataTable via the sub-component
-  watch(
-    () => discoverDataTableRef.value?.dataTableRef,
-    (inner) => {
-      dataTableRef.value = inner ?? null
-    },
-    { flush: 'post' }
-  )
 
   // When the detail sidebar opens or closes, the chart container width changes.
   // Trigger a resize after the DOM has settled so C3 fills the new width.
@@ -599,27 +563,16 @@
     }
   }
 
-  const getCurrentShareState = () => ({
-    filters: filterData.value ? safeStructuredClone(filterData.value) : null,
-    dataset: props.tabSelected?.panel || null,
-    pageSize: pageSize.value,
-    selectedFields: [...selectedFields.value],
-    documentQuery: documentSearchQuery.value || '',
-    selectedView: selectedView.value || 'events:none'
+  // Share_State projections: whole (share links) + fetch-only subset (activate
+  // guard). See useShareState.
+  const { getCurrentShareState, getFetchInputsSnapshot } = useShareState({
+    filterData,
+    pageSize,
+    selectedFields,
+    documentSearchQuery,
+    selectedView,
+    dataset: () => props.tabSelected?.panel || null
   })
-
-  // Fetch-affecting subset of the share state (drops documentQuery + selectedFields,
-  // which filter/project in memory and never reach the fetch layer). Feeds the
-  // activate guard; getCurrentShareState stays whole for share links.
-  const getFetchInputsSnapshot = () => {
-    const state = getCurrentShareState()
-    return {
-      filters: state.filters,
-      dataset: state.dataset,
-      pageSize: state.pageSize,
-      selectedView: state.selectedView
-    }
-  }
 
   /* ── Lifecycle ── */
   // Keydown listener — SINGLE owner via useKeepAliveResource (task 7.6). One
@@ -736,6 +689,7 @@
               v-model:selectedFields="selectedFields"
               v-model:visible="sidebarVisible"
               :data="tableData"
+              :resetToken="dataset.resetToken.value"
               :datasets="allDatasets"
               :selectedDataset="props.tabSelected"
               @add-filter="handleAddFilter"
@@ -767,7 +721,7 @@
                   @update:view="selectedView = $event"
                   @brush-select="handleBrushSelect"
                   @legend-filter="handleLegendFilter"
-                  @toggle-collapse="isChartCollapsed = !isChartCollapsed"
+                  @toggle-collapse="toggleCollapse"
                 />
                 <EventsSummaryBar
                   v-if="showChartSummary && !isChartCollapsed"
@@ -794,8 +748,7 @@
                 class="flex flex-col flex-1 min-w-0 min-h-0 overflow-hidden outline-none"
                 tabindex="0"
               >
-                <DiscoverDataTable
-                  ref="discoverDataTableRef"
+                <VirtualEventTable
                   :data="filteredTableData"
                   :selectedFields="selectedFields"
                   :expandedRows="expandedRows"
@@ -803,8 +756,6 @@
                   :detailViewMode="detailViewMode"
                   :isLoading="isLoading"
                   :isDetailLoading="isDetailLoading"
-                  :exportFilename="`${props.tabSelected.tabRouter}-logs`"
-                  :exportFunction="exportFunctionMapper"
                   :exportCsv="exportCsv"
                   :resetToken="dataset.resetToken.value"
                   :rowClass="getRowClass"
@@ -837,8 +788,8 @@
         :visible="detailSidebarVisible"
         :data="activeRowData"
         :isLoading="isDetailLoading"
-        :onAddFilter="handleAddFilter"
-        :onExcludeFilter="handleExcludeFilter"
+        @add-filter="handleAddFilter"
+        @exclude-filter="handleExcludeFilter"
         @close="closeDetailSidebar"
         @navigate="navigateRow"
       />
@@ -913,6 +864,23 @@
     }
     .discover-layout {
       min-height: 200px;
+    }
+    /* Fields as an overlay drawer: side-by-side split on a phone squeezes the
+       chart/table into ~40% width (overlapping ticks, cramped header). The
+       drawer leaves the main area full-width; the X button still closes it.
+       !important beats the splitter's inline pixel width. */
+    .discover-layout__main {
+      position: relative;
+    }
+    :deep(.resizable-splitter > .panel-a) {
+      position: absolute;
+      inset-block: 0;
+      left: 0;
+      z-index: 20;
+      width: min(85vw, 320px) !important;
+      background: var(--surface-ground);
+      border-right: 1px solid var(--surface-border);
+      box-shadow: var(--shadow-xl);
     }
   }
 
