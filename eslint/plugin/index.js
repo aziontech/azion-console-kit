@@ -24,7 +24,7 @@ module.exports = {
     'naming-convention': namingConvention,
     'type-separation': typeSeparation,
     'no-raw-design-values': noRawDesignValues,
-    'no-io-in-components': noIoInComponents
+    'no-io-in-components': noIoInComponents,
     'no-unawaited-clipboard': noUnawaitedClipboard
   },
   configs: {
