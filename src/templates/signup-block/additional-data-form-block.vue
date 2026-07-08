@@ -160,6 +160,7 @@
   import { ref, inject, computed, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
+  import { trackSignUpSafely } from '@/helpers/track-auth-event'
   import * as yup from 'yup'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
@@ -475,6 +476,12 @@
 
   const loading = ref(false)
 
+  const resolveSignUpMethod = (flags) => {
+    if (flags?.signup_sso_google) return 'google'
+    if (flags?.signup_sso_github) return 'github'
+    return 'email'
+  }
+
   const submitForm = async () => {
     loading.value = true
 
@@ -499,6 +506,16 @@
       await postAddData
 
       tracker.signUp.submittedAdditionalData(values).track()
+
+      // Fire the HubSpot sign-up event now that the profile is enriched (name,
+      // role and company). It is fire-and-forget and swallows its own errors,
+      // so a HubSpot failure never impacts the onboarding flow.
+      const signupTypeFlags = accountStore.getSignupTypeFlags()
+      trackSignUpSafely({
+        tracker,
+        method: resolveSignUpMethod(signupTypeFlags),
+        signupTypeFlags
+      })
     } catch (err) {
       const errors = JSON.parse(err)
 

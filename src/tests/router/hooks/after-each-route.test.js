@@ -65,11 +65,7 @@ describe('afterEachRoute prefetch gate', () => {
     const { default: afterEachRoute } = await import('@/router/hooks/afterEachRoute')
     const { sessionManager } = await import('@/services/v2/base/auth')
 
-    afterEachRoute(
-      { name: 'signup', fullPath: '/signup', meta: { isPublic: true } },
-      {},
-      null
-    )
+    afterEachRoute({ name: 'signup', fullPath: '/signup', meta: { isPublic: true } }, {}, null)
 
     expect(sessionManager.afterLogin).not.toHaveBeenCalled()
   })

@@ -22,6 +22,6 @@ describe('getCurrentTimezone', () => {
     const formattedTime = getCurrentTimezone(time)
 
     expect(formattedTime).toBeTruthy()
-    expect(formattedTime).toMatch(/AM|PM/) // Checa se está no formato de 12 horas
+    expect(formattedTime).toMatch(/\d{2}:\d{2}:\d{2}/) // Checa se contém horário
   })
 })

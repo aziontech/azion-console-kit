@@ -81,7 +81,7 @@
         @click="cancelDialog()"
         data-testid="move-object-dialog-footer-cancel-button"
       />
-      <Button
+      <PrimeButton
         label="Move"
         size="small"
         @click="confirmMove()"

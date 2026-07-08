@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+  import { ref, computed, onMounted, onActivated, onBeforeUnmount, watch, nextTick } from 'vue'
   const props = defineProps({
     panelSizes: {
       type: Array,
@@ -230,6 +230,12 @@
       resizeObserver.observe(root.value)
     }
   })
+  // KeepAlive reactivation: the container may have had zero dimensions while
+  // deactivated, so the percentage-to-pixel conversion in panelAStyle would
+  // have produced 0px. Re-apply sizes so the panels regain their widths.
+  onActivated(() => {
+    applyInitialSizes()
+  })
   watch(
     () => props.direction,
     async () => {
@@ -265,5 +271,18 @@
   }
   .handle {
     background: var(--handle-bg);
+  }
+  /* Tablet (640-1023px): enlarge the splitter handle's touchable area
+     for finger ergonomics. Visual bar inside (`barOuterClass`) stays narrow;
+     only the clickable/touchable wrapper grows. Mouse-driven desktop (>=1024px)
+     and mobile (<640px, where the handle is hidden by the parent) are
+     unaffected. */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .handle.cursor-row-resize {
+      height: 2rem;
+    }
+    .handle.cursor-col-resize {
+      width: 2rem;
+    }
   }
 </style>

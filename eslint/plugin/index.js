@@ -9,6 +9,7 @@ const namingConvention = require('./lib/rules/naming-convention')
 const typeSeparation = require('./lib/rules/type-separation')
 const noRawDesignValues = require('./lib/rules/no-raw-design-values')
 const noIoInComponents = require('./lib/rules/no-io-in-components')
+const noUnawaitedClipboard = require('./lib/rules/no-unawaited-clipboard')
 const recommended = require('./lib/configs/recommended')
 
 module.exports = {
@@ -24,6 +25,7 @@ module.exports = {
     'type-separation': typeSeparation,
     'no-raw-design-values': noRawDesignValues,
     'no-io-in-components': noIoInComponents
+    'no-unawaited-clipboard': noUnawaitedClipboard
   },
   configs: {
     recommended

@@ -759,7 +759,7 @@
           @click="discardChanges"
           data-testid="review-changes-dialog-footer-cancel-button"
         />
-        <Button
+        <PrimeButton
           label="Review Changes"
           class="bg-surface"
           :badgeClass="badgeClass"
