@@ -236,7 +236,7 @@
           <form
             @submit.prevent="handleSubmit"
             class="w-full flex flex-col gap-8"
-            :class="{ 'pointer-events-none opacity-60': readOnly }"
+            :class="{ 'pointer-events-none': readOnly }"
           >
             <slot
               name="formFields"

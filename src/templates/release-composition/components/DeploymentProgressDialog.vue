@@ -91,6 +91,30 @@
 
   const visualFor = (item) => STATUS_VISUAL[item.status] ?? STATUS_VISUAL.deploying
 
+  const SKIP_MESSAGES = {
+    degraded: 'Could not read the active release; deployment skipped.',
+    mismatch: 'The resource is not part of this deployment; skipped.',
+    unresolved_version: 'No ready version resolved for the resource; skipped.'
+  }
+
+  const errorLinesFor = (item) => {
+    const raw = item?.error?.message
+    if (Array.isArray(raw)) return raw.filter(Boolean).map(String)
+    if (raw) return [String(raw)]
+    return []
+  }
+
+  const feedbackFor = (item) => {
+    if (item.status === 'failed') {
+      const lines = errorLinesFor(item)
+      return { tone: 'error', lines: lines.length ? lines : ['Something went wrong.'] }
+    }
+    if (item.status === 'skipped') {
+      return { tone: 'muted', lines: [SKIP_MESSAGES[item.skipReason] ?? 'Deployment skipped.'] }
+    }
+    return { tone: 'muted', lines: [] }
+  }
+
   watch(
     () => props.visible,
     (open) => {
@@ -156,28 +180,48 @@
         <div
           v-for="item in filteredItems"
           :key="item.id"
-          class="flex items-center justify-between gap-[var(--spacing-3)] border-b border-[var(--surface-border)] px-[var(--spacing-4)] py-[var(--spacing-3)] last:border-b-0"
+          class="flex flex-col gap-[var(--spacing-2)] border-b border-[var(--surface-border)] px-[var(--spacing-4)] py-[var(--spacing-3)] last:border-b-0"
           :data-testid="`deployment-progress__item-${item.id}`"
           :data-status="item.status"
         >
-          <div class="flex min-w-0 items-center gap-[var(--spacing-2)]">
-            <i class="pi pi-send text-[var(--text-color-secondary)]" />
-            <span class="truncate text-body-sm font-semibold text-[var(--text-color)]">
-              {{ item.name }}
-            </span>
+          <div class="flex items-center justify-between gap-[var(--spacing-3)]">
+            <div class="flex min-w-0 items-center gap-[var(--spacing-2)]">
+              <i class="pi pi-send text-[var(--text-color-secondary)]" />
+              <span class="truncate text-body-sm font-semibold text-[var(--text-color)]">
+                {{ item.name }}
+              </span>
+              <span
+                v-if="environmentLabel(item)"
+                class="truncate text-body-xs text-[var(--text-color-secondary)]"
+              >
+                · {{ environmentLabel(item) }}
+              </span>
+            </div>
+            <PrimeTag
+              :severity="visualFor(item).severity"
+              :value="visualFor(item).label"
+              :icon="visualFor(item).icon"
+              rounded
+            />
+          </div>
+          <div
+            v-if="feedbackFor(item).lines.length"
+            class="flex flex-col gap-[2px] pl-[var(--spacing-6)]"
+            :data-testid="`deployment-progress__item-${item.id}-error`"
+          >
             <span
-              v-if="environmentLabel(item)"
-              class="truncate text-body-xs text-[var(--text-color-secondary)]"
+              v-for="(line, index) in feedbackFor(item).lines"
+              :key="index"
+              class="break-words text-body-xs"
+              :class="
+                feedbackFor(item).tone === 'error'
+                  ? 'text-[var(--error-color)]'
+                  : 'text-[var(--text-color-secondary)]'
+              "
             >
-              · {{ environmentLabel(item) }}
+              {{ line }}
             </span>
           </div>
-          <PrimeTag
-            :severity="visualFor(item).severity"
-            :value="visualFor(item).label"
-            :icon="visualFor(item).icon"
-            rounded
-          />
         </div>
       </div>
     </div>

@@ -4,6 +4,13 @@
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
 
+  defineProps({
+    disabledFields: {
+      type: Boolean,
+      default: false
+    }
+  })
+
   const { value: name } = useField('name')
   const { value: userAgent } = useField('userAgent')
 </script>
@@ -20,6 +27,7 @@
         required
         name="name"
         :value="name"
+        :disabled="disabledFields"
         placeholder="My device group"
         description="Give a unique and descriptive name to identify the device group."
       />
@@ -39,6 +47,7 @@
           placeholder="(Mobile|iP(hone|od)|BlackBerry|IEMobile)"
           name="userAgent"
           :value="userAgent"
+          :disabled="disabledFields"
           description="Add the regular expression you want to match to the content of the User-Agent header."
         />
       </div>

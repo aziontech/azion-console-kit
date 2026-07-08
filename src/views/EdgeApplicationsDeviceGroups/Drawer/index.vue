@@ -6,11 +6,14 @@
   import { refDebounced } from '@vueuse/core'
   import FormFieldsDrawerDeviceGroup from '@/views/EdgeApplicationsDeviceGroups/FormFields/FormFieldsEdgeApplicationsDeviceGroups'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   defineOptions({ name: 'drawer-device-groups' })
+
+  const { readOnly } = useVersionContext()
 
   const emit = defineEmits(['onSuccess'])
   const showCreateDrawer = ref(false)
@@ -165,13 +168,14 @@
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
+    :readOnly="readOnly"
     @onSuccess="handleSuccessEdit"
     :showBarGoBack="true"
     @onError="handleFailedToEdit"
     title="Edit Device Group"
   >
-    <template #formFields>
-      <FormFieldsDrawerDeviceGroup />
+    <template #formFields="{ disabledFields }">
+      <FormFieldsDrawerDeviceGroup :disabledFields="disabledFields" />
     </template>
   </EditDrawerBlock>
 </template>

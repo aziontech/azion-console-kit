@@ -45,6 +45,7 @@
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
         @additionalErrors="handleAdditionalErrors"
+        :disabledFields="readOnly"
       />
     </template>
     <template #action-bar="{ onSubmit, onCancel, loading }">

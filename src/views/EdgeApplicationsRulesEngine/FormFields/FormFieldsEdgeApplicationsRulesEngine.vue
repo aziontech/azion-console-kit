@@ -64,6 +64,10 @@
     loadingOrigins: {
       type: Boolean,
       default: false
+    },
+    disabledFields: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -607,7 +611,7 @@
         required
         name="name"
         :readonly="isDefaultPhase"
-        :disabled="isDefaultPhase"
+        :disabled="isDefaultPhase || disabledFields"
         placeholder="My rule"
         :value="name"
         description="Give a unique and descriptive name to identify the rule."
@@ -619,6 +623,7 @@
           :autoResize="true"
           rows="1"
           name="description"
+          :disabled="disabledFields"
           :value="description"
           description="Add a short description or comment to the rule."
           data-testid="rule-form-general-description"
@@ -649,7 +654,7 @@
         isCard
         :options="PHASE_OPTIONS"
         data-testid="edge-application-rule-form__phase__radio-group"
-        :disabled="isEditDrawer"
+        :disabled="isEditDrawer || disabledFields"
       />
     </template>
   </FormHorizontal>
@@ -701,7 +706,9 @@
                 :suggestions="variableItems"
                 :onComplete="searchVariableOption"
                 icon="pi pi-search"
-                :disabled="!props.isApplicationAcceleratorEnabled || isDefaultPhase"
+                :disabled="
+                  !props.isApplicationAcceleratorEnabled || isDefaultPhase || disabledFields
+                "
                 completeOnFocus
               />
             </div>
@@ -713,7 +720,7 @@
                 class="h-fit w-full"
                 :name="`criteria[${criteriaIndex}][${conditionalIndex}].operator`"
                 :value="criteria[criteriaIndex].value[conditionalIndex].operator"
-                :disabled="isDefaultPhase"
+                :disabled="isDefaultPhase || disabledFields"
                 :data-testid="`edge-application-rule-form__criteria-operator[${criteriaIndex}][${conditionalIndex}]`"
               />
             </div>
@@ -723,7 +730,7 @@
                 v-if="shouldRenderCriteriaValueInput(criteriaIndex, conditionalIndex)"
                 :name="`criteria[${criteriaIndex}][${conditionalIndex}].argument`"
                 :value="criteria[criteriaIndex].value[conditionalIndex].argument"
-                :disabled="isDefaultPhase"
+                :disabled="isDefaultPhase || disabledFields"
               />
             </div>
           </div>
@@ -873,6 +880,7 @@
               optionLabel="label"
               optionValue="value"
               optionDisabled="requires"
+              :disabled="disabledFields"
               v-bind:value="behaviors[behaviorIndex].value.name"
               :data-testid="`edge-application-rule-form__behaviors-item[${behaviorIndex}]`"
             />
@@ -889,6 +897,7 @@
                   "
                   :loadService="loadFunctionsInstance"
                   :loading="loadingFunctionsInstance"
+                  :disabled="disabledFields"
                   :name="`behaviors[${behaviorIndex}].functionId`"
                   optionLabel="name"
                   optionValue="id"
@@ -928,6 +937,7 @@
                 :service="getEdgeConnectors"
                 :loadService="edgeConnectorsService.loadEdgeConnectorsService"
                 :loading="loadingOrigins"
+                :disabled="disabledFields"
                 :name="`behaviors[${behaviorIndex}].edgeConnectorId`"
                 optionLabel="name"
                 optionValue="id"
@@ -960,6 +970,7 @@
               <FieldDropdown
                 filter
                 :loading="loadingOrigins"
+                :disabled="disabledFields"
                 :name="`behaviors[${behaviorIndex}].originId`"
                 :options="originsOptions"
                 optionLabel="name"
@@ -993,6 +1004,7 @@
               <FieldDropdown
                 filter
                 :loading="isLoadingRequestsData"
+                :disabled="disabledFields"
                 :name="`behaviors[${behaviorIndex}].cacheId`"
                 :options="cacheSettingsOptions"
                 optionLabel="name"
@@ -1027,6 +1039,7 @@
                 <FieldText
                   :name="`behaviors[${behaviorIndex}].captured_array`"
                   :key="behaviorItem.key"
+                  :disabled="disabledFields"
                   placeholder="Captured array name"
                   :value="behaviors[behaviorIndex].value.captured_array"
                   :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-captured-array[${behaviorIndex}]`"
@@ -1035,6 +1048,7 @@
                   placeholder="Subject"
                   :name="`behaviors[${behaviorIndex}].subject`"
                   :key="behaviorItem.key"
+                  :disabled="disabledFields"
                   :value="behaviors[behaviorIndex].value.subject"
                   :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-subject[${behaviorIndex}]`"
                 />
@@ -1042,6 +1056,7 @@
                   placeholder="Regex"
                   :name="`behaviors[${behaviorIndex}].regex`"
                   :key="behaviorItem.key"
+                  :disabled="disabledFields"
                   :value="behaviors[behaviorIndex].value.regex"
                   :data-testid="`edge-application-rule-form__behaviors-item-capture-match-groups-regex[${behaviorIndex}]`"
                 />
@@ -1052,6 +1067,7 @@
                 <FieldText
                   :name="`behaviors[${behaviorIndex}].target`"
                   :key="behaviorItem.key"
+                  :disabled="disabledFields"
                   :placeholder="placeholderBehaviors(behaviorItem.value.name)"
                   :value="behaviors[behaviorIndex].value.target"
                   :data-testid="`edge-application-rule-form__behaviors-item-target[${behaviorIndex}]`"
@@ -1087,6 +1103,7 @@
         auto
         :isCard="false"
         title="Active"
+        :disabled="disabledFields"
         data-testid="rule-form-status-switch"
       />
     </template>

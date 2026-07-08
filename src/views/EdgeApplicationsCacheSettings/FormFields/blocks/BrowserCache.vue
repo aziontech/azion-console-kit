@@ -9,6 +9,7 @@
         nameField="browserCacheSettings"
         :isCard="false"
         :options="getBrowserCacheRadioOptions()"
+        :disabled="disabledFields"
         data-testid="edge-application-cache-settings-form__browser-cache-settings-field"
       />
 
@@ -26,6 +27,7 @@
           showButtons
           v-model="browserCacheSettingsMaximumTtl"
           id="browserCacheSettingsMaximumTtl"
+          :disabled="disabledFields"
           :min="0"
           :max="31536000"
           :step="1"
@@ -57,6 +59,13 @@
   import InputNumber from '@aziontech/webkit/inputnumber'
   import { useField } from 'vee-validate'
   import { computed, watch } from 'vue'
+
+  defineProps({
+    disabledFields: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const {
     value: browserCacheSettingsMaximumTtl,

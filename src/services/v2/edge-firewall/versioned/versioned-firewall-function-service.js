@@ -1,6 +1,7 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { EdgeFirewallFunctionAdapter } from '@/services/v2/edge-firewall/edge-firewall-function-adapter'
+import { enrichFunctionInstanceNames } from '@/services/v2/utils/enrichFunctionInstanceNames'
 
 /**
  * Versioned Firewall Function service, scoped to (firewallId, versionId).
@@ -28,7 +29,12 @@ export class VersionedFirewallFunctionService extends BaseService {
     })
 
     const { results = [], count = 0 } = data ?? {}
-    const body = this.adapter?.transformListFunction?.(results) ?? results
+    const transformed = this.adapter?.transformListFunction?.(results) ?? results
+    const body = await enrichFunctionInstanceNames({
+      http: this.http,
+      items: transformed,
+      getReferenceId: (item) => item.edgeFunctionId
+    })
 
     return { count, body }
   }
@@ -49,7 +55,7 @@ export class VersionedFirewallFunctionService extends BaseService {
       url: this.getUrl(firewallId, versionId, `/${id}`)
     })
 
-    return this.adapter?.transformLoadEdgeFirewallFunction?.(data) ?? data
+    return this.adapter?.transformLoadEdgeFirewallFunction?.(data?.data ?? data) ?? data
   }
 
   load = async (firewallId, versionId, id) => {

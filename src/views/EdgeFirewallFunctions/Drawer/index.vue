@@ -49,6 +49,7 @@
         @additionalErrors="handleAdditionalErrors"
         :listEdgeFunctionsService="edgeFunctionService.listEdgeFunctionsDropdown"
         :loadEdgeFunctionService="edgeFunctionService.loadEdgeFunction"
+        :disabledFields="readOnly"
       />
     </template>
     <template #action-bar="{ onSubmit, onCancel, loading }">

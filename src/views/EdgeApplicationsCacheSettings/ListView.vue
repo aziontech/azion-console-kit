@@ -90,8 +90,6 @@
     ]
   })
 
-  const editInDrawerHandler = computed(() => (readOnly.value ? undefined : openEditDrawer))
-
   const openCreateDrawer = () => {
     handleTrackClickToCreate()
     drawerRef.value.openCreateDrawer()
@@ -178,7 +176,7 @@
     :listService="listCacheSettingsServiceWithDecorator"
     :columns="getColumns"
     :frozenColumns="['name']"
-    :editInDrawer="editInDrawerHandler"
+    :editInDrawer="openEditDrawer"
     :actions="actions"
     :apiFields="CACHE_SETTING_API_FIELDS"
     exportFileName="Application Cache Settings"

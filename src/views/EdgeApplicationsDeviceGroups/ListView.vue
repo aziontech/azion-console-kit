@@ -138,10 +138,6 @@
     ]
   })
 
-  const editInDrawerHandler = computed(() =>
-    readOnly.value ? undefined : openEditDeviceGroupDrawer
-  )
-
   const handleTrackClickToCreate = () => {
     tracker.product
       .clickToCreate({
@@ -184,7 +180,7 @@
     :listService="listDeviceGroupsWithDecorator"
     :columns="getColumns"
     :frozenColumns="['name']"
-    :editInDrawer="editInDrawerHandler"
+    :editInDrawer="openEditDeviceGroupDrawer"
     :actions="actions"
     defaultOrderingFieldName="name"
     :apiFields="DEVICE_GROUP_API_FIELDS"

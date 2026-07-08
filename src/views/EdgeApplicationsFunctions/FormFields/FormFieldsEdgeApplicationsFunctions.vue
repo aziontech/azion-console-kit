@@ -24,6 +24,10 @@
     allowedRuntime: {
       type: String,
       default: null // null = all, 'azion_lua' = only Lua
+    },
+    disabledFields: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -230,6 +234,7 @@
         required
         name="name"
         v-model="name"
+        :disabled="disabledFields"
         placeholder="My Application function instance"
         description="Give a unique and descriptive name to identify the function instance."
       />
@@ -256,6 +261,7 @@
             data-testid="edge-application-function-instance-form__edge-function"
             label="Function"
             name="edgeFunctionID"
+            :disabled="disabledFields"
             optionLabel="name"
             optionValue="id"
             inputId="edgeFunctionID"
@@ -326,6 +332,7 @@
                           class="overflow-clip surface-border border rounded-md"
                           :initialValue="schemaAzionFormString"
                           :errors="hasAzionFormError"
+                          :readOnly="disabledFields"
                           :minimap="false"
                           @update:modelValue="codeEditorFormBuilderUpdate"
                         />
@@ -392,6 +399,7 @@
               class="overflow-clip surface-border border rounded-md"
               :initialValue="args"
               :errors="hasArgsError"
+              :readOnly="disabledFields"
               :minimap="false"
             />
           </div>

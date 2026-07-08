@@ -391,6 +391,7 @@
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
         :initialPhase="initialPhase"
+        :disabledFields="readOnly"
         data-testid="rules-engine-edit-drawer-form-fields"
         :errors="errors"
       />

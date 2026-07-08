@@ -20,6 +20,13 @@
 
   const emit = defineEmits(['toggleDrawer', 'additionalErrors'])
 
+  defineProps({
+    disabledFields: {
+      type: Boolean,
+      default: false
+    }
+  })
+
   const { value: name } = useField('name')
   const { value: edgeFunctionID } = useField('edgeFunctionID')
   const { value: args, errorMessage: argsError } = useField('args')
@@ -218,6 +225,7 @@
         required
         name="name"
         v-model="name"
+        :disabled="disabledFields"
         description="Give a unique and descriptive name to identify the Firewall function instance."
         placeholder="My Firewall function instance"
         data-testid="edge-firewall-functions-form__name-field"
@@ -243,6 +251,7 @@
           data-testid="edge-firewall-functions-form__edge-function-dropdown"
           label="Function"
           name="edgeFunctionID"
+          :disabled="disabledFields"
           optionLabel="name"
           optionValue="id"
           appendTo="self"
@@ -307,6 +316,7 @@
                           class="overflow-clip surface-border border rounded-md"
                           :initialValue="schemaAzionFormString"
                           :errors="hasAzionFormError"
+                          :readOnly="disabledFields"
                           :minimap="false"
                           @update:modelValue="codeEditorFormBuilderUpdate"
                         />
@@ -373,6 +383,7 @@
               class="overflow-clip surface-border border rounded-md"
               :initialValue="args"
               :errors="hasArgsError"
+              :readOnly="disabledFields"
               :minimap="false"
             />
           </div>

@@ -9,6 +9,7 @@
         name="name"
         label="Name"
         required
+        :disabled="disabledFields"
         placeholder="My cache setting"
         description="Give a unique and descriptive name to identify the cache setting."
         data-testid="edge-application-cache-settings-form__name-field"
@@ -16,14 +17,18 @@
     </template>
   </FormHorizontal>
 
-  <BrowserCache />
+  <BrowserCache :disabledFields="disabledFields" />
 
   <EdgeCache
     :isTieredCacheEnabled="showTieredCacheForm"
+    :disabledFields="disabledFields"
     @enableSliceConfiguration="enableSliceConfiguration"
   />
 
-  <ApplicationAccelerator v-if="isApplicationAcceleratorEnabled" />
+  <ApplicationAccelerator
+    v-if="isApplicationAcceleratorEnabled"
+    :disabledFields="disabledFields"
+  />
 </template>
 
 <script setup>
@@ -48,6 +53,10 @@
     showTieredCache: {
       type: Boolean,
       required: true
+    },
+    disabledFields: {
+      type: Boolean,
+      default: false
     }
   })
 

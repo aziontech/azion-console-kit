@@ -277,6 +277,7 @@
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
         :loadWafRulesService="wafService.loadWafRule"
+        :disabledFields="readOnly"
         @isOverlapped="handleIsOverlapped"
       />
     </template>

@@ -24,9 +24,13 @@ describe('VersionedFirewallFunctionService', () => {
 
   it('list GETs the versioned functions URL and returns { count, body }', async () => {
     stubEnsure(service)
-    const requestSpy = vi.spyOn(httpService, 'request').mockResolvedValueOnce({
-      data: { count: 1, results: [{ id: 1, name: 'fn', function: 9, last_modified: null }] }
-    })
+    const requestSpy = vi
+      .spyOn(httpService, 'request')
+      .mockResolvedValueOnce({
+        data: { count: 1, results: [{ id: 1, name: 'fn', function: 9, last_modified: null }] }
+      })
+      // Name enrichment resolves the linked Function (id 9) name.
+      .mockResolvedValueOnce({ data: { count: 1, results: [{ id: 9, name: 'my-function' }] } })
 
     const result = await service.list(RID, VID, { page: 1 })
 
@@ -37,6 +41,7 @@ describe('VersionedFirewallFunctionService', () => {
     })
     expect(result.count).toBe(1)
     expect(result.body[0].name).toBe('fn')
+    expect(result.body[0].functionInstanced).toBe('my-function')
   })
 
   it('remove DELETEs by id and invalidates the versioned functions cache', async () => {
