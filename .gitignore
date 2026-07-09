@@ -17,10 +17,7 @@ coverage
 *.local
 package-lock.json
 
-/.nyc_output
 /.hypothesis
-/cypress/videos/
-/cypress/screenshots/
 
 # Editor directories and files
 .vscode/*
@@ -38,8 +35,6 @@ package-lock.json
 .env
 .env.*
 !.env.sample
-cypress.env.*
-!cypress.env.example.json
 
 #azion vulcan folder
 #azion
@@ -50,11 +45,9 @@ cypress.env.*
 azion/
 
 src/views/Playground/PlaygroundView.vue
-/cypress/downloads
 #Paths added by Azion CLI
 .edge/
 .vulcan
-specs.json
 
 docs/ARCHITECTURE.md
 
