@@ -507,10 +507,12 @@ export default class Aql {
         if (operatorFound) {
           let stringBeforeOperator = expression.split(operatorFound)[0].trim()
           if (stringBeforeOperator.includes(' ')) {
-            if (!(
-              (stringBeforeOperator.startsWith('"') && stringBeforeOperator.endsWith('"')) ||
-              (stringBeforeOperator.startsWith("'") && stringBeforeOperator.endsWith("'"))
-            )) {
+            if (
+              !(
+                (stringBeforeOperator.startsWith('"') && stringBeforeOperator.endsWith('"')) ||
+                (stringBeforeOperator.startsWith("'") && stringBeforeOperator.endsWith("'"))
+              )
+            ) {
               if (!erros.includes('quote-error')) {
                 erros.push('quote-error')
               }
@@ -518,10 +520,12 @@ export default class Aql {
           }
         } else {
           if (expression.includes(' ') && /\s+\S+/.test(expression)) {
-            if (!(
-              (expression.trim().startsWith('"') && expression.trim().endsWith('"')) ||
-              (expression.trim().startsWith("'") && expression.trim().endsWith("'"))
-            )) {
+            if (
+              !(
+                (expression.trim().startsWith('"') && expression.trim().endsWith('"')) ||
+                (expression.trim().startsWith("'") && expression.trim().endsWith("'"))
+              )
+            ) {
               if (!erros.includes('quote-error')) {
                 erros.push('quote-error')
               }
@@ -535,10 +539,12 @@ export default class Aql {
       if (operatorFound) {
         let stringBeforeOperator = queryText.split(operatorFound)[0].trim()
         if (stringBeforeOperator.includes(' ')) {
-          if (!(
-            (stringBeforeOperator.startsWith('"') && stringBeforeOperator.endsWith('"')) ||
-            (stringBeforeOperator.startsWith("'") && stringBeforeOperator.endsWith("'"))
-          )) {
+          if (
+            !(
+              (stringBeforeOperator.startsWith('"') && stringBeforeOperator.endsWith('"')) ||
+              (stringBeforeOperator.startsWith("'") && stringBeforeOperator.endsWith("'"))
+            )
+          ) {
             if (!erros.includes('quote-error')) {
               erros.push('quote-error')
             }
@@ -546,10 +552,12 @@ export default class Aql {
         }
       } else {
         if (queryText.includes(' ') && /\s+\S+/.test(queryText)) {
-          if (!(
-            (queryText.trim().startsWith('"') && queryText.trim().endsWith('"')) ||
-            (queryText.trim().startsWith("'") && queryText.trim().endsWith("'"))
-          )) {
+          if (
+            !(
+              (queryText.trim().startsWith('"') && queryText.trim().endsWith('"')) ||
+              (queryText.trim().startsWith("'") && queryText.trim().endsWith("'"))
+            )
+          ) {
             if (!erros.includes('quote-error')) {
               erros.push('quote-error')
             }
