@@ -40,7 +40,6 @@ This project was developed by [Azion](https://www.azion.com/), a web platform th
 | [Vue Router](https://router.vuejs.org/) | Official router for Vue.js |
 | [Axios](https://axios-http.com/) | HTTP client |
 | [Vitest](https://vitest.dev/) | Unit testing framework |
-| [Cypress](https://www.cypress.io/) | E2E testing framework |
 | [VeeValidate](https://vee-validate.logaretm.com/v4/) + [Yup](https://github.com/jquense/yup) | Form validation |
 
 ## Getting Started 🔛
@@ -194,24 +193,6 @@ yarn test:unit:headless
 yarn test:unit:coverage
 ```
 
-### E2E Tests (Cypress)
-
-Before running E2E tests, create `cypress.env.json` from the example file and fill in valid credentials.
-
-```bash
-# Open Cypress UI (development)
-yarn test:e2e:open:dev
-
-# Run tests headless (development)
-yarn test:e2e:run:dev
-
-# Run against staging
-yarn test:e2e:run:stage
-
-# Run against production
-yarn test:e2e:run:prod
-```
-
 ### Linting & Formatting
 
 ```bash
@@ -261,7 +242,6 @@ Deploy to Azion's web platform using the Azion CLI:
 | `yarn build` | Build for production |
 | `yarn preview` | Preview production build locally |
 | `yarn test:unit` | Run unit tests with UI |
-| `yarn test:e2e:open:dev` | Open Cypress for E2E testing |
 | `yarn lint` | Lint and fix code |
 | `yarn format` | Format code with Prettier |
 

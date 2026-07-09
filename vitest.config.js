@@ -15,8 +15,6 @@ export default mergeConfig(
       },
       exclude: [
         ...configDefaults.exclude,
-        'e2e/*',
-        'cypress',
         'azion',
         '.vscode',
         '.husky',
