@@ -69,7 +69,7 @@
 </script>
 
 <template>
-  <div class="flex w-full flex-col gap-[var(--spacing-2)]">
+  <div class="flex w-full min-w-0 flex-col gap-[var(--spacing-2)]">
     <div
       v-if="showResource"
       class="flex flex-col gap-[var(--spacing-2)]"
@@ -85,11 +85,11 @@
         >
       </label>
       <span
-        class="flex items-center gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-3)] py-[var(--spacing-2)] text-body-sm text-[var(--text-color)]"
+        class="flex min-w-0 items-center gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-3)] py-[var(--spacing-2)] text-body-sm text-[var(--text-color)]"
         data-testid="release-composition__resource-name"
       >
-        <i class="pi pi-box text-[var(--text-color-secondary)]" />
-        {{ resourceName }}
+        <i class="pi pi-box shrink-0 text-[var(--text-color-secondary)]" />
+        <span class="truncate">{{ resourceName }}</span>
       </span>
     </div>
 
@@ -128,13 +128,13 @@
           </span>
           <span
             v-else-if="selectedOption"
-            class="font-mono text-body-sm text-[var(--text-color)]"
+            class="text-body-sm text-[var(--text-color)]"
           >
             {{ selectedOption.label }}
           </span>
           <span
             v-else-if="modelValue"
-            class="font-mono text-body-sm text-[var(--text-color)]"
+            class="text-body-sm text-[var(--text-color)]"
           >
             {{ modelValue }}
           </span>
@@ -171,9 +171,7 @@
           >
             <span class="flex min-w-0 flex-col gap-[var(--spacing-1)]">
               <span class="flex items-center gap-[var(--spacing-2)]">
-                <span class="font-mono text-body-sm text-[var(--text-color)]">{{
-                  option.label
-                }}</span>
+                <span class="text-body-sm text-[var(--text-color)]">{{ option.label }}</span>
                 <span
                   v-if="option.isCurrent"
                   class="inline-flex items-center rounded-[var(--shape-elements)] bg-[var(--surface-200)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm text-[var(--text-color-secondary)]"

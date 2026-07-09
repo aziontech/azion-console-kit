@@ -16,10 +16,12 @@
    *
    * @prop collections — array of `{ type, label, icon, count, open, instances }`
    *   where each instance is `{ id, resourceId, name, options, version,
-   *   versionOptions, locked?, required? }`. A `locked` instance is
+   *   versionOptions, locked?, required?, buildRoute? }`. A `locked` instance is
    *   app-managed: its resource is fixed (rendered as a label, no dropdown) and
    *   it offers no remove. A `required` instance marks its version selector as
-   *   required, and signals when no version is selectable (empty `versionOptions`).
+   *   required, and signals when no version is selectable (empty `versionOptions`);
+   *   in that state it links to `buildRoute` (the dependency's edit page) so the
+   *   user can build a Ready version for it.
    * @event toggle-group(type) — request to collapse/expand a collection group.
    * @event update:instance-resource({ type, id, value }) — instance selection.
    * @event update:instance-version({ type, id, value }) — version selection.
@@ -142,7 +144,7 @@
                   >
                     <div
                       v-if="instance.locked"
-                      class="flex w-full flex-col gap-[var(--spacing-2)]"
+                      class="flex w-full min-w-0 flex-col gap-[var(--spacing-2)]"
                     >
                       <label
                         class="flex items-center gap-[var(--spacing-1)] text-body-sm font-medium text-[var(--text-color-secondary)]"
@@ -198,13 +200,25 @@
                     ]"
                   >
                     <span aria-hidden="true" />
-                    <p
+                    <div
                       class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--color-orange-500)] mt-[var(--spacing-2)]"
                       :data-testid="`release-composition__deps-no-versions-${collection.type}-${instance.id}`"
                     >
-                      <i class="pi pi-exclamation-triangle" />
-                      No Ready version available — publish is blocked.
-                    </p>
+                      <div class="flex gap-[var(--spacing-1)]">
+                        <i class="pi pi-exclamation-triangle" />
+                        <span>No Ready version available — publish is blocked.</span>
+                      </div>
+                      <router-link
+                        v-if="instance.buildRoute"
+                        :to="instance.buildRoute"
+                        rel="noopener"
+                        class="inline-flex items-center gap-[var(--spacing-1)] font-medium text-[var(--text-color-link)] hover:text-[var(--text-color-link-hover)] cursor-pointer hover:underline"
+                        :data-testid="`release-composition__deps-build-link-${collection.type}-${instance.id}`"
+                      >
+                        Build a version
+                        <i class="pi pi-external-link" />
+                      </router-link>
+                    </div>
                   </div>
                 </div>
               </template>

@@ -97,7 +97,7 @@ export const deploymentRoutes = {
             to: '/deployments'
           },
           {
-            label: 'Deployment',
+            label: 'Releases',
             dynamic: true,
             routeParam: 'id'
           },

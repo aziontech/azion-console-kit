@@ -1,7 +1,6 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import PrimeButton from '@aziontech/webkit/button'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
   import DeployDrawerBlock from '@/templates/deploy-drawer-block'
@@ -22,9 +21,6 @@
   // DeployDrawerBlock stays mounted (rollback fallback). The visible model is held
   // but the trigger now routes to the full-page composer (DS-first).
   const isDeployDrawerOpen = ref(false)
-  const openRelease = () => {
-    router.push(releaseComposerRouteFromDeployment())
-  }
 
   const columns = computed(() => [
     { field: 'name', header: 'Name', sortField: 'name', filterPath: 'name' },
@@ -108,14 +104,6 @@
         data-testid="deployments-heading"
       >
         <template #default>
-          <PrimeButton
-            label="Deploy"
-            icon="pi pi-cloud-upload"
-            size="small"
-            outlined
-            data-testid="deployments__deploy"
-            @click="openRelease"
-          />
           <DataTableActionsButtons
             size="small"
             label="Deployment"

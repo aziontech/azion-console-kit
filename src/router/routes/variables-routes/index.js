@@ -1,3 +1,13 @@
+import { hasFlagUseV6Configurations } from '@/composables/user-flag'
+
+export const variablesTabGuard = (to) => {
+  if (to.params.tab && !hasFlagUseV6Configurations()) {
+    return '/not-found'
+  }
+
+  return true
+}
+
 /** @type {import('vue-router').RouteRecordRaw} */
 export const variablesRoutes = {
   path: '/variables',
@@ -6,7 +16,10 @@ export const variablesRoutes = {
     {
       path: '',
       name: 'list-variables',
-      component: () => import('@views/Variables/ListView.vue'),
+      component: () =>
+        hasFlagUseV6Configurations()
+          ? import('@views/Variables/v6/ListView.vue')
+          : import('@views/Variables/ListView.vue'),
       meta: {
         title: 'Variables',
         breadCrumbs: [
@@ -20,7 +33,10 @@ export const variablesRoutes = {
     {
       path: 'create',
       name: 'create-variables',
-      component: () => import('@views/Variables/CreateView.vue'),
+      component: () =>
+        hasFlagUseV6Configurations()
+          ? import('@views/Variables/v6/CreateView.vue')
+          : import('@views/Variables/CreateView.vue'),
       meta: {
         title: 'Create Variable',
         breadCrumbs: [
@@ -36,9 +52,13 @@ export const variablesRoutes = {
       }
     },
     {
-      path: 'edit/:id',
+      path: 'edit/:id/:tab?',
       name: 'edit-variables',
-      component: () => import('@views/Variables/EditView.vue'),
+      component: () =>
+        hasFlagUseV6Configurations()
+          ? import('@views/Variables/v6/EditView.vue')
+          : import('@views/Variables/EditView.vue'),
+      beforeEnter: variablesTabGuard,
       meta: {
         title: 'Edit Variable',
         breadCrumbs: [

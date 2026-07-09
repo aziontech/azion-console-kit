@@ -1,6 +1,8 @@
 import * as yup from 'yup'
 
-export const SCOPE_TYPES = ['global', 'environment', 'deployment', 'resource']
+export const SCOPE_CATEGORIES = ['global', 'environment', 'deployment', 'resource']
+
+export const RESOURCE_SCOPE_TYPES = ['application', 'firewall', 'function']
 
 export const SCOPE_TYPE_OPTIONS = [
   { label: 'Global', value: 'global' },
@@ -9,21 +11,26 @@ export const SCOPE_TYPE_OPTIONS = [
   { label: 'Resource', value: 'resource' }
 ]
 
-const idFieldForType = (type) => (type === 'global' ? null : `${type}_id`)
+export const RESOURCE_TYPE_OPTIONS = [
+  { label: 'Application', value: 'application' },
+  { label: 'Firewall', value: 'firewall' },
+  { label: 'Function', value: 'function' }
+]
 
 const scopeItemSchema = yup
   .object({
-    type: yup.string().oneOf(SCOPE_TYPES, 'Invalid scope type').required('Scope type is required'),
-    environment_id: yup.string().nullable(),
-    deployment_id: yup.string().nullable(),
-    resource_id: yup.string().nullable()
+    type: yup
+      .string()
+      .oneOf(SCOPE_CATEGORIES, 'Invalid scope type')
+      .required('Scope type is required'),
+    resourceType: yup.string().nullable(),
+    id: yup.string().nullable()
   })
-  .test('scope-id-matches-type', 'Scope id does not match scope type', (item) => {
+  .test('scope-selection-complete', 'Complete the scope selection', (item) => {
     if (!item?.type) return false
-    const idKey = idFieldForType(item.type)
-    if (!idKey) return true
-    const idValue = item[idKey]
-    return typeof idValue === 'string' && idValue.trim().length > 0
+    if (item.type === 'global') return true
+    if (item.type === 'resource' && !RESOURCE_SCOPE_TYPES.includes(item.resourceType)) return false
+    return typeof item.id === 'string' && item.id.trim().length > 0
   })
 
 export const scopeArraySchema = yup
@@ -32,4 +39,4 @@ export const scopeArraySchema = yup
   .min(1, 'At least one scope is required')
   .required('Scope is required')
 
-export { idFieldForType, scopeItemSchema }
+export { scopeItemSchema }

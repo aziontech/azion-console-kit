@@ -10,7 +10,7 @@
   const { fields, push, remove } = useFieldArray('scope')
 
   const addScope = () => {
-    push({ type: 'global', environment_id: '', deployment_id: '', resource_id: '' })
+    push({ type: 'global', resourceType: '', id: '' })
   }
 </script>
 

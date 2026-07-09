@@ -655,7 +655,7 @@
   </FormHorizontal>
 
   <FormHorizontal
-    title="Custom Variables"
+    title="Variables"
     description="Define environment-specific variables using the form or JSON editor, or import a .env file."
   >
     <template #inputs>
@@ -681,9 +681,9 @@
             v-model="customVariablesView"
             :options="customVariablesViewOptions"
             :disabled="props.disabledFields"
-            aria-label="Custom variables view"
+            aria-label="Variables view"
             class="flex h-9 p-1 w-fit"
-            data-testid="environment-form__custom-variables-view-toggle"
+            data-testid="environment-form__variables-view-toggle"
           />
         </div>
         <template v-if="customVariablesView === 'Form'">
@@ -700,7 +700,7 @@
                 placeholder="VARIABLE_KEY_NAME"
                 :additionalError="getCustomVariableFieldError(index, 'key')"
                 :disabled="props.disabledFields"
-                :data-testid="`environment-form__custom-variables__key-input-${index}`"
+                :data-testid="`environment-form__variables__key-input-${index}`"
                 @input="(value) => updateCustomVariableEntry(index, 'key', value)"
               />
 

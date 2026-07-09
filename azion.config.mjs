@@ -21,6 +21,8 @@ const environmentApiHost =
     ? 'environment-api.azion.app'
     : 'environment-api-stage.azion.app'
 
+const variablesApiHost = environment === 'production' ? 'variables.azion.com' : 'stage-variables.azion.com'
+
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
     return origin?.map(({ hostHeader, addresses, ...rest }) => {
@@ -174,6 +176,12 @@ const config = {
       type: 'single_origin',
       hostHeader: environmentApiHost,
       addresses: [environmentApiHost]
+    },
+    {
+      name: 'origin-variables-api',
+      type: 'single_origin',
+      hostHeader: variablesApiHost,
+      addresses: [variablesApiHost]
     },
     {
       name: 'origin-console-feedback',
@@ -364,6 +372,12 @@ const config = {
             conditional: 'and',
             operator: 'does_not_match',
             inputValue: '^/environment-api'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/variables-api'
           },
           {
             variable: '${uri}',
@@ -587,6 +601,26 @@ const config = {
           rewrite: `/%{captured[1]}`,
           bypassCache: true
         }
+      },
+      {
+        name: 'Route Variables API Requests',
+        description:
+          'Routes new variables API requests to the variables API origin, stripping the /variables-api prefix.',
+        match: '^/variables-api',
+        behavior: {
+          forwardCookies: true,
+          setOrigin: {
+            name: 'origin-variables-api',
+            type: 'single_origin'
+          },
+          capture: {
+            match: '/variables-api/(.*)',
+            captured: 'captured',
+            subject: 'request_uri'
+          },
+          rewrite: `/%{captured[1]}`,
+          bypassCache: true
+        }
       }
     ],
     response: [
@@ -670,6 +704,12 @@ const config = {
             conditional: 'and',
             operator: 'does_not_match',
             inputValue: '^/environment-api'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/variables-api'
           },
           {
             variable: '${uri}',

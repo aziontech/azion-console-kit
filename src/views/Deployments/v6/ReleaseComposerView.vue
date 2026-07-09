@@ -45,6 +45,7 @@
     RELEASE_COMPOSER_ROUTE,
     releaseComposerRouteFirstRelease
   } from '@/templates/release-composition/release-composer-route'
+  import { resourceBuildRoute } from '@/templates/release-composition/resource-build-route'
   import { useApplicationFunctionDependencies } from '@/templates/release-composition/use-application-function-dependencies'
   import { useApplicationConnectorDependencies } from '@/templates/release-composition/use-application-connector-dependencies'
   import { useApplicationVersionReady } from '@/templates/release-composition/use-application-version-ready'
@@ -763,14 +764,20 @@
     return match?.name ?? ''
   })
 
-  // Keep the breadcrumb's dynamic segment in sync with the resolved deployment
-  // name — "Deployments › <name> › New release" — matching the console-wide
-  // entity breadcrumb pattern. The name resolves async (deployments query), so
-  // re-run update whenever it changes; PageHeadingBlock's one-shot setup update
-  // isn't enough on its own.
+  // Breadcrumb middle segment. Only the 'from-deployment' entry names the single
+  // deployment in scope ("Deployments › <name> › New release"); every other entry
+  // (resource, workload, global) keeps the generic "Releases" fallback — a Workload
+  // binds many Deployment Settings, so naming just one would misrepresent scope.
+  const breadcrumbEntityName = computed(() =>
+    isFromDeployment.value ? deploymentName.value || undefined : undefined
+  )
+
+  // The name resolves async (deployments query), so re-run update whenever it (or
+  // the entry scenario) changes; PageHeadingBlock's one-shot setup update isn't
+  // enough on its own.
   watch(
-    deploymentName,
-    (name) => breadcrumbs.update(route.meta?.breadCrumbs ?? [], route, name || undefined),
+    breadcrumbEntityName,
+    (name) => breadcrumbs.update(route.meta?.breadCrumbs ?? [], route, name),
     { immediate: true }
   )
 
@@ -827,7 +834,8 @@
         version: instance.version,
         versionOptions: composition.versionOptionsFor(type, instance.resourceId),
         locked: instance.locked,
-        required: instance.required
+        required: instance.required,
+        buildRoute: resourceBuildRoute({ type, resourceId: instance.resourceId })
       }))
       return {
         type,
@@ -1362,7 +1370,7 @@
       >
         <PageHeadingBlock
           page-title="Review & deploy"
-          :entity-name="deploymentName"
+          :entity-name="breadcrumbEntityName"
         />
         <h1
           class="text-heading-md font-semibold text-[var(--text-color)]"

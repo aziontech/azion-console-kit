@@ -18,6 +18,7 @@ const getConfig = () => {
   const BEHOLDER_URL = env.VITE_BEHOLDER_URL
   const deploymentApiUrl = IS_PROD ? 'https://deployment-api.azion.app' : 'https://deployment-api-stage.azion.app'
   const environmentApiUrl = IS_PROD ? 'https://environment-api.azion.app' : 'https://environment-api-stage.azion.app'
+  const variablesApiUrl = IS_PROD ? 'https://variables.azion.com' : 'https://stage-variables.azion.com'
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
     target,
@@ -150,6 +151,10 @@ const getConfig = () => {
         '/environment-api': createProxyConfig({
           target: environmentApiUrl,
           rewrite: (path) => path.replace(/^\/environment-api/, '')
+        }),
+        '/variables-api': createProxyConfig({
+          target: variablesApiUrl,
+          rewrite: (path) => path.replace(/^\/variables-api/, '')
         })
       }
     }

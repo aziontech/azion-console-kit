@@ -40,5 +40,5 @@ export const buildCanaryInitialValues = () => ({
   rollout_mode: 'GRADUAL',
   gradual_rollout_candidate_percentage: 10,
   gradual_rollout_candidate_cookie_name: '',
-  gradual_rollout_candidate_cookie_max_age_seconds: null
+  gradual_rollout_candidate_cookie_max_age_seconds: 3600
 })

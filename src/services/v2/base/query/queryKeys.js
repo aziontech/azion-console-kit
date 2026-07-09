@@ -344,6 +344,19 @@ export const queryKeys = {
     all: ['variables'],
     list: () => [...queryKeys.variables.all, 'list']
   },
+  variablesV6: {
+    all: ['variables-v6'],
+    list: (params) => [...queryKeys.variablesV6.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.variablesV6.all, 'detail', id],
+    versions: {
+      all: (id) => [...queryKeys.variablesV6.detail(id), 'versions'],
+      list: (id, params) => [
+        ...queryKeys.variablesV6.versions.all(id),
+        'list',
+        normalizeParams(params)
+      ]
+    }
+  },
   environments: {
     all: ['environments'],
     list: (params) => [...queryKeys.environments.all, 'list', normalizeParams(params)],
