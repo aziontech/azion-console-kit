@@ -5,8 +5,12 @@ import { describe, expect, it, vi } from 'vitest'
 const localeMock = (locale = 'en') => {
   const DateTimeFormat = Intl.DateTimeFormat
   vi.spyOn(window.global.Intl, 'DateTimeFormat')
-    .mockImplementationOnce((__, options) => DateTimeFormat(locale, { ...options }))
-    .mockImplementationOnce((__, options) => DateTimeFormat(locale, { ...options }))
+    .mockImplementationOnce(function (__, options) {
+      return DateTimeFormat(locale, { ...options })
+    })
+    .mockImplementationOnce(function (__, options) {
+      return DateTimeFormat(locale, { ...options })
+    })
 }
 
 const fixtures = {
