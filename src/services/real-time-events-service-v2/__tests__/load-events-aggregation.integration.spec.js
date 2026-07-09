@@ -26,7 +26,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const { mockDecoratorRequest, MockDecoratorClass } = vi.hoisted(() => {
   const mockRequest = vi.fn()
-  const MockClass = vi.fn().mockImplementation(() => ({ request: mockRequest }))
+  // The service instantiates the decorator with `new`; vitest 4 forwards the
+  // `new` call to the implementation, so it must be a constructible function.
+  const MockClass = vi.fn(function () {
+    return { request: mockRequest }
+  })
   return { mockDecoratorRequest: mockRequest, MockDecoratorClass: MockClass }
 })
 
@@ -66,7 +70,9 @@ function emptyChartResponse() {
 beforeEach(() => {
   mockDecoratorRequest.mockReset()
   MockDecoratorClass.mockClear()
-  MockDecoratorClass.mockImplementation(() => ({ request: mockDecoratorRequest }))
+  MockDecoratorClass.mockImplementation(function () {
+    return { request: mockDecoratorRequest }
+  })
   vi.spyOn(console, 'warn').mockImplementation(() => {})
   vi.spyOn(console, 'info').mockImplementation(() => {})
   vi.spyOn(console, 'error').mockImplementation(() => {})
