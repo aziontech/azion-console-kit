@@ -60,8 +60,7 @@ export const VariablesV6Adapter = {
 
     return data.map((item) => ({
       id: item.version_id,
-      label: `Version ${item.version}`,
-      versionNumber: item.version,
+      label: item.version_id,
       isCurrent: item.current ?? Number(item.version) === maxVersion,
       lastEditor: item.last_editor,
       lastModified: formatDateToDayMonthYearHour(item.created_at)

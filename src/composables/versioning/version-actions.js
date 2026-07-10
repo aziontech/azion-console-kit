@@ -8,7 +8,14 @@
  * (`getAvailableActions`); this module only adds the *presentation* layer plus
  * the fixed row-menu model (`buildVersionMenuItems`).
  */
-import { isReady, canArchive, canDelete } from './version-machine'
+import {
+  isReady,
+  isEditable,
+  canArchive,
+  canDelete,
+  isActionAvailable,
+  VERSION_ACTIONS
+} from './version-machine'
 import { getVersionCapability, DEFAULT_CAPABILITY } from './version-capability'
 
 /**
@@ -27,7 +34,7 @@ import { getVersionCapability, DEFAULT_CAPABILITY } from './version-capability'
 export const ACTION_META = {
   SAVE: { label: 'Save Draft' },
   SAVE_AND_BUILD: { label: 'Save and Build' },
-  BUILD: { label: 'Build' },
+  BUILD: { label: 'Build', icon: 'pi pi-cog' },
   CANCEL_BUILD: {
     label: 'Cancel Build',
     danger: true,
@@ -72,14 +79,15 @@ export const ACTION_META = {
       confirmSeverity: 'danger'
     }
   },
-  DEPLOY: { label: 'Deploy' }
+  DEPLOY: { label: 'Deploy', icon: 'pi pi-cloud-upload' }
 }
 
 export const metaFor = (action) => ACTION_META[action] ?? { label: action }
 
-// Clone/Build never appear in the row menu — those flows live in the shell
-// action bar (VersionActionBar). The row menu is the fixed 5-item model below;
-// the legacy `getRowActions` filter was retired in Phase 4 (task 9.1).
+// Build/Deploy now surface in the row menu next to the management actions,
+// derived from the same version-machine state the shell action bar uses. They
+// follow the never-hide rule (present, disabled + tooltip outside their valid
+// state); Deploy is dropped for versioned-only. Clone stays shell-only.
 
 /**
  * Tooltip shown while Rollback stays disabled (Phase 2 — depends on the
@@ -95,17 +103,22 @@ const ROLLBACK_DEFERRED_TOOLTIP =
  */
 const VERSIONED_ONLY_NEW_DRAFT_LABEL = 'New version from this'
 
+const BUILD_DISABLED_TOOLTIP = 'Only draft versions can be built'
+const DEPLOY_DISABLED_TOOLTIP = 'Only Ready versions can be deployed'
+
 /**
  * Builds the version row menu, gated by the resource `capability`. Pure:
  * enablement derives only from `state` (via version-machine predicates), no I/O.
  * The "never hide" pattern — items stay visible+disabled with a tooltip; only
  * DELETE is omitted when the version is already `deleted`.
  *
- * Deployable (default) keeps the fixed 5-item order
- * `[OPEN_CONFIGURATION, PROMOTE, ROLLBACK, ARCHIVE, DELETE]`. When the capability
- * denies Promote, PROMOTE and ROLLBACK are omitted and NEW_DRAFT_FROM is inserted
- * with a "New version from this" label override →
- * `[OPEN_CONFIGURATION, NEW_DRAFT_FROM, ARCHIVE, DELETE]`.
+ * Deployable (default) order:
+ * `[OPEN_CONFIGURATION, BUILD, DEPLOY, PROMOTE, ROLLBACK, ARCHIVE, DELETE]`.
+ * BUILD/DEPLOY follow the never-hide rule — present, disabled + tooltip outside
+ * their valid state (BUILD enabled while editable; DEPLOY while ready/active).
+ * When the capability denies Promote (versioned-only), DEPLOY, PROMOTE and
+ * ROLLBACK are omitted and NEW_DRAFT_FROM is inserted with a "New version from
+ * this" label override → `[OPEN_CONFIGURATION, BUILD, NEW_DRAFT_FROM, ARCHIVE, DELETE]`.
  * @param {string} state version lifecycle state
  * @param {object} [ctx] context; `resourceType` resolves the default capability
  * @param {object} [capability] `{canDeploy,canPromote,canRollback}`; defaults
@@ -131,10 +144,27 @@ export const buildVersionMenuItems = (
     }
   }
 
+  const buildDisabled = !isEditable(state)
+  const deployDisabled = !isActionAvailable(state, VERSION_ACTIONS.DEPLOY, capability)
   const archiveDisabled = !canArchive(state)
   const deleteEnabled = canDelete(state)
 
-  const items = [item('OPEN_CONFIGURATION')]
+  const items = [
+    item('OPEN_CONFIGURATION'),
+    item('BUILD', {
+      disabled: buildDisabled,
+      tooltip: buildDisabled ? BUILD_DISABLED_TOOLTIP : null
+    })
+  ]
+
+  if (capability.canDeploy) {
+    items.push(
+      item('DEPLOY', {
+        disabled: deployDisabled,
+        tooltip: deployDisabled ? DEPLOY_DISABLED_TOOLTIP : null
+      })
+    )
+  }
 
   if (capability.canPromote) {
     const promoteDisabled = !isReady(state)

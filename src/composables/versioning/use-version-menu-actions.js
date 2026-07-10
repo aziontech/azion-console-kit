@@ -1,6 +1,7 @@
 import { toValue } from 'vue'
 import { useToast } from '@aziontech/webkit/use-toast'
 import { useVersionRowActions } from '@/composables/versioning/use-version-row-actions'
+import { releaseComposerRouteFromResource } from '@/templates/release-composition/release-composer-route'
 
 /**
  * SINGLE shared router for the 5 version row-menu actions, consumed identically
@@ -114,12 +115,44 @@ export function useVersionMenuActions({
     }
   }
 
-  // Routes a `row-action` payload. ARCHIVE/DELETE keep their dialog+service+toast
-  // flow inside use-version-row-actions; ROLLBACK is deferred (no-op this phase).
+  // Build: navigate to the version editor carrying the `build` intent. Execution
+  // stays in the shell — it auto-dispatches SAVE_AND_BUILD once its form is ready
+  // (Option A: state control never leaves the VersionShell).
+  const build = (item) => {
+    const type = toValue(resourceType)
+    const name = RESOURCE_VERSION_ROUTES[type]
+    if (!name || !item?.id) return
+    router?.push({
+      name,
+      params: { id: String(toValue(resourceId)), versionId: String(item.id) },
+      query: { intent: 'build' }
+    })
+  }
+
+  // Deploy: open the full-page release composer scoped to this version — the same
+  // entry the shell heading owns. No version-state mutation happens here.
+  const deploy = (item) => {
+    if (!item?.id) return
+    router?.push(
+      releaseComposerRouteFromResource({
+        resourceType: toValue(resourceType),
+        resourceId: toValue(resourceId),
+        version: { id: item.id }
+      })
+    )
+  }
+
+  // Routes a `row-action` payload. BUILD navigates with intent; DEPLOY opens the
+  // composer; ARCHIVE/DELETE keep their dialog+service+toast flow inside
+  // use-version-row-actions; ROLLBACK is deferred (no-op this phase).
   const handleRowAction = ({ action, item } = {}) => {
     switch (action) {
       case 'OPEN_CONFIGURATION':
         return openConfiguration(item)
+      case 'BUILD':
+        return build(item)
+      case 'DEPLOY':
+        return deploy(item)
       case 'PROMOTE':
         return promote(item)
       case 'NEW_DRAFT_FROM':

@@ -1,11 +1,16 @@
 <script setup>
-  import { computed, provide, ref, readonly, onMounted } from 'vue'
+  import { computed, provide, ref, readonly, onMounted, watch } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   import ProgressSpinner from '@aziontech/webkit/progressspinner'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import { useVersionShell } from './use-version-shell'
   import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
   import { getVersionCapability } from '@/composables/versioning/version-capability'
-  import { VERSION_ACTIONS, isProcessing } from '@/composables/versioning/version-machine'
+  import {
+    VERSION_ACTIONS,
+    isProcessing,
+    isActionAvailable
+  } from '@/composables/versioning/version-machine'
   import {
     createVersionCommandBus,
     VERSION_COMMAND_BUS_KEY
@@ -95,9 +100,45 @@
 
   const showOverlay = computed(() => isProcessing(state.value))
 
+  // Build launched from a listing routes here with `?intent=build`. The shell
+  // owns the transition: once the version has loaded and the form child has
+  // registered SAVE_AND_BUILD, it dispatches it once, then strips the query so a
+  // refetch/re-mount never rebuilds. Router calls run after mount only.
+  const route = useRoute()
+  const router = useRouter()
+  let autoBuildHandled = false
+
+  const stripBuildIntent = () => {
+    if (!router || route?.query?.intent == null) return
+    const query = { ...route.query }
+    delete query.intent
+    router.replace({ query }).catch(() => {})
+  }
+
+  const maybeAutoBuild = () => {
+    if (autoBuildHandled) return
+    // Act only once the real version has loaded — never on the default `draft`.
+    if (route?.query?.intent !== 'build' || isLoading.value || !version.value) return
+    if (!isActionAvailable(state.value, VERSION_ACTIONS.SAVE_AND_BUILD)) {
+      autoBuildHandled = true
+      stripBuildIntent()
+      return
+    }
+    if (!bus.registered.value.has(VERSION_ACTIONS.SAVE_AND_BUILD)) return
+    autoBuildHandled = true
+    stripBuildIntent()
+    handleDispatch(VERSION_ACTIONS.SAVE_AND_BUILD, {})
+  }
+
+  watch(
+    [isLoading, state, version, () => bus.registered.value.has(VERSION_ACTIONS.SAVE_AND_BUILD)],
+    maybeAutoBuild
+  )
+
   const isMounted = ref(false)
   onMounted(() => {
     isMounted.value = true
+    maybeAutoBuild()
   })
 </script>
 

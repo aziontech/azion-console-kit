@@ -100,11 +100,12 @@ describe('VariablesV6Adapter — P2 secret masking', () => {
 
       expect(result[0]).toMatchObject({
         id: 'ver-1',
-        label: 'Version 1',
-        versionNumber: '1',
+        label: 'ver-1',
         lastEditor: 'user@azion.com'
       })
       expect(result[0]).not.toHaveProperty('value')
+      expect(result[0]).not.toHaveProperty('versionNumber')
+      expect(result[0]).not.toHaveProperty('version')
     })
 
     it('returns an empty array for a non-array input', () => {

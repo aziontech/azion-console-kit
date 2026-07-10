@@ -79,6 +79,8 @@ describe('VersionListDataView kebab — Property P5: DS tokens only + appendTo=b
     )
     expect(icons).toEqual([
       'pi pi-sliders-h',
+      'pi pi-cog',
+      'pi pi-cloud-upload',
       'pi pi-arrow-up-right',
       'pi pi-history',
       'pi pi-inbox',
@@ -89,6 +91,8 @@ describe('VersionListDataView kebab — Property P5: DS tokens only + appendTo=b
     )
     expect(labels).toEqual([
       'Open configuration',
+      'Build',
+      'Deploy',
       'Promote version',
       'Rollback to this version',
       'Archive',
@@ -114,7 +118,7 @@ describe('VersionListDataView kebab — accessible disabled items (task 5.3)', (
     expect(rollback.classList.contains('p-disabled')).toBe(true)
     expect(rollback.getAttribute('aria-disabled')).toBe('true')
     // Disabled means present-but-blocked, never removed (never-hide pattern).
-    expect(items).toHaveLength(5)
+    expect(items).toHaveLength(7)
     wrapper.unmount()
   })
 
@@ -140,7 +144,7 @@ describe('VersionListDataView kebab — keyboard navigation (task 5.3 / Req 8.4)
     const list = panel.querySelector('[role="menu"]')
     expect(list.tagName).toBe('UL')
     expect(list.getAttribute('tabindex')).toBe('0')
-    expect(panel.querySelectorAll('[role="menuitem"]').length).toBe(5)
+    expect(panel.querySelectorAll('[role="menuitem"]').length).toBe(7)
     wrapper.unmount()
   })
 

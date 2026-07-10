@@ -9,8 +9,16 @@ import { VERSIONED_ONLY, getVersionCapability } from '@/composables/versioning/v
  * default stays byte-identical. Requirements 2.2, 2.3.
  */
 
-const VERSIONED_ONLY_ORDER = ['OPEN_CONFIGURATION', 'NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE']
-const DEPLOYABLE_ORDER = ['OPEN_CONFIGURATION', 'PROMOTE', 'ROLLBACK', 'ARCHIVE', 'DELETE']
+const VERSIONED_ONLY_ORDER = ['OPEN_CONFIGURATION', 'BUILD', 'NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE']
+const DEPLOYABLE_ORDER = [
+  'OPEN_CONFIGURATION',
+  'BUILD',
+  'DEPLOY',
+  'PROMOTE',
+  'ROLLBACK',
+  'ARCHIVE',
+  'DELETE'
+]
 
 // Canonical states plus the synthetic `deleted` (Delete omitted).
 const STATES_WITH_DELETE = Object.values(VERSION_STATES)
@@ -36,7 +44,7 @@ describe('buildVersionMenuItems — versioned-only kebab (Req 2.2)', () => {
 
   it('omits ONLY Delete when the version is already deleted (versioned-only)', () => {
     const items = buildVersionMenuItems('deleted', {}, VERSIONED_ONLY)
-    expect(actionsOf(items)).toEqual(['OPEN_CONFIGURATION', 'NEW_DRAFT_FROM', 'ARCHIVE'])
+    expect(actionsOf(items)).toEqual(['OPEN_CONFIGURATION', 'BUILD', 'NEW_DRAFT_FROM', 'ARCHIVE'])
   })
 })
 
@@ -71,10 +79,12 @@ describe('buildVersionMenuItems — capability resolved from resourceType', () =
   )
 })
 
-describe('buildVersionMenuItems — deployable default is byte-identical (anti-regression)', () => {
-  it.each(STATES_WITH_DELETE)('state "%s" keeps the 5-item deployable order', (state) => {
+describe('buildVersionMenuItems — deployable default keeps the full lifecycle order', () => {
+  it.each(STATES_WITH_DELETE)('state "%s" keeps the 7-item deployable order', (state) => {
     const items = buildVersionMenuItems(state, { resourceType: 'edge_application' })
     expect(actionsOf(items)).toEqual(DEPLOYABLE_ORDER)
+    expect(byAction(items, 'BUILD')).toBeDefined()
+    expect(byAction(items, 'DEPLOY')).toBeDefined()
     expect(byAction(items, 'PROMOTE')).toBeDefined()
     expect(byAction(items, 'ROLLBACK')).toBeDefined()
     expect(byAction(items, 'NEW_DRAFT_FROM')).toBeUndefined()

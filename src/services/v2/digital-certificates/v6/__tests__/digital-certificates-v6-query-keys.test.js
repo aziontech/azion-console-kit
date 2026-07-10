@@ -145,10 +145,7 @@ describe('Property P4 — digital certificates v6 cache keys are isolated from t
 
     it('never prefixes any legacy root with a v6 root', () => {
       const legacyRoots = [queryKeys.digitalCertificates.all, queryKeys.digitalCertificatesCRL.all]
-      const v6Roots = [
-        queryKeys.digitalCertificatesV6.all,
-        queryKeys.digitalCertificatesCRLV6.all
-      ]
+      const v6Roots = [queryKeys.digitalCertificatesV6.all, queryKeys.digitalCertificatesCRLV6.all]
 
       for (const legacyRoot of legacyRoots) {
         for (const v6Root of v6Roots) {

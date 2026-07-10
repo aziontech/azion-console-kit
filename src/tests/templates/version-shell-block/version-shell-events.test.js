@@ -34,6 +34,13 @@ vi.mock('@/templates/version-shell-block/components/VersionActionBar.vue', () =>
   default: VersionActionBarStub
 }))
 
+// The shell reads a `build` intent off the route to auto-dispatch; these tests
+// exercise handleDispatch, not that path, so a no-intent route + noop router.
+vi.mock('vue-router', () => ({
+  useRoute: () => ({ query: {} }),
+  useRouter: () => ({ replace: vi.fn() })
+}))
+
 import VersionShell from '@/templates/version-shell-block/index.vue'
 
 // Minimal shape `useVersionShell` consumes: data.value, isLoading, isError.

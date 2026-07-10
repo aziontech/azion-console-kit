@@ -86,7 +86,15 @@ describe('getAvailableActions — Property 1: versioned-only never exposes gated
 
 describe('buildVersionMenuItems — Property 1: deployable menu baseline never regresses', () => {
   // Stable per-state action order for deployable resources (current shared model).
-  const MENU_BASELINE = ['OPEN_CONFIGURATION', 'PROMOTE', 'ROLLBACK', 'ARCHIVE', 'DELETE']
+  const MENU_BASELINE = [
+    'OPEN_CONFIGURATION',
+    'BUILD',
+    'DEPLOY',
+    'PROMOTE',
+    'ROLLBACK',
+    'ARCHIVE',
+    'DELETE'
+  ]
 
   it.each(STATES)('state "%s" yields the fixed deployable menu order', (state) => {
     const items = buildVersionMenuItems(state, { resourceType: 'edge_application' })
@@ -100,19 +108,18 @@ describe('buildVersionMenuItems — Property 1: deployable menu baseline never r
   })
 })
 
-describe('buildVersionMenuItems — Property 1: versioned-only menu never carries DEPLOY', () => {
-  // DEPLOY is a shell-only action and must never appear as a row-menu item for any
-  // class. The PROMOTE/ROLLBACK row-item omission for versioned-only is wired by
-  // the capability-aware builder (task 3.1) and locked by its own enumeration; the
-  // authoritative gate for those lifecycle actions is `getAvailableActions` above.
+describe('buildVersionMenuItems — Property 1: DEPLOY row item gated by capability', () => {
+  // DEPLOY now surfaces in the deployable row menu (execution delegated to the
+  // shell) but is dropped entirely for versioned-only, mirroring PROMOTE/ROLLBACK.
+  // The authoritative state gate for the lifecycle action stays `getAvailableActions`.
   it.each(STATES)('state "%s" exposes no DEPLOY row item (versioned-only)', (state) => {
     const items = buildVersionMenuItems(state, { resourceType: 'function' }, VERSIONED_ONLY)
     expect(actionsOf(items)).not.toContain('DEPLOY')
   })
 
-  it.each(STATES)('state "%s" exposes no DEPLOY row item (deployable, for contrast)', (state) => {
+  it.each(STATES)('state "%s" exposes a DEPLOY row item (deployable)', (state) => {
     const items = buildVersionMenuItems(state, { resourceType: 'edge_application' })
-    expect(actionsOf(items)).not.toContain('DEPLOY')
+    expect(actionsOf(items)).toContain('DEPLOY')
   })
 
   it.each(['function', 'network_list', 'waf'])(

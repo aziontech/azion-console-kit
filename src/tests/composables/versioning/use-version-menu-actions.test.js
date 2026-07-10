@@ -63,6 +63,49 @@ describe('useVersionMenuActions — OPEN_CONFIGURATION navigation', () => {
   })
 })
 
+describe('useVersionMenuActions — BUILD navigation with intent', () => {
+  it('routes to the version editor carrying the build intent', () => {
+    const router = makeRouter()
+    const api = useVersionMenuActions({ resourceType: 'firewall', resourceId: 'res9', router })
+
+    api.handleRowAction({ action: 'BUILD', item })
+
+    expect(router.push).toHaveBeenCalledWith({
+      name: 'edit-firewall-version',
+      params: { id: 'res9', versionId: 'v123' },
+      query: { intent: 'build' }
+    })
+  })
+
+  it('does not navigate for an unknown resourceType', () => {
+    const router = makeRouter()
+    const api = useVersionMenuActions({ resourceType: 'unknown', resourceId: 'res9', router })
+
+    api.handleRowAction({ action: 'BUILD', item })
+
+    expect(router.push).not.toHaveBeenCalled()
+  })
+})
+
+describe('useVersionMenuActions — DEPLOY opens the release composer', () => {
+  it('routes to the composer scoped to this version (scoped resource)', () => {
+    const router = makeRouter()
+    const api = useVersionMenuActions({ resourceType: 'application', resourceId: 'res9', router })
+
+    api.handleRowAction({ action: 'DEPLOY', item })
+
+    expect(router.push).toHaveBeenCalledWith({
+      name: 'release-composer',
+      query: {
+        fromVersion: 'true',
+        scopedType: 'application',
+        versionId: 'v123',
+        resourceId: 'res9'
+      }
+    })
+  })
+})
+
 describe('useVersionMenuActions — PROMOTE drawer', () => {
   it('opens the promote drawer pinned to the version', () => {
     const openPromoteDrawer = vi.fn()

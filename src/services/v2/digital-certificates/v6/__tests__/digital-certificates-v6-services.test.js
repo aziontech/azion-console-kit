@@ -52,17 +52,20 @@ describe.each(scenarios)('$label', (scenario) => {
   })
 
   describe('Property P7 - every method sends Accept: application/json; version=4', () => {
-    it.each(publicMethods)('%s sends the versioned Accept config on every request', async (name) => {
-      const service = buildService(scenario)
+    it.each(publicMethods)(
+      '%s sends the versioned Accept config on every request',
+      async (name) => {
+        const service = buildService(scenario)
 
-      await invocations[name](service)
+        await invocations[name](service)
 
-      const { calls } = service.http.request.mock
-      expect(calls.length).toBeGreaterThan(0)
-      calls.forEach(([config]) => {
-        expect(config.config).toEqual(ACCEPT)
-      })
-    })
+        const { calls } = service.http.request.mock
+        expect(calls.length).toBeGreaterThan(0)
+        calls.forEach(([config]) => {
+          expect(config.config).toEqual(ACCEPT)
+        })
+      }
+    )
   })
 
   describe('HTTP method and URL per operation', () => {

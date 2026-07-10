@@ -3,13 +3,21 @@ import { buildVersionMenuItems } from '@/composables/versioning/version-actions'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 
 /**
- * Properties P1–P4 of the shared version row-menu model (task 1.3).
- * `buildVersionMenuItems(state, ctx)` is the single source of the 5 fixed items;
- * these tests enumerate every VersionState × a few resourceTypes to lock its
- * set+order (P1), never-hide rule (P2), enablement matrix (P3) and purity (P4).
+ * Properties P1–P4 of the shared version row-menu model.
+ * `buildVersionMenuItems(state, ctx)` is the single source of the deployable
+ * items; these tests enumerate every VersionState × a few resourceTypes to lock
+ * its set+order (P1), never-hide rule (P2), enablement matrix (P3) and purity (P4).
  */
 
-const FIXED_ORDER = ['OPEN_CONFIGURATION', 'PROMOTE', 'ROLLBACK', 'ARCHIVE', 'DELETE']
+const FIXED_ORDER = [
+  'OPEN_CONFIGURATION',
+  'BUILD',
+  'DEPLOY',
+  'PROMOTE',
+  'ROLLBACK',
+  'ARCHIVE',
+  'DELETE'
+]
 const ORDER_WITHOUT_DELETE = FIXED_ORDER.slice(0, -1)
 
 // Canonical states + the synthetic `deleted` (Delete omitted) and an unknown state.
@@ -19,6 +27,8 @@ const ALL_STATES = [...Object.values(VERSION_STATES), 'deleted', 'totally-unknow
 const RESOURCE_TYPES = ['edge_application', 'edge_firewall', 'edge_connector', 'custom_pages']
 
 // Expected enablement per state, derived from the spec matrix (P3).
+const BUILD_ENABLED_STATES = [VERSION_STATES.DRAFT, VERSION_STATES.CANCELED, VERSION_STATES.ERROR]
+const DEPLOY_ENABLED_STATES = [VERSION_STATES.READY, VERSION_STATES.ACTIVE]
 const PROMOTE_ENABLED_STATES = [VERSION_STATES.READY]
 const ARCHIVE_ENABLED_STATES = [VERSION_STATES.READY, VERSION_STATES.ERROR, VERSION_STATES.CANCELED]
 
@@ -46,17 +56,17 @@ describe('buildVersionMenuItems — P1: same set + order regardless of resourceT
 
 describe('buildVersionMenuItems — P2: never hide (items present, disabled not absent)', () => {
   it.each(ALL_STATES.filter((state) => state !== 'deleted'))(
-    'state "%s" keeps all 5 items present',
+    'state "%s" keeps all 7 items present',
     (state) => {
       const items = buildVersionMenuItems(state)
-      expect(items).toHaveLength(5)
+      expect(items).toHaveLength(7)
       expect(actionsOf(items)).toEqual(FIXED_ORDER)
     }
   )
 
   it('omits ONLY Delete when the version is already deleted', () => {
     const items = buildVersionMenuItems('deleted')
-    expect(items).toHaveLength(4)
+    expect(items).toHaveLength(6)
     expect(actionsOf(items)).toEqual(ORDER_WITHOUT_DELETE)
     expect(byAction(items, 'DELETE')).toBeUndefined()
   })
@@ -65,16 +75,32 @@ describe('buildVersionMenuItems — P2: never hide (items present, disabled not 
     const items = buildVersionMenuItems(state)
     // Every present item must carry a boolean `disabled` flag (never silently dropped).
     items.forEach((entry) => expect(typeof entry.disabled).toBe('boolean'))
-    // Promote/Archive/Open/Rollback always stay present regardless of state.
-    ;['OPEN_CONFIGURATION', 'PROMOTE', 'ROLLBACK', 'ARCHIVE'].forEach((action) => {
-      expect(byAction(items, action)).toBeDefined()
-    })
+    // The lifecycle/management items always stay present regardless of state.
+    ;['OPEN_CONFIGURATION', 'BUILD', 'DEPLOY', 'PROMOTE', 'ROLLBACK', 'ARCHIVE'].forEach(
+      (action) => {
+        expect(byAction(items, action)).toBeDefined()
+      }
+    )
   })
 })
 
 describe('buildVersionMenuItems — P3: enablement matrix', () => {
   it.each(ALL_STATES)('Open configuration is always enabled (state "%s")', (state) => {
     expect(byAction(buildVersionMenuItems(state), 'OPEN_CONFIGURATION').disabled).toBe(false)
+  })
+
+  it.each(ALL_STATES)('Build is enabled iff the state is editable (state "%s")', (state) => {
+    const expectedEnabled = BUILD_ENABLED_STATES.includes(state)
+    const build = byAction(buildVersionMenuItems(state), 'BUILD')
+    expect(build.disabled).toBe(!expectedEnabled)
+    if (!expectedEnabled) expect(build.tooltip).toBeTruthy()
+  })
+
+  it.each(ALL_STATES)('Deploy is enabled iff the state is ready/active (state "%s")', (state) => {
+    const expectedEnabled = DEPLOY_ENABLED_STATES.includes(state)
+    const deploy = byAction(buildVersionMenuItems(state), 'DEPLOY')
+    expect(deploy.disabled).toBe(!expectedEnabled)
+    if (!expectedEnabled) expect(deploy.tooltip).toBeTruthy()
   })
 
   it.each(ALL_STATES)('Rollback is always disabled with a tooltip (state "%s")', (state) => {

@@ -4,7 +4,7 @@ import VersionListDataView from '@/components/VersionListDataView/index.vue'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 
 /**
- * Task 5.1 — the kebab renders the FIXED 5-item model from
+ * Task 5.1 — the kebab renders the FIXED model from
  * `buildVersionMenuItems` mapped to the webkit Menu (appendTo=body), with a
  * native separator before Delete and disabled/tooltip/danger per item.
  * UI/a11y (keyboard, z-index) is task 5.3.
@@ -80,7 +80,7 @@ describe('VersionListDataView — kebab renders the fixed menu model (task 5.1)'
     expect(wrapper.findComponent({ name: 'Menu' }).props('appendTo')).toBe('body')
   })
 
-  it('maps the 5 fixed items in order with a separator before Delete', async () => {
+  it('maps the fixed items in order with a separator before Delete', async () => {
     const version = { id: 'v-ready', state: VERSION_STATES.READY }
     const wrapper = mountList(version)
     const model = await openMenuModel(wrapper, version)
@@ -88,6 +88,8 @@ describe('VersionListDataView — kebab renders the fixed menu model (task 5.1)'
     const labels = model.filter((entry) => !entry.separator).map((entry) => entry.label)
     expect(labels).toEqual([
       'Open configuration',
+      'Build',
+      'Deploy',
       'Promote version',
       'Rollback to this version',
       'Archive',
