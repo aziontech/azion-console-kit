@@ -2,7 +2,7 @@ import * as yup from 'yup'
 
 export const SCOPE_CATEGORIES = ['global', 'environment', 'deployment', 'resource']
 
-export const RESOURCE_SCOPE_TYPES = ['application', 'firewall', 'function']
+export const RESOURCE_SCOPE_TYPES = ['application', 'firewall']
 
 export const SCOPE_TYPE_OPTIONS = [
   { label: 'Global', value: 'global' },
@@ -13,8 +13,7 @@ export const SCOPE_TYPE_OPTIONS = [
 
 export const RESOURCE_TYPE_OPTIONS = [
   { label: 'Application', value: 'application' },
-  { label: 'Firewall', value: 'firewall' },
-  { label: 'Function', value: 'function' }
+  { label: 'Firewall', value: 'firewall' }
 ]
 
 const scopeItemSchema = yup

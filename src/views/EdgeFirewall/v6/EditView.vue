@@ -2,6 +2,7 @@
   import VersionsTab from '@/views/EdgeFirewall/v6/tabs/VersionsTab.vue'
   import MainSettingsTab from '@/views/EdgeFirewall/v6/tabs/MainSettingsTab.vue'
   import ResourceVersionLanding from '@/templates/version-shell-block/ResourceVersionLanding.vue'
+  import ScopedVariablesTab from '@/views/Variables/v6/components/ScopedVariablesTab.vue'
   import { useResourceVersionLanding } from '@/composables/versioning/use-resource-version-landing'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import { edgeFirewallVersionService } from '@/services/v2/edge-firewall/edge-firewall-version-service'
@@ -47,6 +48,7 @@
     :latest-version-id="latestVersionId"
     empty-state-description="Create a version on the Versions tab to start configuring this Firewall."
     testid-prefix="firewall-v6-edit"
+    :show-variables="true"
   >
     <template #versions>
       <VersionsTab :firewall-id="resourceId" />
@@ -60,6 +62,12 @@
         @command-success="handleCommandSuccess"
         @command-error="handleCommandError"
         @cancel="handleCancel"
+      />
+    </template>
+    <template #variables>
+      <ScopedVariablesTab
+        scope-type="firewall"
+        :scope-id="resourceId"
       />
     </template>
   </ResourceVersionLanding>

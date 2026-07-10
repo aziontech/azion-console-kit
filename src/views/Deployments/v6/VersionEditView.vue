@@ -2,7 +2,8 @@
   // VersionEditView — the FULL version editor screen for a Deployment. Logic lives
   // in useVersionEditScreen; chrome in VersionEditScreen. The form body is
   // FormFieldsDeployment (loaded from the deployment stream), governed read-only by
-  // the version shell. Deploying is owned elsewhere, so there is no deploy drawer.
+  // the version shell. Deploy routes to the release composer scoped to this
+  // deployment (DS-first), so the footer DEPLOY forwards to editorRef.openRelease.
   import VersionEditScreen from '@/templates/version-shell-block/VersionEditScreen.vue'
   import DeploymentVersionEditor from '@/views/Deployments/v6/DeploymentVersionEditor.vue'
   import { useVersionEditScreen } from '@/composables/versioning/use-version-edit-screen'
@@ -17,6 +18,7 @@
     isLoading,
     loadError,
     title,
+    editorRef,
     handleCommandSuccess,
     handleCommandError,
     handleCancel
@@ -24,8 +26,7 @@
     load: (id) => loadDeploymentByIdAdapter({ id }),
     listRoute: (id) => ({ name: 'deployments-edit', params: { id, tab: 'versions' } }),
     versionRouteName: 'edit-deployment-version',
-    titleWithVersion: false,
-    supportsDeployDrawer: false
+    titleWithVersion: false
   })
 </script>
 
@@ -41,6 +42,7 @@
     <template #editor>
       <DeploymentVersionEditor
         v-if="resource && versionId"
+        ref="editorRef"
         :key="versionId"
         :deployment="resource"
         :resource-id="resourceId"

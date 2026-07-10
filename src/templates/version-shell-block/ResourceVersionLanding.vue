@@ -16,7 +16,7 @@
 
   defineOptions({ name: 'resource-version-landing' })
 
-  const TAB = { VERSIONS: 0, SETTINGS: 1 }
+  const TAB = { VERSIONS: 0, SETTINGS: 1, VARIABLES: 2 }
 
   defineProps({
     isLoading: { type: Boolean, default: false },
@@ -32,6 +32,7 @@
       default: 'Create a version on the Versions tab to start configuring this resource.'
     },
     showSettings: { type: Boolean, default: true },
+    showVariables: { type: Boolean, default: false },
     testidPrefix: { type: String, required: true }
   })
 
@@ -85,7 +86,7 @@
     </template>
     <template #content>
       <TabView
-        v-if="showSettings"
+        v-if="showSettings || showVariables"
         v-model:activeIndex="activeTab"
         :pt="{ root: { class: 'flex flex-col gap-[var(--spacing-4)]' } }"
       >
@@ -128,6 +129,16 @@
               />
             </div>
           </template>
+        </TabPanel>
+        <TabPanel
+          v-if="showVariables"
+          header="Variables"
+          :pt="{ root: { 'data-testid': `${testidPrefix}__tab__variables` } }"
+        >
+          <slot
+            v-if="activeTab === TAB.VARIABLES"
+            name="variables"
+          />
         </TabPanel>
       </TabView>
 

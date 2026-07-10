@@ -73,6 +73,20 @@ const loadActiveRelease = vi.fn((dsId) => {
 
 vi.mock('@/templates/release-composition/use-release-composition', async () => {
   const { watch, toValue } = await import('vue')
+  // Stable per-type list service (memoised so the picker prop identity never
+  // thrashes), backed by the same CATALOG the name resolver reads.
+  const listServiceCache = {}
+  const listServiceFor = (type) => {
+    if (!listServiceCache[type]) {
+      listServiceCache[type] = async () => ({
+        body: (CATALOG[type] ?? []).map((option) => ({ id: option.value, name: option.label })),
+        count: (CATALOG[type] ?? []).length
+      })
+    }
+    return listServiceCache[type]
+  }
+  const nameFor = (type, id) =>
+    (CATALOG[type] ?? []).find((option) => String(option.value) === String(id))?.label ?? null
   return {
     useReleaseComposition: ({ selectedDsIds } = {}) => {
       // Mirror the real composable's internal watcher: loading the active release
@@ -100,6 +114,13 @@ vi.mock('@/templates/release-composition/use-release-composition', async () => {
         loadCatalog,
         catalogOptionsFor: (type) => CATALOG[type] ?? [],
         isLoadingCatalog: () => false,
+        resourceListService: listServiceFor,
+        resourceLoadService: (type) => async (id) => {
+          const option = (CATALOG[type] ?? []).find((entry) => String(entry.value) === String(id))
+          return option ? { id: option.value, name: option.label } : null
+        },
+        ensureResourceNames: vi.fn(),
+        resourceNameFor: nameFor,
         versionOptionsFor: () => READY_VERSIONS,
         isLoadingVersionsFor: () => false
       }

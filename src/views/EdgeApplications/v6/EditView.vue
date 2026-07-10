@@ -25,6 +25,9 @@
   import VersionActionDialog from '@/templates/version-shell-block/components/VersionActionDialog.vue'
   import DeployDrawerBlock from '@/templates/deploy-drawer-block'
   import { releaseComposerRouteFromResource } from '@/templates/release-composition/release-composer-route'
+  import ScopedVariablesTab from '@/views/Variables/v6/components/ScopedVariablesTab.vue'
+  import TabView from 'primevue/tabview'
+  import TabPanel from '@aziontech/webkit/tabpanel'
 
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
@@ -40,6 +43,15 @@
   const toast = useToast()
 
   const edgeApplicationId = computed(() => String(route.params.id))
+
+  const activeTab = computed({
+    get: () => (String(route.params.tab) === 'variables' ? 1 : 0),
+    set: (index) => {
+      const params = { id: edgeApplicationId.value }
+      if (index === 1) params.tab = 'variables'
+      router.replace({ name: 'edit-application', params })
+    }
+  })
 
   const application = ref(null)
   const isLoadingApplication = ref(true)
@@ -221,56 +233,76 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <VersionListDataView
-        :items="items"
-        :columns="columns"
-        :loading="versionsQuery.isLoading.value"
-        :is-error="versionsQuery.isError?.value ?? false"
-        :has-versions="rawVersions.length > 0"
-        :search-term="searchTerm"
-        :filters="filters"
-        :filter-values="filterValues"
-        :sort="sort"
-        :sort-options="sortOptions"
-        :show-row-actions="true"
-        resource-type="application"
-        :paginator-rows="20"
-        search-placeholder="Search versions"
-        :empty-state="{
-          title: 'This application has no versions yet',
-          description:
-            'Create the first version to start configuring this application with the v6 versioning workflow.',
-          buttonLabel: 'New Version',
-          buttonAction: createDraft
-        }"
-        :error-state="{
-          title: 'Failed to load versions',
-          description: 'Something went wrong loading this application’s versions. Try again.',
-          buttonLabel: 'Retry',
-          buttonAction: () => versionsQuery.refetch?.()
-        }"
-        filtered-empty-title="No versions match your filters"
-        filtered-empty-description="Try a different search term or status filter."
-        data-testid="application-v6-versions__table"
-        @update:search-term="searchTerm = $event"
-        @update:filter-values="filterValues = $event"
-        @update:sort="sort = $event"
-        @refresh="versionsQuery.refetch?.()"
-        @row-action="handleRowAction"
-      >
-        <template #toolbar-actions>
-          <PrimeButton
-            v-if="rawVersions.length > 0"
-            label="New Version"
-            icon="pi pi-plus"
-            size="small"
-            class="h-[2.5rem]"
-            :loading="isCreatingDraft"
-            data-testid="application-v6-versions__new-draft"
-            @click="createDraft"
+      <TabView v-model:activeIndex="activeTab">
+        <TabPanel
+          header="Versions"
+          :pt="{ root: { 'data-testid': 'application-v6-edit__tab__versions' } }"
+        >
+          <VersionListDataView
+            :items="items"
+            :columns="columns"
+            :loading="versionsQuery.isLoading.value"
+            :is-error="versionsQuery.isError?.value ?? false"
+            :has-versions="rawVersions.length > 0"
+            :search-term="searchTerm"
+            :filters="filters"
+            :filter-values="filterValues"
+            :sort="sort"
+            :sort-options="sortOptions"
+            :show-row-actions="true"
+            resource-type="application"
+            :paginator-rows="20"
+            search-placeholder="Search versions"
+            :empty-state="{
+              title: 'This application has no versions yet',
+              description:
+                'Create the first version to start configuring this application with the v6 versioning workflow.',
+              buttonLabel: 'New Version',
+              buttonAction: createDraft
+            }"
+            :error-state="{
+              title: 'Failed to load versions',
+              description: 'Something went wrong loading this application’s versions. Try again.',
+              buttonLabel: 'Retry',
+              buttonAction: () => versionsQuery.refetch?.()
+            }"
+            filtered-empty-title="No versions match your filters"
+            filtered-empty-description="Try a different search term or status filter."
+            data-testid="application-v6-versions__table"
+            @update:search-term="searchTerm = $event"
+            @update:filter-values="filterValues = $event"
+            @update:sort="sort = $event"
+            @refresh="versionsQuery.refetch?.()"
+            @row-action="handleRowAction"
+            class="mt-4"
+          >
+            <template #toolbar-actions>
+              <PrimeButton
+                v-if="rawVersions.length > 0"
+                label="New Version"
+                icon="pi pi-plus"
+                size="small"
+                class="h-[2.5rem]"
+                :loading="isCreatingDraft"
+                data-testid="application-v6-versions__new-draft"
+                @click="createDraft"
+              />
+            </template>
+          </VersionListDataView>
+        </TabPanel>
+
+        <TabPanel
+          header="Variables"
+          :pt="{ root: { 'data-testid': 'application-v6-edit__tab__variables' } }"
+        >
+          <ScopedVariablesTab
+            v-if="activeTab === 1"
+            scope-type="application"
+            :scope-id="edgeApplicationId"
+            class="mt-4"
           />
-        </template>
-      </VersionListDataView>
+        </TabPanel>
+      </TabView>
 
       <VersionActionDialog
         v-if="dialogConfig"

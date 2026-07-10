@@ -6,7 +6,7 @@ import { toDeployableVersionOptions } from '@/composables/versioning/to-version-
 import { getVersionCapability } from '@/composables/versioning/version-capability'
 import { releaseComposerRouteFromResource } from '@/templates/release-composition/release-composer-route'
 
-export const LANDING_TAB = { VERSIONS: 0, SETTINGS: 1 }
+export const LANDING_TAB = { VERSIONS: 0, SETTINGS: 1, VARIABLES: 2 }
 
 const SUCCESS_SUMMARY = {
   [VERSION_ACTIONS.SAVE]: 'Version saved',
@@ -101,11 +101,15 @@ export function useResourceVersionLanding({
   })
 
   const activeTab = computed({
-    get: () =>
-      String(route.params.tab) === 'settings' ? LANDING_TAB.SETTINGS : LANDING_TAB.VERSIONS,
+    get: () => {
+      if (String(route.params.tab) === 'variables') return LANDING_TAB.VARIABLES
+      if (String(route.params.tab) === 'settings') return LANDING_TAB.SETTINGS
+      return LANDING_TAB.VERSIONS
+    },
     set: (index) => {
       const params = { id: resourceId.value }
-      if (index === LANDING_TAB.SETTINGS) params.tab = 'settings'
+      if (index === LANDING_TAB.VARIABLES) params.tab = 'variables'
+      else if (index === LANDING_TAB.SETTINGS) params.tab = 'settings'
       router.replace({ name: routeName, params })
     }
   })

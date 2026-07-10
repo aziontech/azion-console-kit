@@ -132,7 +132,7 @@
         @tab-click="handleTabClick"
       >
         <TabPanel
-          header="Configuration"
+          header="Settings"
           :pt="{ root: { 'data-testid': 'variables-tabs__tab__configuration' } }"
         >
           <ConfigurationTab

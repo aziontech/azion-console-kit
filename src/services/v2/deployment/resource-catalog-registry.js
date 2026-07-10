@@ -31,6 +31,19 @@ const toCatalogItem = (resource) => ({
 
 const fromBody = (result) => (Array.isArray(result?.body) ? result.body : []).map(toCatalogItem)
 
+const toLoadedItem = (resource) =>
+  resource?.id == null
+    ? null
+    : {
+        id: resource.id,
+        name: toName(resource.name),
+        executionEnvironment: resource.executionEnvironment ?? null
+      }
+
+const toPage = (result) => ({ body: fromBody(result), count: result?.count ?? 0 })
+
+const firstPageParams = (params) => ({ page: 1, pageSize: CATALOG_PAGE_SIZE, ...params })
+
 export const RESOURCE_CATALOG_REGISTRY = {
   application: {
     versioned: true,
@@ -38,6 +51,9 @@ export const RESOURCE_CATALOG_REGISTRY = {
       edgeAppService
         .listEdgeApplicationsService({ page: 1, pageSize: CATALOG_PAGE_SIZE })
         .then(fromBody),
+    listPage: (params) =>
+      edgeAppService.listEdgeApplicationsService(firstPageParams(params)).then(toPage),
+    loadById: (id) => edgeAppService.loadEdgeApplicationService({ id }).then(toLoadedItem),
     listVersions: (id) => edgeAppVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
   },
   firewall: {
@@ -46,6 +62,9 @@ export const RESOURCE_CATALOG_REGISTRY = {
       edgeFirewallService
         .listEdgeFirewallService({ page: 1, pageSize: CATALOG_PAGE_SIZE })
         .then(fromBody),
+    listPage: (params) =>
+      edgeFirewallService.listEdgeFirewallService(firstPageParams(params)).then(toPage),
+    loadById: (id) => edgeFirewallService.loadEdgeFirewallService({ id }).then(toLoadedItem),
     listVersions: (id) =>
       edgeFirewallVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
   },
@@ -53,6 +72,9 @@ export const RESOURCE_CATALOG_REGISTRY = {
     versioned: true,
     listCatalog: () =>
       customPageService.listCustomPagesService({ pageSize: CATALOG_PAGE_SIZE }).then(fromBody),
+    listPage: (params) =>
+      customPageService.listCustomPagesService(firstPageParams(params)).then(toPage),
+    loadById: (id) => customPageService.loadCustomPagesService({ id }).then(toLoadedItem),
     listVersions: (id) =>
       customPageVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
   },
@@ -62,6 +84,9 @@ export const RESOURCE_CATALOG_REGISTRY = {
       edgeFunctionService
         .listEdgeFunctionsService({ page: 1, pageSize: CATALOG_PAGE_SIZE })
         .then(fromBody),
+    listPage: (params) =>
+      edgeFunctionService.listEdgeFunctionsService(firstPageParams(params)).then(toPage),
+    loadById: (id) => edgeFunctionService.loadEdgeFunctionService({ id }).then(toLoadedItem),
     listVersions: (id) =>
       edgeFunctionVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
   },
@@ -69,6 +94,9 @@ export const RESOURCE_CATALOG_REGISTRY = {
     versioned: true,
     listCatalog: () =>
       networkListsService.listNetworkLists({ page: 1, pageSize: CATALOG_PAGE_SIZE }).then(fromBody),
+    listPage: (params) =>
+      networkListsService.listNetworkLists(firstPageParams(params)).then(toPage),
+    loadById: (id) => networkListsService.loadNetworkList({ id }).then(toLoadedItem),
     listVersions: (id) =>
       networkListVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
   },
@@ -78,6 +106,9 @@ export const RESOURCE_CATALOG_REGISTRY = {
       edgeConnectorsService
         .listEdgeConnectorsService({ page: 1, pageSize: CATALOG_PAGE_SIZE })
         .then(fromBody),
+    listPage: (params) =>
+      edgeConnectorsService.listEdgeConnectorsService(firstPageParams(params)).then(toPage),
+    loadById: (id) => edgeConnectorsService.loadEdgeConnectorsService({ id }).then(toLoadedItem),
     listVersions: (id) =>
       edgeConnectorVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
   },
@@ -85,6 +116,8 @@ export const RESOURCE_CATALOG_REGISTRY = {
     versioned: true,
     listCatalog: () =>
       wafService.listWafRules({ page: 1, pageSize: CATALOG_PAGE_SIZE }).then(fromBody),
+    listPage: (params) => wafService.listWafRules(firstPageParams(params)).then(toPage),
+    loadById: (id) => wafService.loadWafRule({ id }).then(toLoadedItem),
     listVersions: (id) => wafVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
   }
 }

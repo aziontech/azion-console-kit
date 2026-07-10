@@ -9,9 +9,9 @@ import ReleaseDependenciesSection from '@/templates/release-composition/componen
 // forwarding add/instance/version/remove/toggle events with the right payload
 // shape.
 const stubs = {
-  ResourceSelectField: {
-    name: 'release-resource-select-field',
-    props: ['modelValue', 'options', 'label', 'placeholder'],
+  LazyResourceSelectField: {
+    name: 'release-lazy-resource-select-field',
+    props: ['modelValue', 'service', 'loadService', 'label', 'placeholder'],
     emits: ['update:modelValue'],
     template: `<div class="resource-select-field" :data-label="label"></div>`
   },
@@ -38,7 +38,8 @@ const makeInstance = (overrides = {}) => ({
   id: 0,
   resourceId: 'fn-1',
   name: 'Function',
-  options: [{ label: 'fn-one', value: 'fn-1' }],
+  nameService: () => Promise.resolve({ body: [], count: 0 }),
+  nameLoadService: () => Promise.resolve(null),
   version: 'LATEST',
   versionOptions: [{ label: 'v3', value: 'v3' }],
   ...overrides
@@ -102,7 +103,7 @@ describe('ReleaseDependenciesSection', () => {
 
     const row = wrapper.find('[data-testid="release-composition__deps-row-function-0"]')
     expect(row.exists()).toBe(true)
-    expect(row.findComponent({ name: 'release-resource-select-field' }).exists()).toBe(true)
+    expect(row.findComponent({ name: 'release-lazy-resource-select-field' }).exists()).toBe(true)
     expect(row.findComponent({ name: 'release-resource-version-field' }).exists()).toBe(true)
     expect(
       wrapper.find('[data-testid="release-composition__deps-remove-function-0"]').exists()
@@ -161,7 +162,7 @@ describe('ReleaseDependenciesSection', () => {
 
     wrapper
       .find('[data-testid="release-composition__deps-row-function-1"]')
-      .findComponent({ name: 'release-resource-select-field' })
+      .findComponent({ name: 'release-lazy-resource-select-field' })
       .vm.$emit('update:modelValue', 'fn-7')
 
     expect(wrapper.emitted('update:instance-resource')?.at(-1)).toEqual([

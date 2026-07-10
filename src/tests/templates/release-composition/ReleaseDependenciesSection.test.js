@@ -26,10 +26,11 @@ const ResourceVersionFieldStub = defineComponent({
 })
 
 const ResourceSelectFieldStub = defineComponent({
-  name: 'release-resource-select-field',
+  name: 'release-lazy-resource-select-field',
   props: {
     modelValue: { type: [String, Number], default: null },
-    options: { type: Array, default: () => [] },
+    service: { type: Function, default: null },
+    loadService: { type: Function, default: null },
     label: { type: String, default: '' },
     required: { type: Boolean, default: false },
     placeholder: { type: String, default: '' }
@@ -47,7 +48,7 @@ const PrimeButtonStub = defineComponent({
 
 const GLOBAL_STUBS = {
   ResourceVersionField: ResourceVersionFieldStub,
-  ResourceSelectField: ResourceSelectFieldStub,
+  LazyResourceSelectField: ResourceSelectFieldStub,
   PrimeButton: PrimeButtonStub
 }
 

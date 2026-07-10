@@ -142,6 +142,10 @@ vi.mock('@/templates/release-composition/use-release-composition', () => ({
     loadCatalog: vi.fn(),
     catalogOptionsFor: () => [],
     isLoadingCatalog: () => false,
+    resourceListService: () => vi.fn().mockResolvedValue({ body: [], count: 0 }),
+    resourceLoadService: () => vi.fn().mockResolvedValue(null),
+    ensureResourceNames: vi.fn(),
+    resourceNameFor: () => null,
     versionOptionsFor: () => [],
     isLoadingVersionsFor: () => false
   })

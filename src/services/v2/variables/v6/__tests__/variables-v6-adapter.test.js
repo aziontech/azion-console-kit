@@ -272,13 +272,11 @@ describe('VariablesV6Adapter — transformCreatePayload scope', () => {
     expect(
       buildScope([
         { type: 'resource', resourceType: 'application', id: '1001' },
-        { type: 'resource', resourceType: 'firewall', id: '999' },
-        { type: 'resource', resourceType: 'function', id: '777' }
+        { type: 'resource', resourceType: 'firewall', id: '999' }
       ])
     ).toEqual([
       { type: 'application', application_id: '1001' },
-      { type: 'firewall', firewall_id: '999' },
-      { type: 'function', function_id: '777' }
+      { type: 'firewall', firewall_id: '999' }
     ])
   })
 

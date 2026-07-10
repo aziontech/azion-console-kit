@@ -3,7 +3,7 @@
    * ReleaseDependenciesSection — presentational owned dependencies nested inside
    * a parent resource card (Application → Functions/Connectors; Firewall →
    * Network Lists/WAF). Renders one collapsible group per collection; each open
-   * group lists its instances as a `ResourceSelectField` (instance) +
+   * group lists its instances as a `LazyResourceSelectField` (instance) +
    * `ResourceVersionField` (version). Instances are seeded automatically from
    * their source (the application's function instances / the active release);
    * there is no manual "Add".
@@ -15,8 +15,8 @@
    * `v-if`; this component only renders what it is given.
    *
    * @prop collections — array of `{ type, label, icon, count, open, instances }`
-   *   where each instance is `{ id, resourceId, name, options, version,
-   *   versionOptions, locked?, required?, buildRoute? }`. A `locked` instance is
+   *   where each instance is `{ id, resourceId, name, nameService, nameLoadService,
+   *   version, versionOptions, locked?, required?, buildRoute? }`. A `locked` instance is
    *   app-managed: its resource is fixed (rendered as a label, no dropdown) and
    *   it offers no remove. A `required` instance marks its version selector as
    *   required, and signals when no version is selectable (empty `versionOptions`);
@@ -29,7 +29,7 @@
    */
   import PrimeButton from '@aziontech/webkit/button'
 
-  import ResourceSelectField from '@/templates/release-composition/components/ResourceSelectField.vue'
+  import LazyResourceSelectField from '@/templates/release-composition/components/LazyResourceSelectField.vue'
   import ResourceVersionField from '@/templates/release-composition/components/ResourceVersionField.vue'
 
   defineOptions({ name: 'release-dependencies-section' })
@@ -159,10 +159,11 @@
                         <i class="pi pi-lock text-[var(--text-color-secondary)]" />
                       </div>
                     </div>
-                    <ResourceSelectField
+                    <LazyResourceSelectField
                       v-else
                       :modelValue="instance.resourceId"
-                      :options="instance.options"
+                      :service="instance.nameService"
+                      :load-service="instance.nameLoadService"
                       :label="collection.label"
                       :required="false"
                       :placeholder="`Select a ${collection.label}`"

@@ -7,6 +7,7 @@
   import FieldNumber from '@aziontech/webkit/field-number'
   import RadioButton from '@aziontech/webkit/radiobutton'
   import LabelBlock from '@aziontech/webkit/label'
+  import ScopedVariablesInfoTable from '@/views/Variables/v6/components/ScopedVariablesInfoTable.vue'
   import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'form-fields-deployment' })
@@ -15,6 +16,10 @@
     isEdit: {
       type: Boolean,
       default: false
+    },
+    resourceId: {
+      type: [String, Number],
+      default: null
     }
   })
 
@@ -272,6 +277,19 @@
           </div>
         </div>
       </div>
+    </template>
+  </FormHorizontal>
+
+  <FormHorizontal
+    v-if="props.isEdit && props.resourceId"
+    title="Variables"
+    description="Variables scoped to this deployment. To create or edit them, go to the Variables page."
+  >
+    <template #inputs>
+      <ScopedVariablesInfoTable
+        scope-type="deployment"
+        :scope-id="props.resourceId"
+      />
     </template>
   </FormHorizontal>
 </template>

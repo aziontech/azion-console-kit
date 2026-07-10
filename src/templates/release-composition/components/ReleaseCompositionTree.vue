@@ -3,7 +3,7 @@
    * ReleaseCompositionTree — the full-page "Review & deploy" composition renderer
    * (matches the authoritative `vue-preview.html` `resources` renderer). It is the
    * page-owned alternative to the drawer's `ReleaseCompositionField`: same shared
-   * LEAVES (`ResourceSelectField`, `ResourceVersionField`, `ReleaseDependenciesSection`)
+   * LEAVES (`LazyResourceSelectField`, `ResourceVersionField`, `ReleaseDependenciesSection`)
    * but the uniform-card tree structure of the new screen.
    *
    * Presentational only: every value comes in through `resources`, every mutation
@@ -20,9 +20,10 @@
    *     enabled,         // included in the release
    *     name,            // selected resource id (singleton)
    *     version,         // selected version (LATEST sentinel | pinned id)
-   *     nameOptions,     // [{ label, value }] for ResourceSelectField
+   *     nameService,     // (params) => { body, count } for LazyResourceSelectField
+   *     nameLoadService, // (id) => { id, name } — resolves a pre-selected label
    *     versionOptions,  // version picker options for ResourceVersionField
-   *     isLoadingOptions, isLoadingVersions,
+   *     isLoadingVersions,
    *     lockReason,      // text for the read-only row
    *     hasOwned,        // render the nested Dependencies block
    *     ownedCollections // collections for ReleaseDependenciesSection
@@ -39,7 +40,7 @@
    */
   import InputSwitch from '@aziontech/webkit/inputswitch'
 
-  import ResourceSelectField from '@/templates/release-composition/components/ResourceSelectField.vue'
+  import LazyResourceSelectField from '@/templates/release-composition/components/LazyResourceSelectField.vue'
   import ResourceVersionField from '@/templates/release-composition/components/ResourceVersionField.vue'
   import ReleaseDependenciesSection from '@/templates/release-composition/components/ReleaseDependenciesSection.vue'
 
@@ -149,10 +150,10 @@
           class="flex w-full gap-[var(--spacing-3)]"
           :data-testid="`release-composition__fields-${resource.type}`"
         >
-          <ResourceSelectField
+          <LazyResourceSelectField
             :model-value="resource.name"
-            :options="resource.nameOptions"
-            :loading="resource.isLoadingOptions"
+            :service="resource.nameService"
+            :load-service="resource.nameLoadService"
             :disabled="resource.readonly"
             label="Resource"
             :placeholder="`Select ${resource.label}`"

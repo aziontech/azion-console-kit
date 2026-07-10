@@ -823,14 +823,12 @@
     (OWNED_COLLECTIONS[parentType] ?? []).map((type) => {
       const meta = resolveResourceMeta(type)
       const label = labelFor(type)
-      const options = composition.catalogOptionsFor(type)
       const instances = (coll.value[parentType]?.[type] ?? []).map((instance, index) => ({
         id: index,
         resourceId: instance.resourceId,
-        name:
-          options.find((option) => String(option.value) === String(instance.resourceId))?.label ??
-          label,
-        options,
+        name: composition.resourceNameFor(type, instance.resourceId) ?? label,
+        nameService: composition.resourceListService(type),
+        nameLoadService: composition.resourceLoadService(type),
         version: instance.version,
         versionOptions: composition.versionOptionsFor(type, instance.resourceId),
         locked: instance.locked,
@@ -911,8 +909,8 @@
         canToggle,
         enabled,
         name,
-        nameOptions: composition.catalogOptionsFor(type),
-        isLoadingOptions: composition.isLoadingCatalog(type),
+        nameService: composition.resourceListService(type),
+        nameLoadService: composition.resourceLoadService(type),
         version,
         // Version options are loaded under the RAW id (`versionedResources` keys
         // off `resNames`/the active release), so look them up by `rawName` to stay
@@ -990,15 +988,16 @@
           functionExecEnvFor: composition.functionExecutionEnvironmentFor,
           ownedConnectorIdsFor: () => connectorAttribution.ownedConnectorIdsFor(dsId)
         }).map((resource) => {
-          const nameMatch = composition
-            .catalogOptionsFor(resource.resource_type)
-            .find((option) => String(option.value) === String(resource.resource_id))
+          const resolvedName = composition.resourceNameFor(
+            resource.resource_type,
+            resource.resource_id
+          )
           return {
             type: resource.resource_type,
             id: resource.resource_id,
             label: labelFor(resource.resource_type),
             icon: resolveResourceMeta(resource.resource_type).icon,
-            name: nameMatch?.label ?? resource.resource_name ?? String(resource.resource_id),
+            name: resolvedName ?? resource.resource_name ?? String(resource.resource_id),
             version: resource.resource_version ?? 'current'
           }
         })
@@ -1015,15 +1014,37 @@
     () => !isFromDeployment.value || retainedGroups.value.length > 0 || showComposition.value
   )
 
+  // Prime the page-1 catalog + resolve each retained id by id (correct off-page).
   watch(
     () =>
       Object.values(store.retainedStrictResourcesByDs)
         .flat()
-        .map((resource) => resource.resource_type),
-    (types) => {
-      ;[...new Set(types)].forEach((type) => composition.loadCatalog(type))
+        .map((resource) => `${resource.resource_type}:${resource.resource_id}`)
+        .join('|'),
+    () => {
+      const idsByType = {}
+      Object.values(store.retainedStrictResourcesByDs)
+        .flat()
+        .forEach((resource) => {
+          const type = resource?.resource_type
+          if (!type) return
+          composition.loadCatalog(type)
+          ;(idsByType[type] ||= []).push(resource.resource_id)
+        })
+      Object.entries(idsByType).forEach(([type, ids]) => composition.ensureResourceNames(type, ids))
     },
     { immediate: true }
+  )
+
+  // Resolve the name of every referenced resource so off-page ids still show a name.
+  watch(
+    versionedResources,
+    (pairs) => {
+      ;(pairs ?? []).forEach(({ resourceType, resourceId }) =>
+        composition.ensureResourceNames(resourceType, resourceId)
+      )
+    },
+    { immediate: true, deep: true }
   )
 
   // Load the dependency-collection catalogs (function/connector, waf/network_list)

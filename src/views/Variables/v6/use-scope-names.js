@@ -11,8 +11,7 @@ const LOADERS = {
   environment: () => environmentService.listEnvironmentsService(),
   deployment: () => deploymentService.listDeploymentsService(),
   application: fromCatalog('application'),
-  firewall: fromCatalog('firewall'),
-  function: fromCatalog('function')
+  firewall: fromCatalog('firewall')
 }
 
 export function useScopeNames(scopes) {

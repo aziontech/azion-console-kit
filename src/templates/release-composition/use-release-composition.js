@@ -373,6 +373,9 @@ export function useReleaseComposition({
     }))
 
   const functionExecutionEnvironmentFor = (resourceId) => {
+    if (resourceId == null) return null
+    const cached = resourceNameById.value[versionsKey('function', resourceId)]
+    if (cached && cached.executionEnvironment != null) return cached.executionEnvironment
     const match = (catalogByType.value.function ?? []).find(
       (item) => String(item?.id) === String(resourceId)
     )
@@ -391,6 +394,70 @@ export function useReleaseComposition({
     )
     catalogErrorByType.value = {}
     failedTypes.forEach((type) => loadCatalog(type))
+  }
+
+  // --- Lazy resource picker: paginated/searchable services + name resolver ----
+
+  // `catalogByType` (page 1) stays the "first option" default + fast name cache;
+  // `resourceNameById` resolves the label of any id NOT on that page so the
+  // screen-level lookups stay correct regardless of pagination. The service
+  // factories memoise a stable reference per type.
+  const listServiceCache = {}
+  const resourceListService = (resourceType) => {
+    if (!(resourceType in listServiceCache)) {
+      const registry = RESOURCE_CATALOG_REGISTRY[resourceType]
+      listServiceCache[resourceType] = registry?.listPage
+        ? (params) => registry.listPage(params)
+        : null
+    }
+    return listServiceCache[resourceType]
+  }
+
+  const loadServiceCache = {}
+  const resourceLoadService = (resourceType) => {
+    if (!(resourceType in loadServiceCache)) {
+      const registry = RESOURCE_CATALOG_REGISTRY[resourceType]
+      loadServiceCache[resourceType] = registry?.loadById ? (id) => registry.loadById(id) : null
+    }
+    return loadServiceCache[resourceType]
+  }
+
+  // `${type}:${id}` -> { id, name, executionEnvironment }; `resourceNameLoading`
+  // guards in-flight ids against duplicate by-id requests.
+  const resourceNameById = ref({})
+  const resourceNameLoading = {}
+
+  const ensureResourceNames = (resourceType, ids) => {
+    const registry = RESOURCE_CATALOG_REGISTRY[resourceType]
+    if (!registry?.loadById) return
+    ;(Array.isArray(ids) ? ids : [ids]).forEach((id) => {
+      if (id == null || id === '') return
+      const key = versionsKey(resourceType, id)
+      if (key in resourceNameById.value || resourceNameLoading[key]) return
+      const inCatalog = (catalogByType.value[resourceType] ?? []).some(
+        (item) => String(item?.id) === String(id)
+      )
+      if (inCatalog) return
+      resourceNameLoading[key] = true
+      Promise.resolve(registry.loadById(id))
+        .then((item) => {
+          if (item) resourceNameById.value = { ...resourceNameById.value, [key]: item }
+        })
+        .catch(() => {})
+        .finally(() => {
+          delete resourceNameLoading[key]
+        })
+    })
+  }
+
+  const resourceNameFor = (resourceType, resourceId) => {
+    if (resourceId == null || resourceId === '') return null
+    const cached = resourceNameById.value[versionsKey(resourceType, resourceId)]
+    if (cached?.name) return cached.name
+    const fromCatalog = (catalogByType.value[resourceType] ?? []).find(
+      (item) => String(item?.id) === String(resourceId)
+    )
+    return fromCatalog?.name ?? null
   }
 
   // --- Resource -> consuming Deployment Settings (HOP 1, delegated) ---------
@@ -957,6 +1024,11 @@ export function useReleaseComposition({
     hasAnyCatalogError,
     loadCatalog,
     retryCatalogs,
+    // lazy resource picker: paginated/searchable services + off-page name resolver
+    resourceListService,
+    resourceLoadService,
+    ensureResourceNames,
+    resourceNameFor,
     // resource -> consuming DS: the backwards-compatible `string[]` shim (req 1.3)
     resolveConsumingDsIds,
     // resource -> consuming deployments: the full HOP 1 result (de-duped union +

@@ -11,6 +11,10 @@
     scopes: {
       type: Array,
       default: () => []
+    },
+    lockLabel: {
+      type: String,
+      default: 'Set at creation · read-only'
     }
   })
 
@@ -43,7 +47,7 @@
         <PrimeTag
           icon="pi pi-lock"
           severity="info"
-          value="Set at creation · read-only"
+          :value="lockLabel"
           data-testid="variables-form__scope-readonly-badge"
         />
       </div>

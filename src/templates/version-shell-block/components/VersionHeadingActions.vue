@@ -19,6 +19,10 @@
     resourceContext: {
       type: Object,
       default: null
+    },
+    deployRoute: {
+      type: Object,
+      default: null
     }
   })
 
@@ -39,12 +43,16 @@
 
   const isDisabled = (key) =>
     disabledActions.value.includes(key) ||
-    (key === VERSION_ACTIONS.DEPLOY && !props.resourceContext)
+    (key === VERSION_ACTIONS.DEPLOY && !props.resourceContext && !props.deployRoute)
 
   // DeployDrawerBlock stays mounted (rollback fallback); the model is retained but
   // the Deploy action now routes to the full-page composer, scoped to this version.
   const isDeployDrawerOpen = ref(false)
   const openRelease = () => {
+    if (props.deployRoute) {
+      router.push(props.deployRoute)
+      return
+    }
     router.push(
       releaseComposerRouteFromResource({
         ...props.resourceContext,
