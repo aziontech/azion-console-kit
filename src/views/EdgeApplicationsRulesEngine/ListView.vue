@@ -588,10 +588,12 @@
                 data-pc-section="rowreordericon"
                 :class="hasContentDefault(rowData.phase?.content) ? 'no-before mr-8' : ''"
               />
+              <!-- step="-1" inverts the spinner buttons: the down arrow moves the rule up (lower position) and the up arrow moves it down -->
               <InputNumber
                 v-model="rowData.position.value"
                 showButtons
                 :allowEmpty="false"
+                :step="-1"
                 @update:modelValue="(value) => onPositionChange(rowData, value)"
                 @input="(value) => (valueInputedUser = value.value)"
                 buttonLayout="horizontal"

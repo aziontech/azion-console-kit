@@ -470,10 +470,12 @@
                 class="pi pi-bars cursor-move mr-4 hidden md:inline disabled-click-row"
                 data-pc-section="rowreordericon"
               />
+              <!-- step="-1" inverts the spinner buttons: the down arrow moves the rule up (lower position) and the up arrow moves it down -->
               <InputNumber
                 v-model="rowData.position.value"
                 showButtons
                 :allowEmpty="false"
+                :step="-1"
                 @update:modelValue="(value) => onPositionChange(rowData, value)"
                 @input="(value) => (valueInputedUser = value.value)"
                 buttonLayout="horizontal"
