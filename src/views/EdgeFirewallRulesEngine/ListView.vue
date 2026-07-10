@@ -232,7 +232,8 @@
 
     const [movedItem] = data.value.splice(oldIndex, 1)
     movedItem.position.altered = true
-    data.value.splice(newValue, 0, movedItem)
+    const targetIndex = Math.min(Math.max(newValue, 0), data.value.length)
+    data.value.splice(targetIndex, 0, movedItem)
     updateRowPositions(data.value)
   }
 
@@ -470,7 +471,14 @@
                 class="pi pi-bars cursor-move mr-4 hidden md:inline disabled-click-row"
                 data-pc-section="rowreordericon"
               />
-              <!-- step="-1" inverts the spinner buttons: the down arrow moves the rule up (lower position) and the up arrow moves it down -->
+              <!--
+                step="-1" inverts the spinner buttons: the down arrow (increment) moves the rule up
+                and the up arrow (decrement) moves it down. min/max are intentionally omitted because
+                PrimeVue ties its automatic button disabling to the button role and ignores the step
+                sign, which produces inverted disabled states. Instead we disable each button
+                explicitly via pt: the up button (increment) on the first rule and the down button
+                (decrement) on the last rule.
+              -->
               <InputNumber
                 v-model="rowData.position.value"
                 showButtons
@@ -480,9 +488,11 @@
                 @input="(value) => (valueInputedUser = value.value)"
                 buttonLayout="horizontal"
                 class="disabled-click-row"
-                :min="rowData.position.min"
-                :max="rowData.position.max"
-                :pt="{ input: { class: 'w-11 text-center' } }"
+                :pt="{
+                  input: { class: 'w-11 text-center' },
+                  incrementButton: { disabled: rowData.position.value <= rowData.position.min },
+                  decrementButton: { disabled: rowData.position.value >= rowData.position.max }
+                }"
                 data-testid="data-table-input-position"
               >
                 <template #incrementbuttonicon>

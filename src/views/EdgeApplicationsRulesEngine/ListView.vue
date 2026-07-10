@@ -266,6 +266,10 @@
       displayPositionExceededToast()
     }
 
+    if (newPosition < 0) {
+      newPosition = 0
+    }
+
     if (originalIndex === newPosition) return
 
     const firstRule = rulesInCurrentPhase.splice(originalIndex, 1)[0]
@@ -588,7 +592,14 @@
                 data-pc-section="rowreordericon"
                 :class="hasContentDefault(rowData.phase?.content) ? 'no-before mr-8' : ''"
               />
-              <!-- step="-1" inverts the spinner buttons: the down arrow moves the rule up (lower position) and the up arrow moves it down -->
+              <!--
+                step="-1" inverts the spinner buttons: the down arrow (increment) moves the rule up
+                and the up arrow (decrement) moves it down. min/max are intentionally omitted because
+                PrimeVue ties its automatic button disabling to the button role and ignores the step
+                sign, which produces inverted disabled states. Instead we disable each button
+                explicitly via pt: the up button (increment) on the first rule and the down button
+                (decrement) on the last rule.
+              -->
               <InputNumber
                 v-model="rowData.position.value"
                 showButtons
@@ -598,9 +609,19 @@
                 @input="(value) => (valueInputedUser = value.value)"
                 buttonLayout="horizontal"
                 class="disabled-click-row"
-                :min="rowData.position.min"
-                :max="rowData.position.max"
-                :pt="{ input: { class: 'w-11 text-center' } }"
+                :pt="{
+                  input: { class: 'w-11 text-center' },
+                  incrementButton: {
+                    disabled:
+                      hasContentDefault(rowData.phase?.content) ||
+                      rowData.position.value <= rowData.position.min
+                  },
+                  decrementButton: {
+                    disabled:
+                      hasContentDefault(rowData.phase?.content) ||
+                      rowData.position.value >= rowData.position.max
+                  }
+                }"
                 :disabled="hasContentDefault(rowData.phase?.content)"
                 data-testid="data-table-input-position"
               >
