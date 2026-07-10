@@ -23,6 +23,8 @@ const environmentApiHost =
 
 const variablesApiHost = environment === 'production' ? 'variables.azion.com' : 'stage-variables.azion.com'
 
+const tlsApiHost = environment === 'production' ? 'tls-api.azion.net' : 'stage-tls-api.azion.net'
+
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
     return origin?.map(({ hostHeader, addresses, ...rest }) => {
@@ -182,6 +184,12 @@ const config = {
       type: 'single_origin',
       hostHeader: variablesApiHost,
       addresses: [variablesApiHost]
+    },
+    {
+      name: 'origin-tls-api',
+      type: 'single_origin',
+      hostHeader: tlsApiHost,
+      addresses: [tlsApiHost]
     },
     {
       name: 'origin-console-feedback',
@@ -378,6 +386,12 @@ const config = {
             conditional: 'and',
             operator: 'does_not_match',
             inputValue: '^/variables-api'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/tls-api'
           },
           {
             variable: '${uri}',
@@ -621,6 +635,27 @@ const config = {
           rewrite: `/%{captured[1]}`,
           bypassCache: true
         }
+      },
+      {
+        name: 'Route TLS API Requests',
+        description:
+          'Routes TLS API requests to the TLS API origin, stripping the /tls-api prefix and setting the v4 Accept header.',
+        match: '^/tls-api',
+        behavior: {
+          forwardCookies: true,
+          setOrigin: {
+            name: 'origin-tls-api',
+            type: 'single_origin'
+          },
+          setHeaders: ['Accept: application/json; version=4'],
+          capture: {
+            match: '/tls-api/(.*)',
+            captured: 'captured',
+            subject: 'request_uri'
+          },
+          rewrite: `/%{captured[1]}`,
+          bypassCache: true
+        }
       }
     ],
     response: [
@@ -710,6 +745,12 @@ const config = {
             conditional: 'and',
             operator: 'does_not_match',
             inputValue: '^/variables-api'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/tls-api'
           },
           {
             variable: '${uri}',

@@ -19,6 +19,7 @@ const getConfig = () => {
   const deploymentApiUrl = IS_PROD ? 'https://deployment-api.azion.app' : 'https://deployment-api-stage.azion.app'
   const environmentApiUrl = IS_PROD ? 'https://environment-api.azion.app' : 'https://environment-api-stage.azion.app'
   const variablesApiUrl = IS_PROD ? 'https://variables.azion.com' : 'https://stage-variables.azion.com'
+  const tlsApiUrl = IS_PROD ? 'https://tls-api.azion.net' : 'https://stage-tls-api.azion.net'
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
     target,
@@ -155,6 +156,10 @@ const getConfig = () => {
         '/variables-api': createProxyConfig({
           target: variablesApiUrl,
           rewrite: (path) => path.replace(/^\/variables-api/, '')
+        }),
+        '/tls-api': createProxyConfig({
+          target: tlsApiUrl,
+          rewrite: (path) => path.replace(/^\/tls-api/, '')
         })
       }
     }

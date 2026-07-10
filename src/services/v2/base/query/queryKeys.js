@@ -597,6 +597,19 @@ export const queryKeys = {
     list: (params) => [...queryKeys.digitalCertificates.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.digitalCertificates.all, 'detail', id]
   },
+  digitalCertificatesV6: {
+    all: ['digital-certificates-v6'],
+    list: (params) => [...queryKeys.digitalCertificatesV6.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.digitalCertificatesV6.all, 'detail', id],
+    versions: {
+      all: (id) => [...queryKeys.digitalCertificatesV6.detail(id), 'versions'],
+      list: (id, params) => [
+        ...queryKeys.digitalCertificatesV6.versions.all(id),
+        'list',
+        normalizeParams(params)
+      ]
+    }
+  },
   customPages: {
     all: ['custom-pages'],
     list: (params) => [...queryKeys.customPages.all, 'list', normalizeParams(params)],
@@ -615,6 +628,19 @@ export const queryKeys = {
     all: ['digital-certificates-crl'],
     list: (params) => [...queryKeys.digitalCertificatesCRL.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.digitalCertificatesCRL.all, 'detail', id]
+  },
+  digitalCertificatesCRLV6: {
+    all: ['digital-certificates-crl-v6'],
+    list: (params) => [...queryKeys.digitalCertificatesCRLV6.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.digitalCertificatesCRLV6.all, 'detail', id],
+    versions: {
+      all: (id) => [...queryKeys.digitalCertificatesCRLV6.detail(id), 'versions'],
+      list: (id, params) => [
+        ...queryKeys.digitalCertificatesCRLV6.versions.all(id),
+        'list',
+        normalizeParams(params)
+      ]
+    }
   },
   users: {
     all: ['users'],

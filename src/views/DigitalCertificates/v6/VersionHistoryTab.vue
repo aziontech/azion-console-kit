@@ -1,21 +1,26 @@
 <script setup>
-  import { ref, onBeforeUnmount } from 'vue'
+  import { ref, computed, onBeforeUnmount } from 'vue'
   import Menu from '@aziontech/webkit/menu'
   import PrimeButton from '@aziontech/webkit/button'
   import PrimeTag from '@aziontech/webkit/prime-tag'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { clipboardWrite } from '@/helpers/clipboard'
-  import { variablesV6Service } from '@/services/v2/variables/v6/variables-v6-service'
-  import { buildVersionRowActions } from '@/views/Variables/v6/version-row-actions'
-  import RollbackDialog from '@/views/Variables/v6/components/RollbackDialog.vue'
+  import { digitalCertificatesV6Service } from '@/services/v2/digital-certificates/v6/digital-certificates-v6-service'
+  import { digitalCertificatesCRLV6Service } from '@/services/v2/digital-certificates/v6/digital-certificates-crl-v6-service'
+  import { buildVersionRowActions } from './version-row-actions'
+  import RollbackDialog from './components/RollbackDialog.vue'
   import VersionListDataView from '@/components/VersionListDataView'
   import '@/assets/styles/version-row-menu.css'
 
-  defineOptions({ name: 'variables-version-history-tab' })
+  defineOptions({ name: 'digital-certificates-version-history-tab' })
 
   const props = defineProps({
-    variable: {
+    resource: {
       type: Object,
+      required: true
+    },
+    resourceKind: {
+      type: String,
       required: true
     }
   })
@@ -23,6 +28,18 @@
   const emit = defineEmits(['rolled-back'])
 
   const toast = useToast()
+
+  const service = computed(() =>
+    props.resourceKind === 'crl' ? digitalCertificatesCRLV6Service : digitalCertificatesV6Service
+  )
+
+  const resourceLabel = computed(() => (props.resourceKind === 'crl' ? 'CRL' : 'certificate'))
+
+  const emptyStateTitle = computed(() =>
+    props.resourceKind === 'crl'
+      ? 'This CRL has no versions yet'
+      : 'This certificate has no versions yet'
+  )
 
   const columns = [
     { key: 'version', label: 'Version', size: 'minmax(180px, 1.2fr)' },
@@ -49,8 +66,8 @@
       if (searchTerm.value) params.search = searchTerm.value
       if (skipCache) params.skipCache = true
 
-      const { count, body } = await variablesV6Service.listVersions({
-        id: props.variable.id,
+      const { count, body } = await service.value.listVersions({
+        id: props.resource.id,
         ...params
       })
 
@@ -155,18 +172,18 @@
     :show-row-actions="false"
     search-placeholder="Search versions"
     :empty-state="{
-      title: 'This variable has no versions yet',
-      description: 'Each edit creates a new version. Rollback restores an earlier value.'
+      title: emptyStateTitle,
+      description: 'Each edit creates a new version. Rollback restores an earlier configuration.'
     }"
     :error-state="{
       title: 'Failed to load versions',
-      description: 'Something went wrong loading this variable’s versions. Try again.',
+      description: `Something went wrong loading this ${resourceLabel}’s versions. Try again.`,
       buttonLabel: 'Retry',
       buttonAction: () => fetchVersions({ skipCache: true })
     }"
     filtered-empty-title="No versions found"
     filtered-empty-description="Try a different search term."
-    data-testid="variables-version-history"
+    data-testid="digital-certificates-version-history"
     @update:search-term="onSearch"
     @page="onPage"
     class="mt-4"
@@ -174,7 +191,7 @@
     <template #cell-version="{ item }">
       <span
         class="text-body-sm text-[var(--text-color)] break-all"
-        data-testid="variables-version-history__id"
+        data-testid="digital-certificates-version-history__id"
       >
         {{ item.id }}
       </span>
@@ -185,12 +202,12 @@
         v-if="item.isCurrent"
         value="Current"
         severity="success"
-        data-testid="variables-version-history__status-current"
+        data-testid="digital-certificates-version-history__status-current"
       />
       <span
         v-else
         class="text-body-sm text-[var(--text-color-secondary)]"
-        data-testid="variables-version-history__status-historical"
+        data-testid="digital-certificates-version-history__status-historical"
       >
         Historical
       </span>
@@ -203,7 +220,7 @@
         severity="secondary"
         class="version-row-menu__trigger"
         aria-label="Version actions"
-        :data-testid="`variables-version-history__menu-${item.id}`"
+        :data-testid="`digital-certificates-version-history__menu-${item.id}`"
         @click="openRowMenu($event, item)"
       />
     </template>
@@ -235,8 +252,10 @@
 
   <RollbackDialog
     v-model:visible="rollbackVisible"
-    :variable="props.variable"
+    :resource="props.resource"
     :targetVersion="selectedVersion"
+    :rollbackService="service.rollback"
+    :resourceLabel="resourceLabel"
     @success="handleRollbackSuccess"
   />
 </template>
