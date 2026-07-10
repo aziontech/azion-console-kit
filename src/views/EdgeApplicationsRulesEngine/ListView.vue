@@ -266,6 +266,7 @@
       displayPositionExceededToast()
     }
 
+    // Clamp inferior: sem min/max no InputNumber, evita índice negativo no splice
     if (newPosition < 0) {
       newPosition = 0
     }
