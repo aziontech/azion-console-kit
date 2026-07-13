@@ -30,13 +30,40 @@ const parseItemResponse = (data) => {
   return data
 }
 
+const buildApiListParams = (params = {}) => {
+  const hasPagination = params.page != null || params.pageSize != null || params.page_size != null
+
+  const requestParams = {}
+
+  if (hasPagination) {
+    requestParams.page = Number(params.page) > 0 ? Number(params.page) : 1
+    const rawPageSize = params.pageSize ?? params.page_size
+    const pageSize = Number(rawPageSize) > 0 ? Math.min(Number(rawPageSize), 100) : 10
+    requestParams.page_size = pageSize
+  }
+
+  const nameFilter =
+    typeof params.name === 'string' && params.name.trim().length > 0
+      ? params.name.trim()
+      : typeof params.search === 'string' && params.search.trim().length > 0
+        ? params.search.trim()
+        : undefined
+
+  if (nameFilter) {
+    requestParams.name = nameFilter
+  }
+
+  return requestParams
+}
+
 export class EnvironmentService extends BaseService {
   #baseURL = '/environment-api/v4/environments'
 
-  #fetchList = async () => {
+  #fetchList = async (params = {}) => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: this.#baseURL
+      url: this.#baseURL,
+      params: buildApiListParams(params)
     })
 
     const { results, count } = parseListResponse(data)
@@ -101,10 +128,14 @@ export class EnvironmentService extends BaseService {
   listEnvironmentsService = async (params = {}) => {
     const skipCache = params?.skipCache || params?.hasFilter || params?.search
 
-    return await this.useEnsureQueryData(queryKeys.environments.list(), () => this.#fetchList(), {
-      persist: !skipCache,
-      skipCache
-    })
+    return await this.useEnsureQueryData(
+      queryKeys.environments.list(params),
+      () => this.#fetchList(params),
+      {
+        persist: !skipCache,
+        skipCache
+      }
+    )
   }
 
   getEnvironmentFromCache = (id) => {

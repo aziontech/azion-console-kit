@@ -18,14 +18,23 @@ function buildV6CleanDomains(fullDomains, zones = []) {
     const name = typeof entry === 'string' ? entry : entry?.name
     const environment = typeof entry === 'string' ? null : (entry?.environment ?? null)
     const certificate = typeof entry === 'string' ? null : (entry?.certificate ?? null)
+    const isAutoDomain = typeof entry === 'string' ? false : !!entry?.isAutoDomain
+    const autoDomainBinding = typeof entry === 'string' ? null : (entry?.autoDomainBinding ?? null)
     const { domain, subdomain } = getPrimaryDomain(name, zones)
 
-    return { subdomain: subdomain ?? '', domain, environment, certificate }
+    return {
+      subdomain: subdomain ?? '',
+      domain,
+      environment,
+      certificate,
+      isAutoDomain,
+      autoDomainBinding
+    }
   })
 
   return cleanDomains.length
     ? cleanDomains
-    : [{ subdomain: '', domain: '', environment: null, certificate: 0 }]
+    : [{ subdomain: '', domain: '', environment: null, certificate: 0, isAutoDomain: false }]
 }
 
 function extractAzionAppSubdomainLegacy(fullDomains, zones = []) {
@@ -92,24 +101,36 @@ const handleTlsLegacy = (payload) => {
 
 const buildV6DomainEntries = (payload) => {
   return payload.domains
-    .filter(({ subdomain, domain }) => subdomain || domain)
-    .map(({ subdomain, domain, environment, certificate }) => ({
+    .filter(({ subdomain, domain, isAutoDomain }) => subdomain || domain || isAutoDomain)
+    .map(({ subdomain, domain, environment, certificate, isAutoDomain, autoDomainBinding }) => ({
       name: subdomain ? `${subdomain}.${domain}` : domain,
       environment: environment ?? null,
-      certificate: certificate ?? 0
+      certificate: certificate ?? 0,
+      isAutoDomain: !!isAutoDomain,
+      autoDomainBinding: autoDomainBinding ?? null
     }))
 }
 
 const buildV6Bindings = (entries, environmentDeployments = {}, autoDomainAllowAccess) => {
   const bindingByEnvironment = new Map()
 
-  for (const { name, environment, certificate } of entries) {
+  for (const { name, environment, certificate, isAutoDomain, autoDomainBinding } of entries) {
     if (environment == null) continue
     if (!bindingByEnvironment.has(environment)) {
-      bindingByEnvironment.set(environment, { domains: [], certificate: null })
+      bindingByEnvironment.set(environment, {
+        domains: [],
+        certificate: null,
+        autoDomain: false,
+        raw: null
+      })
     }
     const binding = bindingByEnvironment.get(environment)
-    binding.domains.push(name)
+    if (isAutoDomain) {
+      binding.autoDomain = true
+      if (autoDomainBinding) binding.raw = autoDomainBinding
+    } else {
+      binding.domains.push(name)
+    }
     const resolvedCertificate = certificate === 0 ? null : certificate
     if (binding.certificate == null && resolvedCertificate != null) {
       binding.certificate = resolvedCertificate
@@ -117,9 +138,10 @@ const buildV6Bindings = (entries, environmentDeployments = {}, autoDomainAllowAc
   }
 
   return Array.from(bindingByEnvironment, ([environment, binding]) => ({
+    ...(binding.raw ?? {}),
     environment_id: environment,
     deployment_id: environmentDeployments?.[environment]?.deploymentId ?? null,
-    auto_domain_allow_access: autoDomainAllowAccess,
+    auto_domain_allow_access: binding.autoDomain ? true : autoDomainAllowAccess,
     certificate: binding.certificate,
     domains: binding.domains
   }))
@@ -148,8 +170,21 @@ const buildLoadedV6DomainEntries = (bindings = []) => {
 
   return bindings.flatMap((binding) => {
     const bindingCertificate = binding?.certificate ?? null
+    const bindingDomains = Array.isArray(binding?.domains) ? binding.domains : []
 
-    return (Array.isArray(binding?.domains) ? binding.domains : []).map((entry) => ({
+    if (!bindingDomains.length && binding?.auto_domain) {
+      return [
+        {
+          name: binding.auto_domain,
+          environment: binding?.environment_id ?? null,
+          certificate: bindingCertificate ?? 0,
+          isAutoDomain: true,
+          autoDomainBinding: binding
+        }
+      ]
+    }
+
+    return bindingDomains.map((entry) => ({
       name: typeof entry === 'string' ? entry : entry?.name,
       environment: binding?.environment_id ?? null,
       certificate:

@@ -165,7 +165,10 @@
             :versions="resource.versionOptions"
             :show-resource="false"
             :required="resource.required"
+            :loading="resource.isLoadingVersions"
             :disabled="resource.readonly || resource.isLoadingVersions"
+            :build-route="resource.buildRoute"
+            :resource-label="resource.label"
             @update:model-value="onVersion(resource.type, $event)"
           />
         </div>

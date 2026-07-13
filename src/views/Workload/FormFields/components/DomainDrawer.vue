@@ -6,6 +6,7 @@
   import ActionBarBlock from '@/templates/action-bar-block'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
+  import InputText from 'primevue/inputtext'
   import RadioButton from '@aziontech/webkit/radiobutton'
   import MessageCard from '@/components/MessageCard'
   import PrimeButton from '@aziontech/webkit/button'
@@ -51,7 +52,8 @@
       domain: rawDomain,
       environment: data?.environment ?? null,
       domainType: type,
-      certificate: data?.certificate ?? 0
+      certificate: data?.certificate ?? 0,
+      isAutoDomain: !!data?.isAutoDomain
     }
   }
 
@@ -140,6 +142,7 @@
     ([isVisible]) => {
       if (isVisible) {
         resetForm({ values: buildInitialValues(props.initialData) })
+        resolveLockedEnvironment()
       }
     },
     { deep: true }
@@ -153,6 +156,24 @@
   const title = computed(() => (props.mode === 'edit' ? 'Edit Domain' : 'Add Domain'))
 
   const isAzionDomain = computed(() => values.domainType === DOMAIN_TYPE.AZION)
+
+  const isAutoDomainLocked = computed(() => !!props.initialData?.isAutoDomain)
+
+  const lockedEnvironmentLabel = ref('')
+
+  const resolveLockedEnvironment = async () => {
+    const envId = props.initialData?.environment
+    if (!isAutoDomainLocked.value || envId == null || envId === '') {
+      lockedEnvironmentLabel.value = ''
+      return
+    }
+    try {
+      const environment = await environmentService.loadEnvironmentService({ id: envId })
+      lockedEnvironmentLabel.value = environment?.name ?? String(envId)
+    } catch {
+      lockedEnvironmentLabel.value = String(envId)
+    }
+  }
 
   const hasAzionDomainConflict = computed(() => {
     if (!isAzionDomain.value) return false
@@ -233,7 +254,8 @@
       environment: formValues.environment ?? null,
       useCustomDomain: isAzion,
       customDomain: isAzion ? formValues.domain : '',
-      certificate: formValues.certificate ?? 0
+      certificate: formValues.certificate ?? 0,
+      isAutoDomain: isAutoDomainLocked.value
     })
     emit('update:visible', false)
   })
@@ -255,6 +277,12 @@
         class="w-full flex flex-col gap-6"
         @submit.prevent="onSave"
       >
+        <MessageCard
+          v-if="isAutoDomainLocked"
+          type="info"
+          description="This domain was generated automatically for this workload. Its domain and environment can't be changed here — you can only update its Digital Certificate or remove the binding."
+          data-testid="domain-drawer__auto-domain-info"
+        />
         <div class="flex gap-3">
           <div class="flex items-start gap-3">
             <RadioButton
@@ -262,6 +290,7 @@
               name="domainType"
               :value="DOMAIN_TYPE.AZION"
               :modelValue="values.domainType"
+              :disabled="isAutoDomainLocked"
               data-testid="domain-drawer__type-azion"
               @update:modelValue="onDomainTypeChange"
             />
@@ -282,6 +311,7 @@
               name="domainType"
               :value="DOMAIN_TYPE.OWN"
               :modelValue="values.domainType"
+              :disabled="isAutoDomainLocked"
               data-testid="domain-drawer__type-own"
               @update:modelValue="onDomainTypeChange"
             />
@@ -306,6 +336,7 @@
             <FieldDropdown
               name="domain"
               editable
+              :disabled="isAutoDomainLocked"
               :options="isAzionDomain ? [] : domainsOptions"
               optionLabel="label"
               optionValue="label"
@@ -341,7 +372,16 @@
             name="environment"
             required
           />
+          <InputText
+            v-if="isAutoDomainLocked"
+            :modelValue="lockedEnvironmentLabel"
+            disabled
+            class="w-full"
+            placeholder="—"
+            data-testid="domain-drawer__environment-locked"
+          />
           <FieldDropdownLazyLoader
+            v-else
             name="environment"
             :service="environmentService.listEnvironmentsServiceDropdown"
             :loadService="environmentService.loadEnvironmentService"

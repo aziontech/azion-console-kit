@@ -63,25 +63,70 @@ describe('useVersionMenuActions — OPEN_CONFIGURATION navigation', () => {
   })
 })
 
-describe('useVersionMenuActions — BUILD navigation with intent', () => {
-  it('routes to the version editor carrying the build intent', () => {
+describe('useVersionMenuActions — BUILD execution', () => {
+  it('calls the version /build endpoint directly without navigating (has /build)', async () => {
     const router = makeRouter()
-    const api = useVersionMenuActions({ resourceType: 'firewall', resourceId: 'res9', router })
+    const versionService = { build: vi.fn().mockResolvedValue(undefined) }
+    const onSuccess = vi.fn()
+    const api = useVersionMenuActions({
+      resourceType: 'firewall',
+      resourceId: 'res9',
+      versionService,
+      router,
+      onSuccess
+    })
 
-    api.handleRowAction({ action: 'BUILD', item })
+    await api.handleRowAction({ action: 'BUILD', item })
+
+    expect(versionService.build).toHaveBeenCalledWith('res9', 'v123')
+    expect(onSuccess).toHaveBeenCalled()
+    expect(router.push).not.toHaveBeenCalled()
+  })
+
+  it('does not call onSuccess when the build request fails', async () => {
+    const router = makeRouter()
+    const versionService = { build: vi.fn().mockRejectedValue(new Error('boom')) }
+    const onSuccess = vi.fn()
+    const api = useVersionMenuActions({
+      resourceType: 'firewall',
+      resourceId: 'res9',
+      versionService,
+      router,
+      onSuccess
+    })
+
+    await api.handleRowAction({ action: 'BUILD', item })
+
+    expect(versionService.build).toHaveBeenCalledWith('res9', 'v123')
+    expect(onSuccess).not.toHaveBeenCalled()
+    expect(router.push).not.toHaveBeenCalled()
+  })
+
+  it('navigates with the build intent for auto-build-on-save resources (workload)', async () => {
+    const router = makeRouter()
+    const versionService = { build: vi.fn() }
+    const api = useVersionMenuActions({
+      resourceType: 'workload',
+      resourceId: 'res9',
+      versionService,
+      router
+    })
+
+    await api.handleRowAction({ action: 'BUILD', item })
 
     expect(router.push).toHaveBeenCalledWith({
-      name: 'edit-firewall-version',
+      name: 'edit-workload-version',
       params: { id: 'res9', versionId: 'v123' },
       query: { intent: 'build' }
     })
+    expect(versionService.build).not.toHaveBeenCalled()
   })
 
-  it('does not navigate for an unknown resourceType', () => {
+  it('does nothing for an unknown resourceType without a build service', async () => {
     const router = makeRouter()
     const api = useVersionMenuActions({ resourceType: 'unknown', resourceId: 'res9', router })
 
-    api.handleRowAction({ action: 'BUILD', item })
+    await api.handleRowAction({ action: 'BUILD', item })
 
     expect(router.push).not.toHaveBeenCalled()
   })

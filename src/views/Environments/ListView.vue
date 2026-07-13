@@ -121,7 +121,7 @@
         :editPagePath="editPagePath"
         defaultOrderingFieldName="name"
         exportFileName="Environments"
-        :lazy="false"
+        :lazy="true"
         :frozenColumns="frozenColumns"
         :allowedFilters="allowedFilters"
         emptyListMessage="No environments found."

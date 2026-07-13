@@ -40,6 +40,16 @@ export const RESOURCE_VERSION_ROUTES = {
 }
 
 /**
+ * Resource types that auto-build server-side on save (PUT) and expose no dedicated
+ * `/build` endpoint — Workload is the only one (workload-version-service §3). Their
+ * row-menu Build must go through the shell (`?intent=build` → SAVE_AND_BUILD re-saves
+ * the draft to rebuild). Every other resource has a real `/build` endpoint and its
+ * persisted version needs no save, so Build runs the endpoint directly from the
+ * listing — no navigation to the version editor.
+ */
+export const AUTO_BUILD_ON_SAVE = new Set(['workload'])
+
+/**
  * @param {object} cfg
  * @param {import('vue').MaybeRefOrGetter<string>} cfg.resourceType resource kind (key of RESOURCE_VERSION_ROUTES)
  * @param {import('vue').MaybeRefOrGetter<string|number>} cfg.resourceId owning resource id
@@ -66,6 +76,19 @@ export function useVersionMenuActions({
     service: versionService,
     onSuccess
   })
+
+  const reportError = (err, fallback) => {
+    if (err && typeof err.showErrors === 'function') {
+      err.showErrors(toast)
+    } else {
+      toast.add({
+        closable: true,
+        severity: 'error',
+        summary: 'Error',
+        detail: err?.message ?? fallback
+      })
+    }
+  }
 
   // Open configuration: navigate to the version editor; no draft creation.
   const openConfiguration = (item) => {
@@ -102,31 +125,41 @@ export function useVersionMenuActions({
         })
       }
     } catch (err) {
-      if (err && typeof err.showErrors === 'function') {
-        err.showErrors(toast)
-      } else {
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Error',
-          detail: err?.message ?? 'Failed to create a new version. Try again.'
-        })
-      }
+      reportError(err, 'Failed to create a new version. Try again.')
     }
   }
 
-  // Build: navigate to the version editor carrying the `build` intent. Execution
-  // stays in the shell — it auto-dispatches SAVE_AND_BUILD once its form is ready
-  // (Option A: state control never leaves the VersionShell).
-  const build = (item) => {
+  // Build: the persisted version already carries its config, so there is nothing
+  // to save — hit the resource's `/build` endpoint directly and refresh the list
+  // (mirrors Archive/Delete in use-version-row-actions), no navigation. Only
+  // auto-build-on-save resources (Workload, no `/build`) still route to the shell
+  // with `?intent=build`, which re-saves the draft to rebuild it.
+  const build = async (item) => {
     const type = toValue(resourceType)
-    const name = RESOURCE_VERSION_ROUTES[type]
-    if (!name || !item?.id) return
-    router?.push({
-      name,
-      params: { id: String(toValue(resourceId)), versionId: String(item.id) },
-      query: { intent: 'build' }
-    })
+    if (!item?.id) return
+    if (AUTO_BUILD_ON_SAVE.has(type)) {
+      const name = RESOURCE_VERSION_ROUTES[type]
+      if (!name) return
+      router?.push({
+        name,
+        params: { id: String(toValue(resourceId)), versionId: String(item.id) },
+        query: { intent: 'build' }
+      })
+      return
+    }
+    if (typeof versionService?.build !== 'function') return
+    try {
+      await versionService.build(toValue(resourceId), item.id)
+      toast.add({
+        closable: true,
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Build started.'
+      })
+      onSuccess?.()
+    } catch (err) {
+      reportError(err, 'Failed to build the version. Try again.')
+    }
   }
 
   // Deploy: open the full-page release composer scoped to this version — the same
@@ -142,8 +175,9 @@ export function useVersionMenuActions({
     )
   }
 
-  // Routes a `row-action` payload. BUILD navigates with intent; DEPLOY opens the
-  // composer; ARCHIVE/DELETE keep their dialog+service+toast flow inside
+  // Routes a `row-action` payload. BUILD runs the version's `/build` endpoint
+  // directly (auto-build-on-save resources still navigate with intent); DEPLOY
+  // opens the composer; ARCHIVE/DELETE keep their dialog+service+toast flow inside
   // use-version-row-actions; ROLLBACK is deferred (no-op this phase).
   const handleRowAction = ({ action, item } = {}) => {
     switch (action) {

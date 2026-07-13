@@ -57,9 +57,9 @@
     createService,
     isEdgeCertificate,
     isEdgeCertificateCSR,
+    isCertificateRevocationList,
     PRIVATE_KEY_TYPES,
     CERTIFICATE_TYPES,
-    certificateTypeList,
     pageTitleByCertificateType
   } = useDigitalCertificateV6(route.query.certificate)
 
@@ -105,14 +105,16 @@
   }
 
   const handleToast = (response) => {
-    const label = certificateTypeList.value === 'Certificates' ? 'View Certificate' : 'View CRL'
+    const isCRL = isCertificateRevocationList.value
+    const label = isCRL ? 'View CRL' : 'View Certificate'
+    const editPath = isCRL ? '/digital-certificates/edit-crl' : '/digital-certificates/edit'
 
     const toast = {
       feedback: 'Your digital certificate has been created!',
       actions: {
         link: {
           label,
-          callback: () => response.redirectToUrl(`/digital-certificates/edit/${response.data.id}`)
+          callback: () => response.redirectToUrl(`${editPath}/${response.data.id}`)
         }
       }
     }

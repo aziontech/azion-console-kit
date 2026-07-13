@@ -29,6 +29,15 @@ const OWNED_COLLECTIONS = {
 }
 const PARENT_TYPES = Object.keys(OWNED_COLLECTIONS)
 
+// Dependency types whose VERSION is SHARED across parents: the same dependency
+// instance (`resource_type` + `resource_id`) pins a SINGLE version for the whole
+// release — the flat payload already dedupes by `(resource_id, type)`, so picking
+// its version under one parent (e.g. a Connector under Application) must apply to
+// every parent that references it (e.g. the same Connector under Custom Pages),
+// and be shown as shared in the UI. Configurable per resource type; extend this
+// list when a new dependency type becomes cross-parent shareable.
+const SHARED_VERSION_DEP_TYPES = ['connector', 'network_list']
+
 const VERSIONED_URLS = 'versioned_urls'
 const MAX_DEPLOYS = 20
 
@@ -163,11 +172,16 @@ export const useReleaseStore = defineStore('release', {
       }
     },
 
-    // An application version is chosen once the application has a selected version
-    // that is either the LATEST sentinel or a concrete pinned id.
-    appVersionChosen: (state) => {
-      const value = state.resVers[APPLICATION_TYPE]
-      return value === LATEST_READY || Boolean(value)
+    // An application version is chosen once the app has a selected version (LATEST
+    // sentinel or a concrete pinned id). With NO explicit pick the composition
+    // defaults to LATEST_READY at compose time (`composeResources`), so treat it as
+    // chosen as soon as an application is composed — otherwise the version pre-shown
+    // as "Track latest Ready" would leave the button disabled. Whether a deployable
+    // version actually EXISTS is enforced by the view (it also drives the build hint).
+    appVersionChosen() {
+      const value = this.resVers[APPLICATION_TYPE]
+      if (value === LATEST_READY || Boolean(value)) return true
+      return value === undefined && this.deployCtx().hasApp
     },
 
     // A scoped (Scenario B) entry gates on the SCOPED resource's version, not the
@@ -184,9 +198,7 @@ export const useReleaseStore = defineStore('release', {
       return PARENT_TYPES.every((parent) =>
         (OWNED_COLLECTIONS[parent] ?? []).every((type) => {
           const list = Array.isArray(state.coll[parent]?.[type]) ? state.coll[parent][type] : []
-          return list
-            .filter((item) => item?.required)
-            .every((item) => item.version != null && item.version !== LATEST_READY)
+          return list.filter((item) => item?.required).every((item) => item.version != null)
         })
       )
     },
@@ -197,13 +209,31 @@ export const useReleaseStore = defineStore('release', {
         ;(OWNED_COLLECTIONS[parent] ?? []).forEach((type) => {
           const list = Array.isArray(state.coll[parent]?.[type]) ? state.coll[parent][type] : []
           list.forEach((item) => {
-            if (item?.required && (item.version == null || item.version === LATEST_READY)) {
+            if (item?.required && item.version == null) {
               pending.push({ type, resourceId: item.resourceId })
             }
           })
         })
       })
       return pending
+    },
+
+    // Parents (other than `excludeParent`) that reference the SAME shared-type
+    // dependency instance in the current composition. Drives the UI "shared"
+    // badge + hint: a Connector/Network List used by two parents pins ONE version,
+    // so both cards must show they move together. Only SHARED_VERSION_DEP_TYPES can
+    // share; every other type (or an id present under no other parent) returns [].
+    // A parent toggled off has an empty `coll` slot (the view re-seeds it to `[]`),
+    // so it never counts as a sharer.
+    sharedDependencyParentsFor: (state) => (type, resourceId, excludeParent) => {
+      if (!SHARED_VERSION_DEP_TYPES.includes(type) || resourceId == null) return []
+      return PARENT_TYPES.filter((parent) => {
+        if (parent === excludeParent) return false
+        const list = Array.isArray(state.coll[parent]?.[type]) ? state.coll[parent][type] : []
+        return list.some(
+          (entry) => entry?.resourceId != null && String(entry.resourceId) === String(resourceId)
+        )
+      })
     },
 
     // The version gate alone (extracted so the view can tell WHEN only the version
@@ -349,6 +379,9 @@ export const useReleaseStore = defineStore('release', {
         next[parent] = byType
       })
       this.coll = next
+      // A shared-type dependency that reappears under a newly-seeded parent must
+      // inherit the version its sibling already holds (see `reconcileSharedVersions`).
+      this.reconcileSharedVersions()
     },
 
     seedApplicationFunctions(functionDeps = []) {
@@ -489,11 +522,86 @@ export const useReleaseStore = defineStore('release', {
     setCollVer(parent, type, index, version) {
       const list = this.coll[parent]?.[type]
       if (!Array.isArray(list) || !list[index]) return
+      const { resourceId } = list[index]
       this._setParentColl(
         parent,
         type,
         list.map((entry, position) => (position === index ? { ...entry, version } : entry))
       )
+      // Shared-version invariant: a Connector/Network List used by more than one
+      // parent pins ONE version for the whole release (the payload dedupes by
+      // `(resource_id, type)`). Mirror the pick to every other parent that
+      // references the same instance so the two cards never diverge and the change
+      // is visible in both immediately — "select the version in Application and it
+      // is also selected in Custom Pages, and vice versa".
+      if (SHARED_VERSION_DEP_TYPES.includes(type)) {
+        this.syncSharedDependencyVersion(type, resourceId, version)
+      }
+    },
+
+    // Write `version` onto every dependency instance of `type` whose `resourceId`
+    // matches, across ALL parents — the enforcement behind the shared-version
+    // invariant (called from `setCollVer` for SHARED_VERSION_DEP_TYPES). Idempotent:
+    // a parent already at `version` is skipped so no needless reactivity fires.
+    syncSharedDependencyVersion(type, resourceId, version) {
+      if (resourceId == null) return
+      PARENT_TYPES.forEach((parent) => {
+        const list = this.coll[parent]?.[type]
+        if (!Array.isArray(list)) return
+        let changed = false
+        const nextList = list.map((entry) => {
+          if (
+            entry?.resourceId != null &&
+            String(entry.resourceId) === String(resourceId) &&
+            entry.version !== version
+          ) {
+            changed = true
+            return { ...entry, version }
+          }
+          return entry
+        })
+        if (changed) this._setParentColl(parent, type, nextList)
+      })
+    },
+
+    // Reconcile the shared-version invariant across parents after a re-seed: when a
+    // parent's dependency slot is rebuilt (deps reload), a sibling that gained the
+    // instance later can start out of sync (its picked version was never keyed under
+    // the new parent). For each shared instance pick the agreed version — a concrete
+    // pinned id wins over the LATEST sentinel, ties resolved in PARENT_TYPES order
+    // (matching `composeResources`' first-wins dedup) — and apply it everywhere.
+    reconcileSharedVersions() {
+      const rank = (value) => (value == null ? 0 : value === LATEST_READY ? 1 : 2)
+      SHARED_VERSION_DEP_TYPES.forEach((type) => {
+        const agreed = new Map()
+        PARENT_TYPES.forEach((parent) => {
+          const list = Array.isArray(this.coll[parent]?.[type]) ? this.coll[parent][type] : []
+          list.forEach((entry) => {
+            if (entry?.resourceId == null) return
+            const key = String(entry.resourceId)
+            const current = agreed.get(key)
+            if (current === undefined || rank(entry.version) > rank(current)) {
+              agreed.set(key, entry.version)
+            }
+          })
+        })
+        if (agreed.size === 0) return
+        PARENT_TYPES.forEach((parent) => {
+          const list = this.coll[parent]?.[type]
+          if (!Array.isArray(list)) return
+          let changed = false
+          const nextList = list.map((entry) => {
+            if (entry?.resourceId == null) return entry
+            const version = agreed.get(String(entry.resourceId))
+            if (version !== undefined && entry.version !== version) {
+              changed = true
+              return { ...entry, version }
+            }
+            return entry
+          })
+          if (changed) this._setParentColl(parent, type, nextList)
+        })
+      })
     },
 
     // Toggle a dependency collection group open/closed (UI grouping only). Keyed
@@ -693,5 +801,6 @@ export {
   COLLECTION_TYPES,
   OWNED_COLLECTIONS,
   PARENT_TYPES,
+  SHARED_VERSION_DEP_TYPES,
   releaseResourceId
 }

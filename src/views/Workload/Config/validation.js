@@ -56,7 +56,9 @@ export const domainItemSchema = yup.object({
   subdomain: subdomainSchema,
   domain: domainSchema,
   environment: environmentSchema,
-  certificate: yup.mixed().nullable().notRequired().label('Digital Certificate')
+  certificate: yup.mixed().nullable().notRequired().label('Digital Certificate'),
+  isAutoDomain: yup.boolean().default(false),
+  autoDomainBinding: yup.mixed().nullable().notRequired()
 })
 
 const legacyDomainItemSchema = yup.object({

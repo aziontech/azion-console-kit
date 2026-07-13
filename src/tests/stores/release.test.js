@@ -718,12 +718,12 @@ describe('appManagedVersionsChosen — every required dependency has a concrete 
     expect(store.appManagedVersionsChosen).toBe(false)
   })
 
-  it('is false when a required entry is pinned to the LATEST sentinel', () => {
+  it('is true when a required entry tracks the LATEST sentinel (latest is allowed for deps)', () => {
     const store = useReleaseStore()
     store.seedApplicationFunctions([{ functionId: 'fn-100' }])
     store.setCollVer('application', 'function', 0, LATEST_READY)
 
-    expect(store.appManagedVersionsChosen).toBe(false)
+    expect(store.appManagedVersionsChosen).toBe(true)
   })
 
   it('is true once every required function AND connector has a concrete version', () => {
@@ -766,7 +766,7 @@ describe('appManagedVersionsChosen — every required dependency has a concrete 
 })
 
 describe('pendingDependencySelections — required dependencies still missing a version', () => {
-  it('lists { type, resourceId } for required entries with a null or LATEST version', () => {
+  it('lists { type, resourceId } only for required entries still missing a version (null); LATEST counts as chosen', () => {
     const store = useReleaseStore()
     store.seedApplicationFunctions([
       { functionId: 'fn-null' },
@@ -779,9 +779,8 @@ describe('pendingDependencySelections — required dependencies still missing a 
 
     const pending = store.pendingDependencySelections
 
-    expect(pending).toHaveLength(3)
+    expect(pending).toHaveLength(2)
     expect(pending).toContainEqual({ type: 'function', resourceId: 'fn-null' })
-    expect(pending).toContainEqual({ type: 'function', resourceId: 'fn-latest' })
     expect(pending).toContainEqual({ type: 'connector', resourceId: 'cn-null' })
   })
 
@@ -859,6 +858,47 @@ describe('deployEnabled — the app-managed dependency gate', () => {
 
     store.setCollVer('application', 'connector', 0, 'cn-v9')
     expect(store.deployEnabled).toBe(true)
+  })
+
+  it('is enabled when every required dependency tracks LATEST (latest allowed for deps)', () => {
+    const store = useReleaseStore()
+    satisfyNonDependencyGates(store)
+    store.seedApplicationFunctions([{ functionId: 'fn-100' }])
+    store.seedApplicationConnectors([{ connectorId: 'cn-100' }])
+    expect(store.deployEnabled).toBe(false)
+
+    store.setCollVer('application', 'function', 0, LATEST_READY)
+    store.setCollVer('application', 'connector', 0, LATEST_READY)
+    expect(store.deployEnabled).toBe(true)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// appVersionChosen — the implicit LATEST default. The composer shows "Track
+// latest Ready" as a display default without seeding resVers; the gate must
+// treat that as chosen once an application is composed (mirrors composeResources'
+// `?? LATEST_READY`), or the pre-selected version would leave deploy disabled.
+// ---------------------------------------------------------------------------
+describe('appVersionChosen — implicit latest default (pre-selected version)', () => {
+  it('is satisfied when the app is inherited from the active release and no version was picked', () => {
+    const store = useReleaseStore()
+    store.setDeployments([{ id: 'ds-1', deployment_policy: VERSIONED_URLS }])
+    store.setActiveReleaseByDs('ds-1', releaseWithApp(true))
+    store.pickDs('ds-1')
+
+    expect(store.resVers[APPLICATION_TYPE]).toBeUndefined()
+    expect(store.appVersionChosen).toBe(true)
+    expect(store.deployEnabled).toBe(true)
+  })
+
+  it('stays unsatisfied when no application is composed at all', () => {
+    const store = useReleaseStore()
+    store.setDeployments([{ id: 'ds-1', deployment_policy: VERSIONED_URLS }])
+    store.setActiveReleaseByDs('ds-1', releaseWithApp(false))
+    store.pickDs('ds-1')
+
+    expect(store.appVersionChosen).toBe(false)
+    expect(store.deployEnabled).toBe(false)
   })
 })
 

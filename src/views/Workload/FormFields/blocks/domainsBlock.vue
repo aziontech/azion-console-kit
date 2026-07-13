@@ -171,7 +171,8 @@
       environment: null,
       useCustomDomain: useCustomDomain.value ?? false,
       customDomain: customDomain.value ?? '',
-      certificate: 0
+      certificate: 0,
+      isAutoDomain: false
     }
     drawerVisible.value = true
   }
@@ -186,7 +187,8 @@
       environment: item.environment ?? null,
       useCustomDomain: useCustomDomain.value ?? false,
       customDomain: customDomain.value ?? '',
-      certificate: item.certificate ?? 0
+      certificate: item.certificate ?? 0,
+      isAutoDomain: !!item.isAutoDomain
     }
     drawerVisible.value = true
   }
@@ -199,7 +201,8 @@
       subdomain: payload.subdomain ?? '',
       domain: payload.domain ?? '',
       environment: payload.environment ?? null,
-      certificate: payload.certificate ?? 0
+      certificate: payload.certificate ?? 0,
+      isAutoDomain: !!payload.isAutoDomain
     }
 
     if (drawerMode.value === 'edit' && editingIndex.value !== null) {
@@ -227,12 +230,14 @@
 
     try {
       const { body } = await environmentService.listEnvironmentsService()
-      const production = body?.find((env) => env.name === 'Production')
+      const defaultEnvironment =
+        body?.find((env) => env.name === 'Production') ??
+        body?.find((env) => env.deployment_policy === SINGLE_VERSION_LABEL)
 
       const seed = {
         subdomain: '',
         domain: buildAzionDomain(workloadName.value),
-        environment: production?.id ?? null,
+        environment: defaultEnvironment?.id ?? null,
         certificate: 0
       }
 
@@ -289,6 +294,7 @@
               :environmentLabel="environmentName(domain.environment)"
               :certificateLabel="certificateLabel(domain.certificate)"
               :isUrlVersioned="isUrlVersionedEnv(domain.environment)"
+              :isAutoDomain="domain.isAutoDomain"
               :disableRemove="!hasMultipleDomains"
               :dataTestid="`domains-form__row-${index}`"
               @edit="openEditDrawer(index)"

@@ -14,6 +14,8 @@
   import { hasFlagUseV6Configurations } from '@/composables/user-flag'
   import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
   import { useResize } from '@/composables/useResize'
+  import ProtectionSection from '@/views/Environments/FormFields/blocks/ProtectionSection.vue'
+  import BranchTrackingSection from '@/views/Environments/FormFields/blocks/BranchTrackingSection.vue'
 
   defineOptions({ name: 'form-fields-environment' })
 
@@ -33,12 +35,24 @@
   const { value: name } = useField('name')
   const { value: description } = useField('description')
   const { value: deploymentVersionPolicy } = useField('deployment_policy')
+  const { value: logVerbosity } = useField('log_verbosity')
+  const { value: robotsPolicy } = useField('robots_policy')
   const { value: environmentVariables, errorMessage: environmentVariablesError } =
     useField('environmentVariables')
 
   const deploymentVersionPolicyOptions = [
     { label: 'Single Version', value: 'single_version' },
     { label: 'Versioned URL', value: 'versioned_urls' }
+  ]
+
+  const logVerbosityOptions = [
+    { label: 'Normal', value: 'normal' },
+    { label: 'Verbose', value: 'verbose' }
+  ]
+
+  const robotsPolicyOptions = [
+    { label: 'Index', value: 'index' },
+    { label: 'No Index', value: 'noindex' }
   ]
 
   const isDeploymentVersionPolicyDisabled = computed(() => {
@@ -592,9 +606,40 @@
         >
           Deployment Version Policy cannot be changed after the environment is created.
         </small>
+
+        <FieldDropdown
+          label="Log Verbosity"
+          name="log_verbosity"
+          :options="logVerbosityOptions"
+          :value="logVerbosity"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="self"
+          description="Set how much detail is captured in the environment logs."
+          :disabled="props.disabledFields"
+          data-testid="environment-form__log-verbosity-field"
+        />
+
+        <FieldDropdown
+          label="Robots Policy"
+          name="robots_policy"
+          :options="robotsPolicyOptions"
+          :value="robotsPolicy"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="self"
+          description="Control whether search engines are allowed to index this environment."
+          :disabled="props.disabledFields"
+          data-testid="environment-form__robots-policy-field"
+        />
       </div>
     </template>
   </FormHorizontal>
+
+  <ProtectionSection :disabledFields="props.disabledFields" />
+
+  <BranchTrackingSection :disabledFields="props.disabledFields" />
+
   <FormHorizontal
     title="Global Variables"
     description="Global variables created in the platform are automatically applied to this environment. To override a value here, create a custom variable below using the same key."

@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, onMounted, ref, watch } from 'vue'
+  import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
   import { watchDebounced } from '@vueuse/core'
   import { useToast } from '@aziontech/webkit/use-toast'
   import Menu from '@aziontech/webkit/menu'
@@ -9,6 +9,10 @@
   import PrimeButton from '@aziontech/webkit/button'
   import GenericDataView from '@/components/GenericDataView'
   import { deploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
+  import {
+    VERSION_POLL_INTERVAL_MS,
+    hasTransientVersions
+  } from '@/services/v2/versioning/version-cache-policy'
   import InlineTag from '@/components/InlineTag'
   import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
@@ -116,35 +120,61 @@
     return statusActive + dateActive
   })
 
-  const loadVersions = async () => {
+  let pollTimer = null
+
+  const stopPolling = () => {
+    if (pollTimer) {
+      clearInterval(pollTimer)
+      pollTimer = null
+    }
+  }
+
+  const syncPolling = () => {
+    const transient = hasTransientVersions({ body: versions.value })
+    if (transient && !pollTimer) {
+      pollTimer = setInterval(() => {
+        loadVersions({ silent: true })
+      }, VERSION_POLL_INTERVAL_MS)
+    } else if (!transient) {
+      stopPolling()
+    }
+  }
+
+  const loadVersions = async ({ silent = false } = {}) => {
     if (!props.deploymentId) {
       versions.value = []
       totalRecords.value = 0
+      stopPolling()
       return
     }
 
-    loading.value = true
+    if (!silent) loading.value = true
     try {
       const status = filterValues.value.status
       const result = await deploymentReleaseService.listReleasesService(props.deploymentId, {
         page: Math.floor(paginatorFirst.value / paginatorRows.value) + 1,
         pageSize: paginatorRows.value,
         search: searchTerm.value?.trim() || undefined,
-        state: status !== 'all' ? status : undefined
+        state: status !== 'all' ? status : undefined,
+        ...(silent ? { skipCache: true } : {})
       })
       versions.value = Array.isArray(result?.body) ? result.body : []
       totalRecords.value = typeof result?.count === 'number' ? result.count : versions.value.length
+      syncPolling()
     } catch (error) {
-      toast.add({
-        closable: true,
-        severity: 'error',
-        summary: 'Error',
-        detail: error?.message || 'Failed to load deployment history'
-      })
-      versions.value = []
-      totalRecords.value = 0
+      stopPolling()
+      if (!silent) {
+        toast.add({
+          closable: true,
+          severity: 'error',
+          summary: 'Error',
+          detail: error?.message || 'Failed to load deployment history'
+        })
+        versions.value = []
+        totalRecords.value = 0
+      }
     } finally {
-      loading.value = false
+      if (!silent) loading.value = false
     }
   }
 
@@ -256,7 +286,9 @@
 
   watch([filterValues, paginatorFirst, paginatorRows], () => loadVersions(), { deep: true })
 
-  onMounted(loadVersions)
+  onMounted(() => loadVersions())
+
+  onBeforeUnmount(stopPolling)
 </script>
 
 <template>
@@ -282,7 +314,7 @@
       filteredEmptyDescription="Try changing your search or filters."
       rowActionsAriaLabel="Release actions"
       overflowMenuAriaLabel="More release actions"
-      @refresh="loadVersions"
+      @refresh="() => loadVersions()"
       @page="onPage"
       @row-primary-click="goToDetails"
       @open-row-menu="({ event, deployment }) => openRowMenu({ event, version: deployment })"

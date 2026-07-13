@@ -58,4 +58,42 @@ describe('ResourceVersionField', () => {
     const wrapper = makeWrapper({ invalid: true })
     expect(wrapper.find('[data-testid="release-composition__version-error"]').exists()).toBe(true)
   })
+
+  it('renders the build link and hides the picker when there are no versions and a build route is set', () => {
+    const wrapper = mount(ResourceVersionField, {
+      props: {
+        versions: [],
+        modelValue: LATEST_READY,
+        buildRoute: { name: 'edit-application', params: { id: '10' } },
+        resourceLabel: 'Application'
+      },
+      global: { stubs: { RouterLink: { template: '<a><slot /></a>' } } }
+    })
+
+    expect(wrapper.find('[data-testid="release-composition__version-build"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="release-composition__version-build-link"]').exists()).toBe(
+      true
+    )
+    expect(wrapper.findComponent({ name: 'Dropdown' }).exists()).toBe(false)
+  })
+
+  it('keeps the picker while versions are still loading (no build link yet)', () => {
+    const wrapper = mount(ResourceVersionField, {
+      props: {
+        versions: [],
+        loading: true,
+        buildRoute: { name: 'edit-application', params: { id: '10' } }
+      },
+      global: { stubs: { RouterLink: { template: '<a><slot /></a>' } } }
+    })
+
+    expect(wrapper.find('[data-testid="release-composition__version-build"]').exists()).toBe(false)
+  })
+
+  it('keeps the picker when there are no versions but no build route (legacy drawer untouched)', () => {
+    const wrapper = makeWrapper({ versions: [] })
+
+    expect(wrapper.find('[data-testid="release-composition__version-build"]').exists()).toBe(false)
+    expect(wrapper.findComponent({ name: 'Dropdown' }).exists()).toBe(true)
+  })
 })

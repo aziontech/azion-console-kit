@@ -42,13 +42,105 @@ export const normalizeEnvironmentVariables = (environmentVariables) => {
   return {}
 }
 
+const parseLineList = (value) => {
+  const entries = Array.isArray(value)
+    ? value.map((item) => String(item).trim())
+    : typeof value === 'string'
+      ? value.split('\n').map((line) => line.trim())
+      : []
+
+  return [...new Set(entries.filter(Boolean))]
+}
+
+const buildProtectionContract = (protection) => {
+  const source = protection ?? {}
+  const azionAuthentication = source.azion_authentication ?? {}
+  const passwordProtection = source.password_protection ?? {}
+  const ipAllowlist = source.ip_allowlist ?? {}
+  const ssoEnforcement = source.sso_enforcement ?? {}
+
+  return {
+    azion_authentication: {
+      enabled: Boolean(azionAuthentication.enabled)
+    },
+    password_protection: {
+      enabled: Boolean(passwordProtection.enabled),
+      secret_id: passwordProtection.secret_id || null
+    },
+    ip_allowlist: {
+      enabled: Boolean(ipAllowlist.enabled),
+      cidrs: parseLineList(ipAllowlist.cidrs)
+    },
+    sso_enforcement: {
+      enabled: Boolean(ssoEnforcement.enabled),
+      idp_id: ssoEnforcement.idp_id || null,
+      allowed_domains: parseLineList(ssoEnforcement.allowed_domains)
+    }
+  }
+}
+
+const buildBranchTrackingContract = (branchTracking) => {
+  if (!branchTracking || !branchTracking.enabled) return null
+
+  return {
+    enabled: true,
+    mode: branchTracking.mode ?? null,
+    branch_match: branchTracking.branch_match ?? null
+  }
+}
+
 const normalizePayloadToEnvironmentContract = (payload) => {
   const deploymentVersionPolicy = getDeploymentVersionPolicyValue(payload.deployment_policy)
 
   return {
     name: payload.name,
     description: payload.description ?? '',
-    deployment_policy: deploymentVersionPolicy
+    deployment_policy: deploymentVersionPolicy,
+    log_verbosity: payload.log_verbosity,
+    robots_policy: payload.robots_policy,
+    protection: buildProtectionContract(payload.protection),
+    branch_tracking: buildBranchTrackingContract(payload.branch_tracking)
+  }
+}
+
+const toProtectionForm = (protection) => {
+  const source = protection ?? {}
+  const azionAuthentication = source.azion_authentication ?? {}
+  const passwordProtection = source.password_protection ?? {}
+  const ipAllowlist = source.ip_allowlist ?? {}
+  const ssoEnforcement = source.sso_enforcement ?? {}
+
+  return {
+    azion_authentication: {
+      enabled: Boolean(azionAuthentication.enabled)
+    },
+    password_protection: {
+      enabled: Boolean(passwordProtection.enabled),
+      secret_id: passwordProtection.secret_id ?? null
+    },
+    ip_allowlist: {
+      enabled: Boolean(ipAllowlist.enabled),
+      cidrs: Array.isArray(ipAllowlist.cidrs) ? ipAllowlist.cidrs.join('\n') : ''
+    },
+    sso_enforcement: {
+      enabled: Boolean(ssoEnforcement.enabled),
+      idp_id: ssoEnforcement.idp_id ?? null,
+      allowed_domains: Array.isArray(ssoEnforcement.allowed_domains)
+        ? ssoEnforcement.allowed_domains
+        : []
+    }
+  }
+}
+
+const toBranchTrackingForm = (branchTracking) => {
+  if (!branchTracking) {
+    return { enabled: false, mode: 'branch_starts_with', branch_match: '' }
+  }
+
+  return {
+    enabled: Boolean(branchTracking.enabled),
+    mode: branchTracking.mode ?? 'branch_starts_with',
+    branch_match: branchTracking.branch_match ?? ''
   }
 }
 
@@ -171,6 +263,10 @@ export const loadEnvironmentByIdAdapter = async ({ id }) => {
     name: response.data.name,
     description: response.data.description ?? '',
     deployment_policy: getDeploymentVersionPolicyValue(response.data.deployment_policy),
+    log_verbosity: response.data.log_verbosity ?? 'normal',
+    robots_policy: response.data.robots_policy ?? 'index',
+    protection: toProtectionForm(response.data.protection),
+    branch_tracking: toBranchTrackingForm(response.data.branch_tracking),
     environmentVariables: normalizeEnvironmentVariables(response.data.environmentVariables)
   }
 
@@ -229,7 +325,11 @@ export const updateEnvironmentAdapter = async (id, payload, options = {}) => {
   const normalized = normalizePayloadToEnvironmentContract(payload)
   await environmentService.updateEnvironmentService(id, {
     name: normalized.name,
-    description: normalized.description
+    description: normalized.description,
+    log_verbosity: normalized.log_verbosity,
+    robots_policy: normalized.robots_policy,
+    protection: normalized.protection,
+    branch_tracking: normalized.branch_tracking
   })
 
   if (!hasFlagUseV6Configurations()) {

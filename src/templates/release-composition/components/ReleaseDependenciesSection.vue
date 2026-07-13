@@ -16,12 +16,16 @@
    *
    * @prop collections — array of `{ type, label, icon, count, open, instances }`
    *   where each instance is `{ id, resourceId, name, nameService, nameLoadService,
-   *   version, versionOptions, locked?, required?, buildRoute? }`. A `locked` instance is
-   *   app-managed: its resource is fixed (rendered as a label, no dropdown) and
-   *   it offers no remove. A `required` instance marks its version selector as
-   *   required, and signals when no version is selectable (empty `versionOptions`);
-   *   in that state it links to `buildRoute` (the dependency's edit page) so the
-   *   user can build a Ready version for it.
+   *   version, versionOptions, locked?, required?, buildRoute?, sharedWith? }`. A
+   *   `locked` instance is app-managed: its resource is fixed (rendered as a label,
+   *   no dropdown) and it offers no remove. A `required` instance marks its version
+   *   selector as required, and signals when no version is selectable (empty
+   *   `versionOptions`); in that state it links to `buildRoute` (the dependency's
+   *   edit page) so the user can build a Ready version for it. `sharedWith` is the
+   *   list of OTHER parent labels that reference this same dependency instance —
+   *   when non-empty the row shows a "Shared" badge + a hint, because the same
+   *   Connector/Network List pins ONE version across every parent that uses it, so
+   *   picking a version here also sets it there (and vice versa).
    * @event toggle-group(type) — request to collapse/expand a collection group.
    * @event update:instance-resource({ type, id, value }) — instance selection.
    * @event update:instance-version({ type, id, value }) — version selection.
@@ -147,9 +151,17 @@
                       class="flex w-full min-w-0 flex-col gap-[var(--spacing-2)]"
                     >
                       <label
-                        class="flex items-center gap-[var(--spacing-1)] text-body-sm font-medium text-[var(--text-color-secondary)]"
+                        class="flex items-center gap-[var(--spacing-2)] text-body-sm font-medium text-[var(--text-color-secondary)]"
                       >
                         {{ collection.label }}
+                        <span
+                          v-if="instance.sharedWith && instance.sharedWith.length"
+                          class="inline-flex items-center gap-[var(--spacing-1)] rounded-[var(--shape-elements)] bg-[var(--surface-200)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm font-normal text-[var(--text-color-secondary)]"
+                          :data-testid="`release-composition__deps-shared-badge-${collection.type}-${instance.id}`"
+                        >
+                          <i class="pi pi-link" />
+                          Shared
+                        </span>
                       </label>
                       <div
                         class="flex justify-between items-center gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-3)] py-[var(--spacing-2)] text-body-sm text-[var(--text-color)]"
@@ -191,6 +203,26 @@
                       :data-testid="`release-composition__deps-remove-${collection.type}-${instance.id}`"
                       @click="onRemove(collection.type, instance.id)"
                     />
+                  </div>
+
+                  <div
+                    v-if="instance.sharedWith && instance.sharedWith.length"
+                    :class="[
+                      'release-composition__deps-row grid gap-[var(--spacing-3)]',
+                      instance.locked && 'release-composition__deps-row--locked'
+                    ]"
+                  >
+                    <span aria-hidden="true" />
+                    <div
+                      class="flex items-center mt-[var(--spacing-2)] gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
+                      :data-testid="`release-composition__deps-shared-hint-${collection.type}-${instance.id}`"
+                    >
+                      <i class="pi pi-link" />
+                      <span>
+                        Shared with {{ instance.sharedWith.join(', ') }} — one version applies to
+                        all.
+                      </span>
+                    </div>
                   </div>
 
                   <div

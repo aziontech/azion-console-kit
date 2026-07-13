@@ -823,7 +823,14 @@
         versionOptions: composition.versionOptionsFor(type, instance.resourceId),
         locked: instance.locked,
         required: instance.required,
-        buildRoute: resourceBuildRoute({ type, resourceId: instance.resourceId })
+        buildRoute: resourceBuildRoute({ type, resourceId: instance.resourceId }),
+        // Labels of the OTHER parent cards that reference this SAME dependency
+        // instance. A shared Connector/Network List pins one version for the whole
+        // release (the store keeps every card in sync via `setCollVer`), so the row
+        // shows it moves together with those parents.
+        sharedWith: store
+          .sharedDependencyParentsFor(type, instance.resourceId, parentType)
+          .map((parent) => labelFor(parent))
       }))
       return {
         type,
@@ -835,6 +842,20 @@
         instances
       }
     })
+
+  // A resource whose version catalog actually LOADED (its key is present in
+  // `versionsByResource`) but resolved to zero deployable versions — the "Track
+  // latest Ready" default can't resolve, so it needs a build. Distinct from "still
+  // loading" or "never requested" (key absent), both of which return false so the
+  // build prompt never flashes for a resource whose versions simply aren't in yet.
+  const resourceHasNoReadyVersion = (resourceType, resourceId) => {
+    if (resourceId == null || resourceId === '') return false
+    const key = `${resourceType}:${resourceId}`
+    return (
+      key in composition.versionsByResource.value &&
+      composition.versionOptionsFor(resourceType, resourceId).length === 0
+    )
+  }
 
   // The composition tree view-model — a faithful port of the preview's
   // `resources` computed, re-keyed to the real resource types and wired to the
@@ -907,6 +928,9 @@
         // on the same store key — `name` may be the coerced catalog value.
         versionOptions: composition.versionOptionsFor(type, rawName),
         isLoadingVersions: composition.isLoadingVersionsFor(type, rawName),
+        buildRoute: resourceHasNoReadyVersion(type, rawName)
+          ? resourceBuildRoute({ type, resourceId: rawName })
+          : null,
         ownedCollections: owned,
         hasOwned: owned.length > 0,
         lockReason: 'Kept from the active release'
@@ -1144,10 +1168,29 @@
     )
   )
 
+  // Composed resources whose version catalog settled (not loading, not errored)
+  // with ZERO deployable versions: the "Track latest Ready" default can't resolve,
+  // so the deploy is blocked and each such card renders a "build a version" link.
+  const resourcesMissingReadyVersion = computed(() =>
+    versionedResources.value.filter((resource) =>
+      resourceHasNoReadyVersion(resource.resourceType, resource.resourceId)
+    )
+  )
+
+  const missingReadyVersionLabel = computed(() => {
+    const first = resourcesMissingReadyVersion.value[0]
+    return first ? labelFor(first.resourceType) : ''
+  })
+
   // `deployEnabled` already gates on the effective DS; combine with the multi-DS
-  // fold so any blocking DS disables the button (the store covers app/version).
+  // fold so any blocking DS disables the button (the store covers app/version), and
+  // block when any composed resource has no deployable version to resolve.
   const canBuildAndActivate = computed(
-    () => deployEnabled.value && !blockingDs.value && !versionsStillLoading.value
+    () =>
+      deployEnabled.value &&
+      !blockingDs.value &&
+      !versionsStillLoading.value &&
+      !resourcesMissingReadyVersion.value.length
   )
 
   // --- Confirm + Build & activate (spec §G) ------------------------------------
@@ -1524,6 +1567,13 @@
         >
           <i class="pi pi-spinner pi-spin" />
           Loading versions…
+        </span>
+        <span
+          v-else-if="resourcesMissingReadyVersion.length"
+          class="text-body-xs text-[var(--text-color-secondary)]"
+          data-testid="release-composition__footer-missing-version"
+        >
+          Build a Ready version of {{ missingReadyVersionLabel }} to publish.
         </span>
         <span
           v-else-if="!versionGateSatisfied"

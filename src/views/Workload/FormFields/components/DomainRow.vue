@@ -25,6 +25,10 @@
       type: Boolean,
       default: false
     },
+    isAutoDomain: {
+      type: Boolean,
+      default: false
+    },
     disableRemove: {
       type: Boolean,
       default: false
@@ -37,8 +41,21 @@
 
   defineEmits(['edit', 'remove'])
 
+  const AZION_APP_SUFFIX = '.azion.app'
+
+  const isAzionAppDomain = computed(
+    () =>
+      props.domain === 'azion.app' ||
+      `${props.subdomain ? `${props.subdomain}.` : ''}${props.domain || ''}`.endsWith(
+        AZION_APP_SUFFIX
+      )
+  )
+
   const fqdn = computed(() => {
     if (!props.domain && !props.subdomain) return 'New domain'
+    if (props.isAutoDomain && isAzionAppDomain.value) {
+      return props.subdomain || (props.domain || '').replace(/\.azion\.app$/, '')
+    }
     const sub = props.subdomain ? `${props.subdomain}.` : ''
     return `${sub}${props.domain || ''}`
   })
@@ -51,16 +68,31 @@
   >
     <div class="flex flex-1 gap-4 min-w-0">
       <div class="flex flex-col gap-1 flex-1 min-w-0">
-        <span class="text-[10px] uppercase tracking-wider text-color-secondary leading-none">
-          domain
-        </span>
+        <div class="flex items-center gap-1.5">
+          <span class="text-[10px] uppercase tracking-wider text-color-secondary leading-none">
+            domain
+          </span>
+          <span
+            v-if="isAutoDomain"
+            class="text-[10px] leading-none px-1.5 py-0.5 rounded border surface-border text-color-secondary"
+            title="This domain was generated automatically and can't be edited."
+            :data-testid="`${dataTestid}__auto-badge`"
+          >
+            Auto-generated
+          </span>
+        </div>
         <span class="text-xs truncate">
           <span
             v-if="isUrlVersioned && (domain || subdomain)"
             class="text-color-secondary"
             title="This environment is url-versioned: each deploy generates a dynamic hash prefix."
             >*.</span
-          >{{ fqdn }}
+          >{{ fqdn
+          }}<span
+            v-if="isAutoDomain && isAzionAppDomain"
+            class="text-color-secondary"
+            >.azion.app</span
+          >
         </span>
       </div>
       <div class="flex flex-col gap-1 flex-1 min-w-0">
