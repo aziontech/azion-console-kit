@@ -20,38 +20,30 @@
     modal
     @show="resetForm()"
     header="Report an issue"
-    :style="{ width: '35rem' }"
+    :style="{ width: '40rem' }"
   >
     <div class="flex flex-col gap-5">
-      <div class="flex flex-col gap-3">
-        <label
-          for="type"
-          class="font-semibold"
-          >Type</label
-        >
-        <Dropdown
-          v-model="selectedIssueType"
+      <div class="max-w-[216px]">
+        <FieldDropdown
+          label="Type"
+          name="type"
           :options="types"
           optionLabel="name"
           optionValue="code"
+          :value="selectedIssueType"
+          required
           placeholder="Select one Type"
-          class="max-w-[216px]"
           data-testid="feedback-dialog__dialog-body__button-type-dropdown"
         />
       </div>
-      <div class="flex flex-col gap-3">
-        <label
-          for="type"
-          class="font-semibold"
-          >Report an issue</label
-        >
-        <Textarea
-          v-model="report"
-          rows="5"
-          cols="30"
-          data-testid="feedback-dialog__dialog-body__textarea-description"
-        />
-      </div>
+      <FieldTextArea
+        label="Report an issue"
+        name="description"
+        required
+        :rows="5"
+        placeholder="Describe your issue or idea"
+        data-testid="feedback-dialog__dialog-body__textarea-description"
+      />
     </div>
     <template #footer>
       <div
@@ -93,9 +85,13 @@
             type="button"
             severity="secondary"
             label="Send feedback"
-            class="sm:w-36"
+            class="sm:w-auto sm:min-w-36 whitespace-nowrap"
             size="small"
             :loading="loading"
+            :pt="{
+              label: { class: 'whitespace-nowrap' },
+              loadingIcon: { class: '!w-3.5 !h-3.5' }
+            }"
             @click="sendFeedback()"
             data-testid="feedback-dialog__dialog-footer__confirm-button"
           />
@@ -107,15 +103,17 @@
 
 <script setup>
   import { ref } from 'vue'
+  import { useForm } from 'vee-validate'
+  import * as yup from 'yup'
   import { storeToRefs } from 'pinia'
   import { useAccountStore } from '@/stores/account'
-  import { createFeedbackServices } from '@/services/feedback-services'
+  import { feedbackService } from '@/services/v2/feedback'
   import { useLayout } from '@/composables/use-layout'
   import { AZION_CONTACT_SUPPORT } from '@/helpers/azion-documentation-window-opener'
   import { useToast } from '@aziontech/webkit/use-toast'
   import Dialog from '@aziontech/webkit/dialog'
-  import Dropdown from '@aziontech/webkit/dropdown'
-  import Textarea from '@aziontech/webkit/textarea'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import FieldTextArea from '@aziontech/webkit/field-text-area'
   import PrimeButton from '@aziontech/webkit/button'
 
   defineOptions({ name: 'console-feedback' })
@@ -134,14 +132,24 @@
     }
   })
 
+  const emit = defineEmits(['onError'])
+
   const { accountData: account } = storeToRefs(useAccountStore())
   const { OpenSidebarComponent } = useLayout()
   const toast = useToast()
 
+  const showToast = (severity, detail) => {
+    toast.add({
+      severity,
+      summary: severity === 'error' ? 'Error' : 'Success',
+      detail,
+      life: 3000
+    })
+  }
+
   const visible = ref(false)
   const loading = ref(false)
   const selectedIssueType = ref('issue')
-  const report = ref('')
 
   const types = [
     { name: 'Issue', code: 'issue' },
@@ -149,45 +157,53 @@
     { name: 'Other', code: 'other' }
   ]
 
+  const validationSchema = yup.object({
+    type: yup.string().required(),
+    description: yup.string().required('Please describe your issue or idea.')
+  })
+
+  const { handleSubmit, resetForm } = useForm({
+    validationSchema,
+    initialValues: { type: selectedIssueType.value, description: '' }
+  })
+
   const openCopilot = () => {
     visible.value = false
     OpenSidebarComponent('copilot')
   }
 
-  const resetForm = () => {
-    selectedIssueType.value = 'issue'
-    report.value = ''
-  }
-
-  const sendFeedback = async () => {
+  const sendFeedback = handleSubmit(async (values) => {
     try {
       loading.value = true
-      const payload = {
-        type: selectedIssueType.value,
-        account_id: account.value.id,
-        client_id: account.value.client_id,
+      const successMessage = await feedbackService.create({
+        type: values.type,
+        accountId: account.value.id,
+        clientId: account.value.client_id,
         name: account.value.name,
         email: account.value.email,
-        description: report.value
-      }
-      await createFeedbackServices(payload)
+        description: values.description
+      })
       toast.add({
         severity: 'success',
         summary: 'Success',
-        detail: 'Feedback sent successfully',
+        detail: successMessage,
         life: 3000
       })
       resetForm()
       visible.value = false
     } catch (error) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Error sending feedback',
-        life: 3000
-      })
+      // Check if error is an ErrorHandler instance (from v2 services)
+      if (error && typeof error.showErrors === 'function') {
+        error.showErrors(toast)
+        emit('onError', error.message[0])
+      } else {
+        // Fallback for legacy errors or non-ErrorHandler errors
+        const errorMessage = error?.message || error
+        emit('onError', errorMessage)
+        showToast('error', errorMessage)
+      }
     } finally {
       loading.value = false
     }
-  }
+  })
 </script>
