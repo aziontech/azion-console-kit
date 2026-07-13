@@ -9,7 +9,6 @@
 
 import { defineStore } from 'pinia'
 import { LATEST_READY, resolveLatestVersion } from '@/templates/release-composition/version-options'
-import { retainedStrictBindings } from '@/templates/release-composition/retained-strict-bindings'
 
 // Composition singletons (one each, never repeated). `application` is required
 // and has no toggle; the others are optional (gated by `resEnabled`).
@@ -222,42 +221,6 @@ export const useReleaseStore = defineStore('release', {
     deployEnabled() {
       const ctx = this.deployCtx()
       return Boolean(ctx.ok && ctx.canDeploy && this.effDsId && this.versionGateSatisfied)
-    },
-
-    // The resources the user is explicitly composing this release — a DS's active
-    // resources NOT in this set are carried forward. Non-scoped: the full base
-    // composition. Scoped: only the scoped singleton + its own dependency picks
-    // (every other active resource is preserved byte-for-byte by the scoped swap).
-    composedResourceRefs() {
-      if (!this.scopedType) return this.composeResources()
-      const scopedType = this.scopedType
-      const refs = [
-        { resource_type: scopedType, resource_id: this.resNames[scopedType] ?? this.resourceId }
-      ]
-      ;(OWNED_COLLECTIONS[scopedType] ?? []).forEach((type) => {
-        const list = Array.isArray(this.coll[scopedType]?.[type]) ? this.coll[scopedType][type] : []
-        list.forEach((item) => {
-          if (item?.resourceId != null)
-            refs.push({ resource_type: type, resource_id: item.resourceId })
-        })
-      })
-      return refs
-    },
-
-    retainedStrictResourcesByDs() {
-      const composedResources = this.composedResourceRefs
-      const byDs = {}
-      this.deploymentIds.forEach((dsId) => {
-        const deployment =
-          this.deployments.find((item) => String(item?.id) === String(dsId)) ?? null
-        const retained = retainedStrictBindings({
-          activeResources: this.activeReleaseByDs[dsId]?.resources ?? [],
-          composedResources,
-          bindingPolicy: deployment?.binding_policy ?? null
-        })
-        if (retained.length) byDs[dsId] = retained
-      })
-      return byDs
     }
   },
 
@@ -679,7 +642,6 @@ export const useReleaseStore = defineStore('release', {
         return {
           scoped: false,
           resources: this.composeResources(),
-          retainedByDs: this.retainedStrictResourcesByDs,
           canary: this.canary,
           canaryForm: { ...this.canaryForm }
         }

@@ -25,8 +25,7 @@ const toName = (name) => (name && typeof name === 'object' ? (name.text ?? '') :
 
 const toCatalogItem = (resource) => ({
   id: resource.id,
-  name: toName(resource.name),
-  executionEnvironment: resource.executionEnvironment ?? null
+  name: toName(resource.name)
 })
 
 const fromBody = (result) => (Array.isArray(result?.body) ? result.body : []).map(toCatalogItem)
@@ -36,8 +35,7 @@ const toLoadedItem = (resource) =>
     ? null
     : {
         id: resource.id,
-        name: toName(resource.name),
-        executionEnvironment: resource.executionEnvironment ?? null
+        name: toName(resource.name)
       }
 
 const toPage = (result) => ({ body: fromBody(result), count: result?.count ?? 0 })

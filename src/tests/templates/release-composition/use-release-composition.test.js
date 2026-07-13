@@ -1259,25 +1259,3 @@ describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-
     ])
   })
 })
-
-describe('useReleaseComposition - function execution environment (scoped retained source)', () => {
-  it('exposes each function execution_environment from the loaded catalog, null when unknown', async () => {
-    RESOURCE_CATALOG_REGISTRY.function.listCatalog.mockResolvedValue([
-      { id: 1, name: 'fw-fn', executionEnvironment: 'firewall' },
-      { id: 2, name: 'app-fn', executionEnvironment: 'application' }
-    ])
-
-    const composition = useReleaseComposition({
-      enabled: ref(true),
-      selectedDsIds: ref([]),
-      versionedResources: ref([])
-    })
-
-    await composition.loadCatalog('function')
-    await flushPromises()
-
-    expect(composition.functionExecutionEnvironmentFor(1)).toBe('firewall')
-    expect(composition.functionExecutionEnvironmentFor('2')).toBe('application')
-    expect(composition.functionExecutionEnvironmentFor(999)).toBeNull()
-  })
-})

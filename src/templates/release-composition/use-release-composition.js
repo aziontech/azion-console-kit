@@ -372,16 +372,6 @@ export function useReleaseComposition({
       value: item.id
     }))
 
-  const functionExecutionEnvironmentFor = (resourceId) => {
-    if (resourceId == null) return null
-    const cached = resourceNameById.value[versionsKey('function', resourceId)]
-    if (cached && cached.executionEnvironment != null) return cached.executionEnvironment
-    const match = (catalogByType.value.function ?? []).find(
-      (item) => String(item?.id) === String(resourceId)
-    )
-    return match?.executionEnvironment ?? null
-  }
-
   const isLoadingCatalog = (resourceType) => Boolean(catalogLoadingByType.value[resourceType])
 
   const hasAnyCatalogError = computed(() => Object.values(catalogErrorByType.value).some(Boolean))
@@ -422,7 +412,7 @@ export function useReleaseComposition({
     return loadServiceCache[resourceType]
   }
 
-  // `${type}:${id}` -> { id, name, executionEnvironment }; `resourceNameLoading`
+  // `${type}:${id}` -> { id, name }; `resourceNameLoading`
   // guards in-flight ids against duplicate by-id requests.
   const resourceNameById = ref({})
   const resourceNameLoading = {}
@@ -814,11 +804,9 @@ export function useReleaseComposition({
     return outcomes
   }
 
-  // Non-scoped (Scenario A): the DS-agnostic base payload, plus each DS's own
-  // STRICT-retained bindings (`retainedByDs[id]`) merged into its body so a strict
-  // DS keeps the resources this version dropped. DSs with no retained bindings get
-  // the base unchanged.
-  const buildAndActivateShared = async (ids, resources, retainedByDs, strategy, onOutcome) => {
+  // Non-scoped (Scenario A): the DS-agnostic base payload fanned out to every
+  // selected DS.
+  const buildAndActivateShared = async (ids, resources, strategy, onOutcome) => {
     // Guard the null-version leak (mirrors the scoped path): the store resolves the
     // LATEST sentinel to a concrete `version_id` in `composePayload()`, but when a
     // resource's versions never loaded (or failed) that resolution yields `null`.
@@ -833,19 +821,8 @@ export function useReleaseComposition({
         return outcome
       })
     }
-    const retained = retainedByDs && typeof retainedByDs === 'object' ? retainedByDs : {}
-    const targets = ids.map((id) => {
-      const kept = (Array.isArray(retained[id]) ? retained[id] : []).map((resource) => ({
-        resource_id: resource.resource_id,
-        resource_version: resource.resource_version,
-        resource_type: resource.resource_type
-      }))
-      const payload = DeploymentAdapter.transformBuildAndActivatePayload(
-        [...list, ...kept],
-        strategy
-      )
-      return { id, payload }
-    })
+    const payload = DeploymentAdapter.transformBuildAndActivatePayload(list, strategy)
+    const targets = ids.map((id) => ({ id, payload }))
     return dispatchFanOut(targets, onOutcome)
   }
 
@@ -983,13 +960,7 @@ export function useReleaseComposition({
           onOutcome
         )
       }
-      return await buildAndActivateShared(
-        ids,
-        composedPayload.resources ?? [],
-        composedPayload.retainedByDs ?? {},
-        strategy,
-        onOutcome
-      )
+      return await buildAndActivateShared(ids, composedPayload.resources ?? [], strategy, onOutcome)
     } finally {
       isDeploying.value = false
     }
@@ -1019,7 +990,6 @@ export function useReleaseComposition({
     // instance catalog per type
     catalogByType,
     catalogOptionsFor,
-    functionExecutionEnvironmentFor,
     isLoadingCatalog,
     hasAnyCatalogError,
     loadCatalog,

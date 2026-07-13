@@ -7,21 +7,16 @@ const environment = VITE_ENVIRONMENT || 'production'
 const domainSuffix = environment === 'production' ? 'net' : 'com'
 
 const edgeApiHost =
-  environment === 'production'
-    ? 'jkjuyhi0gza.map.azionedge.net'
-    : 'urvlgkvpxla.map.azionedge.net'
+  environment === 'production' ? 'jkjuyhi0gza.map.azionedge.net' : 'urvlgkvpxla.map.azionedge.net'
 
 const deploymentApiHost =
-  environment === 'production'
-    ? 'deployment-api.azion.app'
-    : 'deployment-api-stage.azion.app'
+  environment === 'production' ? 'deployment-api.azion.app' : 'deployment-api-stage.azion.app'
 
 const environmentApiHost =
-  environment === 'production'
-    ? 'environment-api.azion.app'
-    : 'environment-api-stage.azion.app'
+  environment === 'production' ? 'environment-api.azion.app' : 'environment-api-stage.azion.app'
 
-const variablesApiHost = environment === 'production' ? 'variables.azion.com' : 'stage-variables.azion.com'
+const variablesApiHost =
+  environment === 'production' ? 'variables.azion.com' : 'stage-variables.azion.com'
 
 const tlsApiHost = environment === 'production' ? 'tls-api.azion.net' : 'stage-tls-api.azion.net'
 

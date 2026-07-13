@@ -27,7 +27,6 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block/index.vue'
   import ReleaseCompositionTree from '@/templates/release-composition/components/ReleaseCompositionTree.vue'
-  import RetainedBindingsNotice from '@/templates/release-composition/components/RetainedBindingsNotice.vue'
   import DeploymentSettingsPicker from '@/templates/release-composition/components/DeploymentSettingsPicker.vue'
   import CanaryStrategyField from '@/templates/release-composition/components/CanaryStrategyField.vue'
   import ImpactPanel from '@/templates/release-composition/components/ImpactPanel.vue'
@@ -37,8 +36,6 @@
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { LATEST_READY } from '@/templates/release-composition/version-options'
   import { useReleaseComposition } from '@/templates/release-composition/use-release-composition'
-  import { filterScopedRetained } from '@/templates/release-composition/retained-strict-bindings'
-  import { useScopedConnectorAttribution } from '@/templates/release-composition/use-scoped-connector-attribution'
   import { useReleaseDeployProgress } from '@/templates/release-composition/use-release-deploy-progress'
   import { classifyDeploymentsForResource } from '@/templates/release-composition/classify-deployments-for-resource'
   import {
@@ -221,13 +218,6 @@
     // that intentionally scan only the loaded releases.
     resolveConsumingDeployments
   })
-
-  // Scoped connector attribution: for a scoped release whose parent owns
-  // connectors (application/custom_page), a retained connector is only truly the
-  // scope's if the parent's ACTIVE version binds it. Resolved lazily per DS from
-  // the parent's active-version connector manifest (functions use the in-memory
-  // catalog's execution_environment instead — no request).
-  const connectorAttribution = useScopedConnectorAttribution()
 
   // The application id the composition is built around: the explicit Application
   // pick first, else the scoped entry id when the screen is scoped to an
@@ -924,116 +914,8 @@
     })
   })
 
-  const showAllRetained = computed(
-    () => !isScoped.value || isFromWorkload.value || isFromDeployment.value
-  )
-
-  const scopedRelatedTypes = computed(() => {
-    const type = scopedType.value
-    if (!type) return null
-    return new Set([type, ...(OWNED_COLLECTIONS[type] ?? [])])
-  })
-
-  const scopedOwnsConnector = computed(() =>
-    Boolean(scopedType.value && OWNED_COLLECTIONS[scopedType.value]?.includes('connector'))
-  )
-
-  const scopedParentId = computed(() =>
-    scopedType.value ? (resNames.value[scopedType.value] ?? store.resourceId ?? null) : null
-  )
-
-  // Lazy per-DS connector attribution: only when a scoped, connector-owning release
-  // actually has a retained connector for a DS do we fetch that DS's parent
-  // active-version connector manifest. DSs without a retained connector never fire.
-  watch(
-    () =>
-      !showAllRetained.value && scopedOwnsConnector.value
-        ? Object.entries(store.retainedStrictResourcesByDs)
-            .filter(([, resources]) =>
-              (resources ?? []).some((resource) => resource?.resource_type === 'connector')
-            )
-            .map(([dsId]) => `${dsId}:${activeReleaseVersionForDs(dsId, scopedType.value) ?? ''}`)
-            .join('|')
-        : '',
-    () => {
-      if (showAllRetained.value || !scopedOwnsConnector.value) return
-      const parentId = scopedParentId.value
-      Object.entries(store.retainedStrictResourcesByDs).forEach(([dsId, resources]) => {
-        const hasConnector = (resources ?? []).some(
-          (resource) => resource?.resource_type === 'connector'
-        )
-        if (!hasConnector) return
-        connectorAttribution.ensure(dsId, {
-          scopedType: scopedType.value,
-          parentId,
-          versionId: activeReleaseVersionForDs(dsId, scopedType.value)
-        })
-      })
-    },
-    { immediate: true }
-  )
-
-  const retainedGroups = computed(() => {
-    const byDs = store.retainedStrictResourcesByDs
-    const relatedTypes = scopedRelatedTypes.value
-    const showAll = showAllRetained.value
-    return Object.keys(byDs)
-      .map((dsId) => {
-        const deployment = store.deployments.find((item) => String(item?.id) === String(dsId))
-        const resources = filterScopedRetained({
-          resources: byDs[dsId],
-          relatedTypes,
-          scopedType: scopedType.value,
-          showAll,
-          functionExecEnvFor: composition.functionExecutionEnvironmentFor,
-          ownedConnectorIdsFor: () => connectorAttribution.ownedConnectorIdsFor(dsId)
-        }).map((resource) => {
-          const resolvedName = composition.resourceNameFor(
-            resource.resource_type,
-            resource.resource_id
-          )
-          return {
-            type: resource.resource_type,
-            id: resource.resource_id,
-            label: labelFor(resource.resource_type),
-            icon: resolveResourceMeta(resource.resource_type).icon,
-            name: resolvedName ?? resource.resource_name ?? String(resource.resource_id),
-            version: resource.resource_version ?? 'current'
-          }
-        })
-        return { dsId, dsName: deployment?.name || dsId, resources }
-      })
-      .filter((group) => group.resources.length > 0)
-  })
-
-  const retainedCount = computed(() =>
-    retainedGroups.value.reduce((total, group) => total + group.resources.length, 0)
-  )
-
   const showDeploymentSettingsCard = computed(
-    () => !isFromDeployment.value || retainedGroups.value.length > 0 || showComposition.value
-  )
-
-  // Prime the page-1 catalog + resolve each retained id by id (correct off-page).
-  watch(
-    () =>
-      Object.values(store.retainedStrictResourcesByDs)
-        .flat()
-        .map((resource) => `${resource.resource_type}:${resource.resource_id}`)
-        .join('|'),
-    () => {
-      const idsByType = {}
-      Object.values(store.retainedStrictResourcesByDs)
-        .flat()
-        .forEach((resource) => {
-          const type = resource?.resource_type
-          if (!type) return
-          composition.loadCatalog(type)
-          ;(idsByType[type] ||= []).push(resource.resource_id)
-        })
-      Object.entries(idsByType).forEach(([type, ids]) => composition.ensureResourceNames(type, ids))
-    },
-    { immediate: true }
+    () => !isFromDeployment.value || showComposition.value
   )
 
   // Resolve the name of every referenced resource so off-page ids still show a name.
@@ -1073,8 +955,6 @@
   const onTreeResource = ({ type, value }) => store.setResName(type, value)
   const onTreeVersion = ({ type, value }) => store.setResVer(type, value)
   const toggleOptional = (type) => store.toggleResource(type)
-
-  const onCreateNewDeployment = () => router.push({ name: 'deployments-create' })
 
   const onToggleGroup = ({ type, group }) => store.toggleCollOpen(type, group)
   const onInstanceResource = ({ type, group, id, value }) =>
@@ -1549,24 +1429,10 @@
                 @group-action="onGroupAction"
               />
 
-              <Transition name="retained-collapse">
-                <div
-                  v-if="retainedGroups.length"
-                  class="retained-collapse"
-                >
-                  <div class="retained-collapse__inner">
-                    <RetainedBindingsNotice
-                      :groups="retainedGroups"
-                      @create-new-deployment="onCreateNewDeployment"
-                    />
-                  </div>
-                </div>
-              </Transition>
-
               <CanaryStrategyField
                 v-if="showComposition"
                 :class="[
-                  (!isFromDeployment || retainedGroups.length) &&
+                  !isFromDeployment &&
                     'border-t border-[var(--surface-border)] pt-[var(--spacing-6)]'
                 ]"
                 @update:enabled="onCanaryEnabled"
@@ -1701,14 +1567,6 @@
     >
       {{ impactSummary }}
     </p>
-    <p
-      v-if="retainedCount"
-      class="mt-[var(--spacing-2)] flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
-      data-testid="release-composition__confirm-retained"
-    >
-      <i class="pi pi-lock" />
-      {{ retainedCount }} resource{{ retainedCount === 1 ? '' : 's' }} kept by strict policy.
-    </p>
     <template #footer>
       <div class="flex items-center justify-end gap-[var(--spacing-3)]">
         <PrimeButton
@@ -1743,35 +1601,6 @@
 </template>
 
 <style scoped>
-  .retained-collapse-enter-active,
-  .retained-collapse-leave-active {
-    display: grid;
-    grid-template-rows: 1fr;
-    overflow: hidden;
-    transition:
-      grid-template-rows 0.25s ease,
-      opacity 0.25s ease;
-  }
-
-  .retained-collapse-enter-from,
-  .retained-collapse-leave-to {
-    grid-template-rows: 0fr;
-    opacity: 0;
-  }
-
-  .retained-collapse-enter-active .retained-collapse__inner,
-  .retained-collapse-leave-active .retained-collapse__inner {
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .retained-collapse-enter-active,
-    .retained-collapse-leave-active {
-      transition: none;
-    }
-  }
-
   .release-composer__grid {
     grid-template-columns: minmax(0, 1fr) minmax(var(--container-xs), var(--container-md));
   }

@@ -100,8 +100,8 @@ curl -s "$API/v4/deployments/ADEPSTG1" -H "Authorization: Token $TOKEN"
 **200** `{ data:{ …same shape as POST 201 } }`
 **Errors** `404 DEPLOYMENT_NOT_FOUND`
 
-### PATCH /v4/deployments/{id}
-State-aware update: head `draft` → edit in place; else → clone latest into a new draft.
+### PATCH /v4/deployments/{id} · PUT /v4/deployments/{id}
+State-aware save-and-build (`PUT` is an alias of `PATCH` — same handler, merge semantics, **not** a full replace). Head `draft` (deployment never built/activated) → edit the draft in place, no build. Head `ready` → **build a new `deployment_version` born `queued`** from the patched config, **point `active_deployment_version_id`** at it, and emit `deployment/install` with the **current, unchanged routing**; the new version reaches `ready` only when the edge confirms the install (`meta.state` is `queued`/`building` until then). The prior READY stays live until this install succeeds, then is archived (or the pointer reverts to it if the install fails → never zero READY). Any other head state (`queued`/`building`/`error`/`canceled`/`archiving`/`archived`) → **409** (not patchable). Releases are left intact (children of the base row, not of the version). `deployment_policy` is immutable (409 on mismatch).
 ```bash
 curl -sX PATCH "$API/v4/deployments/ADEPSTG1" \
   -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' \
@@ -109,7 +109,7 @@ curl -sX PATCH "$API/v4/deployments/ADEPSTG1" \
 ```
 **Body** `name?` `description?` `binding_policy?` `deployment_policy?`(idempotent) `strategy_defaults?`
 **200** `{ data:{ … }, meta:{ version_id, state, … } }`
-**Errors** `404` · `409 IMMUTABLE_FIELD`(deployment_policy mismatch) · `409 CANNOT_TIGHTEN_POLICY`(FLEXIBLE→STRICT on mixed history) · `409 DUPLICATE_NAME`
+**Errors** `404` · `409 IMMUTABLE_FIELD`(deployment_policy mismatch) · `409 CANNOT_TIGHTEN_POLICY`(FLEXIBLE→STRICT on mixed history — governed types only: application/firewall/custom_page) · `409 DUPLICATE_NAME`
 
 ### DELETE /v4/deployments/{id}
 Soft-delete (cascade base + versions + releases → `deleting`; worker → `deleted`).
@@ -136,6 +136,8 @@ curl -sX POST "$API/v4/deployments/ADEPSTG1/archive" \
 
 `@azion/versioning` lib. One row per `(deployment_id, version_number)` in `deployment_versions`; lifecycle on the row.
 
+**READ-ONLY surface — only LIST and GET.** Deployment versions are *derived*: the only way a version comes into being or changes is through create / PATCH-and-build / `build_and_activate` on the deployment itself. The lib's mutating routes (`POST` create/clone, `PATCH`, `DELETE`, and the `cancel`/`archive` actions) are **unregistered** (filter in `buildDeploymentVersioningDescriptors`, `container.ts`) — a corrected mirror of the tls-api pattern. Requesting any of them returns 404. The lib's `VersioningService.createDraft`/`patchDraft` stay callable in-process; only the HTTP surface is removed.
+
 ### GET /v4/deployments/{id}/versions
 List version rows + lifecycle state.
 ```bash
@@ -143,49 +145,12 @@ curl -s "$API/v4/deployments/ADEPSTG1/versions?page=1&page_size=20" -H "Authoriz
 ```
 **Query** `page?` `page_size?` `fields?`(sparse) **200** list envelope
 
-### POST /v4/deployments/{id}/versions
-Create DRAFT by cloning latest READY. Cap `MAX_VERSIONING_DRAFTS_PER_RESOURCE` (20).
-```bash
-curl -sX POST "$API/v4/deployments/ADEPSTG1/versions" -H "Authorization: Token $TOKEN"
-```
-**202** `{ data:{ id, state:"draft" } }` · **422** `DRAFT_LIMIT_EXCEEDED`
-
 ### GET /v4/deployments/{id}/versions/{vid}
 Read one version row.
 ```bash
 curl -s "$API/v4/deployments/ADEPSTG1/versions/ADEPVRD1" -H "Authorization: Token $TOKEN"
 ```
 **200** `{ data:{ …, meta:{ version_id, state, … } } }`
-
-### PATCH /v4/deployments/{id}/versions/{vid}
-Edit a DRAFT row's build-config (only while `state='draft'`).
-```bash
-curl -sX PATCH "$API/v4/deployments/ADEPSTG1/versions/ADEPVRD1" \
-  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' -d '{...}'
-```
-**200** version row · **409** not a draft
-
-### POST /v4/deployments/{id}/versions/{vid}/cancel
-Cancel a queued/building version row.
-```bash
-curl -sX POST "$API/v4/deployments/ADEPSTG1/versions/ADEPVRD1/cancel" -H "Authorization: Token $TOKEN"
-```
-**202** `{ data:{ id, state:"canceled" } }`
-
-### POST /v4/deployments/{id}/versions/{vid}/archive
-READY version row → `archiving` (worker drives the rest).
-```bash
-curl -sX POST "$API/v4/deployments/ADEPSTG1/versions/ADEPVRD1/archive" \
-  -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' -d '{"reason":"SUPERSEDED"}'
-```
-**202** `{ data:{ id, state:"archiving" } }`
-
-### DELETE /v4/deployments/{id}/versions/{vid}
-Soft-delete: `draft`/`error`/`canceled` → `deleted` (direct); `ready`/`queued`/`building` → `deleting` (outbox). Blocked while `traffic_role ≠ INACTIVE`.
-```bash
-curl -sX DELETE "$API/v4/deployments/ADEPSTG1/versions/ADEPVRD1" -H "Authorization: Token $TOKEN"
-```
-**200** `{ state:"executed", data:null }`
 
 ---
 
@@ -236,7 +201,8 @@ Finalize: `draft|error → queued` + INSTALL outbox (worker builds at edge). On 
 curl -sX POST "$API/v4/deployments/ADEPSTG1/releases/ARELDRF1/build" -H "Authorization: Token $TOKEN"
 ```
 **202** `{ data:{ id, state:"queued", trace_id } }`
-**Errors** `404` · `409 not draft|error` · `422 catalog/composition`
+**Errors** `404` · `409 not draft|error` · `422 catalog/composition/dependency-mismatch`
+The build always reconciles subresources against the owner dependency graph returned inline on the catalog's `getResourceState` query (`dependencyStates: [QUEUED, BUILDING, READY]`). A missing dependency or an orphan subresource → `422 43010 DependencyMismatch`, pointer `/resources` (response redacted to the offending subresource type only). See CONTEXT.md invariant 5a.
 
 ### POST /v4/deployments/{did}/releases/{rid}/cancel
 Cancel a queued/building release.
@@ -270,7 +236,7 @@ curl -sX POST "$API/v4/deployments/ADEPSTG1/releases/ARELACT1/promote" \
   -H "Authorization: Token $TOKEN" -H 'Content-Type: application/json' -d '{"target_deployment_id":"ATGTDEP1"}'
 ```
 **Body** `target_deployment_id*`
-**202** `{ data:{ id, deployment_id, state:"queued" } }` · **404** target/source not found
+**202** `{ data:{ id, deployment_id, state:"queued" } }` · **404** target/source not found · **422** composition/dependency-mismatch (reconciliação de dependências como no `/build`, ver CONTEXT.md 5a)
 
 ---
 
@@ -319,7 +285,7 @@ curl -sX POST "$API/v4/deployments/ADEPSTG1/build_and_activate" \
 ```
 **Body** `resources*`(as in POST /releases) `strategy?` `origin?` `deployment_version_id?`(target draft of `:id`, else 422)
 **202** `{ data:{ id, state:"queued", trace_id } }` (`trace_id` shared by both outbox rows)
-**Errors** `404 deployment / unknown global_id` · `409 ConcurrentActivation` · `422 catalog/composition / VERSIONED_URLS_ACTIVE_LIMIT`
+**Errors** `404 deployment / unknown global_id` · `409 ConcurrentActivation` · `422 catalog/composition/dependency-mismatch / VERSIONED_URLS_ACTIVE_LIMIT` (dependency reconciliation as in `/build`, see CONTEXT.md 5a)
 
 ### POST /v4/deployments/{did}/releases/{rid}/patch_and_activate
 Clone `:rid` with the override, build, and activate the clone — one call. Delegates to `build_and_activate` (same optimistic semantic + rollback).
