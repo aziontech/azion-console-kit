@@ -7,10 +7,11 @@
   import PrimeButton from '@aziontech/webkit/button'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import DeployDrawerBlock from '@/templates/deploy-drawer-block'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
-  import VersionsTab from '@/views/Deployments/tabs/VersionsTab.vue'
+  import EditViewSkeleton from '@/views/Deployments/components/EditViewSkeleton.vue'
+  import SettingsTab from '@/views/Deployments/tabs/SettingsTab.vue'
   import ReleasesTab from '@/views/Deployments/tabs/ReleasesTab.vue'
+  import VersionHistoryTab from '@/views/Deployments/tabs/VersionHistoryTab.vue'
   import { loadDeploymentByIdAdapter } from '@/views/Deployments/Config/adapters'
   import { releaseComposerRouteFromDeployment } from '@/templates/release-composition/release-composer-route'
   import { provideTabUnsaved } from '@/composables/useTabUnsaved'
@@ -18,7 +19,7 @@
 
   defineOptions({ name: 'tabs-deployments-edit' })
 
-  const TAB_ORDER = ['versions', 'releases']
+  const TAB_ORDER = ['settings', 'releases', 'version-history']
   const TAB_TO_INDEX = TAB_ORDER.reduce((acc, name, index) => {
     acc[name] = index
     return acc
@@ -33,23 +34,19 @@
   const deployment = ref(null)
   const isLoading = ref(true)
 
-  const initialTabName = TAB_ORDER.includes(route.params.tab) ? route.params.tab : 'versions'
-  const activeTab = ref(TAB_TO_INDEX[initialTabName])
+  const releasesRefreshKey = ref(0)
+  const historyRefreshKey = ref(0)
 
-  if (route.params.tab !== initialTabName) {
-    router.replace({
-      name: 'deployments-edit',
-      params: { id: deploymentId.value, tab: initialTabName },
-      query: route.query
-    })
-  }
+  const activeTab = computed(() => {
+    const tabName = TAB_ORDER.includes(route.params.tab) ? route.params.tab : 'settings'
+    return TAB_TO_INDEX[tabName]
+  })
 
   const tabViewRef = ref(null)
 
   const indexToTabName = (index) => TAB_ORDER[index] || TAB_ORDER[0]
 
   const changeTab = (index) => {
-    activeTab.value = index
     router.replace({
       name: 'deployments-edit',
       params: { id: deploymentId.value, tab: indexToTabName(index) },
@@ -71,18 +68,8 @@
 
   const deploymentName = computed(() => deployment.value?.name || '')
 
-  const isDeployDrawerOpen = ref(false)
-  const releasesRefreshKey = ref(0)
-
   const openRelease = () => {
     router.push(releaseComposerRouteFromDeployment(deploymentId.value))
-  }
-
-  const onDeployed = () => {
-    releasesRefreshKey.value += 1
-    if (activeTab.value !== TAB_TO_INDEX.releases) {
-      changeTab(TAB_TO_INDEX.releases)
-    }
   }
 
   const fetchDeployment = async () => {
@@ -98,22 +85,32 @@
         summary: 'Processing failed',
         detail: error
       })
-      deployment.value = {}
+      deployment.value = null
     } finally {
       isLoading.value = false
     }
+  }
+
+  const onUpdated = async () => {
+    await fetchDeployment()
+    historyRefreshKey.value += 1
   }
 
   fetchDeployment()
 </script>
 
 <template>
-  <ContentBlock data-testid="deployments-edit-content-block">
+  <EditViewSkeleton v-if="isLoading" />
+
+  <ContentBlock
+    v-else-if="deployment"
+    data-testid="deployments-edit-content-block"
+  >
     <template #heading>
       <PageHeadingBlock
         :pageTitle="deploymentName"
         :entityName="deploymentName"
-        description="View and manage the versions and releases of this deployment."
+        description="View and manage the settings, releases, and version history of this deployment."
         data-testid="deployments-edit-heading"
       >
         <template #default>
@@ -140,13 +137,13 @@
         @tab-click="handleTabClick"
       >
         <TabPanel
-          header="Versions"
-          :pt="{ root: { 'data-testid': 'deployments-edit-tabs__tab__versions' } }"
+          header="Settings"
+          :pt="{ root: { 'data-testid': 'deployments-edit-tabs__tab__settings' } }"
         >
-          <VersionsTab
-            v-if="activeTab === TAB_TO_INDEX.versions"
-            :deploymentId="deploymentId"
-            class="mt-4"
+          <SettingsTab
+            v-if="activeTab === TAB_TO_INDEX.settings"
+            :deployment="deployment"
+            @updated="onUpdated"
           />
         </TabPanel>
         <TabPanel
@@ -159,13 +156,17 @@
             :deploymentId="deploymentId"
           />
         </TabPanel>
+        <TabPanel
+          header="Version history"
+          :pt="{ root: { 'data-testid': 'deployments-edit-tabs__tab__version-history' } }"
+        >
+          <VersionHistoryTab
+            v-if="activeTab === TAB_TO_INDEX['version-history']"
+            :key="historyRefreshKey"
+            :deploymentId="deploymentId"
+          />
+        </TabPanel>
       </TabView>
-
-      <DeployDrawerBlock
-        v-model:visible="isDeployDrawerOpen"
-        :preselected-deployment-id="deploymentId"
-        @deployed="onDeployed"
-      />
     </template>
   </ContentBlock>
 </template>

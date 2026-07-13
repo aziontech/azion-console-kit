@@ -41,6 +41,7 @@ export const loadDeploymentByIdAdapter = async ({ id }) => {
   const skew = deployment.strategy_defaults?.skew_protection
 
   return {
+    id: deployment.id ?? id,
     name: deployment.name ?? '',
     description: deployment.description ?? '',
     binding_policy: deployment.binding_policy ?? 'STRICT',
@@ -48,11 +49,12 @@ export const loadDeploymentByIdAdapter = async ({ id }) => {
     strategy_canary_enabled: !!canary?.enabled,
     strategy_canary_default_percentage: canary?.default_percentage ?? 10,
     strategy_skew_enabled: !!skew?.enabled,
-    strategy_skew_default_ttl_seconds: skew?.default_ttl_seconds ?? 3600
+    strategy_skew_default_ttl_seconds: skew?.default_ttl_seconds ?? 3600,
+    state: deployment.state ?? null
   }
 }
 
-export const updateDeploymentAdapter = async (id, payload) => {
+export const updateDeploymentAdapter = async (id, payload, { headState } = {}) => {
   await deploymentService.updateDeploymentService(id, {
     name: payload.name,
     description: sanitizeDescription(payload.description),
@@ -61,5 +63,5 @@ export const updateDeploymentAdapter = async (id, payload) => {
     strategy_defaults: buildStrategyDefaults(payload, { alwaysEmit: true })
   })
 
-  return 'Deployment updated successfully'
+  return headState === 'draft' ? 'Deployment updated' : 'A new version is now current'
 }

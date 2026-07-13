@@ -140,7 +140,7 @@ describe('DeploymentReleaseService - buildAndActivate (P3, P6)', () => {
     expect(removeSpy).toHaveBeenCalled()
   })
 
-  it('P6: clears the drawer caches and invalidates the releases/deployments caches on success', async () => {
+  it('P6: clears the drawer caches and removes the releases/deployments listings on success', async () => {
     const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries').mockImplementation(() => {})
     vi.spyOn(httpService, 'request').mockResolvedValueOnce({ data: { id: 'x' } })
@@ -150,11 +150,12 @@ describe('DeploymentReleaseService - buildAndActivate (P3, P6)', () => {
     // Drawer caches (active-release composition + history) are removed outright.
     expect(removeSpy).toHaveBeenCalledWith({ queryKey: queryKeys.deployments.history.all })
     expect(removeSpy).toHaveBeenCalledWith({ queryKey: queryKeys.release.all(DEPLOYMENT_ID) })
-    // Releases CRUD + deployments caches are invalidated (theirs namespace).
-    expect(invalidateSpy).toHaveBeenCalledWith({
+    // Releases + deployments listings are removed so imperative reads refetch fresh.
+    expect(removeSpy).toHaveBeenCalledWith({
       queryKey: queryKeys.deployments.releases.all(DEPLOYMENT_ID)
     })
-    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.deployments.all })
+    expect(removeSpy).toHaveBeenCalledWith({ queryKey: queryKeys.deployments.all })
+    // The deployment detail has no imperative cache consumer, so it stays a soft invalidate.
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: queryKeys.deployments.detail(DEPLOYMENT_ID)
     })

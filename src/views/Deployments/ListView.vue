@@ -51,7 +51,7 @@
 
   const openDeploymentEdit = (deployment) => {
     if (!deployment?.id) return
-    router.push({ name: 'deployments-edit', params: { id: deployment.id, tab: 'versions' } })
+    router.push({ name: 'deployments-edit', params: { id: deployment.id, tab: 'settings' } })
   }
 
   // Entry "from a Deployment Settings": pre-selects this DS so the composer

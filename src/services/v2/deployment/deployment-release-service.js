@@ -93,13 +93,13 @@ export class DeploymentReleaseService extends BaseService {
   #releasesURL = (deploymentId) => `${this.#baseURL}/${deploymentId}/releases`
 
   #invalidateReleases = (deploymentId) => {
-    this.queryClient.invalidateQueries({
+    this.queryClient.removeQueries({
       queryKey: queryKeys.deployments.releases.all(deploymentId)
     })
   }
 
   #invalidateDeployments = () => {
-    this.queryClient.invalidateQueries({
+    this.queryClient.removeQueries({
       queryKey: queryKeys.deployments.all
     })
   }

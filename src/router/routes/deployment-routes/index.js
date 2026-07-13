@@ -38,7 +38,7 @@ export const deploymentRoutes = {
       }
     },
     {
-      path: 'edit/:id/:tab(versions|releases)?',
+      path: 'edit/:id/:tab(settings|releases|version-history)?',
       name: 'deployments-edit',
       component: () => import('@views/Deployments/TabsView.vue'),
       meta: {
@@ -53,33 +53,6 @@ export const deploymentRoutes = {
             dynamic: true,
             routeParam: 'id',
             toRoute: { name: 'deployments-edit', params: ['id'] }
-          }
-        ]
-      }
-    },
-    {
-      path: 'edit/:id/versions/:versionId',
-      name: 'edit-deployment-version',
-      component: () => import('@views/Deployments/v6/VersionEditView.vue'),
-      meta: {
-        title: 'Edit Version',
-        flag: 'use_v6_configurations',
-        breadCrumbs: [
-          {
-            label: 'Deployments',
-            to: '/deployments'
-          },
-          {
-            label: 'Edit Deployment',
-            dynamic: true,
-            routeParam: 'id',
-            toRoute: { name: 'deployments-edit', params: ['id'] }
-          },
-          {
-            label: 'Version',
-            dynamic: true,
-            routeParam: 'versionId',
-            useParamValue: true
           }
         ]
       }

@@ -1,4 +1,5 @@
 import { mapStateToStatus, resolveResourceMeta } from '@/services/v2/deployment/deployment-adapter'
+import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
 const isObject = (value) => {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -56,6 +57,9 @@ const normalizeVersion = (version) => {
   const meta = isObject(source.meta) ? source.meta : {}
   const state = meta.state ?? source.state ?? null
 
+  const lastActivityAt =
+    source.updated_at ?? meta.updated_at ?? source.created_at ?? meta.created_at ?? null
+
   return {
     id: source.id ?? null,
     deployment_id: source.deployment_id ?? null,
@@ -65,8 +69,9 @@ const normalizeVersion = (version) => {
     state,
     state_detail: source.state_detail ?? null,
     comment: source.description ?? meta.description ?? '',
-    createdAt: source.updated_at ?? meta.updated_at ?? source.created_at ?? meta.created_at ?? null,
-    lastEditor: resolveActorEmail(source.last_modified_by)
+    createdAt: lastActivityAt,
+    lastModified: lastActivityAt ? formatDateToDayMonthYearHour(lastActivityAt) : null,
+    lastEditor: resolveActorEmail(source.last_modified_by) ?? resolveActorEmail(source.created_by)
   }
 }
 
