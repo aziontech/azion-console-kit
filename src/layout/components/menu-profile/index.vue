@@ -88,7 +88,7 @@
                   >{{ user.full_name }}</span
                 >
                 <span
-                  class="text-xs"
+                  class="text-xs break-all"
                   data-testid="profile-block__settings-menu__email"
                   >{{ user.email }}</span
                 >
@@ -242,7 +242,7 @@
             >{{ user.full_name }}</span
           >
           <span
-            class="text-xs"
+            class="text-xs break-all"
             data-testid="profile-block__mobile-settings-menu__email"
             >{{ user.email }}</span
           >
