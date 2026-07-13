@@ -34,8 +34,8 @@
             <span
               class="text-sm font-medium"
               data-testid="profile-block__profile-menu__user-name"
-              >{{ user.name }}</span
-            >
+              >{{ user.name }}
+            </span>
             <div class="flex gap-2">
               <span
                 class="text-xs"
@@ -80,15 +80,16 @@
           }"
         >
           <template #start>
-            <div class="flex flex-row items-center">
-              <div class="flex flex-col gap-1 px-2 py-2.5">
+            <div class="flex flex-row items-center min-w-0">
+              <div class="flex flex-col gap-1 px-2 py-2.5 min-w-0">
                 <span
                   class="text-sm font-medium leading-none"
                   data-testid="profile-block__settings-menu__full-name"
                   >{{ user.full_name }}</span
                 >
                 <span
-                  class="text-xs break-all"
+                  class="text-xs truncate"
+                  :title="user.email"
                   data-testid="profile-block__settings-menu__email"
                   >{{ user.email }}</span
                 >
@@ -234,15 +235,16 @@
     </template>
 
     <template #end>
-      <div class="flex flex-row items-center">
-        <div class="flex flex-col gap-1 px-2 py-2.5">
+      <div class="flex flex-row items-center min-w-0">
+        <div class="flex flex-col gap-1 px-2 py-2.5 min-w-0">
           <span
             class="text-sm font-medium leading-none"
             data-testid="profile-block__mobile-settings-menu__full-name"
             >{{ user.full_name }}</span
           >
           <span
-            class="text-xs break-all"
+            class="text-xs truncate"
+            :title="user.email"
             data-testid="profile-block__mobile-settings-menu__email"
             >{{ user.email }}</span
           >
