@@ -128,6 +128,13 @@
     resourceType: {
       type: String,
       default: ''
+    },
+    // Hide the toolbar (search/filter/sort + `toolbar-actions` slot). Used by the
+    // Overview's Live Deployments table, which is a small, non-searchable list
+    // but must still share this component's table shell for visual consistency.
+    showToolbar: {
+      type: Boolean,
+      default: true
     }
   })
 
@@ -368,7 +375,10 @@
     class="flex flex-col gap-4 text-[var(--text-color)]"
     data-testid="version-list-data-view"
   >
-    <div class="flex flex-wrap items-center justify-between gap-2">
+    <div
+      v-if="showToolbar"
+      class="flex flex-wrap items-center justify-between gap-2"
+    >
       <div class="dataview-toolbar flex min-w-0 flex-1 flex-wrap items-center gap-2">
         <button
           v-if="isCompactViewport && hasCollapsibleFilters"

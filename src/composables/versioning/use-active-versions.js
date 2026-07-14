@@ -15,6 +15,7 @@ const readRef = (resourceRef) => {
 
 export function useActiveVersions(resourceRef) {
   const activeVersions = ref(new Map())
+  const isLoading = ref(true)
 
   const fetchRows = async (resource, skipCache) => {
     const rows = []
@@ -45,14 +46,20 @@ export function useActiveVersions(resourceRef) {
     const resource = readRef(resourceRef)
     if (!resource) {
       activeVersions.value = new Map()
+      isLoading.value = false
       return
     }
 
-    const rows = await fetchRows(resource, skipCache)
-    activeVersions.value = activeVersionsForResource(rows, {
-      resource_type: resource.resourceType,
-      resource_id: resource.resourceId
-    })
+    isLoading.value = true
+    try {
+      const rows = await fetchRows(resource, skipCache)
+      activeVersions.value = activeVersionsForResource(rows, {
+        resource_type: resource.resourceType,
+        resource_id: resource.resourceId
+      })
+    } finally {
+      isLoading.value = false
+    }
   }
 
   const refresh = () => load({ skipCache: true })
@@ -68,5 +75,5 @@ export function useActiveVersions(resourceRef) {
     { immediate: true }
   )
 
-  return { activeVersions, isActive, refresh }
+  return { activeVersions, isActive, isLoading, refresh }
 }

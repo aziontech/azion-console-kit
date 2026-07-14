@@ -31,6 +31,7 @@ const COMPOSABLES_DIR = 'src/composables/versioning'
 // Allowlist of shared framework files. Every entry is generic (no resource name
 // baked in). Adding a file here must be a deliberate, shared addition.
 const SHELL_ALLOWLIST = [
+  'ResourceOverviewBlock.vue',
   'ResourceVersionLanding.vue',
   'VersionEditScreen.vue',
   'VersionEditorTabsShell.vue',
@@ -44,9 +45,13 @@ const SHELL_ALLOWLIST = [
 ]
 
 const COMPOSABLES_ALLOWLIST = [
+  'active-versions.js',
+  'overview-resource-config.js',
   'to-version-options.js',
+  'use-active-versions.js',
   'use-deploy-resource-context.js',
   'use-deployment-release-drawer.js',
+  'use-live-deployments.js',
   'use-resource-version-landing.js',
   'use-version-command-bus.js',
   'use-version-command.js',
@@ -59,6 +64,7 @@ const COMPOSABLES_ALLOWLIST = [
   'use-workload-version-environments.js',
   'version-actions.js',
   'version-capability.js',
+  'version-list-columns.js',
   'version-machine.js'
 ]
 

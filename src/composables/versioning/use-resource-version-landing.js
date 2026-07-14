@@ -4,8 +4,26 @@ import { useToast } from '@aziontech/webkit/use-toast'
 import { VERSION_ACTIONS } from '@/composables/versioning/version-machine'
 import { toDeployableVersionOptions } from '@/composables/versioning/to-version-options'
 import { getVersionCapability } from '@/composables/versioning/version-capability'
+import { useActiveVersions } from '@/composables/versioning/use-active-versions'
 import { releaseComposerRouteFromResource } from '@/templates/release-composition/release-composer-route'
 
+// Landing tab route keys — the numeric index is derived from `showOverview` so
+// callers that opt out of Overview keep VERSIONS at index 0 without regressions.
+export const LANDING_TAB_KEYS = ['overview', 'versions', 'settings', 'variables']
+
+const tabIndexer = (showOverview) => {
+  const keys = showOverview
+    ? LANDING_TAB_KEYS
+    : LANDING_TAB_KEYS.filter((key) => key !== 'overview')
+  return {
+    keys,
+    indexOf: (key) => keys.indexOf(key),
+    keyAt: (index) => keys[index] ?? keys[0]
+  }
+}
+
+// Back-compat: existing callers that read LANDING_TAB.VERSIONS/SETTINGS/VARIABLES
+// keep working — these are the indexes for the classic (no Overview) layout.
 export const LANDING_TAB = { VERSIONS: 0, SETTINGS: 1, VARIABLES: 2 }
 
 const SUCCESS_SUMMARY = {
@@ -42,8 +60,10 @@ export function useResourceVersionLanding({
   versionService,
   resourceType,
   routeName,
-  versionRouteName
+  versionRouteName,
+  showOverview = false
 }) {
+  const tabs = tabIndexer(showOverview)
   const route = useRoute()
   const router = useRouter()
   const toast = useToast()
@@ -70,7 +90,10 @@ export function useResourceVersionLanding({
     ...(capability.canDeploy
       ? { openPromoteDrawer: (payload) => openPromoteRelease(payload) }
       : {}),
-    onSuccess: () => versionsQuery.refetch?.()
+    onSuccess: () => {
+      versionsQuery.refetch?.()
+      refreshActiveVersions()
+    }
   })
 
   const loadResource = async () => {
@@ -91,6 +114,16 @@ export function useResourceVersionLanding({
   const versionsQuery = versionService.useListVersionsQuery(resourceId.value)
   const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
 
+  // Overview needs the active-versions map to render Live Deployments; kept at
+  // the landing level so both the Overview slot and the Versions slot can share
+  // the same fetch (and a single refresh after a mutation).
+  const activeVersionsResourceRef = computed(() => ({ resourceType, resourceId: resourceId.value }))
+  const {
+    activeVersions,
+    isLoading: activeVersionsLoading,
+    refresh: refreshActiveVersions
+  } = useActiveVersions(activeVersionsResourceRef)
+
   const latestVersionId = computed(() => {
     const list = rawVersions.value
     if (!list.length) return null
@@ -102,14 +135,18 @@ export function useResourceVersionLanding({
 
   const activeTab = computed({
     get: () => {
-      if (String(route.params.tab) === 'variables') return LANDING_TAB.VARIABLES
-      if (String(route.params.tab) === 'settings') return LANDING_TAB.SETTINGS
-      return LANDING_TAB.VERSIONS
+      const key = String(route.params.tab ?? '')
+      if (tabs.keys.includes(key)) return tabs.indexOf(key)
+      // Default: Overview when enabled, otherwise Versions.
+      return showOverview ? tabs.indexOf('overview') : tabs.indexOf('versions')
     },
     set: (index) => {
+      const key = tabs.keyAt(index)
       const params = { id: resourceId.value }
-      if (index === LANDING_TAB.VARIABLES) params.tab = 'variables'
-      else if (index === LANDING_TAB.SETTINGS) params.tab = 'settings'
+      // Keep URLs clean for the default tab (no `?tab=overview` in the URL when
+      // Overview is the landing default).
+      const defaultKey = showOverview ? 'overview' : 'versions'
+      if (key && key !== defaultKey) params.tab = key
       router.replace({ name: routeName, params })
     }
   })
@@ -172,7 +209,7 @@ export function useResourceVersionLanding({
   })
 
   const goToVersionsList = () => {
-    activeTab.value = LANDING_TAB.VERSIONS
+    activeTab.value = tabs.indexOf('versions')
   }
   const handleCancel = () => goToVersionsList()
 
@@ -230,6 +267,12 @@ export function useResourceVersionLanding({
     deployResourceContext,
     handleCommandSuccess,
     handleCommandError,
-    handleCancel
+    handleCancel,
+    // Overview support
+    versionsQuery,
+    rawVersions,
+    activeVersions,
+    activeVersionsLoading,
+    refreshActiveVersions
   }
 }

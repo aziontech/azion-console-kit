@@ -52,7 +52,8 @@ describe('activeVersionsForResource', () => {
         state: 'ready',
         policy: 'single_version',
         trafficRole: 'ACTIVE',
-        releaseId: 'AREL0001'
+        releaseId: 'AREL0001',
+        deployedAt: null
       },
       {
         id: 'ADEP0002',
@@ -60,7 +61,8 @@ describe('activeVersionsForResource', () => {
         state: 'ready',
         policy: 'versioned_urls',
         trafficRole: 'CANDIDATE',
-        releaseId: 'AREL0002'
+        releaseId: 'AREL0002',
+        deployedAt: null
       }
     ])
   })
@@ -101,7 +103,8 @@ describe('activeVersionsForResource', () => {
       state: 'ready',
       policy: 'single_version',
       trafficRole: 'ACTIVE',
-      releaseId: 'AREL0003'
+      releaseId: 'AREL0003',
+      deployedAt: null
     })
 
     const byResourceId = activeVersionsForResource(appRows, {
