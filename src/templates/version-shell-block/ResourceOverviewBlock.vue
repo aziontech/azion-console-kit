@@ -21,6 +21,7 @@
   import VersionActionDialog from '@/templates/version-shell-block/components/VersionActionDialog.vue'
   import { useVersionList } from '@/composables/versioning/use-version-list'
   import { useLiveDeployments } from '@/composables/versioning/use-live-deployments'
+  import { useWorkloadDirectory } from '@/composables/versioning/use-workload-directory'
   import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
   import {
     getVersionListColumns,
@@ -72,29 +73,35 @@
     handleRowAction({ action, item: { ...item, id: item?.versionId ?? item?.id } })
   }
 
+  // Tenant-wide deployment_id → workload_name directory, fetched once and
+  // shared across every Live Deployments row. Falls back to an empty Map on
+  // error — the resolver renders "—" in that case.
+  const { deploymentToWorkload, isLoading: workloadDirectoryLoading } = useWorkloadDirectory()
+
   const { liveDeployments } = useLiveDeployments({
     activeVersions: () => props.activeVersions,
     versions: () => props.rawVersions,
     workloadResolver: computed(() => config.value?.workloadResolver),
-    resolverContext: computed(() => ({ resourceId: props.resourceId }))
+    resolverContext: computed(() => ({
+      resourceId: props.resourceId,
+      deploymentToWorkload: deploymentToWorkload.value
+    }))
   })
 
   const liveColumns = getLiveDeploymentColumns()
 
-  // Reshape each row so VersionListDataView's default cell renderer picks up the
-  // per-column fields (`environment`, `workload`, `deployed`) via the `column.field`
-  // fallback in resolveDisplayValue. `id` is required — DataView uses it as
-  // dataKey — and combines version id with deployment id when a single version
-  // fans out to multiple deployments.
+  // One row per version — Environment and Workload columns render every
+  // deployment the version is currently pinned to (see #cell-environment /
+  // #cell-workload slots below). Deployed shows the most recent timestamp.
   const liveItems = computed(() =>
     liveDeployments.value.map((row) => ({
       ...row.version,
-      id: row.deployment?.id ? `${row.versionId}::${row.deployment.id}` : row.versionId,
+      id: row.versionId,
       versionId: row.versionId,
-      environment: row.environment ?? '—',
-      workload: row.workload ?? '—',
-      deployedAt: row.deployedAt,
-      deployed: row.deployedAt ? formatDateToDayMonthYearHour(row.deployedAt) : '—'
+      environments: row.environments,
+      workloads: row.workloads,
+      deployedAt: row.latestDeployedAt,
+      deployed: row.latestDeployedAt ? formatDateToDayMonthYearHour(row.latestDeployedAt) : '—'
     }))
   )
 
@@ -116,7 +123,10 @@
   // versions query have settled — otherwise, whichever finishes first would
   // flash an empty state before its counterpart's rows arrive.
   const isLoading = computed(
-    () => Boolean(props.versionsQuery?.isLoading?.value) || props.activeVersionsLoading
+    () =>
+      Boolean(props.versionsQuery?.isLoading?.value) ||
+      props.activeVersionsLoading ||
+      workloadDirectoryLoading.value
   )
   const isError = computed(() => Boolean(props.versionsQuery?.isError?.value))
 </script>
@@ -153,7 +163,7 @@
         :show-row-actions="false"
         :show-toolbar="false"
         :resource-type="resourceType"
-        :paginator-rows="liveItems.length || 1"
+        :show-paginator="false"
         :empty-state="{
           title: 'No versions currently receiving traffic',
           description:
@@ -162,15 +172,58 @@
         :data-testid="`${testidPrefix}__live__table`"
         @row-action="handleLiveRowAction"
       >
-        <template #cell-version="{ item }">
-          <span class="inline-flex items-center gap-[var(--spacing-2)]">
-            <span class="version-hash text-body-md">{{ item.versionId }}</span>
+        <template #cell-version="{ item, onPrimaryClick }">
+          <button
+            type="button"
+            class="version-cell-button flex max-w-full min-w-0 items-center gap-[var(--spacing-2)] border-0 bg-transparent text-left text-[var(--text-color)]"
+            :data-testid="`${testidPrefix}__live__row-${item.versionId}__primary`"
+            @click="onPrimaryClick"
+          >
+            <span class="version-hash text-body-sm">{{ item.versionId }}</span>
             <PrimeTag
               severity="success"
               icon="pi pi-globe"
               value="Live"
             />
+          </button>
+        </template>
+
+        <template #cell-environment="{ item }">
+          <span
+            v-if="item.environments?.length"
+            class="inline-flex flex-wrap items-center gap-[var(--spacing-1)]"
+          >
+            <PrimeTag
+              v-for="name in item.environments"
+              :key="name"
+              severity="secondary"
+              :value="name"
+            />
           </span>
+          <span
+            v-else
+            class="cell-default"
+            >—</span
+          >
+        </template>
+
+        <template #cell-workload="{ item }">
+          <span
+            v-if="item.workloads?.length"
+            class="inline-flex flex-wrap items-center gap-[var(--spacing-1)]"
+          >
+            <PrimeTag
+              v-for="name in item.workloads"
+              :key="name"
+              severity="secondary"
+              :value="name"
+            />
+          </span>
+          <span
+            v-else
+            class="cell-default"
+            >—</span
+          >
         </template>
       </VersionListDataView>
     </section>

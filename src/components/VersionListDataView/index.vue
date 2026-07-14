@@ -105,6 +105,10 @@
       type: Number,
       default: 20
     },
+    showPaginator: {
+      type: Boolean,
+      default: true
+    },
     lazy: {
       type: Boolean,
       default: false
@@ -583,7 +587,7 @@
           <DataView
             :value="items"
             dataKey="id"
-            :paginator="true"
+            :paginator="showPaginator"
             :lazy="lazy"
             :totalRecords="lazy ? totalRecords : undefined"
             :rows="paginatorRows"

@@ -61,6 +61,7 @@ const COMPOSABLES_ALLOWLIST = [
   'use-version-list.js',
   'use-version-menu-actions.js',
   'use-version-row-actions.js',
+  'use-workload-directory.js',
   'use-workload-version-environments.js',
   'version-actions.js',
   'version-capability.js',

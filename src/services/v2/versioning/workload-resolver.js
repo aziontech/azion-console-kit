@@ -4,16 +4,22 @@
 // Workload / Deployed columns of the Live Deployments table.
 //
 // Default (name-based) resolver: the deployment name IS the environment
-// label surfaced in the Figma; the bound workload is not carried in
-// resource_usage rows yet, so `workload` is left null and the table
-// renders "—". Application and Firewall share this behavior today; a
-// future resource type may look up the workload via ctx.resourceId.
+// label surfaced in the Figma. When the caller provides a
+// `ctx.deploymentToWorkload` Map (built once per session by
+// use-workload-directory), the resolver enriches `workload` too; otherwise
+// it leaves it as null and the table renders "—".
 
 export const createNameBasedWorkloadResolver = () => ({
-  resolve(deployment /* , ctx = { resourceId } */) {
+  resolve(deployment, ctx = {}) {
+    const directory = ctx?.deploymentToWorkload
+    const workload =
+      directory instanceof Map && deployment?.id != null
+        ? (directory.get(String(deployment.id)) ?? null)
+        : null
+
     return {
       environment: deployment?.name ?? null,
-      workload: null,
+      workload,
       deployedAt: deployment?.deployedAt ?? null
     }
   }
