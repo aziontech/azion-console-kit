@@ -356,49 +356,8 @@ const config = {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
-            inputValue: '^/api'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/v4'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/deployment-api'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/environment-api'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/variables-api'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/tls-api'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/graphql'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/billing/invoices'
+            inputValue:
+              '^/(api|v4|deployment-api|environment-api|variables-api|tls-api|graphql|billing/invoices)'
           },
           {
             variable: '${uri}',
@@ -715,49 +674,8 @@ const config = {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
-            inputValue: '^/api'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/v4'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/deployment-api'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/environment-api'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/variables-api'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/tls-api'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/graphql'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/billing/invoices'
+            inputValue:
+              '^/(api|v4|deployment-api|environment-api|variables-api|tls-api|graphql|billing/invoices|sse)'
           },
           {
             variable: '${uri}',
@@ -765,12 +683,6 @@ const config = {
             operator: 'does_not_match',
             inputValue:
               '^(?!.*workspace/storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/sse'
           }
         ],
         behavior: {
