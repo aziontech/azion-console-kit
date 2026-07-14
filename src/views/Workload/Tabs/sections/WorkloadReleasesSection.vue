@@ -1,6 +1,7 @@
 <script setup>
   import { computed, onMounted, ref, watch } from 'vue'
   import Dropdown from '@aziontech/webkit/dropdown'
+  import Calendar from '@aziontech/webkit/calendar'
   import GenericDataView from '@/components/GenericDataView'
   import CurrentBadge from '@/components/CurrentBadge'
   import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
@@ -22,6 +23,7 @@
 
   const searchTerm = ref('')
   const filterValues = ref({ status: 'all' })
+  const dateRange = ref(null)
   const paginatorFirst = ref(0)
   const paginatorRows = ref(10)
 
@@ -57,13 +59,29 @@
     return release.status?.content === status
   }
 
+  const matchesDateRange = (release) => {
+    const [from, to] = Array.isArray(dateRange.value) ? dateRange.value : []
+    if (!from && !to) return true
+
+    const reference = release.created_at ? new Date(release.created_at) : null
+    if (!reference || Number.isNaN(reference.getTime())) return false
+
+    if (from && reference < new Date(new Date(from).setHours(0, 0, 0, 0))) return false
+    if (to && reference > new Date(new Date(to).setHours(23, 59, 59, 999))) return false
+    return true
+  }
+
   const filteredReleases = computed(() =>
-    releases.value.filter((release) => matchesSearch(release) && matchesStatus(release))
+    releases.value.filter(
+      (release) => matchesSearch(release) && matchesStatus(release) && matchesDateRange(release)
+    )
   )
 
-  const activeFilterCount = computed(() =>
-    filterValues.value.status && filterValues.value.status !== 'all' ? 1 : 0
-  )
+  const activeFilterCount = computed(() => {
+    const statusActive = filterValues.value.status && filterValues.value.status !== 'all' ? 1 : 0
+    const dateActive = Array.isArray(dateRange.value) && dateRange.value.some(Boolean) ? 1 : 0
+    return statusActive + dateActive
+  })
 
   const rowSubtitle = (release) => {
     const parts = []
@@ -117,7 +135,7 @@
   }
 
   watch(
-    [searchTerm, filterValues],
+    [searchTerm, filterValues, dateRange],
     () => {
       paginatorFirst.value = 0
     },
@@ -161,6 +179,15 @@
         optionValue="value"
         placeholder="Status"
         class="dataview-control dataview-dropdown min-w-0 w-full sm:w-auto sm:min-w-[9.5rem]"
+      />
+      <Calendar
+        v-model="dateRange"
+        selectionMode="range"
+        placeholder="Select a Date"
+        showIcon
+        icon="pi pi-chevron-down"
+        :manualInput="false"
+        class="dataview-control dataview-dropdown min-w-0 w-full sm:w-auto sm:min-w-[12rem]"
       />
     </template>
 
@@ -226,5 +253,73 @@
     padding: 0;
     cursor: pointer;
     font: inherit;
+  }
+
+  :deep(.dataview-control.p-calendar) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 0.375rem;
+    background: var(--surface-section);
+    box-shadow: none;
+    overflow: hidden;
+  }
+
+  :deep(.dataview-control.p-calendar:hover) {
+    border-color: var(--surface-border);
+    background: var(--surface-ground);
+  }
+
+  :deep(.dataview-control.p-calendar:focus-within) {
+    border-color: var(--primary-color);
+  }
+
+  :deep(.dataview-control.p-calendar .p-inputtext) {
+    flex: 1;
+    width: 100%;
+    min-height: auto;
+    border: 0;
+    background: transparent;
+    color: var(--text-color);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    box-shadow: none;
+    padding-block: 0.5rem;
+  }
+
+  :deep(.dataview-control.p-calendar .p-inputtext:hover),
+  :deep(.dataview-control.p-calendar .p-inputtext:enabled:focus) {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  :deep(.dataview-control.p-calendar .p-inputtext::placeholder) {
+    color: var(--text-color-secondary);
+  }
+
+  :deep(.dataview-control.p-calendar .p-datepicker-trigger),
+  :deep(.dataview-control.p-calendar > button) {
+    flex-shrink: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    color: var(--text-color-secondary);
+    padding: 0 0.75rem;
+    width: auto;
+    min-width: 0;
+    height: 100%;
+  }
+
+  :deep(.dataview-control.p-calendar .p-datepicker-trigger:hover),
+  :deep(.dataview-control.p-calendar > button:hover) {
+    background: transparent;
+    color: var(--text-color-secondary);
+  }
+
+  :deep(.dataview-control.p-calendar .p-datepicker-trigger:focus) {
+    outline: none;
+    box-shadow: none;
   }
 </style>

@@ -755,21 +755,31 @@
   })
 
   // Breadcrumb middle segment. Only the 'from-deployment' entry names the single
-  // deployment in scope ("Deployments › <name> › New release"); every other entry
-  // (resource, workload, global) keeps the generic "Releases" fallback — a Workload
-  // binds many Deployment Settings, so naming just one would misrepresent scope.
-  const breadcrumbEntityName = computed(() =>
-    isFromDeployment.value ? deploymentName.value || undefined : undefined
-  )
+  // deployment in scope AND links back to it ("Deployments › <name> › New
+  // release"); every other entry (resource, workload, global) keeps the generic,
+  // linkless "Releases" fallback — a Workload binds many Deployment Settings, so
+  // naming/linking just one would misrepresent scope. The link is resolved here
+  // (not via the store's param-based `toRoute`) because the originating deployment
+  // id travels in the query (`deploymentIds`), not the route params.
+  const breadcrumbItems = computed(() => {
+    const items = route.meta?.breadCrumbs ?? []
+    const name = deploymentName.value
+    const dsId = effDsId.value
+    if (!isFromDeployment.value || !name || dsId == null || dsId === '') return items
+    return items.map((item) =>
+      item.dynamic && item.routeParam
+        ? {
+            ...item,
+            label: name,
+            to: { name: 'deployments-edit', params: { id: String(dsId), tab: 'releases' } }
+          }
+        : item
+    )
+  })
 
-  // The name resolves async (deployments query), so re-run update whenever it (or
-  // the entry scenario) changes; PageHeadingBlock's one-shot setup update isn't
-  // enough on its own.
-  watch(
-    breadcrumbEntityName,
-    (name) => breadcrumbs.update(route.meta?.breadCrumbs ?? [], route, name),
-    { immediate: true }
-  )
+  // The name resolves async (deployments query), so re-run update whenever the
+  // resolved items change; PageHeadingBlock's one-shot setup update isn't enough.
+  watch(breadcrumbItems, (items) => breadcrumbs.update(items), { immediate: true })
 
   // Composition intro (the eyebrow line above the tree):
   //   Scenario A → leads with the deployment ("a new release to <deployment>");
@@ -1312,10 +1322,7 @@
         class="flex flex-col gap-[var(--spacing-1)]"
         data-testid="release-composition__heading"
       >
-        <PageHeadingBlock
-          page-title="Review & deploy"
-          :entity-name="breadcrumbEntityName"
-        />
+        <PageHeadingBlock page-title="Review & deploy" />
         <h1
           class="text-heading-md font-semibold text-[var(--text-color)]"
           data-testid="release-composition__heading-title"

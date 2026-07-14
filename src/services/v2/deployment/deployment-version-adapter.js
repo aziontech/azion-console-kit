@@ -55,7 +55,7 @@ const resolveActorEmail = (actor) => {
 const normalizeVersion = (version) => {
   const source = isObject(version) ? version : {}
   const meta = isObject(source.meta) ? source.meta : {}
-  const state = meta.state ?? source.state ?? null
+  const state = meta.version_state ?? meta.state ?? source.version_state ?? source.state ?? null
 
   const lastActivityAt =
     source.updated_at ?? meta.updated_at ?? source.created_at ?? meta.created_at ?? null

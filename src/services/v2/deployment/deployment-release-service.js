@@ -55,7 +55,7 @@ const buildApiListParams = (params = {}) => {
 
   const state =
     typeof params.state === 'string' && params.state.trim().length > 0
-      ? params.state.trim()
+      ? params.state.trim().toLowerCase()
       : undefined
 
   const ordering =

@@ -228,7 +228,7 @@
     <template #cell-status="{ item }">
       <PrimeTag
         v-if="isActiveVersion(item.state)"
-        value="Active"
+        value="Current"
         severity="success"
         data-testid="deployment-version-history__status-active"
       />
