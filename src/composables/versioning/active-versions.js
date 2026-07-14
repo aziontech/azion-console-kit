@@ -33,7 +33,7 @@ export const activeVersionsForResource = (rows, ref) => {
           policy: row?.deployment_policy ?? null,
           trafficRole: rowResource?.traffic_role ?? null,
           releaseId: rowResource?.release_id ?? null,
-          deployedAt: row?.updated_at ?? row?.created_at ?? null
+          deployedAt: row?.last_modified ?? row?.updated_at ?? row?.created_at ?? null
         })
       }
 

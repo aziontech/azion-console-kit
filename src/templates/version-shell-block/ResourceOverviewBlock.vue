@@ -196,7 +196,7 @@
             <PrimeTag
               v-for="name in item.environments"
               :key="name"
-              severity="secondary"
+              severity="info"
               :value="name"
             />
           </span>
@@ -215,7 +215,7 @@
             <PrimeTag
               v-for="name in item.workloads"
               :key="name"
-              severity="secondary"
+              severity="info"
               :value="name"
             />
           </span>
