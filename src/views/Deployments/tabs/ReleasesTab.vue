@@ -13,7 +13,7 @@
     VERSION_POLL_INTERVAL_MS,
     hasTransientVersions
   } from '@/services/v2/versioning/version-cache-policy'
-  import InlineTag from '@/components/InlineTag'
+  import CurrentBadge from '@/components/CurrentBadge'
   import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
   import { useReleaseDrawerController } from '@/composables/versioning/use-deployment-release-drawer'
@@ -340,7 +340,7 @@
       </template>
 
       <template #cell-deployment="{ item: version }">
-        <div class="min-w-0 flex flex-col gap-1">
+        <div class="min-w-0 flex items-center gap-2">
           <button
             type="button"
             class="version-name-button m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-medium leading-6 text-[var(--text-color)] hover:text-[var(--primary-color)] hover:underline focus-visible:text-[var(--primary-color)] focus-visible:outline-none"
@@ -349,16 +349,7 @@
           >
             <span class="font-mono">{{ version.name || version.id || '--' }}</span>
           </button>
-          <div
-            v-if="version.isCurrent"
-            class="flex items-center gap-1"
-          >
-            <InlineTag
-              text="Current"
-              type="info"
-              icon="pi pi-arrow-circle-up"
-            />
-          </div>
+          <CurrentBadge v-if="version.isCurrent" />
         </div>
       </template>
 
