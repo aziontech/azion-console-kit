@@ -93,7 +93,9 @@ const parseHttpResponse = (response, dataset) => {
   }
 }
 
-const METRICS_DATASET_MAP = {
+// Exported: shared with useEventsData's count-source gate (P2) so "does this
+// events dataset have a rollup?" has a single source of truth.
+export const METRICS_DATASET_MAP = {
   workloadEvents: 'httpMetrics',
   functionEvents: 'edgeFunctionsMetrics',
   functionConsoleEvents: 'edgeFunctionsMetrics',

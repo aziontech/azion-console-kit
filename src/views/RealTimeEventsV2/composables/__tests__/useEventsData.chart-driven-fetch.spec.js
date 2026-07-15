@@ -14,10 +14,9 @@ const DAY = 24 * 60 * 60 * 1000
 
 /**
  * The chart's first request already reports how many events exist in the
- * range+filter. The list loader reuses that total to avoid walking the range
- * window by window:
- *   - small, non-partial total → ONE newest→oldest query over the whole range
- *     (the API skips the empty span between "now" and the data on its own)
+ * range+filter. The list loader reuses that total to stop early:
+ *   - non-partial total → the walk halts the moment every known record was
+ *     collected (bounded windows only — never a full-range query)
  *   - zero total → no list request at all
  */
 describe('useEventsData — chart total drives the list fetch strategy', () => {
@@ -63,20 +62,23 @@ describe('useEventsData — chart total drives the list fetch strategy', () => {
     return { instance, listService, now, begin }
   }
 
-  it('sparse total → a single list query over the whole range, end clamped to now', async () => {
+  it('sparse total → the walk stops at one BOUNDED window once every known record arrived', async () => {
     const rows = Array.from({ length: 71 }, (unused, idx) => ({
       id: `e${idx}`,
       ts: new Date().toISOString()
     }))
-    const { instance, listService, now, begin } = setup({ chartTotal: 71, rows })
+    const { instance, listService, now } = setup({ chartTotal: 71, rows })
 
     await instance.load()
 
-    // Exactly one list request — no window-by-window walk.
+    // One list request, and a bounded one: the known total (71) halts the walk
+    // after the first ≤2h window — never a query over the whole range.
     expect(listService).toHaveBeenCalledTimes(1)
     const call = listService.mock.calls[0][0]
-    // Covers the full range begin, with the end clamped to ~now (not the future).
-    expect(new Date(call.tsRange.tsRangeBegin).getTime()).toBe(begin)
+    const spanMs =
+      new Date(call.tsRange.tsRangeEnd).getTime() - new Date(call.tsRange.tsRangeBegin).getTime()
+    expect(spanMs).toBeLessThanOrEqual(2 * 60 * 60 * 1000)
+    // End clamped to ~now (not the future half of "this week").
     expect(new Date(call.tsRange.tsRangeEnd).getTime()).toBeLessThanOrEqual(now + 1000)
     expect(instance.tableData.value.length).toBe(71)
     expect(instance.hasMoreData.value).toBe(false)

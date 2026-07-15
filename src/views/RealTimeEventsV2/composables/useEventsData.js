@@ -1,16 +1,21 @@
 import { ref, computed, shallowRef } from 'vue'
 import { useGraphQLStore } from '@/stores/graphql-query'
-import { loadSummaryKpis } from '@/services/real-time-events-service-v2/load-events-aggregation'
+import {
+  loadSummaryKpis,
+  METRICS_DATASET_MAP
+} from '@/services/real-time-events-service-v2/load-events-aggregation'
 import { loadEventsCount } from '@/services/real-time-events-service-v2/load-events-count'
 import { buildFilter } from '@/services/real-time-events-service-v2/_shared/filter/build-filter'
+import { buildForTarget } from '@/services/real-time-events-service-v2/_shared/filter/adapters'
+import { resolveChartApi } from '@/services/real-time-events-service-v2/chart-api-router'
 
 const MAX_LIST_RANGE_MS = 2 * 60 * 60 * 1000
 
-// At/below this non-partial chart total the data is sparse enough to fetch with
-// a single newest→oldest query over the whole range (the API skips empty periods)
-// instead of walking it window by window; above it, windowing bounds each scan.
-// Mirrors the aggregate `limit: 10000` used by the count query.
-const SINGLE_QUERY_MAX_TOTAL = 10000
+// A window that exhausts without filling the page grows by this factor before
+// the walk probes the next (older) stretch. Empty/sparse spans then cost a
+// short ladder of BOUNDED scans (total ≤ ~1.33× the window that finally hits
+// data) instead of one query that makes the engine scan the whole range.
+const WINDOW_GROWTH_FACTOR = 4
 
 // Max time the list fetch waits on the chart summary before proceeding on its
 // own (fix F5). The chart summary is only an optimization input; blocking the
@@ -64,7 +69,10 @@ export function useEventsData({
   const initialLoadDone = ref(false)
 
   let currentWindowEnd = null
-  let currentWindowOffset = 0
+  let currentWindowMs = MAX_LIST_RANGE_MS
+  // Paging state for the stretch being read: [beginMs, endMs] plus the ts
+  // cursor, the natural-key dedupe set and the offset-fallback fields.
+  let segment = null
   let isShortRange = false
   let loadCallId = 0
   let chartLoadToken = 0
@@ -80,20 +88,6 @@ export function useEventsData({
   // chart's FIRST request returns (before the optional KPI fallback), so the list
   // loader picks its fetch strategy without waiting on that second request.
   let onChartSummary = null
-
-  const getWindowFilter = (windowEnd) => {
-    const filter = filterData.value
-    const begin = new Date(filter.tsRange.tsRangeBegin).getTime()
-    const wBegin = Math.max(windowEnd - MAX_LIST_RANGE_MS, begin)
-    return {
-      ...filter,
-      tsRange: {
-        ...filter.tsRange,
-        tsRangeBegin: new Date(wBegin).toISOString(),
-        tsRangeEnd: new Date(windowEnd).toISOString()
-      }
-    }
-  }
 
   // Delegates to the shared `buildFilter` (L1 filter domain), reading the
   // current `filterData.value?.fields`. Byte-equivalent to the previous inline
@@ -128,17 +122,36 @@ export function useEventsData({
     recordsCount.value = total
   }
 
+  // True when the chart-summary total (Metrics rollup) can be the badge source:
+  // rollup-routed range (>30min), a rollup dataset exists, the chart co-fire is
+  // on, and EVERY active filter clause translates to the Metrics dataset. Then
+  // the raw-events count query — a full-range scan — is skipped.
+  const aggregateCountCovers = () => {
+    const metricsDataset = METRICS_DATASET_MAP[tabSelected.value?.dataset]
+    if (!metricsDataset) return false
+    const { tsRangeBegin, tsRangeEnd } = filterData.value?.tsRange || {}
+    if (resolveChartApi(tsRangeBegin, tsRangeEnd) !== 'metrics') return false
+    if (!hasChartConfig.value || !loadChartAggregation.value) return false
+    return !buildForTarget(filterData.value?.fields || [], {
+      api: 'metrics',
+      dataset: metricsDataset
+    }).partial
+  }
+
   // ── Count (only when filters are active) ─────────────────────────────
   // Range + 24h-fallback query logic lives in the numeric `loadEventsCount`
   // service (§3.10); this wrapper keeps the supersession token, active-filters
   // gate, and the single recency-guarded numeric writer (no string round-trip).
-  const loadTotalCount = async () => {
+  const loadTotalCount = async ({ skipRawQuery = false } = {}) => {
     const myToken = ++countToken
     hasAccurateCount = false
     knownTotalCount = null
     const dataset = tabSelected.value?.dataset
     if (!dataset || !filterData.value?.tsRange) return
     if (!hasActiveFilters()) return
+    // P2: the rollup total covers this range+filter — the chart summary writes
+    // the badge and the raw full-range count is not fired.
+    if (skipRawQuery) return
 
     const total = await loadEventsCount({
       dataset,
@@ -292,10 +305,10 @@ export function useEventsData({
       const parsed = typeof payload === 'string' ? JSON.parse(payload) : payload
       if (!parsed?.query) return
       const variables = { ...(parsed.variables ?? {}) }
-      // Long ranges are fetched in narrow time windows (getWindowFilter); that
-      // window leaks into the captured variables, so the playground would
-      // reproduce a ~2h slice instead of the user-selected range. Restore the
-      // full tsRange so the stored query matches the selection.
+      // Long ranges are fetched in narrow segments; that segment tsRange leaks
+      // into the captured variables, so the playground would reproduce a slice
+      // instead of the user-selected range. Restore the full tsRange so the
+      // stored query matches the selection.
       const fullRange = filterData.value?.tsRange
       if (fullRange?.tsRangeBegin && fullRange?.tsRangeEnd && 'tsRange_begin' in variables) {
         variables.tsRange_begin = fullRange.tsRangeBegin
@@ -307,64 +320,124 @@ export function useEventsData({
     }
   }
 
-  // Single query over [tsRangeBegin, currentWindowEnd], newest→oldest, with
-  // offset paging. The API skips any empty span on its own, so this both serves
-  // short ranges and acts as the one-shot fallback when the windowed walk hits
-  // an empty window (probing ~96 windows one by one froze the UI for minutes).
-  const fetchWideRemainder = async (target) => {
-    const clamped = {
-      ...filterData.value,
-      tsRange: {
-        ...filterData.value.tsRange,
-        tsRangeEnd: new Date(currentWindowEnd).toISOString()
-      }
+  // ── Fetch engine: geometric window walk + ts-cursor paging ────────────
+  // The range is read newest→oldest in segments. A segment that exhausts
+  // without filling the page makes the next one WINDOW_GROWTH_FACTOR× wider
+  // (bounded-scan ladder). Inside a segment, pages descend by ts CURSOR —
+  // shrinking tsRangeEnd to the oldest delivered ts — instead of `offset`,
+  // so the engine reads only the granules of the next page rather than
+  // re-scanning and discarding every previous page.
+
+  // Natural row identity for boundary dedupe: the synthetic `row.id` is
+  // regenerated on every fetch and can never match across requests.
+  const rowNaturalKey = (row) =>
+    `${row?.ts}|${JSON.stringify(row?.summary ?? { ...row, id: undefined })}`
+
+  const openSegment = (beginMs, endMs) => {
+    segment = {
+      beginMs,
+      endMs,
+      cursorEndMs: endMs,
+      // natural key → { count, tsMs }: MULTISET of delivered rows. Dedupe skips
+      // only the occurrences already delivered per key, so identical-looking
+      // rows (same ts + same fields) still all load; drives the offset baseline.
+      seen: new Map(),
+      offsetMode: false,
+      offset: 0,
+      exhausted: false
     }
-    const res = await listService.value(
-      { ...clamped, pageSize: target, offset: currentWindowOffset },
-      { onQuery }
-    )
-    const records = res.data || []
-    currentWindowOffset += records.length
-    return records
+  }
+
+  const segmentQuery = (pageSizeArg) => ({
+    ...filterData.value,
+    tsRange: {
+      ...filterData.value.tsRange,
+      tsRangeBegin: new Date(segment.beginMs).toISOString(),
+      tsRangeEnd: new Date(segment.cursorEndMs).toISOString()
+    },
+    pageSize: pageSizeArg,
+    ...(segment.offsetMode && { offset: segment.offset })
+  })
+
+  /**
+   * One page from the current segment. Cursor mode over-asks by 1 row and steps
+   * to oldest-kept-ts +1ms: the overlap keeps the step lossless under inclusive
+   * AND exclusive tsRange-end semantics, with the seen-set absorbing the
+   * re-included boundary rows. A full page with zero fresh rows (one instant
+   * holding > pageSize events) falls back to offset paging WITHIN this bounded
+   * segment — exactly the legacy semantics, now the worst case instead of the norm.
+   */
+  const fetchSegmentPage = async (want) => {
+    const seg = segment
+    const asked = seg.offsetMode ? want : want + 1
+    const res = await listService.value(segmentQuery(asked), { onQuery })
+    const raw = res.data || []
+    const fresh = []
+    const pageOccurrences = new Map()
+    for (const row of raw) {
+      // Overlap pad: rows past `want` stay un-marked so the next page re-serves them.
+      if (fresh.length >= want) break
+      const key = rowNaturalKey(row)
+      const occurrence = (pageOccurrences.get(key) || 0) + 1
+      pageOccurrences.set(key, occurrence)
+      const entry = seg.seen.get(key)
+      // Multiset skip: the first `entry.count` occurrences of a key in ts_DESC
+      // order were already delivered by previous (overlapping) pages.
+      if (entry && occurrence <= entry.count) continue
+      if (entry) entry.count = occurrence
+      else seg.seen.set(key, { count: occurrence, tsMs: new Date(row.ts).getTime() })
+      fresh.push(row)
+    }
+    if (raw.length < asked) {
+      seg.exhausted = true
+      return fresh
+    }
+    if (seg.offsetMode) {
+      seg.offset += raw.length
+      return fresh
+    }
+    if (fresh.length === 0) {
+      seg.offsetMode = true
+      let alreadyConsumed = 0
+      for (const entry of seg.seen.values()) {
+        if (entry.tsMs <= seg.cursorEndMs) alreadyConsumed += entry.count
+      }
+      seg.offset = alreadyConsumed
+      return fresh
+    }
+    const oldestKeptMs = new Date(fresh[fresh.length - 1].ts).getTime()
+    if (Number.isFinite(oldestKeptMs)) {
+      seg.cursorEndMs = Math.min(seg.cursorEndMs, oldestKeptMs + 1)
+    } else {
+      // Rows without a usable ts cannot drive a cursor — stop this segment.
+      seg.exhausted = true
+    }
+    return fresh
   }
 
   const fetchPage = async (target, callId = loadCallId) => {
     const originalBegin = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
     let records = []
-    if (isShortRange) return fetchWideRemainder(target)
-    while (records.length < target && currentWindowEnd > originalBegin) {
-      // A superseded load must not keep walking windows and corrupting the
-      // shared cursor (fix C5).
+    while (records.length < target) {
+      // A superseded load must not keep walking and corrupting the shared
+      // cursor state (fix C5).
       if (callId !== loadCallId) break
-      const windowFilter = getWindowFilter(currentWindowEnd)
-      const remaining = target - records.length
-      const res = await listService.value(
-        { ...windowFilter, pageSize: remaining, offset: currentWindowOffset },
-        { onQuery }
-      )
-      const batch = res.data || []
+      if (!segment || segment.exhausted) {
+        if (isShortRange) {
+          if (segment) break
+          openSegment(originalBegin, currentWindowEnd)
+        } else {
+          if (segment) {
+            currentWindowEnd = segment.beginMs
+            currentWindowMs *= WINDOW_GROWTH_FACTOR
+          }
+          if (currentWindowEnd <= originalBegin) break
+          openSegment(Math.max(currentWindowEnd - currentWindowMs, originalBegin), currentWindowEnd)
+        }
+      }
+      const batch = await fetchSegmentPage(target - records.length)
       records = [...records, ...batch]
-      if (batch.length === 0) {
-        // First EMPTY window: stop walking. One wide probe over the remaining
-        // range answers "is there anything older at all" in a single request —
-        // sparse data still loads, and a truly empty tail stops at 2 requests
-        // instead of walking every 2h window to the range start.
-        currentWindowEnd = new Date(windowFilter.tsRange.tsRangeBegin).getTime()
-        currentWindowOffset = 0
-        isShortRange = true
-        if (callId !== loadCallId || currentWindowEnd <= originalBegin) break
-        const wide = await fetchWideRemainder(target - records.length)
-        records = [...records, ...wide]
-        break
-      }
-      if (batch.length < remaining) {
-        // Window exhausted — move to the next (older) window.
-        currentWindowEnd = new Date(windowFilter.tsRange.tsRangeBegin).getTime()
-        currentWindowOffset = 0
-        if (knownTotalCount != null && records.length >= knownTotalCount) break
-      } else {
-        currentWindowOffset += batch.length
-      }
+      if (knownTotalCount != null && records.length >= knownTotalCount) break
     }
     return records
   }
@@ -435,7 +508,13 @@ export function useEventsData({
       } else {
         loadChart().catch(() => {})
       }
-      loadTotalCount().catch(() => {})
+      // P2: when the rollup covers range+filter, the chart-summary total is the
+      // badge source and the raw count is skipped; if that summary fails to
+      // deliver a usable total, the raw count re-fires below as fallback.
+      const countCoveredByAggregate = !skipChart && aggregateCountCovers()
+      const summaryProvidesCount = (summary) =>
+        !!summary && !summary.partialFilter && typeof summary.total === 'number'
+      loadTotalCount({ skipRawQuery: countCoveredByAggregate }).catch(() => {})
       const originalBegin = new Date(filterData.value.tsRange.tsRangeBegin).getTime()
       const originalEnd = new Date(filterData.value.tsRange.tsRangeEnd).getTime()
       // Calendar presets like "this week" / "today" end at the end of the
@@ -443,13 +522,8 @@ export function useEventsData({
       // future end never leaks into the query (the future has no data and would
       // otherwise be probed first).
       currentWindowEnd = Math.min(originalEnd, Date.now())
-      currentWindowOffset = 0
-
-      // Reuse the chart's in-flight first request to pick the list fetch strategy
-      // instead of blindly walking window by window. A small non-partial total
-      // means sparse data → one newest→oldest query suffices; a zero total means
-      // the list is empty up front, so we skip the list request entirely.
-      let singleQuery = false
+      currentWindowMs = MAX_LIST_RANGE_MS
+      segment = null
       // Bound the wait on the chart summary (fix F5). It is only an OPTIMIZATION
       // input (picks the single-query fast path + seeds the displayed count); the
       // windowed walk is correct without it. Blocking the list on a slow chart is
@@ -470,14 +544,16 @@ export function useEventsData({
       }
       if (chartSummary !== undefined) {
         applyChartTotal(chartSummary)
+        // P2 fallback: the summary this load counted on (error/partial/null
+        // total) cannot feed the badge — fire the raw count after all.
+        if (countCoveredByAggregate && !summaryProvidesCount(chartSummary)) {
+          loadTotalCount().catch(() => {})
+        }
         if (chartSummary && !chartSummary.partialFilter && chartSummary.total === 0) {
           tableData.value = []
           recordsCount.value = 0
           hasMoreData.value = false
           return
-        }
-        if (chartSummary && !chartSummary.partialFilter && typeof chartSummary.total === 'number') {
-          singleQuery = chartSummary.total <= SINGLE_QUERY_MAX_TOTAL
         }
       } else {
         // Chart was slow: don't block the list. Apply its total to the count when
@@ -487,6 +563,9 @@ export function useEventsData({
           .then((late) => {
             if (callId !== loadCallId) return
             applyChartTotal(late)
+            if (countCoveredByAggregate && !summaryProvidesCount(late)) {
+              loadTotalCount().catch(() => {})
+            }
             // The list may have already resolved EMPTY before the slow chart
             // total landed — light the divergence indicator retroactively.
             if ((late?.total ?? 0) > 0 && !late?.partialFilter && tableData.value.length === 0) {
@@ -496,7 +575,7 @@ export function useEventsData({
           .catch(() => {})
       }
 
-      isShortRange = singleQuery || currentWindowEnd - originalBegin <= MAX_LIST_RANGE_MS
+      isShortRange = currentWindowEnd - originalBegin <= MAX_LIST_RANGE_MS
       const records = await fetchPage(pageSize.value, callId)
       if (callId !== loadCallId) return
       tableData.value = records
