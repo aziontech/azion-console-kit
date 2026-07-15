@@ -475,7 +475,7 @@ describe('ReleaseComposerView — cancel', () => {
 
     await wrapper.find('[data-testid="release-composition__cancel"]').trigger('click')
 
-    expect(routerPush).toHaveBeenCalledWith({ name: 'deployments' })
+    expect(routerPush).toHaveBeenCalledWith({ name: 'deployments-list' })
   })
 })
 

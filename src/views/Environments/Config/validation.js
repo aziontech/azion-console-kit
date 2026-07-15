@@ -13,22 +13,23 @@ export const validationSchema = yup.object({
   log_verbosity: yup.string().oneOf(['normal', 'verbose']).default('normal').label('Log Verbosity'),
   robots_policy: yup.string().oneOf(['index', 'noindex']).default('index').label('Robots Policy'),
   protection: yup.object({
-    azion_authentication: yup.object({
-      enabled: yup.boolean().default(false)
-    }),
-    password_protection: yup.object({
-      enabled: yup.boolean().default(false),
-      secret_id: yup.string().nullable().default(null).label('Secret')
-    }),
+    // Azion Authentication, Password Protection and SSO Enforcement hidden until the API supports them.
+    // azion_authentication: yup.object({
+    //   enabled: yup.boolean().default(false)
+    // }),
+    // password_protection: yup.object({
+    //   enabled: yup.boolean().default(false),
+    //   secret_id: yup.string().nullable().default(null).label('Secret')
+    // }),
     ip_allowlist: yup.object({
       enabled: yup.boolean().default(false),
       cidrs: yup.string().nullable().default('').label('IPs/CIDRs')
-    }),
-    sso_enforcement: yup.object({
-      enabled: yup.boolean().default(false),
-      idp_id: yup.string().nullable().default(null).label('Identity Provider'),
-      allowed_domains: yup.array().of(yup.string()).default([]).label('Allowed Domains')
     })
+    // sso_enforcement: yup.object({
+    //   enabled: yup.boolean().default(false),
+    //   idp_id: yup.string().nullable().default(null).label('Identity Provider'),
+    //   allowed_domains: yup.array().of(yup.string()).default([]).label('Allowed Domains')
+    // })
   }),
   branch_tracking: yup.object({
     enabled: yup.boolean().default(false),
@@ -73,10 +74,11 @@ export const initialValues = {
   log_verbosity: 'normal',
   robots_policy: 'index',
   protection: {
-    azion_authentication: { enabled: false },
-    password_protection: { enabled: false, secret_id: null },
-    ip_allowlist: { enabled: false, cidrs: '' },
-    sso_enforcement: { enabled: false, idp_id: null, allowed_domains: [] }
+    // Azion Authentication, Password Protection and SSO Enforcement hidden until the API supports them.
+    // azion_authentication: { enabled: false },
+    // password_protection: { enabled: false, secret_id: null },
+    ip_allowlist: { enabled: false, cidrs: '' }
+    // sso_enforcement: { enabled: false, idp_id: null, allowed_domains: [] }
   },
   branch_tracking: { enabled: false, mode: 'branch_starts_with', branch_match: '' },
   environmentVariables: {}

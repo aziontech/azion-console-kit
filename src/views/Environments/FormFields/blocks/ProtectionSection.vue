@@ -1,12 +1,13 @@
 <script setup>
-  import { computed } from 'vue'
+  // Azion Authentication, Password Protection and SSO Enforcement hidden until the API supports them.
+  // import { computed } from 'vue'
   import { useField } from 'vee-validate'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  import FieldText from '@aziontech/webkit/field-text'
+  // import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import LabelBlock from '@aziontech/webkit/label'
-  import TextArea from 'primevue/textarea'
+  // import LabelBlock from '@aziontech/webkit/label'
+  // import TextArea from 'primevue/textarea'
 
   defineOptions({ name: 'environment-form-protection-section' })
 
@@ -17,26 +18,27 @@
     }
   })
 
-  const { value: azionAuthenticationEnabled } = useField('protection.azion_authentication.enabled')
-  const { value: passwordProtectionEnabled } = useField('protection.password_protection.enabled')
-  const { value: passwordProtectionSecretId } = useField('protection.password_protection.secret_id')
+  // Azion Authentication, Password Protection and SSO Enforcement hidden until the API supports them.
+  // const { value: azionAuthenticationEnabled } = useField('protection.azion_authentication.enabled')
+  // const { value: passwordProtectionEnabled } = useField('protection.password_protection.enabled')
+  // const { value: passwordProtectionSecretId } = useField('protection.password_protection.secret_id')
   const { value: ipAllowlistEnabled } = useField('protection.ip_allowlist.enabled')
   const { value: ipAllowlistCidrs } = useField('protection.ip_allowlist.cidrs')
-  const { value: ssoEnforcementEnabled } = useField('protection.sso_enforcement.enabled')
-  const { value: ssoEnforcementIdpId } = useField('protection.sso_enforcement.idp_id')
-  const { value: ssoEnforcementAllowedDomains } = useField(
-    'protection.sso_enforcement.allowed_domains'
-  )
+  // const { value: ssoEnforcementEnabled } = useField('protection.sso_enforcement.enabled')
+  // const { value: ssoEnforcementIdpId } = useField('protection.sso_enforcement.idp_id')
+  // const { value: ssoEnforcementAllowedDomains } = useField(
+  //   'protection.sso_enforcement.allowed_domains'
+  // )
 
-  const allowedDomainsText = computed({
-    get: () =>
-      Array.isArray(ssoEnforcementAllowedDomains.value)
-        ? ssoEnforcementAllowedDomains.value.join('\n')
-        : '',
-    set: (value) => {
-      ssoEnforcementAllowedDomains.value = String(value ?? '').split('\n')
-    }
-  })
+  // const allowedDomainsText = computed({
+  //   get: () =>
+  //     Array.isArray(ssoEnforcementAllowedDomains.value)
+  //       ? ssoEnforcementAllowedDomains.value.join('\n')
+  //       : '',
+  //   set: (value) => {
+  //     ssoEnforcementAllowedDomains.value = String(value ?? '').split('\n')
+  //   }
+  // })
 </script>
 
 <template>
@@ -47,6 +49,8 @@
   >
     <template #inputs>
       <div class="flex flex-col w-full gap-6">
+        <!--
+          Azion Authentication and Password Protection hidden until the API supports them.
         <div class="flex flex-col w-full gap-2">
           <FieldSwitchBlock
             nameField="protection.azion_authentication.enabled"
@@ -88,6 +92,7 @@
             />
           </div>
         </div>
+        -->
 
         <div class="flex flex-col w-full gap-2">
           <FieldSwitchBlock
@@ -125,6 +130,8 @@
           </div>
         </div>
 
+        <!--
+          SSO Enforcement hidden until the API supports it.
         <div class="flex flex-col w-full gap-2">
           <FieldSwitchBlock
             nameField="protection.sso_enforcement.enabled"
@@ -169,6 +176,7 @@
             </div>
           </div>
         </div>
+        -->
       </div>
     </template>
   </FormHorizontal>

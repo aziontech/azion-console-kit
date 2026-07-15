@@ -3,8 +3,9 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  import FieldNumber from '@aziontech/webkit/field-number'
+  // Strategy Defaults hidden until the API supports strategy_defaults.
+  // import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
+  // import FieldNumber from '@aziontech/webkit/field-number'
   import RadioButton from '@aziontech/webkit/radiobutton'
   import LabelBlock from '@aziontech/webkit/label'
   import ScopedVariablesInfoTable from '@/views/Variables/v6/components/ScopedVariablesInfoTable.vue'
@@ -34,10 +35,11 @@
     setValue: setDeploymentVersionPolicy,
     errorMessage: deploymentVersionPolicyError
   } = useField('deployment_policy')
-  const { value: strategyCanaryEnabled } = useField('strategy_canary_enabled')
-  const { value: strategyCanaryDefaultPercentage } = useField('strategy_canary_default_percentage')
-  const { value: strategySkewEnabled } = useField('strategy_skew_enabled')
-  const { value: strategySkewDefaultTtlSeconds } = useField('strategy_skew_default_ttl_seconds')
+  // Strategy Defaults hidden until the API supports strategy_defaults.
+  // const { value: strategyCanaryEnabled } = useField('strategy_canary_enabled')
+  // const { value: strategyCanaryDefaultPercentage } = useField('strategy_canary_default_percentage')
+  // const { value: strategySkewEnabled } = useField('strategy_skew_enabled')
+  // const { value: strategySkewDefaultTtlSeconds } = useField('strategy_skew_default_ttl_seconds')
 
   const bindingPolicyOptions = [
     {
@@ -198,6 +200,8 @@
     </template>
   </FormHorizontal>
 
+  <!--
+    Strategy Defaults hidden until the API supports strategy_defaults.
   <FormHorizontal
     title="Strategy Defaults"
     description="Default rollout behavior applied to new versions of this deployment."
@@ -267,6 +271,7 @@
       </div>
     </template>
   </FormHorizontal>
+  -->
 
   <FormHorizontal
     v-if="props.isEdit && props.resourceId"

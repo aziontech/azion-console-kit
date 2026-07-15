@@ -1311,7 +1311,7 @@
   }
 
   const onCancel = () => {
-    router.push({ name: 'deployments' })
+    router.push({ name: 'deployments-list' })
   }
 </script>
 
