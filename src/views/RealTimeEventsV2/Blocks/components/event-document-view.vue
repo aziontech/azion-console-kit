@@ -382,8 +382,7 @@
             class="json-pre p-4 text-xs text-color surface-ground rounded-[var(--border-radius)] overflow-x-auto leading-5"
             :class="jsonPreClass"
             data-testid="event-document-json"
-            >{{ jsonDocument }}</pre
-          >
+            >{{ jsonDocument }}</pre>
         </div>
       </TabPanel>
     </TabView>
