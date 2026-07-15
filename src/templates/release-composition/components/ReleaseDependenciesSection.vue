@@ -4,9 +4,10 @@
    * a parent resource card (Application → Functions/Connectors; Firewall →
    * Network Lists/WAF). Renders one collapsible group per collection; each open
    * group lists its instances as a `LazyResourceSelectField` (instance) +
-   * `ResourceVersionField` (version). Instances are seeded automatically from
-   * their source (the application's function instances / the active release);
-   * there is no manual "Add".
+   * `ResourceVersionField` (version). Instances are usually seeded automatically
+   * from their source (the application's function instances / the active release).
+   * When `allowAdd` is set (the "Additional dependencies" section) each group also
+   * renders an "Add" button so the user can append manual instances.
    *
    * Fully controlled: every value (including each group's `open` flag) comes
    * from props; all mutation flows back through events. No fetching, no
@@ -30,6 +31,7 @@
    * @event update:instance-resource({ type, id, value }) — instance selection.
    * @event update:instance-version({ type, id, value }) — version selection.
    * @event remove-instance({ type, id }) — remove an instance from a group.
+   * @event add-instance(type) — request to append a manual instance (allowAdd only).
    */
   import PrimeButton from '@aziontech/webkit/button'
 
@@ -42,6 +44,18 @@
     collections: {
       type: Array,
       default: () => []
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    loadingMessage: {
+      type: String,
+      default: 'Detecting dependencies…'
+    },
+    allowAdd: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -49,10 +63,13 @@
     'toggle-group',
     'update:instance-resource',
     'update:instance-version',
-    'remove-instance'
+    'remove-instance',
+    'add-instance'
   ])
 
   const onToggleGroup = (type) => emit('toggle-group', type)
+
+  const onAdd = (type) => emit('add-instance', type)
 
   const onResourceChange = (type, id, value) =>
     emit('update:instance-resource', { type, id, value })
@@ -73,6 +90,17 @@
     >
       Dependencies
     </span>
+
+    <Transition name="deps-loading-fade">
+      <div
+        v-if="loading"
+        class="flex items-center gap-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
+        data-testid="release-composition__deps-loading"
+      >
+        <i class="pi pi-spinner deps-loading-spinner" />
+        <span>{{ loadingMessage }}</span>
+      </div>
+    </Transition>
 
     <div
       class="flex flex-col gap-[var(--spacing-3)] ml-[var(--spacing-2)] border-l border-[var(--surface-border)] pl-[var(--spacing-3)]"
@@ -255,6 +283,18 @@
                   </div>
                 </div>
               </template>
+
+              <PrimeButton
+                v-if="allowAdd"
+                type="button"
+                icon="pi pi-plus"
+                size="small"
+                outlined
+                :label="`Add ${collection.label}`"
+                class="self-start"
+                :data-testid="`release-composition__deps-add-${collection.type}`"
+                @click="onAdd(collection.type)"
+              />
             </div>
           </div>
         </div>
@@ -264,6 +304,41 @@
 </template>
 
 <style scoped>
+  .deps-loading-spinner {
+    animation: deps-loading-spin 1s linear infinite;
+  }
+
+  @keyframes deps-loading-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .deps-loading-fade-enter-active,
+  .deps-loading-fade-leave-active {
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+  .deps-loading-fade-enter-from,
+  .deps-loading-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .deps-loading-spinner {
+      animation: none;
+    }
+    .deps-loading-fade-enter-active,
+    .deps-loading-fade-leave-active {
+      transition: none;
+    }
+  }
+
   .collapsible-panel {
     display: grid;
     grid-template-rows: 0fr;

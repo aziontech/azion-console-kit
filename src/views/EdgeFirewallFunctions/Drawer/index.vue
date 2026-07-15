@@ -50,6 +50,7 @@
         :listEdgeFunctionsService="edgeFunctionService.listEdgeFunctionsDropdown"
         :loadEdgeFunctionService="edgeFunctionService.loadEdgeFunction"
         :disabledFields="readOnly"
+        :deferUntilValue="true"
       />
     </template>
     <template #action-bar="{ onSubmit, onCancel, loading }">

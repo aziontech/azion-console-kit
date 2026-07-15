@@ -15,8 +15,6 @@ import { resolveReleaseResources } from '@/views/Deployments/utils/resolveReleas
 // blank. Order: resolved/adapter name → resource id → label → em dash.
 const FALLBACK_LABEL = '--'
 
-const DRAWER_RESOURCE_TYPES = new Set(['application', 'firewall', 'custom_page'])
-
 const getUtcDayRange = (isoDate) => {
   if (!isoDate) return null
   const date = new Date(isoDate)
@@ -30,10 +28,7 @@ const getUtcDayRange = (isoDate) => {
   }
 }
 
-const filterDrawerResources = (resources) =>
-  (Array.isArray(resources) ? resources : []).filter((resource) =>
-    DRAWER_RESOURCE_TYPES.has(resource?.type)
-  )
+const toResourceList = (resources) => (Array.isArray(resources) ? resources : [])
 
 const withResolvedName = (resource) => ({
   ...resource,
@@ -65,11 +60,13 @@ export function useDeploymentReleaseDrawer({ release, visible, emit } = {}) {
 
   // Single fallback pass over the resolved resources: the adapter seeds `name`,
   // `resolveReleaseResources` enriches it, here we guarantee a deterministic value.
+  // Every release resource is shown; the adapter already orders them so the main
+  // ones (application, firewall, custom_page) come first.
   const displayRelease = computed(() => {
     const base = detail.value ?? currentRelease.value
     if (!base) return base
     const source = resolvedResources.value.length ? resolvedResources.value : (base.resources ?? [])
-    const resources = filterDrawerResources(source).map(withResolvedName)
+    const resources = toResourceList(source).map(withResolvedName)
     return { ...base, resources }
   })
 
@@ -185,12 +182,12 @@ export function useDeploymentReleaseDrawer({ release, visible, emit } = {}) {
       const { data } = await deploymentReleaseService.getReleaseByIdService(deploymentId, releaseId)
       if (seq !== resolveSeq) return
       detail.value = data
-      const drawerResources = filterDrawerResources(data?.resources)
-      resolvedResources.value = drawerResources
+      const releaseResources = toResourceList(data?.resources)
+      resolvedResources.value = releaseResources
 
       // Single resolution pipeline: enrich names via the util, guarded against
       // stale writes from a newer release selection.
-      const enriched = await resolveReleaseResources(drawerResources)
+      const enriched = await resolveReleaseResources(releaseResources)
       if (seq !== resolveSeq) return
       resolvedResources.value = enriched
 

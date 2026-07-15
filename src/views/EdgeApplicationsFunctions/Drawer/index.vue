@@ -46,6 +46,7 @@
         @toggleDrawer="handleToggleDrawer"
         @additionalErrors="handleAdditionalErrors"
         :disabledFields="readOnly"
+        :deferUntilValue="true"
       />
     </template>
     <template #action-bar="{ onSubmit, onCancel, loading }">

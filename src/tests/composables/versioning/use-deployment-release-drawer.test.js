@@ -113,7 +113,9 @@ describe('useDeploymentReleaseDrawer', () => {
     expect(api.displayRelease.value.resources[0].name).toBe('resolved-name')
   })
 
-  it('shows only application, firewall and custom_page resources in the drawer', async () => {
+  it('shows every release resource, in the order the adapter provides them', async () => {
+    // The adapter already orders resources main-first (application, firewall,
+    // custom_page) ahead of the rest; the drawer surfaces all of them untouched.
     const allResources = [
       { type: 'application', id: 'app-1', name: 'app' },
       { type: 'firewall', id: 'fw-1', name: 'fw' },
@@ -122,7 +124,6 @@ describe('useDeploymentReleaseDrawer', () => {
       { type: 'connector', id: 'cn-1', name: 'conn' }
     ]
     getReleaseByIdService.mockResolvedValue({ data: { id: 'R1', resources: allResources } })
-    // The resolver only ever receives the already-filtered drawer resources.
     resolveReleaseResources.mockImplementation(async (resources) => resources)
 
     const { visible, api } = setup()
@@ -130,12 +131,8 @@ describe('useDeploymentReleaseDrawer', () => {
     await flush()
 
     const types = api.displayRelease.value.resources.map((resource) => resource.type)
-    expect(types).toEqual(['application', 'firewall', 'custom_page'])
-    expect(resolveReleaseResources).toHaveBeenCalledWith([
-      { type: 'application', id: 'app-1', name: 'app' },
-      { type: 'firewall', id: 'fw-1', name: 'fw' },
-      { type: 'custom_page', id: 'cp-1', name: 'page' }
-    ])
+    expect(types).toEqual(['application', 'firewall', 'custom_page', 'function', 'connector'])
+    expect(resolveReleaseResources).toHaveBeenCalledWith(allResources)
   })
 
   it('stale guard: a newer release wins over an older in-flight resolution', async () => {

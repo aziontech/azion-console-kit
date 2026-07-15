@@ -210,6 +210,10 @@
       data-testid="release-composition__resource-select"
       @update:modelValue="onChange"
     >
+      <template #dropdownicon>
+        <i class="pi pi-chevron-down text-body-sm text-[var(--text-color-secondary)]" />
+      </template>
+
       <template #value="{ value }">
         <span
           v-if="value != null && value !== ''"
@@ -272,5 +276,17 @@
   :deep(.release-composition-control) {
     background: var(--surface-section) !important;
     border-color: var(--surface-border) !important;
+  }
+
+  /* Match the webkit ResourceVersionField dropdown (h-10 / 40px) so the Resource
+     and Version selectors line up — mirrors CanaryStrategyField's normalization. */
+  :deep(.release-composition-control.p-dropdown) {
+    height: 40px;
+    min-height: 40px;
+  }
+
+  :deep(.release-composition-control .p-dropdown-label) {
+    display: flex;
+    align-items: center;
   }
 </style>

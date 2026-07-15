@@ -27,12 +27,13 @@
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block/index.vue'
   import ReleaseCompositionTree from '@/templates/release-composition/components/ReleaseCompositionTree.vue'
+  import ReleaseDependenciesSection from '@/templates/release-composition/components/ReleaseDependenciesSection.vue'
   import DeploymentSettingsPicker from '@/templates/release-composition/components/DeploymentSettingsPicker.vue'
   import CanaryStrategyField from '@/templates/release-composition/components/CanaryStrategyField.vue'
   import ImpactPanel from '@/templates/release-composition/components/ImpactPanel.vue'
   import DeploymentProgressDialog from '@/templates/release-composition/components/DeploymentProgressDialog.vue'
 
-  import { useReleaseStore } from '@/stores/release'
+  import { useReleaseStore, ADDITIONAL_PARENT } from '@/stores/release'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { LATEST_READY } from '@/templates/release-composition/version-options'
   import { useReleaseComposition } from '@/templates/release-composition/use-release-composition'
@@ -73,7 +74,11 @@
   const OWNED_COLLECTIONS = {
     application: ['function', 'connector'],
     firewall: ['function', 'network_list', 'waf'],
-    custom_page: ['connector']
+    custom_page: ['connector'],
+    // The "Additional dependencies" bucket — resources the user adds manually
+    // (mirrors MANUAL_DEP_TYPES in the store). Not a singleton card; only feeds
+    // `collectionsFor(ADDITIONAL_PARENT)` and the catalog preload.
+    [ADDITIONAL_PARENT]: ['connector', 'network_list']
   }
 
   // Composition labels follow the Azion product names (plural for the dependency
@@ -87,7 +92,8 @@
     function: 'Functions',
     connector: 'Connectors',
     network_list: 'Network Lists',
-    waf: 'WAF'
+    waf: 'WAF',
+    [ADDITIONAL_PARENT]: 'Additional dependencies'
   }
   const labelFor = (type) => COMPOSITION_LABELS[type] ?? resolveResourceMeta(type).label
 
@@ -439,20 +445,44 @@
     enabled: customPageDependenciesEnabled
   })
 
-  const dependenciesLoading = computed(
+  // Per-card loading text (shown below the "Dependencies" title of the OWNING
+  // resource's own card) — distinct per singleton so the message never implies
+  // work that belongs to a different card (req: individualize the indicator).
+  const DEPENDENCIES_LOADING_MESSAGES = {
+    application: 'Detecting Functions and Connectors used by this Application…',
+    firewall: 'Detecting Functions, Network Lists and WAF used by this Firewall…',
+    custom_page: 'Detecting Connectors used by this Custom Page…'
+  }
+
+  // Per-singleton loading flag, split out of the old single aggregate so each
+  // card's own "Dependencies" block can show its own indicator instead of one
+  // shared top-of-page banner that only ever named the Application.
+  const applicationDependenciesLoading = computed(
     () =>
-      (isApplicationComposed.value &&
-        (versionReady.isLoading.value ||
-          functionDeps.isLoading.value ||
-          connectorDeps.isLoading.value)) ||
-      (isFirewallComposed.value &&
-        (firewallVersionReady.isLoading.value ||
-          firewallFunctionDeps.isLoading.value ||
-          firewallWafDeps.isLoading.value ||
-          firewallNetworkListDeps.isLoading.value)) ||
-      (isCustomPageComposed.value &&
-        (customPageVersionReady.isLoading.value || customPageConnectorDeps.isLoading.value))
+      isApplicationComposed.value &&
+      (versionReady.isLoading.value ||
+        functionDeps.isLoading.value ||
+        connectorDeps.isLoading.value)
   )
+  const firewallDependenciesLoading = computed(
+    () =>
+      isFirewallComposed.value &&
+      (firewallVersionReady.isLoading.value ||
+        firewallFunctionDeps.isLoading.value ||
+        firewallWafDeps.isLoading.value ||
+        firewallNetworkListDeps.isLoading.value)
+  )
+  const customPageDependenciesLoading = computed(
+    () =>
+      isCustomPageComposed.value &&
+      (customPageVersionReady.isLoading.value || customPageConnectorDeps.isLoading.value)
+  )
+  const DEPENDENCIES_LOADING_BY_TYPE = {
+    application: applicationDependenciesLoading,
+    firewall: firewallDependenciesLoading,
+    custom_page: customPageDependenciesLoading
+  }
+  const dependenciesLoadingFor = (type) => DEPENDENCIES_LOADING_BY_TYPE[type]?.value ?? false
   const dependenciesError = computed(
     () =>
       (isApplicationComposed.value &&
@@ -588,6 +618,32 @@
       )
 
       store.restoreCollVersions(pickedVersions)
+    },
+    { immediate: true, deep: true }
+  )
+
+  // Pre-select the singleton + dependency versions from the effective DS's active
+  // release for a 'from-deployment' entry (`store.seedVersionsFromRelease` is a
+  // no-op past its first successful write per slot — see its docblock). Watched
+  // sources, each arriving async on its own schedule:
+  //   - `activeReleaseByDs` / `store.versionsByResource`: the release and the
+  //     version catalogs load independently; the seed can only match a pin once
+  //     BOTH are in (the action itself no-ops until the catalog entry exists —
+  //     recall `versionedResources` above already includes the release's pinned
+  //     resources, so their catalogs get requested without waiting on this seed).
+  //   - `coll`: dependency instances surface later (discovered from the pinned
+  //     singleton's VERSION, once seeded), so a re-run here is what lets deps
+  //     seeded on a later tick still get their pin applied.
+  //   - `resVers`: re-fires after `openRelease`'s reset on a same-route re-entry,
+  //     re-arming the seed for the new deployment.
+  // Recursion is harmless: every slot the action can write is guarded by
+  // "already defined" (singleton) / "already non-null" (dependency), so once a
+  // slot is seeded, further re-runs simply skip it.
+  watch(
+    [activeReleaseByDs, effDsId, resVers, coll, () => store.versionsByResource],
+    () => {
+      if (!isFromDeployment.value) return
+      store.seedVersionsFromRelease(effDsId.value)
     },
     { immediate: true, deep: true }
   )
@@ -853,6 +909,39 @@
       }
     })
 
+  // Resource picker for the "Additional dependencies" section: the base catalog
+  // service minus resources already in the composition (ENG-46674 — a resource can
+  // only be added once; its version is managed where it already appears). The
+  // row's own current pick is kept selectable. `LazyResourceSelectField` reads the
+  // service at fetch time (mount/search/scroll) and never on prop identity, so a
+  // fresh closure per render is cheap.
+  const excludeUsedResourcesService = (type, ownResourceId) => async (params) => {
+    const response = await composition.resourceListService(type)(params)
+    const used = store.usedDependencyIds(type)
+    if (ownResourceId != null) used.delete(String(ownResourceId))
+    return {
+      ...response,
+      body: (Array.isArray(response?.body) ? response.body : []).filter(
+        (option) => !used.has(String(option.id))
+      )
+    }
+  }
+
+  // The additional-dependencies VM: same shape as a parent's collections, but with
+  // the picker narrowed to not-yet-used resources.
+  const additionalCollections = computed(() =>
+    collectionsFor(ADDITIONAL_PARENT).map((collection) => ({
+      ...collection,
+      instances: collection.instances.map((instance) => ({
+        ...instance,
+        nameService: excludeUsedResourcesService(collection.type, instance.resourceId),
+        // Only enforce the version (and the "no Ready version" warning) once a
+        // resource is actually chosen — a blank row must not read as blocking.
+        required: instance.resourceId != null
+      }))
+    }))
+  )
+
   // A resource whose version catalog actually LOADED (its key is present in
   // `versionsByResource`) but resolved to zero deployable versions — the "Track
   // latest Ready" default can't resolve, so it needs a build. Distinct from "still
@@ -892,9 +981,12 @@
 
       // Base from the effective DS's active release, overridden by store state.
       // The Resource defaults to the active release's instance when present, else
-      // the catalog's first option (never fabricated — only real data); the
-      // Version defaults to the LATEST_READY sentinel ("latest Ready"), matching
-      // the target, NOT the active release's pinned id.
+      // the catalog's first option (never fabricated — only real data). The
+      // Version itself is resolved below (see `version`): in a 'from-deployment'
+      // entry it is PRE-SEEDED into `resVers[type]` by `store.seedVersionsFromRelease`
+      // with the active release's pinned id whenever that pin resolves against the
+      // loaded catalog; every other scenario, and a from-deployment pin that misses
+      // the catalog, falls through to the LATEST_READY sentinel.
       const base = activeReleaseResources.value[type] ?? { resourceId: null, version: null }
       const catalogOptions = composition.catalogOptionsFor(type)
       const fallbackResourceId = base.resourceId ?? catalogOptions[0]?.value ?? null
@@ -910,8 +1002,11 @@
         (option) => String(option.value) === String(rawName)
       )
       const name = matchedOption ? matchedOption.value : rawName
-      // Default to the LATEST_READY sentinel; a scoped-from-version entry pins
-      // the promoted version. The user picks/confirms before deploy.
+      // `resVers[type]` is the single source of truth once set — either an
+      // explicit user pick, OR (for a 'from-deployment' entry) the version seeded
+      // by `store.seedVersionsFromRelease` from the active release's pin. With no
+      // slot set yet: a scoped-from-version entry pins the promoted version,
+      // otherwise default to LATEST_READY. The user picks/confirms before deploy.
       const version =
         resVers.value[type] !== undefined
           ? resVers.value[type]
@@ -943,6 +1038,8 @@
           : null,
         ownedCollections: owned,
         hasOwned: owned.length > 0,
+        dependenciesLoading: dependenciesLoadingFor(type),
+        dependenciesLoadingMessage: DEPENDENCIES_LOADING_MESSAGES[type],
         lockReason: 'Kept from the active release'
       }
     })
@@ -1005,6 +1102,46 @@
     })
     if (collOpen.value[`${type}:${group}`] === false) store.toggleCollOpen(type, group)
   }
+
+  // --- Additional (manual) dependencies → store mutations ----------------------
+  // The section's events carry the depType directly (no parent), so route them all
+  // to the ADDITIONAL_PARENT bucket. A manual instance starts blank + required so
+  // the "no Ready version" guard applies once a resource is picked.
+  const onAdditionalToggle = (type) => store.toggleCollOpen(ADDITIONAL_PARENT, type)
+
+  const onAdditionalAdd = (type) => {
+    store.addCollItem({
+      parent: ADDITIONAL_PARENT,
+      type,
+      item: { resourceId: null, version: null, required: true }
+    })
+    if (collOpen.value[`${ADDITIONAL_PARENT}:${type}`] === false) {
+      store.toggleCollOpen(ADDITIONAL_PARENT, type)
+    }
+  }
+
+  const onAdditionalResource = ({ type, id, value }) => {
+    if (value != null) {
+      const used = store.usedDependencyIds(type)
+      const current = coll.value[ADDITIONAL_PARENT]?.[type]?.[id]?.resourceId
+      if (current != null) used.delete(String(current))
+      if (used.has(String(value))) {
+        toast.add({
+          severity: 'warn',
+          summary: 'Already in this release',
+          detail: 'This resource is already a dependency — set its version where it appears.',
+          life: 5000
+        })
+        return
+      }
+    }
+    store.setCollResource({ parent: ADDITIONAL_PARENT, type, id, resourceId: value })
+  }
+
+  const onAdditionalVersion = ({ type, id, value }) =>
+    store.setCollVer(ADDITIONAL_PARENT, type, id, value)
+
+  const onAdditionalRemove = ({ type, id }) => store.removeCollItem(ADDITIONAL_PARENT, type, id)
 
   const onCanaryEnabled = (value) => store.toggleCanary(value)
   const onCanaryForm = (values) => store.setCanaryForm(values)
@@ -1403,16 +1540,7 @@
                 </div>
 
                 <div
-                  v-if="dependenciesLoading"
-                  class="flex items-center gap-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
-                  data-testid="release-composition__dependencies-loading"
-                >
-                  <i class="pi pi-spinner pi-spin" />
-                  <span>Detecting Functions and Connectors used by this Application…</span>
-                </div>
-
-                <div
-                  v-else-if="dependenciesError"
+                  v-if="dependenciesError"
                   class="flex flex-col gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-50)] px-[var(--spacing-4)] py-[var(--spacing-3)]"
                   data-testid="release-composition__dependencies-error"
                 >
@@ -1444,6 +1572,30 @@
                   @update:instance-version="onInstanceVersion"
                   @remove-instance="onRemoveInstance"
                 />
+
+                <div
+                  class="flex flex-col gap-[var(--spacing-3)] border-t border-[var(--surface-border)] pt-[var(--spacing-4)]"
+                  data-testid="release-composition__additional"
+                >
+                  <div class="flex flex-col gap-[var(--spacing-1)]">
+                    <span class="text-body-sm font-medium text-[var(--text-color)]">
+                      Additional dependencies
+                    </span>
+                    <span class="text-body-xs text-[var(--text-color-secondary)]">
+                      Add connectors or network lists referenced dynamically by functions that
+                      aren't detected automatically.
+                    </span>
+                  </div>
+                  <ReleaseDependenciesSection
+                    :collections="additionalCollections"
+                    :allow-add="true"
+                    @toggle-group="onAdditionalToggle"
+                    @add-instance="onAdditionalAdd"
+                    @update:instance-resource="onAdditionalResource"
+                    @update:instance-version="onAdditionalVersion"
+                    @remove-instance="onAdditionalRemove"
+                  />
+                </div>
               </div>
             </div>
           </section>

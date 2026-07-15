@@ -26,7 +26,9 @@
    *     isLoadingVersions,
    *     lockReason,      // text for the read-only row
    *     hasOwned,        // render the nested Dependencies block
-   *     ownedCollections // collections for ReleaseDependenciesSection
+   *     ownedCollections, // collections for ReleaseDependenciesSection
+   *     dependenciesLoading, // this card's own dependency discovery is in flight
+   *     dependenciesLoadingMessage // text shown below the "Dependencies" title while loading
    *   }
    *
    * @event toggle(type)                       — flip an optional singleton on/off.
@@ -196,6 +198,8 @@
         v-if="resource.hasOwned"
         class="border-t border-[var(--surface-border)] pt-[var(--spacing-4)]"
         :collections="resource.ownedCollections"
+        :loading="resource.dependenciesLoading"
+        :loading-message="resource.dependenciesLoadingMessage"
         :data-testid="`release-composition__deps-${resource.type}`"
         @toggle-group="onToggleGroup(resource.type, $event)"
         @add-instance="onAddInstance(resource.type, $event)"

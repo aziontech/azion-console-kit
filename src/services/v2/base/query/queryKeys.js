@@ -25,6 +25,8 @@ const normalizeParams = (params) => {
   return normalized
 }
 
+const normalizeId = (id) => (id === null || id === undefined ? id : String(id))
+
 export const queryKeys = {
   account: {
     all: ['account'],
@@ -148,7 +150,7 @@ export const queryKeys = {
       ]
     },
     version: {
-      all: (parentId) => [...queryKeys.application.detail(parentId), 'versions'],
+      all: (parentId) => [...queryKeys.application.detail(normalizeId(parentId)), 'versions'],
       list: (parentId, params) =>
         params === undefined
           ? [...queryKeys.application.version.all(parentId), 'list']
@@ -156,7 +158,7 @@ export const queryKeys = {
       detail: (parentId, versionId) => [
         ...queryKeys.application.version.all(parentId),
         'detail',
-        versionId
+        normalizeId(versionId)
       ],
       cacheSettings: {
         all: (parentId, versionId) => [
@@ -238,12 +240,12 @@ export const queryKeys = {
     detail: (id) => [...queryKeys.workload.all, 'detail', id],
     metrics: (id, params) => [...queryKeys.workload.detail(id), 'metrics', normalizeParams(params)],
     version: {
-      all: (parentId) => [...queryKeys.workload.detail(parentId), 'versions'],
+      all: (parentId) => [...queryKeys.workload.detail(normalizeId(parentId)), 'versions'],
       list: (parentId) => [...queryKeys.workload.version.all(parentId), 'list'],
       detail: (parentId, versionId) => [
         ...queryKeys.workload.version.all(parentId),
         'detail',
-        versionId
+        normalizeId(versionId)
       ]
     },
     versions: (id, params) => [
@@ -283,12 +285,12 @@ export const queryKeys = {
       ]
     },
     version: {
-      all: (parentId) => [...queryKeys.firewall.detail(parentId), 'versions'],
+      all: (parentId) => [...queryKeys.firewall.detail(normalizeId(parentId)), 'versions'],
       list: (parentId) => [...queryKeys.firewall.version.all(parentId), 'list'],
       detail: (parentId, versionId) => [
         ...queryKeys.firewall.version.all(parentId),
         'detail',
-        versionId
+        normalizeId(versionId)
       ],
       functions: {
         all: (parentId, versionId) => [
@@ -349,7 +351,7 @@ export const queryKeys = {
     list: (params) => [...queryKeys.variablesV6.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.variablesV6.all, 'detail', id],
     versions: {
-      all: (id) => [...queryKeys.variablesV6.detail(id), 'versions'],
+      all: (id) => [...queryKeys.variablesV6.detail(normalizeId(id)), 'versions'],
       list: (id, params) => [
         ...queryKeys.variablesV6.versions.all(id),
         'list',
@@ -367,7 +369,10 @@ export const queryKeys = {
     list: (params) => [...queryKeys.deployments.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.deployments.all, 'detail', id],
     versions: {
-      all: (deploymentId) => [...queryKeys.deployments.detail(deploymentId), 'versions'],
+      all: (deploymentId) => [
+        ...queryKeys.deployments.detail(normalizeId(deploymentId)),
+        'versions'
+      ],
       list: (deploymentId, params) => [
         ...queryKeys.deployments.versions.all(deploymentId),
         'list',
@@ -376,7 +381,7 @@ export const queryKeys = {
       detail: (deploymentId, versionId) => [
         ...queryKeys.deployments.versions.all(deploymentId),
         'detail',
-        versionId
+        normalizeId(versionId)
       ]
     },
     history: {
@@ -438,7 +443,7 @@ export const queryKeys = {
     list: (params) => [...queryKeys.edgeFunction.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.edgeFunction.all, 'detail', id],
     version: {
-      all: (parentId) => [...queryKeys.edgeFunction.detail(parentId), 'versions'],
+      all: (parentId) => [...queryKeys.edgeFunction.detail(normalizeId(parentId)), 'versions'],
       list: (parentId, params) =>
         params === undefined
           ? [...queryKeys.edgeFunction.version.all(parentId), 'list']
@@ -446,7 +451,7 @@ export const queryKeys = {
       detail: (parentId, versionId) => [
         ...queryKeys.edgeFunction.version.all(parentId),
         'detail',
-        versionId
+        normalizeId(versionId)
       ]
     }
   },
@@ -506,7 +511,7 @@ export const queryKeys = {
     list: (params) => [...queryKeys.connector.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.connector.all, 'detail', id],
     version: {
-      all: (parentId) => [...queryKeys.connector.detail(parentId), 'versions'],
+      all: (parentId) => [...queryKeys.connector.detail(normalizeId(parentId)), 'versions'],
       list: (parentId, params) =>
         params === undefined
           ? [...queryKeys.connector.version.all(parentId), 'list']
@@ -514,7 +519,7 @@ export const queryKeys = {
       detail: (parentId, versionId) => [
         ...queryKeys.connector.version.all(parentId),
         'detail',
-        versionId
+        normalizeId(versionId)
       ]
     }
   },
@@ -530,7 +535,7 @@ export const queryKeys = {
     allowed: (wafId, params) => [...queryKeys.waf.all, 'allowed', wafId, normalizeParams(params)],
     domains: (wafId) => [...queryKeys.waf.all, 'domains', wafId],
     version: {
-      all: (parentId) => [...queryKeys.waf.detail(parentId), 'versions'],
+      all: (parentId) => [...queryKeys.waf.detail(normalizeId(parentId)), 'versions'],
       list: (parentId, params) =>
         params === undefined
           ? [...queryKeys.waf.version.all(parentId), 'list']
@@ -538,7 +543,7 @@ export const queryKeys = {
       detail: (parentId, versionId) => [
         ...queryKeys.waf.version.all(parentId),
         'detail',
-        versionId
+        normalizeId(versionId)
       ],
       exceptions: {
         all: (parentId, versionId) => [
@@ -580,7 +585,7 @@ export const queryKeys = {
     all: ['network-list'],
     detail: (id) => [...queryKeys.networkList.all, 'detail', id],
     version: {
-      all: (parentId) => [...queryKeys.networkList.detail(parentId), 'versions'],
+      all: (parentId) => [...queryKeys.networkList.detail(normalizeId(parentId)), 'versions'],
       list: (parentId, params) =>
         params === undefined
           ? [...queryKeys.networkList.version.all(parentId), 'list']
@@ -588,7 +593,7 @@ export const queryKeys = {
       detail: (parentId, versionId) => [
         ...queryKeys.networkList.version.all(parentId),
         'detail',
-        versionId
+        normalizeId(versionId)
       ]
     }
   },
@@ -602,7 +607,7 @@ export const queryKeys = {
     list: (params) => [...queryKeys.digitalCertificatesV6.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.digitalCertificatesV6.all, 'detail', id],
     versions: {
-      all: (id) => [...queryKeys.digitalCertificatesV6.detail(id), 'versions'],
+      all: (id) => [...queryKeys.digitalCertificatesV6.detail(normalizeId(id)), 'versions'],
       list: (id, params) => [
         ...queryKeys.digitalCertificatesV6.versions.all(id),
         'list',
@@ -615,12 +620,12 @@ export const queryKeys = {
     list: (params) => [...queryKeys.customPages.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.customPages.all, 'detail', id],
     version: {
-      all: (parentId) => [...queryKeys.customPages.detail(parentId), 'versions'],
+      all: (parentId) => [...queryKeys.customPages.detail(normalizeId(parentId)), 'versions'],
       list: (parentId) => [...queryKeys.customPages.version.all(parentId), 'list'],
       detail: (parentId, versionId) => [
         ...queryKeys.customPages.version.all(parentId),
         'detail',
-        versionId
+        normalizeId(versionId)
       ]
     }
   },
@@ -634,7 +639,7 @@ export const queryKeys = {
     list: (params) => [...queryKeys.digitalCertificatesCRLV6.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.digitalCertificatesCRLV6.all, 'detail', id],
     versions: {
-      all: (id) => [...queryKeys.digitalCertificatesCRLV6.detail(id), 'versions'],
+      all: (id) => [...queryKeys.digitalCertificatesCRLV6.detail(normalizeId(id)), 'versions'],
       list: (id, params) => [
         ...queryKeys.digitalCertificatesCRLV6.versions.all(id),
         'list',

@@ -20,12 +20,25 @@ const SINGLETON_TYPES = [APPLICATION_TYPE, ...OPTIONAL_SINGLETON_TYPES]
 // payload is a flat `resources[]`). `function_instance` is never serialized.
 const COLLECTION_TYPES = ['function', 'connector', 'waf', 'network_list']
 
+// Pseudo-parent bucket for dependencies the user adds MANUALLY — a connector or
+// network_list a function references dynamically at runtime, invisible to the
+// static per-parent discovery. It is NOT a singleton (no card, no version of its
+// own); being a key of OWNED_COLLECTIONS is what lets it ride every
+// PARENT_TYPES-driven path (compose + dedupe, shared-version sync, version load)
+// for free, and the seed* actions never touch it, so manual entries survive a
+// dependency re-seed. Extend MANUAL_DEP_TYPES to make a new type manually addable.
+const ADDITIONAL_PARENT = 'additional'
+const MANUAL_DEP_TYPES = ['connector', 'network_list']
+
 // Which dependency collections each parent singleton owns. `coll` is keyed by
 // parent → depType so a dependency of one singleton never bleeds into another.
+// `additional` is appended LAST so real parents win the first-wins dedupe in
+// `composeResources`.
 const OWNED_COLLECTIONS = {
   [APPLICATION_TYPE]: ['function', 'connector'],
   firewall: ['function', 'network_list', 'waf'],
-  custom_page: ['connector']
+  custom_page: ['connector'],
+  [ADDITIONAL_PARENT]: MANUAL_DEP_TYPES
 }
 const PARENT_TYPES = Object.keys(OWNED_COLLECTIONS)
 
@@ -198,7 +211,9 @@ export const useReleaseStore = defineStore('release', {
       return PARENT_TYPES.every((parent) =>
         (OWNED_COLLECTIONS[parent] ?? []).every((type) => {
           const list = Array.isArray(state.coll[parent]?.[type]) ? state.coll[parent][type] : []
-          return list.filter((item) => item?.required).every((item) => item.version != null)
+          return list
+            .filter((item) => item?.required && item?.resourceId != null)
+            .every((item) => item.version != null)
         })
       )
     },
@@ -209,7 +224,7 @@ export const useReleaseStore = defineStore('release', {
         ;(OWNED_COLLECTIONS[parent] ?? []).forEach((type) => {
           const list = Array.isArray(state.coll[parent]?.[type]) ? state.coll[parent][type] : []
           list.forEach((item) => {
-            if (item?.required && item.version == null) {
+            if (item?.required && item.resourceId != null && item.version == null) {
               pending.push({ type, resourceId: item.resourceId })
             }
           })
@@ -234,6 +249,22 @@ export const useReleaseStore = defineStore('release', {
           (entry) => entry?.resourceId != null && String(entry.resourceId) === String(resourceId)
         )
       })
+    },
+
+    // Set of resourceIds (as String) of `type` already present anywhere in the
+    // composition (real parents + `additional`). Feeds the "additional" picker so
+    // a resource that is already a dependency can't be added a second time
+    // (ENG-46674: one version per resource) — the caller drops the current row's
+    // own id so it stays selectable.
+    usedDependencyIds: (state) => (type) => {
+      const ids = new Set()
+      PARENT_TYPES.forEach((parent) => {
+        const list = Array.isArray(state.coll[parent]?.[type]) ? state.coll[parent][type] : []
+        list.forEach((entry) => {
+          if (entry?.resourceId != null) ids.add(String(entry.resourceId))
+        })
+      })
+      return ids
     },
 
     // The version gate alone (extracted so the view can tell WHEN only the version
@@ -359,7 +390,8 @@ export const useReleaseStore = defineStore('release', {
         ...list,
         {
           resourceId: item.resourceId ?? null,
-          version: item.version ?? LATEST_READY
+          version: 'version' in item ? item.version : LATEST_READY,
+          ...(item.required ? { required: true } : {})
         }
       ])
     },
@@ -655,6 +687,92 @@ export const useReleaseStore = defineStore('release', {
       }
     },
 
+    // Pre-select the singleton + dependency versions with the pins carried by
+    // `dsId`'s active release — the 'from-deployment' entry only (the view gates
+    // the caller on `isFromDeployment`; every other entry keeps its own default:
+    // LATEST_READY for singletons, `null`/pending for dependencies). Reads ONLY
+    // store state (`activeReleaseByDs`, `versionsByResource`, `resVers`, `coll`) —
+    // no I/O — so it can be re-invoked freely as the view's loaded-data watchers
+    // re-fire while the release/catalogs/deps arrive async.
+    //
+    // "User pick wins" doubles as the ONE-SHOT/idempotency guard: a slot already
+    // defined — a prior explicit pick OR a prior seed — is never revisited, so a
+    // slot is written AT MOST once and repeated calls with the same loaded data
+    // are a no-op past the first successful write.
+    //
+    // A pin is only applied when it resolves against the LOADED catalog
+    // (`versionsByResource`): the release may pin a version that has since been
+    // deprecated/removed, or the catalog for that resource simply hasn't loaded
+    // yet. Either way, a miss is SILENT — no warning surfaces — and the slot
+    // falls through to its existing default (LATEST_READY for a singleton, `null`
+    // for a dependency), exactly as if this action had never run.
+    seedVersionsFromRelease(dsId) {
+      const release = this.activeReleaseByDs[dsId]
+      const releaseResources = Array.isArray(release?.resources) ? release.resources : []
+
+      // --- singletons: resVers[type] ---
+      releaseResources.forEach((resource) => {
+        const type = resource?.resource_type
+        if (!SINGLETON_TYPES.includes(type)) return
+        if (this.resVers[type] !== undefined) return
+
+        const resourceId = resource.resource_id ?? resource.global_id
+        const pin = resource.version_id ?? resource.resource_version_id ?? resource.resource_version
+        if (resourceId == null || pin == null) return
+
+        const options = this.versionsByResource[versionsKey(type, resourceId)] ?? []
+        const matched = options.find((option) => String(option.value) === String(pin))
+        if (!matched) return
+
+        this.resVers[type] = matched.value
+      })
+
+      // --- dependencies: coll[parent][type][].version ---
+      // Index the release composition once by `type:resourceId` → pin so every
+      // dependency instance (nested per parent) can look up its own pin in O(1).
+      const pinByKey = new Map()
+      releaseResources.forEach((resource) => {
+        const type = resource?.resource_type
+        const resourceId = resource?.resource_id ?? resource?.global_id
+        const pin =
+          resource?.version_id ?? resource?.resource_version_id ?? resource?.resource_version
+        if (type == null || resourceId == null || pin == null) return
+        pinByKey.set(`${type}:${String(resourceId)}`, pin)
+      })
+
+      let seededAnyDep = false
+      PARENT_TYPES.forEach((parent) => {
+        ;(OWNED_COLLECTIONS[parent] ?? []).forEach((type) => {
+          const list = Array.isArray(this.coll[parent]?.[type]) ? this.coll[parent][type] : []
+          if (!list.length) return
+
+          let changed = false
+          const nextList = list.map((instance) => {
+            if (instance?.resourceId == null || instance.version != null) return instance
+
+            const pin = pinByKey.get(`${type}:${String(instance.resourceId)}`)
+            if (pin == null) return instance
+
+            const options = this.versionsByResource[versionsKey(type, instance.resourceId)] ?? []
+            const matched = options.find((option) => String(option.value) === String(pin))
+            if (!matched) return instance
+
+            changed = true
+            seededAnyDep = true
+            return { ...instance, version: matched.value }
+          })
+
+          if (changed) this._setParentColl(parent, type, nextList)
+        })
+      })
+
+      // A shared-type dependency (connector/network_list) just seeded under one
+      // parent must propagate to every sibling parent that references the same
+      // instance — the existing `rank` in `reconcileSharedVersions` already makes
+      // a concrete pin win over `null`/LATEST, so this is a straight reuse.
+      if (seededAnyDep) this.reconcileSharedVersions()
+    },
+
     // Resolve a chosen version to a concrete id for dispatch (Property 6: the
     // 'LATEST' sentinel never leaves the store).
     resolveVersion(type, resourceId, selected) {
@@ -759,22 +877,27 @@ export const useReleaseStore = defineStore('release', {
       const resourceId = this.resNames[scopedType] ?? this.resourceId
       const selectedVersion = this.resVers[scopedType] ?? LATEST_READY
 
-      // Only the SCOPED singleton's own dependencies are editable overrides; every
-      // other singleton's deps are preserved byte-for-byte by the composable's
-      // per-DS read, so they must never leak into `dependencyOverrides` here.
+      // The SCOPED singleton's own dependencies are editable overrides; every OTHER
+      // singleton's deps are preserved byte-for-byte by the composable's per-DS read
+      // and must never leak here. The `additional` bucket is the deliberate
+      // exception: those are dependencies the user EXPLICITLY added to this release,
+      // so they ride along as overrides too (the composable appends any that don't
+      // already exist in the preserved composition).
       const dependencyOverrides = []
       const seenDeps = new Set()
-      ;(OWNED_COLLECTIONS[scopedType] ?? []).forEach((type) => {
-        const list = Array.isArray(this.coll[scopedType]?.[type]) ? this.coll[scopedType][type] : []
-        list.forEach((item) => {
-          if (item?.resourceId == null) return
-          const key = versionsKey(type, item.resourceId)
-          if (seenDeps.has(key)) return
-          seenDeps.add(key)
-          dependencyOverrides.push({
-            resource_id: item.resourceId,
-            resource_type: type,
-            version: this.resolveVersion(type, item.resourceId, item.version)
+      ;[scopedType, ADDITIONAL_PARENT].forEach((parent) => {
+        ;(OWNED_COLLECTIONS[parent] ?? []).forEach((type) => {
+          const list = Array.isArray(this.coll[parent]?.[type]) ? this.coll[parent][type] : []
+          list.forEach((item) => {
+            if (item?.resourceId == null) return
+            const key = versionsKey(type, item.resourceId)
+            if (seenDeps.has(key)) return
+            seenDeps.add(key)
+            dependencyOverrides.push({
+              resource_id: item.resourceId,
+              resource_type: type,
+              version: this.resolveVersion(type, item.resourceId, item.version)
+            })
           })
         })
       })
@@ -802,5 +925,7 @@ export {
   OWNED_COLLECTIONS,
   PARENT_TYPES,
   SHARED_VERSION_DEP_TYPES,
+  ADDITIONAL_PARENT,
+  MANUAL_DEP_TYPES,
   releaseResourceId
 }

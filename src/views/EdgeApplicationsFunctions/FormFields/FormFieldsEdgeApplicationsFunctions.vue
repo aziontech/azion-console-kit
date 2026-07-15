@@ -28,6 +28,10 @@
     disabledFields: {
       type: Boolean,
       default: false
+    },
+    deferUntilValue: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -37,6 +41,20 @@
   const { value: edgeFunctionID } = useField('edgeFunctionID')
   const { value: args, errorMessage: argsError } = useField('args')
   const { value: azionForm } = useField('azionForm')
+
+  const hasResolvedInitialValue = ref(false)
+  watch(
+    edgeFunctionID,
+    (value) => {
+      if (value !== undefined && value !== null && value !== '') {
+        hasResolvedInitialValue.value = true
+      }
+    },
+    { immediate: true }
+  )
+  const functionDropdownKey = computed(() =>
+    props.deferUntilValue && hasResolvedInitialValue.value ? 'ready' : 'initial'
+  )
 
   const schemaAzionForm = ref({})
   const emptySchemaAzionForm = ref(true)
@@ -256,6 +274,7 @@
 
         <div class="flex">
           <FieldDropdownLazyLoader
+            :key="functionDropdownKey"
             required
             disableEmitFirstRender
             data-testid="edge-application-function-instance-form__edge-function"
