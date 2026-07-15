@@ -51,18 +51,27 @@ export function useLiveDeployments({
       const environments = []
       const workloads = []
       let latestDeployedAt = null
+      let latestDeployedBy = null
 
       for (const deployment of rawDeployments) {
         const enriched = resolver?.resolve?.(deployment, ctx) ?? {}
         const environment = enriched.environment ?? null
         const workload = enriched.workload ?? null
         const deployedAt = enriched.deployedAt ?? deployment?.deployedAt ?? null
+        const deployedBy = enriched.deployedBy ?? null
 
-        deployments.push({ id: deployment?.id ?? null, environment, workload, deployedAt })
+        deployments.push({
+          id: deployment?.id ?? null,
+          environment,
+          workload,
+          deployedAt,
+          deployedBy
+        })
         if (environment && !environments.includes(environment)) environments.push(environment)
         if (workload && !workloads.includes(workload)) workloads.push(workload)
         if (deployedAt && (!latestDeployedAt || deployedAt > latestDeployedAt)) {
           latestDeployedAt = deployedAt
+          latestDeployedBy = deployedBy
         }
       }
 
@@ -72,7 +81,8 @@ export function useLiveDeployments({
         deployments,
         environments,
         workloads,
-        latestDeployedAt
+        latestDeployedAt,
+        latestDeployedBy
       })
     }
     return rows

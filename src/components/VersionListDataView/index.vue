@@ -678,6 +678,29 @@
                       </button>
 
                       <button
+                        v-else-if="column.key === 'deployed'"
+                        type="button"
+                        class="created-cell-button flex max-w-full min-w-0 flex-col items-start gap-0.5 border-0 bg-transparent p-0 text-left"
+                        @click="triggerRowClick(version)"
+                      >
+                        <span
+                          class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm text-[var(--text-color)]"
+                        >
+                          {{
+                            version.deployedAt
+                              ? formatDateToDayMonthYearHour(version.deployedAt)
+                              : '--'
+                          }}
+                        </span>
+                        <span
+                          class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs text-[var(--text-color-secondary)]"
+                          data-sentry-mask
+                        >
+                          {{ version.deployedBy || version.lastEditor || 'azion@azion.com' }}
+                        </span>
+                      </button>
+
+                      <button
                         v-else-if="column.key === 'inUse'"
                         type="button"
                         class="in-use-cell-button inline-flex min-w-0 max-w-full items-center border-0 bg-transparent p-0 text-left"
@@ -839,6 +862,23 @@
                               data-sentry-mask
                             >
                               {{ version.lastEditor || 'azion@azion.com' }}
+                            </span>
+                          </template>
+                          <template v-else-if="col.key === 'deployed'">
+                            <span
+                              class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm text-[var(--text-color)]"
+                            >
+                              {{
+                                version.deployedAt
+                                  ? formatDateToDayMonthYearHour(version.deployedAt)
+                                  : '--'
+                              }}
+                            </span>
+                            <span
+                              class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs text-[var(--text-color-secondary)]"
+                              data-sentry-mask
+                            >
+                              {{ version.deployedBy || version.lastEditor || 'azion@azion.com' }}
                             </span>
                           </template>
                           <span

@@ -39,7 +39,7 @@ export const getLiveDeploymentColumns = () => [
     key: 'deployed',
     field: 'deployed',
     label: 'Deployed',
-    size: 'minmax(180px, 1fr)',
+    size: 'minmax(220px, 1.2fr)',
     mobileLabel: 'Deployed'
   }
 ]

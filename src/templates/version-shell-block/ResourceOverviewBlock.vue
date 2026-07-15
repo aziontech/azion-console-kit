@@ -28,7 +28,6 @@
     getLiveDeploymentColumns
   } from '@/composables/versioning/version-list-columns'
   import { getOverviewConfig } from '@/composables/versioning/overview-resource-config'
-  import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
 
   defineOptions({ name: 'resource-overview-block' })
 
@@ -73,10 +72,16 @@
     handleRowAction({ action, item: { ...item, id: item?.versionId ?? item?.id } })
   }
 
-  // Tenant-wide deployment_id → workload_name directory, fetched once and
-  // shared across every Live Deployments row. Falls back to an empty Map on
-  // error — the resolver renders "—" in that case.
-  const { deploymentToWorkload, isLoading: workloadDirectoryLoading } = useWorkloadDirectory()
+  // Tenant-wide directories used by the workload resolver to fill the
+  // Environment and Workload columns of Live Deployments. Both are keyed by
+  // deployment_id; on error each falls back to an empty Map and the resolver
+  // renders "—" in the corresponding column.
+  const {
+    deploymentToWorkload,
+    deploymentToEnvironment,
+    deploymentToMeta,
+    isLoading: workloadDirectoryLoading
+  } = useWorkloadDirectory()
 
   const { liveDeployments } = useLiveDeployments({
     activeVersions: () => props.activeVersions,
@@ -84,7 +89,9 @@
     workloadResolver: computed(() => config.value?.workloadResolver),
     resolverContext: computed(() => ({
       resourceId: props.resourceId,
-      deploymentToWorkload: deploymentToWorkload.value
+      deploymentToWorkload: deploymentToWorkload.value,
+      deploymentToEnvironment: deploymentToEnvironment.value,
+      deploymentToMeta: deploymentToMeta.value
     }))
   })
 
@@ -92,7 +99,9 @@
 
   // One row per version — Environment and Workload columns render every
   // deployment the version is currently pinned to (see #cell-environment /
-  // #cell-workload slots below). Deployed shows the most recent timestamp.
+  // #cell-workload slots below). The Deployed column reads `deployedAt` +
+  // `lastEditor` (carried via `...row.version`) and is rendered by
+  // VersionListDataView with the same two-line pattern as "Created by".
   const liveItems = computed(() =>
     liveDeployments.value.map((row) => ({
       ...row.version,
@@ -101,7 +110,7 @@
       environments: row.environments,
       workloads: row.workloads,
       deployedAt: row.latestDeployedAt,
-      deployed: row.latestDeployedAt ? formatDateToDayMonthYearHour(row.latestDeployedAt) : '—'
+      deployedBy: row.latestDeployedBy
     }))
   )
 
