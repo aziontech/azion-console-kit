@@ -6,7 +6,6 @@
   import InputText from '@aziontech/webkit/inputtext'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { clipboardWrite } from '@/helpers/clipboard'
-  import { useClickToFilter } from '../../composables/useClickToFilter.js'
 
   defineOptions({ name: 'EventDocumentView' })
 
@@ -115,11 +114,6 @@
     const str = String(value)
     return str !== '' && str !== '-' && str !== 'null' && str !== 'undefined'
   }
-
-  const { onValueMouseDown, onValueMouseUp, onValueClick } = useClickToFilter({
-    onAdd: (key, value) => emit('add-filter', key, value),
-    onExclude: (key, value) => emit('exclude-filter', key, value)
-  })
 
   const clearSearch = () => {
     fieldSearch.value = ''
@@ -243,19 +237,11 @@
               <span
                 class="doc-compact__value"
                 :title="String(entry.value).length > 100 ? String(entry.value) : undefined"
-                :role="isValidValue(entry.value) ? 'button' : undefined"
-                :tabindex="isValidValue(entry.value) ? 0 : undefined"
-                :aria-label="isValidValue(entry.value) ? `Filter for ${entry.key}` : undefined"
-                @mousedown="onValueMouseDown"
-                @mouseup="onValueMouseUp"
-                @click.stop="(e) => onValueClick(e, entry.key, entry.value)"
-                @keydown.enter.stop.prevent="(e) => onValueClick(e, entry.key, entry.value)"
-                @keydown.space.stop.prevent="(e) => onValueClick(e, entry.key, entry.value)"
                 >{{ formatDisplayValue(entry.value)
                 }}<span class="doc-compact__actions">
                   <PrimeButton
                     v-if="canAddFilter && isValidValue(entry.value)"
-                    icon="pi pi-plus-circle"
+                    icon="pi pi-filter"
                     text
                     size="small"
                     class="!w-5 !h-5 !p-0"
@@ -265,7 +251,7 @@
                   />
                   <PrimeButton
                     v-if="canExcludeFilter && isValidValue(entry.value)"
-                    icon="pi pi-minus-circle"
+                    icon="pi pi-filter-slash"
                     text
                     size="small"
                     class="!w-5 !h-5 !p-0"
@@ -319,14 +305,6 @@
               <span
                 class="doc-list__value"
                 :title="String(entry.value).length > 30 ? String(entry.value) : undefined"
-                :role="isValidValue(entry.value) ? 'button' : undefined"
-                :tabindex="isValidValue(entry.value) ? 0 : undefined"
-                :aria-label="isValidValue(entry.value) ? `Filter for ${entry.key}` : undefined"
-                @mousedown="onValueMouseDown"
-                @mouseup="onValueMouseUp"
-                @click.stop="(e) => onValueClick(e, entry.key, entry.value)"
-                @keydown.enter.stop.prevent="(e) => onValueClick(e, entry.key, entry.value)"
-                @keydown.space.stop.prevent="(e) => onValueClick(e, entry.key, entry.value)"
                 ><span class="doc-list__value-text">{{
                   formatDisplayValue(entry.value)
                 }}</span></span
@@ -334,7 +312,7 @@
               <span class="doc-list__actions">
                 <PrimeButton
                   v-if="canAddFilter && isValidValue(entry.value)"
-                  icon="pi pi-plus-circle"
+                  icon="pi pi-filter"
                   text
                   size="small"
                   class="!w-5 !h-5 !p-0"
@@ -344,7 +322,7 @@
                 />
                 <PrimeButton
                   v-if="canExcludeFilter && isValidValue(entry.value)"
-                  icon="pi pi-minus-circle"
+                  icon="pi pi-filter-slash"
                   text
                   size="small"
                   class="!w-5 !h-5 !p-0"
@@ -606,7 +584,9 @@
 
   .doc-compact__row > .doc-compact__key,
   .doc-compact__row > .doc-compact__value {
-    padding: 0.3rem 0.5rem;
+    /* Right padding RESERVES the action-icons zone: the value ellipsizes
+       before it, so the icons never sit on top of the attribute value. */
+    padding: 0.3rem 72px 0.3rem 0.5rem;
     border-bottom: 1px solid var(--surface-border);
     transition: background 0.1s;
     height: 1.6rem;
@@ -651,19 +631,6 @@
     position: relative;
   }
 
-  .doc-compact__value:hover {
-    text-decoration: underline;
-    text-decoration-style: dotted;
-    text-underline-offset: 2px;
-  }
-
-  .doc-compact__value:focus-visible,
-  .doc-list__value:focus-visible {
-    outline: 2px solid var(--primary-color);
-    outline-offset: -1px;
-    border-radius: 2px;
-  }
-
   .doc-compact__actions {
     position: absolute;
     right: 0;
@@ -676,12 +643,19 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.1s ease;
-    background: var(--surface-hover);
   }
 
   .doc-compact__row:hover .doc-compact__actions {
     opacity: 1;
     pointer-events: auto;
+  }
+
+  /* Hover colors mirror the table badges' filter icons (single filter pattern). */
+  :deep([data-testid='event-document-add-filter']:hover) {
+    color: var(--primary-color) !important;
+  }
+  :deep([data-testid='event-document-exclude-filter']:hover) {
+    color: var(--danger-contrast) !important;
   }
 
   .doc-compact__footer {

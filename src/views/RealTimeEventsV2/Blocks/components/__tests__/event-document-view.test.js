@@ -86,7 +86,7 @@ describe('EventDocumentView', () => {
   })
 })
 
-describe('EventDocumentView — click-to-filter routing on Table rows', () => {
+describe('EventDocumentView — filtering only via explicit hover icons', () => {
   const mountWithFilters = (extraProps = {}) => {
     const onAddFilter = vi.fn()
     const onExcludeFilter = vi.fn()
@@ -121,101 +121,56 @@ describe('EventDocumentView — click-to-filter routing on Table rows', () => {
     return { wrapper, onAddFilter, onExcludeFilter }
   }
 
-  it('clicking a .doc-list__value row calls onAddFilter with the correct key and value', async () => {
+  // UX decision (2026-07-16): the value is INERT — clicking it never filters.
+  // Filtering happens only through the explicit hover icons, mirroring copy.
+
+  it('clicking a .doc-list__value calls neither onAddFilter nor onExcludeFilter', async () => {
     const { wrapper, onAddFilter, onExcludeFilter } = mountWithFilters()
 
     const valueEls = wrapper.findAll('.doc-list__value')
     expect(valueEls.length).toBeGreaterThan(0)
 
-    // Simulate mousedown + mouseup (no drag) + click on the first value
     const firstValue = valueEls[0]
     await firstValue.trigger('mousedown', { clientX: 10, clientY: 10 })
     await firstValue.trigger('mouseup', { clientX: 10, clientY: 10 })
     await firstValue.trigger('click', { clientX: 10, clientY: 10, altKey: false })
-
-    expect(onAddFilter).toHaveBeenCalledWith('host', 'example.com')
-    expect(onExcludeFilter).not.toHaveBeenCalled()
-  })
-
-  it('Alt+clicking a .doc-list__value row calls onExcludeFilter with the correct key and value', async () => {
-    const { wrapper, onAddFilter, onExcludeFilter } = mountWithFilters()
-
-    const valueEls = wrapper.findAll('.doc-list__value')
-    const firstValue = valueEls[0]
-
-    await firstValue.trigger('mousedown', { clientX: 10, clientY: 10 })
-    await firstValue.trigger('mouseup', { clientX: 10, clientY: 10 })
     await firstValue.trigger('click', { clientX: 10, clientY: 10, altKey: true })
 
+    expect(onAddFilter).not.toHaveBeenCalled()
+    expect(onExcludeFilter).not.toHaveBeenCalled()
+  })
+
+  it('the value is plain selectable text: no button role, no tabindex', () => {
+    const { wrapper } = mountWithFilters()
+    const firstValue = wrapper.findAll('.doc-list__value')[0]
+    expect(firstValue.attributes('role')).toBeUndefined()
+    expect(firstValue.attributes('tabindex')).toBeUndefined()
+  })
+
+  it('the hover filter icon calls onAddFilter with the correct key and value', async () => {
+    const { wrapper, onAddFilter } = mountWithFilters()
+
+    const addBtn = wrapper.findAll('[data-testid="event-document-add-filter"]')[0]
+    expect(addBtn.exists()).toBe(true)
+    await addBtn.trigger('click')
+
+    expect(onAddFilter).toHaveBeenCalledWith('host', 'example.com')
+  })
+
+  it('the hover exclude icon calls onExcludeFilter with the correct key and value', async () => {
+    const { wrapper, onExcludeFilter } = mountWithFilters()
+
+    const excludeBtn = wrapper.findAll('[data-testid="event-document-exclude-filter"]')[0]
+    expect(excludeBtn.exists()).toBe(true)
+    await excludeBtn.trigger('click')
+
     expect(onExcludeFilter).toHaveBeenCalledWith('host', 'example.com')
-    expect(onAddFilter).not.toHaveBeenCalled()
   })
 
-  it('clicking over a text selection calls neither onAddFilter nor onExcludeFilter', async () => {
-    const { wrapper, onAddFilter, onExcludeFilter } = mountWithFilters()
-
-    // Simulate a non-collapsed selection
-    const originalGetSelection = window.getSelection
-    window.getSelection = () => ({
-      isCollapsed: false,
-      toString: () => 'example'
-    })
-
-    const valueEls = wrapper.findAll('.doc-list__value')
-    const firstValue = valueEls[0]
-
-    await firstValue.trigger('mousedown', { clientX: 10, clientY: 10 })
-    await firstValue.trigger('mouseup', { clientX: 10, clientY: 10 })
-    await firstValue.trigger('click', { clientX: 10, clientY: 10, altKey: false })
-
-    expect(onAddFilter).not.toHaveBeenCalled()
-    expect(onExcludeFilter).not.toHaveBeenCalled()
-
-    window.getSelection = originalGetSelection
-  })
-
-  it('clicking a value of "-" calls neither onAddFilter nor onExcludeFilter', async () => {
-    const { wrapper, onAddFilter, onExcludeFilter } = mountWithFilters()
-
-    // The 3rd entry has value '-'
-    const valueEls = wrapper.findAll('.doc-list__value')
-    const dashValue = valueEls[2]
-
-    await dashValue.trigger('mousedown', { clientX: 10, clientY: 10 })
-    await dashValue.trigger('mouseup', { clientX: 10, clientY: 10 })
-    await dashValue.trigger('click', { clientX: 10, clientY: 10, altKey: false })
-
-    expect(onAddFilter).not.toHaveBeenCalled()
-    expect(onExcludeFilter).not.toHaveBeenCalled()
-  })
-
-  it('clicking an empty string value calls neither onAddFilter nor onExcludeFilter', async () => {
-    const { wrapper, onAddFilter, onExcludeFilter } = mountWithFilters()
-
-    // The 4th entry has value ''
-    const valueEls = wrapper.findAll('.doc-list__value')
-    const emptyValue = valueEls[3]
-
-    await emptyValue.trigger('mousedown', { clientX: 10, clientY: 10 })
-    await emptyValue.trigger('mouseup', { clientX: 10, clientY: 10 })
-    await emptyValue.trigger('click', { clientX: 10, clientY: 10, altKey: false })
-
-    expect(onAddFilter).not.toHaveBeenCalled()
-    expect(onExcludeFilter).not.toHaveBeenCalled()
-  })
-
-  it('dragging over a value (text selection drag) calls neither callback', async () => {
-    const { wrapper, onAddFilter, onExcludeFilter } = mountWithFilters()
-
-    const valueEls = wrapper.findAll('.doc-list__value')
-    const firstValue = valueEls[0]
-
-    // Simulate a drag: mousedown at (10,10), mouseup at (50,10) — 40px drag
-    await firstValue.trigger('mousedown', { clientX: 10, clientY: 10 })
-    await firstValue.trigger('mouseup', { clientX: 50, clientY: 10 })
-    await firstValue.trigger('click', { clientX: 50, clientY: 10, altKey: false })
-
-    expect(onAddFilter).not.toHaveBeenCalled()
-    expect(onExcludeFilter).not.toHaveBeenCalled()
+  it('no filter icons render for invalid values ("-" and empty string)', () => {
+    const { wrapper } = mountWithFilters()
+    // Entries: host, status (valid) + '-', '' (invalid) → 2 add icons, not 4.
+    expect(wrapper.findAll('[data-testid="event-document-add-filter"]')).toHaveLength(2)
+    expect(wrapper.findAll('[data-testid="event-document-exclude-filter"]')).toHaveLength(2)
   })
 })

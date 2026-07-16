@@ -2,7 +2,6 @@
   import { computed, ref } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
   import { getSeverity } from '../../composables/utils/severity-classifier'
-  import { useClickToFilter } from '../../composables/useClickToFilter.js'
   import { highlightMatch } from '../../composables/utils/highlight-match'
 
   defineOptions({ name: 'LogFieldBadges' })
@@ -34,11 +33,6 @@
   })
 
   const emit = defineEmits(['toggle-expand', 'add-filter', 'exclude-filter'])
-
-  const { onValueMouseDown, onValueMouseUp, onValueClick } = useClickToFilter({
-    onAdd: (key, value) => emit('add-filter', key, value),
-    onExclude: (key, value) => emit('exclude-filter', key, value)
-  })
 
   const highlightSet = computed(() => new Set(props.highlightFields))
 
@@ -131,14 +125,6 @@
         <span
           class="log-badge__value"
           :title="item.title"
-          role="button"
-          tabindex="0"
-          :aria-label="`Filter for ${item.key}`"
-          @mousedown="onValueMouseDown"
-          @mouseup="onValueMouseUp"
-          @click.stop="(e) => onValueClick(e, item.key, item.value)"
-          @keydown.enter.stop.prevent="(e) => onValueClick(e, item.key, item.value)"
-          @keydown.space.stop.prevent="(e) => onValueClick(e, item.key, item.value)"
           v-html="item.valueHtml"
         />
         <span class="log-badge__actions">
@@ -149,6 +135,7 @@
               size="small"
               class="log-badge__action-btn log-badge__action-btn--filter"
               aria-label="Filter for value"
+              v-tooltip.top="{ value: 'Filter for value', showDelay: 300 }"
               @click.stop="emit('add-filter', item.key, item.value)"
             />
             <PrimeButton
@@ -157,6 +144,7 @@
               size="small"
               class="log-badge__action-btn log-badge__action-btn--exclude"
               aria-label="Filter out value"
+              v-tooltip.top="{ value: 'Filter out value', showDelay: 300 }"
               @click.stop="emit('exclude-filter', item.key, item.value)"
             />
           </template>
@@ -221,6 +209,7 @@
     border: 1px solid var(--surface-200);
     max-width: 100%;
     position: relative;
+    overflow: hidden;
     flex-shrink: 0;
     user-select: text;
     transition:
@@ -317,25 +306,26 @@
   }
 
   .log-badges-container:focus-visible,
-  .log-badge__value:focus-visible,
   .log-badge--more:focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 1px;
   }
 
   /* ── Inline hover action buttons ──────────────────────────────── */
+  /* In-flow AFTER the value with reserved width: the icons never sit on top of
+     the attribute value and never shift layout on hover; the pill's
+     overflow:hidden keeps a width-clamped pill from spilling them outside. */
   .log-badge__actions {
     display: inline-flex;
     align-items: center;
     gap: 0;
     margin-left: 2px;
     flex-shrink: 0;
+    width: 32px;
+    justify-content: flex-end;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.1s ease;
-    /* Reserve fixed width so badges don't shift on hover */
-    width: 32px;
-    justify-content: flex-end;
   }
 
   .log-badge:hover .log-badge__actions {

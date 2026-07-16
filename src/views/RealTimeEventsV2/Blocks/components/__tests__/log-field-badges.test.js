@@ -40,84 +40,13 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-// ─── Click-to-filter: plain click → add-filter ────────────────────────────────
+// ─── Value span is INERT: filtering happens only via the hover icons ─────────
+// UX decision (2026-07-16): clicking a value must never apply a filter — the
+// cheap exploration gesture (click/select/copy) can't trigger the expensive,
+// context-destroying action (reload with the value filtered).
 
-describe('LogFieldBadges — plain click on value span', () => {
-  it('emits add-filter with the correct key and value', async () => {
-    // Ensure selection appears collapsed (no text selected)
-    vi.spyOn(window, 'getSelection').mockReturnValue({ isCollapsed: true })
-
-    const wrapper = mountComponent()
-    const valueSpans = wrapper.findAll('.log-badge__value')
-    expect(valueSpans.length).toBeGreaterThan(0)
-
-    // Simulate mousedown → mouseup → click on the first value span
-    const span = valueSpans[0]
-    await span.trigger('mousedown', { clientX: 10, clientY: 10 })
-    await span.trigger('mouseup', { clientX: 10, clientY: 10 })
-    await span.trigger('click', { altKey: false, clientX: 10, clientY: 10 })
-
-    const emitted = wrapper.emitted('add-filter')
-    expect(emitted).toBeTruthy()
-    expect(emitted[0]).toEqual(['host', 'example.com'])
-  })
-
-  it('emits add-filter for a numeric value', async () => {
-    vi.spyOn(window, 'getSelection').mockReturnValue({ isCollapsed: true })
-
-    const wrapper = mountComponent()
-    const valueSpans = wrapper.findAll('.log-badge__value')
-
-    const span = valueSpans[1]
-    await span.trigger('mousedown', { clientX: 5, clientY: 5 })
-    await span.trigger('mouseup', { clientX: 5, clientY: 5 })
-    await span.trigger('click', { altKey: false, clientX: 5, clientY: 5 })
-
-    const emitted = wrapper.emitted('add-filter')
-    expect(emitted).toBeTruthy()
-    expect(emitted[0]).toEqual(['status', 200])
-  })
-})
-
-// ─── Click-to-filter: Alt+click → exclude-filter ─────────────────────────────
-
-describe('LogFieldBadges — Alt+click on value span', () => {
-  it('emits exclude-filter with the correct key and value', async () => {
-    vi.spyOn(window, 'getSelection').mockReturnValue({ isCollapsed: true })
-
-    const wrapper = mountComponent()
-    const valueSpans = wrapper.findAll('.log-badge__value')
-
-    const span = valueSpans[0]
-    await span.trigger('mousedown', { clientX: 10, clientY: 10 })
-    await span.trigger('mouseup', { clientX: 10, clientY: 10 })
-    await span.trigger('click', { altKey: true, clientX: 10, clientY: 10 })
-
-    const emitted = wrapper.emitted('exclude-filter')
-    expect(emitted).toBeTruthy()
-    expect(emitted[0]).toEqual(['host', 'example.com'])
-  })
-
-  it('does NOT emit add-filter on Alt+click', async () => {
-    vi.spyOn(window, 'getSelection').mockReturnValue({ isCollapsed: true })
-
-    const wrapper = mountComponent()
-    const span = wrapper.findAll('.log-badge__value')[0]
-    await span.trigger('mousedown', { clientX: 10, clientY: 10 })
-    await span.trigger('mouseup', { clientX: 10, clientY: 10 })
-    await span.trigger('click', { altKey: true, clientX: 10, clientY: 10 })
-
-    expect(wrapper.emitted('add-filter')).toBeFalsy()
-  })
-})
-
-// ─── Text-selection gate: non-collapsed selection → no emit ──────────────────
-
-describe('LogFieldBadges — click over a text selection', () => {
-  it('emits neither add-filter nor exclude-filter when selection is non-collapsed', async () => {
-    // Simulate user having text selected
-    vi.spyOn(window, 'getSelection').mockReturnValue({ isCollapsed: false })
-
+describe('LogFieldBadges — value span is inert', () => {
+  it('clicking a value emits neither add-filter nor exclude-filter', async () => {
     const wrapper = mountComponent()
     const span = wrapper.findAll('.log-badge__value')[0]
     await span.trigger('mousedown', { clientX: 10, clientY: 10 })
@@ -128,17 +57,20 @@ describe('LogFieldBadges — click over a text selection', () => {
     expect(wrapper.emitted('exclude-filter')).toBeFalsy()
   })
 
-  it('also suppresses Alt+click when selection is non-collapsed', async () => {
-    vi.spyOn(window, 'getSelection').mockReturnValue({ isCollapsed: false })
-
+  it('Alt+clicking a value emits nothing either (no hidden gesture)', async () => {
     const wrapper = mountComponent()
     const span = wrapper.findAll('.log-badge__value')[0]
-    await span.trigger('mousedown', { clientX: 10, clientY: 10 })
-    await span.trigger('mouseup', { clientX: 10, clientY: 10 })
     await span.trigger('click', { altKey: true, clientX: 10, clientY: 10 })
 
     expect(wrapper.emitted('add-filter')).toBeFalsy()
     expect(wrapper.emitted('exclude-filter')).toBeFalsy()
+  })
+
+  it('the value is plain selectable text: no button role, no tabindex', () => {
+    const wrapper = mountComponent()
+    const span = wrapper.findAll('.log-badge__value')[0]
+    expect(span.attributes('role')).toBeUndefined()
+    expect(span.attributes('tabindex')).toBeUndefined()
   })
 })
 
@@ -195,9 +127,8 @@ describe('LogFieldBadges — hover PrimeButton filter actions', () => {
     expect(emitted[0]).toEqual(['host', 'example.com'])
   })
 
-  it('does NOT emit add-filter from the PrimeButton when selection is non-collapsed', async () => {
-    // PrimeButton uses @click.stop directly on emit — it bypasses useClickToFilter,
-    // so it should still emit regardless of selection state (it's the explicit hover control)
+  it('emits add-filter from the PrimeButton even with an active text selection', async () => {
+    // The icon is the EXPLICIT filter control — selection state is irrelevant to it.
     vi.spyOn(window, 'getSelection').mockReturnValue({ isCollapsed: false })
 
     const wrapper = mountComponent()
@@ -305,13 +236,10 @@ describe('LogFieldBadges — full value on hover (task 15.2)', () => {
     expect(value.attributes('title')).toBe(LONG_URI)
   })
 
-  it('emits the FULL value on click, so the filter matches the applied URI', async () => {
-    vi.spyOn(window, 'getSelection').mockReturnValue({ isCollapsed: true })
+  it('the hover filter icon emits the FULL value, so the filter matches the applied URI', async () => {
     const wrapper = mountComponent({ summary: [{ key: 'requestUri', value: LONG_URI }] })
-    const span = wrapper.find('.log-badge__value')
-    await span.trigger('mousedown', { clientX: 10, clientY: 10 })
-    await span.trigger('mouseup', { clientX: 10, clientY: 10 })
-    await span.trigger('click', { altKey: false, clientX: 10, clientY: 10 })
+    await wrapper.find('.log-badge').trigger('mouseenter')
+    await wrapper.find('button[aria-label="Filter for value"]').trigger('click')
     expect(wrapper.emitted('add-filter')[0]).toEqual(['requestUri', LONG_URI])
   })
 
@@ -342,39 +270,5 @@ describe('LogFieldBadges — invalid summary is observable, not a silent blank (
   it('does not throw and renders empty for a missing summary', () => {
     const wrapper = mountComponent({ summary: undefined })
     expect(wrapper.findAll('.log-badge__value')).toHaveLength(0)
-  })
-})
-
-// ─── Invalid value gate ───────────────────────────────────────────────────────
-
-describe('LogFieldBadges — invalid value gate', () => {
-  it('does not emit add-filter for a dash "-" value', async () => {
-    vi.spyOn(window, 'getSelection').mockReturnValue({ isCollapsed: true })
-
-    const wrapper = mountComponent({
-      summary: [{ key: 'empty', value: '-' }]
-    })
-
-    const span = wrapper.find('.log-badge__value')
-    await span.trigger('mousedown', { clientX: 10, clientY: 10 })
-    await span.trigger('mouseup', { clientX: 10, clientY: 10 })
-    await span.trigger('click', { altKey: false, clientX: 10, clientY: 10 })
-
-    expect(wrapper.emitted('add-filter')).toBeFalsy()
-  })
-
-  it('does not emit add-filter for an empty string value', async () => {
-    vi.spyOn(window, 'getSelection').mockReturnValue({ isCollapsed: true })
-
-    const wrapper = mountComponent({
-      summary: [{ key: 'empty', value: '' }]
-    })
-
-    const span = wrapper.find('.log-badge__value')
-    await span.trigger('mousedown', { clientX: 10, clientY: 10 })
-    await span.trigger('mouseup', { clientX: 10, clientY: 10 })
-    await span.trigger('click', { altKey: false, clientX: 10, clientY: 10 })
-
-    expect(wrapper.emitted('add-filter')).toBeFalsy()
   })
 })
