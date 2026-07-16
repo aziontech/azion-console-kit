@@ -79,6 +79,61 @@ describe('AccountService.fetchAccountIdentity', () => {
     expect(identity.client_id).toBe('client-9')
     expect(identity.email).toBe('r@acme.com')
   })
+
+  it('exposes every field the account store getters and consumers depend on', async () => {
+    mockRequestByUrl({
+      'account/info': {
+        data: {
+          id: 1,
+          kind: 'client',
+          status: 'ONLINE',
+          client_flags: ['allow_console'],
+          first_login: false
+        }
+      },
+      'user/me': {
+        data: {
+          id: 9,
+          client_id: 'client-9',
+          is_account_owner: true,
+          email: 'e@acme.com',
+          first_name: 'first',
+          last_name: 'last',
+          timezone: 'UTC',
+          utc_offset: '+0000',
+          permissions: [{ name: 'View Data Stream' }]
+        }
+      },
+      'v4/iam/account': { data: { data: { job_function: 'other' } } }
+    })
+
+    const identity = await accountService.fetchAccountIdentity()
+
+    const requiredKeys = [
+      'id',
+      'kind',
+      'status',
+      'client_flags',
+      'first_login',
+      'client_id',
+      'is_account_owner',
+      'permissions',
+      'user_id',
+      'email',
+      'first_name',
+      'last_name',
+      'timezone',
+      'utc_offset',
+      'jobRole',
+      'accountTypeIcon',
+      'accountTypeName',
+      'isDeveloperSupportPlan'
+    ]
+
+    for (const key of requiredKeys) {
+      expect(identity, `identity must expose "${key}"`).toHaveProperty(key)
+    }
+  })
 })
 
 describe('AccountService.getAccountIdentity (hardened query)', () => {

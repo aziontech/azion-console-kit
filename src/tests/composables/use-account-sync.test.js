@@ -39,6 +39,19 @@ describe('useAccountSync', () => {
     )
   })
 
+  it('enables the query only when a session exists', () => {
+    const store = useAccountStore()
+    runInScope(() => useAccountSync())
+
+    const options = accountService.useQuery.mock.calls[0][2]
+
+    expect(store.hasSession).toBe(false)
+    expect(options.enabled.value).toBe(false)
+
+    store.setHasSession(true)
+    expect(options.enabled.value).toBe(true)
+  })
+
   it('mirrors the query data into the store as it changes (reactive single writer)', async () => {
     const store = useAccountStore()
     runInScope(() => useAccountSync())
