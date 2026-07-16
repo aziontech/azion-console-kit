@@ -45,7 +45,7 @@
     { activeVersions }
   )
 
-  const columns = getVersionListColumns()
+  const columns = getVersionListColumns({ includeTraffic: false })
 
   const goToVersion = (versionIdOrObject) => {
     const id = typeof versionIdOrObject === 'string' ? versionIdOrObject : versionIdOrObject?.id

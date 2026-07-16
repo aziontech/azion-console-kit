@@ -1,6 +1,7 @@
 <script setup>
+  import PrimeButton from '@aziontech/webkit/button'
+
   import VersionsTab from '@/views/EdgeFirewall/v6/tabs/VersionsTab.vue'
-  import MainSettingsTab from '@/views/EdgeFirewall/v6/tabs/MainSettingsTab.vue'
   import ResourceVersionLanding from '@/templates/version-shell-block/ResourceVersionLanding.vue'
   import ResourceOverviewBlock from '@/templates/version-shell-block/ResourceOverviewBlock.vue'
   import ScopedVariablesTab from '@/views/Variables/v6/components/ScopedVariablesTab.vue'
@@ -18,10 +19,8 @@
     latestVersionId,
     activeTab,
     isDeployDrawerOpen,
+    openRelease,
     deployResourceContext,
-    handleCommandSuccess,
-    handleCommandError,
-    handleCancel,
     versionsQuery,
     rawVersions,
     activeVersions,
@@ -55,8 +54,18 @@
     empty-state-description="Create a version on the Versions tab to start configuring this Firewall."
     testid-prefix="firewall-v6-edit"
     :show-overview="true"
+    :show-settings="false"
     :show-variables="true"
   >
+    <template #heading-actions>
+      <PrimeButton
+        label="Deploy"
+        icon="pi pi-cloud-upload"
+        size="small"
+        data-testid="firewall-v6-edit__deploy"
+        @click="openRelease"
+      />
+    </template>
     <template #overview>
       <ResourceOverviewBlock
         resource-type="firewall"
@@ -70,17 +79,6 @@
     </template>
     <template #versions>
       <VersionsTab :firewall-id="resourceId" />
-    </template>
-    <template #settings>
-      <MainSettingsTab
-        :key="latestVersionId"
-        :firewall="resource"
-        :resource-id="resourceId"
-        :version-id="latestVersionId"
-        @command-success="handleCommandSuccess"
-        @command-error="handleCommandError"
-        @cancel="handleCancel"
-      />
     </template>
     <template #variables>
       <ScopedVariablesTab

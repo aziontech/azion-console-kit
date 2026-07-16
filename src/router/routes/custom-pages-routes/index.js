@@ -44,7 +44,7 @@ export const customPagesRoutes = {
       }
     },
     {
-      path: 'edit/:id',
+      path: 'edit/:id/:tab?',
       name: 'edit-custom-pages',
       component: () =>
         hasFlagUseV6Configurations()

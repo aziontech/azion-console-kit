@@ -46,8 +46,6 @@
     { activeVersions }
   )
 
-  // Overview owns the Live Deployments table now, so the Versions listing drops
-  // the Traffic column (previously ENG-46624's Live tag).
   const columns = getVersionListColumns({ includeTraffic: false })
 
   const goToVersion = (versionIdOrObject) => {

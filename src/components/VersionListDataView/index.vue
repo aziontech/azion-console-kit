@@ -214,6 +214,10 @@
 
   const hideTrafficPopup = () => trafficOverlayRef.value?.hide?.()
 
+  const hasTrafficColumn = computed(() =>
+    visibleColumns.value.some((col) => col?.key === 'traffic')
+  )
+
   const resolveSize = (column) => column?.size || 'minmax(0, 1fr)'
 
   const extractMinPx = (size) => {
@@ -636,6 +640,19 @@
                             <i class="pi pi-circle-on" />
                             Current
                           </span>
+                          <span
+                            v-if="version.activeTraffic && !hasTrafficColumn"
+                            class="inline-flex items-center"
+                            :data-testid="`version-list-data-view__row-${version.id}__traffic`"
+                            @mouseenter="showTrafficPopup($event, version)"
+                            @mouseleave="hideTrafficPopup"
+                          >
+                            <PrimeTag
+                              severity="success"
+                              icon="pi pi-globe"
+                              value="Live"
+                            />
+                          </span>
                         </span>
                         <span
                           v-if="version.comment"
@@ -784,6 +801,12 @@
                               <i class="pi pi-circle-on" />
                               Current
                             </span>
+                            <PrimeTag
+                              v-if="version.activeTraffic && !hasTrafficColumn"
+                              severity="success"
+                              icon="pi pi-globe"
+                              value="Live"
+                            />
                           </span>
                           <span
                             v-if="version.comment"
