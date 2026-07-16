@@ -1,321 +1,101 @@
 <script setup>
   /**
-   * v6 EditView — the Application screen, gated by `use_v6_configurations`.
-   * Lists every version of the Application with search/filter/sort and per-row
-   * management actions (Clone / Archive / Delete). Clicking a version — or
-   * creating/cloning one — opens its FULL editor (VersionEditView, route
-   * `edit-application-version`). The page heading carries the Deploy action +
-   * drawer.
+   * v6 EditView — the Application landing screen, gated by
+   * `use_v6_configurations`. Uses the shared ResourceVersionLanding shell
+   * (mirrors Firewall) and plugs into it three tabs: Overview + Versions +
+   * Variables. The version editor lives in a separate screen
+   * (`edit-application-version`); Deploy from the heading routes to the
+   * full-page release composer.
    *
    * The flag check stays centralized in the router (req 10.1) — this view never
    * imports user-flag.
    */
-  import { computed, ref, watch, provide } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
-  import { useToast } from '@aziontech/webkit/use-toast'
-  import ProgressSpinner from '@aziontech/webkit/progressspinner'
-  import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PrimeButton from '@aziontech/webkit/button'
 
-  import { toDeployableVersionOptions } from '@/composables/versioning/to-version-options'
-
-  import ContentBlock from '@/templates/content-block'
-  import PageHeadingBlock from '@/templates/page-heading-block'
-  import VersionListDataView from '@/components/VersionListDataView'
-  import VersionActionDialog from '@/templates/version-shell-block/components/VersionActionDialog.vue'
-  import DeployDrawerBlock from '@/templates/deploy-drawer-block'
-  import { releaseComposerRouteFromResource } from '@/templates/release-composition/release-composer-route'
+  import ResourceVersionLanding from '@/templates/version-shell-block/ResourceVersionLanding.vue'
+  import ResourceOverviewBlock from '@/templates/version-shell-block/ResourceOverviewBlock.vue'
+  import VersionsTab from '@/views/EdgeApplications/v6/tabs/VersionsTab.vue'
   import ScopedVariablesTab from '@/views/Variables/v6/components/ScopedVariablesTab.vue'
-  import TabView from 'primevue/tabview'
-  import TabPanel from '@aziontech/webkit/tabpanel'
-
+  import { useResourceVersionLanding } from '@/composables/versioning/use-resource-version-landing'
   import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
   import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
-  import { useVersionList } from '@/composables/versioning/use-version-list'
-  import { useActiveVersions } from '@/composables/versioning/use-active-versions'
-  import { getVersionListColumns } from '@/composables/versioning/version-list-columns'
-  import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
 
   defineOptions({ name: 'application-v6-edit-view' })
 
-  const route = useRoute()
-  const router = useRouter()
-  const toast = useToast()
-
-  const edgeApplicationId = computed(() => String(route.params.id))
-
-  const activeTab = computed({
-    get: () => (String(route.params.tab) === 'variables' ? 1 : 0),
-    set: (index) => {
-      const params = { id: edgeApplicationId.value }
-      if (index === 1) params.tab = 'variables'
-      router.replace({ name: 'edit-application', params })
-    }
-  })
-
-  const application = ref(null)
-  const isLoadingApplication = ref(true)
-  const loadError = ref(null)
-
-  provide('edgeApplication', application)
-
-  const loadApplication = async () => {
-    if (!application.value) isLoadingApplication.value = true
-    loadError.value = null
-    try {
-      application.value = await edgeAppService.loadEdgeApplicationService({
-        id: edgeApplicationId.value
-      })
-    } catch (err) {
-      loadError.value = err
-      application.value = null
-    } finally {
-      isLoadingApplication.value = false
-    }
-  }
-
-  watch(edgeApplicationId, loadApplication, { immediate: true })
-
-  const versionsQuery = edgeAppVersionService.useListVersionsQuery(edgeApplicationId.value)
-  const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
-
-  const resourceRef = computed(() => ({
-    resourceType: 'application',
-    resourceId: edgeApplicationId.value
-  }))
-  const { activeVersions, refresh: refreshActiveVersions } = useActiveVersions(resourceRef)
-
-  const { items, searchTerm, filterValues, sort, filters, sortOptions } = useVersionList(
-    rawVersions,
-    { activeVersions }
-  )
-
-  const columns = getVersionListColumns()
-
-  const goToVersion = (versionIdOrObject) => {
-    const id = typeof versionIdOrObject === 'string' ? versionIdOrObject : versionIdOrObject?.id
-    if (!id) return
-    router.push(`/applications/edit/${edgeApplicationId.value}/versions/${id}`)
-  }
-
-  // DeployDrawerBlock stays mounted (rollback fallback); the visible/pinned models
-  // are retained but the Deploy/Promote entries now route to the full-page composer.
-  const isDeployDrawerOpen = ref(false)
-  // Version pinned by a row-menu Promote; cleared when the drawer closes.
-  const pinnedDeployVersionId = ref(null)
-  // Heading Deploy: route to the composer scoped to this Application, pinning the
-  // newest Ready version so the composer opens with a concrete selection.
-  const openRelease = () => {
-    router.push(
-      releaseComposerRouteFromResource({
-        resourceType: 'application',
-        resourceId: Number(edgeApplicationId.value),
-        version: null,
-        versions: readyVersionOptions.value
-      })
-    )
-  }
-  // Promote from the row menu: route to the composer with this version pinned.
-  const openPromoteRelease = ({ pin } = {}) => {
-    router.push(
-      releaseComposerRouteFromResource({
-        resourceType: 'application',
-        resourceId: Number(edgeApplicationId.value),
-        version: pin ? { id: pin } : null,
-        versions: readyVersionOptions.value
-      })
-    )
-  }
-  watch(isDeployDrawerOpen, (open) => {
-    if (!open) pinnedDeployVersionId.value = null
-  })
-
-  // Single shared row-menu driver (spec §3.3, Req 1.4/10.1): nav, Promote
-  // (routes to the composer) and Archive/Delete all flow through one router.
   const {
-    handleRowAction,
-    dialogConfig,
-    dialogProps,
-    dialogVisible,
-    handleConfirm,
-    handleVisibility
-  } = useVersionMenuActions({
-    resourceType: 'application',
-    resourceId: edgeApplicationId,
+    resource,
+    resourceId,
+    isLoading,
+    loadError,
+    latestVersionId,
+    activeTab,
+    isDeployDrawerOpen,
+    openRelease,
+    deployResourceContext,
+    versionsQuery,
+    rawVersions,
+    activeVersions,
+    activeVersionsLoading
+  } = useResourceVersionLanding({
+    load: (id) => edgeAppService.loadEdgeApplicationService({ id }),
+    provideKey: 'edgeApplication',
     versionService: edgeAppVersionService,
-    router,
-    openPromoteDrawer: openPromoteRelease,
-    onSuccess: () => {
-      versionsQuery.refetch?.()
-      refreshActiveVersions()
-    }
+    resourceType: 'application',
+    routeName: 'edit-application',
+    versionRouteName: 'edit-application-version',
+    showOverview: true
   })
 
-  const isCreatingDraft = ref(false)
-
-  const createDraft = async () => {
-    if (isCreatingDraft.value) return
-    isCreatingDraft.value = true
-    try {
-      const draft = await edgeAppVersionService.createDraft(edgeApplicationId.value, {})
-      if (draft?.id) goToVersion(draft.id)
-    } catch (err) {
-      if (err && typeof err.showErrors === 'function') {
-        err.showErrors(toast)
-      } else {
-        toast.add({
-          closable: true,
-          severity: 'error',
-          summary: 'Error',
-          detail: err?.message ?? 'Failed to create a new version. Try again.'
-        })
-      }
-    } finally {
-      isCreatingDraft.value = false
-    }
-  }
-
-  const readyVersionOptions = computed(() => toDeployableVersionOptions(rawVersions.value))
-
-  const deployResourceContext = computed(() => ({
-    resourceType: 'application',
-    resourceId: Number(edgeApplicationId.value),
-    resourceName: application.value?.name ?? '',
-    version: pinnedDeployVersionId.value ? { id: pinnedDeployVersionId.value } : null,
-    versions: readyVersionOptions.value
-  }))
-
-  const applicationTitle = computed(() => application.value?.name ?? '')
   const pageDescription =
     "Each version is an isolated snapshot of this Application's configuration. Edit a draft, then build it to publish an immutable version to the Edge."
 </script>
 
 <template>
-  <div
-    v-if="isLoadingApplication"
-    class="flex items-center justify-center p-8"
-    data-testid="application-v6-edit__loading"
+  <ResourceVersionLanding
+    v-model:active-tab="activeTab"
+    v-model:deploy-visible="isDeployDrawerOpen"
+    :is-loading="isLoading"
+    :load-error="loadError"
+    :title="resource?.name ?? ''"
+    :description="pageDescription"
+    :entity-name="resource?.name"
+    error-message="Failed to load application. Try refreshing the page."
+    :resource-context="deployResourceContext"
+    :latest-version-id="latestVersionId"
+    empty-state-description="Create a version on the Versions tab to start configuring this Application."
+    testid-prefix="application-v6-edit"
+    :show-overview="true"
+    :show-settings="false"
+    :show-variables="true"
   >
-    <ProgressSpinner
-      class="w-10 h-10 text-color"
-      strokeWidth="4"
-    />
-  </div>
-
-  <InlineMessage
-    v-else-if="loadError"
-    class="w-full"
-    severity="error"
-    data-testid="application-v6-edit__error"
-  >
-    Failed to load application. Try refreshing the page.
-  </InlineMessage>
-
-  <ContentBlock
-    v-else
-    data-testid="application-v6-edit"
-  >
-    <template #heading>
-      <PageHeadingBlock
-        :pageTitle="applicationTitle"
-        :description="pageDescription"
-        :entityName="application?.name"
-      >
-        <template #default>
-          <PrimeButton
-            label="Deploy"
-            icon="pi pi-cloud-upload"
-            size="small"
-            data-testid="application-v6-edit__deploy"
-            @click="openRelease"
-          />
-        </template>
-      </PageHeadingBlock>
-    </template>
-    <template #content>
-      <TabView v-model:activeIndex="activeTab">
-        <TabPanel
-          header="Versions"
-          :pt="{ root: { 'data-testid': 'application-v6-edit__tab__versions' } }"
-        >
-          <VersionListDataView
-            :items="items"
-            :columns="columns"
-            :loading="versionsQuery.isLoading.value"
-            :is-error="versionsQuery.isError?.value ?? false"
-            :has-versions="rawVersions.length > 0"
-            :search-term="searchTerm"
-            :filters="filters"
-            :filter-values="filterValues"
-            :sort="sort"
-            :sort-options="sortOptions"
-            :show-row-actions="true"
-            resource-type="application"
-            :paginator-rows="20"
-            search-placeholder="Search versions"
-            :empty-state="{
-              title: 'This application has no versions yet',
-              description:
-                'Create the first version to start configuring this application with the v6 versioning workflow.',
-              buttonLabel: 'New Version',
-              buttonAction: createDraft
-            }"
-            :error-state="{
-              title: 'Failed to load versions',
-              description: 'Something went wrong loading this application’s versions. Try again.',
-              buttonLabel: 'Retry',
-              buttonAction: () => versionsQuery.refetch?.()
-            }"
-            filtered-empty-title="No versions match your filters"
-            filtered-empty-description="Try a different search term or status filter."
-            data-testid="application-v6-versions__table"
-            @update:search-term="searchTerm = $event"
-            @update:filter-values="filterValues = $event"
-            @update:sort="sort = $event"
-            @refresh="versionsQuery.refetch?.()"
-            @row-action="handleRowAction"
-            class="mt-4"
-          >
-            <template #toolbar-actions>
-              <PrimeButton
-                v-if="rawVersions.length > 0"
-                label="New Version"
-                icon="pi pi-plus"
-                size="small"
-                class="h-[2.5rem]"
-                :loading="isCreatingDraft"
-                data-testid="application-v6-versions__new-draft"
-                @click="createDraft"
-              />
-            </template>
-          </VersionListDataView>
-        </TabPanel>
-
-        <TabPanel
-          header="Variables"
-          :pt="{ root: { 'data-testid': 'application-v6-edit__tab__variables' } }"
-        >
-          <ScopedVariablesTab
-            v-if="activeTab === 1"
-            scope-type="application"
-            :scope-id="edgeApplicationId"
-            class="mt-4"
-          />
-        </TabPanel>
-      </TabView>
-
-      <VersionActionDialog
-        v-if="dialogConfig"
-        v-bind="dialogProps"
-        :visible="dialogVisible"
-        @confirm="handleConfirm"
-        @update:visible="handleVisibility"
-      />
-
-      <DeployDrawerBlock
-        v-model:visible="isDeployDrawerOpen"
-        :resource-context="deployResourceContext"
+    <template #heading-actions>
+      <PrimeButton
+        label="Deploy"
+        icon="pi pi-cloud-upload"
+        size="small"
+        data-testid="application-v6-edit__deploy"
+        @click="openRelease"
       />
     </template>
-  </ContentBlock>
+    <template #overview>
+      <ResourceOverviewBlock
+        resource-type="application"
+        :resource-id="resourceId"
+        :raw-versions="rawVersions"
+        :active-versions="activeVersions"
+        :active-versions-loading="activeVersionsLoading"
+        :versions-query="versionsQuery"
+        testid-prefix="application-v6-overview"
+      />
+    </template>
+    <template #versions>
+      <VersionsTab :application-id="resourceId" />
+    </template>
+    <template #variables>
+      <ScopedVariablesTab
+        scope-type="application"
+        :scope-id="resourceId"
+      />
+    </template>
+  </ResourceVersionLanding>
 </template>

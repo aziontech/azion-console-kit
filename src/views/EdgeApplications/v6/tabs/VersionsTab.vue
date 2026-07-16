@@ -1,10 +1,11 @@
 <script setup>
   /**
-   * VersionsTab — the version LISTING body of the Firewall v6 screen.
+   * VersionsTab — the version LISTING body of the Application v6 screen.
    *
-   * Lists every version of the Firewall with search/filter/sort and per-row
-   * actions (Clone / Archive / Delete). Clicking a version opens its FULL editor
-   * (VersionEditView). Owns its own versions query (deduped by queryKey).
+   * Lists every version of the Application with search/filter/sort and per-row
+   * actions (Clone / Archive / Delete / Promote). Clicking a version opens its
+   * FULL editor (VersionEditView). Owns its own versions query (deduped by
+   * queryKey), and reads the shared menu host provided by ResourceVersionLanding.
    */
   import { computed, inject, ref } from 'vue'
   import { useRouter } from 'vue-router'
@@ -14,16 +15,16 @@
   import VersionListDataView from '@/components/VersionListDataView'
   import VersionActionDialog from '@/templates/version-shell-block/components/VersionActionDialog.vue'
 
-  import { edgeFirewallVersionService } from '@/services/v2/edge-firewall/edge-firewall-version-service'
+  import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
   import { useVersionList } from '@/composables/versioning/use-version-list'
   import { useActiveVersions } from '@/composables/versioning/use-active-versions'
   import { getVersionListColumns } from '@/composables/versioning/version-list-columns'
   import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
 
-  defineOptions({ name: 'firewall-v6-versions-tab' })
+  defineOptions({ name: 'application-v6-versions-tab' })
 
   const props = defineProps({
-    firewallId: {
+    applicationId: {
       type: [String, Number],
       required: true
     }
@@ -32,13 +33,16 @@
   const router = useRouter()
   const toast = useToast()
 
-  const firewallId = computed(() => String(props.firewallId))
+  const applicationId = computed(() => String(props.applicationId))
   const isCreatingDraft = ref(false)
 
-  const versionsQuery = edgeFirewallVersionService.useListVersionsQuery(firewallId.value)
+  const versionsQuery = edgeAppVersionService.useListVersionsQuery(applicationId.value)
   const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
 
-  const resourceRef = computed(() => ({ resourceType: 'firewall', resourceId: firewallId.value }))
+  const resourceRef = computed(() => ({
+    resourceType: 'application',
+    resourceId: applicationId.value
+  }))
   const { activeVersions, refresh: refreshActiveVersions } = useActiveVersions(resourceRef)
 
   const { items, searchTerm, filterValues, sort, filters, sortOptions } = useVersionList(
@@ -53,11 +57,9 @@
   const goToVersion = (versionIdOrObject) => {
     const id = typeof versionIdOrObject === 'string' ? versionIdOrObject : versionIdOrObject?.id
     if (!id) return
-    router.push(`/firewalls/edit/${firewallId.value}/versions/${id}`)
+    router.push(`/applications/edit/${applicationId.value}/versions/${id}`)
   }
 
-  // The landing owns the release drawer; the tab only routes through the
-  // single shared row-menu driver (spec §3.3/3.6, Req 1.4/10.1).
   const menuHost = inject('versionMenuHost', {})
 
   const {
@@ -68,9 +70,9 @@
     handleConfirm,
     handleVisibility
   } = useVersionMenuActions({
-    resourceType: 'firewall',
-    resourceId: firewallId,
-    versionService: edgeFirewallVersionService,
+    resourceType: 'application',
+    resourceId: applicationId,
+    versionService: edgeAppVersionService,
     router,
     openPromoteDrawer: menuHost.openPromoteDrawer,
     onSuccess: () => {
@@ -83,7 +85,7 @@
     if (isCreatingDraft.value) return
     isCreatingDraft.value = true
     try {
-      const draft = await edgeFirewallVersionService.createDraft(firewallId.value, {})
+      const draft = await edgeAppVersionService.createDraft(applicationId.value, {})
       if (draft?.id) goToVersion(draft.id)
     } catch (err) {
       if (err && typeof err.showErrors === 'function') {
@@ -103,7 +105,7 @@
 </script>
 
 <template>
-  <div data-testid="firewall-v6-versions-tab">
+  <div data-testid="application-v6-versions-tab">
     <VersionListDataView
       :items="items"
       :columns="columns"
@@ -116,25 +118,25 @@
       :sort="sort"
       :sort-options="sortOptions"
       :show-row-actions="true"
-      resource-type="firewall"
+      resource-type="application"
       :paginator-rows="20"
       search-placeholder="Search versions"
       :empty-state="{
-        title: 'This firewall has no versions yet',
+        title: 'This application has no versions yet',
         description:
-          'Create the first version to start configuring this firewall with the v6 versioning workflow.',
+          'Create the first version to start configuring this application with the v6 versioning workflow.',
         buttonLabel: 'New Version',
         buttonAction: createDraft
       }"
       :error-state="{
         title: 'Failed to load versions',
-        description: 'Something went wrong loading this firewall’s versions. Try again.',
+        description: 'Something went wrong loading this application’s versions. Try again.',
         buttonLabel: 'Retry',
         buttonAction: () => versionsQuery.refetch?.()
       }"
       filtered-empty-title="No versions match your filters"
       filtered-empty-description="Try a different search term or status filter."
-      data-testid="firewall-v6-versions__table"
+      data-testid="application-v6-versions__table"
       @update:search-term="searchTerm = $event"
       @update:filter-values="filterValues = $event"
       @update:sort="sort = $event"
@@ -148,7 +150,7 @@
           icon="pi pi-plus"
           size="small"
           :loading="isCreatingDraft"
-          data-testid="firewall-v6-versions__new-draft"
+          data-testid="application-v6-versions__new-draft"
           @click="createDraft"
           class="h-[2.5rem]"
         />

@@ -381,8 +381,7 @@
                   : 'json-pre--compact'
             "
             data-testid="event-document-json"
-            >{{ jsonDocument }}</pre
-          >
+            >{{ jsonDocument }}</pre>
         </div>
       </TabPanel>
     </TabView>

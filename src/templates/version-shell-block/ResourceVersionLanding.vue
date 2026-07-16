@@ -1,10 +1,15 @@
 <script setup>
-  // Shared chrome for the TABBED landing screen (Versions listing + Settings =
-  // Main Settings of the latest version), used by Custom Pages and Firewall. Owns
-  // the heading (with the version-lifecycle teleport target), the two-tab shell,
-  // the "no version yet" empty state and the deploy drawer. The per-resource tab
-  // bodies arrive through the `versions` and `settings` slots; logic lives in
-  // useResourceVersionLanding.
+  // Shared chrome for the TABBED landing screen (Overview + Versions listing +
+  // Settings = Main Settings of the latest version + Variables), used by
+  // Custom Pages, Firewall and Application. Owns the heading (with the
+  // version-lifecycle teleport target), the tab shell, the "no version yet"
+  // empty state and the deploy drawer. The per-resource tab bodies arrive
+  // through the `overview`, `versions`, `settings` and `variables` slots;
+  // logic lives in useResourceVersionLanding.
+  //
+  // `showOverview` is opt-in — only resource types wired via the Overview
+  // registry (overview-resource-config) should enable it.
+  import { computed } from 'vue'
   import ProgressSpinner from '@aziontech/webkit/progressspinner'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PrimeButton from '@aziontech/webkit/button'
@@ -16,9 +21,7 @@
 
   defineOptions({ name: 'resource-version-landing' })
 
-  const TAB = { VERSIONS: 0, SETTINGS: 1, VARIABLES: 2 }
-
-  defineProps({
+  const props = defineProps({
     isLoading: { type: Boolean, default: false },
     loadError: { type: [Object, Error], default: null },
     title: { type: String, default: '' },
@@ -31,6 +34,7 @@
       type: String,
       default: 'Create a version on the Versions tab to start configuring this resource.'
     },
+    showOverview: { type: Boolean, default: false },
     showSettings: { type: Boolean, default: true },
     showVariables: { type: Boolean, default: false },
     testidPrefix: { type: String, required: true }
@@ -38,6 +42,20 @@
 
   const activeTab = defineModel('activeTab', { type: Number, default: 0 })
   const deployVisible = defineModel('deployVisible', { type: Boolean, default: false })
+
+  // Compute the numeric tab index per section so slots stay stable regardless of
+  // whether Overview is enabled. Order: Overview? → Versions → Settings? → Variables?
+  const tabIndexes = computed(() => {
+    let cursor = 0
+    const map = {}
+    if (props.showOverview) map.overview = cursor++
+    map.versions = cursor++
+    if (props.showSettings) map.settings = cursor++
+    if (props.showVariables) map.variables = cursor++
+    return map
+  })
+
+  const hasTabs = computed(() => props.showOverview || props.showSettings || props.showVariables)
 </script>
 
 <template>
@@ -72,11 +90,10 @@
         :entityName="entityName"
       >
         <template #default>
-          <div
-            v-if="showSettings"
-            class="flex items-center gap-[var(--spacing-3)]"
-          >
+          <div class="flex items-center gap-[var(--spacing-3)]">
+            <slot name="heading-actions" />
             <div
+              v-if="showSettings"
               id="version-lifecycle-action"
               class="flex items-center"
             />
@@ -86,24 +103,35 @@
     </template>
     <template #content>
       <TabView
-        v-if="showSettings || showVariables"
+        v-if="hasTabs"
         v-model:activeIndex="activeTab"
         :pt="{ root: { class: 'flex flex-col gap-[var(--spacing-4)]' } }"
       >
+        <TabPanel
+          v-if="showOverview"
+          header="Overview"
+          :pt="{ root: { 'data-testid': `${testidPrefix}__tab__overview` } }"
+        >
+          <slot
+            v-if="activeTab === tabIndexes.overview"
+            name="overview"
+          />
+        </TabPanel>
         <TabPanel
           header="Versions"
           :pt="{ root: { 'data-testid': `${testidPrefix}__tab__versions` } }"
         >
           <slot
-            v-if="activeTab === TAB.VERSIONS"
+            v-if="activeTab === tabIndexes.versions"
             name="versions"
           />
         </TabPanel>
         <TabPanel
+          v-if="showSettings"
           header="Settings"
           :pt="{ root: { 'data-testid': `${testidPrefix}__tab__settings` } }"
         >
-          <template v-if="activeTab === TAB.SETTINGS">
+          <template v-if="activeTab === tabIndexes.settings">
             <slot
               v-if="latestVersionId"
               name="settings"
@@ -125,7 +153,7 @@
                 icon="pi pi-plus"
                 size="small"
                 :data-testid="`${testidPrefix}__settings-empty__cta`"
-                @click="activeTab = TAB.VERSIONS"
+                @click="activeTab = tabIndexes.versions"
               />
             </div>
           </template>
@@ -136,7 +164,7 @@
           :pt="{ root: { 'data-testid': `${testidPrefix}__tab__variables` } }"
         >
           <slot
-            v-if="activeTab === TAB.VARIABLES"
+            v-if="activeTab === tabIndexes.variables"
             name="variables"
           />
         </TabPanel>

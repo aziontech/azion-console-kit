@@ -2,6 +2,7 @@
   import VersionsTab from '@/views/EdgeFirewall/v6/tabs/VersionsTab.vue'
   import MainSettingsTab from '@/views/EdgeFirewall/v6/tabs/MainSettingsTab.vue'
   import ResourceVersionLanding from '@/templates/version-shell-block/ResourceVersionLanding.vue'
+  import ResourceOverviewBlock from '@/templates/version-shell-block/ResourceOverviewBlock.vue'
   import ScopedVariablesTab from '@/views/Variables/v6/components/ScopedVariablesTab.vue'
   import { useResourceVersionLanding } from '@/composables/versioning/use-resource-version-landing'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
@@ -20,14 +21,19 @@
     deployResourceContext,
     handleCommandSuccess,
     handleCommandError,
-    handleCancel
+    handleCancel,
+    versionsQuery,
+    rawVersions,
+    activeVersions,
+    activeVersionsLoading
   } = useResourceVersionLanding({
     load: (id) => edgeFirewallService.loadEdgeFirewallService({ id }),
     provideKey: 'edgeFirewall',
     versionService: edgeFirewallVersionService,
     resourceType: 'firewall',
     routeName: 'edit-firewall',
-    versionRouteName: 'edit-firewall-version'
+    versionRouteName: 'edit-firewall-version',
+    showOverview: true
   })
 
   const pageDescription =
@@ -48,8 +54,20 @@
     :latest-version-id="latestVersionId"
     empty-state-description="Create a version on the Versions tab to start configuring this Firewall."
     testid-prefix="firewall-v6-edit"
+    :show-overview="true"
     :show-variables="true"
   >
+    <template #overview>
+      <ResourceOverviewBlock
+        resource-type="firewall"
+        :resource-id="resourceId"
+        :raw-versions="rawVersions"
+        :active-versions="activeVersions"
+        :active-versions-loading="activeVersionsLoading"
+        :versions-query="versionsQuery"
+        testid-prefix="firewall-v6-overview"
+      />
+    </template>
     <template #versions>
       <VersionsTab :firewall-id="resourceId" />
     </template>

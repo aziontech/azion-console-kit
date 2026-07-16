@@ -40,9 +40,9 @@ import { VERSION_STATES } from '@/composables/versioning/version-machine'
  */
 const LISTINGS = [
   {
-    name: 'EdgeApplications EditView',
+    name: 'EdgeApplications VersionsTab',
     resourceType: 'application',
-    file: 'src/views/EdgeApplications/v6/EditView.vue'
+    file: 'src/views/EdgeApplications/v6/tabs/VersionsTab.vue'
   },
   {
     name: 'EdgeFirewall VersionsTab',

@@ -105,6 +105,10 @@
       type: Number,
       default: 20
     },
+    showPaginator: {
+      type: Boolean,
+      default: true
+    },
     lazy: {
       type: Boolean,
       default: false
@@ -128,6 +132,13 @@
     resourceType: {
       type: String,
       default: ''
+    },
+    // Hide the toolbar (search/filter/sort + `toolbar-actions` slot). Used by the
+    // Overview's Live Deployments table, which is a small, non-searchable list
+    // but must still share this component's table shell for visual consistency.
+    showToolbar: {
+      type: Boolean,
+      default: true
     }
   })
 
@@ -368,7 +379,10 @@
     class="flex flex-col gap-4 text-[var(--text-color)]"
     data-testid="version-list-data-view"
   >
-    <div class="flex flex-wrap items-center justify-between gap-2">
+    <div
+      v-if="showToolbar"
+      class="flex flex-wrap items-center justify-between gap-2"
+    >
       <div class="dataview-toolbar flex min-w-0 flex-1 flex-wrap items-center gap-2">
         <button
           v-if="isCompactViewport && hasCollapsibleFilters"
@@ -573,7 +587,7 @@
           <DataView
             :value="items"
             dataKey="id"
-            :paginator="true"
+            :paginator="showPaginator"
             :lazy="lazy"
             :totalRecords="lazy ? totalRecords : undefined"
             :rows="paginatorRows"
@@ -660,6 +674,29 @@
                           data-sentry-mask
                         >
                           {{ version.lastEditor || 'azion@azion.com' }}
+                        </span>
+                      </button>
+
+                      <button
+                        v-else-if="column.key === 'deployed'"
+                        type="button"
+                        class="created-cell-button flex max-w-full min-w-0 flex-col items-start gap-0.5 border-0 bg-transparent p-0 text-left"
+                        @click="triggerRowClick(version)"
+                      >
+                        <span
+                          class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm text-[var(--text-color)]"
+                        >
+                          {{
+                            version.deployedAt
+                              ? formatDateToDayMonthYearHour(version.deployedAt)
+                              : '--'
+                          }}
+                        </span>
+                        <span
+                          class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs text-[var(--text-color-secondary)]"
+                          data-sentry-mask
+                        >
+                          {{ version.deployedBy || version.lastEditor || 'azion@azion.com' }}
                         </span>
                       </button>
 
@@ -825,6 +862,23 @@
                               data-sentry-mask
                             >
                               {{ version.lastEditor || 'azion@azion.com' }}
+                            </span>
+                          </template>
+                          <template v-else-if="col.key === 'deployed'">
+                            <span
+                              class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm text-[var(--text-color)]"
+                            >
+                              {{
+                                version.deployedAt
+                                  ? formatDateToDayMonthYearHour(version.deployedAt)
+                                  : '--'
+                              }}
+                            </span>
+                            <span
+                              class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs text-[var(--text-color-secondary)]"
+                              data-sentry-mask
+                            >
+                              {{ version.deployedBy || version.lastEditor || 'azion@azion.com' }}
                             </span>
                           </template>
                           <span
