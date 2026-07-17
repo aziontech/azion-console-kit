@@ -120,3 +120,27 @@ describe('DeploymentVersionService - createVersionService invalidates both cache
     })
   })
 })
+
+describe('DeploymentVersionService - revert generates a new version from a chosen version', () => {
+  it('POSTs to /versions/{versionId}/revert with an empty body and invalidates both caches', async () => {
+    const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries').mockImplementation(() => {})
+    const requestSpy = vi.spyOn(httpService, 'request').mockResolvedValueOnce({ data: {} })
+
+    const feedback = await service.revert({ id: DID, versionId: VID })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: `${BASE}/${VID}/revert`,
+      body: {}
+    })
+    expect(feedback).toBe('Deployment successfully reverted')
+
+    expect(removeSpy).toHaveBeenCalledWith({
+      queryKey: queryKeys.deployments.versions.all(DID)
+    })
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: queryKeys.deployments.detail(DID)
+    })
+  })
+})

@@ -22,9 +22,9 @@ const mapItem = (item) => ({
 const transformScopePayload = (scope) => {
   if (!Array.isArray(scope)) return []
   return scope.map((item) => {
-    if (item.type === 'global') return { type: 'global' }
+    if (item.type === 'global') return { resource_type: 'global' }
     const type = item.type === 'resource' ? item.resourceType : item.type
-    return { type, [`${type}_id`]: item.id }
+    return { resource_type: type, [`${type}_id`]: item.id }
   })
 }
 
@@ -55,13 +55,11 @@ export const VariablesV6Adapter = {
   transformVersionsList(data) {
     if (!Array.isArray(data)) return []
 
-    const numbers = data.map((item) => Number(item.version))
-    const maxVersion = numbers.length ? Math.max(...numbers) : null
-
     return data.map((item) => ({
       id: item.version_id,
       label: item.version_id,
-      isCurrent: item.current ?? Number(item.version) === maxVersion,
+      versionState: item.version_state,
+      isCurrent: item.version_state === 'ready',
       lastEditor: item.last_editor,
       lastModified: formatDateToDayMonthYearHour(item.created_at)
     }))
@@ -94,7 +92,7 @@ export const VariablesV6Adapter = {
     return payload
   },
 
-  transformRollbackPayload() {
+  transformRevertPayload() {
     return {}
   }
 }

@@ -159,7 +159,7 @@
             v-if="activeTab === TAB_TO_INDEX['version-history']"
             :resource="resource"
             :resourceKind="resourceKind"
-            @rolled-back="refreshResource"
+            @reverted="refreshResource"
           />
         </TabPanel>
       </TabView>

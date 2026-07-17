@@ -34,6 +34,11 @@ const LEGITIMATE_RELEASE_TOKENS = [
   '.archive('
 ]
 
+// ENG-46694: revert is now an allowed version-history operation. It generates a
+// NEW version from the chosen version's config (it is not a draft/build mutation),
+// so it stays out of VERSION_MUTATION_TOKENS on purpose.
+const LEGITIMATE_VERSION_HISTORY_TOKENS = ['deploymentVersionService.revert', '.revert(']
+
 const toPosix = (value) => value.split(sep).join('/')
 
 const walk = (dir) =>
@@ -47,7 +52,7 @@ const scannedFiles = walk(DEPLOYMENTS_DIR)
   .map((file) => ({ file, rel: toPosix(relative(DEPLOYMENTS_DIR, file)) }))
   .filter(({ rel }) => !PRESERVED_VERSION_FORMS_FOR_OTHER_FLOWS.includes(rel))
 
-describe('Deployment views — Version History surface is read-only (no version mutation)', () => {
+describe('Deployment views — Version History surface performs no version mutation except revert', () => {
   it('discovers deployment view source files to scan', () => {
     expect(scannedFiles.length).toBeGreaterThan(0)
   })
@@ -58,10 +63,15 @@ describe('Deployment views — Version History surface is read-only (no version 
     expect(found, `${rel} must not mutate deployment versions`).toEqual([])
   })
 
-  it('does not forbid legitimate release operations', () => {
-    for (const legit of LEGITIMATE_RELEASE_TOKENS) {
+  it('does not forbid legitimate release or revert operations', () => {
+    for (const legit of [...LEGITIMATE_RELEASE_TOKENS, ...LEGITIMATE_VERSION_HISTORY_TOKENS]) {
       expect(VERSION_MUTATION_TOKENS).not.toContain(legit)
     }
+  })
+
+  it('wires the revert action on the Version History tab (ENG-46694)', () => {
+    const tab = readFileSync(join(DEPLOYMENTS_DIR, 'tabs', 'VersionHistoryTab.vue'), 'utf8')
+    expect(tab).toContain('deploymentVersionService.revert')
   })
 
   it('keeps preserved version forms out of the read-only scope (used by Workload / Release Composer)', () => {

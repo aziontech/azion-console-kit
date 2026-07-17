@@ -118,18 +118,18 @@ export class VariablesV6Service extends BaseService {
     )
   }
 
-  rollback = async ({ id, versionId }) => {
-    const body = VariablesV6Adapter.transformRollbackPayload()
+  revert = async ({ id, versionId }) => {
+    const body = VariablesV6Adapter.transformRevertPayload()
 
     await this.http.request({
       method: 'POST',
-      url: `${this.#baseURL}/${id}/rollback/${versionId}`,
+      url: `${this.#baseURL}/${id}/revert/${versionId}`,
       body
     })
 
     this.queryClient.removeQueries({ queryKey: queryKeys.variablesV6.all })
 
-    return 'Variable successfully rolled back'
+    return 'Variable successfully reverted'
   }
 }
 

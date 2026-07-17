@@ -3,43 +3,34 @@
   import PrimeDialog from '@aziontech/webkit/dialog'
   import PrimeButton from '@aziontech/webkit/button'
   import { useToast } from '@aziontech/webkit/use-toast'
+  import { variablesV6Service } from '@/services/v2/variables/v6/variables-v6-service'
 
-  defineOptions({ name: 'digital-certificates-rollback-dialog' })
+  defineOptions({ name: 'variables-revert-dialog' })
 
   const props = defineProps({
     visible: {
       type: Boolean,
       required: true
     },
-    resource: {
+    variable: {
       type: Object,
       default: null
     },
     targetVersion: {
       type: Object,
       default: null
-    },
-    rollbackService: {
-      type: Function,
-      required: true
-    },
-    resourceLabel: {
-      type: String,
-      default: 'certificate'
     }
   })
 
   const emit = defineEmits(['update:visible', 'success'])
 
   const toast = useToast()
-  const isRollingBack = ref(false)
-
-  const header = computed(() => `Rollback ${props.resourceLabel}`)
+  const isReverting = ref(false)
 
   const description = computed(() => {
-    const name = props.resource?.name ?? `this ${props.resourceLabel}`
+    const key = props.variable?.key ?? 'this variable'
     const label = props.targetVersion?.label ?? 'the selected version'
-    return `This creates a new current version of ${name} using the contents from ${label}. The current version is preserved in history.`
+    return `This creates a new current version of ${key} using the values from ${label}. The current version is preserved in history and the scope stays unchanged.`
   })
 
   const close = () => {
@@ -47,7 +38,7 @@
   }
 
   const handleCancel = () => {
-    if (isRollingBack.value) return
+    if (isReverting.value) return
     close()
   }
 
@@ -60,18 +51,18 @@
       closable: true,
       severity: 'error',
       summary: 'Error',
-      detail: error?.message ?? `Failed to roll back the ${props.resourceLabel}. Try again.`
+      detail: error?.message ?? 'Failed to revert the variable. Try again.'
     })
   }
 
-  const handleRollback = async () => {
-    if (isRollingBack.value) return
-    if (!props.resource?.id || !props.targetVersion?.id) return
+  const handleRevert = async () => {
+    if (isReverting.value) return
+    if (!props.variable?.id || !props.targetVersion?.id) return
 
-    isRollingBack.value = true
+    isReverting.value = true
     try {
-      const feedback = await props.rollbackService({
-        id: props.resource.id,
+      const feedback = await variablesV6Service.revert({
+        id: props.variable.id,
         versionId: props.targetVersion.id
       })
       toast.add({
@@ -85,7 +76,7 @@
     } catch (error) {
       reportError(error)
     } finally {
-      isRollingBack.value = false
+      isReverting.value = false
     }
   }
 </script>
@@ -100,7 +91,7 @@
     @update:visible="handleCancel"
   >
     <template #header>
-      <h5 class="text-heading-sm not-italic font-medium">{{ header }}</h5>
+      <h5 class="text-heading-sm not-italic font-medium">Revert variable</h5>
     </template>
 
     <div
@@ -109,7 +100,7 @@
     >
       <p
         class="text-body-sm text-[var(--text-color-secondary)]"
-        data-testid="digital-certificates-rollback-dialog__description"
+        data-testid="variables-revert-dialog__description"
       >
         {{ description }}
       </p>
@@ -121,18 +112,18 @@
         size="small"
         label="Cancel"
         outlined
-        :disabled="isRollingBack"
-        data-testid="digital-certificates-rollback-dialog__cancel"
+        :disabled="isReverting"
+        data-testid="variables-revert-dialog__cancel"
         @click="handleCancel"
       />
       <PrimeButton
         severity="primary"
         size="small"
-        label="Rollback"
-        :loading="isRollingBack"
-        :disabled="isRollingBack || !targetVersion"
-        data-testid="digital-certificates-rollback-dialog__confirm"
-        @click="handleRollback"
+        label="Revert"
+        :loading="isReverting"
+        :disabled="isReverting || !targetVersion"
+        data-testid="variables-revert-dialog__confirm"
+        @click="handleRevert"
       />
     </template>
   </PrimeDialog>

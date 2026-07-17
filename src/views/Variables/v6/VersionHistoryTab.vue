@@ -7,7 +7,7 @@
   import { clipboardWrite } from '@/helpers/clipboard'
   import { variablesV6Service } from '@/services/v2/variables/v6/variables-v6-service'
   import { buildVersionRowActions } from '@/views/Variables/v6/version-row-actions'
-  import RollbackDialog from '@/views/Variables/v6/components/RollbackDialog.vue'
+  import RevertDialog from '@/views/Variables/v6/components/RevertDialog.vue'
   import VersionListDataView from '@/components/VersionListDataView'
   import '@/assets/styles/version-row-menu.css'
 
@@ -20,7 +20,7 @@
     }
   })
 
-  const emit = defineEmits(['rolled-back'])
+  const emit = defineEmits(['reverted'])
 
   const toast = useToast()
 
@@ -81,12 +81,12 @@
     fetchVersions()
   }
 
-  const rollbackVisible = ref(false)
+  const revertVisible = ref(false)
   const selectedVersion = ref(null)
 
-  const openRollback = (version) => {
+  const openRevert = (version) => {
     selectedVersion.value = version
-    rollbackVisible.value = true
+    revertVisible.value = true
   }
 
   const copyVersionId = async (version) => {
@@ -109,7 +109,7 @@
   }
 
   const rowHandlers = {
-    onRollback: openRollback,
+    onRevert: openRevert,
     onCopy: copyVersionId
   }
 
@@ -129,9 +129,9 @@
     rowMenuRef.value?.toggle?.(event)
   }
 
-  const handleRollbackSuccess = async () => {
+  const handleRevertSuccess = async () => {
     await fetchVersions({ skipCache: true })
-    emit('rolled-back')
+    emit('reverted')
   }
 
   onBeforeUnmount(() => {
@@ -156,7 +156,7 @@
     search-placeholder="Search versions"
     :empty-state="{
       title: 'This variable has no versions yet',
-      description: 'Each edit creates a new version. Rollback restores an earlier value.'
+      description: 'Each edit creates a new version. Revert restores an earlier value.'
     }"
     :error-state="{
       title: 'Failed to load versions',
@@ -233,10 +233,10 @@
     </template>
   </Menu>
 
-  <RollbackDialog
-    v-model:visible="rollbackVisible"
+  <RevertDialog
+    v-model:visible="revertVisible"
     :variable="props.variable"
     :targetVersion="selectedVersion"
-    @success="handleRollbackSuccess"
+    @success="handleRevertSuccess"
   />
 </template>

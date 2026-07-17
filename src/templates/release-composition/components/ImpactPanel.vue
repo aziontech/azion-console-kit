@@ -165,7 +165,6 @@
             :data-testid="`release-composition__impact-env-${env.name}`"
           >
             <div class="flex items-center gap-[var(--spacing-2)]">
-              <i class="pi pi-box text-[var(--text-color-secondary)]" />
               <span class="flex-1 text-body-xs text-[var(--text-color)]">{{ env.name }}</span>
               <span class="ml-auto text-body-xxs text-[var(--text-color-secondary)]"
                 >{{ env.wlCount }} workloads</span

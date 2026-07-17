@@ -40,7 +40,7 @@ const buildInvocations = (scenario) => ({
   edit: (service) => service.edit({ id: ID, values: scenario.editValues }),
   delete: (service) => service.delete(ID),
   listVersions: (service) => service.listVersions({ id: ID, page: 1 }),
-  rollback: (service) => service.rollback({ id: ID, versionId: VERSION_ID })
+  revert: (service) => service.revert({ id: ID, versionId: VERSION_ID })
 })
 
 describe.each(scenarios)('$label', (scenario) => {
@@ -149,13 +149,13 @@ describe.each(scenarios)('$label', (scenario) => {
       )
     })
 
-    it('rollback issues POST on /{id}/rollback/{versionId} with an empty body', async () => {
-      await service.rollback({ id: ID, versionId: VERSION_ID })
+    it('revert issues POST on /{id}/revert/{versionId} with an empty body', async () => {
+      await service.revert({ id: ID, versionId: VERSION_ID })
 
       expect(service.http.request).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'POST',
-          url: `${scenario.baseURL}/${ID}/rollback/${VERSION_ID}`,
+          url: `${scenario.baseURL}/${ID}/revert/${VERSION_ID}`,
           body: {},
           config: ACCEPT
         })
@@ -188,8 +188,8 @@ describe.each(scenarios)('$label', (scenario) => {
       expect(service.queryClient.removeQueries).toHaveBeenCalledWith({ queryKey: scenario.rootKey })
     })
 
-    it('rollback calls removeQueries with the root key', async () => {
-      await service.rollback({ id: ID, versionId: VERSION_ID })
+    it('revert calls removeQueries with the root key', async () => {
+      await service.revert({ id: ID, versionId: VERSION_ID })
 
       expect(service.queryClient.removeQueries).toHaveBeenCalledWith({ queryKey: scenario.rootKey })
     })

@@ -120,6 +120,23 @@ export class DeploymentVersionService extends VersionServiceBase {
 
     return { data: this.adapter.transformLoadVersion(unwrapItem(data)) }
   }
+
+  // Version-history revert: the API generates a NEW version from the chosen
+  // version's configuration (does not just re-point). Mirrors the variables /
+  // certificates `revert` shape so the shared RevertDialog can call it directly.
+  revert = async ({ id, versionId }) => {
+    const deploymentId = toValue(id)
+
+    await this.http.request({
+      method: 'POST',
+      url: this.getUrl(deploymentId, toValue(versionId), '/revert'),
+      body: {}
+    })
+
+    this.invalidateAfterMutation(deploymentId)
+
+    return 'Deployment successfully reverted'
+  }
 }
 
 export const deploymentVersionService = new DeploymentVersionService()

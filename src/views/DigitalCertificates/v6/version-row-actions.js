@@ -2,14 +2,14 @@ export const buildVersionRowActions = (version, handlers = {}) => {
   const actions = []
 
   if (version?.isCurrent !== true) {
-    const runRollback = () => handlers.onRollback?.(version)
+    const runRevert = () => handlers.onRevert?.(version)
     actions.push({
-      id: 'rollback',
-      label: 'Rollback to this version',
+      id: 'revert',
+      label: 'Revert to this version',
       icon: 'pi pi-history',
       type: 'action',
-      execute: runRollback,
-      commandAction: runRollback
+      execute: runRevert,
+      commandAction: runRevert
     })
   }
 

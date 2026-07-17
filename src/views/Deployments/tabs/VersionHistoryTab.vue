@@ -11,6 +11,7 @@
     hasTransientVersions
   } from '@/services/v2/versioning/version-cache-policy'
   import { buildVersionRowActions } from './version-history-row-actions'
+  import RevertDialog from './components/RevertDialog.vue'
   import VersionListDataView from '@/components/VersionListDataView'
   import '@/assets/styles/version-row-menu.css'
 
@@ -155,7 +156,21 @@
     }
   }
 
+  const revertVisible = ref(false)
+  const selectedVersion = ref(null)
+  const deploymentResource = computed(() => ({ id: props.deploymentId }))
+
+  const openRevert = (version) => {
+    selectedVersion.value = version
+    revertVisible.value = true
+  }
+
+  const onRevertSuccess = async () => {
+    await fetchVersions({ skipCache: true })
+  }
+
   const rowHandlers = {
+    onRevert: openRevert,
     onCopy: copyVersionId
   }
 
@@ -292,4 +307,12 @@
       </a>
     </template>
   </Menu>
+
+  <RevertDialog
+    v-model:visible="revertVisible"
+    :resource="deploymentResource"
+    :targetVersion="selectedVersion"
+    :revertService="deploymentVersionService.revert"
+    @success="onRevertSuccess"
+  />
 </template>

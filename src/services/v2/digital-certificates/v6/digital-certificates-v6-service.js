@@ -116,17 +116,17 @@ export class DigitalCertificatesV6Service extends BaseService {
     )
   }
 
-  rollback = async ({ id, versionId }) => {
+  revert = async ({ id, versionId }) => {
     await this.http.request({
       method: 'POST',
-      url: `${this.#baseURL}/${id}/rollback/${versionId}`,
+      url: `${this.#baseURL}/${id}/revert/${versionId}`,
       body: {},
       config: this.#requestConfig
     })
 
     this.queryClient.removeQueries({ queryKey: queryKeys.digitalCertificatesV6.all })
 
-    return 'Certificate successfully rolled back'
+    return 'Certificate successfully reverted'
   }
 }
 

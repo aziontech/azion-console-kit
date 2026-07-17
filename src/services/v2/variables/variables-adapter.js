@@ -66,9 +66,9 @@ export const VariablesAdapter = {
   transformScopePayload(scope) {
     if (!Array.isArray(scope)) return []
     return scope.map((item) => {
-      if (item.type === 'global') return { type: 'global' }
+      if (item.type === 'global') return { resource_type: 'global' }
       const idKey = `${item.type}_id`
-      return { type: item.type, [idKey]: item[idKey] }
+      return { resource_type: item.type, [idKey]: item[idKey] }
     })
   }
 }

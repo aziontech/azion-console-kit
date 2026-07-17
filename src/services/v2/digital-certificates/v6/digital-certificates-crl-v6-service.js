@@ -118,17 +118,17 @@ export class DigitalCertificatesCRLV6Service extends BaseService {
     )
   }
 
-  rollback = async ({ id, versionId }) => {
+  revert = async ({ id, versionId }) => {
     await this.http.request({
       method: 'POST',
-      url: `${this.#baseURL}/${id}/rollback/${versionId}`,
+      url: `${this.#baseURL}/${id}/revert/${versionId}`,
       body: {},
       config: this.#config
     })
 
     this.queryClient.removeQueries({ queryKey: queryKeys.digitalCertificatesCRLV6.all })
 
-    return 'CRL successfully rolled back'
+    return 'CRL successfully reverted'
   }
 }
 

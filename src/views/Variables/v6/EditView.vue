@@ -149,7 +149,7 @@
           <VersionHistoryTab
             v-if="activeTab === TAB_TO_INDEX['version-history']"
             :variable="variable"
-            @rolled-back="refreshVariable"
+            @reverted="refreshVariable"
           />
         </TabPanel>
       </TabView>

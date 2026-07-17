@@ -8,7 +8,7 @@
   import { digitalCertificatesV6Service } from '@/services/v2/digital-certificates/v6/digital-certificates-v6-service'
   import { digitalCertificatesCRLV6Service } from '@/services/v2/digital-certificates/v6/digital-certificates-crl-v6-service'
   import { buildVersionRowActions } from './version-row-actions'
-  import RollbackDialog from './components/RollbackDialog.vue'
+  import RevertDialog from './components/RevertDialog.vue'
   import VersionListDataView from '@/components/VersionListDataView'
   import '@/assets/styles/version-row-menu.css'
 
@@ -25,7 +25,7 @@
     }
   })
 
-  const emit = defineEmits(['rolled-back'])
+  const emit = defineEmits(['reverted'])
 
   const toast = useToast()
 
@@ -98,12 +98,12 @@
     fetchVersions()
   }
 
-  const rollbackVisible = ref(false)
+  const revertVisible = ref(false)
   const selectedVersion = ref(null)
 
-  const openRollback = (version) => {
+  const openRevert = (version) => {
     selectedVersion.value = version
-    rollbackVisible.value = true
+    revertVisible.value = true
   }
 
   const copyVersionId = async (version) => {
@@ -126,7 +126,7 @@
   }
 
   const rowHandlers = {
-    onRollback: openRollback,
+    onRevert: openRevert,
     onCopy: copyVersionId
   }
 
@@ -146,9 +146,9 @@
     rowMenuRef.value?.toggle?.(event)
   }
 
-  const handleRollbackSuccess = async () => {
+  const handleRevertSuccess = async () => {
     await fetchVersions({ skipCache: true })
-    emit('rolled-back')
+    emit('reverted')
   }
 
   onBeforeUnmount(() => {
@@ -173,7 +173,7 @@
     search-placeholder="Search versions"
     :empty-state="{
       title: emptyStateTitle,
-      description: 'Each edit creates a new version. Rollback restores an earlier configuration.'
+      description: 'Each edit creates a new version. Revert restores an earlier configuration.'
     }"
     :error-state="{
       title: 'Failed to load versions',
@@ -250,12 +250,12 @@
     </template>
   </Menu>
 
-  <RollbackDialog
-    v-model:visible="rollbackVisible"
+  <RevertDialog
+    v-model:visible="revertVisible"
     :resource="props.resource"
     :targetVersion="selectedVersion"
-    :rollbackService="service.rollback"
+    :revertService="service.revert"
     :resourceLabel="resourceLabel"
-    @success="handleRollbackSuccess"
+    @success="handleRevertSuccess"
   />
 </template>

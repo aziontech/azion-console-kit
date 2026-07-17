@@ -3,34 +3,34 @@ import { buildVersionRowActions } from '@/views/DigitalCertificates/v6/version-r
 
 const idsOf = (actions) => actions.map((action) => action.id)
 
-describe('Property P6 — rollback is never offered on the current version', () => {
+describe('Property P6 — revert is never offered on the current version', () => {
   it('exposes only copy-version-id when isCurrent is true', () => {
     const actions = buildVersionRowActions({ id: 'v3', isCurrent: true })
     const ids = idsOf(actions)
 
-    expect(ids).not.toContain('rollback')
+    expect(ids).not.toContain('revert')
     expect(ids).toEqual(['copy-version-id'])
   })
 
-  it('offers rollback before copy-version-id when isCurrent is false', () => {
+  it('offers revert before copy-version-id when isCurrent is false', () => {
     const actions = buildVersionRowActions({ id: 'v2', isCurrent: false })
     const ids = idsOf(actions)
 
-    expect(ids).toContain('rollback')
+    expect(ids).toContain('revert')
     expect(ids).toContain('copy-version-id')
-    expect(ids.indexOf('rollback')).toBeLessThan(ids.indexOf('copy-version-id'))
+    expect(ids.indexOf('revert')).toBeLessThan(ids.indexOf('copy-version-id'))
   })
 
-  it('runs onRollback with the version when the rollback action executes', () => {
+  it('runs onRevert with the version when the revert action executes', () => {
     const version = { id: 'v2', isCurrent: false }
-    const onRollback = vi.fn()
+    const onRevert = vi.fn()
 
-    const actions = buildVersionRowActions(version, { onRollback })
-    const rollback = actions.find((action) => action.id === 'rollback')
-    rollback.execute()
+    const actions = buildVersionRowActions(version, { onRevert })
+    const revert = actions.find((action) => action.id === 'revert')
+    revert.execute()
 
-    expect(onRollback).toHaveBeenCalledTimes(1)
-    expect(onRollback).toHaveBeenCalledWith(version)
+    expect(onRevert).toHaveBeenCalledTimes(1)
+    expect(onRevert).toHaveBeenCalledWith(version)
   })
 
   it('runs onCopy with the version when the copy-version-id action executes', () => {
@@ -45,11 +45,11 @@ describe('Property P6 — rollback is never offered on the current version', () 
     expect(onCopy).toHaveBeenCalledWith(version)
   })
 
-  it('treats missing isCurrent as non-current because only isCurrent === true blocks rollback', () => {
+  it('treats missing isCurrent as non-current because only isCurrent === true blocks revert', () => {
     const actions = buildVersionRowActions({ id: 'v1' })
     const ids = idsOf(actions)
 
-    expect(ids).toContain('rollback')
+    expect(ids).toContain('revert')
     expect(ids).toContain('copy-version-id')
   })
 

@@ -22,7 +22,7 @@ const makeApiItem = (overrides = {}) => ({
 
 const makeVersionItem = (overrides = {}) => ({
   version_id: 'ver-1',
-  version: '1',
+  version_state: 'archived',
   value: 'plain-version-value',
   secret: false,
   last_editor: 'user@azion.com',
@@ -254,7 +254,9 @@ describe('VariablesV6Adapter — transformCreatePayload scope', () => {
     VariablesV6Adapter.transformCreatePayload({ key: 'K', value: 'v', secret: false, scope }).scope
 
   it('maps a global scope without an id', () => {
-    expect(buildScope([{ type: 'global', resourceType: '', id: '' }])).toEqual([{ type: 'global' }])
+    expect(buildScope([{ type: 'global', resourceType: '', id: '' }])).toEqual([
+      { resource_type: 'global' }
+    ])
   })
 
   it('maps environment and deployment scopes to their <type>_id', () => {
@@ -264,8 +266,8 @@ describe('VariablesV6Adapter — transformCreatePayload scope', () => {
         { type: 'deployment', resourceType: '', id: '456' }
       ])
     ).toEqual([
-      { type: 'environment', environment_id: '123' },
-      { type: 'deployment', deployment_id: '456' }
+      { resource_type: 'environment', environment_id: '123' },
+      { resource_type: 'deployment', deployment_id: '456' }
     ])
   })
 
@@ -276,8 +278,8 @@ describe('VariablesV6Adapter — transformCreatePayload scope', () => {
         { type: 'resource', resourceType: 'firewall', id: '999' }
       ])
     ).toEqual([
-      { type: 'application', application_id: '1001' },
-      { type: 'firewall', firewall_id: '999' }
+      { resource_type: 'application', application_id: '1001' },
+      { resource_type: 'firewall', firewall_id: '999' }
     ])
   })
 
@@ -289,29 +291,27 @@ describe('VariablesV6Adapter — transformCreatePayload scope', () => {
 })
 
 describe('VariablesV6Adapter — extras', () => {
-  it('marks isCurrent from the explicit current field when present', () => {
+  it('marks isCurrent from version_state — ready is current, archived is historical', () => {
     const result = VariablesV6Adapter.transformVersionsList([
-      makeVersionItem({ version_id: 'ver-1', version: '1', current: true }),
-      makeVersionItem({ version_id: 'ver-2', version: '2', current: false })
+      makeVersionItem({ version_id: 'ver-1', version_state: 'ready' }),
+      makeVersionItem({ version_id: 'ver-2', version_state: 'archived' }),
+      makeVersionItem({ version_id: 'ver-3', version_state: 'archived' })
     ])
 
     expect(result.find((entry) => entry.id === 'ver-1').isCurrent).toBe(true)
     expect(result.find((entry) => entry.id === 'ver-2').isCurrent).toBe(false)
+    expect(result.find((entry) => entry.id === 'ver-3').isCurrent).toBe(false)
   })
 
-  it('falls back to the highest version number for isCurrent when current is absent', () => {
+  it('exposes the raw versionState on each mapped row', () => {
     const result = VariablesV6Adapter.transformVersionsList([
-      makeVersionItem({ version_id: 'ver-1', version: '1' }),
-      makeVersionItem({ version_id: 'ver-3', version: '3' }),
-      makeVersionItem({ version_id: 'ver-2', version: '2' })
+      makeVersionItem({ version_id: 'ver-1', version_state: 'ready' })
     ])
 
-    expect(result.find((entry) => entry.id === 'ver-3').isCurrent).toBe(true)
-    expect(result.find((entry) => entry.id === 'ver-1').isCurrent).toBe(false)
-    expect(result.find((entry) => entry.id === 'ver-2').isCurrent).toBe(false)
+    expect(result[0].versionState).toBe('ready')
   })
 
-  it('returns an empty rollback payload', () => {
-    expect(VariablesV6Adapter.transformRollbackPayload()).toEqual({})
+  it('returns an empty revert payload', () => {
+    expect(VariablesV6Adapter.transformRevertPayload()).toEqual({})
   })
 })
