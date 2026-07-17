@@ -186,7 +186,7 @@
         >
           <div class="flex items-center justify-between gap-[var(--spacing-3)]">
             <div class="flex min-w-0 items-center gap-[var(--spacing-2)]">
-              <i class="pi pi-send text-[var(--text-color-secondary)]" />
+              <i class="ai ai-deploy-pillar text-[var(--text-color-secondary)]" />
               <span class="truncate text-body-sm font-semibold text-[var(--text-color)]">
                 {{ item.name }}
               </span>

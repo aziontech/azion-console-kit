@@ -28,6 +28,11 @@
    * @prop {string} query Search string (owned by the parent).
    * @prop {boolean} isLoadingMeta When true, the impact metadata (workloads
    *   count and environment tags) is replaced by a discrete skeleton placeholder.
+   * @prop {boolean} metaUnavailable When true, a row with no resolved workload
+   *   count surfaces an "impact unavailable" note instead of the "no workloads"
+   *   line — so a failed impact load is never misread as "zero workloads". Rows
+   *   always render a second metadata line (count, unavailable, or "no workloads")
+   *   so every card keeps the same height.
    *
    * @emits update:modelValue When the selection changes.
    * @emits update:query When the search string changes.
@@ -63,6 +68,10 @@
     isLoadingMeta: {
       type: Boolean,
       default: false
+    },
+    metaUnavailable: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -71,7 +80,9 @@
   const visibleEnvNames = (ds) => (ds.environmentNames ?? []).slice(0, MAX_ENV_TAGS)
   const remainingEnvNames = (ds) => (ds.environmentNames ?? []).slice(MAX_ENV_TAGS)
   const extraEnvCount = (ds) => remainingEnvNames(ds).length
-  const hasWorkloadsCount = (ds) => Number.isFinite(ds.workloadsCount)
+  const hasWorkloads = (ds) => Number.isFinite(ds.workloadsCount) && ds.workloadsCount > 0
+  const workloadsLabel = (ds) =>
+    `${ds.workloadsCount} ${ds.workloadsCount === 1 ? 'Workload' : 'Workloads'} affected`
 
   const emit = defineEmits([
     'update:modelValue',
@@ -302,7 +313,7 @@
           />
           <div class="flex flex-1 flex-col gap-[var(--spacing-1)]">
             <span class="flex flex-wrap items-center gap-[var(--spacing-2)]">
-              <i class="pi pi-send text-[var(--text-color-secondary)]" />
+              <i class="ai ai-deploy-pillar text-[var(--text-color-secondary)]" />
               <span class="text-body-sm text-[var(--text-color)]">{{ ds.name }}</span>
 
               <span
@@ -351,12 +362,30 @@
             </div>
 
             <span
-              v-else-if="hasWorkloadsCount(ds)"
+              v-else-if="hasWorkloads(ds)"
               class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
               :data-testid="`release-composition__ds-workloads-${ds.id}`"
             >
-              <i class="pi pi-globe" />
-              {{ ds.workloadsCount }} Workloads affected
+              <i class="ai ai-workloads" />
+              {{ workloadsLabel(ds) }}
+            </span>
+
+            <span
+              v-else-if="metaUnavailable"
+              class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
+              :data-testid="`release-composition__ds-workloads-unavailable-${ds.id}`"
+            >
+              <i class="ai ai-workloads" />
+              Workloads impact unavailable
+            </span>
+
+            <span
+              v-else
+              class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
+              :data-testid="`release-composition__ds-workloads-empty-${ds.id}`"
+            >
+              <i class="ai ai-workloads" />
+              No workloads bound
             </span>
           </div>
           <span
@@ -378,7 +407,7 @@
           />
           <div class="flex flex-1 flex-col gap-[var(--spacing-1)]">
             <span class="flex flex-wrap items-center gap-[var(--spacing-2)]">
-              <i class="pi pi-send text-[var(--text-color-secondary)]" />
+              <i class="ai ai-deploy-pillar text-[var(--text-color-secondary)]" />
               <span class="text-body-sm text-[var(--text-color)]">{{ ds.name }}</span>
               <span
                 class="inline-flex shrink-0 items-center rounded-[var(--shape-elements)] bg-[var(--surface-200)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm text-[var(--text-color-secondary)]"

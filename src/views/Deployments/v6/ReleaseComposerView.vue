@@ -1625,6 +1625,7 @@
                 :model-value="deploymentIds"
                 :query="dsQuery"
                 :is-loading-meta="impact.isLoading.value"
+                :meta-unavailable="impactReason === 'fetch_failed'"
                 @update:model-value="onPickDs"
                 @update:query="dsQuery = $event"
                 @bind-environment="onBindEnvironment"

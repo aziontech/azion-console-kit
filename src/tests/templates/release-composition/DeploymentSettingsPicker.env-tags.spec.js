@@ -117,17 +117,52 @@ describe('DeploymentSettingsPicker environment tags', () => {
     expect(chip.attributes('aria-label')).toBe('2 more Environments: d, e')
   })
 
-  it('renders the "{N} Workloads affected" line when a finite workloadsCount is present and omits it otherwise', () => {
+  it('renders the "{N} Workloads affected" line when a positive workloadsCount is present', () => {
     const withCount = makeWrapper(makeDeployment({ id: 'ds-wl', workloadsCount: 20 }))
     const line = withCount.find('[data-testid="release-composition__ds-workloads-ds-wl"]')
     expect(line.exists()).toBe(true)
     expect(line.text()).toContain('20 Workloads affected')
+  })
 
+  it('singularizes the workloads line when exactly one workload is affected', () => {
+    const one = makeWrapper(makeDeployment({ id: 'ds-one', workloadsCount: 1 }))
+    const line = one.find('[data-testid="release-composition__ds-workloads-ds-one"]')
+    expect(line.text()).toContain('1 Workload affected')
+    expect(line.text()).not.toContain('1 Workloads affected')
+  })
+
+  it('shows a "No workloads bound" line (never the count line) so cards keep the same height when no workload is affected', () => {
     const withoutCount = makeWrapper(makeDeployment({ id: 'ds-nowl' }))
-    const missing = withoutCount.find('[data-testid="release-composition__ds-workloads-ds-nowl"]')
-    expect(missing.exists()).toBe(false)
+    expect(
+      withoutCount.find('[data-testid="release-composition__ds-workloads-ds-nowl"]').exists()
+    ).toBe(false)
+    const empty = withoutCount.find(
+      '[data-testid="release-composition__ds-workloads-empty-ds-nowl"]'
+    )
+    expect(empty.exists()).toBe(true)
+    expect(empty.text()).toContain('No workloads bound')
     expect(withoutCount.text()).not.toContain('Workloads affected')
-    expect(withoutCount.text()).not.toContain('0 Workloads')
+  })
+
+  it('treats a zero workloadsCount as "No workloads bound" rather than "0 Workloads affected"', () => {
+    const zero = makeWrapper(makeDeployment({ id: 'ds-zero', workloadsCount: 0 }))
+    expect(
+      zero.find('[data-testid="release-composition__ds-workloads-empty-ds-zero"]').exists()
+    ).toBe(true)
+    expect(zero.text()).not.toContain('0 Workloads affected')
+  })
+
+  it('surfaces an "impact unavailable" note instead of "No workloads bound" when the meta failed to load', () => {
+    const unavailable = makeWrapper(makeDeployment({ id: 'ds-unavail' }), {
+      metaUnavailable: true
+    })
+    expect(
+      unavailable
+        .find('[data-testid="release-composition__ds-workloads-unavailable-ds-unavail"]')
+        .exists()
+    ).toBe(true)
+    expect(unavailable.text()).toContain('Workloads impact unavailable')
+    expect(unavailable.text()).not.toContain('No workloads bound')
   })
 
   it('shows the skeleton and hides real tags and workloads when isLoadingMeta is true', () => {

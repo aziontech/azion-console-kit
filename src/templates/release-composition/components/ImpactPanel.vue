@@ -108,7 +108,7 @@
       <div
         class="flex items-center gap-[var(--spacing-2)] rounded-[var(--shape-card)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-3)] py-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
       >
-        <i class="pi pi-send text-[var(--text-color-secondary)]" />
+        <i class="ai ai-deploy-pillar text-[var(--text-color-secondary)]" />
         <span>{{ impact.totals.dsCount }} Deployment Settings selected</span>
       </div>
       <PrimeButton
@@ -145,7 +145,7 @@
         :data-testid="`release-composition__impact-ds-${ds.name}`"
       >
         <div class="flex items-center gap-[var(--spacing-2)] py-[var(--spacing-1)]">
-          <i class="pi pi-send text-[var(--text-color-secondary)]" />
+          <i class="ai ai-deploy-pillar text-[var(--text-color-secondary)]" />
           <span class="flex-1 text-body-sm font-semibold text-[var(--text-color)]">{{
             ds.name
           }}</span>
@@ -181,7 +181,7 @@
                 class="flex items-center gap-[var(--spacing-2)] border-t border-[var(--surface-border)] py-[var(--spacing-1)]"
                 :data-testid="`release-composition__impact-row-${row.name}`"
               >
-                <i class="pi pi-globe text-[var(--text-color-secondary)]" />
+                <i class="ai ai-workloads text-[var(--text-color-secondary)]" />
                 <span class="flex-1 text-body-xs text-[var(--text-color)]">{{ row.name }}</span>
                 <span class="ml-auto text-body-xxs text-[var(--text-color-secondary)]"
                   >{{ row.domains }} domains</span
