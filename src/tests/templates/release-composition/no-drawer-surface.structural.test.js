@@ -40,9 +40,9 @@ const SHARED_BLOCKS = [
 ]
 
 // Where a duplicate definition of a shared block could plausibly live. We scan
-// the whole composition surface plus the legacy drawer it was relocated from;
-// any second copy outside the canonical module is a fork.
-const BLOCK_SCAN_ROOTS = ['src/templates/release-composition', 'src/templates/deploy-drawer-block']
+// the whole composition surface; any second copy outside the canonical module
+// is a fork.
+const BLOCK_SCAN_ROOTS = ['src/templates/release-composition']
 
 const SOURCE_EXTENSIONS = ['.vue', '.js', '.ts']
 

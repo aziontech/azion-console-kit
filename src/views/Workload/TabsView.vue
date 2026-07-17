@@ -7,7 +7,6 @@
   import PrimeButton from '@aziontech/webkit/button'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import DeployDrawerBlock from '@/templates/deploy-drawer-block'
   import DialogUnsaved from '@/templates/dialog-unsaved/DialogUnsaved.vue'
   import EditViewSkeleton from './components/EditViewSkeleton.vue'
   import EditView from './EditView.vue'
@@ -115,7 +114,6 @@
   const createDrawerVisible = ref(false)
   const releasesRefreshKey = ref(0)
 
-  const isDeployDrawerOpen = ref(false)
   const openRelease = () => {
     const resolvedIds = resolveDeploymentIds(workload.value?.bindings)
     const deploymentIds = resolvedIds.length
@@ -209,12 +207,6 @@
         :workload="workload"
         :workloadDeploymentId="workload?.workloadDeploymentId"
         @save="onVersionCreated"
-      />
-
-      <DeployDrawerBlock
-        v-model:visible="isDeployDrawerOpen"
-        :preselected-workload-id="Number(workloadId)"
-        lock-workload
       />
     </template>
   </ContentBlock>

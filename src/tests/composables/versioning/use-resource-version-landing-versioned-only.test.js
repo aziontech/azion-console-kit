@@ -4,8 +4,8 @@ import { h, inject } from 'vue'
 
 /**
  * Task 3.8 — Phase 1: the tabbed landing builds no deploy affordance for
- * versioned-only resources — no `deployResourceContext`, no `openPromoteDrawer`
- * on the shared `versionMenuHost` — while the deployable default keeps both.
+ * versioned-only resources — no `openPromoteDrawer` on the shared
+ * `versionMenuHost` — while the deployable default keeps it.
  * Requirement 2.5.
  */
 
@@ -81,30 +81,4 @@ describe('useResourceVersionLanding — promote seam gated by capability (Req 2.
     expect(host.versionService).toBe(config.versionService)
     expect(typeof host.onSuccess).toBe('function')
   })
-})
-
-describe('useResourceVersionLanding — deployResourceContext gated by capability (Req 2.5)', () => {
-  const getDeployContext = (resourceType) => {
-    let landing
-    mount({
-      setup() {
-        landing = useResourceVersionLanding(baseConfig(resourceType))
-        return () => null
-      }
-    })
-    return landing.deployResourceContext.value
-  }
-
-  it('builds a deploy context for a deployable resource', () => {
-    const ctx = getDeployContext('edge_application')
-    expect(ctx).not.toBeNull()
-    expect(ctx.resourceType).toBe('edge_application')
-  })
-
-  it.each(['function', 'network_list', 'waf'])(
-    'never builds a deploy context for versioned-only "%s"',
-    (resourceType) => {
-      expect(getDeployContext(resourceType)).toBeNull()
-    }
-  )
 })

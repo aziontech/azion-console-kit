@@ -3,7 +3,6 @@
   import { useRouter } from 'vue-router'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import DeployDrawerBlock from '@/templates/deploy-drawer-block'
   import ListTable from '@/components/list-table/ListTable.vue'
   import { DataTableActionsButtons } from '@/components/list-table'
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
@@ -17,10 +16,6 @@
   const router = useRouter()
 
   const listTableRef = ref(null)
-
-  // DeployDrawerBlock stays mounted (rollback fallback). The visible model is held
-  // but the trigger now routes to the full-page composer (DS-first).
-  const isDeployDrawerOpen = ref(false)
 
   const columns = computed(() => [
     { field: 'name', header: 'Name', sortField: 'name', filterPath: 'name' },
@@ -143,8 +138,6 @@
           }"
         />
       </div>
-
-      <DeployDrawerBlock v-model:visible="isDeployDrawerOpen" />
     </template>
   </ContentBlock>
 </template>

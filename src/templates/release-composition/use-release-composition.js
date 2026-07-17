@@ -706,7 +706,7 @@ export function useReleaseComposition({
   // --- Dispatch: build_and_activate fan-out (Property 7) -------------------
 
   // The composable is the layer allowed to call services, so the per-DS dispatch
-  // lives here (mirrors `use-deploy-drawer.js` `deploy()`). The store hands over a
+  // lives here. The store hands over a
   // PURE, DISCRIMINATED `composePayload()`; this branches on `payload.scoped`:
   //
   //   non-scoped (Scenario A) → build ONE adapter payload from `payload.resources`

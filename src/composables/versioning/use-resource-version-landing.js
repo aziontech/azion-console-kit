@@ -151,12 +151,6 @@ export function useResourceVersionLanding({
     }
   })
 
-  // DeployDrawerBlock stays mounted (rollback fallback); the visible/pinned models
-  // are retained but the Deploy/Promote entries now route to the full-page composer.
-  const isDeployDrawerOpen = ref(false)
-  // Version pinned by a row-menu Promote; cleared when the drawer closes.
-  const pinnedDeployVersionId = ref(null)
-
   // Deployable (Ready) version options; the shared mapper orders them newest-first.
   const deployableVersionOptions = computed(() => toDeployableVersionOptions(rawVersions.value))
 
@@ -184,29 +178,6 @@ export function useResourceVersionLanding({
       })
     )
   }
-
-  // A row-menu Promote pins a version; otherwise default to the latest deployable
-  // one so the drawer always references a concrete version (the banner and the
-  // promote stay consistent) regardless of the landing tab it was opened from.
-  const deployVersionId = computed(
-    () => pinnedDeployVersionId.value ?? deployableVersionOptions.value[0]?.value ?? null
-  )
-  // versioned-only: no deploy context built — the drawer is never fed nor mounted.
-  const deployResourceContext = computed(() => {
-    if (!capability.canDeploy) return null
-    return {
-      resourceType,
-      resourceId: Number(resourceId.value),
-      resourceName: resource.value?.name ?? '',
-      version: deployVersionId.value ? { id: deployVersionId.value } : null,
-      versions: deployableVersionOptions.value
-    }
-  })
-
-  // Drop the pinned version once the drawer is dismissed so the next open is clean.
-  watch(isDeployDrawerOpen, (open) => {
-    if (!open) pinnedDeployVersionId.value = null
-  })
 
   const goToVersionsList = () => {
     activeTab.value = tabs.indexOf('versions')
@@ -261,10 +232,8 @@ export function useResourceVersionLanding({
     loadError,
     latestVersionId,
     activeTab,
-    isDeployDrawerOpen,
     openRelease,
     openPromoteRelease,
-    deployResourceContext,
     handleCommandSuccess,
     handleCommandError,
     handleCancel,

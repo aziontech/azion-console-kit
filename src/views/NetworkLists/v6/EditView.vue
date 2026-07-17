@@ -10,15 +10,14 @@
 
   defineOptions({ name: 'network-lists-v6-edit-view' })
 
-  const { resource, resourceId, isLoading, loadError, isDeployDrawerOpen, deployResourceContext } =
-    useResourceVersionLanding({
-      load: (id) => networkListsService.loadNetworkList({ id }),
-      provideKey: 'networkList',
-      versionService: networkListVersionService,
-      resourceType: 'network_list',
-      routeName: 'edit-network-lists',
-      versionRouteName: 'edit-network-lists-version'
-    })
+  const { resource, resourceId, isLoading, loadError } = useResourceVersionLanding({
+    load: (id) => networkListsService.loadNetworkList({ id }),
+    provideKey: 'networkList',
+    versionService: networkListVersionService,
+    resourceType: 'network_list',
+    routeName: 'edit-network-lists',
+    versionRouteName: 'edit-network-lists-version'
+  })
 
   const pageDescription =
     "Each version is an isolated snapshot of this network list's configuration. Edit a draft, then build it to publish an immutable version."
@@ -26,14 +25,12 @@
 
 <template>
   <ResourceVersionLanding
-    v-model:deploy-visible="isDeployDrawerOpen"
     :is-loading="isLoading"
     :load-error="loadError"
     :title="resource?.name ?? ''"
     :description="pageDescription"
     :entity-name="resource?.name"
     error-message="Failed to load network list. Try refreshing the page."
-    :resource-context="deployResourceContext"
     :show-settings="false"
     testid-prefix="network-lists-v6-edit"
   >

@@ -5,8 +5,9 @@ import { getVersionCapability } from './version-capability'
 
 /**
  * useDeployResourceContext — builds the `resourceContext` consumed by the shared
- * VersionHeadingActions' DeployDrawerBlock. Shared by every deployable resource
- * (Application / Custom Page / Firewall); specializes via config only.
+ * VersionHeadingActions to scope the Deploy route to the release composer. Shared
+ * by every deployable resource (Application / Custom Page / Firewall); specializes
+ * via config only.
  *
  * The resource (for id/name) is read from the editor's `provide`d ref under
  * `injectionKey`; the deployable versions come from the resource's version list.

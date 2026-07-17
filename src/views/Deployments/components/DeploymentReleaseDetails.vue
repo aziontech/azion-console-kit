@@ -2,7 +2,7 @@
   import { computed } from 'vue'
   import InlineTag from '@/components/InlineTag'
   import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
-  import ImpactedWorkloadsPanel from '@/templates/deploy-drawer-block/components/ImpactedWorkloadsPanel.vue'
+  import ImpactedWorkloadsPanel from '@/views/Deployments/components/ImpactedWorkloadsPanel.vue'
   import ScriptRunnerBlock from '@/templates/script-runner-block'
   import { convertToRelativeTime } from '@/helpers/convert-date'
 

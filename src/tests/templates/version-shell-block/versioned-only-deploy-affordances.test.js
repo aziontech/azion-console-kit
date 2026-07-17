@@ -8,8 +8,8 @@ import { getAvailableActions } from '@/composables/versioning/version-machine'
 /**
  * Task 3.8 — Phase 1: the shell surfaces (heading + footer) expose Deploy only
  * for deployable resources. For versioned-only the Deploy button is removed
- * (not just disabled), the deploy drawer is never mounted, and the footer copy
- * drops the Deploy mention. Requirements 2.1, 2.4.
+ * (not just disabled) and the footer copy drops the Deploy mention.
+ * Requirements 2.1, 2.4.
  */
 
 // Webkit primitives → plain DOM so jsdom renders and we can query by testid.
@@ -26,19 +26,6 @@ vi.mock('@aziontech/webkit/prime-tag', () => ({
     name: 'PrimeTag',
     props: ['value', 'severity', 'icon'],
     template: '<span>{{ value }}</span>'
-  }
-}))
-
-// The deploy drawer must NEVER mount for versioned-only — spy on its presence.
-const deployDrawerMounted = vi.fn()
-vi.mock('@/templates/deploy-drawer-block', () => ({
-  default: {
-    name: 'DeployDrawerBlock',
-    props: ['visible', 'resourceContext'],
-    setup() {
-      deployDrawerMounted()
-    },
-    template: '<div data-testid="deploy-drawer" />'
   }
 }))
 
@@ -79,7 +66,6 @@ const mountFooter = ({ capability, state = 'ready', availableActions = [] }) =>
   })
 
 beforeEach(() => {
-  deployDrawerMounted.mockClear()
   // Heading teleports to #version-lifecycle-action — provide the target in body.
   const target = document.createElement('div')
   target.id = 'version-lifecycle-action'
@@ -103,17 +89,6 @@ describe('VersionHeadingActions — Deploy button gated by capability (Req 2.1)'
     mountHeading({ capability: VERSIONED_ONLY })
     await flushPromises()
     expect(hasDeployButton()).toBe(false)
-  })
-
-  it('mounts the deploy drawer for deployable, never for versioned-only', async () => {
-    mountHeading({ capability: DEFAULT_CAPABILITY })
-    await flushPromises()
-    expect(deployDrawerMounted).toHaveBeenCalledTimes(1)
-
-    deployDrawerMounted.mockClear()
-    mountHeading({ capability: VERSIONED_ONLY })
-    await flushPromises()
-    expect(deployDrawerMounted).not.toHaveBeenCalled()
   })
 })
 

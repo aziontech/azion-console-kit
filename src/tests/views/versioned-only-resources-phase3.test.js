@@ -39,19 +39,6 @@ vi.mock('@/templates/version-shell-block/components/ProcessingOverlay.vue', () =
   default: { name: 'ProcessingOverlay', template: '<div data-testid="overlay" />' }
 }))
 
-// The deploy drawer must NEVER mount for versioned-only resources — flag if it does.
-const deployDrawerMounted = vi.fn()
-vi.mock('@/templates/deploy-drawer-block', () => ({
-  default: {
-    name: 'DeployDrawerBlock',
-    props: ['visible', 'resourceContext'],
-    setup() {
-      deployDrawerMounted()
-    },
-    template: '<div data-testid="deploy-drawer" />'
-  }
-}))
-
 vi.mock('@/helpers/convert-date', () => ({
   formatExhibitionDate: () => 'Jan 1, 2026',
   formatDateToDayMonthYearHour: () => 'Jan 1, 2026 00:00'
@@ -110,7 +97,6 @@ const mountShellFor = (resourceType, state = 'ready') =>
   })
 
 beforeEach(() => {
-  deployDrawerMounted.mockClear()
   // Footer + heading teleport to these targets — provide them in the document.
   for (const id of ['action-bar', 'version-lifecycle-action']) {
     const target = document.createElement('div')
@@ -186,7 +172,7 @@ describe('Phase 3 — no Deploy button in the heading for versioned-only (Req 2.
   })
 
   it.each(VERSIONED_ONLY_RESOURCES)(
-    '"%s" heading shows no Deploy button and mounts no deploy drawer',
+    '"%s" heading shows no Deploy button',
     async (resourceType) => {
       mount(VersionHeadingActions, {
         attachTo: document.body,
@@ -198,7 +184,6 @@ describe('Phase 3 — no Deploy button in the heading for versioned-only (Req 2.
       })
       await flushPromises()
       expect(document.querySelector('[data-testid="version-heading__deploy"]')).toBeNull()
-      expect(deployDrawerMounted).not.toHaveBeenCalled()
     }
   )
 })
@@ -293,8 +278,7 @@ describe('Phase 3 — listing shows Current and the informative In use column (R
 })
 
 describe('Phase 3 — release picker hides all three versioned-only resources (Req 2.7)', () => {
-  // The picker drops a type when its capability cannot deploy — exactly the
-  // predicate use-deploy-drawer filters `editableSourceResources` on.
+  // The picker drops a type when its capability cannot deploy.
   it.each(VERSIONED_ONLY_RESOURCES)('"%s" is not selectable (canDeploy false)', (resourceType) => {
     expect(getVersionCapability(resourceType).canDeploy).toBe(false)
   })

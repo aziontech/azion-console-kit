@@ -416,7 +416,7 @@ describe('useReleaseComposition - versionOptionsFor (registry toVersionOptions m
 
 // ---------------------------------------------------------------------------
 // Property 7 — buildAndActivate is the composable's dispatch seam (the layer
-// allowed to call services, mirroring use-deploy-drawer.js `deploy()`). Multi-DS
+// allowed to call services). Multi-DS
 // is N independent calls via Promise.allSettled, a per-DS settled outcome, and
 // NO retry. The store hands over a PURE `composePayload()` (`{ resources, canary,
 // canaryForm }`); the composable builds the strategy + adapter payload and fans

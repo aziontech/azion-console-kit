@@ -2,8 +2,8 @@
   // Shared chrome for the TABBED landing screen (Overview + Versions listing +
   // Settings = Main Settings of the latest version + Variables), used by
   // Custom Pages, Firewall and Application. Owns the heading (with the
-  // version-lifecycle teleport target), the tab shell, the "no version yet"
-  // empty state and the deploy drawer. The per-resource tab bodies arrive
+  // version-lifecycle teleport target), the tab shell and the "no version yet"
+  // empty state. The per-resource tab bodies arrive
   // through the `overview`, `versions`, `settings` and `variables` slots;
   // logic lives in useResourceVersionLanding.
   //
@@ -17,7 +17,6 @@
   import TabPanel from '@aziontech/webkit/tabpanel'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import DeployDrawerBlock from '@/templates/deploy-drawer-block'
 
   defineOptions({ name: 'resource-version-landing' })
 
@@ -28,7 +27,6 @@
     description: { type: String, default: '' },
     entityName: { type: String, default: '' },
     errorMessage: { type: String, default: 'Failed to load. Try refreshing the page.' },
-    resourceContext: { type: Object, default: null },
     latestVersionId: { type: [String, Number], default: null },
     emptyStateDescription: {
       type: String,
@@ -41,7 +39,6 @@
   })
 
   const activeTab = defineModel('activeTab', { type: Number, default: 0 })
-  const deployVisible = defineModel('deployVisible', { type: Boolean, default: false })
 
   // Compute the numeric tab index per section so slots stay stable regardless of
   // whether Overview is enabled. Order: Overview? → Versions → Settings? → Variables?
@@ -173,12 +170,6 @@
       <slot
         v-else
         name="versions"
-      />
-
-      <DeployDrawerBlock
-        v-if="resourceContext"
-        v-model:visible="deployVisible"
-        :resource-context="resourceContext"
       />
     </template>
   </ContentBlock>

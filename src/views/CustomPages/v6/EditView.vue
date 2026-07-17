@@ -17,9 +17,7 @@
     loadError,
     latestVersionId,
     activeTab,
-    isDeployDrawerOpen,
     openRelease,
-    deployResourceContext,
     versionsQuery,
     rawVersions,
     activeVersions,
@@ -41,14 +39,12 @@
 <template>
   <ResourceVersionLanding
     v-model:active-tab="activeTab"
-    v-model:deploy-visible="isDeployDrawerOpen"
     :is-loading="isLoading"
     :load-error="loadError"
     :title="resource?.name ?? ''"
     :description="pageDescription"
     :entity-name="resource?.name"
     error-message="Failed to load custom page. Try refreshing the page."
-    :resource-context="deployResourceContext"
     :latest-version-id="latestVersionId"
     empty-state-description="Create a version on the Versions tab to start configuring this custom page."
     testid-prefix="custom-pages-v6-edit"

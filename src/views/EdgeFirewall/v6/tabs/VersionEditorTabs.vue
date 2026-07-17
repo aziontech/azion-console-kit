@@ -130,8 +130,8 @@
   const useVersionQuery = () =>
     edgeFirewallVersionService.useLoadVersionQuery(props.resourceId, props.versionId)
 
-  // The deploy `resourceContext` (ready versions of this Firewall) feeds the shared
-  // heading's DeployDrawerBlock.
+  // The deploy `resourceContext` (ready versions of this Firewall) scopes the shared
+  // heading's Deploy route to the release composer.
   const { resourceContext } = useDeployResourceContext({
     resourceType: 'firewall',
     injectionKey: 'edgeFirewall',

@@ -43,12 +43,12 @@ export function useDeploymentReleaseDrawer({ release, visible, emit } = {}) {
   // Raw resources for the current detail; the final display fallback is applied
   // once in `displayRelease` so this stays the single resolution pipeline.
   const resolvedResources = ref([])
-  // Explicit resolving flag (mirrors `useDeployDrawer`'s `isResolving*`): true
-  // while names resolve, so the UI can show a placeholder instead of blanks.
+  // Explicit resolving flag: true while names resolve, so the UI can show a
+  // placeholder instead of blanks.
   const isResolvingResources = ref(false)
 
   // Stale guard: rapid release switches must not let an older async resolution
-  // overwrite a newer one (same pattern as `useDeployDrawer`'s seq counters).
+  // overwrite a newer one (a monotonic seq counter).
   let resolveSeq = 0
 
   const currentRelease = computed(() => toValue(release))

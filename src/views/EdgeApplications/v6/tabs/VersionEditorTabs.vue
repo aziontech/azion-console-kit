@@ -200,8 +200,8 @@
   const useVersionQuery = () =>
     edgeAppVersionService.useLoadVersionQuery(props.resourceId, props.versionId)
 
-  // The deploy `resourceContext` (ready versions of this Application) feeds the
-  // shared heading's DeployDrawerBlock.
+  // The deploy `resourceContext` (ready versions of this Application) scopes the
+  // shared heading's Deploy route to the release composer.
   const { resourceContext } = useDeployResourceContext({
     resourceType: 'application',
     injectionKey: 'edgeApplication',

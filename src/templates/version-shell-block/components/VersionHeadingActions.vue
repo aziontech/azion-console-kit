@@ -9,12 +9,11 @@
   import { VERSION_ACTIONS } from '@/composables/versioning/version-machine'
   import { formatExhibitionDate } from '@/helpers/convert-date'
   import { releaseComposerRouteFromResource } from '@/templates/release-composition/release-composer-route'
-  import DeployDrawerBlock from '@/templates/deploy-drawer-block'
 
   defineOptions({ name: 'version-heading-actions' })
 
-  // `resourceContext` feeds the DeployDrawerBlock; null (e.g. versioned-only) means
-  // no Deploy action and no drawer is mounted.
+  // `resourceContext` scopes the Deploy route to this resource/version; null (e.g.
+  // versioned-only) means no Deploy action.
   const props = defineProps({
     resourceContext: {
       type: Object,
@@ -45,9 +44,7 @@
     disabledActions.value.includes(key) ||
     (key === VERSION_ACTIONS.DEPLOY && !props.resourceContext && !props.deployRoute)
 
-  // DeployDrawerBlock stays mounted (rollback fallback); the model is retained but
-  // the Deploy action now routes to the full-page composer, scoped to this version.
-  const isDeployDrawerOpen = ref(false)
+  // The Deploy action routes to the full-page composer, scoped to this version.
   const openRelease = () => {
     if (props.deployRoute) {
       router.push(props.deployRoute)
@@ -123,10 +120,4 @@
       </span>
     </div>
   </Teleport>
-
-  <DeployDrawerBlock
-    v-if="cap.canDeploy && resourceContext"
-    v-model:visible="isDeployDrawerOpen"
-    :resource-context="resourceContext"
-  />
 </template>
