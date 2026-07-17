@@ -73,7 +73,7 @@ describe('activeVersionsForResource', () => {
     ).toBe(0)
   })
 
-  it('matches application by global_id, not by resource_id', () => {
+  it('matches application by resource_id (its global_id value)', () => {
     const appRows = [
       {
         deployment_id: 'ADEP0003',
@@ -83,8 +83,7 @@ describe('activeVersionsForResource', () => {
         resources: [
           {
             resource_type: 'application',
-            resource_id: 555,
-            global_id: 521846,
+            resource_id: 521846,
             resource_version: 'AAPV0001',
             traffic_role: 'ACTIVE',
             release_id: 'AREL0003'
@@ -93,11 +92,11 @@ describe('activeVersionsForResource', () => {
       }
     ]
 
-    const byGlobalId = activeVersionsForResource(appRows, {
+    const byResourceId = activeVersionsForResource(appRows, {
       resource_type: 'application',
       resource_id: 521846
     })
-    expect(byGlobalId.get('AAPV0001').deployments[0]).toEqual({
+    expect(byResourceId.get('AAPV0001').deployments[0]).toEqual({
       id: 'ADEP0003',
       name: 'app-ds',
       state: 'ready',
@@ -107,11 +106,11 @@ describe('activeVersionsForResource', () => {
       deployedAt: null
     })
 
-    const byResourceId = activeVersionsForResource(appRows, {
+    const byOtherId = activeVersionsForResource(appRows, {
       resource_type: 'application',
       resource_id: 555
     })
-    expect(byResourceId.size).toBe(0)
+    expect(byOtherId.size).toBe(0)
   })
 
   it('returns an empty map for empty or invalid input', () => {

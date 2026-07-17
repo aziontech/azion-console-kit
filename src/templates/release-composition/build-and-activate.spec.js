@@ -131,10 +131,10 @@ describe('build_and_activate write path — Property 7 (integration)', () => {
     const payloads = deploymentReleaseService.buildAndActivate.mock.calls.map(
       ([, payload]) => payload
     )
-    // The application is keyed by `global_id`, the version pinned in `version_id`
+    // Every resource is keyed by `resource_id`, the version pinned in `version_id`
     // (deployment-api schema), produced by the real `DeploymentAdapter`.
     const appRef = payloads[0].resources.find((entry) => entry.resource_type === 'application')
-    expect(appRef.global_id).toBe('app-1')
+    expect(appRef.resource_id).toBe('app-1')
     expect(appRef.version_id).toBe('app-v1')
     // Every DS receives the identical built payload (resources are DS-agnostic).
     payloads.forEach((payload) => expect(payload).toEqual(payloads[0]))

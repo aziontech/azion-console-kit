@@ -171,21 +171,18 @@ describe('Phase 3 — no Deploy button in the heading for versioned-only (Req 2.
     dispatch: vi.fn()
   })
 
-  it.each(VERSIONED_ONLY_RESOURCES)(
-    '"%s" heading shows no Deploy button',
-    async (resourceType) => {
-      mount(VersionHeadingActions, {
-        attachTo: document.body,
-        // resource-context is null by design for versioned-only views.
-        props: { resourceContext: null },
-        global: {
-          provide: { [VERSION_CONTEXT_KEY]: makeCtx(getVersionCapability(resourceType), 'ready') }
-        }
-      })
-      await flushPromises()
-      expect(document.querySelector('[data-testid="version-heading__deploy"]')).toBeNull()
-    }
-  )
+  it.each(VERSIONED_ONLY_RESOURCES)('"%s" heading shows no Deploy button', async (resourceType) => {
+    mount(VersionHeadingActions, {
+      attachTo: document.body,
+      // resource-context is null by design for versioned-only views.
+      props: { resourceContext: null },
+      global: {
+        provide: { [VERSION_CONTEXT_KEY]: makeCtx(getVersionCapability(resourceType), 'ready') }
+      }
+    })
+    await flushPromises()
+    expect(document.querySelector('[data-testid="version-heading__deploy"]')).toBeNull()
+  })
 })
 
 describe('Phase 3 — row menu drops Promote/Rollback for each resource (Req 2.2, 2.3)', () => {

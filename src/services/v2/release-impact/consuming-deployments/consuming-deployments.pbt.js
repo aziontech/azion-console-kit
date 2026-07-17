@@ -1,20 +1,18 @@
 /**
  * Property-based test for the HOP 1 match rule (spec task 9.4, Property 4).
  *
- * Property 4 — `application` is matched by `global_id`, every other resource
- * type by `resource_id` (req 1.5). The rule lives in exactly one place —
- * `matchFieldFor` in `./contract.js` — and is consumed by `fanoutResolver`
- * (and, later, by `resourceUsageResolver`); this PBT pins both:
+ * Property 4 — every resource is matched by `resource_id` (req 1.5). The
+ * deployment-api now returns every resource id under `resource_id` (for
+ * `application` its value is the `global_id`); the legacy response shape, which
+ * surfaced `application` under `global_id`, still matches via the fallback in
+ * `matchIdValue` (`./contract.js`) consumed by `fanoutResolver` (and
+ * `resourceUsageResolver`). This PBT pins both:
  *
- *   1. `matchFieldFor` returns `'global_id'` for `application` and
- *      `'resource_id'` for every other type — and nothing else.
+ *   1. `matchIdValue` reads `resource_id`, falling back to `global_id`, else null.
  *   2. End-to-end through `createFanoutResolver` (fakes injected, no IO): a
- *      requested ref matches an active-release resource of the same type
- *      ONLY when the release's match-field id equals the requested
- *      `resource_id`. So an `application` ref matches on `global_id` and is
- *      NOT fooled by a release whose `resource_id` happens to collide; every
- *      non-application ref matches on `resource_id` and is NOT fooled by a
- *      colliding `global_id`.
+ *      requested ref matches an active-release resource of the same type ONLY
+ *      when its id (`resource_id`, or the legacy `global_id`) equals the requested
+ *      `resource_id`; a differing id never matches.
  *
  * Validates requirement 1.5.
  *
@@ -25,11 +23,11 @@
  * below still runs, keeping the file self-verifying.
  */
 import { describe, it, expect } from 'vitest'
-import { APPLICATION_RESOURCE_TYPE, matchFieldFor } from './contract'
+import { APPLICATION_RESOURCE_TYPE, matchIdValue } from './contract'
 import { createFanoutResolver } from './fanout-resolver'
 
-// Resource types other than `application`; each must match by `resource_id`.
-const NON_APPLICATION_TYPES = ['function', 'waf', 'cache_setting', 'rule_engine', 'origin']
+// The resource types the rule is exercised across; each matches by resource_id.
+const RESOURCE_TYPES = [APPLICATION_RESOURCE_TYPE, 'function', 'waf', 'cache_setting', 'origin']
 
 // fast-check is optional today; load it lazily so the file stays importable.
 let fc = null
@@ -44,24 +42,17 @@ const NUM_RUNS = 100
 const describeOrSkip = fc ? describe : describe.skip
 const skipReason = fc ? '' : ' (SKIPPED: fast-check is not installed — see spec task 1.2 blockers)'
 
-// A resource-ref arbitrary: an `application` ref (matched by global_id) or a
-// ref of some other type (matched by resource_id). `idArb` lets a caller mix
-// numeric and string ids so the rule is exercised across both.
+// `idArb` mixes numeric and string ids so the rule is exercised across both.
 const idArb = (fcModule) =>
   fcModule.oneof(
     fcModule.string({ minLength: 1, maxLength: 12 }),
     fcModule.integer({ min: 1, max: 999999 })
   )
 
-const applicationRefArb = (fcModule) =>
+// A resource-ref arbitrary of some type; every type matches by resource_id.
+const refArb = (fcModule) =>
   fcModule.record({
-    resource_type: fcModule.constant(APPLICATION_RESOURCE_TYPE),
-    resource_id: idArb(fcModule)
-  })
-
-const otherRefArb = (fcModule) =>
-  fcModule.record({
-    resource_type: fcModule.constantFrom(...NON_APPLICATION_TYPES),
+    resource_type: fcModule.constantFrom(...RESOURCE_TYPES),
     resource_id: idArb(fcModule)
   })
 
@@ -81,134 +72,81 @@ const fakeResolverOver = (releaseResources) =>
   })
 
 describeOrSkip(`HOP 1 match rule — Property 4${skipReason}`, () => {
-  it('matchFieldFor selects global_id for application and resource_id otherwise', () => {
+  it('matchIdValue reads resource_id, falling back to global_id, else null', () => {
     fc.assert(
-      fc.property(fc.oneof(applicationRefArb(fc), otherRefArb(fc)), (resource) => {
-        const field = matchFieldFor(resource)
-        return resource.resource_type === APPLICATION_RESOURCE_TYPE
-          ? field === 'global_id'
-          : field === 'resource_id'
+      fc.property(refArb(fc), idArb(fc), (ref, legacyId) => {
+        // resource_id present → it wins over any legacy global_id.
+        if (matchIdValue({ resource_id: ref.resource_id, global_id: legacyId }) !== ref.resource_id)
+          return false
+        // resource_id absent → global_id is the fallback.
+        if (matchIdValue({ global_id: legacyId }) !== legacyId) return false
+        // neither present → null.
+        return matchIdValue({}) === null
       }),
       { numRuns: NUM_RUNS }
     )
   })
 
-  it('matches an application ref by global_id and is not fooled by a colliding resource_id', async () => {
+  it('matches a ref by resource_id and is not fooled by a different id', async () => {
     await fc.assert(
-      fc.asyncProperty(applicationRefArb(fc), idArb(fc), async (ref, decoyId) => {
+      fc.asyncProperty(refArb(fc), idArb(fc), async (ref, decoyId) => {
         // Decoy must be a genuinely different id, else it is a legitimate match.
         fc.pre(String(decoyId) !== String(ref.resource_id))
 
-        // The release carries the application keyed by global_id == the request,
-        // but its resource_id is a DIFFERENT (decoy) id. Matching by resource_id
-        // would miss it; matching by global_id finds it (req 1.5).
+        // The release carries the resource keyed by resource_id == the request.
         const release = [
-          {
-            resource_type: APPLICATION_RESOURCE_TYPE,
-            global_id: ref.resource_id,
-            resource_id: decoyId,
-            version_id: 7
-          }
+          { resource_type: ref.resource_type, resource_id: ref.resource_id, version_id: 7 }
         ]
         const { matchedByDeployment } = await fakeResolverOver(release)(ref)
         const matched = matchedByDeployment.get(DS_ID) ?? []
-        return matched.length === 1 && matched[0] === ref
-      }),
-      { numRuns: NUM_RUNS }
-    )
-  })
+        if (!(matched.length === 1 && matched[0] === ref)) return false
 
-  it('does NOT match an application ref when only resource_id (not global_id) collides', async () => {
-    await fc.assert(
-      fc.asyncProperty(applicationRefArb(fc), idArb(fc), async (ref, otherGlobalId) => {
-        fc.pre(String(otherGlobalId) !== String(ref.resource_id))
-
-        // The release's resource_id equals the request, but global_id differs.
-        // The application rule keys on global_id, so this must NOT match.
-        const release = [
-          {
-            resource_type: APPLICATION_RESOURCE_TYPE,
-            global_id: otherGlobalId,
-            resource_id: ref.resource_id,
-            version_id: 7
-          }
+        // A release whose only id is the decoy must NOT match.
+        const decoyRelease = [
+          { resource_type: ref.resource_type, resource_id: decoyId, version_id: 7 }
         ]
-        const { deployments } = await fakeResolverOver(release)(ref)
+        const { deployments } = await fakeResolverOver(decoyRelease)(ref)
         return deployments.length === 0
       }),
       { numRuns: NUM_RUNS }
     )
   })
 
-  it('matches a non-application ref by resource_id and is not fooled by a colliding global_id', async () => {
+  it('matches an application ref via the legacy global_id-only shape (fallback)', async () => {
     await fc.assert(
-      fc.asyncProperty(otherRefArb(fc), idArb(fc), async (ref, decoyGlobalId) => {
-        // The release carries the resource keyed by resource_id == the request,
-        // with a different global_id. Non-application types match by resource_id,
-        // so the global_id is irrelevant and must not block the match (req 1.5).
-        const release = [
-          {
-            resource_type: ref.resource_type,
-            resource_id: ref.resource_id,
-            global_id: decoyGlobalId,
-            version_id: 3
-          }
-        ]
+      fc.asyncProperty(idArb(fc), async (id) => {
+        const ref = { resource_type: APPLICATION_RESOURCE_TYPE, resource_id: id }
+        // Legacy shape: the id surfaces under global_id, resource_id absent.
+        const release = [{ resource_type: APPLICATION_RESOURCE_TYPE, global_id: id, version_id: 7 }]
         const { matchedByDeployment } = await fakeResolverOver(release)(ref)
         const matched = matchedByDeployment.get(DS_ID) ?? []
         return matched.length === 1 && matched[0] === ref
-      }),
-      { numRuns: NUM_RUNS }
-    )
-  })
-
-  it('does NOT match a non-application ref when only global_id (not resource_id) collides', async () => {
-    await fc.assert(
-      fc.asyncProperty(otherRefArb(fc), idArb(fc), async (ref, otherResourceId) => {
-        fc.pre(String(otherResourceId) !== String(ref.resource_id))
-
-        // The release's global_id equals the request, but resource_id differs.
-        // Non-application types key on resource_id, so this must NOT match.
-        const release = [
-          {
-            resource_type: ref.resource_type,
-            resource_id: otherResourceId,
-            global_id: ref.resource_id,
-            version_id: 3
-          }
-        ]
-        const { deployments } = await fakeResolverOver(release)(ref)
-        return deployments.length === 0
       }),
       { numRuns: NUM_RUNS }
     )
   })
 })
 
-// Deterministic guard so the file is meaningful even without fast-check: it
-// pins the match rule against hand-built cases — application keyed by global_id,
-// every other type by resource_id (req 1.5).
+// Deterministic guard so the file is meaningful even without fast-check: it pins
+// the match rule against hand-built cases — every resource matched by
+// resource_id, with a legacy global_id fallback (req 1.5).
 describe('HOP 1 match rule — Property 4 (deterministic guard)', () => {
-  it('matchFieldFor: global_id for application, resource_id for other types', () => {
-    expect(matchFieldFor({ resource_type: 'application', resource_id: 'a-1' })).toBe('global_id')
-    expect(matchFieldFor({ resource_type: 'function', resource_id: 'f-1' })).toBe('resource_id')
-    expect(matchFieldFor({ resource_type: 'waf', resource_id: 5 })).toBe('resource_id')
+  it('matchIdValue: resource_id when present, else global_id, else null', () => {
+    expect(
+      matchIdValue({ resource_type: 'application', resource_id: 'a-1', global_id: 'g-1' })
+    ).toBe('a-1')
+    expect(matchIdValue({ resource_type: 'application', global_id: 'g-1' })).toBe('g-1')
+    expect(matchIdValue({ resource_type: 'function', resource_id: 'f-1' })).toBe('f-1')
+    expect(matchIdValue({})).toBeNull()
   })
 
-  it('matches application by global_id (not resource_id) and others by resource_id (not global_id)', async () => {
-    const appRef = { resource_type: 'application', resource_id: 'app-global-1' }
+  it('matches every type by resource_id (application via its global_id value)', async () => {
+    const appRef = { resource_type: 'application', resource_id: 'app-1' }
     const fnRef = { resource_type: 'function', resource_id: 42 }
 
-    // Release: app matched via global_id with a decoy resource_id; function
-    // matched via resource_id with a decoy global_id.
     const release = [
-      {
-        resource_type: 'application',
-        global_id: 'app-global-1',
-        resource_id: 'decoy',
-        version_id: 11
-      },
-      { resource_type: 'function', resource_id: 42, global_id: 'decoy-global', version_id: 4 }
+      { resource_type: 'application', resource_id: 'app-1', version_id: 11 },
+      { resource_type: 'function', resource_id: 42, version_id: 4 }
     ]
 
     const resolver = fakeResolverOver(release)
@@ -222,16 +160,16 @@ describe('HOP 1 match rule — Property 4 (deterministic guard)', () => {
     expect(fnResult.matchedByDeployment.get(DS_ID)).toEqual([fnRef])
   })
 
-  it('does not match application when only resource_id collides', async () => {
-    const appRef = { resource_type: 'application', resource_id: 'app-global-1' }
-    const release = [
-      {
-        resource_type: 'application',
-        global_id: 'different-global',
-        resource_id: 'app-global-1',
-        version_id: 1
-      }
-    ]
+  it('matches an application via the legacy global_id-only shape', async () => {
+    const appRef = { resource_type: 'application', resource_id: 'app-1' }
+    const release = [{ resource_type: 'application', global_id: 'app-1', version_id: 1 }]
+    const { deployments } = await fakeResolverOver(release)(appRef)
+    expect(deployments).toHaveLength(1)
+  })
+
+  it('does not match when the id differs', async () => {
+    const appRef = { resource_type: 'application', resource_id: 'app-1' }
+    const release = [{ resource_type: 'application', resource_id: 'different', version_id: 1 }]
     const { deployments } = await fakeResolverOver(release)(appRef)
     expect(deployments).toHaveLength(0)
   })

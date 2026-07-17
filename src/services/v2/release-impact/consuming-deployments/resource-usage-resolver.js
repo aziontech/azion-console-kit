@@ -10,9 +10,9 @@
  * `selectResolver()` swaps it for `fanoutResolver` without touching any caller
  * (Liskov; Property 3 in the contract spec runs against both).
  *
- * Match rule (req 1.5), encoded once in `matchFieldFor`: an `application` ref is
- * matched by `global_id`, every other type by `resource_id`. Dependencies are a
- * factory argument (services-as-args) so this is unit-testable without IO and
+ * Match rule (req 1.5), encoded once in `matchIdValue`: every resource is matched
+ * by `resource_id` (for `application` its value is the `global_id`). Dependencies
+ * are a factory argument (services-as-args) so this is unit-testable without IO and
  * without a Vue context. Only the tenant resource-usage service is used.
  *
  * @typedef {import('./contract').ResolveConsumingDeployments} ResolveConsumingDeployments

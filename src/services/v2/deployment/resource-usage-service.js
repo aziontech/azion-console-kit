@@ -4,8 +4,8 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 // `resource_type` and 1..100 resource ids, lists the deployments with an ACTIVE
 // link to any of them — one row per deployment carrying the matched live
 // occurrences (incl. the active `resource_version`). See docs/DEPLOYMENT-API.md
-// "Resource usage" / GET /v4/resource_usage. Identity: `application` is matched
-// by its external `global_id`; every other type by `resource_id`.
+// "Resource usage" / GET /v4/resource_usage. Identity: every resource is sent and
+// matched by `resource_id` (for `application` its value is the external `global_id`).
 const BASE_URL = '/deployment-api/v4/resource_usage'
 const MAX_PAGE_SIZE = 100
 

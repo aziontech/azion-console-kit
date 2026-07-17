@@ -83,7 +83,7 @@ export const resolveConsumingDeployments = (resources, deps) => selectResolver(d
 export {
   APPLICATION_RESOURCE_TYPE,
   resourceKey,
-  matchFieldFor,
+  matchIdValue,
   normalizeResources,
   emptyResult,
   assertConsumingDeploymentsShape

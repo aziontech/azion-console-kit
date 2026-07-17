@@ -79,7 +79,8 @@ const fanoutServicesFor = (scenario) => ({
 
 // Drive the resource-usage resolver from the SAME ContractScenario: the fake
 // `listResourceUsage` derives the endpoint's per-deployment rows from each DS's
-// active release (single-type per call, `application` matched by `global_id`).
+// active release (single-type per call, every resource matched by `resource_id`,
+// with a `global_id` fallback for the legacy shape).
 const resourceUsageServicesFor = (scenario) => ({
   resourceUsageService: {
     listResourceUsage: ({ resourceType, resourceIds }) => {
@@ -89,8 +90,7 @@ const resourceUsageServicesFor = (scenario) => ({
           const releaseResources = scenario.releaseByDs[dsId]?.resources ?? []
           const matched = releaseResources.filter((resource) => {
             if (resource.resource_type !== resourceType) return false
-            const idField =
-              resourceType === 'application' ? resource.global_id : resource.resource_id
+            const idField = resource.resource_id ?? resource.global_id
             return wanted.has(String(idField))
           })
           if (matched.length === 0) return null
@@ -156,17 +156,16 @@ export const runConsumingDeploymentsContract = ({ name, makeResolver }) => {
       expect(assertConsumingDeploymentsShape(result)).toBe(true)
     })
 
-    it('matches an `application` ref by `global_id` and carries its pinned version', async () => {
+    it('matches an `application` ref by `resource_id` and carries its pinned version', async () => {
       const scenario = {
         dsIds: ['ds-1'],
         releaseByDs: {
           'ds-1': {
             resources: [
-              // application: matched by global_id, NOT resource_id (req 1.5).
+              // application: matched by resource_id (its global_id value) (req 1.5).
               releaseResource({
                 resource_type: 'application',
-                resource_id: '999',
-                global_id: 'app-global-1',
+                resource_id: 'app-global-1',
                 version_id: 'av-7'
               })
             ]

@@ -154,20 +154,20 @@ describe('DeploymentAdapter.transformBuildAndActivatePayload', () => {
     }
   ]
 
-  // P1 — application is keyed by global_id + version_id (schema shape), no name.
-  it('emits the application resource by global_id + version_id (no strategy)', () => {
+  // P1 — application is keyed by resource_id + version_id (schema shape), no name.
+  it('emits the application resource by resource_id + version_id (no strategy)', () => {
     const payload = DeploymentAdapter.transformBuildAndActivatePayload(singleResource)
 
     expect(payload).toEqual({
       resources: [
         {
-          global_id: 42,
+          resource_id: 42,
           version_id: 'app-version-id',
           resource_type: 'application'
         }
       ]
     })
-    expect(payload.resources[0]).not.toHaveProperty('resource_id')
+    expect(payload.resources[0]).not.toHaveProperty('global_id')
     expect(payload.resources[0]).not.toHaveProperty('name')
     expect(payload).not.toHaveProperty('strategy')
   })
@@ -239,7 +239,7 @@ describe('DeploymentAdapter.transformBuildAndActivatePayload', () => {
     // The resources block is unaffected by the strategy.
     expect(payload.resources).toEqual([
       {
-        global_id: 42,
+        resource_id: 42,
         version_id: 'app-version-id',
         resource_type: 'application'
       }

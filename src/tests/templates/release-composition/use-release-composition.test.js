@@ -451,12 +451,12 @@ describe('useReleaseComposition - Property 7 (buildAndActivate fan-out, no retry
     expect(calledIds).toEqual(['ds-1', 'ds-2', 'ds-3'])
 
     // The DS-agnostic payload is built once: every call gets the SAME adapter
-    // shape (resources keyed for deployment-api, application by global_id).
+    // shape (resources keyed for deployment-api, every resource by resource_id).
     const payloads = deploymentReleaseService.buildAndActivate.mock.calls.map(
       ([, payload]) => payload
     )
     const appRef = payloads[0].resources.find((ref) => ref.resource_type === 'application')
-    expect(appRef.global_id).toBe('app-1')
+    expect(appRef.resource_id).toBe('app-1')
     expect(appRef.version_id).toBe('app-v1')
     payloads.forEach((payload) => expect(payload).toEqual(payloads[0]))
 
@@ -715,7 +715,7 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
     expect(results[0]).toMatchObject({ id: 'ds-keep', ok: true })
   })
 
-  it('matches the scoped application by global_id (not resource_id)', async () => {
+  it('matches the scoped application by resource_id', async () => {
     wireScopedReleases()
     deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
 
@@ -726,11 +726,11 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
     })
     await flushPromises()
 
-    // The override id is the application's global_id; the swap must land on it.
+    // The override id is the application's id; the swap must land on it.
     await buildAndActivate(scopedAppOverride(), ['ds-keep'])
     const [, payload] = deploymentReleaseService.buildAndActivate.mock.calls[0]
     const appRef = payload.resources.find((resource) => resource.resource_type === 'application')
-    expect(appRef.global_id).toBe(42)
+    expect(appRef.resource_id).toBe(42)
     expect(appRef.version_id).toBe('app-new')
   })
 
@@ -756,7 +756,7 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
 
     expect(
       payload.resources.filter((resource) => resource.resource_type === 'application')
-    ).toEqual([{ global_id: 42, version_id: 'app-new', resource_type: 'application' }])
+    ).toEqual([{ resource_id: 42, version_id: 'app-new', resource_type: 'application' }])
 
     expect(results[0]).toMatchObject({ id: 'ds-other', ok: true })
   })
@@ -780,7 +780,7 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
     const [calledId, payload] = deploymentReleaseService.buildAndActivate.mock.calls[0]
     expect(calledId).toBe('ds-gone')
     expect(payload.resources).toEqual([
-      { global_id: 42, version_id: 'app-new', resource_type: 'application' }
+      { resource_id: 42, version_id: 'app-new', resource_type: 'application' }
     ])
 
     expect(results[0]).toMatchObject({ id: 'ds-gone', ok: true })

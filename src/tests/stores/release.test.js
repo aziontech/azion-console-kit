@@ -306,9 +306,9 @@ describe("Property 6 — 'LATEST' is resolved before the payload", () => {
       expect(ref.version_id).not.toBe(LATEST_READY)
     })
 
-    // The application ref is keyed by global_id (adapter contract), versioned.
+    // The application ref is keyed by resource_id (adapter contract), versioned.
     const appRef = payload.resources.find((ref) => ref.resource_type === APPLICATION_TYPE)
-    expect(appRef.global_id).toBe('app-1')
+    expect(appRef.resource_id).toBe('app-1')
     expect(appRef.version_id).toBe('app-v2')
   })
 })

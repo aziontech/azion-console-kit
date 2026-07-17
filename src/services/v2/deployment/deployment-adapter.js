@@ -14,10 +14,10 @@ const pickDefined = (payload) => {
   }, {})
 }
 
-// The deployment-api expects the resource ids (`application.global_id` and every
-// other type's `resource_id`) as numbers; the scoped entry point and catalog
-// picks may carry them as strings. Coerce numeric-looking ids to Number, leaving
-// non-numeric/nullish values untouched.
+// The deployment-api expects every resource id under `resource_id` as a number
+// (for `application` the value is its `global_id`); the scoped entry point and
+// catalog picks may carry them as strings. Coerce numeric-looking ids to Number,
+// leaving non-numeric/nullish values untouched.
 const toNumericId = (value) => {
   if (value == null) return value
   const numeric = Number(value)
@@ -235,18 +235,16 @@ export const DeploymentAdapter = {
   },
 
   transformBuildAndActivatePayload(resources = [], strategy) {
-    const resourceRefs = (Array.isArray(resources) ? resources : []).map((resource) => {
-      // deployment-api schema: version is `version_id`; the `application`
-      // resource is keyed by `global_id`, every other type by `resource_id`.
+    const resourceRefs = (Array.isArray(resources) ? resources : []).map((resource) =>
+      // deployment-api schema: version is `version_id`; every resource id is sent
+      // under `resource_id` (for `application` its value is the `global_id`).
       // `name`/`resource_version` are rejected as unrecognized keys.
-      const isApplication = resource?.resource_type === 'application'
-      return pickDefined({
-        global_id: isApplication ? toNumericId(resource?.resource_id) : undefined,
-        resource_id: isApplication ? undefined : toNumericId(resource?.resource_id),
+      pickDefined({
+        resource_id: toNumericId(resource?.resource_id),
         version_id: resource?.resource_version,
         resource_type: resource?.resource_type
       })
-    })
+    )
 
     return pickDefined({
       resources: resourceRefs,

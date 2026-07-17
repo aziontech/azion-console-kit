@@ -24,7 +24,7 @@ import {
 const READY_ONLY_DEPENDENCY_TYPES = ['function', 'connector', 'waf', 'network_list']
 import {
   APPLICATION_RESOURCE_TYPE,
-  matchFieldFor,
+  matchIdValue,
   normalizeResources,
   resourceKey
 } from '@/services/v2/release-impact/consuming-deployments'
@@ -77,9 +77,10 @@ const classifyBuildAndActivateError = (reason) =>
     ? BUILD_AND_ACTIVATE_ERROR_TYPES.VERSIONED_URLS_ACTIVE_LIMIT
     : null
 
-// The active release returns each consumed resource keyed by `resource_id` for
-// every type except `application`, which uses `global_id`; version is pinned in
-// `version_id` (spec §L). This reads the id for the dependency-instance seed.
+// The active release returns each consumed resource's id under `resource_id`
+// (for `application` its value is the `global_id`; `global_id` is kept as a
+// legacy fallback); version is pinned in `version_id` (spec §L). This reads the
+// id for the dependency-instance seed.
 const releaseResourceId = (resource) => resource?.resource_id ?? resource?.global_id ?? null
 
 // The release pins the chosen version in `version_id` (spec §L); fall back to the
@@ -87,21 +88,25 @@ const releaseResourceId = (resource) => resource?.resource_id ?? resource?.globa
 const releaseResourceVersion = (resource) =>
   resource?.version_id ?? resource?.resource_version_id ?? resource?.resource_version ?? null
 
-// Does an active-release resource match the scoped override? `application` is
-// matched by `global_id`, every other type by `resource_id` (req 1.5) — the same
-// rule the HOP 1 contract encodes, reused here so it is never re-derived.
-const matchesOverride = (releaseResource, override) =>
-  releaseResource?.resource_type === override.resource_type &&
-  releaseResource?.[matchFieldFor(override)] != null &&
-  String(releaseResource[matchFieldFor(override)]) === String(override.resource_id)
+// Does an active-release resource match the scoped override? Every resource is
+// matched by `resource_id` (for `application` its value is the `global_id`, with a
+// `global_id` fallback for the legacy shape) via {@link matchIdValue} — the same
+// rule the HOP 1 contract encodes, reused here so it is never re-derived (req 1.5).
+const matchesOverride = (releaseResource, override) => {
+  const id = matchIdValue(releaseResource)
+  return (
+    releaseResource?.resource_type === override.resource_type &&
+    id != null &&
+    String(id) === String(override.resource_id)
+  )
+}
 
-// Map a DS's active-release resources (deployment-api shape: `application` keyed
-// by `global_id`, others by `resource_id`, version pinned in `version_id`) into
-// the FLAT `{ resource_id, resource_version, resource_type }` shape the adapter
-// consumes — the same shape `store.composeResources()` produces, so
-// `transformBuildAndActivatePayload` re-keys `application` back to `global_id`
-// uniformly. Every non-scoped resource is carried over BYTE-FOR-BYTE: same id,
-// same pinned version (req 5.6).
+// Map a DS's active-release resources (deployment-api shape: every id under
+// `resource_id`, version pinned in `version_id`) into the FLAT
+// `{ resource_id, resource_version, resource_type }` shape the adapter consumes —
+// the same shape `store.composeResources()` produces, so the payload keys every
+// resource by `resource_id` uniformly. Every non-scoped resource is carried over
+// BYTE-FOR-BYTE: same id, same pinned version (req 5.6).
 const toAdapterResources = (releaseResources) =>
   (Array.isArray(releaseResources) ? releaseResources : []).map((resource) => ({
     resource_id: releaseResourceId(resource),
@@ -453,9 +458,9 @@ export function useReleaseComposition({
   // --- Resource -> consuming Deployment Settings (HOP 1, delegated) ---------
 
   // req 1.2 / 8.3: HOP 1 (`resource -> consuming deployments`) goes through the
-  // `resolveConsumingDeployments` interface. The match rule (`application` by
-  // `global_id`, others by `resource_id`) and the `{ deployments,
-  // matchedByDeployment }` result shape are owned by that interface's contract
+  // `resolveConsumingDeployments` interface. The match rule (every resource by
+  // `resource_id`) and the `{ deployments, matchedByDeployment }` result shape are
+  // owned by that interface's contract
   // (`@/services/v2/release-impact/consuming-deployments`) and reused here via
   // its helpers — never re-encoded.
   //
@@ -467,10 +472,14 @@ export function useReleaseComposition({
   // caller injects the production fan-out resolver (or the future
   // `resourceUsageResolver`) via the `resolveConsumingDeployments` factory-arg to
   // resolve over the full inventory; the swap touches no caller.
-  const matchesResource = (releaseResource, resource) =>
-    releaseResource?.resource_type === resource.resource_type &&
-    releaseResource?.[matchFieldFor(resource)] != null &&
-    String(releaseResource[matchFieldFor(resource)]) === String(resource.resource_id)
+  const matchesResource = (releaseResource, resource) => {
+    const id = matchIdValue(releaseResource)
+    return (
+      releaseResource?.resource_type === resource.resource_type &&
+      id != null &&
+      String(id) === String(resource.resource_id)
+    )
+  }
 
   // Per-DS deploy context for the strictest-case gate (req 6.3): the policy and
   // the inputs `store.deployCtx` folds over (`isVersioned`/`deployed`/`hasApp`),

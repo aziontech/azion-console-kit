@@ -1,4 +1,4 @@
-import { matchFieldFor } from './contract'
+import { matchIdValue } from './contract'
 
 export const sameId = (left, right) =>
   left != null && right != null && String(left) === String(right)
@@ -11,4 +11,4 @@ export const rowResourceVersion = (rowResource) =>
 
 export const matchesRow = (rowResource, ref) =>
   rowResource?.resource_type === ref.resource_type &&
-  sameId(rowResource?.[matchFieldFor(ref)], ref.resource_id)
+  sameId(matchIdValue(rowResource), ref.resource_id)

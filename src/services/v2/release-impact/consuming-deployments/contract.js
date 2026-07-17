@@ -20,9 +20,10 @@
  *
  * @typedef {object} ResourceRef
  * @property {string} resource_type - e.g. `'application'`, `'function'`, `'waf'`.
- * @property {string|number} resource_id - the resource identifier. For
- *   `resource_type === 'application'` this is matched against the active
- *   release's `global_id`; for every other type against `resource_id` (req 1.5).
+ * @property {string|number} resource_id - the resource identifier (for
+ *   `application` this is its `global_id` value). Matched against the active
+ *   release resource's `resource_id`, falling back to `global_id` for the legacy
+ *   response shape (req 1.5).
  */
 
 /**
@@ -59,8 +60,8 @@
  */
 
 /**
- * Resource type that matches the active release by `global_id` instead of
- * `resource_id` (req 1.5). The single place this rule is encoded.
+ * The `application` resource type. Kept as a named constant so the domain type is
+ * referenced in one place.
  */
 export const APPLICATION_RESOURCE_TYPE = 'application'
 
@@ -75,15 +76,17 @@ export const APPLICATION_RESOURCE_TYPE = 'application'
 export const resourceKey = (resource) => `${resource?.resource_type}:${resource?.resource_id}`
 
 /**
- * The release field a given resource is matched against: `global_id` for
- * `application`, `resource_id` for every other type (req 1.5). Encoding this
- * once keeps the rule out of every strategy.
+ * Read the id an active-release resource is matched against. The deployment-api
+ * now returns every resource id under `resource_id` (for `application` its value
+ * is the `global_id`); `global_id` is kept as a fallback for the legacy response
+ * shape so matching survives a mixed rollout (req 1.5). Encoding this once keeps
+ * the rule out of every strategy.
  *
- * @param {ResourceRef} resource
- * @returns {'global_id'|'resource_id'}
+ * @param {object} resource - one entry of an active release `resources[]` (or a
+ *   `resource_usage` row resource).
+ * @returns {string|number|null}
  */
-export const matchFieldFor = (resource) =>
-  resource?.resource_type === APPLICATION_RESOURCE_TYPE ? 'global_id' : 'resource_id'
+export const matchIdValue = (resource) => resource?.resource_id ?? resource?.global_id ?? null
 
 /**
  * Normalise the 1..N input into a clean `ResourceRef[]` (req 6.1): wraps a

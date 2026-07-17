@@ -10,8 +10,8 @@
  *   - list Deployment Settings (cached `deploymentService.listDeploymentsService`);
  *   - when DS count ≤ 50, load+scan each DS's active release composition
  *     (`deploymentReleaseService.getActiveReleaseComposition`, cached) and match
- *     each resource using {@link matchFieldFor} — `application` against the
- *     release `global_id`, every other type against `resource_id` (req 1.5);
+ *     each resource by `resource_id` via {@link matchIdValue} — the id the
+ *     deployment-api now returns for every type (req 1.5);
  *   - return the de-duplicated union with `matchedByDeployment` (req 1.7),
  *     pinning each matched resource to its release `version_id` (req 1.1);
  *   - when DS count > 50, return the EMPTY result (no preselection, req 1.8);
@@ -31,7 +31,7 @@
 
 import { deploymentService as defaultDeploymentService } from '@/services/v2/deployment/deployment-service'
 import { deploymentReleaseService as defaultDeploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
-import { emptyResult, matchFieldFor, normalizeResources, resourceKey } from './contract'
+import { emptyResult, matchIdValue, normalizeResources, resourceKey } from './contract'
 
 /**
  * Maximum Deployment Settings count the fan-out scans for preselection
@@ -51,11 +51,6 @@ const listResponseBody = (response) => (Array.isArray(response?.body) ? response
 const listResponseCount = (response) =>
   Number.isFinite(response?.count) ? response.count : listResponseBody(response).length
 
-// The active release keys each consumed resource by `resource_id` for every
-// type except `application`, which uses `global_id`; this reads the id the
-// resource is matched against per {@link matchFieldFor}.
-const releaseFieldValue = (releaseResource, field) => releaseResource?.[field] ?? null
-
 // The release pins the chosen version in `version_id` (design §L); fall back to
 // the other shapes the API has used so the match always carries the real id.
 const releaseResourceVersion = (releaseResource) =>
@@ -67,10 +62,10 @@ const releaseResourceVersion = (releaseResource) =>
 const sameId = (left, right) => left != null && right != null && String(left) === String(right)
 
 /**
- * Does this release resource match the requested resource ref? An
- * `application` ref matches the release `global_id`; every other type matches
- * the release `resource_id` (req 1.5). Ids are string-coerced so a numeric
- * request matches a string id and vice versa.
+ * Does this release resource match the requested resource ref? Every resource is
+ * matched by `resource_id` (for `application` its value is the `global_id`), per
+ * {@link matchIdValue}. Ids are string-coerced so a numeric request matches a
+ * string id and vice versa.
  *
  * @param {object} releaseResource - one entry of an active release `resources[]`.
  * @param {ResourceRef} resource - the requested resource ref.
@@ -78,7 +73,7 @@ const sameId = (left, right) => left != null && right != null && String(left) ==
  */
 const matchesResource = (releaseResource, resource) =>
   releaseResource?.resource_type === resource.resource_type &&
-  sameId(releaseFieldValue(releaseResource, matchFieldFor(resource)), resource.resource_id)
+  sameId(matchIdValue(releaseResource), resource.resource_id)
 
 /**
  * Build the fan-out resolver over the given tenant services.

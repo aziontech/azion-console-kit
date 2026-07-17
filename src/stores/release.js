@@ -62,8 +62,9 @@ const versionsKey = (type, id) => `${type}:${id}`
 // Key capturing a user's picked version per parent-scoped dependency instance.
 const collKey = (parent, type, id) => `${parent}:${type}:${id}`
 
-// The release endpoint pins version in `version_id`; the active-release payload
-// keys `application` by `global_id` and every other type by `resource_id`.
+// The release endpoint pins version in `version_id`; the active-release response
+// returns every resource id under `resource_id` (for `application` its value is
+// the `global_id`), with `global_id` kept as a legacy fallback.
 const releaseResourceId = (resource) =>
   resource?.resource_type === APPLICATION_TYPE
     ? (resource?.global_id ?? resource?.resource_id ?? null)
@@ -782,9 +783,9 @@ export const useReleaseStore = defineStore('release', {
 
     // Assemble the flat `resources[]` for the payload. Each entry carries
     // `resource_id` + `resource_version` + `resource_type` in the shape the
-    // adapter expects (`transformBuildAndActivatePayload` re-keys `application`
-    // to `global_id`). Optional singletons toggled off are skipped; every
-    // 'LATEST' sentinel is resolved to a concrete `version_id` (Property 6).
+    // adapter expects (every resource keyed by `resource_id`). Optional
+    // singletons toggled off are skipped; every 'LATEST' sentinel is resolved to
+    // a concrete `version_id` (Property 6).
     composeResources() {
       const resources = []
 
