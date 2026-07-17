@@ -3,6 +3,7 @@
   import PrimeButton from '@aziontech/webkit/button'
   import { getSeverity } from '../../composables/utils/severity-classifier'
   import { highlightMatch } from '../../composables/utils/highlight-match'
+  import { isFieldFilterable } from '../../composables/utils/filterable-fields'
 
   defineOptions({ name: 'LogFieldBadges' })
 
@@ -128,7 +129,7 @@
           v-html="item.valueHtml"
         />
         <span class="log-badge__actions">
-          <template v-if="hoveredIndex === index">
+          <template v-if="hoveredIndex === index && isFieldFilterable(item.key)">
             <PrimeButton
               icon="pi pi-filter"
               text

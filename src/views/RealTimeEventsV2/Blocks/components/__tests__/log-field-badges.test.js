@@ -127,6 +127,16 @@ describe('LogFieldBadges — hover PrimeButton filter actions', () => {
     expect(emitted[0]).toEqual(['host', 'example.com'])
   })
 
+  it('stacktrace badge offers NO filter actions on hover (non-filterable field)', async () => {
+    const wrapper = mountComponent({
+      summary: [{ key: 'stacktrace', value: '{ "edge_application": [] }' }]
+    })
+    await wrapper.findAll('.log-badge')[0].trigger('mouseenter')
+
+    expect(wrapper.find('button[aria-label="Filter for value"]').exists()).toBe(false)
+    expect(wrapper.find('button[aria-label="Filter out value"]').exists()).toBe(false)
+  })
+
   it('emits add-filter from the PrimeButton even with an active text selection', async () => {
     // The icon is the EXPLICIT filter control — selection state is irrelevant to it.
     vi.spyOn(window, 'getSelection').mockReturnValue({ isCollapsed: false })

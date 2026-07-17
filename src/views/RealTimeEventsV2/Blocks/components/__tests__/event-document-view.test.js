@@ -173,4 +173,13 @@ describe('EventDocumentView — filtering only via explicit hover icons', () => 
     expect(wrapper.findAll('[data-testid="event-document-add-filter"]')).toHaveLength(2)
     expect(wrapper.findAll('[data-testid="event-document-exclude-filter"]')).toHaveLength(2)
   })
+
+  it('stacktrace is NOT filterable: no filter icons, copy still available', () => {
+    const { wrapper } = mountWithFilters({
+      data: { id: '2', summary: [{ key: 'stacktrace', value: '{ "edge_application": [] }' }] }
+    })
+    expect(wrapper.findAll('[data-testid="event-document-add-filter"]')).toHaveLength(0)
+    expect(wrapper.findAll('[data-testid="event-document-exclude-filter"]')).toHaveLength(0)
+    expect(wrapper.findAll('[data-testid="event-document-copy-value"]')).toHaveLength(1)
+  })
 })

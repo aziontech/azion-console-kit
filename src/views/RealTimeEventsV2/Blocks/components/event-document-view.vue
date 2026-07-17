@@ -6,6 +6,7 @@
   import InputText from '@aziontech/webkit/inputtext'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { clipboardWrite } from '@/helpers/clipboard'
+  import { isFieldFilterable } from '../../composables/utils/filterable-fields'
 
   defineOptions({ name: 'EventDocumentView' })
 
@@ -237,10 +238,11 @@
               <span
                 class="doc-compact__value"
                 :title="String(entry.value).length > 100 ? String(entry.value) : undefined"
-                >{{ formatDisplayValue(entry.value)
-                }}<span class="doc-compact__actions">
+              >
+                <span class="doc-compact__value-text">{{ formatDisplayValue(entry.value) }}</span>
+                <span class="doc-compact__actions">
                   <PrimeButton
-                    v-if="canAddFilter && isValidValue(entry.value)"
+                    v-if="canAddFilter && isValidValue(entry.value) && isFieldFilterable(entry.key)"
                     icon="pi pi-filter"
                     text
                     size="small"
@@ -250,7 +252,9 @@
                     data-testid="event-document-add-filter"
                   />
                   <PrimeButton
-                    v-if="canExcludeFilter && isValidValue(entry.value)"
+                    v-if="
+                      canExcludeFilter && isValidValue(entry.value) && isFieldFilterable(entry.key)
+                    "
                     icon="pi pi-filter-slash"
                     text
                     size="small"
@@ -267,8 +271,9 @@
                     class="!w-5 !h-5 !p-0"
                     v-tooltip.top="{ value: 'Copy value', showDelay: 300 }"
                     @click.stop="handleCopy(entry.value)"
-                  /> </span
-              ></span>
+                  />
+                </span>
+              </span>
             </div>
           </div>
           <div
@@ -311,7 +316,7 @@
               >
               <span class="doc-list__actions">
                 <PrimeButton
-                  v-if="canAddFilter && isValidValue(entry.value)"
+                  v-if="canAddFilter && isValidValue(entry.value) && isFieldFilterable(entry.key)"
                   icon="pi pi-filter"
                   text
                   size="small"
@@ -321,7 +326,9 @@
                   data-testid="event-document-add-filter"
                 />
                 <PrimeButton
-                  v-if="canExcludeFilter && isValidValue(entry.value)"
+                  v-if="
+                    canExcludeFilter && isValidValue(entry.value) && isFieldFilterable(entry.key)
+                  "
                   icon="pi pi-filter-slash"
                   text
                   size="small"
@@ -584,14 +591,13 @@
 
   .doc-compact__row > .doc-compact__key,
   .doc-compact__row > .doc-compact__value {
-    /* Right padding RESERVES the action-icons zone: the value ellipsizes
-       before it, so the icons never sit on top of the attribute value. */
-    padding: 0.3rem 72px 0.3rem 0.5rem;
+    padding: 0.3rem 0.5rem;
     border-bottom: 1px solid var(--surface-border);
     transition: background 0.1s;
     height: 1.6rem;
     display: flex;
     align-items: center;
+    gap: 4px;
   }
 
   .doc-compact__row:last-child > .doc-compact__key,
@@ -622,24 +628,26 @@
     font-size: 0.7rem;
     line-height: 1.4;
     color: var(--text-color);
+    min-width: 0;
+  }
+  /* Real flex item (not anonymous flex text): text-overflow only applies here,
+     and the in-flow actions sibling can never sit on top of the value. */
+  .doc-compact__value-text {
+    flex: 1;
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 0;
     user-select: text;
     cursor: text;
-    position: relative;
   }
 
   .doc-compact__actions {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
     display: flex;
     align-items: center;
     gap: 1px;
-    padding: 0 4px;
+    margin-left: auto;
+    flex-shrink: 0;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.1s ease;
