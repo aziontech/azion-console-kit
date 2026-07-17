@@ -114,7 +114,7 @@
     },
     useCustomDomain: false,
     customDomain: '',
-    workloadHostnameAllowAccess: true,
+    workloadHostnameAllowAccess: false,
     tls: { ciphers: 7, minimumVersion: 'tls_1_3' },
     domains: [],
     environmentDeployments: {}

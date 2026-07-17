@@ -1,13 +1,11 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 /**
- * Round-trip coverage for v6 auto-domain bindings.
+ * Coverage for v6 workload binding domains.
  *
- * A binding created via API can carry an empty `domains[]` plus an `auto_domain`
- * string (the API-generated hostname). The console must (a) surface that binding
- * on load — reading `auto_domain` and flagging it `isAutoDomain` — and (b) send it
- * back on update as `{ domains: [], auto_domain_allow_access: true }` without ever
- * dropping it, regardless of edits.
+ * Bindings carry real domains only — there is no `auto_domain` / `auto_domain_allow_access`
+ * inside a binding. `workload_domain_allow_access` is a top-level field: never displayed or
+ * edited, sent as `false` on create and round-tripped unchanged on update.
  */
 
 const hasFlagUseV6Configurations = vi.fn()
@@ -18,7 +16,7 @@ vi.mock('@/composables/user-flag', () => ({
 
 import { WorkloadAdapter } from '@/services/v2/workload/workload-adapter'
 
-const makeLoadedWorkload = (bindings) => ({
+const makeLoadedWorkload = (bindings, overrides = {}) => ({
   data: {
     id: 42,
     name: 'wl',
@@ -31,14 +29,15 @@ const makeLoadedWorkload = (bindings) => ({
     bindings,
     protocols: { http: { http_ports: [80], https_ports: null, quic_ports: null } },
     tls: { minimum_version: null, ciphers: null, certificate: null },
-    mtls: { enabled: false, config: { verification: null, certificate: null, crl: null } }
+    mtls: { enabled: false, config: { verification: null, certificate: null, crl: null } },
+    ...overrides
   }
 })
 
-const makeUpdatePayload = (
+const makeCreatePayload = (
   domains,
   environmentDeployments,
-  workloadHostnameAllowAccess = true
+  workloadHostnameAllowAccess = false
 ) => ({
   id: 42,
   name: 'wl',
@@ -65,60 +64,25 @@ beforeEach(() => {
   hasFlagUseV6Configurations.mockReturnValue(true)
 })
 
-describe('WorkloadAdapter.transformLoadWorkload — auto-domain bindings (v6)', () => {
-  it('surfaces a binding with empty domains[] using its auto_domain, flagged isAutoDomain', () => {
+describe('WorkloadAdapter.transformLoadWorkload — v6 binding domains', () => {
+  it('surfaces one row per binding domain', () => {
     const result = WorkloadAdapter.transformLoadWorkload(
       makeLoadedWorkload([
-        { environment_id: 'env-prod', deployment_id: 'ds-1', domains: ['shop.example.com'] },
-        {
-          environment_id: 'env-stg',
-          deployment_id: 'ds-2',
-          domains: [],
-          auto_domain: 'auto-gen.azion.app',
-          auto_domain_allow_access: true
-        }
-      ]),
-      null,
-      []
-    )
-
-    expect(result.domains).toHaveLength(2)
-
-    const autoRow = result.domains.find((entry) => entry.isAutoDomain)
-    expect(autoRow).toMatchObject({
-      subdomain: 'auto-gen',
-      domain: 'azion.app',
-      environment: 'env-stg',
-      isAutoDomain: true
-    })
-
-    const regularRow = result.domains.find((entry) => !entry.isAutoDomain)
-    expect(regularRow.environment).toBe('env-prod')
-    expect(regularRow.isAutoDomain).toBe(false)
-
-    expect(result.environmentDeployments['env-stg']).toEqual({ deploymentId: 'ds-2' })
-  })
-
-  it('ignores auto_domain when the binding already has domains (regression)', () => {
-    const result = WorkloadAdapter.transformLoadWorkload(
-      makeLoadedWorkload([
-        {
-          environment_id: 'env-prod',
-          deployment_id: 'ds-1',
-          domains: ['shop.example.com'],
-          auto_domain: 'auto-gen.azion.app'
-        }
+        { environment_id: 'env-prod', deployment_id: 'ds-1', domains: ['shop.example.com'] }
       ]),
       null,
       []
     )
 
     expect(result.domains).toHaveLength(1)
-    expect(result.domains[0].isAutoDomain).toBe(false)
-    expect(result.domains[0]).toMatchObject({ subdomain: 'shop', domain: 'example.com' })
+    expect(result.domains[0]).toMatchObject({
+      subdomain: 'shop',
+      domain: 'example.com',
+      environment: 'env-prod'
+    })
   })
 
-  it('leaves a binding with empty domains and no auto_domain producing no row', () => {
+  it('produces no row for a binding with empty domains', () => {
     const result = WorkloadAdapter.transformLoadWorkload(
       makeLoadedWorkload([
         { environment_id: 'env-prod', deployment_id: 'ds-1', domains: ['shop.example.com'] },
@@ -131,26 +95,40 @@ describe('WorkloadAdapter.transformLoadWorkload — auto-domain bindings (v6)', 
     expect(result.domains).toHaveLength(1)
     expect(result.domains[0].environment).toBe('env-prod')
   })
+
+  it('reads workloadHostnameAllowAccess from the top-level workload_domain_allow_access', () => {
+    const result = WorkloadAdapter.transformLoadWorkload(
+      makeLoadedWorkload(
+        [{ environment_id: 'env-prod', deployment_id: 'ds-1', domains: ['shop.example.com'] }],
+        { workload_domain_allow_access: true }
+      ),
+      null,
+      []
+    )
+
+    expect(result.workloadHostnameAllowAccess).toBe(true)
+  })
+
+  it('does not expose isAutoDomain or autoDomainBinding on domain rows', () => {
+    const result = WorkloadAdapter.transformLoadWorkload(
+      makeLoadedWorkload([
+        { environment_id: 'env-prod', deployment_id: 'ds-1', domains: ['shop.example.com'] }
+      ]),
+      null,
+      []
+    )
+
+    expect(result.domains[0]).not.toHaveProperty('isAutoDomain')
+    expect(result.domains[0]).not.toHaveProperty('autoDomainBinding')
+  })
 })
 
-describe('WorkloadAdapter.transformCreateWorkload — auto-domain bindings (v6 update)', () => {
-  it('emits the auto-domain binding with empty domains[] and auto_domain_allow_access true', () => {
-    const payload = makeUpdatePayload(
+describe('WorkloadAdapter.transformCreateWorkload — v6 binding domains', () => {
+  it('builds bindings grouped by environment without auto_domain_allow_access', () => {
+    const payload = makeCreatePayload(
       [
-        {
-          subdomain: 'shop',
-          domain: 'example.com',
-          environment: 'env-prod',
-          certificate: 0,
-          isAutoDomain: false
-        },
-        {
-          subdomain: 'auto-gen',
-          domain: 'azion.app',
-          environment: 'env-stg',
-          certificate: 0,
-          isAutoDomain: true
-        }
+        { subdomain: 'shop', domain: 'example.com', environment: 'env-prod', certificate: 0 },
+        { subdomain: '', domain: 'api.example.com', environment: 'env-stg', certificate: 5 }
       ],
       { 'env-prod': { deploymentId: 'ds-1' }, 'env-stg': { deploymentId: 'ds-2' } }
     )
@@ -160,65 +138,49 @@ describe('WorkloadAdapter.transformCreateWorkload — auto-domain bindings (v6 u
     expect(bindings).toHaveLength(2)
 
     const prod = bindings.find((binding) => binding.environment_id === 'env-prod')
-    expect(prod.domains).toEqual(['shop.example.com'])
+    expect(prod).toEqual({
+      environment_id: 'env-prod',
+      deployment_id: 'ds-1',
+      certificate: null,
+      domains: ['shop.example.com']
+    })
+    expect(prod).not.toHaveProperty('auto_domain_allow_access')
 
     const stg = bindings.find((binding) => binding.environment_id === 'env-stg')
-    expect(stg.domains).toEqual([])
-    expect(stg.deployment_id).toBe('ds-2')
-    expect(stg.auto_domain_allow_access).toBe(true)
+    expect(stg.domains).toEqual(['api.example.com'])
+    expect(stg.certificate).toBe(5)
+    expect(stg).not.toHaveProperty('auto_domain_allow_access')
   })
 
-  it('forces auto_domain_allow_access true on the auto-domain binding even when the workload switch is off', () => {
-    const payload = makeUpdatePayload(
-      [
-        {
-          subdomain: 'auto-gen',
-          domain: 'azion.app',
-          environment: 'env-stg',
-          certificate: 0,
-          isAutoDomain: true
-        }
-      ],
-      { 'env-stg': { deploymentId: 'ds-2' } },
+  it('sends workload_domain_allow_access as false on create', () => {
+    const payload = makeCreatePayload(
+      [{ subdomain: 'shop', domain: 'example.com', environment: 'env-prod', certificate: 0 }],
+      { 'env-prod': { deploymentId: 'ds-1' } },
       false
     )
 
-    const { bindings } = WorkloadAdapter.transformCreateWorkload(payload)
-
-    expect(bindings).toHaveLength(1)
-    expect(bindings[0].domains).toEqual([])
-    expect(bindings[0].auto_domain_allow_access).toBe(true)
+    const request = WorkloadAdapter.transformCreateWorkload(payload)
+    expect(request.workload_domain_allow_access).toBe(false)
   })
 
-  it('preserves auto_domain and other retrieve fields through a full load → update round-trip', () => {
+  it('round-trips workload_domain_allow_access unchanged on update', () => {
     const loaded = WorkloadAdapter.transformLoadWorkload(
-      makeLoadedWorkload([
-        {
-          id: 'bind-1',
-          environment_id: 'env-stg',
-          deployment_id: 'ds-2',
-          domains: [],
-          auto_domain: 'auto-gen.map.azionedge.net',
-          auto_domain_allow_access: true,
-          some_api_field: 'keep-me'
-        }
-      ]),
+      makeLoadedWorkload(
+        [{ environment_id: 'env-prod', deployment_id: 'ds-1', domains: ['shop.example.com'] }],
+        { workload_domain_allow_access: true }
+      ),
       null,
       []
     )
 
-    const payload = makeUpdatePayload(loaded.domains, loaded.environmentDeployments, false)
-    const { bindings } = WorkloadAdapter.transformCreateWorkload(payload)
+    const payload = makeCreatePayload(
+      loaded.domains,
+      loaded.environmentDeployments,
+      loaded.workloadHostnameAllowAccess
+    )
+    const request = WorkloadAdapter.transformCreateWorkload(payload)
 
-    expect(bindings).toHaveLength(1)
-    expect(bindings[0]).toMatchObject({
-      id: 'bind-1',
-      environment_id: 'env-stg',
-      deployment_id: 'ds-2',
-      auto_domain: 'auto-gen.map.azionedge.net',
-      auto_domain_allow_access: true,
-      some_api_field: 'keep-me',
-      domains: []
-    })
+    expect(request.workload_domain_allow_access).toBe(true)
+    expect(request.bindings[0]).not.toHaveProperty('auto_domain_allow_access')
   })
 })

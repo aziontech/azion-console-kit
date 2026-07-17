@@ -21,6 +21,13 @@
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
+  const props = defineProps({
+    isV6: {
+      type: Boolean,
+      default: false
+    }
+  })
+
   const router = useRouter()
   const createDomainPath = `${handleTextDomainWorkload.pluralLabel}/create?origin=list`
   const toast = useToast()
@@ -78,7 +85,7 @@
   })
 
   const getColumns = computed(() => {
-    return [
+    const columns = [
       {
         field: 'name',
         header: 'Name',
@@ -161,6 +168,8 @@
         filterPath: 'lastModified'
       }
     ]
+
+    return props.isV6 ? columns.filter((column) => column.field !== 'workloadHostname') : columns
   })
 
   const allowedFilters = computed(() =>

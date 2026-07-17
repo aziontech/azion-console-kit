@@ -18,23 +18,19 @@ function buildV6CleanDomains(fullDomains, zones = []) {
     const name = typeof entry === 'string' ? entry : entry?.name
     const environment = typeof entry === 'string' ? null : (entry?.environment ?? null)
     const certificate = typeof entry === 'string' ? null : (entry?.certificate ?? null)
-    const isAutoDomain = typeof entry === 'string' ? false : !!entry?.isAutoDomain
-    const autoDomainBinding = typeof entry === 'string' ? null : (entry?.autoDomainBinding ?? null)
     const { domain, subdomain } = getPrimaryDomain(name, zones)
 
     return {
       subdomain: subdomain ?? '',
       domain,
       environment,
-      certificate,
-      isAutoDomain,
-      autoDomainBinding
+      certificate
     }
   })
 
   return cleanDomains.length
     ? cleanDomains
-    : [{ subdomain: '', domain: '', environment: null, certificate: 0, isAutoDomain: false }]
+    : [{ subdomain: '', domain: '', environment: null, certificate: 0 }]
 }
 
 function extractAzionAppSubdomainLegacy(fullDomains, zones = []) {
@@ -101,36 +97,27 @@ const handleTlsLegacy = (payload) => {
 
 const buildV6DomainEntries = (payload) => {
   return payload.domains
-    .filter(({ subdomain, domain, isAutoDomain }) => subdomain || domain || isAutoDomain)
-    .map(({ subdomain, domain, environment, certificate, isAutoDomain, autoDomainBinding }) => ({
+    .filter(({ subdomain, domain }) => subdomain || domain)
+    .map(({ subdomain, domain, environment, certificate }) => ({
       name: subdomain ? `${subdomain}.${domain}` : domain,
       environment: environment ?? null,
-      certificate: certificate ?? 0,
-      isAutoDomain: !!isAutoDomain,
-      autoDomainBinding: autoDomainBinding ?? null
+      certificate: certificate ?? 0
     }))
 }
 
-const buildV6Bindings = (entries, environmentDeployments = {}, autoDomainAllowAccess) => {
+const buildV6Bindings = (entries, environmentDeployments = {}) => {
   const bindingByEnvironment = new Map()
 
-  for (const { name, environment, certificate, isAutoDomain, autoDomainBinding } of entries) {
+  for (const { name, environment, certificate } of entries) {
     if (environment == null) continue
     if (!bindingByEnvironment.has(environment)) {
       bindingByEnvironment.set(environment, {
         domains: [],
-        certificate: null,
-        autoDomain: false,
-        raw: null
+        certificate: null
       })
     }
     const binding = bindingByEnvironment.get(environment)
-    if (isAutoDomain) {
-      binding.autoDomain = true
-      if (autoDomainBinding) binding.raw = autoDomainBinding
-    } else {
-      binding.domains.push(name)
-    }
+    binding.domains.push(name)
     const resolvedCertificate = certificate === 0 ? null : certificate
     if (binding.certificate == null && resolvedCertificate != null) {
       binding.certificate = resolvedCertificate
@@ -138,10 +125,8 @@ const buildV6Bindings = (entries, environmentDeployments = {}, autoDomainAllowAc
   }
 
   return Array.from(bindingByEnvironment, ([environment, binding]) => ({
-    ...(binding.raw ?? {}),
     environment_id: environment,
     deployment_id: environmentDeployments?.[environment]?.deploymentId ?? null,
-    auto_domain_allow_access: binding.autoDomain ? true : autoDomainAllowAccess,
     certificate: binding.certificate,
     domains: binding.domains
   }))
@@ -172,18 +157,6 @@ const buildLoadedV6DomainEntries = (bindings = []) => {
     const bindingCertificate = binding?.certificate ?? null
     const bindingDomains = Array.isArray(binding?.domains) ? binding.domains : []
 
-    if (!bindingDomains.length && binding?.auto_domain) {
-      return [
-        {
-          name: binding.auto_domain,
-          environment: binding?.environment_id ?? null,
-          certificate: bindingCertificate ?? 0,
-          isAutoDomain: true,
-          autoDomainBinding: binding
-        }
-      ]
-    }
-
     return bindingDomains.map((entry) => ({
       name: typeof entry === 'string' ? entry : entry?.name,
       environment: binding?.environment_id ?? null,
@@ -203,11 +176,7 @@ export const WorkloadAdapter = {
 
     if (isV6) {
       const domainEntries = buildV6DomainEntries(payload)
-      bindings = buildV6Bindings(
-        domainEntries,
-        payload.environmentDeployments,
-        payload.workloadHostnameAllowAccess
-      )
+      bindings = buildV6Bindings(domainEntries, payload.environmentDeployments)
 
       tls = handleTls(payload)
     } else {
@@ -253,9 +222,8 @@ export const WorkloadAdapter = {
     }
     if (isV6) {
       payloadResquest.bindings = bindings
-    } else {
-      payloadResquest.workload_domain_allow_access = payload.workloadHostnameAllowAccess
     }
+    payloadResquest.workload_domain_allow_access = payload.workloadHostnameAllowAccess
     if (payloadResquest.tls === null) {
       delete payloadResquest.tls
       delete payloadResquest.protocols.http.https_ports
@@ -302,9 +270,7 @@ export const WorkloadAdapter = {
       workloadHostname: item.workloadHostname?.content?.replace(/\.azion\.app$/, ''),
       infrastructure: item.infrastructure === 'Production' ? '1' : '2',
       isLocked: item.isLocked,
-      workloadHostnameAllowAccess: isV6
-        ? (item.bindings?.[0]?.auto_domain_allow_access ?? item.workloadDomainAllowAccess)
-        : item.workloadDomainAllowAccess,
+      workloadHostnameAllowAccess: item.workloadDomainAllowAccess,
       initialDomains: item.domains,
       tls: item.tls
         ? {
@@ -381,9 +347,7 @@ export const WorkloadAdapter = {
       customDomain: azionAppSubdomains,
       useCustomDomain: !!azionAppSubdomains,
       infrastructure: String(workload.infrastructure),
-      workloadHostnameAllowAccess: isV6
-        ? (bindings[0]?.auto_domain_allow_access ?? workload.workload_domain_allow_access)
-        : workload.workload_domain_allow_access,
+      workloadHostnameAllowAccess: workload.workload_domain_allow_access,
       tls: {
         minimumVersion: workload.tls.minimum_version,
         ciphers: workload.tls.ciphers || SUPPORTED_CIPHERS_LIST_OPTIONS[0].value,

@@ -171,8 +171,7 @@
       environment: null,
       useCustomDomain: useCustomDomain.value ?? false,
       customDomain: customDomain.value ?? '',
-      certificate: 0,
-      isAutoDomain: false
+      certificate: 0
     }
     drawerVisible.value = true
   }
@@ -187,8 +186,7 @@
       environment: item.environment ?? null,
       useCustomDomain: useCustomDomain.value ?? false,
       customDomain: customDomain.value ?? '',
-      certificate: item.certificate ?? 0,
-      isAutoDomain: !!item.isAutoDomain
+      certificate: item.certificate ?? 0
     }
     drawerVisible.value = true
   }
@@ -201,8 +199,7 @@
       subdomain: payload.subdomain ?? '',
       domain: payload.domain ?? '',
       environment: payload.environment ?? null,
-      certificate: payload.certificate ?? 0,
-      isAutoDomain: !!payload.isAutoDomain
+      certificate: payload.certificate ?? 0
     }
 
     if (drawerMode.value === 'edit' && editingIndex.value !== null) {
@@ -294,7 +291,6 @@
               :environmentLabel="environmentName(domain.environment)"
               :certificateLabel="certificateLabel(domain.certificate)"
               :isUrlVersioned="isUrlVersionedEnv(domain.environment)"
-              :isAutoDomain="domain.isAutoDomain"
               :disableRemove="!hasMultipleDomains"
               :dataTestid="`domains-form__row-${index}`"
               @edit="openEditDrawer(index)"

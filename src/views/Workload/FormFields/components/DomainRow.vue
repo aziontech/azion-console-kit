@@ -27,10 +27,6 @@
       type: Boolean,
       default: false
     },
-    isAutoDomain: {
-      type: Boolean,
-      default: false
-    },
     disableRemove: {
       type: Boolean,
       default: false
@@ -43,21 +39,8 @@
 
   defineEmits(['edit', 'remove'])
 
-  const AZION_APP_SUFFIX = '.azion.app'
-
-  const isAzionAppDomain = computed(
-    () =>
-      props.domain === 'azion.app' ||
-      `${props.subdomain ? `${props.subdomain}.` : ''}${props.domain || ''}`.endsWith(
-        AZION_APP_SUFFIX
-      )
-  )
-
   const fqdn = computed(() => {
     if (!props.domain && !props.subdomain) return 'New domain'
-    if (props.isAutoDomain && isAzionAppDomain.value) {
-      return props.subdomain || (props.domain || '').replace(/\.azion\.app$/, '')
-    }
     const sub = props.subdomain ? `${props.subdomain}.` : ''
     return `${sub}${props.domain || ''}`
   })
@@ -66,13 +49,7 @@
     props.isUrlVersioned && (props.domain || props.subdomain) ? '*.' : ''
   )
 
-  const azionAppSuffix = computed(() =>
-    props.isAutoDomain && isAzionAppDomain.value ? AZION_APP_SUFFIX : ''
-  )
-
-  const domainDisplay = computed(
-    () => `${versionedPrefix.value}${fqdn.value}${azionAppSuffix.value}`
-  )
+  const domainDisplay = computed(() => `${versionedPrefix.value}${fqdn.value}`)
 
   const environmentDisplay = computed(() => props.environmentLabel || '—')
   const certificateDisplay = computed(() => props.certificateLabel || '—')
@@ -88,7 +65,7 @@
   )
 
   const hasDomain = computed(() => !!(props.domain || props.subdomain))
-  const copyValue = computed(() => `${fqdn.value}${azionAppSuffix.value}`)
+  const copyValue = computed(() => fqdn.value)
 
   const copied = ref(false)
   let copiedTimeout = null
@@ -120,14 +97,6 @@
           <span class="text-[10px] uppercase tracking-wider text-color-secondary leading-none">
             domain
           </span>
-          <span
-            v-if="isAutoDomain"
-            class="text-[10px] leading-none px-1.5 py-0.5 rounded border surface-border text-color-secondary"
-            title="This domain was generated automatically and can't be edited."
-            :data-testid="`${dataTestid}__auto-badge`"
-          >
-            Auto-generated
-          </span>
         </div>
         <div class="flex items-center gap-1 min-w-0 h-5">
           <span
@@ -144,12 +113,7 @@
               class="text-color-secondary"
               title="This environment is url-versioned: each deploy generates a dynamic hash prefix."
               >{{ versionedPrefix }}</span
-            >{{ fqdn
-            }}<span
-              v-if="azionAppSuffix"
-              class="text-color-secondary"
-              >{{ azionAppSuffix }}</span
-            >
+            >{{ fqdn }}
           </span>
           <PrimeButton
             v-if="hasDomain"

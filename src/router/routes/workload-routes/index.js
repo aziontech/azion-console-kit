@@ -9,6 +9,7 @@ export const workloadRoutes = {
       path: '',
       name: `list-workloads`,
       component: () => import('@views/Workload/ListView.vue'),
+      props: () => ({ isV6: hasFlagUseV6Configurations() }),
       meta: {
         title: 'Workloads',
         flag: 'checkout_access_without_flag',
