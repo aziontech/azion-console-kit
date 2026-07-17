@@ -178,8 +178,19 @@
       filterDataRange.value.endDate,
       selectedUtcOffset
     )
+    // Final guard for filterDateRangeMaxDays: every picker path (preset, typed
+    // relative, calendar, persisted label re-parse) materializes here, so a
+    // span over the cap is clamped by moving BEGIN up (end/"now" preserved).
+    let cappedBegin = tsRangeBegin
+    if (props.filterDateRangeMaxDays > 0) {
+      const maxRangeMs = props.filterDateRangeMaxDays * 864e5
+      const endMs = new Date(tsRangeEnd).getTime()
+      if (endMs - new Date(tsRangeBegin).getTime() > maxRangeMs) {
+        cappedBegin = new Date(endMs - maxRangeMs).toISOString().replace(/\.\d{3}/, '')
+      }
+    }
     filterData.value.tsRange = {
-      tsRangeBegin,
+      tsRangeBegin: cappedBegin,
       tsRangeEnd,
       label: filterDataRange.value.label || '',
       labelStart: filterDataRange.value.labelStart || '',

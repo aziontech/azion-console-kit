@@ -327,6 +327,22 @@
 
   const applyQuickSelect = () => {
     const now = new Date()
+    // The preset list is filtered by maxDays, but the typed "Last N <unit>"
+    // path must be clamped too. Rewriting value/unit BEFORE building keeps the
+    // displayed label honest ("last 7 days", never a lying "last 30 days").
+    if (props.maxDays > 0) {
+      const requested = createRelativeRange(
+        quickSelectValue.value,
+        quickSelectUnit.value,
+        quickSelectDirection.value,
+        now
+      )
+      const spanMs = Math.abs(requested.endDate.getTime() - requested.startDate.getTime())
+      if (spanMs > props.maxDays * 864e5) {
+        quickSelectValue.value = props.maxDays
+        quickSelectUnit.value = 'days'
+      }
+    }
     const { startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
       quickSelectValue.value,
       quickSelectUnit.value,

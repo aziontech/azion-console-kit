@@ -85,7 +85,7 @@
               @update:filterData="onFilterDataUpdate"
               :fieldsInFilter="filterFields"
               :dataset="tabSelected?.dataset || ''"
-              :filterDateRangeMaxDays="365"
+              :filterDateRangeMaxDays="7"
               :hideFilterTags="true"
               @updatedFilter="emit('filter-updated')"
             />
