@@ -2,7 +2,6 @@ import {
   logoutGuard,
   accountGuard,
   themeGuard,
-  billingGuard,
   redirectGuard,
   flagGuard,
   cliGuard,
@@ -19,7 +18,6 @@ export default async function beforeEachRoute(guardDependency) {
     themeGuard,
     accountGuard,
     cliGuard,
-    billingGuard,
     redirectGuard,
     flagGuard,
     realTimeEventsVersionGuard
