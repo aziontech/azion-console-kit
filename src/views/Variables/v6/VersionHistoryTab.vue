@@ -6,9 +6,12 @@
   import { useToast } from '@aziontech/webkit/use-toast'
   import { clipboardWrite } from '@/helpers/clipboard'
   import { variablesV6Service } from '@/services/v2/variables/v6/variables-v6-service'
+  import { VERSION_POLL_INTERVAL_MS } from '@/services/v2/versioning/version-cache-policy'
+  import { isProcessing } from '@/composables/versioning/version-machine'
   import { buildVersionRowActions } from '@/views/Variables/v6/version-row-actions'
   import RevertDialog from '@/views/Variables/v6/components/RevertDialog.vue'
   import VersionListDataView from '@/components/VersionListDataView'
+  import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
   import '@/assets/styles/version-row-menu.css'
 
   defineOptions({ name: 'variables-version-history-tab' })
@@ -41,8 +44,31 @@
   const pageSize = ref(20)
   const searchTerm = ref('')
 
-  const fetchVersions = async ({ skipCache = false } = {}) => {
-    isLoading.value = true
+  let pollTimer = null
+
+  const stopPolling = () => {
+    if (pollTimer) {
+      clearInterval(pollTimer)
+      pollTimer = null
+    }
+  }
+
+  const hasTransientVersions = () =>
+    items.value.some((version) => isProcessing(version?.versionState))
+
+  const syncPolling = () => {
+    const transient = hasTransientVersions()
+    if (transient && !pollTimer) {
+      pollTimer = setInterval(() => {
+        fetchVersions({ skipCache: true, silent: true })
+      }, VERSION_POLL_INTERVAL_MS)
+    } else if (!transient) {
+      stopPolling()
+    }
+  }
+
+  const fetchVersions = async ({ skipCache = false, silent = false } = {}) => {
+    if (!silent) isLoading.value = true
     isError.value = false
     try {
       const params = { page: page.value, pageSize: pageSize.value }
@@ -57,11 +83,15 @@
       items.value = body
       totalRecords.value = count
       if (!searchTerm.value) hasAnyVersions.value = count > 0
+      syncPolling()
     } catch {
-      isError.value = true
-      items.value = []
+      if (!silent) {
+        isError.value = true
+        items.value = []
+      }
+      stopPolling()
     } finally {
-      isLoading.value = false
+      if (!silent) isLoading.value = false
     }
   }
 
@@ -136,6 +166,7 @@
 
   onBeforeUnmount(() => {
     if (searchTimer) clearTimeout(searchTimer)
+    stopPolling()
   })
 
   fetchVersions()
@@ -186,6 +217,11 @@
         value="Current"
         severity="success"
         data-testid="variables-version-history__status-current"
+      />
+      <VersionStateBadge
+        v-else-if="isProcessing(item.versionState)"
+        :state="item.versionState"
+        data-testid="variables-version-history__status-transient"
       />
       <span
         v-else

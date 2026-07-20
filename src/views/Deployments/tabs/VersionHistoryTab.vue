@@ -10,9 +10,11 @@
     VERSION_POLL_INTERVAL_MS,
     hasTransientVersions
   } from '@/services/v2/versioning/version-cache-policy'
+  import { isProcessing } from '@/composables/versioning/version-machine'
   import { buildVersionRowActions } from './version-history-row-actions'
   import RevertDialog from './components/RevertDialog.vue'
   import VersionListDataView from '@/components/VersionListDataView'
+  import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
   import '@/assets/styles/version-row-menu.css'
 
   defineOptions({ name: 'deployment-version-history-tab' })
@@ -246,6 +248,11 @@
         value="Current"
         severity="success"
         data-testid="deployment-version-history__status-active"
+      />
+      <VersionStateBadge
+        v-else-if="isProcessing(item.state)"
+        :state="item.state"
+        data-testid="deployment-version-history__status-transient"
       />
       <span
         v-else

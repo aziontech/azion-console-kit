@@ -480,7 +480,10 @@
         </OverlayPanel>
       </div>
 
-      <div class="flex flex-none items-center justify-end gap-2">
+      <div
+        v-if="$slots['toolbar-actions']"
+        class="flex flex-none items-center justify-end gap-2"
+      >
         <slot name="toolbar-actions"> </slot>
       </div>
     </div>

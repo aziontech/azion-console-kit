@@ -149,13 +149,13 @@ describe.each(scenarios)('$label', (scenario) => {
       )
     })
 
-    it('revert issues POST on /{id}/revert/{versionId} with an empty body', async () => {
+    it('revert issues POST on /{id}/versions/{versionId}/revert with an empty body', async () => {
       await service.revert({ id: ID, versionId: VERSION_ID })
 
       expect(service.http.request).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'POST',
-          url: `${scenario.baseURL}/${ID}/revert/${VERSION_ID}`,
+          url: `${scenario.baseURL}/${ID}/versions/${VERSION_ID}/revert`,
           body: {},
           config: ACCEPT
         })

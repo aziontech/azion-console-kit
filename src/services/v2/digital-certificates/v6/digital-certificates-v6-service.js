@@ -119,7 +119,7 @@ export class DigitalCertificatesV6Service extends BaseService {
   revert = async ({ id, versionId }) => {
     await this.http.request({
       method: 'POST',
-      url: `${this.#baseURL}/${id}/revert/${versionId}`,
+      url: `${this.#baseURL}/${id}/versions/${versionId}/revert`,
       body: {},
       config: this.#requestConfig
     })
