@@ -6,12 +6,12 @@ para criar uma nova release. Ela atende três pontos de partida — **Workload**
 que é permitido alterar, o que vem pré-selecionado e quais verificações/carregamentos a tela executa.
 
 - **Rota**: `/deployments/releases/new`, nome `release-composer`, gated pelo flag `use_v6_configurations`
-  (`src/router/routes/deployment-routes/index.js:88`).
+  (`src/router/routes/deployment-routes/index.js:66`).
 - **Entrada**: tudo viaja por **query params**; a tela lê a rota **uma única vez por navegação** (`openFromRoute`) e
   captura o cenário em `entryScenario` — ele nunca muda enquanto o usuário edita a seleção
-  (`ReleaseComposerView.vue:111`).
+  (`ReleaseComposerView.vue:120`).
 - **Re-entrada**: navegação para a mesma rota (ex.: CTA "Compose first release") não remonta o componente; um watch
-  em `route.fullPath` reexecuta `openFromRoute` (`ReleaseComposerView.vue:682-687`).
+  em `route.fullPath` reexecuta `openFromRoute` (`ReleaseComposerView.vue:784-791`).
 
 ## Arquitetura da tela
 
@@ -60,7 +60,7 @@ flowchart LR
 
 ## Os 4 cenários de entrada (`entryScenario`)
 
-Capturados uma única vez em `openFromRoute` (`ReleaseComposerView.vue:640-646`):
+Capturados uma única vez em `openFromRoute` (`ReleaseComposerView.vue:742-748`):
 
 | Cenário | Query params | DSs pré-selecionados | Picker de DS | Composição |
 |---|---|---|---|---|
@@ -106,10 +106,10 @@ flowchart TD
 
 ## Fluxo 1 — Entrada por Workload
 
-**Origem**: botão **Deploy** no heading de `src/views/Workload/TabsView.vue:126`.
+**Origem**: botão **Deploy** no heading do Workload → `openRelease` (`src/views/Workload/TabsView.vue:117-124`).
 
 **O que é carregado ANTES de navegar:**
-1. O Workload via `workloadService.loadWorkload({ id })` (`TabsView.vue:91`) — traz `bindings` (um binding por
+1. O Workload via `workloadService.loadWorkload({ id })` (`TabsView.vue:87-90`, `fetchWorkload`) — traz `bindings` (um binding por
    environment) e `workloadDeploymentId` (fallback).
 2. `resolveDeploymentIds(bindings)` (`src/views/Workload/utils/resolveDeploymentIds.js`) extrai e **deduplica** os
    `deployment_id` de cada binding; se vazio, usa `[workloadDeploymentId]`; senão `[]`.
@@ -120,7 +120,7 @@ environment**. A entrada carrega **todos** os DS ids, não só o primeiro:
 - **0 DSs** → abre a entrada global (usuário escolhe o DS).
 - **1 DS** → delega para `releaseComposerRouteFromDeployment(id)` — vira o Cenário A.
 - **2+ DSs** → `pickTarget=true`: o composer mantém o picker, **restrito** aos DSs do Workload
-  (`workloadCandidateDsIds`, `ReleaseComposerView.vue:118,649-650,934-936`), com **todos pré-selecionados** para que
+  (`workloadCandidateDsIds`, `ReleaseComposerView.vue:127,751-753,1170`), com **todos pré-selecionados** para que
   o impacto abra como o **agregado real de todos os environments**. O usuário pode desmarcar os que quiser pular.
 
 **Na tela** (`from-workload`):
@@ -147,30 +147,37 @@ flowchart TD
 ## Fluxo 2 — Entrada por Deployment Settings
 
 **Origens** (todas usam `releaseComposerRouteFromDeployment`):
-- `src/views/Deployments/ListView.vue:65` — row action **New release** (passa `deployment.id`; guard: `if (!deployment?.id) return`).
-- `src/views/Deployments/TabsView.vue:78` — botão **Deploy** do heading (passa `route.params.id`).
-- `src/views/Deployments/ListView.vue:26` — botão global **Deploy** (sem argumento → cenário **global**).
+- `src/views/Deployments/ListView.vue:54-56` — row action **New release** (`newReleaseFromDeployment`, passa `deployment.id`; guard `if (!deployment?.id) return`).
+- `src/views/Deployments/TabsView.vue:72` — botão **Deploy** do heading (passa `deploymentId`).
+- **Cenário `global`**: **não há mais** um botão "Deploy" global dedicado na lista de Deployments — o cenário global
+  é a **degradação** dos helpers com entrada vazia (`releaseComposerRouteFromDeployment()` sem id; `FromWorkload`
+  com 0 DSs; `FromResource` com entrada inválida).
 
 **O que é carregado antes de navegar**: nada além do que a listagem já tem — o id viaja direto na query.
 
 **Na tela** (`from-deployment`, Cenário A):
 - O DS de origem é **fixo e pré-selecionado**; o **picker não é renderizado** (`v-if="!isFromDeployment"`,
-  `ReleaseComposerView.vue:1260`).
+  `ReleaseComposerView.vue:1623`).
 - A release ativa do DS é carregada (`getActiveReleaseComposition`) e vira a **base da composição**: cada singleton
-  (Application/Firewall/Custom Pages) é pré-preenchido com o recurso da release ativa; a versão default é o sentinel
-  **`LATEST` ("Track latest Ready")**, não a versão pinada na release ativa.
+  (Application/Firewall/Custom Pages) é pré-preenchido com o recurso da release ativa. A versão de cada card é
+  **pré-semeada com a versão pinada na release ativa** por `store.seedVersionsFromRelease(effDsId)`
+  (`release.js:710`) — singletons **e** dependências, exclusivo do fluxo `from-deployment`
+  (`ReleaseComposerView.vue:642-649` gateia o watch em `isFromDeployment`). O pin só é aplicado quando **resolve
+  contra o catálogo já carregado**; num miss (versão removida/deprecada, ou catálogo ainda carregando) o slot cai
+  silenciosamente para o default (`LATEST_READY` no singleton, pendente na dependência). É um seed **one-shot
+  idempotente por slot** — um pick explícito do usuário sempre vence.
 - Tudo é editável (é um composer de nova release); o gate fica no botão de deploy (`deployCtx`).
 - Aviso específico: "This release applies to `<deployment>` and reaches every environment that uses it".
 - Impacto mostra apenas esse DS.
 
 **Cenário `global`** é o mesmo fluxo sem pré-seleção: o picker (inventário completo) é o primeiro passo e a
-composição só aparece após selecionar ao menos um DS (`showComposition`, `ReleaseComposerView.vue:701`).
+composição só aparece após selecionar ao menos um DS (`showComposition`, `ReleaseComposerView.vue:805`).
 
 ```mermaid
 flowchart TD
     A1["ListView row action<br/>New release"] --> R["deploymentIds=id"]
     A2["TabsView botão Deploy"] --> R
-    A3["ListView botão Deploy global"] --> R0["rota sem query"]
+    A3["Helpers com entrada vazia<br/>(sem id / inválida)"] --> R0["rota sem query"]
 
     R --> B["openFromRoute<br/>entryScenario = from-deployment"]
     R0 --> B0["openFromRoute<br/>entryScenario = global"]
@@ -182,7 +189,7 @@ flowchart TD
     C0 --> D0["picker com inventário completo<br/>composição escondida até selecionar DS"]
     D0 -->|"usuário seleciona DS"| D
 
-    D --> E["composição completa pré-preenchida:<br/>singletons da release ativa<br/>versão default = LATEST (Track latest Ready)<br/>dependências herdadas da release ativa"]
+    D --> E["composição completa pré-preenchida:<br/>singletons da release ativa<br/>versão pré-semeada = pin da release ativa<br/>(seedVersionsFromRelease; fallback LATEST)<br/>dependências herdadas da release ativa"]
     E --> F["picker OCULTO no from-deployment<br/>impacto só do DS fixo"]
 ```
 
@@ -194,10 +201,10 @@ flowchart TD
 
 | Origem | Arquivo | Versão passada |
 |---|---|---|
-| Botão **Deploy** do heading do recurso | `src/views/EdgeApplications/v6/EditView.vue:91-98` | `version: null` → helper resolve para a **primeira ready** |
-| Row action **Promote** no menu de versões | `EditView.vue:101-110` via `useVersionMenuActions` | `version: { id: pin }` → **versão pinada** |
-| Landing de recurso versionado (Firewall, Custom Pages) | `src/composables/versioning/use-resource-version-landing.js:124-145` | idem (Deploy/Promote) |
-| Footer **Deploy** do Version Shell (editor de versão) | `src/templates/version-shell-block/components/VersionHeadingActions.vue:47-54` | versão **em edição** no shell |
+| Botão **Deploy** do heading do recurso | `use-resource-version-landing.js:159` (`openRelease`) — compartilhado por EdgeApplications/Firewall/Custom Pages; `EditView.vue` delega | `version: null` + `versions` → helper resolve para a **primeira ready** |
+| Row action **Promote/Deploy** no menu de versões | `use-resource-version-landing.js:171` (`openPromoteRelease`) / `use-version-menu-actions.js:167` (`deploy`) | `version: { id: pin }` → **versão pinada** |
+| Landing de recurso versionado (Firewall, Custom Pages) | `src/composables/versioning/use-resource-version-landing.js:159-180` | idem (Deploy/Promote) |
+| Footer **Deploy** do Version Shell (editor de versão) | `src/templates/version-shell-block/components/VersionHeadingActions.vue:48-59` (aceita `deployRoute` pré-montado ou monta via `resourceContext`) | versão **em edição** no shell |
 
 **O que é carregado antes de navegar:**
 1. O recurso (`loadEdgeApplicationService` / `loadCustomPage` / etc.).
@@ -213,13 +220,15 @@ flowchart TD
 - Sem nenhuma versão deployável → `versions` chega vazio → o helper **degrada para a entrada global** (nunca abre
   scoped sem versão).
 
-**Na tela** (`from-resource`), em `openFromRoute` (`ReleaseComposerView.vue:612-663`):
+**Na tela** (`from-resource`), em `openFromRoute` (`ReleaseComposerView.vue:660-772`):
 
 1. **HOP 1 (async)** — resolve os Deployment Settings **consumidores** do recurso via
    `resolveConsumingDeployments({ resource_type, resource_id })`
    (`src/services/v2/release-impact/consuming-deployments/index.js`):
    - **Estratégia primária**: `resourceUsageResolver` — `GET /v4/resource_usage` (endpoint autoritativo,
-     single-type, 1..100 ids); match: `application` por `global_id`, demais tipos por `resource_id` (req 1.5).
+     single-type, 1..100 ids); match: **todo tipo por `resource_id`** (`matchIdValue`; para `application` esse
+     valor **é** o `global_id`, com `global_id` mantido só como fallback legado) — regra unificada em `f08e33f34`,
+     que aposentou o antigo `matchFieldFor` (req 1.5).
    - **Fallback transparente** (endpoint fora do ar OU resultado vazio): `fanoutResolver` — lista os DSs
      (1 página de 100) e escaneia a release ativa de cada um; **acima de 50 DSs retorna vazio** (não faz fan-out
      no inventário inteiro — req 1.8). Falha por DS é isolada (`allSettled`).
@@ -227,7 +236,7 @@ flowchart TD
      podendo escolher no inventário completo.
 2. **`store.openRelease`** com `deploymentIds: []` — a tela scoped **sempre abre com ZERO DSs selecionados**
    (req 1.9); o recurso + versão são semeados no slot do singleton (`resNames/resVers[scopedType]`,
-   `release.js:250-254`).
+   `release.js:332-336`).
 3. A **composição colapsa** para o tipo scoped: só o card do recurso de origem é renderizado (editável — o usuário
    pode trocar a versão, o que **redescobre as dependências**).
 4. O **picker agrupa** os DSs via `classifyDeploymentsForResource`
@@ -235,9 +244,10 @@ flowchart TD
 
 | Grupo | Regra | Selecionável? |
 |---|---|---|
-| `linked` — "Already using this resource" | release ativa do DS contém **este** recurso (match por `global_id`/`resource_id`) | Sim — a release nova troca a versão dele |
+| `linked` — "Already using this resource" | release ativa do DS contém **este** recurso (match por `resource_id` via `matchIdValue`; `global_id` só fallback legado) | Sim — a release nova troca a versão dele |
 | `available` — "Available — not linked yet" | `binding_policy === 'FLEXIBLE'`, ou `STRICT` **sem** nenhum recurso do tipo scoped na release ativa | Sim — a release nova **adiciona/linka** o recurso |
 | `needsFirstRelease` — "Needs a first release" | DS scoped **sem release ativa** (nada para preservar/override) | **Não** — vira o CTA "Compose first release" |
+| `loadFailed` — "Couldn't load the active release" | leitura da release ativa do DS **falhou** (fica `null` + flag em `activeReleaseErrorByDs`), distinto de "sem release" | **Não** — oferece **Retry** (`retryActiveReleases`); nunca cai em `needsFirstRelease` (evita re-release que sobrescreveria a composição não lida) |
 | `hidden` | `STRICT` já com **outro** recurso do mesmo tipo | Não aparece |
 
 > Nota de implementação: `scopedCandidateDsIds` (resultado do HOP 1) é resolvido e mantido na view, mas hoje quem
@@ -277,11 +287,11 @@ flowchart TD
 ### Fluxo 3b — CTA "Compose first release"
 
 Um DS **sem release ativa** não pode receber override scoped (não há composição a preservar). O picker então oferece
-o CTA, que **reabre o composer DS-first** para aquele único DS (`ReleaseComposerView.vue:998-1006`):
+o CTA, que **reabre o composer DS-first** para aquele único DS (`ReleaseComposerView.vue:1272-1281`):
 
 - Query: `deploymentIds=<ds>` + `seedType/seedResourceId/seedVersionId` (o recurso/versão de onde o usuário veio).
 - Como as chaves são `seed*` (e não `scopedType`), a composição **não colapsa**: abre **completa**, com o seed
-  pré-preenchido no slot do singleton (`release.js:260-265`) e **só a Application faltando escolher** (ela é
+  pré-preenchido no slot do singleton (`release.js:342-347`) e **só a Application faltando escolher** (ela é
   obrigatória — Case 1 do `deployCtx` bloqueia publicar sem Application).
 - É uma navegação para a **mesma rota** — quem reprocessa é o watch de `route.fullPath`, nunca o `onMounted`.
 
@@ -334,13 +344,13 @@ Pontos-chave do carregamento:
 
 1. **`openRelease` reseta TODA a seleção** (`$patch(freshSelectionState())`) mas **preserva** os dados carregados
    (`deployments`, `activeReleaseByDs`, `versionsByResource`) — eles pertencem ao composable e podem já estar em
-   cache (`release.js:208-216`).
+   cache (`release.js:289-320`).
 2. **Release ativa por DS**: `getActiveReleaseComposition(dsId)` lista as releases do DS ordenadas por
    `-created_at` e prefere a de `traffic_role` ACTIVE (`deployment-release-service.js:345`). Carregada para cada DS
    **selecionado** e também para cada DS **listado no picker** (`ensureActiveReleases`) — é o que permite
    classificar os grupos. Falha por DS registra `null` e **não bloqueia os demais** (§7.3).
 3. **Versões por recurso**: para todo par `(type, id)` da composição **efetiva** — picks explícitos, singletons
-   herdados da release ativa e instâncias de dependência (`versionedResources`, `ReleaseComposerView.vue:156-184`).
+   herdados da release ativa e instâncias de dependência (`versionedResources`, `ReleaseComposerView.vue:169-197`).
    Singletons usam `toVersionOptions` (**ready | active**); dependências usam `toReadyVersionOptions`
    (**somente ready**).
 4. **Dependências são descobertas da VERSÃO que será publicada** (não do recurso): trocar a versão no card
@@ -364,13 +374,15 @@ Pontos-chave do carregamento:
    quebrado nunca derruba os demais.
 5. **Versão default = `LATEST` ("Track latest Ready")**: sentinel resolvido para um id concreto só no
    `composePayload`/dispatch (`resolveLatestVersion` — prefere a marcada `isCurrent`, senão a primeira). O payload
-   **nunca** carrega `LATEST` nem `version_id: null`.
+   **nunca** carrega `LATEST` nem `version_id: null`. **Exceção**: o fluxo `from-deployment` pré-semeia cada card
+   com o **pin da release ativa** (`seedVersionsFromRelease`) e só cai para `LATEST` quando o pin não resolve —
+   ver Fluxo 2.
 6. **Estados deployáveis**: singleton aceita versão `ready | active`; **dependência aceita somente `ready`**.
    Dependência `required` sem nenhuma versão ready **bloqueia o publish** ("No Ready version available").
 7. **Gate de deploy** (botão "Deploy release"): `deployEnabled` (store: DS efetivo ok + `canDeploy` + versão do
    scoped/app escolhida + versões das dependências app-managed escolhidas) **E** fold do multi-DS — o DS **mais
    restritivo** bloqueia (`blockingDs`: qualquer DS selecionado com `!ctx.ok || !ctx.canDeploy`;
-   `ReleaseComposerView.vue:1010-1023`). `canDeploy` exige **Application presente** (herdada da release ativa ou
+   `ReleaseComposerView.vue:1298-1307`). `canDeploy` exige **Application presente** (herdada da release ativa ou
    escolhida).
 8. **Confirmação antes do dispatch**: dialog com resumo de impacto ("go live on N DSs … route X domains across Y
    workloads"; versão honesta quando o impacto está indisponível).
@@ -394,7 +406,7 @@ Pontos-chave do carregamento:
 | Picker de DS | Sim, com grupos scoped | **Não renderiza** | Sim, restrito ao Workload | Sim, inventário |
 | Composição | **Só o tipo scoped** | Completa | Completa | Completa (após 1º DS) |
 | Toggle Firewall/Custom Pages | Não (colapsada) | Sim (default ON) | Sim (default ON) | Sim (default ON) |
-| Versão inicial do card | A versão da URL (pinada) | `LATEST` | `LATEST` | `LATEST` |
+| Versão inicial do card | A versão da URL (pinada) | **Pin da release ativa** (`seedVersionsFromRelease`; fallback `LATEST`) | `LATEST` | `LATEST` |
 | HOP 1 (consuming DSs) | **Sim**, no mount | Não | Não | Não |
 | Payload de dispatch | **Scoped: preserve & swap por DS** | Compartilhado: 1 payload → N DSs | Compartilhado | Compartilhado |
 | CTA "Compose first release" | Sim (DS sem release ativa) | — | — | — |
@@ -420,7 +432,7 @@ flowchart TD
     G --> H{"leitura ok?"}
     H -->|"não"| I["skipReason=degraded<br/>excluído do fan-out"]
     H -->|"sim"| J["preserve & swap:<br/>mesmo recurso → troca só version_id<br/>outro recurso do tipo → troca a entrada<br/>tipo ausente → ADICIONA (link)<br/>demais recursos byte a byte"]
-    J --> K["aplica dependencyOverrides<br/>(troca/adiciona versão das deps)"]
+    J --> K["aplica dependencyOverrides<br/>(deps do tipo scoped + bucket 'additional')<br/>troca/adiciona versão"]
     K --> D
 
     D --> L["por DS: 202 + trace_id<br/>ou erro (422 43007 = limite versioned URLs)"]
@@ -439,6 +451,7 @@ Descobertas **da versão selecionada** do pai, exibidas aninhadas no card do pai
 | Firewall | WAF | request rules | behavior `set_waf` → `waf_id` (dedup, `ruleCount`) |
 | Firewall | Network Lists | request rules | criterion `variable === '${network}'` → `argument` (dedup, `ruleCount`) |
 | Custom Pages | Connectors | `config.pages` da versão | página `type === 'page_connector'` → `connector` (dedup, `pageCount`) |
+| **Additional** (manual) | Connectors, Network Lists | **adicionadas pelo usuário** (não descobertas) | picker paginado (`LazyResourceSelectField`); dedup global por `usedDependencyIds` (ENG-46674) |
 
 Regras:
 - Carregam **somente** quando o pai está composto (id + versão resolvidos) **e** a versão é `ready`
@@ -454,9 +467,36 @@ Regras:
   `retryCatalogs()`. Enquanto as versões carregam, o botão de deploy fica bloqueado com o hint "Loading versions…"
   (o sentinel `LATEST` resolveria para `null` no meio da carga).
 
+### Dependências adicionais (manuais)
+
+Além das dependências descobertas automaticamente da versão, o card de composição sempre expõe (em **qualquer**
+fluxo, inclusive scoped, enquanto `showComposition`) a seção **"Additional dependencies"** — o bucket
+`ADDITIONAL_PARENT` (`'additional'`, `release.js:30`). Serve para `connector`/`network_list`
+(`MANUAL_DEP_TYPES`, `release.js:31`) que uma function referencia **dinamicamente** em runtime, invisíveis à
+varredura estática por parent.
+
+- **Não é um singleton**: não tem card nem versão própria; só alimenta `collectionsFor(ADDITIONAL_PARENT)` e o
+  preload de catálogo. Os `seed*` de dependências nunca o tocam, então entradas manuais **sobrevivem** a um
+  re-seed.
+- **Um recurso, uma vez** (ENG-46674): `store.usedDependencyIds(type)` (`release.js:260`) impede adicionar o
+  mesmo recurso duas vezes em qualquer parent — o picker já remove os ids em uso (`excludeUsedResourcesService`) e
+  uma tentativa duplicada dispara o toast "Already in this release". A versão é gerida onde o recurso aparece.
+- **Obrigatório só depois de escolhido**: uma linha em branco não bloqueia; ao escolher o recurso a linha vira
+  `required` e entra em `pendingDependencySelections` (o footer pede "Select a version for each Function and
+  Connector…").
+- **No dispatch**:
+  - fluxo **não-scoped** — as instâncias entram no `resources[]` flat como qualquer dependência (dedup por
+    `(resource_id, type)`).
+  - fluxo **scoped** — o `composePayload` percorre `[scopedType, ADDITIONAL_PARENT]` para montar
+    `dependencyOverrides` (`release.js:889`), então as dependências manuais **também** são aplicadas
+    (troca/adiciona versão) sobre a composição preservada de cada DS — a única exceção à regra "só o tipo scoped
+    muda".
+- **Versão compartilhada**: `connector`/`network_list` são `SHARED_VERSION_DEP_TYPES` (`release.js:52`) — a mesma
+  instância fixa **uma** versão para toda a release, sincronizada entre os cards que a referenciam.
+
 ## Os 5 casos do `deployCtx` (gate por DS)
 
-`store.deployCtx(dsId)` (`release.js:107-150`) governa edição/publicação por DS:
+`store.deployCtx(dsId)` (`release.js:135-187`) governa edição/publicação por DS:
 
 | Caso | Condição | Efeito |
 |---|---|---|
