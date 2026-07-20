@@ -12,6 +12,7 @@ const convertValueToDateByUserTimezone = (time, timezone) => {
     second: '2-digit',
     hour12: true
   }
+
   return date.toLocaleString('en-US', options)
 }
 

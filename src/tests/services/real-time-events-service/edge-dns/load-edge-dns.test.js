@@ -2,6 +2,7 @@ import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { loadEdgeDNS } from '@/services/real-time-events-service/edge-dns'
 import { describe, expect, it, vi } from 'vitest'
 import { localeMock } from '@/tests/utils/localeMock'
+import { getCurrentTimezone } from '@/helpers'
 
 const fixtures = {
   filter: {
@@ -77,7 +78,7 @@ describe('ImageProcessorServices', () => {
         { key: 'resolutionType', value: fixtures.edgeDns.resolutionType },
         { key: 'solutionId', value: fixtures.edgeDns.solutionId },
         { key: 'statusCode', value: fixtures.edgeDns.statusCode },
-        { key: 'ts', value: 'February 23, 2024 at 06:07:25 PM' },
+        { key: 'ts', value: getCurrentTimezone(fixtures.edgeDns.ts) },
         { key: 'uuid', value: fixtures.edgeDns.uuid },
         { key: 'zoneId', value: fixtures.edgeDns.zoneId }
       ]

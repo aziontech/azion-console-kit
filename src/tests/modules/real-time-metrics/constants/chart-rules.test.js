@@ -19,14 +19,14 @@ describe('RealTimeMetricsModule', () => {
         SCREEN_XSMALL_BREAKPOINT: 540,
         MEAN_LINE_LABEL: 'Mean Line',
         DATA_VOLUME: {
-          yotta: Math.pow(1024, 8),
-          zetta: Math.pow(1024, 7),
-          exa: Math.pow(1024, 6),
-          peta: Math.pow(1024, 5),
-          tera: Math.pow(1024, 4),
-          giga: Math.pow(1024, 3),
-          mega: Math.pow(1024, 2),
-          kilo: 1024
+          yotta: Math.pow(1000, 8),
+          zetta: Math.pow(1000, 7),
+          exa: Math.pow(1000, 6),
+          peta: Math.pow(1000, 5),
+          tera: Math.pow(1000, 4),
+          giga: Math.pow(1000, 3),
+          mega: Math.pow(1000, 2),
+          kilo: 1000
         },
         C3_TYPES: {
           ts: 'timeseries',

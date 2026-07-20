@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="border-b px-8 py-2.5 justify-between surface-border flex">
+    <div class="border-b px-4 sm:px-6 md:px-8 py-2.5 justify-between surface-border flex">
       <h3 class="text-sm font-semibold text-color">Add filter</h3>
       <PrimeButton
         icon="pi pi-times"
@@ -12,7 +12,7 @@
     </div>
 
     <!-- Filter Rows -->
-    <div class="px-8 py-6 flex gap-2 flex-col">
+    <div class="px-4 sm:px-6 md:px-8 py-6 flex gap-2 flex-col">
       <div
         v-for="(filterRow, rowIndex) in filterRows"
         :key="rowIndex"
@@ -45,40 +45,8 @@
       </div>
     </div>
 
-    <!-- Preview Section -->
-    <div class="px-8 py-4 border-t surface-border">
-      <div class="flex items-center gap-2 mb-3">
-        <i class="pi pi-search text-color-secondary"></i>
-        Preview
-      </div>
-
-      <div class="flex flex-wrap gap-2">
-        <div
-          v-for="(error, index) in validationErrors"
-          :key="index"
-          class="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg"
-        >
-          <i class="pi pi-exclamation-triangle text-orange-500"></i>
-          <span class="text-sm text-gray-700">{{ error }}</span>
-          <span
-            v-if="index < validationErrors.length - 1"
-            class="text-blue-500 font-medium"
-            >OR</span
-          >
-        </div>
-      </div>
-
-      <!-- JSON Preview -->
-      <div class="mt-4 p-3 bg-gray-50 rounded-lg">
-        <h5 class="text-sm font-medium text-gray-700 mb-2">JSON Structure:</h5>
-        <pre class="text-xs text-gray-600 overflow-auto">{{
-          JSON.stringify(generateFilterStructure(), null, 2)
-        }}</pre>
-      </div>
-    </div>
-
     <!-- Custom Label Section -->
-    <div class="px-8 py-5 flex gap-3.5 flex-col">
+    <div class="px-4 sm:px-6 md:px-8 py-5 flex gap-3.5 flex-col">
       <label class="text-sm font-medium text-color">Custom label (optional)</label>
       <InputText
         v-model="customLabel"
@@ -90,7 +58,7 @@
 
     <!-- Footer Buttons -->
     <div
-      class="px-8 py-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
+      class="px-4 sm:px-6 md:px-8 py-3 border-t surface-border flex gap-2 items-center justify-end p-dialog-footer"
     >
       <PrimeButton
         type="button"

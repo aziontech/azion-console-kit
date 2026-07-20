@@ -25,10 +25,6 @@ module.exports = {
   ],
   overrides: [
     {
-      files: ['cypress/**/*.{cy,spec}.{js,ts,jsx,tsx}'],
-      extends: ['plugin:cypress/recommended']
-    },
-    {
       files: ['scripts/**/*.cjs'],
       env: { node: true },
       rules: {
@@ -42,6 +38,10 @@ module.exports = {
   },
   rules: {
     'no-case-declarations': 0,
+    // Reliability — applies repo-wide, not gated by tier.
+    // navigator.clipboard.writeText() returns a Promise; ignoring it hides
+    // permission rejections and lost-focus failures that silently break copy UX.
+    'azion-architecture/no-unawaited-clipboard': 'error',
     'no-console': ['error', { allow: ['error'] }],
     'id-length': ['error', { min: 2 }]
   }

@@ -2,9 +2,11 @@ import {
   logoutGuard,
   accountGuard,
   themeGuard,
+  billingGuard,
   redirectGuard,
   flagGuard,
-  cliGuard
+  cliGuard,
+  realTimeEventsVersionGuard
 } from '@/router/hooks/guards'
 import { useRouter } from 'vue-router'
 
@@ -17,8 +19,10 @@ export default async function beforeEachRoute(guardDependency) {
     themeGuard,
     accountGuard,
     cliGuard,
+    billingGuard,
     redirectGuard,
-    flagGuard
+    flagGuard,
+    realTimeEventsVersionGuard
   ]
 
   for (const executeGuard of guards) {
