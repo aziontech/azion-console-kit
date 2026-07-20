@@ -477,26 +477,6 @@ yarn test:unit:headless
 yarn test:unit:coverage
 ```
 
-### E2E Tests with Cypress
-
-1. Copy `cypress.env.example.json` to `cypress.env.json`
-2. Fill in valid credentials for your target environment
-
-```bash
-# Open Cypress UI
-yarn test:e2e:open:dev
-
-# Run headless
-yarn test:e2e:run:dev
-```
-
-For CI environments, run tests against the production build:
-
-```bash
-yarn build
-yarn test:e2e:run:stage
-```
-
 ### Linting
 
 ```bash

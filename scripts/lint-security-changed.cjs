@@ -102,11 +102,9 @@ function shouldLint(relativePath) {
   const extension = path.extname(normalizedPath)
 
   if (!LINT_EXTENSIONS.has(extension)) return false
-  if (normalizedPath.startsWith('cypress/')) return false
   if (normalizedPath.startsWith('node_modules/')) return false
   if (normalizedPath.includes('/node_modules/')) return false
-  if (/cypress\.config\.(js|cjs|mjs)$/.test(normalizedPath)) return false
-  if (/(^|\/).*\.(test|spec)\.(js|jsx|cjs|mjs)$/.test(normalizedPath)) return false
+  if (/(^|\/).*\.test\.(js|jsx|cjs|mjs)$/.test(normalizedPath)) return false
 
   return true
 }

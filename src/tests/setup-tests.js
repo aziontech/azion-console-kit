@@ -31,6 +31,37 @@ function installResizeObserverPolyfill() {
 }
 
 /**
+ * jsdom does not implement window.matchMedia, and vitest 4's vi.spyOn no
+ * longer creates spies over undefined properties. Install a callable stub so
+ * code reading `matchMedia('(prefers-color-scheme: dark)').matches` works and
+ * tests can spy on it.
+ */
+function installMatchMediaPolyfill() {
+  const makeMediaQueryList = (query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener() {},
+    removeListener() {},
+    addEventListener() {},
+    removeEventListener() {},
+    dispatchEvent() {
+      return false
+    }
+  })
+
+  const targets = []
+  if (typeof globalThis !== 'undefined') targets.push(globalThis)
+  if (typeof window !== 'undefined' && window !== globalThis) targets.push(window)
+
+  for (const target of targets) {
+    if (typeof target.matchMedia === 'undefined') {
+      target.matchMedia = (query) => makeMediaQueryList(query)
+    }
+  }
+}
+
+/**
  * Provide a localStorage / sessionStorage polyfill for the test environment.
  *
  * Node 22+ ships with a built-in (experimental) `globalThis.localStorage`
@@ -128,6 +159,7 @@ export function setupGlobalPinia() {
 installStoragePolyfill('localStorage')
 installStoragePolyfill('sessionStorage')
 installResizeObserverPolyfill()
+installMatchMediaPolyfill()
 
 function clearStorageSafely(propName) {
   // The polyfill installed above is a plain object — not a real Storage

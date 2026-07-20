@@ -5,7 +5,6 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { defineConfig, loadEnv } from 'vite'
 import { webkitViteConfig } from '@aziontech/webkit/vite'
-import istanbul from 'vite-plugin-istanbul'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 const getConfig = () => {
@@ -50,9 +49,6 @@ const getConfig = () => {
     plugins: [
       vue(),
       vueJsx(),
-      istanbul({
-        nycrcPath: '.nycrc'
-      }),
       ...(IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length
         ? [
             sentryVitePlugin({

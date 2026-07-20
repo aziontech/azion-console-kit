@@ -4,9 +4,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // the factory must also be hoisted via vi.hoisted().
 const { mockDecoratorRequest, MockDecoratorClass } = vi.hoisted(() => {
   const mockDecoratorRequest = vi.fn()
-  const MockDecoratorClass = vi.fn().mockImplementation(() => ({
-    request: mockDecoratorRequest
-  }))
+  // The service instantiates the decorator with `new`; vitest 4 forwards the
+  // `new` call to the implementation, so it must be a constructible function.
+  const MockDecoratorClass = vi.fn(function () {
+    return { request: mockDecoratorRequest }
+  })
   return { mockDecoratorRequest, MockDecoratorClass }
 })
 
@@ -37,7 +39,9 @@ beforeEach(() => {
   // since vi.clearAllMocks() would wipe the mockImplementation set via vi.hoisted().
   mockDecoratorRequest.mockReset()
   MockDecoratorClass.mockClear()
-  MockDecoratorClass.mockImplementation(() => ({ request: mockDecoratorRequest }))
+  MockDecoratorClass.mockImplementation(function () {
+    return { request: mockDecoratorRequest }
+  })
 })
 
 describe('loadSummaryKpis', () => {

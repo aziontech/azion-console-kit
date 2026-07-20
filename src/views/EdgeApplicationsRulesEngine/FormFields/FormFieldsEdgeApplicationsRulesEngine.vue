@@ -153,7 +153,6 @@
     '${arg_}',
     '${args}',
     '${cookie_}',
-    '${da_}',
     '${device_group}',
     '${domain}',
     '${geoip_city_continent_code}',
