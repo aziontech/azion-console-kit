@@ -106,9 +106,18 @@ vi.mock('@/templates/release-composition/use-release-composition', async () => {
         impact: ref({ hasSelection: true, impactUnavailable: true, perDs: [], totals: null }),
         impactUnavailable: ref(true),
         retryImpact: vi.fn(),
+        activeReleaseErrorByDs: ref({}),
+        hasAnyVersionsError: ref(false),
+        hasAnyCatalogError: ref(false),
+        resolveConsumingDeployments: vi.fn().mockResolvedValue({ deployments: [] }),
+        retryActiveReleases: vi.fn(),
+        retryCatalogs: vi.fn(),
+        retryResourceVersions: vi.fn(),
         isDeploying: ref(false),
         buildAndActivate: vi.fn().mockResolvedValue([]),
         loadActiveRelease,
+        ensureActiveReleases: (ids) =>
+          (Array.isArray(ids) ? ids : []).forEach((id) => loadActiveRelease(id)),
         dependencyResourcesFor: (dsId) => dependencyResourcesByDs[dsId] ?? {},
         resolveConsumingDsIds: () => [],
         loadCatalog,
@@ -134,6 +143,9 @@ vi.mock('@/templates/release-composition/use-release-impact', async () => {
     useReleaseImpact: () => ({
       reverseLookupByDs: ref({}),
       dsMetaFor: () => ({}),
+      activeVersionHintFor: () => null,
+      isLoading: ref(false),
+      isPartial: computed(() => false),
       degradationReason: computed(() => null),
       retry: vi.fn()
     })
@@ -157,6 +169,88 @@ vi.mock('@/templates/release-composition/use-application-connector-dependencies'
   const { ref } = await import('vue')
   return {
     useApplicationConnectorDependencies: () => ({
+      connectorDependencies: ref([]),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+
+// The view also composes firewall + custom-page version-ready gates and their
+// nested dependency discoveries; stub each with its own return shape so the
+// composition renders without reaching the real (vue-query-backed) composables.
+vi.mock('@/templates/release-composition/use-application-version-ready', async () => {
+  const { ref } = await import('vue')
+  return {
+    useApplicationVersionReady: () => ({
+      isReady: ref(true),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-firewall-version-ready', async () => {
+  const { ref } = await import('vue')
+  return {
+    useFirewallVersionReady: () => ({
+      isReady: ref(true),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-custom-page-version-ready', async () => {
+  const { ref } = await import('vue')
+  return {
+    useCustomPageVersionReady: () => ({
+      isReady: ref(true),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-firewall-function-dependencies', async () => {
+  const { ref } = await import('vue')
+  return {
+    useFirewallFunctionDependencies: () => ({
+      functionDependencies: ref([]),
+      isModuleEnabled: ref(false),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-firewall-waf-dependencies', async () => {
+  const { ref } = await import('vue')
+  return {
+    useFirewallWafDependencies: () => ({
+      wafDependencies: ref([]),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-firewall-network-list-dependencies', async () => {
+  const { ref } = await import('vue')
+  return {
+    useFirewallNetworkListDependencies: () => ({
+      networkListDependencies: ref([]),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-custom-page-connector-dependencies', async () => {
+  const { ref } = await import('vue')
+  return {
+    useCustomPageConnectorDependencies: () => ({
       connectorDependencies: ref([]),
       isLoading: ref(false),
       hasError: ref(false),
@@ -295,9 +389,11 @@ describe('ReleaseComposerView — DS-first flow (Scenario A)', () => {
       wrapper.find('[data-testid="release-composition__deps-group-network_list"]').exists()
     ).toBe(true)
 
-    // Dependency instances are seeded automatically; there is no manual Add control.
+    // Auto-detected dependency instances are seeded; a separate "Additional
+    // dependencies" section provides the manual Add control for connectors/network
+    // lists referenced dynamically (allow-add), so the control is present.
     const connectorAdd = wrapper.find('[data-testid="release-composition__deps-add-connector"]')
-    expect(connectorAdd.exists()).toBe(false)
+    expect(connectorAdd.exists()).toBe(true)
   })
 
   it('defaults the Version picker to "latest Ready" (LATEST sentinel) on a fresh DS-first selection', async () => {

@@ -135,6 +135,7 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
     // `environments[]` (DS → environment → workload rows); domains/wlCount per DS.
     expect(result.perDs).toEqual([
       {
+        deploymentId: 'ds-1',
         name: 'Storefront',
         domains: 3,
         wlCount: 2,
@@ -151,6 +152,7 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
         ]
       },
       {
+        deploymentId: 'ds-2',
         name: 'Checkout',
         domains: 1,
         wlCount: 1,
@@ -213,14 +215,16 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
     ])
   })
 
-  it('degrades to unavailable when ANY selected DS is missing from the ref (no fabrication)', () => {
+  it('treats a DS absent from the ref as resolved-with-zero (non-blocking, no fabrication)', () => {
     setDeployments([
       { id: 'ds-1', name: 'Has data' },
       { id: 'ds-2', name: 'No data' }
     ])
 
-    // ds-1 resolved, ds-2 absent => the engine reports unavailable with ZERO rows
-    // but keeps the REAL selection count (Property 8: never invent impact rows).
+    // ds-1 resolved, ds-2 absent => the engine renders ds-2 as a real zero (no
+    // environments, 0 workloads/domains) and keeps impact available. A missing
+    // key is non-blocking, never fabricated (Property 8); only a genuine lookup
+    // FAILURE degrades to unavailable.
     const reverseLookupByDs = ref({
       'ds-1': [row({ id: 'wl-a', name: 'web-a', domains: ['a1.example.com'] })]
     })
@@ -233,9 +237,26 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
 
     const result = impact.value
     expect(result.hasSelection).toBe(true)
-    expect(result.impactUnavailable).toBe(true)
-    expect(result.perDs).toEqual([])
-    expect(result.totals).toEqual({ dsCount: 2, totalDomains: 0, totalWorkloads: 0 })
+    expect(result.impactUnavailable).toBe(false)
+    expect(result.perDs).toEqual([
+      {
+        deploymentId: 'ds-1',
+        name: 'Has data',
+        domains: 1,
+        wlCount: 1,
+        environments: [
+          { name: null, wlCount: 1, domains: 1, rows: [{ name: 'web-a', domains: 1 }] }
+        ]
+      },
+      {
+        deploymentId: 'ds-2',
+        name: 'No data',
+        domains: 0,
+        wlCount: 0,
+        environments: []
+      }
+    ])
+    expect(result.totals).toEqual({ dsCount: 2, totalDomains: 1, totalWorkloads: 1 })
   })
 
   it('reports no impact (not unavailable) when nothing is selected', () => {
@@ -255,9 +276,9 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
   it('consumes the injected ref REACTIVELY and unchanged (mutation flows through the engine)', async () => {
     setDeployments([{ id: 'ds-1', name: 'Storefront' }])
 
-    // Start with the DS unresolved => degraded. Then populate the SAME injected
-    // ref and assert the engine re-derives the tree from it with no other input:
-    // proof the engine reads the ref it was handed, byte-for-byte (req 9.5).
+    // Start with the DS absent => resolved-with-zero (non-blocking). Then populate
+    // the SAME injected ref and assert the engine re-derives the tree from it with
+    // no other input: proof the engine reads the ref it was handed (req 9.5).
     const reverseLookupByDs = ref({})
 
     const { impact } = useReleaseComposition({
@@ -266,8 +287,10 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
       reverseLookupByDs
     })
 
-    expect(impact.value.impactUnavailable).toBe(true)
-    expect(impact.value.perDs).toEqual([])
+    expect(impact.value.impactUnavailable).toBe(false)
+    expect(impact.value.perDs).toEqual([
+      { deploymentId: 'ds-1', name: 'Storefront', domains: 0, wlCount: 0, environments: [] }
+    ])
 
     reverseLookupByDs.value = {
       'ds-1': [
@@ -286,6 +309,7 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
     expect(result.impactUnavailable).toBe(false)
     expect(result.perDs).toEqual([
       {
+        deploymentId: 'ds-1',
         name: 'Storefront',
         domains: 2,
         wlCount: 1,
@@ -312,7 +336,9 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
 
     const result = impact.value
     expect(result.impactUnavailable).toBe(false)
-    expect(result.perDs).toEqual([{ name: 'Empty DS', domains: 0, wlCount: 0, environments: [] }])
+    expect(result.perDs).toEqual([
+      { deploymentId: 'ds-1', name: 'Empty DS', domains: 0, wlCount: 0, environments: [] }
+    ])
     expect(result.totals).toEqual({ dsCount: 1, totalWorkloads: 0, totalDomains: 0 })
   })
 

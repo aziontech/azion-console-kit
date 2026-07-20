@@ -104,7 +104,10 @@ describe('useReleaseDeployProgress', () => {
       (ids, onOutcome) =>
         new Promise((resolve) => {
           onOutcome({ id: 'ds-1', ok: true })
-          resolveDispatch = () => resolve([])
+          resolveDispatch = () => {
+            onOutcome({ id: 'ds-2', ok: true })
+            resolve([])
+          }
         })
     )
     const progress = useReleaseDeployProgress({ dispatch, resolveRow })

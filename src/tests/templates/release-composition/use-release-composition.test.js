@@ -89,7 +89,7 @@ describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
     expect(impact.value.totals).toEqual({ dsCount: 0, totalDomains: 0, totalWorkloads: 0 })
   })
 
-  it('degraded state: DS selected but no reverse-lookup => unavailable, zero rows, real dsCount only', async () => {
+  it('non-blocking state: DS selected but no reverse-lookup => available with zero-row entries, real dsCount', async () => {
     deploymentReleaseService.getActiveReleaseComposition.mockResolvedValue(
       release([{ resource_type: 'application', global_id: 42, version_id: 'app-live' }])
     )
@@ -101,13 +101,16 @@ describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
     })
     await flushPromises()
 
-    // No reverse-lookup data for these DSs, so impact degrades. Nothing synthetic
-    // is produced (zero rows, zero workloads/domains) but `totals.dsCount` still
-    // reflects the REAL selection so the panel can show "{N} selected" (Property 8).
-    expect(impactUnavailable.value).toBe(true)
+    // No reverse-lookup data for these DSs => each renders as a real zero (no
+    // environments, 0 workloads/domains). Impact stays available (non-blocking)
+    // and `totals.dsCount` reflects the REAL selection. Nothing synthetic is
+    // produced — a missing key is a real zero, never fabricated (Property 8).
+    expect(impactUnavailable.value).toBe(false)
     expect(impact.value.hasSelection).toBe(true)
-    expect(impact.value.perDs).toEqual([])
-    expect(impact.value.perDs).toHaveLength(0)
+    expect(impact.value.perDs).toEqual([
+      { deploymentId: 'ds-1', name: 'ds-1', domains: 0, wlCount: 0, environments: [] },
+      { deploymentId: 'ds-2', name: 'ds-2', domains: 0, wlCount: 0, environments: [] }
+    ])
     expect(impact.value.totals).toEqual({ dsCount: 2, totalDomains: 0, totalWorkloads: 0 })
   })
 
@@ -127,12 +130,14 @@ describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
     await flushPromises()
 
     // Even with an active release loaded (so resources are known), there is no
-    // blast-radius data — impact must stay strictly empty (no derived rows), with
-    // only the REAL dsCount surfaced (no fabricated workloads/domains).
+    // blast-radius data — the selected DS renders as a real zero (no derived rows),
+    // impact stays available, and only the REAL dsCount is surfaced (no fabricated
+    // workloads/domains).
     expect(impact.value).toEqual({
       hasSelection: true,
-      impactUnavailable: true,
-      perDs: [],
+      isLoading: false,
+      impactUnavailable: false,
+      perDs: [{ deploymentId: 'ds-1', name: 'ds-1', domains: 0, wlCount: 0, environments: [] }],
       totals: { dsCount: 1, totalDomains: 0, totalWorkloads: 0 }
     })
   })
@@ -155,8 +160,10 @@ describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
     await flushPromises()
 
     expect(stub.refetch).toHaveBeenCalledTimes(1)
-    expect(impactUnavailable.value).toBe(true)
-    expect(impact.value.perDs).toEqual([])
+    expect(impactUnavailable.value).toBe(false)
+    expect(impact.value.perDs).toEqual([
+      { deploymentId: 'ds-1', name: 'ds-1', domains: 0, wlCount: 0, environments: [] }
+    ])
     expect(impact.value.totals).toEqual({ dsCount: 1, totalDomains: 0, totalWorkloads: 0 })
   })
 
@@ -697,7 +704,7 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
       payload.resources.map((resource) => [resource.resource_type, resource])
     )
     expect(byType.application).toEqual({
-      global_id: 42,
+      resource_id: 42,
       version_id: 'app-new',
       resource_type: 'application'
     })
@@ -983,7 +990,7 @@ describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-
     const payload = lastPayloadFor('ds-with-fn')
 
     expect(findByType(payload, 'application')).toEqual({
-      global_id: 42,
+      resource_id: 42,
       version_id: 'app-new',
       resource_type: 'application'
     })
@@ -1025,7 +1032,7 @@ describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-
       resource_type: 'function'
     })
     expect(findByType(payload, 'application')).toEqual({
-      global_id: 42,
+      resource_id: 42,
       version_id: 'app-new',
       resource_type: 'application'
     })
@@ -1106,7 +1113,7 @@ describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-
     const payload = lastPayloadFor('ds-with-fn')
 
     expect(findByType(payload, 'application')).toEqual({
-      global_id: 42,
+      resource_id: 42,
       version_id: 'app-new',
       resource_type: 'application'
     })
@@ -1150,7 +1157,7 @@ describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-
       resource_type: 'connector'
     })
     expect(findByType(payload, 'application')).toEqual({
-      global_id: 42,
+      resource_id: 42,
       version_id: 'app-new',
       resource_type: 'application'
     })
@@ -1182,7 +1189,7 @@ describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-
     const payload = lastPayloadFor('ds-with-fn')
 
     expect(findByType(payload, 'application')).toEqual({
-      global_id: 42,
+      resource_id: 42,
       version_id: 'app-new',
       resource_type: 'application'
     })
@@ -1243,7 +1250,7 @@ describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-
 
     const gonePayload = lastPayloadFor('ds-gone')
     expect(findByType(gonePayload, 'application')).toEqual({
-      global_id: 42,
+      resource_id: 42,
       version_id: 'app-new',
       resource_type: 'application'
     })

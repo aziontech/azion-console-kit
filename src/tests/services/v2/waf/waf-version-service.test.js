@@ -110,7 +110,7 @@ describe('WafVersionService - mutations + cache invalidation', () => {
     expect(removeSpy).toHaveBeenCalledWith({ queryKey: queryKeys.waf.version.all(RID) })
   })
 
-  it('updateDraft PUTs the WAF Main Settings payload to /versions/{vid} and invalidates', async () => {
+  it('updateDraft PATCHes the WAF Main Settings payload to /versions/{vid} and invalidates', async () => {
     const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
     const requestSpy = vi
       .spyOn(httpService, 'request')
@@ -124,7 +124,7 @@ describe('WafVersionService - mutations + cache invalidation', () => {
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      method: 'PUT',
+      method: 'PATCH',
       url: `${BASE}/${VID}`,
       body: expect.objectContaining({
         name: 'waf-main',

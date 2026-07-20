@@ -66,7 +66,7 @@ describe('EdgeFirewallVersionService - mutations', () => {
     })
   })
 
-  it('updateDraft PUTs to the version URL and invalidates', async () => {
+  it('updateDraft PATCHes the version URL and invalidates', async () => {
     const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
     const requestSpy = vi
       .spyOn(httpService, 'request')
@@ -75,9 +75,9 @@ describe('EdgeFirewallVersionService - mutations', () => {
     await service.updateDraft(RID, VID, { name: 'fw', wafEnabled: true })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      method: 'PUT',
+      method: 'PATCH',
       url: `v4/workspace/firewalls/${RID}/versions/${VID}`,
-      body: { name: 'fw', waf_enabled: true }
+      body: { name: 'fw', modules: { waf: { enabled: true } } }
     })
     expect(removeSpy).toHaveBeenCalledWith({
       queryKey: queryKeys.firewall.version.all(RID)

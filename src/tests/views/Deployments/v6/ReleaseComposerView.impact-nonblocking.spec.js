@@ -29,11 +29,13 @@ const storeState = reactive({
   coll: {},
   collOpen: {},
   activeReleaseByDs: {},
+  activeReleaseErrorByDs: {},
   deployments: [{ id: 'ds-1', name: 'production-edge', deployment_policy: 'single_version' }],
   scopedType: null,
   fromVersion: false,
   versionId: '',
-  pendingDependencySelections: []
+  pendingDependencySelections: [],
+  versionGateSatisfied: true
 })
 
 const storeMock = {
@@ -43,7 +45,10 @@ const storeMock = {
   resourceId: '',
   setDeployments: vi.fn(),
   setActiveReleaseByDs: vi.fn(),
+  setActiveReleaseError: vi.fn(),
   setVersionsByResource: vi.fn(),
+  seedVersionsFromRelease: vi.fn(),
+  usedDependencyIds: vi.fn(() => new Set()),
   resolveVersion: vi.fn(() => null),
   restoreCollVersions: vi.fn(),
   seedApplicationFunctions: vi.fn(),
@@ -78,7 +83,8 @@ Object.keys(storeState).forEach((key) => {
 
 vi.mock('@/stores/release', () => ({
   useReleaseStore: () => storeMock,
-  COLLECTION_TYPES: ['function', 'connector', 'waf', 'network_list']
+  COLLECTION_TYPES: ['function', 'connector', 'waf', 'network_list'],
+  ADDITIONAL_PARENT: 'additional'
 }))
 
 vi.mock('@/stores/breadcrumbs', () => ({
@@ -104,7 +110,8 @@ vi.mock('pinia', async () => {
         'scopedType',
         'fromVersion',
         'versionId',
-        'pendingDependencySelections'
+        'pendingDependencySelections',
+        'versionGateSatisfied'
       ]
       const refs = {}
       keys.forEach((key) => {
@@ -156,27 +163,45 @@ vi.mock('@/templates/release-composition/use-release-composition', () => ({
     buildAndActivate,
     dependencyResourcesFor: () => ({}),
     resolveConsumingDeployments: vi.fn().mockResolvedValue({ deployments: [] }),
+    resolveConsumingDsIds: () => [],
     ensureActiveReleases: vi.fn(),
+    activeReleaseErrorByDs: ref({}),
+    hasAnyVersionsError: ref(false),
+    hasAnyCatalogError: ref(false),
+    retryActiveReleases: vi.fn(),
+    retryCatalogs: vi.fn(),
+    retryResourceVersions: vi.fn(),
     loadCatalog: vi.fn(),
     catalogOptionsFor: () => [],
     isLoadingCatalog: () => false,
+    resourceListService: () => vi.fn().mockResolvedValue({ body: [], count: 0 }),
+    resourceLoadService: () => vi.fn().mockResolvedValue(null),
+    ensureResourceNames: vi.fn(),
+    resourceNameFor: () => null,
     versionOptionsFor: () => [],
     isLoadingVersionsFor: () => false
   })
 }))
 
 // --- dependency composables: quiet (not the subject of this suite) ------------
-const quietVersionReady = () => ({
-  isReady: ref(false),
-  isLoading: ref(false),
-  hasError: ref(false),
-  retry: vi.fn()
-})
-const quietDeps = (key) => () => ({
-  [key]: ref([]),
-  isLoading: ref(false),
-  hasError: ref(false),
-  retry: vi.fn()
+// Hoisted so the (hoisted) vi.mock factories below can reference them without a
+// temporal-dead-zone error.
+const { quietVersionReady, quietDeps } = await vi.hoisted(async () => {
+  const { ref: hoistedRef } = await import('vue')
+  return {
+    quietVersionReady: () => ({
+      isReady: hoistedRef(false),
+      isLoading: hoistedRef(false),
+      hasError: hoistedRef(false),
+      retry: vi.fn()
+    }),
+    quietDeps: (key) => () => ({
+      [key]: hoistedRef([]),
+      isLoading: hoistedRef(false),
+      hasError: hoistedRef(false),
+      retry: vi.fn()
+    })
+  }
 })
 
 vi.mock('@/templates/release-composition/use-application-version-ready', () => ({
@@ -292,9 +317,16 @@ vi.mock('@/templates/release-composition/components/ImpactPanel.vue', () => ({
   }
 }))
 
+import { flushPromises } from '@vue/test-utils'
 import ReleaseComposerView from '@/views/Deployments/v6/ReleaseComposerView.vue'
 
-const mountView = () => mount(ReleaseComposerView, { global: { stubs: { teleport: true } } })
+// The Deploy button lives in a `<Teleport v-if="isMounted">`; `isMounted` flips in
+// `onMounted`, a re-render that only lands next tick — await it before querying.
+const mountView = async () => {
+  const wrapper = mount(ReleaseComposerView, { global: { stubs: { teleport: true } } })
+  await flushPromises()
+  return wrapper
+}
 
 const deployButton = (wrapper) =>
   wrapper.find('[data-testid="release-composition__build-and-activate"]')
@@ -318,9 +350,9 @@ afterEach(() => {
 })
 
 describe('ReleaseComposerView — impact state never gates the Deploy button (Property 4 / req 5.4)', () => {
-  it('keeps Deploy enabled while the impact is LOADING (and propagates is-loading-meta to the picker)', () => {
+  it('keeps Deploy enabled while the impact is LOADING (and propagates is-loading-meta to the picker)', async () => {
     impactIsLoading.value = true
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     // Publishing is enabled → the button is not gated by the impact load.
     expect(deployButton(wrapper).attributes('disabled')).toBeUndefined()
@@ -331,36 +363,36 @@ describe('ReleaseComposerView — impact state never gates the Deploy button (Pr
     expect(picker.props('isLoadingMeta')).toBe(true)
   })
 
-  it('keeps Deploy enabled when the impact is PARTIAL (capped / degraded)', () => {
+  it('keeps Deploy enabled when the impact is PARTIAL (capped / degraded)', async () => {
     impactUnavailable.value = false
     impactDegradationReason.value = 'capped'
     impact.value = { hasSelection: true, impactUnavailable: false, perDs: [], totals: null }
 
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     expect(deployButton(wrapper).attributes('disabled')).toBeUndefined()
   })
 
-  it('keeps Deploy enabled when the impact is UNAVAILABLE (fetch failed)', () => {
+  it('keeps Deploy enabled when the impact is UNAVAILABLE (fetch failed)', async () => {
     impactUnavailable.value = true
     impactDegradationReason.value = 'fetch_failed'
     impact.value = { hasSelection: true, impactUnavailable: true, perDs: [], totals: null }
 
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     expect(deployButton(wrapper).attributes('disabled')).toBeUndefined()
   })
 
-  it('disables Deploy only when PUBLISHING is closed — proving the gate ignores impact', () => {
+  it('disables Deploy only when PUBLISHING is closed — proving the gate ignores impact', async () => {
     // Contrapositive: with a healthy impact, closing the publishing gate
     // (deployEnabled=false) or introducing a blocking DS disables the button.
     storeState.deployEnabled = false
-    const closedGate = mountView()
+    const closedGate = await mountView()
     expect(deployButton(closedGate).attributes('disabled')).toBeDefined()
 
     storeState.deployEnabled = true
     deployCtx.mockReturnValue({ ok: false, canDeploy: false })
-    const blockingDs = mountView()
+    const blockingDs = await mountView()
     expect(deployButton(blockingDs).attributes('disabled')).toBeDefined()
   })
 })

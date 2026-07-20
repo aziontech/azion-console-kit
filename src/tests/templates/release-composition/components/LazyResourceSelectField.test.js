@@ -19,15 +19,16 @@ const DropdownStub = defineComponent({
     placeholder: { type: String, default: '' }
   },
   emits: ['update:modelValue'],
-  setup(props, { slots, expose }) {
-    expose({
-      triggerLazyLoad: (last) => props.virtualScrollerOptions?.onLazyLoad?.({ last })
-    })
-    return () =>
-      h('div', { class: 'dropdown-stub', 'data-count': props.options.length }, [
-        slots.header?.(),
-        slots.footer?.()
-      ])
+  methods: {
+    triggerLazyLoad(last) {
+      return this.virtualScrollerOptions?.onLazyLoad?.({ last })
+    }
+  },
+  render() {
+    return h('div', { class: 'dropdown-stub', 'data-count': this.options.length }, [
+      this.$slots.header?.(),
+      this.$slots.footer?.()
+    ])
   }
 })
 

@@ -65,7 +65,7 @@ const trafficCell = (wrapper, id) =>
   wrapper.find(`[data-testid="version-list-data-view__row-${id}__traffic"]`)
 
 describe('VersionListDataView — traffic column', () => {
-  it('renders the "Receiving traffic" badge for an active version', () => {
+  it('renders the "Live" badge for an active version', () => {
     const items = [
       {
         id: 'v1',
@@ -74,7 +74,7 @@ describe('VersionListDataView — traffic column', () => {
       }
     ]
     const wrapper = mountList({ items, hasVersions: true, resourceType: 'waf' })
-    expect(trafficCell(wrapper, 'v1').text()).toContain('Receiving traffic')
+    expect(trafficCell(wrapper, 'v1').text()).toContain('Live')
   })
 
   it('shows nothing for an inactive version while the column stays visible', () => {

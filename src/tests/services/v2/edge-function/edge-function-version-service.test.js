@@ -129,7 +129,7 @@ describe('EdgeFunctionVersionService - mutations + cache invalidation', () => {
     })
   })
 
-  it('updateDraft PUTs the snake_case payload to /versions/{vid}', async () => {
+  it('updateDraft PATCHes the snake_case payload to /versions/{vid}', async () => {
     const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
     const requestSpy = vi
       .spyOn(httpService, 'request')
@@ -145,7 +145,7 @@ describe('EdgeFunctionVersionService - mutations + cache invalidation', () => {
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      method: 'PUT',
+      method: 'PATCH',
       url: `${BASE}/${VID}`,
       body: expect.objectContaining({ name: 'updated', active: false, runtime: 'azion_lua' })
     })

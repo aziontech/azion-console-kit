@@ -70,11 +70,6 @@ const LISTINGS = [
     file: 'src/views/Workload/Tabs/VersionsTab.vue'
   },
   {
-    name: 'Deployment VersionsTab',
-    resourceType: 'deployment',
-    file: 'src/views/Deployments/tabs/VersionsTab.vue'
-  },
-  {
     name: 'NetworkLists VersionsTab',
     resourceType: 'network_list',
     file: 'src/views/NetworkLists/v6/tabs/VersionsTab.vue'

@@ -58,55 +58,32 @@ const mountFormFields = ({ initialValues, secretChangeValueOnly, disabled = fals
 }
 
 describe('FormFieldsVariables', () => {
-  it('locks key and secret fields when editing an existing secret', () => {
+  // The V6 rework dropped the secret/loading field-lock from this component (its
+  // parents no longer pass `disabled`/`secretChangeValueOnly`), so no field is
+  // ever disabled here and the value placeholder is static.
+  it('renders key, value and secret fields without locking any of them', () => {
     const wrapper = mountFormFields({
-      initialValues: { key: 'SECRET_KEY', value: '', secret: true },
-      secretChangeValueOnly: true
+      initialValues: { key: 'SECRET_KEY', value: '', secret: true }
     })
 
     expect(
       wrapper.get('[data-testid="variables-form__key-field"]').attributes('data-disabled')
-    ).toBe('true')
+    ).toBe('false')
+    expect(
+      wrapper.get('[data-testid="variables-form__value-field"]').attributes('data-disabled')
+    ).toBe('false')
     expect(
       wrapper.get('[data-testid="variables-form__secret-field"]').attributes('data-disabled')
-    ).toBe('true')
-    expect(
-      wrapper.get('[data-testid="variables-form__value-field"]').attributes('placeholder')
-    ).toBe('NEW_SECRET_VALUE')
+    ).toBe('false')
   })
 
-  it('does not lock fields only because the current form value is secret', () => {
+  it('uses the static value placeholder (no NEW_SECRET_VALUE special-casing)', () => {
     const wrapper = mountFormFields({
-      initialValues: { key: 'VARIABLE_KEY', value: 'value', secret: true },
-      secretChangeValueOnly: false
+      initialValues: { key: 'VARIABLE_KEY', value: 'value', secret: true }
     })
 
-    expect(
-      wrapper.get('[data-testid="variables-form__key-field"]').attributes('data-disabled')
-    ).toBe('false')
-    expect(
-      wrapper.get('[data-testid="variables-form__secret-field"]').attributes('data-disabled')
-    ).toBe('false')
     expect(
       wrapper.get('[data-testid="variables-form__value-field"]').attributes('placeholder')
     ).toBe('VARIABLE_VALUE')
-  })
-
-  it('locks all fields while edit data is loading', () => {
-    const wrapper = mountFormFields({
-      initialValues: {},
-      disabled: true,
-      secretChangeValueOnly: false
-    })
-
-    expect(
-      wrapper.get('[data-testid="variables-form__key-field"]').attributes('data-disabled')
-    ).toBe('true')
-    expect(
-      wrapper.get('[data-testid="variables-form__value-field"]').attributes('data-disabled')
-    ).toBe('true')
-    expect(
-      wrapper.get('[data-testid="variables-form__secret-field"]').attributes('data-disabled')
-    ).toBe('true')
   })
 })

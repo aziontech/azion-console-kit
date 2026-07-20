@@ -14,6 +14,28 @@ vi.mock('@/views/Deployments/utils/resolveReleaseResources', () => ({
   resolveReleaseResources: (...args) => resolveReleaseResources(...args)
 }))
 
+// The composable now derives impacted workloads + deployment name from three
+// list queries. Stub them as query-shaped objects so the composable is
+// constructible outside a component's vue-query injection context.
+vi.mock('@/services/v2/workload/workload-service', () => ({
+  workloadService: {
+    useWorkloadsListQuery: () => ({ data: { value: { body: [] } }, isLoading: { value: false } })
+  }
+}))
+vi.mock('@/services/v2/environment/environment-service', () => ({
+  environmentService: {
+    useEnvironmentsListQuery: () => ({
+      data: { value: { body: [] } },
+      isLoading: { value: false }
+    })
+  }
+}))
+vi.mock('@/services/v2/deployment/deployment-service', () => ({
+  deploymentService: {
+    useDeploymentsListQuery: () => ({ data: { value: { body: [] } }, isLoading: { value: false } })
+  }
+}))
+
 import {
   useDeploymentReleaseDrawer,
   useReleaseDrawerController

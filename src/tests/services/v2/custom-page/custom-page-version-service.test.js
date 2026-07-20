@@ -93,7 +93,7 @@ describe('CustomPageVersionService - mutations + cache invalidation', () => {
     })
   })
 
-  it('updateDraft PUTs the snake_case payload to /versions/{vid}', async () => {
+  it('updateDraft PATCHes the snake_case payload to /versions/{vid}', async () => {
     const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
     const requestSpy = vi
       .spyOn(httpService, 'request')
@@ -102,7 +102,7 @@ describe('CustomPageVersionService - mutations + cache invalidation', () => {
     await service.updateDraft(RID, VID, { name: 'updated', active: false, pages: [] })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      method: 'PUT',
+      method: 'PATCH',
       url: `${BASE}/${VID}`,
       body: expect.objectContaining({ name: 'updated', active: false })
     })

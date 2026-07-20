@@ -105,7 +105,7 @@ describe('NetworkListVersionService - mutations + cache invalidation', () => {
     expect(removeSpy).toHaveBeenCalledWith({ queryKey: queryKeys.networkList.version.all(RID) })
   })
 
-  it('updateDraft PUTs the snake_case items payload to /versions/{vid}', async () => {
+  it('updateDraft PATCHes the snake_case items payload to /versions/{vid}', async () => {
     const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
     const requestSpy = vi
       .spyOn(httpService, 'request')
@@ -118,7 +118,7 @@ describe('NetworkListVersionService - mutations + cache invalidation', () => {
     })
 
     expect(requestSpy).toHaveBeenCalledWith({
-      method: 'PUT',
+      method: 'PATCH',
       url: `${BASE}/${VID}`,
       body: expect.objectContaining({
         name: 'ip-list',

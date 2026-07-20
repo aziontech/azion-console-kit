@@ -28,11 +28,14 @@ const storeState = reactive({
   coll: {},
   collOpen: {},
   activeReleaseByDs: {},
+  activeReleaseErrorByDs: {},
   deployments: [{ id: 'ds-1', name: 'production-edge', deployment_policy: 'single_version' }],
   scopedType: null,
+  fromVersion: false,
   resourceId: '',
   versionId: '',
-  pendingDependencySelections: []
+  pendingDependencySelections: [],
+  versionGateSatisfied: true
 })
 
 // The store mock delegates every state key back to the SAME reactive
@@ -44,7 +47,10 @@ const storeMock = {
   openRelease,
   setDeployments: vi.fn(),
   setActiveReleaseByDs: vi.fn(),
+  setActiveReleaseError: vi.fn(),
   setVersionsByResource: vi.fn(),
+  seedVersionsFromRelease: vi.fn(),
+  usedDependencyIds: vi.fn(() => new Set()),
   resolveVersion: vi.fn(() => null),
   seedApplicationFunctions: vi.fn(),
   seedApplicationConnectors: vi.fn(),
@@ -78,7 +84,8 @@ Object.keys(storeState).forEach((key) => {
 
 vi.mock('@/stores/release', () => ({
   useReleaseStore: () => storeMock,
-  COLLECTION_TYPES: ['function', 'connector', 'waf', 'network_list']
+  COLLECTION_TYPES: ['function', 'connector', 'waf', 'network_list'],
+  ADDITIONAL_PARENT: 'additional'
 }))
 
 // storeToRefs is only used to destructure reactive state; return live refs onto
@@ -102,8 +109,10 @@ vi.mock('pinia', async () => {
         'activeReleaseByDs',
         'deployments',
         'scopedType',
+        'fromVersion',
         'versionId',
-        'pendingDependencySelections'
+        'pendingDependencySelections',
+        'versionGateSatisfied'
       ]
       const refs = {}
       keys.forEach((key) => {
@@ -137,6 +146,14 @@ vi.mock('@/templates/release-composition/use-release-composition', () => ({
     retryImpact,
     isDeploying,
     buildAndActivate,
+    ensureActiveReleases: vi.fn(),
+    activeReleaseErrorByDs: ref({}),
+    hasAnyVersionsError: ref(false),
+    hasAnyCatalogError: ref(false),
+    resolveConsumingDeployments: vi.fn().mockResolvedValue({ deployments: [] }),
+    retryActiveReleases: vi.fn(),
+    retryCatalogs: vi.fn(),
+    retryResourceVersions: vi.fn(),
     dependencyResourcesFor: () => ({}),
     resolveConsumingDsIds: () => [],
     loadCatalog: vi.fn(),
@@ -150,6 +167,125 @@ vi.mock('@/templates/release-composition/use-release-composition', () => ({
     isLoadingVersionsFor: () => false
   })
 }))
+
+// The view also composes the impact hook + per-resource version-ready gates and
+// their nested dependency discoveries at setup; stub each so the thin view mounts
+// without reaching the real (vue-query-backed) composables.
+vi.mock('@/templates/release-composition/use-release-impact', async () => {
+  const { ref, computed } = await import('vue')
+  return {
+    useReleaseImpact: () => ({
+      reverseLookupByDs: ref({}),
+      dsMetaFor: () => ({}),
+      activeVersionHintFor: () => null,
+      isLoading: ref(false),
+      isPartial: computed(() => false),
+      degradationReason: computed(() => null),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-application-version-ready', async () => {
+  const { ref } = await import('vue')
+  return {
+    useApplicationVersionReady: () => ({
+      isReady: ref(true),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-firewall-version-ready', async () => {
+  const { ref } = await import('vue')
+  return {
+    useFirewallVersionReady: () => ({
+      isReady: ref(true),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-custom-page-version-ready', async () => {
+  const { ref } = await import('vue')
+  return {
+    useCustomPageVersionReady: () => ({
+      isReady: ref(true),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-application-function-dependencies', async () => {
+  const { ref } = await import('vue')
+  return {
+    useApplicationFunctionDependencies: () => ({
+      functionDependencies: ref([]),
+      isModuleEnabled: ref(false),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-application-connector-dependencies', async () => {
+  const { ref } = await import('vue')
+  return {
+    useApplicationConnectorDependencies: () => ({
+      connectorDependencies: ref([]),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-firewall-function-dependencies', async () => {
+  const { ref } = await import('vue')
+  return {
+    useFirewallFunctionDependencies: () => ({
+      functionDependencies: ref([]),
+      isModuleEnabled: ref(false),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-firewall-waf-dependencies', async () => {
+  const { ref } = await import('vue')
+  return {
+    useFirewallWafDependencies: () => ({
+      wafDependencies: ref([]),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-firewall-network-list-dependencies', async () => {
+  const { ref } = await import('vue')
+  return {
+    useFirewallNetworkListDependencies: () => ({
+      networkListDependencies: ref([]),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
+vi.mock('@/templates/release-composition/use-custom-page-connector-dependencies', async () => {
+  const { ref } = await import('vue')
+  return {
+    useCustomPageConnectorDependencies: () => ({
+      connectorDependencies: ref([]),
+      isLoading: ref(false),
+      hasError: ref(false),
+      retry: vi.fn()
+    })
+  }
+})
 
 // --- adapter mock: pure mapping, no HTTP --------------------------------------
 vi.mock('@/services/v2/deployment/deployment-adapter', () => ({
@@ -216,6 +352,13 @@ vi.mock('@/templates/release-composition/components/ReleaseCompositionField.vue'
     template: '<div :class="$attrs.class" data-stub="ReleaseCompositionField" />'
   }
 }))
+vi.mock('@/templates/release-composition/components/ReleaseCompositionTree.vue', () => ({
+  default: {
+    name: 'ReleaseCompositionTree',
+    inheritAttrs: true,
+    template: '<div :class="$attrs.class" data-stub="ReleaseCompositionTree" />'
+  }
+}))
 vi.mock('@/templates/release-composition/components/ReleaseDependenciesSection.vue', () => ({
   default: {
     name: 'ReleaseDependenciesSection',
@@ -247,7 +390,14 @@ vi.mock('@/templates/release-composition/components/ImpactPanel.vue', () => ({
 
 import ReleaseComposerView from '@/views/Deployments/v6/ReleaseComposerView.vue'
 
-const mountView = () => mount(ReleaseComposerView, { global: { stubs: { teleport: true } } })
+// The action bar (Cancel/Deploy buttons) lives in a `<Teleport v-if="isMounted">`,
+// and `isMounted` flips true in `onMounted` — a re-render that only lands on the
+// next tick. Await it so the teleported footer is present before querying.
+const mountView = async () => {
+  const wrapper = mount(ReleaseComposerView, { global: { stubs: { teleport: true } } })
+  await flushPromises()
+  return wrapper
+}
 
 beforeEach(() => {
   storeState.deploymentIds = ['ds-1']
@@ -269,49 +419,44 @@ afterEach(() => {
 })
 
 describe('ReleaseComposerView — entry', () => {
-  it('opens the release from the route on mount (single source of truth)', () => {
-    mountView()
+  it('opens the release from the route on mount (single source of truth)', async () => {
+    await mountView()
     expect(openRelease).toHaveBeenCalledTimes(1)
   })
 })
 
-describe('ReleaseComposerView — composition order (flex order)', () => {
-  it('places composition first, the DS picker second and Canary last', () => {
-    const wrapper = mountView()
+describe('ReleaseComposerView — composition blocks', () => {
+  it('renders the composition tree, the DS picker and the Canary block', async () => {
+    const wrapper = await mountView()
 
-    const composition = wrapper.findComponent({ name: 'ReleaseCompositionField' })
-    const picker = wrapper.findComponent({ name: 'DeploymentSettingsPicker' })
-    const canary = wrapper.findComponent({ name: 'CanaryStrategyField' })
-
-    expect(composition.exists()).toBe(true)
-    expect(picker.exists()).toBe(true)
-    expect(canary.exists()).toBe(true)
-
-    expect(composition.classes()).toContain('order-1')
-    expect(picker.classes()).toContain('order-2')
-    expect(canary.classes()).toContain('order-3')
+    // The composition now renders as a `ReleaseCompositionTree` (the old
+    // `ReleaseCompositionField` + flex `order-N` layout was removed); the DS
+    // picker and Canary block still compose alongside it.
+    expect(wrapper.findComponent({ name: 'ReleaseCompositionTree' }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: 'DeploymentSettingsPicker' }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: 'CanaryStrategyField' }).exists()).toBe(true)
   })
 })
 
 describe('ReleaseComposerView — Build & activate gate', () => {
-  it('enables Build & activate when deployEnabled and no DS is blocking', () => {
-    const wrapper = mountView()
+  it('enables Build & activate when deployEnabled and no DS is blocking', async () => {
+    const wrapper = await mountView()
 
     const button = wrapper.find('[data-testid="release-composition__build-and-activate"]')
     expect(button.attributes('disabled')).toBeUndefined()
   })
 
-  it('disables Build & activate when the store gate (deployEnabled) is false', () => {
+  it('disables Build & activate when the store gate (deployEnabled) is false', async () => {
     storeState.deployEnabled = false
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     const button = wrapper.find('[data-testid="release-composition__build-and-activate"]')
     expect(button.attributes('disabled')).toBeDefined()
   })
 
-  it('disables Build & activate when a selected DS cannot deploy (multi-DS fold)', () => {
+  it('disables Build & activate when a selected DS cannot deploy (multi-DS fold)', async () => {
     deployCtx.mockReturnValue({ ok: false, canDeploy: false })
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     const button = wrapper.find('[data-testid="release-composition__build-and-activate"]')
     expect(button.attributes('disabled')).toBeDefined()
@@ -320,7 +465,7 @@ describe('ReleaseComposerView — Build & activate gate', () => {
 
 describe('ReleaseComposerView — confirm + dispatch', () => {
   it('opens the confirm dialog when Build & activate is clicked', async () => {
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     expect(wrapper.find('[data-testid="dialog"]').exists()).toBe(false)
 
@@ -331,7 +476,7 @@ describe('ReleaseComposerView — confirm + dispatch', () => {
 
   it('does not open the confirm dialog while the gate is closed', async () => {
     storeState.deployEnabled = false
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     await wrapper.find('[data-testid="release-composition__build-and-activate"]').trigger('click')
 
@@ -339,7 +484,7 @@ describe('ReleaseComposerView — confirm + dispatch', () => {
   })
 
   it('invokes composition.buildAndActivate(store.composePayload(), dsIds) on confirm', async () => {
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     await wrapper.find('[data-testid="release-composition__build-and-activate"]').trigger('click')
     await wrapper.find('[data-testid="release-composition__confirm-build"]').trigger('click')
@@ -357,7 +502,7 @@ describe('ReleaseComposerView — confirm + dispatch', () => {
 
   it('navigates to the first successful DS releases tab after a confirmed dispatch', async () => {
     buildAndActivate.mockResolvedValue([{ id: 'ds-1', ok: true }])
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     await wrapper.find('[data-testid="release-composition__build-and-activate"]').trigger('click')
     await wrapper.find('[data-testid="release-composition__confirm-build"]').trigger('click')
@@ -373,7 +518,7 @@ describe('ReleaseComposerView — confirm + dispatch', () => {
     buildAndActivate.mockResolvedValue([
       { id: 'ds-1', ok: false, error: new Error('boom'), errorType: null }
     ])
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     await wrapper.find('[data-testid="release-composition__build-and-activate"]').trigger('click')
     await wrapper.find('[data-testid="release-composition__confirm-build"]').trigger('click')
@@ -387,7 +532,7 @@ describe('ReleaseComposerView — confirm + dispatch', () => {
       { id: 'ds-1', ok: false, error: new Error('boom'), errorType: null },
       { id: 'ds-2', ok: true }
     ])
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     await wrapper.find('[data-testid="release-composition__build-and-activate"]').trigger('click')
     await wrapper.find('[data-testid="release-composition__confirm-build"]').trigger('click')
@@ -423,7 +568,7 @@ describe('ReleaseComposerView — multi-DS progress dialog', () => {
   it('opens the progress dialog (no auto-navigation) when confirming a multi-DS release', async () => {
     selectTwoDs()
     buildAndActivate.mockImplementation(reportAllOk)
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     await confirmDeploy(wrapper)
 
@@ -439,7 +584,7 @@ describe('ReleaseComposerView — multi-DS progress dialog', () => {
   it('navigates to the first deployment releases tab when closed after full success', async () => {
     selectTwoDs()
     buildAndActivate.mockImplementation(reportAllOk)
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     await confirmDeploy(wrapper)
     await wrapper.find('[data-testid="deployment-progress__close"]').trigger('click')
@@ -460,7 +605,7 @@ describe('ReleaseComposerView — multi-DS progress dialog', () => {
         { id: 'ds-2', ok: false }
       ])
     })
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     await confirmDeploy(wrapper)
     await wrapper.find('[data-testid="deployment-progress__close"]').trigger('click')
@@ -471,7 +616,7 @@ describe('ReleaseComposerView — multi-DS progress dialog', () => {
 
 describe('ReleaseComposerView — cancel', () => {
   it('navigates back to deployments when Cancel is clicked', async () => {
-    const wrapper = mountView()
+    const wrapper = await mountView()
 
     await wrapper.find('[data-testid="release-composition__cancel"]').trigger('click')
 
@@ -485,11 +630,13 @@ describe('ReleaseComposerView — first-release CTA', () => {
     storeState.resourceId = 'fw-7'
     storeState.versionId = 'v-42'
 
-    const wrapper = mountView()
+    const wrapper = await mountView()
     await flushPromises()
 
+    // The picker now emits a single generic `group-action`; the view routes the
+    // `needsFirstRelease` group to the first-release composer route.
     const picker = wrapper.findComponent({ name: 'DeploymentSettingsPicker' })
-    picker.vm.$emit('compose-first-release', 'ds-new')
+    picker.vm.$emit('group-action', { groupKey: 'needsFirstRelease', dsId: 'ds-new' })
     await flushPromises()
 
     expect(routerPush).toHaveBeenCalledWith({
