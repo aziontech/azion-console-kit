@@ -121,6 +121,71 @@ describe('DeploymentVersionService - createVersionService invalidates both cache
   })
 })
 
+describe('DeploymentVersionService - inherited lifecycle mutations hit deployment-api + invalidate both caches', () => {
+  const expectBothCaches = (removeSpy, invalidateSpy) => {
+    expect(removeSpy).toHaveBeenCalledWith({ queryKey: queryKeys.deployments.versions.all(DID) })
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.deployments.detail(DID) })
+  }
+
+  it('updateDraft PATCHes /versions/{vid} under deployment-api and invalidates both caches', async () => {
+    const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries').mockImplementation(() => {})
+    const requestSpy = vi
+      .spyOn(httpService, 'request')
+      .mockResolvedValueOnce({ data: { id: VID, state: 'draft', resources: [] } })
+
+    await service.updateDraft(DID, VID, { strategy: 'canary' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'PATCH',
+      url: `${BASE}/${VID}`,
+      body: { strategy: 'canary' }
+    })
+    expectBothCaches(removeSpy, invalidateSpy)
+  })
+
+  it('build POSTs /versions/{vid}/build under deployment-api and invalidates both caches', async () => {
+    const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries').mockImplementation(() => {})
+    const requestSpy = vi.spyOn(httpService, 'request').mockResolvedValueOnce({ data: {} })
+
+    await service.build(DID, VID, { comment: 'go-live' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: `${BASE}/${VID}/build`,
+      body: { comment: 'go-live' }
+    })
+    expectBothCaches(removeSpy, invalidateSpy)
+  })
+
+  it('cancelBuild POSTs /versions/{vid}/cancel under deployment-api and invalidates both caches', async () => {
+    const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries').mockImplementation(() => {})
+    const requestSpy = vi.spyOn(httpService, 'request').mockResolvedValueOnce({ data: {} })
+
+    await service.cancelBuild(DID, VID, { reason: 'aborted' })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: `${BASE}/${VID}/cancel`,
+      body: { reason: 'aborted' }
+    })
+    expectBothCaches(removeSpy, invalidateSpy)
+  })
+
+  it('deleteVersion DELETEs /versions/{vid} under deployment-api and invalidates both caches', async () => {
+    const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries').mockImplementation(() => {})
+    const requestSpy = vi.spyOn(httpService, 'request').mockResolvedValueOnce({ data: {} })
+
+    await service.deleteVersion(DID, VID)
+
+    expect(requestSpy).toHaveBeenCalledWith({ method: 'DELETE', url: `${BASE}/${VID}` })
+    expectBothCaches(removeSpy, invalidateSpy)
+  })
+})
+
 describe('DeploymentVersionService - revert generates a new version from a chosen version', () => {
   it('POSTs to /versions/{versionId}/revert with an empty body and invalidates both caches', async () => {
     const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})

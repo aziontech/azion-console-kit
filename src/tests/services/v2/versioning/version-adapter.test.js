@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createVersionAdapter } from '@/services/v2/versioning/version-adapter'
+import { createVersionAdapter, stripUndefinedDeep } from '@/services/v2/versioning/version-adapter'
 
 /**
  * Task 5.5 — `referenceCount` is normalized by the SHARED adapter factory so
@@ -85,5 +85,42 @@ describe('createVersionAdapter — state normalization', () => {
       meta: { version_id: 'v1', state: 'archived' }
     })
     expect(version.state).toBe('archived')
+  })
+})
+
+describe('stripUndefinedDeep', () => {
+  it('removes only undefined keys, preserving null values verbatim', () => {
+    expect(stripUndefinedDeep({ one: 1, gone: undefined, nothing: null })).toEqual({
+      one: 1,
+      nothing: null
+    })
+  })
+
+  it('preserves arrays as leaf values without recursing into their entries', () => {
+    const input = { items: [1, undefined, null, { nested: undefined }] }
+    const result = stripUndefinedDeep(input)
+    // The array is treated as a leaf: its entries (incl. undefined) are kept as-is.
+    expect(result.items).toBe(input.items)
+    expect(result.items).toEqual([1, undefined, null, { nested: undefined }])
+  })
+
+  it('recurses into nested objects and collapses an all-undefined branch to undefined', () => {
+    expect(
+      stripUndefinedDeep({ keep: { one: 1, gone: undefined }, drop: { gone: undefined } })
+    ).toEqual({ keep: { one: 1 } })
+  })
+
+  it('returns undefined for an object that becomes empty after stripping', () => {
+    expect(stripUndefinedDeep({ gone: undefined })).toBeUndefined()
+    expect(stripUndefinedDeep({})).toBeUndefined()
+  })
+
+  it('passes primitives, null and top-level arrays through unchanged', () => {
+    expect(stripUndefinedDeep(undefined)).toBeUndefined()
+    expect(stripUndefinedDeep(null)).toBeNull()
+    expect(stripUndefinedDeep(5)).toBe(5)
+    expect(stripUndefinedDeep('literal')).toBe('literal')
+    const arr = [1, undefined, null]
+    expect(stripUndefinedDeep(arr)).toBe(arr)
   })
 })
