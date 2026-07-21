@@ -37,7 +37,7 @@ describe('useActiveVersions', () => {
   })
 
   it('aggregates across pages until the reported count is reached', async () => {
-    listResourceUsage.mockImplementation(({ page }) =>
+    listResourceUsage.mockImplementation(({ page } = {}) =>
       page === 1
         ? Promise.resolve({ body: [wafRow('D1', 'a', 'V1', 'ACTIVE')], count: 2 })
         : Promise.resolve({ body: [wafRow('D2', 'b', 'V2', 'VALID_URL')], count: 2 })

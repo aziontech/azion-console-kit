@@ -3,6 +3,7 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
 
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 
@@ -55,8 +56,8 @@ const mountTable = (readOnly) => {
   return { wrapper, captured }
 }
 
-const read = (relative) =>
-  readFileSync(fileURLToPath(new URL(`../../../${relative}`, import.meta.url)), 'utf8')
+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../..')
+const read = (relative) => readFileSync(join(REPO_ROOT, relative), 'utf8')
 
 describe('useDataTable — read-only version drops row actions', () => {
   it('renders actions in an editable (draft) context', async () => {
