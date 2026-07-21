@@ -17,6 +17,9 @@
   "workload_domain_allow_access": true,
   "domains": [],
   "tls": { "minimum_version": "tls_1_2", "ciphers": null },
-  "mtls": { "enabled": false, "config": { "verification": null, "certificate": null, "crl": null } },
+  "mtls": {
+    "enabled": false,
+    "config": { "verification": null, "certificate": null, "crl": null }
+  },
   "protocols": { "http": { "http_ports": [80], "https_ports": [443], "quic_ports": null } }
 }

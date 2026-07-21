@@ -12,6 +12,7 @@ import {
   getResponseSchema,
   getRequestBodySchema,
   unwrapToItemSchema,
+  applyKnownDrift,
   compareResponseFields,
   compareRequestFields
 } from '../../../tests/contracts/openapi-drift-engine'
@@ -222,5 +223,67 @@ describe('openapi-drift-engine — request-side drift (lighter)', () => {
     )
     // Sanity: the real app draft carries the common + resource-specific writes.
     expect(fields).toEqual(expect.arrayContaining(['comment', 'source_version', 'name', 'active']))
+  })
+})
+
+describe('applyKnownDrift (known-drift allowlist)', () => {
+  const issues = [
+    { field: 'state', kind: 'missing', expected: 'string', spec: 'absent' },
+    { field: 'name', kind: 'type', expected: 'string', spec: 'number' },
+    { field: 'items', kind: 'missing-strict' }
+  ]
+
+  it('accepts issues matched by resource + kind + field and keeps the rest failing', () => {
+    const allowlist = {
+      entries: [{ resources: ['application'], kind: 'missing', fields: ['state'], reason: 'r1' }]
+    }
+    const { failures, accepted } = applyKnownDrift(issues, allowlist, 'application')
+    expect(accepted).toEqual([{ ...issues[0], reason: 'r1' }])
+    expect(failures).toEqual([issues[1], issues[2]])
+  })
+
+  it('supports the * wildcard on resources and on fields', () => {
+    const allowlist = {
+      entries: [{ resources: ['*'], kind: 'missing-strict', fields: ['*'], reason: 'r2' }]
+    }
+    const { failures, accepted } = applyKnownDrift(issues, allowlist, 'network_list')
+    expect(accepted).toEqual([{ ...issues[2], reason: 'r2' }])
+    expect(failures).toHaveLength(2)
+  })
+
+  it('does not accept when kind differs and passes everything through with no allowlist', () => {
+    const byKind = applyKnownDrift(
+      issues,
+      { entries: [{ resources: ['*'], kind: 'missing', fields: ['name'] }] },
+      'waf'
+    )
+    expect(byKind.accepted).toEqual([])
+    expect(byKind.failures).toHaveLength(3)
+    expect(applyKnownDrift(issues, null, 'waf').failures).toHaveLength(3)
+  })
+})
+
+describe('unwrapToItemSchema — polymorphic composition (oneOf/anyOf/allOf)', () => {
+  it('merges union member properties so a field present in ANY member counts', () => {
+    const spec = {
+      components: {
+        schemas: {
+          Http: {
+            type: 'object',
+            properties: { name: { type: 'string' }, host: { type: 'string' } }
+          },
+          Storage: {
+            type: 'object',
+            properties: { name: { type: 'string' }, bucket: { type: 'string' } }
+          }
+        }
+      }
+    }
+    const node = {
+      oneOf: [{ $ref: '#/components/schemas/Http' }, { $ref: '#/components/schemas/Storage' }]
+    }
+    const { itemSchema } = unwrapToItemSchema(spec, node)
+    expect(itemSchema).toBeTruthy()
+    expect(Object.keys(itemSchema.properties).sort()).toEqual(['bucket', 'host', 'name'])
   })
 })

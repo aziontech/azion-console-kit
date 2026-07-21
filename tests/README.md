@@ -61,3 +61,18 @@ Rollout is *reporting → required* (design ADR 7.6). Current state and flips:
 | Contract-drift pre-deploy (stage/prod) | step runs with `continue-on-error: true`; validates the PUBLISHED OpenAPI spec via `OPENAPI_SCHEMA_URL_{STAGE,PROD}` **vars** (public URLs, no secrets — default to `https://stage-api.azion.com/schema/` and `https://api.azion.com/schema/`); skips cleanly when the URL is unreachable/non-JSON | confirm the URLs / set the vars → observe → remove the `continue-on-error: true` line (stage first, then prod) |
 | Mutation score (Stryker) | `thresholds.break = null` (reporting) | set `break` to the calibrated score in `stryker.config.mjs` once the survivor report stabilizes |
 | Anti-placebo ESLint rules | **already `error`** (promoted by task 2.3) | — |
+
+### Known drift (`contracts/known-drift.json`)
+
+Real spec URLs (confirmed 2026-07-21): stage
+`https://stage-api.azion.com/v4/openapi/openapi.yaml` · production
+`https://api.azion.com/v4/openapi/openapi.yaml` (YAML; the drift check parses both
+JSON and YAML). Divergences that are **known and accepted** live in
+`known-drift.json` — each entry carries the matching rule (resources/kind/fields,
+`*` wildcards allowed), a reason and the follow-up action. Matching issues become
+report annotations; anything NOT listed still fails the check. First real run
+found: the published spec models version responses as the bare resource schema
+(version envelope undocumented) and version request bodies as strict
+comment/source_version-only — both reported to the API team; remove the entries
+when the spec is fixed. In production the version endpoints are not published at
+all yet — the check correctly reports that until the API ships.

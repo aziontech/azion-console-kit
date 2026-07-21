@@ -186,7 +186,23 @@ export const unwrapToItemSchema = (spec, schemaNode) => {
     }
     break
   }
-  const itemSchema = current && typeof current === 'object' && current.properties ? current : null
+  let itemSchema = current && typeof current === 'object' && current.properties ? current : null
+  // Polymorphic schemas (oneOf/anyOf per connector type; allOf composition):
+  // a field the front reads counts as present when ANY union member declares it.
+  if (!itemSchema && current && typeof current === 'object') {
+    const members = ['oneOf', 'anyOf', 'allOf'].flatMap((key) =>
+      Array.isArray(current[key]) ? current[key] : []
+    )
+    if (members.length > 0) {
+      const merged = {}
+      for (const member of members) {
+        const node = resolveRef(spec, member)
+        const { itemSchema: memberItem } = unwrapToItemSchema(spec, node)
+        Object.assign(merged, memberItem?.properties ?? {})
+      }
+      if (Object.keys(merged).length > 0) itemSchema = { type: 'object', properties: merged }
+    }
+  }
   return { itemSchema, envelope }
 }
 
@@ -259,4 +275,27 @@ export const compareRequestFields = (ourFields, requestSchema, spec) => {
     }
   }
   return { issues, warnings, resolvable: true }
+}
+
+/**
+ * Splits drift issues into hard failures vs. ACCEPTED known drift
+ * (tests/contracts/known-drift.json). An issue is accepted when some allowlist
+ * entry matches its resource ('*' wildcard or explicit), its kind AND its
+ * field — anything else keeps failing. Pure: allowlist is passed in.
+ */
+export const applyKnownDrift = (issues, allowlist, resource) => {
+  const entries = Array.isArray(allowlist?.entries) ? allowlist.entries : []
+  const failures = []
+  const accepted = []
+  for (const issue of issues) {
+    const match = entries.find(
+      (entry) =>
+        (entry.resources?.includes('*') || entry.resources?.includes(resource)) &&
+        entry.kind === issue.kind &&
+        (entry.fields?.includes('*') || entry.fields?.includes(issue.field))
+    )
+    if (match) accepted.push({ ...issue, reason: match.reason })
+    else failures.push(issue)
+  }
+  return { failures, accepted }
 }

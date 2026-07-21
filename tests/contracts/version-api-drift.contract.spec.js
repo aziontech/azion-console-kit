@@ -36,12 +36,16 @@
  * — visible in the Playwright report, zero lint noise.
  *
  * HOW TO RUN against a target environment:
- *   OPENAPI_SCHEMA_URL=https://api.azion.com/schema/ \
+ *   OPENAPI_SCHEMA_URL=https://api.azion.com/v4/openapi/openapi.yaml \
  *   npx playwright test --project=contract-drift
  * Without the env it exits 0 with every test skipped (CI-wiring validation path).
  */
 import { test, expect } from '@playwright/test'
+import yaml from 'js-yaml'
 import { contractSchemas } from './schemas'
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, resolve as resolvePath } from 'node:path'
 import {
   describeFields,
   findVersionPaths,
@@ -49,8 +53,14 @@ import {
   getRequestBodySchema,
   unwrapToItemSchema,
   compareResponseFields,
-  compareRequestFields
+  compareRequestFields,
+  applyKnownDrift
 } from './openapi-drift-engine'
+
+// JSON import attributes vary across Node versions — plain fs read is portable.
+const knownDrift = JSON.parse(
+  readFileSync(resolvePath(dirname(fileURLToPath(import.meta.url)), 'known-drift.json'), 'utf8')
+)
 
 const SCHEMA_URL = process.env.OPENAPI_SCHEMA_URL
 const REQUEST_TIMEOUT_MS = 30000
@@ -102,12 +112,14 @@ const fetchSpec = async (request) => {
     try {
       return { spec: JSON.parse(body) }
     } catch {
-      const looksYaml = /^\s*(openapi|swagger)\s*:/i.test(body)
-      return {
-        skip: looksYaml
-          ? 'published spec is YAML — yaml not supported yet (no parser dep)'
-          : `published spec at ${SCHEMA_URL} is not valid JSON`
+      // The published Azion spec is served as YAML (v4/openapi/openapi.yaml).
+      try {
+        const parsed = yaml.load(body)
+        if (parsed && typeof parsed === 'object') return { spec: parsed }
+      } catch {
+        // fall through to the skip below
       }
+      return { skip: `published spec at ${SCHEMA_URL} is neither valid JSON nor YAML` }
     }
   }
   return {
@@ -159,17 +171,21 @@ for (const { resource, segment, schemas } of RESOURCES) {
 
       const responseFields = describeFields(schemas.versionResponse)
       const responseIssues = compareResponseFields(responseFields, itemSchema, publishedSpec)
+      // Known, documented divergences (tests/contracts/known-drift.json) become
+      // warnings; anything NEW keeps failing (spec §3.4 — no alarm fatigue).
+      const { failures, accepted } = applyKnownDrift(responseIssues, knownDrift, resource)
       annotate(testInfo, {
         resource,
         section: 'response',
         endpoint: responsePath,
         envelope,
         fields: responseFields.length,
-        issues: responseIssues
+        failures,
+        knownDrift: accepted
       })
       expect(
-        responseIssues,
-        `response contract drift in "${resource}" (field vs published spec)`
+        failures,
+        `NEW response contract drift in "${resource}" (field vs published spec; known drift lives in known-drift.json)`
       ).toEqual([])
 
       // (3) REQUEST (lighter) — draft (POST on the collection), build/archive
@@ -217,11 +233,17 @@ for (const { resource, segment, schemas } of RESOURCES) {
           issues,
           warnings
         })
-        requestIssues.push(...issues.map((issue) => ({ kind: check.name, ...issue })))
+        requestIssues.push(...issues.map((issue) => ({ check: check.name, ...issue })))
+      }
+      // Same known-drift downgrade as the response side: documented divergences
+      // become annotations; only NEW request drift fails.
+      const requestVerdict = applyKnownDrift(requestIssues, knownDrift, resource)
+      if (requestVerdict.accepted.length > 0) {
+        annotate(testInfo, { resource, section: 'request', knownDrift: requestVerdict.accepted })
       }
       expect(
-        requestIssues,
-        `request contract drift in "${resource}" (field forbidden by additionalProperties:false)`
+        requestVerdict.failures,
+        `NEW request contract drift in "${resource}" (field forbidden by additionalProperties:false; known drift lives in known-drift.json)`
       ).toEqual([])
     })
   })

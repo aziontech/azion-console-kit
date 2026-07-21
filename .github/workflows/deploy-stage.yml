@@ -44,7 +44,7 @@ jobs:
         continue-on-error: true
         run: npx playwright test --project=contract-drift
         env:
-          OPENAPI_SCHEMA_URL: ${{ vars.OPENAPI_SCHEMA_URL_STAGE || 'https://stage-api.azion.com/v4/schema/' }}
+          OPENAPI_SCHEMA_URL: ${{ vars.OPENAPI_SCHEMA_URL_STAGE || 'https://stage-api.azion.com/v4/openapi/openapi.yaml' }}
 
       - name: Build & Deploy
         run: azion deploy --auto --local --debug --config-dir azion/stage

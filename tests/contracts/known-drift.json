@@ -1,0 +1,66 @@
+{
+  "$comment": "Known, ACCEPTED divergences between the published OpenAPI spec and the fields the front depends on (spec versioning-test-coverage §3.4). Each entry MUST carry a reason and stays here only until the provider fixes the published spec — the drift check downgrades matching issues to warnings (annotations) and still FAILS on anything not listed. Remove entries as the API team updates the schema.",
+  "entries": [
+    {
+      "resources": ["*"],
+      "kind": "missing",
+      "fields": [
+        "version_id",
+        "state",
+        "version",
+        "comment",
+        "description",
+        "created_at",
+        "ready_at",
+        "last_modified",
+        "last_editor",
+        "source_version_id",
+        "reference_count",
+        "meta"
+      ],
+      "reason": "The published spec models every version-detail/list response as the BARE resource schema (e.g. GET .../versions/{version_id} -> #/components/schemas/Application), leaving the whole version envelope (state, meta, timestamps, version identity) undocumented — while the live API does return it (the VersionShell works against stage). Found by this check on 2026-07-21 across all 8 workspace resources.",
+      "action": "Report to the edge-api team: version endpoints should reference a Version response schema (resource fields + version envelope), not the bare resource schema."
+    },
+    {
+      "resources": ["*"],
+      "kind": "missing-strict",
+      "fields": ["*"],
+      "reason": "The published spec models version request bodies (create/update draft, build) as STRICT schemas (additionalProperties:false) containing only comment/source_version — while the agreed payload contract (API team, 2026-06-12) and the working stage API accept the resource fields at the ROOT (and trace_id on build). Found by this check on 2026-07-21 across all 8 resources.",
+      "action": "Report to the edge-api team: version request schemas should declare the resource root fields (or drop additionalProperties:false)."
+    },
+    {
+      "resources": ["workload"],
+      "kind": "missing",
+      "fields": ["deployment_id", "environment_id", "last_error"],
+      "reason": "Workload version meta (deployment/environment binding, last build error) is returned by the live API (mapMeta in workload-version-adapter) but absent from the published Workload schema — same undocumented version-envelope class as entry 1.",
+      "action": "Same as entry 1 (version response schema)."
+    },
+    {
+      "resources": ["firewall"],
+      "kind": "missing",
+      "fields": [
+        "debug_rules",
+        "edge_functions_enabled",
+        "network_protection_enabled",
+        "waf_enabled",
+        "ddos_protection_unmetered"
+      ],
+      "reason": "Flat legacy module flags the adapter tolerates as fallbacks (edge-firewall-version-adapter reads nested modules.* first, flat *_enabled as fallback). The published spec only documents the nested form — the flat aliases are tolerated inputs, not required outputs.",
+      "action": "None required if the API never returns the flat form anymore; drop the fallbacks from our schema+adapter to retire this entry."
+    },
+    {
+      "resources": ["function"],
+      "kind": "missing",
+      "fields": ["language", "runtime_environment", "json_args", "version", "azion_form"],
+      "reason": "Legacy field aliases the adapter coalesces (runtime??language, execution_environment??runtime_environment, default_args??json_args) plus azion_form. The published spec documents only the modern names — aliases are tolerated inputs.",
+      "action": "Retire the aliases from schema+adapter once the API confirms only modern names are returned."
+    },
+    {
+      "resources": ["function"],
+      "kind": "type",
+      "fields": ["version"],
+      "reason": "Name collision on the bare-resource comparison: the published EdgeFunction schema declares its OWN version field as string, while our schema declares the version-envelope ordinal (number). Both are right about different things — resolves itself when the API publishes a proper Version response schema (entry 1).",
+      "action": "Same as entry 1."
+    }
+  ]
+}

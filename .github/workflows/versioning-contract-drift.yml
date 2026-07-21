@@ -51,7 +51,7 @@ jobs:
         env:
           # Manual override wins; else the repo var; else the public default.
           # Unreachable/non-JSON -> spec skips all tests and exits 0 (see guard).
-          OPENAPI_SCHEMA_URL: ${{ inputs.schema_url || vars.OPENAPI_SCHEMA_URL || 'https://api.azion.com/v4/schema/' }}
+          OPENAPI_SCHEMA_URL: ${{ inputs.schema_url || vars.OPENAPI_SCHEMA_URL || 'https://api.azion.com/v4/openapi/openapi.yaml' }}
 
       - name: Upload Playwright report
         if: always()
