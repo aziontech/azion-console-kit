@@ -8,6 +8,7 @@
   import { useAccountStore } from '@/stores/account'
   import { contractService } from '@/services/v2/account'
   import { useDialog } from '@aziontech/webkit/use-dialog'
+  // eslint-disable-next-line azion-architecture/no-direct-http-in-components -- legado: origins ainda não possui service v2 (migração pendente)
   import { createOriginService } from '@/services/edge-application-origins-services'
   import { inject, ref, computed } from 'vue'
   import * as yup from 'yup'
