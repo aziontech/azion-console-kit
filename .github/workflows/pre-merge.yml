@@ -8,7 +8,14 @@ on:
 
 env:
   HUSKY: 0
-  
+
+# Cancel superseded runs of the SAME ref on pull_request only. On push to `dev`
+# we let runs finish (cancel-in-progress false) so we never abort a merge-commit
+# CI mid-flight.
+concurrency:
+  group: pre-merge-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   run-tests:
     runs-on: ubuntu-latest
@@ -39,119 +46,112 @@ jobs:
             coverage/unit/sonar-report.xml
           retention-days: 1
 
-  # run-prod-e2e-tests:
-  #   name: Run Dev E2E Tests
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       group: [2, 3, 4, 5, 6, 7]
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 18
-  #     - name: Run Cypress Tests
-  #       uses: cypress-io/github-action@v6
-  #       env:
-  #         PROD_CYPRESS_EMAIL: ${{ secrets.PROD_CYPRESS_EMAIL }}
-  #         PROD_CYPRESS_PASSWORD: ${{ secrets.PROD_CYPRESS_PASSWORD }}
-  #         VITE_ENVIRONMENT: 'production'
-  #       with:
-  #         build: yarn build
-  #         start: yarn dev --logLevel=warn
-  #         browser: chrome
-  #         wait-on: 'http://localhost:5173/'
-  #         wait-on-timeout: 120
-  #         config-file: cypress.config.prod.js
-  #         env: environment=prod,grepTags=@dev${{ matrix.group }}+-@xfail+-@dont_run_prod
-  #     - name: Generate Specs JSON
-  #       run: yarn generate-specs-json
-  #     - name: Validate Specs Tags
-  #       run: node ./scripts/check_tags.js specs.json
-  #     - name: Move Coverage Files
-  #       run: mv .nyc_output/out.json .nyc_output/out_${{ matrix.group }}.json
-  #     - name: Upload Cypress Screenshots
-  #       if: ${{ failure() }}
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: cypress_screenshots_${{ matrix.group }}
-  #         path: cypress/screenshots
-  #         retention-days: 4
-  #     - name: Upload Cypress Videos
-  #       if: ${{ failure() }}
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: cypress_videos_${{ matrix.group }}
-  #         path: cypress/videos
-  #         retention-days: 1
-  #     - name: Upload Coverage Files
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: coverage_report_${{ matrix.group }}
-  #         path: .nyc_output/*
-  #         retention-days: 1
-  #         include-hidden-files: true
-  # download_and_merge:
-  #   name: Download and Merge Coverage Reports
-  #   needs: run-prod-e2e-tests
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v4
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 18
-  #     - name: Install Dependencies
-  #       run: npm install --global nyc
-  #     - name: Download Coverage Artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         path: coverage_report
-  #         pattern: coverage_report_*
-  #         merge-multiple: true
-  #     - name: Merge Coverage Reports
-  #       run: npx nyc merge ./coverage_report .nyc_output/out.json
-  #     - name: Generate Text Coverage Report
-  #       run: npx nyc report --reporter=text-summary
-  #     - name: Generate HTML Coverage Report
-  #       run: npx nyc report --reporter=html --report-dir=./coverage/e2e
-  #     - name: Generate LCOV Report
-  #       run: npx nyc report --reporter=lcovonly --report-dir=./coverage/e2e
-  #     - name: Check E2E Test Coverage
-  #       if: ${{ always() }}
-  #       run: node ./scripts/check_coverage.js ./coverage/e2e/lcov.info 20
-  #     - name: Compress Coverage Reports
-  #       if: ${{ always() }}
-  #       run: zip -r coverage.zip coverage
-  #     - name: Upload Coverage Report Artifact
-  #       if: ${{ always() }}
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: coverage_e2e_report
-  #         path: coverage.zip
-  #         retention-days: 7
-  # sonarcloud:
-  #   needs: [run-tests, download_and_merge]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         name: coverage_unit_report
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         name: coverage_e2e_report
-  #     - name: Extract E2E Coverage Report
-  #       run: |
-  #         unzip coverage.zip -d coverage_e2e
-  #         pwd
-  #         find ./
-  #     - name: SonarCloud Scan
-  #       uses: sonarsource/sonarcloud-github-action@v2.3.0
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_CLOUD_TOKEN }}
+  # Detect whether this PR/push touches versioning surfaces. Downstream jobs
+  # (functional, contract-consumer) only run when `versioning == 'true'`, so
+  # unrelated changes pay zero extra CI cost.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      versioning: ${{ steps.filter.outputs.versioning }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Filter changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          # On pull_request the action auto-detects the PR base; on push to dev
+          # we compare against the dev branch explicitly.
+          base: ${{ github.event_name == 'pull_request' && '' || 'dev' }}
+          filters: |
+            versioning:
+              - 'src/composables/versioning/**'
+              - 'src/templates/version-shell-block/**'
+              - 'src/components/VersionListDataView/**'
+              - 'src/services/v2/versioning/**'
+              - 'src/services/v2/**/*version*'
+              - 'src/tests/functional/**'
+              - 'src/tests/**/versioning/**'
+              - 'tests/**'
+              - 'vitest.functional.config.js'
+              - 'playwright.config.ts'
+              - '.github/workflows/pre-merge.yml'
+
+  # Functional suite = Vitest BROWSER MODE (real Chromium via Playwright).
+  # Runs in the official Playwright image pinned to the SAME version resolved in
+  # yarn.lock (playwright 1.61.1) so the pre-installed browsers match the
+  # @vitest/browser-playwright runtime exactly — no browser download at runtime.
+  functional:
+    needs: [changes]
+    if: needs.changes.outputs.versioning == 'true'
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-jammy
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies --frozen-lockfile
+        run: yarn install:lock
+
+      - name: Run functional tests (shard ${{ matrix.shard }}/2)
+        run: yarn test:functional --shard=${{ matrix.shard }}/2
+
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: functional-artifacts-shard-${{ matrix.shard }}
+          path: |
+            src/tests/functional/__screenshots__
+            test-results
+          retention-days: 4
+
+  # Consumer contract tests for the versioning services (schema sanity checks).
+  # Runs in the same node:22-alpine container as run-tests for parity.
+  contract-consumer:
+    needs: [changes]
+    if: needs.changes.outputs.versioning == 'true'
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-alpine
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SO deps
+        run: apk add curl bash git
+
+      - name: Install dependencies --frozen-lockfile
+        run: yarn install:lock
+
+      - name: Run consumer contract tests
+        run: TZ=UTC npx vitest run --config vitest.config.js src/tests/contracts
+
+  # Aggregate gate for the versioning test suites. This is the intended FUTURE
+  # single required check for branch protection (do NOT add it to required
+  # checks here — that is branch-protection config, out of scope for this file).
+  # Passes when every upstream need is 'success' OR 'skipped' (skipped == the PR
+  # did not touch versioning surfaces).
+  versioning-tests-gate:
+    needs: [functional, contract-consumer]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate upstream results
+        run: |
+          functional='${{ needs.functional.result }}'
+          contract='${{ needs.contract-consumer.result }}'
+          echo "functional=$functional contract-consumer=$contract"
+          for result in "$functional" "$contract"; do
+            if [ "$result" != "success" ] && [ "$result" != "skipped" ]; then
+              echo "::error::versioning-tests-gate failed (a required suite did not succeed)"
+              exit 1
+            fi
+          done
+          echo "versioning-tests-gate passed"

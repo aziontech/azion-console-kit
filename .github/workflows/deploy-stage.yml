@@ -32,6 +32,20 @@ jobs:
       - name: Configure Azion CLI
         run: azion -t ${{ secrets.PLATFORM_KIT_TOKEN }}
 
+      # Contract drift pre-deploy check — validates the STAGE Version API against
+      # the adapter schemas before publishing. API-only (no browser); runs in this
+      # same node:22-alpine container after yarn install:lock above.
+      # reporting-only until the secrets are configured and the team promotes it to
+      # blocking (remove continue-on-error) — spec versioning-test-coverage ADR 7.6.
+      # No secrets -> spec skips -> step is green. Secrets + real drift -> step is
+      # red but does NOT block the deploy (flip to blocking is an explicit decision).
+      - name: Contract drift pre-deploy check
+        continue-on-error: true
+        run: npx playwright test --project=contract-drift
+        env:
+          CONTRACT_API_BASE_URL: ${{ secrets.CONTRACT_API_BASE_URL_STAGE }}
+          CONTRACT_API_TOKEN: ${{ secrets.CONTRACT_API_TOKEN_STAGE }}
+
       - name: Build & Deploy
         run: azion deploy --auto --local --debug --config-dir azion/stage
         env:
