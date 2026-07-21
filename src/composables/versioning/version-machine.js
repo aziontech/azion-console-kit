@@ -122,8 +122,13 @@ const isAllowedByCapability = (action, capability) => {
  * Pure: same input → same output, no I/O. The default capability is
  * `deployable`, so omitting it preserves the prior output exactly.
  */
-export const getAvailableActions = (state, capability = DEFAULT_CAPABILITY) =>
-  (STATE_ACTIONS[state] ?? []).filter((action) => isAllowedByCapability(action, capability))
+export const getAvailableActions = (state, capability = DEFAULT_CAPABILITY) => {
+  // Own-property guard: reading `STATE_ACTIONS[state]` directly would resolve
+  // prototype-chain keys (`toString`, `constructor`, …) to inherited members,
+  // defeating the fail-closed contract. Only declared states yield actions.
+  const actions = Object.hasOwn(STATE_ACTIONS, state) ? STATE_ACTIONS[state] : []
+  return actions.filter((action) => isAllowedByCapability(action, capability))
+}
 
 /**
  * Boolean used by buttons/menu items to toggle the disabled state.
