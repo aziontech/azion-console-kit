@@ -8,7 +8,6 @@
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { deleteDomainService } from '@/services/domains-services'
   import {
     documentationSecureProducts,
     documentationBuildProducts
@@ -45,7 +44,7 @@
       title: `${handleTextDomainWorkload.singularTitle}`,
       icon: 'pi pi-trash',
       tooltip: 'Delete',
-      service: isWorkload.value ? workloadService.deleteWorkload : deleteDomainService
+      service: isWorkload.value ? workloadService.deleteWorkload : workloadService.deleteDomain
     }
   ]
 
