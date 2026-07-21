@@ -136,11 +136,42 @@ export const RESOURCE_TEST_REGISTRY = {
     mapMetaFields: [],
     extraMutations: [],
     overridesActionPayloads: false,
+    // Sub-resource descriptors drive the shared CRUD contract directly (path/
+    // queryKeyGroup/idKey/buildPayload live HERE, not in the instantiation file).
+    // `bespoke: true` marks a sub-resource whose service diverges from the generic
+    // factory interface (its own signatures) — the instantiation file covers it by
+    // hand and the shared suite skips it.
     subresources: [
-      { key: 'cacheSettings', service: () => versionedCacheSettingsService },
-      { key: 'deviceGroups', service: () => versionedDeviceGroupService },
-      { key: 'functions', service: () => versionedFunctionService },
-      { key: 'rulesEngine', service: () => versionedRulesEngineService }
+      {
+        key: 'cacheSettings',
+        service: () => versionedCacheSettingsService,
+        path: 'cache_settings',
+        queryKeyGroup: queryKeys.application.version.cacheSettings,
+        idKey: 'cacheId',
+        buildPayload: () => ({
+          name: 'cs-1',
+          browserCacheSettings: 'honor',
+          cdnCacheSettings: 'honor',
+          cacheByQueryString: 'ignore',
+          cacheByCookies: 'ignore',
+          adaptiveDeliveryAction: 'ignore'
+        })
+      },
+      {
+        key: 'deviceGroups',
+        service: () => versionedDeviceGroupService,
+        path: 'device_groups',
+        queryKeyGroup: queryKeys.application.version.deviceGroups,
+        buildPayload: () => ({ name: 'dg-1', userAgent: 'Mozilla/5.0' })
+      },
+      {
+        key: 'functions',
+        service: () => versionedFunctionService,
+        path: 'functions',
+        queryKeyGroup: queryKeys.application.version.functions,
+        buildPayload: () => ({ name: 'fn-1', edgeFunctionID: 3, args: '{}', azionForm: '{}' })
+      },
+      { key: 'rulesEngine', service: () => versionedRulesEngineService, bespoke: true }
     ]
   },
 
@@ -184,7 +215,21 @@ export const RESOURCE_TEST_REGISTRY = {
     mapMetaFields: [],
     extraMutations: [],
     overridesActionPayloads: false,
-    subresources: [{ key: 'exceptions', service: () => versionedWafExceptionsService }]
+    subresources: [
+      {
+        key: 'exceptions',
+        service: () => versionedWafExceptionsService,
+        path: 'exceptions',
+        queryKeyGroup: queryKeys.waf.version.exceptions,
+        buildPayload: () => ({
+          name: 'allow-1',
+          path: '/x',
+          ruleId: 9,
+          status: true,
+          conditions: []
+        })
+      }
+    ]
   },
 
   network_list: {
@@ -356,9 +401,16 @@ export const RESOURCE_TEST_REGISTRY = {
     mapMetaFields: [],
     extraMutations: [],
     overridesActionPayloads: false,
+    // Both firewall sub-resource services are hand-written classes (name enrichment,
+    // phase paths, reorder) — they do NOT come from the generic factory, so they run
+    // bespoke in the instantiation file, not the shared CRUD contract.
     subresources: [
-      { key: 'firewallFunction', service: () => versionedFirewallFunctionService },
-      { key: 'firewallRulesEngine', service: () => versionedFirewallRulesEngineService }
+      { key: 'firewallFunction', service: () => versionedFirewallFunctionService, bespoke: true },
+      {
+        key: 'firewallRulesEngine',
+        service: () => versionedFirewallRulesEngineService,
+        bespoke: true
+      }
     ]
   },
 

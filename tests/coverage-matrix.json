@@ -289,7 +289,7 @@
         "status": "partial",
         "coveredBy": [
           "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/services/workload-version-services/workload-version-adapter.test.js"
+          "src/tests/services/v2/workload/workload-version-adapter-real.test.js"
         ],
         "note": "createDraft invalidation + transformCreateDraftPayload (clone carries source_version + comment; empty body → empty payload). Gap: 'new draft opens in the editor' navigation."
       },
@@ -298,7 +298,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
-          "src/tests/services/workload-version-services/workload-version-adapter.test.js",
+          "src/tests/services/v2/workload/workload-version-adapter-real.test.js",
           "src/tests/services/versioning/invalidation.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
           "src/tests/functional/version-action-bar.browser.test.js"
@@ -329,7 +329,7 @@
         "status": "partial",
         "coveredBy": [
           "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
-          "src/tests/services/workload-version-services/workload-version-adapter.test.js",
+          "src/tests/services/v2/workload/workload-version-adapter-real.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js"
         ],
         "note": "Shared NEW_DRAFT_FROM handler + clone payload (source_version + comment, with/without overrides). Wave 1 closed navigate-to-new-draft (edit screen routes to the newly created version). Remaining gap: editor remount via :key."
@@ -340,7 +340,7 @@
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
           "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/services/workload-version-services/workload-version-adapter.test.js",
+          "src/tests/services/v2/workload/workload-version-adapter-real.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
         "note": "Shared archive contract (comment guard, invalidation, in-use rejection) + workload archive payload (comment only). Wave 1: rendered dialog (confirm disabled until a comment is typed) in the functional dialogs suite."
@@ -395,9 +395,8 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/custom-page/custom-page-version-service.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/services/v2/custom-page/custom-page-version-adapter.test.js"
+          "src/tests/services/v2/custom-page/custom-page-version.test.js",
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "createDraft mutation + invalidation + adapter payload. Gap: open-in-editor navigation."
       },
@@ -406,8 +405,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
-          "src/tests/services/v2/custom-page/custom-page-version-service.test.js",
-          "src/tests/services/v2/custom-page/custom-page-version-adapter.test.js",
+          "src/tests/services/v2/custom-page/custom-page-version.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
           "src/tests/functional/version-action-bar.browser.test.js"
         ],
@@ -417,7 +415,7 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/custom-page/custom-page-version-service.test.js",
+          "src/tests/services/v2/custom-page/custom-page-version.test.js",
           "src/tests/services/versioning/invalidation.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js"
         ],
@@ -427,7 +425,7 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/services/v2/custom-page/custom-page-version-service.test.js",
+          "src/tests/services/v2/custom-page/custom-page-version.test.js",
           "src/tests/services/versioning/invalidation.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
@@ -438,7 +436,7 @@
         "status": "partial",
         "coveredBy": [
           "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
-          "src/tests/services/v2/custom-page/custom-page-version-adapter.test.js",
+          "src/tests/services/v2/custom-page/custom-page-version.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js"
         ],
         "note": "Shared handler + clone payload. Wave 1 closed navigate-to-new-draft (edit screen routes to the newly created version). Remaining gap: editor remount via :key."
@@ -448,7 +446,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/custom-page/custom-page-version-service.test.js",
+          "src/tests/services/v2/custom-page/custom-page-version.test.js",
           "src/tests/services/versioning/invalidation.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
@@ -459,7 +457,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/custom-page/custom-page-version-service.test.js",
+          "src/tests/services/v2/custom-page/custom-page-version.test.js",
           "src/tests/services/versioning/invalidation.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
@@ -504,9 +502,8 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/edge-firewall/edge-firewall-version-service.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/services/v2/edge-firewall/edge-firewall-version-adapter.test.js"
+          "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "createDraft service + invalidation + adapter payload. Gap: open-in-editor navigation."
       },
@@ -515,8 +512,8 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
-          "src/tests/services/v2/edge-firewall/edge-firewall-version-adapter.test.js",
-          "src/tests/services/v2/edge-firewall/versioned-firewall-sub-resource-service.test.js",
+          "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
+          "src/tests/services/v2/edge-firewall/versioned-subresources.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
           "src/tests/functional/version-action-bar.browser.test.js"
         ],
@@ -527,7 +524,7 @@
         "status": "partial",
         "coveredBy": [
           "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
-          "src/tests/services/v2/edge-firewall/edge-firewall-version-service.test.js",
+          "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
         ],
@@ -537,7 +534,7 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/services/v2/edge-firewall/edge-firewall-version-service.test.js",
+          "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
           "src/tests/services/versioning/invalidation.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
@@ -548,7 +545,7 @@
         "status": "partial",
         "coveredBy": [
           "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
-          "src/tests/services/v2/edge-firewall/edge-firewall-version-adapter.test.js",
+          "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js"
         ],
         "note": "Shared handler + clone payload. Wave 1 closed navigate-to-new-draft (edit screen routes to the newly created version). Remaining gap: editor remount via :key."
@@ -558,7 +555,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/edge-firewall/edge-firewall-version-service.test.js",
+          "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
           "src/tests/services/versioning/invalidation.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
@@ -569,7 +566,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/edge-firewall/edge-firewall-version-service.test.js",
+          "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
           "src/tests/services/versioning/invalidation.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
@@ -614,18 +611,14 @@
       "J1": {
         "level": "component",
         "status": "partial",
-        "coveredBy": [
-          "src/tests/services/v2/edge-connectors/edge-connector-version-service.test.js",
-          "src/tests/services/v2/edge-connectors/edge-connector-version-adapter.test.js"
-        ],
+        "coveredBy": ["src/tests/services/v2/edge-connectors/edge-connector-version.test.js"],
         "note": "createDraft mutation + invalidation + adapter payload (connector is NOT in the shared invalidation suite; its own service test carries the contract). Gap: open-in-editor navigation."
       },
       "J2": {
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/services/v2/edge-connectors/edge-connector-version-service.test.js",
-          "src/tests/services/v2/edge-connectors/edge-connector-version-adapter.test.js",
+          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
           "src/tests/functional/version-action-bar.browser.test.js"
         ],
@@ -635,7 +628,7 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/edge-connectors/edge-connector-version-service.test.js",
+          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
@@ -646,7 +639,7 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/services/v2/edge-connectors/edge-connector-version-service.test.js",
+          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
         "note": "cancelBuild POSTs /versions/{vid}/cancel and invalidates. Wave 1: overlay rendered behavior closed generically (functional dialogs suite)."
@@ -656,7 +649,7 @@
         "status": "partial",
         "coveredBy": [
           "src/tests/views/EdgeConnectors/v6/edge-connector-v6.test.js",
-          "src/tests/services/v2/edge-connectors/edge-connector-version-adapter.test.js",
+          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js"
         ],
         "note": "NEW_DRAFT_FROM exercised in the connector v6 view test + clone payload in the adapter. Wave 1 closed navigate-to-new-draft (edit screen routes to the newly created version). Remaining gap: editor remount via :key."
@@ -666,7 +659,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/edge-connectors/edge-connector-version-service.test.js",
+          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
         "note": "Shared archive contract + connector archive (non-empty comment required) service test. Wave 1: rendered dialog (confirm disabled until a comment is typed) in the functional dialogs suite."
@@ -676,7 +669,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/edge-connectors/edge-connector-version-service.test.js",
+          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
         "note": "Shared delete confirm + connector deleteVersion service test. Wave 1: destructive confirm rendered (DELETE confirms without a comment) in the functional dialogs suite."
@@ -720,8 +713,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/edge-function/edge-function-version-service.test.js",
-          "src/tests/views/EdgeFunctions/v6/edge-function-version-adapter.test.js"
+          "src/tests/services/v2/edge-function/edge-function-version.test.js",
+          "src/tests/views/EdgeFunctions/v6/edge-function-version-adapter.test.js",
+          "src/tests/shared/versioning/version-service.contract.js"
         ],
         "note": "createDraft (clone maps resource fields to root snake_case) + invalidation + view-level adapter usage. Gap: open-in-editor navigation."
       },
@@ -729,8 +723,7 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/services/v2/edge-function/edge-function-version-service.test.js",
-          "src/tests/services/v2/edge-function/edge-function-version-adapter.test.js",
+          "src/tests/services/v2/edge-function/edge-function-version.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
           "src/tests/functional/version-action-bar.browser.test.js"
         ],
@@ -740,7 +733,7 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/edge-function/edge-function-version-service.test.js",
+          "src/tests/services/v2/edge-function/edge-function-version.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
@@ -751,7 +744,7 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/services/v2/edge-function/edge-function-version-service.test.js",
+          "src/tests/services/v2/edge-function/edge-function-version.test.js",
           "src/tests/views/EdgeFunctions/v6/edge-function-version-adapter.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
@@ -772,7 +765,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/edge-function/edge-function-version-service.test.js",
+          "src/tests/services/v2/edge-function/edge-function-version.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
         "note": "Shared archive contract + function archive (comment required, POST with comment) service tests. Wave 1: rendered dialog (confirm disabled until a comment is typed) in the functional dialogs suite."
@@ -782,7 +775,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/edge-function/edge-function-version-service.test.js",
+          "src/tests/services/v2/edge-function/edge-function-version.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
         "note": "Shared delete confirm + function deleteVersion service test. Wave 1: destructive confirm rendered (DELETE confirms without a comment) in the functional dialogs suite."
@@ -829,8 +822,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/network-lists/network-list-version-service.test.js",
-          "src/tests/views/NetworkLists/v6/network-list-version-adapter.test.js"
+          "src/tests/services/v2/network-lists/network-list-version.test.js",
+          "src/tests/views/NetworkLists/v6/network-list-version-adapter.test.js",
+          "src/tests/shared/versioning/version-service.contract.js"
         ],
         "note": "createDraft + invalidation + view-level adapter usage. Gap: open-in-editor navigation."
       },
@@ -838,8 +832,7 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/services/v2/network-lists/network-list-version-service.test.js",
-          "src/tests/services/v2/network-lists/network-list-version-adapter.test.js",
+          "src/tests/services/v2/network-lists/network-list-version.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
           "src/tests/functional/version-action-bar.browser.test.js"
         ],
@@ -849,7 +842,7 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/network-lists/network-list-version-service.test.js",
+          "src/tests/services/v2/network-lists/network-list-version.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
@@ -860,7 +853,7 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/services/v2/network-lists/network-list-version-service.test.js",
+          "src/tests/services/v2/network-lists/network-list-version.test.js",
           "src/tests/views/NetworkLists/v6/network-list-version-adapter.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
@@ -881,7 +874,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/network-lists/network-list-version-service.test.js",
+          "src/tests/services/v2/network-lists/network-list-version.test.js",
           "src/tests/services/versioning/invalidation.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
@@ -892,7 +885,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/network-lists/network-list-version-service.test.js",
+          "src/tests/services/v2/network-lists/network-list-version.test.js",
           "src/tests/services/versioning/invalidation.test.js",
           "src/tests/functional/version-dialogs.browser.test.js"
         ],
@@ -952,7 +945,7 @@
         "coveredBy": [
           "src/tests/services/v2/waf/waf-version-service.test.js",
           "src/tests/services/v2/waf/waf-version-adapter.test.js",
-          "src/tests/services/v2/waf/versioned-waf-exceptions-service.test.js",
+          "src/tests/services/v2/waf/versioned-subresources.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
           "src/tests/functional/version-action-bar.browser.test.js"
         ],
@@ -1053,10 +1046,7 @@
       "J1": {
         "level": "component",
         "status": "partial",
-        "coveredBy": [
-          "src/tests/services/v2/deployment/deployment-version-service.test.js",
-          "src/tests/services/v2/deployment/deployment-version-adapter.test.js"
-        ],
+        "coveredBy": ["src/tests/services/v2/deployment/deployment-version.test.js"],
         "note": "createVersionService POSTs /versions and invalidates BOTH the version cache and deployments.detail (special hook tested); Wave 1 closed the clone payload gap (transformCreateDraftPayload keeps only resource {id, resource_type} + strategy/origin). Gap: open-in-editor navigation."
       },
       "J2": {
@@ -1065,8 +1055,7 @@
         "coveredBy": [
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
-          "src/tests/services/v2/deployment/deployment-version-service.test.js",
-          "src/tests/services/v2/deployment/deployment-version-adapter.test.js"
+          "src/tests/services/v2/deployment/deployment-version.test.js"
         ],
         "note": "Closed in Wave 1: updateDraft PATCHes /versions/{vid} under deployment-api and invalidates both the version cache and deployments.detail (deployment-version-service); draft payload mapping asserted (deployment-version-adapter); shared invalid-SAVE gate + rendered disabled Save proven generically."
       },
@@ -1076,7 +1065,7 @@
         "coveredBy": [
           "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
-          "src/tests/services/v2/deployment/deployment-version-service.test.js"
+          "src/tests/services/v2/deployment/deployment-version.test.js"
         ],
         "note": "Closed the service gap in Wave 1: build POSTs /versions/{vid}/build under deployment-api and invalidates both caches (deployment-version-service). Generic save→build ordering and post-command navigation also proven. Remaining gap: rendered building/queued badge in the listing; the release-composer build&activate path is the composer contract (J8), not this journey."
       },
@@ -1085,7 +1074,7 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/functional/version-dialogs.browser.test.js",
-          "src/tests/services/v2/deployment/deployment-version-service.test.js"
+          "src/tests/services/v2/deployment/deployment-version.test.js"
         ],
         "note": "Closed in Wave 1: cancelBuild POSTs /versions/{vid}/cancel under deployment-api and invalidates both caches (deployment-version-service); overlay rendered behavior proven generically (functional dialogs suite)."
       },
@@ -1093,7 +1082,7 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/deployment/deployment-version-service.test.js",
+          "src/tests/services/v2/deployment/deployment-version.test.js",
           "src/tests/views/Deployments/deployment-version-readonly.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js"
         ],
@@ -1105,7 +1094,7 @@
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
           "src/tests/functional/version-dialogs.browser.test.js",
-          "src/tests/services/v2/deployment/deployment-version-adapter.test.js"
+          "src/tests/services/v2/deployment/deployment-version.test.js"
         ],
         "note": "Shared (service-agnostic) archive contract + Wave 1 archive payload mapping (transformArchivePayload carries only reason + comment) and rendered dialog behavior (generic). Still no archive call exercised against deployment-api."
       },
@@ -1115,7 +1104,7 @@
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
           "src/tests/functional/version-dialogs.browser.test.js",
-          "src/tests/services/v2/deployment/deployment-version-service.test.js"
+          "src/tests/services/v2/deployment/deployment-version.test.js"
         ],
         "note": "Shared delete confirm + Wave 1 deployment-specific test: deleteVersion DELETEs /versions/{vid} under deployment-api and invalidates both caches; destructive confirm rendered generically (functional dialogs suite)."
       },

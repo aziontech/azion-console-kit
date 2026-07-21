@@ -6,60 +6,24 @@ import {
   restoreBoundaries
 } from '@/tests/support/versioning/boundaries'
 import { describeVersionedSubresourceCrud } from '@/tests/shared/versioning/subresource-crud.contract'
+import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 
-import { versionedCacheSettingsService } from '@/services/v2/edge-app/versioned/versioned-cache-settings-service'
-import { versionedDeviceGroupService } from '@/services/v2/edge-app/versioned/versioned-device-group-service'
-import { versionedFunctionService } from '@/services/v2/edge-app/versioned/versioned-function-service'
 import { versionedRulesEngineService } from '@/services/v2/edge-app/versioned/versioned-rules-engine-service'
 
 /**
- * Edge Application versioned sub-resources.
+ * Edge Application versioned sub-resources — registry-driven (TEST-ARCHITECTURE §3.3).
  *
  * `cacheSettings`, `deviceGroups` and `functions` are produced by
- * `createVersionedSubResourceService`, so they run the shared factory-contract
- * suite. `rulesEngine` has its own (request/response phase) signature — it does
- * not fit the generic drop-in interface — so it is covered bespoke below.
- *
- * TODO (F4): move these sub-resource descriptors (path/idKey/queryKeyGroup/
- * buildPayload) into `RESOURCE_TEST_REGISTRY[...].subresources` so the suite is
- * driven entirely from the registry. They live here for now because the registry
- * subresource entries only carry `{ key, service }` on this branch.
+ * `createVersionedSubResourceService`, so they run the shared factory-contract suite,
+ * fed entirely from `RESOURCE_TEST_REGISTRY.application.subresources` (path/idKey/
+ * queryKeyGroup/buildPayload all live in the registry). `rulesEngine` has its own
+ * (request/response phase) signature — flagged `bespoke` in the registry — so it is
+ * covered by hand below.
  */
 
-describeVersionedSubresourceCrud({
-  ownerLabel: 'edge-app',
-  subKey: 'cacheSettings',
-  service: () => versionedCacheSettingsService,
-  path: 'cache_settings',
-  queryKeyGroup: queryKeys.application.version.cacheSettings,
-  idKey: 'cacheId',
-  buildPayload: () => ({
-    name: 'cs-1',
-    browserCacheSettings: 'honor',
-    cdnCacheSettings: 'honor',
-    cacheByQueryString: 'ignore',
-    cacheByCookies: 'ignore',
-    adaptiveDeliveryAction: 'ignore'
-  })
-})
-
-describeVersionedSubresourceCrud({
-  ownerLabel: 'edge-app',
-  subKey: 'deviceGroups',
-  service: () => versionedDeviceGroupService,
-  path: 'device_groups',
-  queryKeyGroup: queryKeys.application.version.deviceGroups,
-  buildPayload: () => ({ name: 'dg-1', userAgent: 'Mozilla/5.0' })
-})
-
-describeVersionedSubresourceCrud({
-  ownerLabel: 'edge-app',
-  subKey: 'functions',
-  service: () => versionedFunctionService,
-  path: 'functions',
-  queryKeyGroup: queryKeys.application.version.functions,
-  buildPayload: () => ({ name: 'fn-1', edgeFunctionID: 3, args: '{}', azionForm: '{}' })
-})
+RESOURCE_TEST_REGISTRY.application.subresources
+  .filter((sub) => !sub.bespoke)
+  .forEach((sub) => describeVersionedSubresourceCrud({ ownerLabel: 'edge-app', ...sub }))
 
 /**
  * Bespoke — Rules Engine carries a phase-aware API (`request_rules` /

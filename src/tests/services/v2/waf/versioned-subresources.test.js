@@ -1,32 +1,19 @@
-import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { describeVersionedSubresourceCrud } from '@/tests/shared/versioning/subresource-crud.contract'
-import { versionedWafExceptionsService } from '@/services/v2/waf/versioned/versioned-waf-exceptions-service'
+import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 
 /**
- * WAF versioned sub-resources.
+ * WAF versioned sub-resources — registry-driven (TEST-ARCHITECTURE §3.3).
  *
  * `exceptions` (allowed rules) is produced by `createVersionedSubResourceService`,
- * so it runs the shared factory-contract suite.
- *
- * OVERLAP: `versioned-waf-exceptions-service.test.js` already covers this service
- * with hand-written per-method tests. The shared instantiation COEXISTS with it
- * (both green); consolidation is deferred to F4 — do not delete the existing file.
- *
- * TODO (F4): move this sub-resource descriptor into
- * `RESOURCE_TEST_REGISTRY.waf.subresources` (it carries only `{ key, service }`
- * on this branch).
+ * so it runs the shared factory-contract suite, fed entirely from
+ * `RESOURCE_TEST_REGISTRY.waf.subresources`. This is now the SINGLE source of truth
+ * for the versioned exceptions service — the former hand-written
+ * `versioned-waf-exceptions-service.test.js` was deleted in F4 because every one of
+ * its its (list/load/create/edit/remove, incl. the exact success messages) is a
+ * strict subset of this shared contract, which additionally proves the search-skip
+ * read and the (rid, vid) version-isolation invariant.
  */
-describeVersionedSubresourceCrud({
-  ownerLabel: 'waf',
-  subKey: 'exceptions',
-  service: () => versionedWafExceptionsService,
-  path: 'exceptions',
-  queryKeyGroup: queryKeys.waf.version.exceptions,
-  buildPayload: () => ({
-    name: 'allow-1',
-    path: '/x',
-    ruleId: 9,
-    status: true,
-    conditions: []
-  })
-})
+
+RESOURCE_TEST_REGISTRY.waf.subresources
+  .filter((sub) => !sub.bespoke)
+  .forEach((sub) => describeVersionedSubresourceCrud({ ownerLabel: 'waf', ...sub }))

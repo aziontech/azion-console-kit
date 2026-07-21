@@ -24,9 +24,13 @@ import {
  * Titles are prefixed with owner/sub-resource so a failure names it and the
  * per-owner instantiation file anchors the stack trace.
  *
+ * The `key`, `service`, `path`, `queryKeyGroup`, `idKey` and `buildPayload` fields
+ * come straight from a `RESOURCE_TEST_REGISTRY[owner].subresources` entry (spread
+ * into this call), so the instantiation file adds only `ownerLabel`.
+ *
  * @param {object}   args
  * @param {string}   args.ownerLabel     Parent resource label (e.g. 'edge-app').
- * @param {string}   args.subKey         Sub-resource label (e.g. 'cacheSettings').
+ * @param {string}   args.key            Sub-resource label (e.g. 'cacheSettings').
  * @param {() => object} args.service    Getter for the sub-resource service singleton.
  * @param {string}   args.path           API path segment (e.g. 'cache_settings').
  * @param {object}   args.queryKeyGroup  Versioned query-key group with `all`/`list`/`detail`.
@@ -35,13 +39,14 @@ import {
  */
 export const describeVersionedSubresourceCrud = ({
   ownerLabel,
-  subKey,
+  key,
   service,
   path,
   queryKeyGroup,
   idKey = 'id',
   buildPayload
 }) => {
+  const subKey = key
   const RID_A = 'res-A'
   const RID_B = 'res-B'
   const VID_1 = 'ver-1'

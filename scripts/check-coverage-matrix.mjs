@@ -18,6 +18,12 @@
  *      declares an explicit `acceptedGap: "<justification>"`, which downgrades
  *      it to a WARNING (an audited, deliberate gap — not a forgotten one).
  *   4. Ghost coverage — every path in `coveredBy` must exist on disk.
+ *   4b. coveredBy-real — for every covered/partial cell, at least one path in
+ *      `coveredBy` must both EXIST and CONTAIN a textual reference to the
+ *      journey's command (grep of the file content). A cell whose evidence files
+ *      never mention the behavior they claim to prove is a "stale coverage claim"
+ *      (the F2 file deletions could otherwise leave a cell pointing at a file
+ *      that no longer exercises the journey). Token map per journey below.
  *   5. Class consistency — resources declared VERSIONED_ONLY in
  *      version-capability.js must have class 'versioned-only' and J8 at
  *      level 'n/a' (there is no deploy journey to cover); no other resource
@@ -49,6 +55,26 @@ const ROUTES_FILE = path.join(
 const CAPABILITY_FILE = path.join(PROJECT_ROOT, 'src/composables/versioning/version-capability.js')
 
 const STATUSES = new Set(['covered', 'partial', 'missing'])
+
+/**
+ * Journey → command tokens. A covered/partial cell must cite at least one file
+ * whose content references one of its journey's tokens. Matched case-insensitively
+ * (so `transformCreateDraftPayload` counts for `createDraft`, `Build` for `build`)
+ * — the point is that the evidence file genuinely mentions the journey's command,
+ * not the exact casing. Mirrors requirements §7 (J1–J10) command vocabulary.
+ */
+const JOURNEY_TOKENS = {
+  J1: ['createDraft'],
+  J2: ['SAVE'],
+  J3: ['SAVE_AND_BUILD', 'build'],
+  J4: ['CANCEL_BUILD', 'cancel'],
+  J5: ['NEW_DRAFT_FROM', 'createDraft'],
+  J6: ['ARCHIVE', 'archive'],
+  J7: ['DELETE', 'deleteVersion'],
+  J8: ['DEPLOY', 'PROMOTE'],
+  J9: ['readOnly', 'isImmutable', 'disabled'],
+  J10: ['command-error', 'showErrors', 'rejects']
+}
 
 function readFileOrDie(file, label) {
   try {
@@ -185,6 +211,37 @@ function checkCells(matrix, errors, warnings) {
   }
 }
 
+/**
+ * Check 4b — coveredBy-real: a covered/partial cell must cite at least one file
+ * that actually mentions the journey's command. Reads each existing coveredBy
+ * file once and greps (case-insensitive) for the journey's tokens.
+ */
+function checkCoveredByReal(matrix, errors) {
+  const fileMentions = (file, tokens) => {
+    const abs = path.join(PROJECT_ROOT, file)
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- CI gate: paths come from the repo-committed matrix
+    if (!fs.existsSync(abs)) return false
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- CI gate: paths come from the repo-committed matrix
+    const content = fs.readFileSync(abs, 'utf-8').toLowerCase()
+    return tokens.some((token) => content.includes(token.toLowerCase()))
+  }
+
+  for (const [resource, row] of Object.entries(matrix.matrix)) {
+    for (const [journey, cell] of Object.entries(row)) {
+      if (cell.status !== 'covered' && cell.status !== 'partial') continue
+      const tokens = JOURNEY_TOKENS[journey]
+      if (!tokens) continue
+      const coveredBy = Array.isArray(cell.coveredBy) ? cell.coveredBy : []
+      const backed = coveredBy.some((file) => fileMentions(file, tokens))
+      if (!backed) {
+        errors.push(
+          `[stale-coverage-claim] ${resource}.${journey} is "${cell.status}" but none of its coveredBy files mention the journey command (${tokens.join('/')}). Cite a file that actually exercises ${journey}, or downgrade the cell.`
+        )
+      }
+    }
+  }
+}
+
 /** Check 5 — capability class consistency (versioned-only never deploys). */
 function checkClassConsistency(matrix, versionedOnly, errors) {
   const declaredClass = new Map(
@@ -300,6 +357,7 @@ function main() {
   checkPluggedResources(matrix, plugged, errors, warnings)
   checkJourneyCompleteness(matrix, journeyIds, errors, warnings)
   checkCells(matrix, errors, warnings)
+  checkCoveredByReal(matrix, errors)
   checkClassConsistency(matrix, versionedOnly, errors)
 
   const computed = computeSummary(matrix, journeyIds)
