@@ -34,6 +34,7 @@ module.exports = {
         'azion-architecture/no-direct-http-in-components': 'error',
         'azion-architecture/no-http-in-stores': 'error',
         'azion-architecture/require-vue-query': 'error',
+        'azion-architecture/require-v2-service-base-class': 'error',
         'azion-architecture/no-try-catch-in-services': 'warn',
         'azion-architecture/services-http-only': 'warn',
         'azion-architecture/pure-adapters': 'warn',

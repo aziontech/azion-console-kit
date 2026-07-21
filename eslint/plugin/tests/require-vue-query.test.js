@@ -123,6 +123,34 @@ ruleTester.run('require-vue-query', rule, {
         }
       `,
       filename: 'src/modules/users/composables/use-users.js'
+    },
+
+    // Composable delegating to a v2 service (BaseService-backed) without a
+    // literal vue-query call — allowed. V2 services expose Vue Query internally,
+    // so the performance model is satisfied one layer down. Mirrors the
+    // isV2ServiceImport exemption in no-direct-http-in-components.
+    {
+      code: `
+        import { listUsers } from '@/services/v2/users/users-service'
+
+        export function useUserList() {
+          return listUsers()
+        }
+      `,
+      filename: 'src/modules/users/composables/useUserList.js'
+    },
+
+    // Composable importing a v2 service instance and delegating imperatively
+    // (pagination/orchestration) — allowed for the same reason.
+    {
+      code: `
+        import { resourceUsageService } from '@/services/v2/deployment/resource-usage-service'
+
+        export function useActiveVersions() {
+          return resourceUsageService.listResourceUsage({ page: 1 })
+        }
+      `,
+      filename: 'src/composables/versioning/use-active-versions.js'
     }
   ],
 
@@ -148,10 +176,12 @@ ruleTester.run('require-vue-query', rule, {
       ]
     },
 
-    // Composable importing @/services without vue-query — forbidden
+    // Composable importing a LEGACY (non-v2) service without vue-query — forbidden.
+    // Legacy services are not BaseService-backed, so the composable bypasses the
+    // performance model.
     {
       code: `
-        import { listUsers } from '@/services/v2/users/users-service'
+        import { listUsers } from '@/services/users-services'
 
         export function useUserList() {
           return listUsers()
@@ -163,7 +193,7 @@ ruleTester.run('require-vue-query', rule, {
           messageId: 'requireVueQuery',
           data: {
             fileName: 'useUserList.js',
-            source: '@/services/v2/users/users-service'
+            source: '@/services/users-services'
           }
         }
       ]

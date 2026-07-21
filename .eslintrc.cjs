@@ -66,10 +66,6 @@ module.exports = {
       }
     },
     {
-      files: ['cypress/**/*.{cy,spec}.{js,ts,jsx,tsx}'],
-      extends: ['plugin:cypress/recommended']
-    },
-    {
       files: ['scripts/**/*.{cjs,mjs}'],
       env: { node: true },
       rules: {

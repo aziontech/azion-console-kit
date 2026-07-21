@@ -1,6 +1,6 @@
 const path = require('path')
 const { classifyPath } = require('../utils/path-classifier')
-const { isServiceImport, isVueQueryImport } = require('../utils/import-resolver')
+const { isServiceImport, isVueQueryImport, isV2ServiceImport } = require('../utils/import-resolver')
 
 module.exports = {
   meta: {
@@ -34,7 +34,7 @@ module.exports = {
       ImportDeclaration(node) {
         const source = node.source.value
 
-        if (isServiceImport(source)) {
+        if (isServiceImport(source) && !isV2ServiceImport(source)) {
           hasServiceImport = true
           serviceSource = source
         }
@@ -66,7 +66,10 @@ module.exports = {
         if (hasServiceImport && !hasVueQueryImport && !hasBaseServiceUsage) {
           // Find the service import node to report on
           const serviceImportNode = node.body.find(
-            (bodyNode) => bodyNode.type === 'ImportDeclaration' && isServiceImport(bodyNode.source.value)
+            (bodyNode) =>
+              bodyNode.type === 'ImportDeclaration' &&
+              isServiceImport(bodyNode.source.value) &&
+              !isV2ServiceImport(bodyNode.source.value)
           )
 
           if (serviceImportNode) {
