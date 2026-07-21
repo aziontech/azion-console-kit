@@ -1084,7 +1084,7 @@ mutação (updateDraft/build/archive/…)
   → version.value muda → state recomputa → action bar / readOnly / overlay reagem
 ```
 
-**Sem polling.** Em **erro**, o service **não** invalida.
+**Polling transiente.** A lista de versões faz polling de 3s ENQUANTO houver versão em estado transiente (`queued`/`building`) e para quando tudo assenta (`version-cache-policy.js`, coberto por `version-cache-policy.test.js`). Fora disso, sem polling: o detalhe atualiza por invalidação pós-mutação. Em **erro**, o service **não** invalida.
 
 ---
 
