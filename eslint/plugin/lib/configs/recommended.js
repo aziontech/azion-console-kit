@@ -12,6 +12,7 @@ module.exports = {
     'azion-architecture/no-direct-http-in-components': 'error',
     'azion-architecture/no-http-in-stores': 'error',
     'azion-architecture/require-vue-query': 'error',
+    'azion-architecture/require-v2-service-base-class': 'error',
 
     // Best practices — encourage clean layer separation
     'azion-architecture/no-try-catch-in-services': 'warn',

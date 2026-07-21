@@ -458,6 +458,18 @@ export class WorkloadService extends BaseService {
     return `Workload successfully deleted.`
   }
 
+  deleteDomain = async (id) => {
+    await this.http.request({
+      method: 'DELETE',
+      url: `v3/domains/${id}`,
+      config: { baseURL: '/api' }
+    })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
+
+    return `Domain successfully deleted.`
+  }
+
   getWorkloadFromCache = (id) => {
     if (!id) return undefined
 

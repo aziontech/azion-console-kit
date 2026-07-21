@@ -20,6 +20,11 @@ vi.mock('vue-router', () => ({
   useRouter: () => routerStub
 }))
 vi.mock('@aziontech/webkit/use-toast', () => ({ useToast: () => ({ add: vi.fn() }) }))
+vi.mock('@/services/v2/deployment/resource-usage-service', () => ({
+  resourceUsageService: {
+    listResourceUsage: vi.fn().mockResolvedValue({ body: [], count: 0 })
+  }
+}))
 
 import { useResourceVersionLanding } from '@/composables/versioning/use-resource-version-landing'
 

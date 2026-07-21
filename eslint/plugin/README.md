@@ -12,6 +12,7 @@ For the full rules documentation with examples, see [docs/architecture-governanc
 | `no-io-in-components`          | TanStack  | warn    | No axios/`*-service` imports nor s2s endpoint literals (`workloadsByDeployment`, `edge/api/graphql`) in `src/**/components/` |
 | `no-http-in-stores`            | TanStack  | error   | Pinia stores must not make HTTP calls                                                                                        |
 | `require-vue-query`            | TanStack  | error   | Composables with service imports must use Vue Query                                                                          |
+| `require-v2-service-base-class`| TanStack  | error   | V2 service classes (`src/services/v2/*-service`) must extend `BaseService` / `VersionServiceBase`                            |
 | `no-try-catch-in-services`     | Layer     | warn    | Services must not swallow errors with try/catch                                                                              |
 | `services-http-only`           | Layer     | warn    | Services must only handle HTTP — no stores, DOM, or router                                                                   |
 | `pure-adapters`                | Layer     | warn    | Adapters must be pure functions — no side effects                                                                            |

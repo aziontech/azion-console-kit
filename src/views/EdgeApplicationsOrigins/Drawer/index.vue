@@ -6,8 +6,9 @@
   import { refDebounced } from '@vueuse/core'
   import { onMounted } from 'vue'
   import { useAccountStore } from '@/stores/account'
-  import { loadProductsListService } from '@/services/contract-services'
+  import { contractService } from '@/services/v2/account'
   import { useDialog } from '@aziontech/webkit/use-dialog'
+  // eslint-disable-next-line azion-architecture/no-direct-http-in-components -- legado: origins ainda não possui service v2 (migração pendente)
   import { createOriginService } from '@/services/edge-application-origins-services'
   import { inject, ref, computed } from 'vue'
   import * as yup from 'yup'
@@ -43,8 +44,8 @@
   })
 
   onMounted(async () => {
-    const products = await loadProductsListService({ clientId: accountStore.account.client_id })
-    if (products.slugs.includes('live_ingest')) {
+    const slugs = await contractService.listProductSlugs(accountStore.account.client_id)
+    if (slugs.includes('live_ingest')) {
       hasLiveIngest.value = true
     }
     originTypesOptions.value.push({
