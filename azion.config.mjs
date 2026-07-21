@@ -7,9 +7,7 @@ const environment = VITE_ENVIRONMENT || 'production'
 const domainSuffix = environment === 'production' ? 'net' : 'com'
 
 const edgeApiHost =
-  environment === 'production'
-    ? 'jkjuyhi0gza.map.azionedge.net'
-    : 'urvlgkvpxla.map.azionedge.net'
+  environment === 'production' ? 'jkjuyhi0gza.map.azionedge.net' : 'urvlgkvpxla.map.azionedge.net'
 
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
@@ -348,6 +346,12 @@ const config = {
             conditional: 'and',
             operator: 'does_not_match',
             inputValue: '^/edge_api'
+          },
+          {
+            variable: '${uri}',
+            conditional: 'and',
+            operator: 'does_not_match',
+            inputValue: '^/sse'
           },
           {
             variable: '${uri}',
