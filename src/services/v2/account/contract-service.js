@@ -20,6 +20,16 @@ export class ContractService extends BaseService {
     )
   }
 
+  async listProductSlugs(clientId) {
+    const response = await this.http.request({
+      method: 'GET',
+      url: `${this.baseUrl}/${clientId}/products`,
+      config: { baseURL: '/api' }
+    })
+    const products = response.data || []
+    return products.map((product) => product.slug)
+  }
+
   _adaptContractPlan(response) {
     const products = response || []
     const slugs = products?.map((product) => product.slug)
