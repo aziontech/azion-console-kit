@@ -38,7 +38,7 @@ rejected — by lint where the machine can see it, by review where it can't.
 |---|---|---|
 | **Unit** (`src/tests/**`, jsdom) | `yarn test:unit:headless` · mutation: `yarn test:mutation` | Stryker (mutation — proves tests catch broken code; config `stryker.config.mjs`, scoped to the pure versioning logic modules; thresholds are **reporting-only** until the gate is calibrated per ADR/Q8) + fast-check (property-based — kills happy-path-only) + the lint rules above |
 | **Functional** (`src/tests/functional/**/*.browser.test.js`, real Chromium) | `yarn test:functional` | Real browser (no jsdom no-ops for focus/layout/Teleport) + mandatory floor: every test drives a **real user action** AND asserts an **observable consequence** |
-| **Contract** (`tests/contracts/**`) | consumer: Vitest · drift: `npx playwright test --project=contract-drift` | yup schema is the single source of truth; every fixture must validate against it (a lying fixture fails the gate); drift validates the REAL API pre-deploy |
+| **Contract** (`tests/contracts/**`) | consumer: Vitest · drift: `npx playwright test --project=contract-drift` | yup schema is the single source of truth; every fixture must validate against it (a lying fixture fails the gate); drift validates the PUBLISHED OpenAPI spec (open `/schema/` URL, no secrets) — engine unit-tested against a local fixture so detection is provably real |
 | **E2E** | — | **Deferred** (design ADR 7.4). Do not add e2e specs until that phase is approved. |
 
 ## Functional (browser mode) specifics

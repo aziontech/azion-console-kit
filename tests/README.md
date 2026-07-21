@@ -12,7 +12,7 @@ makes "complete coverage" auditable.
 | --- | --- |
 | `coverage-matrix.json` | Journey checklist (design §3.5): 9 versioned resources × journeys J1–J10 (requirements §7). Each cell records `level` (`component` now — e2e is deferred per ADR 7.4; `n/a` when the journey doesn't apply to the class), `coveredBy` (real test files, verified — never invented), and `status` (`covered` / `partial` / `missing`). Primary coverage gate — percentage is a support metric only. |
 | `ratchet-baseline.json` | Coverage ratchet cut point (ADR 7.8): merge-base SHAs with `dev` that define the "new code" bar (90% new-code coverage via Sonar); everything older is grandfathered. |
-| `contracts/` | Consumer-side API contracts (yup schemas, `*.schema.ts`) — single source of truth for version-endpoint request/response shapes, used by the offline consumer tests, the fixture-validation gate, and the scheduled/pre-deploy `contract-drift` check. Created by tasks 7.x/8.x. |
+| `contracts/` | Consumer-side API contracts (yup schemas, `*.schema.ts`) plus the OpenAPI drift engine (`openapi-drift-engine.js`) and its sample spec (`fixtures/openapi.sample.json`) — single source of truth for version-endpoint request/response shapes, used by the offline consumer tests, the fixture-validation gate, and the scheduled/pre-deploy `contract-drift` check (which validates the PUBLISHED OpenAPI spec). Created by tasks 7.x/8.x. |
 
 ## How the matrix is verified
 
@@ -58,6 +58,6 @@ Rollout is *reporting → required* (design ADR 7.6). Current state and flips:
 | Gate | State today | Flip to enforce |
 |---|---|---|
 | `versioning-tests-gate` (pre-merge) | job exists, **not** a required check | GitHub → Settings → Branch protection (`dev`) → add required status check `versioning-tests-gate` — after 1–2 weeks of green/flake data |
-| Contract-drift pre-deploy (stage/prod) | step runs with `continue-on-error: true`; skips cleanly while `CONTRACT_API_*_{STAGE,PROD}` secrets are absent | configure the secrets → observe → remove the `continue-on-error: true` line (stage first, then prod) |
+| Contract-drift pre-deploy (stage/prod) | step runs with `continue-on-error: true`; validates the PUBLISHED OpenAPI spec via `OPENAPI_SCHEMA_URL_{STAGE,PROD}` **vars** (public URLs, no secrets — default to `https://stage-api.azion.com/schema/` and `https://api.azion.com/schema/`); skips cleanly when the URL is unreachable/non-JSON | confirm the URLs / set the vars → observe → remove the `continue-on-error: true` line (stage first, then prod) |
 | Mutation score (Stryker) | `thresholds.break = null` (reporting) | set `break` to the calibrated score in `stryker.config.mjs` once the survivor report stabilizes |
 | Anti-placebo ESLint rules | **already `error`** (promoted by task 2.3) | — |

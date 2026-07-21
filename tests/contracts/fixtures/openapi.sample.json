@@ -1,0 +1,181 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "Azion Version API (drift-engine fixture)", "version": "test" },
+  "paths": {
+    "/v4/workspace/applications/{id}/versions": {
+      "get": {
+        "operationId": "listApplicationVersions",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": { "type": "integer" },
+                    "results": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/ApplicationVersion" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createApplicationDraft",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ApplicationDraftRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApplicationVersion" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v4/workspace/applications/{id}/versions/{versionId}": {
+      "get": {
+        "operationId": "getApplicationVersion",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/ApplicationVersion" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v4/workspace/network_lists/{id}/versions": {
+      "get": {
+        "operationId": "listNetworkListVersions",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/NetworkListVersion" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createNetworkListDraft",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NetworkListDraftRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NetworkListVersion" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v4/workspace/network_lists/{id}/versions/{versionId}": {
+      "get": {
+        "operationId": "getNetworkListVersion",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": { "$ref": "#/components/schemas/NetworkListVersion" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ModuleFlag": {
+        "type": "object",
+        "properties": { "enabled": { "type": "boolean" } }
+      },
+      "ApplicationModules": {
+        "type": "object",
+        "properties": {
+          "cache": { "$ref": "#/components/schemas/ModuleFlag" },
+          "functions": { "$ref": "#/components/schemas/ModuleFlag" }
+        }
+      },
+      "ApplicationVersion": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "version_id": { "type": "string" },
+          "state": { "type": "string" },
+          "name": { "type": "string" },
+          "active": { "type": "string" },
+          "modules": { "$ref": "#/components/schemas/ApplicationModules" },
+          "self": { "$ref": "#/components/schemas/ApplicationVersion" }
+        }
+      },
+      "ApplicationDraftRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "comment": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      },
+      "NetworkListVersion": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "version_id": { "type": "string" },
+          "state": { "type": "string" },
+          "name": { "type": "string" },
+          "type": { "type": "string" },
+          "items": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "NetworkListDraftRequest": {
+        "type": "object",
+        "properties": {
+          "comment": { "type": "string" },
+          "name": { "type": "string" },
+          "type": { "type": "string" }
+        }
+      }
+    }
+  }
+}

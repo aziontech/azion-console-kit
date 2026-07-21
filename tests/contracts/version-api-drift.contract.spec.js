@@ -2,172 +2,239 @@
 /**
  * Contract DRIFT check — spec `versioning-test-coverage`, task 8.1 (req 10.4).
  *
- * PURPOSE (deploy safety): validate the REAL Version API of a target
- * environment against the yup schemas the front's adapters assume
+ * PURPOSE (deploy safety): validate the PUBLISHED OpenAPI spec of a target
+ * environment (an OPEN, no-auth documentation URL — DRF/drf-spectacular
+ * `/schema/`) against the yup schemas the front's adapters assume
  * (`tests/contracts/schemas/**`, single source of truth via `contractSchemas`).
- * Runs API-only (Playwright `request` — no browser) so it is safe in any node
- * CI container. Intended to run scheduled AND as a pre-deploy gate that BLOCKS
- * the deploy when the API diverges from what the adapters read.
  *
- * SCOPE (this first version):
- *   - READ-ONLY. Only GETs. No POST/PUT/PATCH/DELETE: read drift already catches
- *     a contract change, and mutating a real environment is unsafe. Mutation
- *     drift is deferred to when a dedicated seeded tenant exists.
- *   - Workspace-API deployable resources only: application, workload,
- *     custom_page, firewall, connector, function, network_list, waf.
- *   - Deployment is intentionally EXCLUDED here: it lives under a different
- *     base URL (`/deployment-api`, not the workspace `v4/...` baseURL wired in
- *     `playwright.config.ts`). It is NOT marked `test.fixme` on purpose — our
- *     testing bar forbids committed escape hatches (`.skip`/`.only`/`fixme`);
- *     it will get its own spec/base-URL wiring in a later task.
+ * WHY THE PUBLISHED SPEC INSTEAD OF LIVE CALLS: consuming the provider's own
+ * published contract means ZERO secrets, ZERO tenant/token, and no mutation of
+ * a real environment. It is provider-side truth — exactly what the API promises
+ * to return. All comparison logic lives in the pure `openapi-drift-engine.js`
+ * module, which is unit-tested against a local fixture
+ * (`src/tests/contracts/openapi-drift-engine.test.js`) so the check is provably
+ * real even where the `/schema/` URL is unreachable (this network returns 204).
  *
- * SKIP SEMANTICS (both are runtime-conditional, NOT the static committed skips
- * the bar rejects):
- *   - Config guard: if `CONTRACT_API_BASE_URL` is unset the whole file skips
- *     cleanly, so a job without the env passes instead of failing.
- *   - Per-resource: if the target env has no rows for a resource (empty list),
- *     or the caller lacks access (403/404), that resource's test skips at
- *     runtime with a reason. This is data-driven, not a disabled test.
+ * WHAT IT ASSERTS, per versioned resource:
+ *   - PATHS: the `/workspace/<segment>/{...}/versions` (+ `/versions/{...}`)
+ *     endpoints exist in the published spec — else the resource FAILS.
+ *   - RESPONSE (core): every field our `versionResponse` yup schema READS must
+ *     exist, with a compatible type, in the resolved 200 item schema (envelope
+ *     `data`/`results` auto-detected, `$ref`s resolved cyclic-safe).
+ *   - REQUEST (lighter): every field our draft/build/archive schemas WRITE must
+ *     exist in the request body; a missing field FAILS only when the spec sets
+ *     `additionalProperties: false`, otherwise it is a non-blocking annotation.
  *
- * STRUCTURED LOGS: the repo lint bans `console.*` except `console.error`, so
- * instead of logging we attach one JSON annotation per validated endpoint
- * ({resource, endpoint, status, items, ok}) — visible in the Playwright report,
- * zero lint noise.
+ * SKIP SEMANTICS (runtime-conditional, NOT the static committed skips the bar
+ * rejects): if `OPENAPI_SCHEMA_URL` is unset, or the fetch is non-200 / empty /
+ * not JSON (e.g. YAML, or the edge returns 204 from this network), the whole
+ * file skips cleanly with a reason — a job without a reachable spec passes
+ * instead of failing.
+ *
+ * STRUCTURED LOGS: the repo lint bans `console.*` (except `console.error`); we
+ * attach one JSON annotation per resource ({resource, paths, response, request})
+ * — visible in the Playwright report, zero lint noise.
  *
  * HOW TO RUN against a target environment:
- *   CONTRACT_API_BASE_URL=https://api.azion.com \
- *   CONTRACT_API_TOKEN=<workspace-token> \
+ *   OPENAPI_SCHEMA_URL=https://api.azion.com/schema/ \
  *   npx playwright test --project=contract-drift
- * Without env it exits 0 with every test skipped (validation path for CI wiring).
+ * Without the env it exits 0 with every test skipped (CI-wiring validation path).
  */
 import { test, expect } from '@playwright/test'
 import { contractSchemas } from './schemas'
-import { resolveVersionId } from './schemas/version-common.schema'
+import {
+  describeFields,
+  findVersionPaths,
+  getResponseSchema,
+  getRequestBodySchema,
+  unwrapToItemSchema,
+  compareResponseFields,
+  compareRequestFields
+} from './openapi-drift-engine'
 
-// Skip the whole file cleanly when the target env is not configured.
-test.skip(!process.env.CONTRACT_API_BASE_URL, 'CONTRACT_API_BASE_URL not set')
+const SCHEMA_URL = process.env.OPENAPI_SCHEMA_URL
+const REQUEST_TIMEOUT_MS = 30000
 
-const REQUEST_TIMEOUT_MS = 20000
-const TEST_TIMEOUT_MS = 45000
-
-// Statuses that mean "this resource is not reachable/authorized in the target
-// env" — a data/access condition, not contract drift → skip, don't fail.
-const NOT_AVAILABLE_STATUSES = [403, 404]
+// Skip the whole file cleanly when no published-spec URL is configured.
+test.skip(!SCHEMA_URL, 'OPENAPI_SCHEMA_URL not set')
 
 /**
- * Workspace deployable resources under the shared `v4/workspace` baseURL.
- * `schema` is the resource's version-response contract from the single-source
- * registry; `path` is the parent-resource collection endpoint.
+ * Resource registry: `segment` is the workspace path segment used to discover
+ * the version endpoints in the published spec; the schema group is the front's
+ * single-source contract (response + the three request payloads).
  */
 const RESOURCES = [
-  { resource: 'application', path: '/v4/workspace/applications', schema: contractSchemas.application.versionResponse },
-  { resource: 'workload', path: '/v4/workspace/workloads', schema: contractSchemas.workload.versionResponse },
-  { resource: 'custom_page', path: '/v4/workspace/custom_pages', schema: contractSchemas.customPage.versionResponse },
-  { resource: 'firewall', path: '/v4/workspace/firewalls', schema: contractSchemas.edgeFirewall.versionResponse },
-  { resource: 'connector', path: '/v4/workspace/connectors', schema: contractSchemas.edgeConnector.versionResponse },
-  { resource: 'function', path: '/v4/workspace/functions', schema: contractSchemas.edgeFunction.versionResponse },
-  { resource: 'network_list', path: '/v4/workspace/network_lists', schema: contractSchemas.networkList.versionResponse },
-  { resource: 'waf', path: '/v4/workspace/wafs', schema: contractSchemas.waf.versionResponse }
+  { resource: 'application', segment: 'applications', schemas: contractSchemas.application },
+  { resource: 'workload', segment: 'workloads', schemas: contractSchemas.workload },
+  { resource: 'custom_page', segment: 'custom_pages', schemas: contractSchemas.customPage },
+  { resource: 'firewall', segment: 'firewalls', schemas: contractSchemas.edgeFirewall },
+  { resource: 'connector', segment: 'connectors', schemas: contractSchemas.edgeConnector },
+  { resource: 'function', segment: 'functions', schemas: contractSchemas.edgeFunction },
+  { resource: 'network_list', segment: 'network_lists', schemas: contractSchemas.networkList },
+  { resource: 'waf', segment: 'wafs', schemas: contractSchemas.waf }
 ]
 
-/**
- * Unwraps a list payload the same way the base adapter does
- * (`raw?.data ?? raw`, then `.results` or a bare array), so the drift check
- * reads exactly what the front reads.
- */
-const extractResults = (body) => {
-  const source = body?.data ?? body
-  if (Array.isArray(source?.results)) return source.results
-  if (Array.isArray(source)) return source
-  return []
-}
-
-/** Unwraps a single-object payload with the adapter's precedence. */
-const unwrapItem = (body) => body?.data ?? body
-
-/**
- * Validates one raw API item against the contract schema, returning ALL
- * messages (abortEarly:false) so a drift report lists every broken field at
- * once. `strict` disables coercion — we assert the API's real types.
- */
-const collectErrors = (schema, item) => {
-  try {
-    schema.validateSync(item, { strict: true, abortEarly: false })
-    return []
-  } catch (err) {
-    return err?.errors?.length ? err.errors : [err?.message ?? String(err)]
-  }
-}
-
-/** One structured JSON annotation per validated endpoint (see header). */
+// One structured JSON annotation per resource/section (see header).
 const annotate = (testInfo, entry) => {
   testInfo.annotations.push({ type: 'drift', description: JSON.stringify(entry) })
 }
 
-for (const { resource, path, schema } of RESOURCES) {
+/**
+ * Fetches the published spec once. Tries the drf-spectacular OpenAPI JSON media
+ * type first, then plain JSON. Returns `{ spec }` on success, or `{ skip }` with
+ * a human reason on any non-200 / empty / non-JSON response — so the caller
+ * skips cleanly instead of failing on a network/edge condition.
+ */
+const fetchSpec = async (request) => {
+  const accepts = ['application/vnd.oai.openapi+json', 'application/json']
+  let last = null
+  for (const accept of accepts) {
+    const response = await request.get(SCHEMA_URL, {
+      headers: { Accept: accept },
+      timeout: REQUEST_TIMEOUT_MS,
+      failOnStatusCode: false
+    })
+    last = response
+    if (!response.ok()) continue
+    const body = await response.text()
+    if (!body || !body.trim())
+      return { skip: `empty body from ${SCHEMA_URL} (status ${response.status()})` }
+    try {
+      return { spec: JSON.parse(body) }
+    } catch {
+      const looksYaml = /^\s*(openapi|swagger)\s*:/i.test(body)
+      return {
+        skip: looksYaml
+          ? 'published spec is YAML — yaml not supported yet (no parser dep)'
+          : `published spec at ${SCHEMA_URL} is not valid JSON`
+      }
+    }
+  }
+  return {
+    skip: `no OK response from ${SCHEMA_URL} (last status ${last ? last.status() : 'none'})`
+  }
+}
+
+// Fetch the spec once for the whole file; per-resource tests read the cached copy.
+let publishedSpec = null
+let skipReason = null
+
+test.beforeAll(async ({ request }) => {
+  const result = await fetchSpec(request)
+  publishedSpec = result.spec ?? null
+  skipReason = result.skip ?? null
+})
+
+for (const { resource, segment, schemas } of RESOURCES) {
   test.describe(`contract drift: ${resource}`, () => {
-    test(`${resource} version responses match the adapter contract`, async ({ request }, testInfo) => {
-      test.setTimeout(TEST_TIMEOUT_MS)
+    test(`${resource} published OpenAPI matches the adapter contract`, async () => {
+      // `test.info()` avoids taking the fixtures arg (this test does no per-test
+      // I/O — the spec is fetched once in `beforeAll`), keeping the signature clean.
+      const testInfo = test.info()
+      test.skip(skipReason !== null, skipReason ?? 'no published spec')
+      expect(publishedSpec, 'published spec should be loaded when not skipped').toBeTruthy()
 
-      // (1) Parent list — one row is enough to obtain a real id.
-      const listResponse = await request.get(`${path}?page_size=1`, { timeout: REQUEST_TIMEOUT_MS })
-      annotate(testInfo, {
-        resource,
-        endpoint: `${path}?page_size=1`,
-        status: listResponse.status(),
-        items: null,
-        ok: listResponse.ok()
-      })
+      // (1) PATHS — the version endpoints must be published for this resource.
+      const paths = findVersionPaths(publishedSpec, segment)
+      annotate(testInfo, { resource, section: 'paths', ...paths })
+      expect(
+        paths.list || paths.detail,
+        `resource "${resource}" version endpoints missing from published OpenAPI`
+      ).toBeTruthy()
 
-      if (NOT_AVAILABLE_STATUSES.includes(listResponse.status())) {
-        test.skip(true, `no access to ${resource} in target env (status ${listResponse.status()})`)
-      }
-      expect(listResponse.ok(), `unexpected status listing ${resource}`).toBeTruthy()
-
-      const parents = extractResults(await listResponse.json())
-      if (parents.length === 0) {
-        test.skip(true, `no ${resource} available in target env`)
-      }
-
-      const resourceId = parents[0]?.id
-      expect(resourceId, `${resource} row is missing an id`).toBeDefined()
-
-      // (2) Version list — every item must validate against the contract.
-      const versionsEndpoint = `${path}/${resourceId}/versions`
-      const versionsResponse = await request.get(versionsEndpoint, { timeout: REQUEST_TIMEOUT_MS })
-      expect(versionsResponse.status(), `GET ${versionsEndpoint}`).toBe(200)
-
-      const versions = extractResults(await versionsResponse.json())
-      const listErrors = versions.flatMap((item, index) =>
-        collectErrors(schema, item).map((message) => `[version #${index}] ${message}`)
+      // (2) RESPONSE (core) — resolve the version item schema (detail preferred,
+      // else the list item) and confirm every field the front READS is present
+      // with a compatible type.
+      const responsePath = paths.detail ?? paths.list
+      const responseSchema = getResponseSchema(
+        publishedSpec,
+        publishedSpec.paths[responsePath],
+        'get'
       )
+      const { itemSchema, envelope } = unwrapToItemSchema(publishedSpec, responseSchema)
+      expect(
+        itemSchema,
+        `could not resolve a version item schema for "${resource}" at ${responsePath}`
+      ).toBeTruthy()
+
+      const responseFields = describeFields(schemas.versionResponse)
+      const responseIssues = compareResponseFields(responseFields, itemSchema, publishedSpec)
       annotate(testInfo, {
         resource,
-        endpoint: versionsEndpoint,
-        status: versionsResponse.status(),
-        items: versions.length,
-        ok: listErrors.length === 0
+        section: 'response',
+        endpoint: responsePath,
+        envelope,
+        fields: responseFields.length,
+        issues: responseIssues
       })
-      expect(listErrors, `contract drift in ${resource} version list`).toEqual([])
+      expect(
+        responseIssues,
+        `response contract drift in "${resource}" (field vs published spec)`
+      ).toEqual([])
 
-      // (3) Single version — validate the detail shape too, when one exists.
-      const firstVersionId = versions.length ? resolveVersionId(versions[0]) : undefined
-      if (firstVersionId === undefined || firstVersionId === null) return
+      // (3) REQUEST (lighter) — draft (POST on the collection), build/archive
+      // (POST on the corresponding action sub-paths, when published). Missing
+      // fields fail only under `additionalProperties: false`; else annotate.
+      const requestChecks = [
+        { name: 'draft', schema: schemas.draftRequest, path: paths.list, method: 'post' },
+        {
+          name: 'build',
+          schema: schemas.buildRequest,
+          path: findActionPath(publishedSpec, segment, 'build'),
+          method: 'post'
+        },
+        {
+          name: 'archive',
+          schema: schemas.archiveRequest,
+          path: findActionPath(publishedSpec, segment, 'archive'),
+          method: 'post'
+        }
+      ]
 
-      const detailEndpoint = `${path}/${resourceId}/versions/${firstVersionId}`
-      const detailResponse = await request.get(detailEndpoint, { timeout: REQUEST_TIMEOUT_MS })
-      expect(detailResponse.status(), `GET ${detailEndpoint}`).toBe(200)
-
-      const detailItem = unwrapItem(await detailResponse.json())
-      const detailErrors = collectErrors(schema, detailItem)
-      annotate(testInfo, {
-        resource,
-        endpoint: detailEndpoint,
-        status: detailResponse.status(),
-        items: 1,
-        ok: detailErrors.length === 0
-      })
-      expect(detailErrors, `contract drift in ${resource} version detail`).toEqual([])
+      const requestIssues = []
+      for (const check of requestChecks) {
+        if (!check.schema || !check.path) {
+          annotate(testInfo, { resource, section: 'request', kind: check.name, resolvable: false })
+          continue
+        }
+        const bodySchema = getRequestBodySchema(
+          publishedSpec,
+          publishedSpec.paths[check.path],
+          check.method
+        )
+        const fields = describeFields(check.schema)
+        const { issues, warnings, resolvable } = compareRequestFields(
+          fields,
+          bodySchema,
+          publishedSpec
+        )
+        annotate(testInfo, {
+          resource,
+          section: 'request',
+          kind: check.name,
+          path: check.path,
+          resolvable,
+          issues,
+          warnings
+        })
+        requestIssues.push(...issues.map((issue) => ({ kind: check.name, ...issue })))
+      }
+      expect(
+        requestIssues,
+        `request contract drift in "${resource}" (field forbidden by additionalProperties:false)`
+      ).toEqual([])
     })
   })
+}
+
+/**
+ * Finds a version ACTION sub-path (`.../versions/{...}/<action>`) for a segment,
+ * e.g. build/archive. Returns null when the action is not published (then the
+ * request check for it is annotated as unresolvable, not failed).
+ */
+function findActionPath(spec, segment, action) {
+  const paths = spec?.paths ? Object.keys(spec.paths) : []
+  const seg = segment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const re = new RegExp(`/workspace/${seg}/\\{[^/}]+\\}/versions/\\{[^/}]+\\}/${action}/?$`)
+  return paths.find((path) => re.test(path)) ?? null
 }
