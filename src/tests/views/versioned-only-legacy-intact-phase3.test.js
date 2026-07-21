@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
 import { setFeatureFlags, hasFlagUseV6Configurations } from '@/composables/user-flag'
 
 /**
@@ -12,7 +13,7 @@ import { setFeatureFlags, hasFlagUseV6Configurations } from '@/composables/user-
  */
 
 const read = (relative) =>
-  readFileSync(fileURLToPath(new URL(`../../${relative}`, import.meta.url)), 'utf8')
+  readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), `../../${relative}`), 'utf8')
 
 // Real-shaped account payloads: feature flags arrive as the `client_flags` array.
 const accountWithFlag = { client_flags: ['use_v6_configurations'] }

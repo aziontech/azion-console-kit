@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { afterEach, describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { defineComponent, h, ref } from 'vue'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
+import { httpService } from '@/services/v2/base/http/httpService'
+import { queryClient } from '@/services/v2/base/query/queryClient'
 import {
   createVersionCommandBus,
   VERSION_COMMAND_BUS_KEY
@@ -11,28 +13,20 @@ import {
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 
 // Task 6.4 (optional): NetworkListVersionAdapter is a thin child that delegates
-// the whole version lifecycle to useVersionFormAdapter. We assert the framework
-// contract a new atomic resource must honor — without any real HTTP: SAVE invalid
-// never mutates, read-only propagates to the form, and NEW_DRAFT_FROM clones.
-
-// One spy per service method so we can assert the adapter routes to the shared
-// version service without touching the network.
-const makeServiceMock = () => ({
-  updateDraft: vi.fn().mockResolvedValue({ id: 'v1' }),
-  build: vi.fn().mockResolvedValue(undefined),
-  archive: vi.fn().mockResolvedValue(undefined),
-  cancelBuild: vi.fn().mockResolvedValue(undefined),
-  createDraft: vi.fn().mockResolvedValue({ id: 'v2', name: 'cloned draft' }),
-  deleteVersion: vi.fn().mockResolvedValue(undefined)
-})
-
-const { networkListService } = vi.hoisted(() => ({ networkListService: {} }))
-
-vi.mock('@/services/v2/network-lists/network-list-version-service', () => ({
-  networkListVersionService: networkListService
-}))
+// the whole version lifecycle to useVersionFormAdapter. The REAL networkListVersionService
+// runs; only the HTTP client and the query cache are stubbed. We assert the framework
+// contract a new atomic resource must honor via the HTTP request the chain drives:
+// SAVE invalid never writes, read-only propagates to the form, and NEW_DRAFT_FROM clones.
 
 import NetworkListVersionAdapter from '@/views/NetworkLists/v6/NetworkListVersionAdapter.vue'
+
+const NL_URL = 'v4/workspace/network_lists/10/versions/v1'
+
+let requestSpy
+const countReq = (method, urlPart) =>
+  requestSpy.mock.calls
+    .map(([req]) => req)
+    .filter((req) => req.method === method && req.url.includes(urlPart)).length
 
 // Satisfies the real Network List schema: name required; ip_cidr requires a
 // non-empty itemsValues with no blank lines.
@@ -66,7 +60,17 @@ const mountAdapter = ({ bus, resource = VALID_RESOURCE, context = makeContext(),
   })
 
 beforeEach(() => {
-  Object.assign(networkListService, makeServiceMock())
+  vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+  vi.spyOn(queryClient, 'invalidateQueries').mockImplementation(() => {})
+  // Metadata-only snapshot (no `type`) so the adapter's config normalizer no-ops;
+  // the response body is not asserted, only the request the chain drives.
+  requestSpy = vi
+    .spyOn(httpService, 'request')
+    .mockResolvedValue({ data: { version_id: 'v2', state: 'draft' } })
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
 })
 
 describe('NetworkListVersionAdapter — thin adapter delegating to useVersionFormAdapter', () => {
@@ -76,36 +80,40 @@ describe('NetworkListVersionAdapter — thin adapter delegating to useVersionFor
     expect(wrapper.find('[data-testid="form-fields"]').exists()).toBe(true)
   })
 
-  it('SAVE updates the draft; SAVE_AND_BUILD updates then builds (default strategy)', async () => {
+  it('SAVE PATCHes the draft; SAVE_AND_BUILD PATCHes then POSTs /build (default strategy)', async () => {
     const bus = createVersionCommandBus()
     mountAdapter({ bus })
     await flushPromises()
 
     await bus.emit('SAVE', { resourceId: '10', versionId: 'v1' })
-    expect(networkListService.updateDraft).toHaveBeenCalledWith(
-      '10',
-      'v1',
-      expect.objectContaining({ name: 'my-list' })
-    )
-    expect(networkListService.build).not.toHaveBeenCalled()
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'PATCH',
+      url: NL_URL,
+      body: expect.objectContaining({ name: 'my-list' })
+    })
+    expect(countReq('POST', '/build')).toBe(0)
 
     await bus.emit('SAVE_AND_BUILD', { comment: 'ship it' })
-    expect(networkListService.updateDraft).toHaveBeenCalledTimes(2)
-    expect(networkListService.build).toHaveBeenCalledWith('10', 'v1', { comment: 'ship it' })
+    expect(countReq('PATCH', NL_URL)).toBe(2)
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: `${NL_URL}/build`,
+      body: { comment: 'ship it' }
+    })
   })
 
-  it('SAVE with invalid form rejects and never mutates the draft', async () => {
+  it('SAVE with invalid form rejects and never issues a write request', async () => {
     const bus = createVersionCommandBus()
     // `name` is required by the Network List schema; an empty value fails validation.
     mountAdapter({ bus, resource: { ...VALID_RESOURCE, name: '' } })
     await flushPromises()
 
     await expect(bus.emit('SAVE', { resourceId: '10', versionId: 'v1' })).rejects.toThrow()
-    expect(networkListService.updateDraft).not.toHaveBeenCalled()
-    expect(networkListService.build).not.toHaveBeenCalled()
+    expect(countReq('PATCH', NL_URL)).toBe(0)
+    expect(countReq('POST', '/build')).toBe(0)
   })
 
-  it('NEW_DRAFT_FROM clones the source version and returns the new draft', async () => {
+  it('NEW_DRAFT_FROM POSTs the clone and returns the normalized new draft', async () => {
     const bus = createVersionCommandBus()
     mountAdapter({ bus })
     await flushPromises()
@@ -115,26 +123,36 @@ describe('NetworkListVersionAdapter — thin adapter delegating to useVersionFor
       versionId: 'v1',
       comment: 'clone'
     })
-    expect(networkListService.createDraft).toHaveBeenCalledWith('10', {
-      sourceVersionId: 'v1',
-      comment: 'clone'
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: 'v4/workspace/network_lists/10/versions',
+      body: expect.objectContaining({ source_version: 'v1', comment: 'clone' })
     })
-    expect(draft).toEqual({ id: 'v2', name: 'cloned draft' })
+    // The service returns the adapter-normalized version (id at the root), not raw.
+    expect(draft.id).toBe('v2')
   })
 
-  it('ARCHIVE / CANCEL_BUILD / DELETE route to the shared service', async () => {
+  it('ARCHIVE / CANCEL_BUILD / DELETE hit their endpoints', async () => {
     const bus = createVersionCommandBus()
     mountAdapter({ bus })
     await flushPromises()
 
     await bus.emit('ARCHIVE', { resourceId: '10', versionId: 'v1', comment: 'done' })
-    expect(networkListService.archive).toHaveBeenCalledWith('10', 'v1', { comment: 'done' })
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: `${NL_URL}/archive`,
+      body: { comment: 'done' }
+    })
 
     await bus.emit('CANCEL_BUILD', { resourceId: '10', versionId: 'v1', comment: 'stop' })
-    expect(networkListService.cancelBuild).toHaveBeenCalledWith('10', 'v1', { comment: 'stop' })
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: `${NL_URL}/cancel`,
+      body: { comment: 'stop' }
+    })
 
     await bus.emit('DELETE', { resourceId: '10', versionId: 'v1' })
-    expect(networkListService.deleteVersion).toHaveBeenCalledWith('10', 'v1')
+    expect(requestSpy).toHaveBeenCalledWith({ method: 'DELETE', url: NL_URL })
   })
 })
 

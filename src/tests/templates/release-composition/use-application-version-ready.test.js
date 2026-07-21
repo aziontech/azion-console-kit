@@ -1,15 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref, effectScope, nextTick } from 'vue'
 import { flushPromises } from '@vue/test-utils'
-
-vi.mock('@/services/v2/edge-app/edge-app-version-service', () => ({
-  edgeAppVersionService: {
-    loadVersion: vi.fn()
-  }
-}))
-
-import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
+import { httpService } from '@/services/v2/base/http/httpService'
+import { queryClient } from '@/services/v2/base/query/queryClient'
 import { useApplicationVersionReady } from '@/templates/release-composition/use-application-version-ready'
+
+/**
+ * Real service under test: the composable runs the real `edgeAppVersionService`
+ * (loadVersion → adapter normalization). Only the boundaries are stubbed — the
+ * HTTP client (`httpService.request`) and the query cache (`queryClient.ensureQueryData`,
+ * short-circuited to the fetch so no cross-test cache leaks). The composable's
+ * readiness is asserted by observing the HTTP call it drives and the refs it exposes.
+ */
 
 const runInScope = (factory) => {
   const scope = effectScope()
@@ -17,17 +19,24 @@ const runInScope = (factory) => {
   return { exposed, dispose: () => scope.stop() }
 }
 
+// The application version detail URL the real service GETs.
+const versionUrl = (appId, verId) => `v4/workspace/applications/${appId}/versions/${verId}`
+
+let requestSpy
+
 beforeEach(() => {
   vi.spyOn(console, 'error').mockImplementation(() => {})
+  // Short-circuit the cache to the fetch so each load hits the HTTP boundary.
+  vi.spyOn(queryClient, 'ensureQueryData').mockImplementation(({ queryFn }) => queryFn())
+  requestSpy = vi.spyOn(httpService, 'request')
 })
 
 afterEach(() => {
   vi.restoreAllMocks()
-  edgeAppVersionService.loadVersion.mockReset()
 })
 
 describe('useApplicationVersionReady - gated off', () => {
-  it('should not call loadVersion and stay not ready when versionId is null', async () => {
+  it('should not request and stay not ready when versionId is null', async () => {
     const { exposed, dispose } = runInScope(() =>
       useApplicationVersionReady({
         applicationId: ref('app-1'),
@@ -37,14 +46,14 @@ describe('useApplicationVersionReady - gated off', () => {
     )
     await flushPromises()
 
-    expect(edgeAppVersionService.loadVersion).not.toHaveBeenCalled()
+    expect(requestSpy).not.toHaveBeenCalled()
     expect(exposed.isReady.value).toBe(false)
     expect(exposed.isLoading.value).toBe(false)
 
     dispose()
   })
 
-  it('should not call loadVersion and stay not ready when applicationId is null', async () => {
+  it('should not request and stay not ready when applicationId is null', async () => {
     const { exposed, dispose } = runInScope(() =>
       useApplicationVersionReady({
         applicationId: ref(null),
@@ -54,13 +63,13 @@ describe('useApplicationVersionReady - gated off', () => {
     )
     await flushPromises()
 
-    expect(edgeAppVersionService.loadVersion).not.toHaveBeenCalled()
+    expect(requestSpy).not.toHaveBeenCalled()
     expect(exposed.isReady.value).toBe(false)
 
     dispose()
   })
 
-  it('should not call loadVersion and stay not ready when enabled is false', async () => {
+  it('should not request and stay not ready when enabled is false', async () => {
     const { exposed, dispose } = runInScope(() =>
       useApplicationVersionReady({
         applicationId: ref('app-1'),
@@ -70,7 +79,7 @@ describe('useApplicationVersionReady - gated off', () => {
     )
     await flushPromises()
 
-    expect(edgeAppVersionService.loadVersion).not.toHaveBeenCalled()
+    expect(requestSpy).not.toHaveBeenCalled()
     expect(exposed.isReady.value).toBe(false)
 
     dispose()
@@ -79,7 +88,7 @@ describe('useApplicationVersionReady - gated off', () => {
 
 describe('useApplicationVersionReady - ready state', () => {
   it('should set isReady true and toggle isLoading when the version state is ready', async () => {
-    edgeAppVersionService.loadVersion.mockResolvedValue({ state: 'ready' })
+    requestSpy.mockResolvedValue({ data: { version_id: 'ver-2', state: 'ready' } })
 
     const { exposed, dispose } = runInScope(() =>
       useApplicationVersionReady({
@@ -92,7 +101,7 @@ describe('useApplicationVersionReady - ready state', () => {
     expect(exposed.isLoading.value).toBe(true)
     await flushPromises()
 
-    expect(edgeAppVersionService.loadVersion).toHaveBeenCalledWith('app-2', 'ver-2')
+    expect(requestSpy).toHaveBeenCalledWith({ method: 'GET', url: versionUrl('app-2', 'ver-2') })
     expect(exposed.isReady.value).toBe(true)
     expect(exposed.hasError.value).toBe(false)
     expect(exposed.isLoading.value).toBe(false)
@@ -100,8 +109,8 @@ describe('useApplicationVersionReady - ready state', () => {
     dispose()
   })
 
-  it('should set isReady true when the version exposes the version_state fallback key', async () => {
-    edgeAppVersionService.loadVersion.mockResolvedValue({ version_state: 'ready' })
+  it('should set isReady true when the version exposes the version_state key', async () => {
+    requestSpy.mockResolvedValue({ data: { version_id: 'ver-3', version_state: 'ready' } })
 
     const { exposed, dispose } = runInScope(() =>
       useApplicationVersionReady({
@@ -123,7 +132,7 @@ describe('useApplicationVersionReady - non-ready states', () => {
   it.each(['draft', 'building', 'active'])(
     'should keep isReady false when the version state is %s',
     async (state) => {
-      edgeAppVersionService.loadVersion.mockResolvedValue({ state })
+      requestSpy.mockResolvedValue({ data: { version_id: 'ver-4', state } })
 
       const { exposed, dispose } = runInScope(() =>
         useApplicationVersionReady({
@@ -134,7 +143,7 @@ describe('useApplicationVersionReady - non-ready states', () => {
       )
       await flushPromises()
 
-      expect(edgeAppVersionService.loadVersion).toHaveBeenCalledWith('app-4', 'ver-4')
+      expect(requestSpy).toHaveBeenCalledWith({ method: 'GET', url: versionUrl('app-4', 'ver-4') })
       expect(exposed.isReady.value).toBe(false)
       expect(exposed.hasError.value).toBe(false)
 
@@ -144,8 +153,8 @@ describe('useApplicationVersionReady - non-ready states', () => {
 })
 
 describe('useApplicationVersionReady - error degradation', () => {
-  it('should degrade to not ready with hasError without throwing when loadVersion rejects', async () => {
-    edgeAppVersionService.loadVersion.mockRejectedValue(new Error('load boom'))
+  it('should degrade to not ready with hasError without throwing when the request rejects', async () => {
+    requestSpy.mockRejectedValue(new Error('load boom'))
 
     const { exposed, dispose } = runInScope(() =>
       useApplicationVersionReady({
@@ -156,7 +165,7 @@ describe('useApplicationVersionReady - error degradation', () => {
     )
     await flushPromises()
 
-    expect(edgeAppVersionService.loadVersion).toHaveBeenCalledWith('app-5', 'ver-5')
+    expect(requestSpy).toHaveBeenCalledWith({ method: 'GET', url: versionUrl('app-5', 'ver-5') })
     expect(exposed.isReady.value).toBe(false)
     expect(exposed.hasError.value).toBe(true)
     expect(exposed.isLoading.value).toBe(false)
@@ -166,9 +175,9 @@ describe('useApplicationVersionReady - error degradation', () => {
 })
 
 describe('useApplicationVersionReady - reactive versionId', () => {
-  it('should re-run loadVersion with the new version when versionId changes', async () => {
-    edgeAppVersionService.loadVersion.mockImplementation((_appId, verId) =>
-      Promise.resolve(verId === 'ver-7' ? { state: 'ready' } : { state: 'draft' })
+  it('should re-request with the new version when versionId changes', async () => {
+    requestSpy.mockImplementation(({ url }) =>
+      Promise.resolve({ data: { state: url.endsWith('ver-7') ? 'ready' : 'draft' } })
     )
 
     const versionId = ref('ver-6')
@@ -177,14 +186,14 @@ describe('useApplicationVersionReady - reactive versionId', () => {
     )
     await flushPromises()
 
-    expect(edgeAppVersionService.loadVersion).toHaveBeenCalledWith('app-6', 'ver-6')
+    expect(requestSpy).toHaveBeenCalledWith({ method: 'GET', url: versionUrl('app-6', 'ver-6') })
     expect(exposed.isReady.value).toBe(false)
 
     versionId.value = 'ver-7'
     await nextTick()
     await flushPromises()
 
-    expect(edgeAppVersionService.loadVersion).toHaveBeenCalledWith('app-6', 'ver-7')
+    expect(requestSpy).toHaveBeenCalledWith({ method: 'GET', url: versionUrl('app-6', 'ver-7') })
     expect(exposed.isReady.value).toBe(true)
 
     dispose()
@@ -192,10 +201,10 @@ describe('useApplicationVersionReady - reactive versionId', () => {
 })
 
 describe('useApplicationVersionReady - retry', () => {
-  it('should re-run loadVersion for the current keys when retry is invoked after a failure', async () => {
-    edgeAppVersionService.loadVersion
+  it('should re-request for the current keys when retry is invoked after a failure', async () => {
+    requestSpy
       .mockRejectedValueOnce(new Error('transient boom'))
-      .mockResolvedValueOnce({ state: 'ready' })
+      .mockResolvedValueOnce({ data: { version_id: 'ver-8', state: 'ready' } })
 
     const { exposed, dispose } = runInScope(() =>
       useApplicationVersionReady({
@@ -206,15 +215,18 @@ describe('useApplicationVersionReady - retry', () => {
     )
     await flushPromises()
 
-    expect(edgeAppVersionService.loadVersion).toHaveBeenCalledTimes(1)
+    expect(requestSpy).toHaveBeenCalledTimes(1)
     expect(exposed.hasError.value).toBe(true)
     expect(exposed.isReady.value).toBe(false)
 
     await exposed.retry()
     await flushPromises()
 
-    expect(edgeAppVersionService.loadVersion).toHaveBeenCalledTimes(2)
-    expect(edgeAppVersionService.loadVersion).toHaveBeenLastCalledWith('app-8', 'ver-8')
+    expect(requestSpy).toHaveBeenCalledTimes(2)
+    expect(requestSpy).toHaveBeenLastCalledWith({
+      method: 'GET',
+      url: versionUrl('app-8', 'ver-8')
+    })
     expect(exposed.hasError.value).toBe(false)
     expect(exposed.isReady.value).toBe(true)
 

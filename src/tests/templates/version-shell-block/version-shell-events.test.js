@@ -12,28 +12,6 @@ vi.mock('@aziontech/webkit/inlinemessage', () => ({
   default: { name: 'InlineMessage', template: '<div><slot /></div>' }
 }))
 
-// Stub the children: ProcessingOverlay is irrelevant here (state is `draft`),
-// and VersionActionBar is replaced by a minimal stub that re-emits `dispatch`,
-// which is the real integration seam into `handleDispatch`.
-vi.mock('@/templates/version-shell-block/components/ProcessingOverlay.vue', () => ({
-  default: { name: 'ProcessingOverlay', template: '<div data-testid="overlay" />' }
-}))
-
-// `vi.hoisted` so the stub is initialized before the hoisted `vi.mock` factory
-// reads it — referencing a plain top-level const there hits the TDZ.
-const { VersionActionBarStub } = vi.hoisted(() => ({
-  VersionActionBarStub: {
-    name: 'VersionActionBar',
-    props: ['state', 'availableActions', 'disabledActions'],
-    emits: ['dispatch', 'cancel'],
-    template: '<div data-testid="action-bar" />'
-  }
-}))
-
-vi.mock('@/templates/version-shell-block/components/VersionActionBar.vue', () => ({
-  default: VersionActionBarStub
-}))
-
 // The shell reads a `build` intent off the route to auto-dispatch; these tests
 // exercise handleDispatch, not that path, so a no-intent route + noop router.
 vi.mock('vue-router', () => ({
@@ -41,6 +19,10 @@ vi.mock('vue-router', () => ({
   useRouter: () => ({ replace: vi.fn() })
 }))
 
+// The children (VersionActionBar / ProcessingOverlay) render for REAL — they are
+// the versioning code under test, not a boundary. Dispatch is driven by clicking
+// the bar's real SAVE button; the shell's handleDispatch outcome is the assertion.
+import VersionActionBar from '@/templates/version-shell-block/components/VersionActionBar.vue'
 import VersionShell from '@/templates/version-shell-block/index.vue'
 
 // Minimal shape `useVersionShell` consumes: data.value, isLoading, isError.
@@ -86,8 +68,14 @@ afterEach(() => {
   document.body.innerHTML = ''
 })
 
-const dispatchSave = (wrapper) =>
-  wrapper.findComponent(VersionActionBarStub).vm.$emit('dispatch', 'SAVE', {})
+// The action bar is teleported to #action-bar; reach it through the tracked
+// component rather than the render container.
+const saveButton = (wrapper) =>
+  wrapper.findComponent(VersionActionBar).get('[data-testid="version-action-bar__action-SAVE"]')
+
+// Real user action: click the bar's SAVE button (rendered by the real bar because
+// the child registered a SAVE handler). Its click → dispatch → shell handleDispatch.
+const dispatchSave = (wrapper) => saveButton(wrapper).trigger('click')
 
 describe('VersionShell — handleDispatch events (P3)', () => {
   it('emits `updated` with { action, result } when the handler resolves', async () => {
@@ -139,7 +127,9 @@ describe('VersionShell — handleDispatch events (P3)', () => {
     const wrapper = mountShell({ handler })
     await flushPromises()
 
-    wrapper.findComponent(VersionActionBarStub).vm.$emit('cancel')
+    // The bar has no cancel button in this state; the shell forwards the bar's
+    // declared `cancel` emit (its public contract) straight through as `cancel`.
+    wrapper.findComponent(VersionActionBar).vm.$emit('cancel')
     await flushPromises()
 
     expect(wrapper.emitted('cancel')).toHaveLength(1)
@@ -172,13 +162,12 @@ describe('VersionShell — handleDispatch events (P3)', () => {
     })
     await flushPromises()
 
-    const actionBar = wrapper.findComponent(VersionActionBarStub)
-    // ready=false → SAVE disabled.
-    expect(actionBar.props('disabledActions')).toContain('SAVE')
+    // ready=false → SAVE button disabled in the DOM.
+    expect(saveButton(wrapper).element.disabled).toBe(true)
 
-    // ready=true → recomputes and enables.
+    // ready=true → recomputes and enables the button.
     readyRef.value = true
     await flushPromises()
-    expect(actionBar.props('disabledActions')).not.toContain('SAVE')
+    expect(saveButton(wrapper).element.disabled).toBe(false)
   })
 })

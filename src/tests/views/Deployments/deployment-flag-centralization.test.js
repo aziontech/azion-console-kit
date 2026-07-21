@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { join, relative } from 'node:path'
+import { join, relative, dirname, resolve } from 'node:path'
 
-const ROOT = fileURLToPath(new URL('../../../../', import.meta.url))
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../')
 
 const SCAN_DIRS = ['src/views/Deployments', 'src/services/v2/deployment']
 

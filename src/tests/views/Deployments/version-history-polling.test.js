@@ -1,10 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { VERSION_POLL_INTERVAL_MS } from '@/services/v2/versioning/version-cache-policy'
+import { httpService } from '@/services/v2/base/http/httpService'
+import { queryClient } from '@/services/v2/base/query/queryClient'
 
-vi.mock('@/services/v2/deployment/deployment-version-service', () => ({
-  deploymentVersionService: { listVersionsService: vi.fn() }
-}))
+// The REAL deploymentVersionService runs; only the HTTP client and the query cache
+// are stubbed. The tab's polling lifecycle is proven by the HTTP GETs it drives
+// (count, timing, params incl. skipCache) — not by a mocked version service.
 
 vi.mock('@aziontech/webkit/use-toast', () => ({
   useToast: () => ({ add: vi.fn() })
@@ -70,10 +72,26 @@ vi.mock('@/components/VersionListDataView', () => ({
   }
 }))
 
-import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
 import VersionHistoryTab from '@/views/Deployments/tabs/VersionHistoryTab.vue'
 
-const listVersionsService = deploymentVersionService.listVersionsService
+// The deployment versions list endpoint the real service GETs.
+const VERSIONS_URL = '/deployment-api/v4/deployments/dep-1/versions'
+
+// API list envelope → the service normalizes it to { body, count }.
+const listResponse = (versions) => ({
+  data: { results: versions, count: versions.length }
+})
+
+let requestSpy
+
+// Stub the boundaries so every listVersionsService call reaches the HTTP client
+// (bypassing the cache) and mutations never touch the real query cache.
+const setupBoundary = () => {
+  vi.spyOn(queryClient, 'ensureQueryData').mockImplementation(({ queryFn }) => queryFn())
+  vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+  vi.spyOn(queryClient, 'invalidateQueries').mockImplementation(() => {})
+  requestSpy = vi.spyOn(httpService, 'request')
+}
 
 const flush = async () => {
   for (let index = 0; index < 6; index += 1) {
@@ -89,7 +107,7 @@ const mountTab = () =>
 describe('VersionHistoryTab — polling lifecycle (P6)', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    listVersionsService.mockReset()
+    setupBoundary()
   })
 
   afterEach(() => {
@@ -97,128 +115,117 @@ describe('VersionHistoryTab — polling lifecycle (P6)', () => {
   })
 
   it('starts polling only after the poll interval elapses while a version is queued/building', async () => {
-    listVersionsService.mockResolvedValue({
-      body: [{ id: 'a1b2c3', state: 'building' }],
-      count: 1
-    })
+    requestSpy.mockResolvedValue(listResponse([{ id: 'a1b2c3', state: 'building' }]))
 
     mountTab()
     await flush()
 
-    expect(listVersionsService).toHaveBeenCalledTimes(1)
-    expect(listVersionsService).toHaveBeenLastCalledWith(
-      'dep-1',
-      expect.objectContaining({ page: 1, pageSize: 20 })
+    expect(requestSpy).toHaveBeenCalledTimes(1)
+    expect(requestSpy).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        method: 'GET',
+        url: VERSIONS_URL,
+        params: expect.objectContaining({ page: 1, pageSize: 20 })
+      })
     )
-    expect(listVersionsService.mock.calls[0][1]).not.toHaveProperty('skipCache')
+    expect(requestSpy.mock.calls[0][0].params).not.toHaveProperty('skipCache')
 
     await vi.advanceTimersByTimeAsync(VERSION_POLL_INTERVAL_MS - 1)
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(1)
+    expect(requestSpy).toHaveBeenCalledTimes(1)
 
     await vi.advanceTimersByTimeAsync(1)
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(2)
-    expect(listVersionsService).toHaveBeenLastCalledWith(
-      'dep-1',
-      expect.objectContaining({ skipCache: true })
+    expect(requestSpy).toHaveBeenCalledTimes(2)
+    expect(requestSpy).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        method: 'GET',
+        url: VERSIONS_URL,
+        params: expect.objectContaining({ skipCache: true })
+      })
     )
   })
 
   it('keeps re-fetching every interval while a transient version remains', async () => {
-    listVersionsService.mockResolvedValue({
-      body: [{ id: 'a1b2c3', state: 'queued' }],
-      count: 1
-    })
+    requestSpy.mockResolvedValue(listResponse([{ id: 'a1b2c3', state: 'queued' }]))
 
     mountTab()
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(1)
+    expect(requestSpy).toHaveBeenCalledTimes(1)
 
     await vi.advanceTimersByTimeAsync(VERSION_POLL_INTERVAL_MS)
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(2)
+    expect(requestSpy).toHaveBeenCalledTimes(2)
 
     await vi.advanceTimersByTimeAsync(VERSION_POLL_INTERVAL_MS)
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(3)
+    expect(requestSpy).toHaveBeenCalledTimes(3)
   })
 
   it('stops polling once every version reaches a terminal state (ready/error)', async () => {
-    listVersionsService.mockResolvedValue({
-      body: [{ id: 'a1b2c3', state: 'building' }],
-      count: 1
-    })
+    requestSpy.mockResolvedValue(listResponse([{ id: 'a1b2c3', state: 'building' }]))
 
     mountTab()
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(1)
+    expect(requestSpy).toHaveBeenCalledTimes(1)
 
     await vi.advanceTimersByTimeAsync(VERSION_POLL_INTERVAL_MS)
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(2)
+    expect(requestSpy).toHaveBeenCalledTimes(2)
 
-    listVersionsService.mockResolvedValue({
-      body: [
+    requestSpy.mockResolvedValue(
+      listResponse([
         { id: 'a1b2c3', state: 'ready' },
         { id: 'd4e5f6', state: 'error' }
-      ],
-      count: 2
-    })
+      ])
+    )
 
     await vi.advanceTimersByTimeAsync(VERSION_POLL_INTERVAL_MS)
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(3)
+    expect(requestSpy).toHaveBeenCalledTimes(3)
 
     await vi.advanceTimersByTimeAsync(VERSION_POLL_INTERVAL_MS * 3)
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(3)
+    expect(requestSpy).toHaveBeenCalledTimes(3)
   })
 
   it('does not poll at all when the initial load has no transient versions', async () => {
-    listVersionsService.mockResolvedValue({
-      body: [{ id: 'a1b2c3', state: 'ready' }],
-      count: 1
-    })
+    requestSpy.mockResolvedValue(listResponse([{ id: 'a1b2c3', state: 'ready' }]))
 
     mountTab()
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(1)
+    expect(requestSpy).toHaveBeenCalledTimes(1)
 
     await vi.advanceTimersByTimeAsync(VERSION_POLL_INTERVAL_MS * 4)
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(1)
+    expect(requestSpy).toHaveBeenCalledTimes(1)
   })
 
   it('clears the poll timer on unmount so no fetch fires afterwards', async () => {
-    listVersionsService.mockResolvedValue({
-      body: [{ id: 'a1b2c3', state: 'building' }],
-      count: 1
-    })
+    requestSpy.mockResolvedValue(listResponse([{ id: 'a1b2c3', state: 'building' }]))
 
     const wrapper = mountTab()
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(1)
+    expect(requestSpy).toHaveBeenCalledTimes(1)
 
     wrapper.unmount()
 
     await vi.advanceTimersByTimeAsync(VERSION_POLL_INTERVAL_MS * 3)
     await flush()
-    expect(listVersionsService).toHaveBeenCalledTimes(1)
+    expect(requestSpy).toHaveBeenCalledTimes(1)
   })
 })
 
 describe('VersionHistoryTab — read-only row contract', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    listVersionsService.mockReset()
-    listVersionsService.mockResolvedValue({
-      body: [
+    setupBoundary()
+    requestSpy.mockResolvedValue(
+      listResponse([
         { id: 'a1b2c3d4e5', state: 'ready' },
         { id: 'f6g7h8i9j0', state: 'error' }
-      ],
-      count: 2
-    })
+      ])
+    )
   })
 
   afterEach(() => {
@@ -265,7 +272,7 @@ describe('VersionHistoryTab — read-only row contract', () => {
 describe('VersionHistoryTab — active vs historical derives from state', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    listVersionsService.mockReset()
+    setupBoundary()
   })
 
   afterEach(() => {
@@ -273,15 +280,14 @@ describe('VersionHistoryTab — active vs historical derives from state', () => 
   })
 
   it('marks ready/active as Active and everything else as Historical', async () => {
-    listVersionsService.mockResolvedValue({
-      body: [
+    requestSpy.mockResolvedValue(
+      listResponse([
         { id: 'ready01', state: 'ready' },
         { id: 'active01', state: 'active' },
         { id: 'archived01', state: 'archived' },
         { id: 'draft01', state: 'draft' }
-      ],
-      count: 4
-    })
+      ])
+    )
 
     const wrapper = mountTab()
     await flush()

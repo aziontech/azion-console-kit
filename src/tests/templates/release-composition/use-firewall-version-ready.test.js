@@ -1,15 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref, effectScope, nextTick } from 'vue'
 import { flushPromises } from '@vue/test-utils'
-
-vi.mock('@/services/v2/edge-firewall/edge-firewall-version-service', () => ({
-  edgeFirewallVersionService: {
-    loadVersion: vi.fn()
-  }
-}))
-
-import { edgeFirewallVersionService } from '@/services/v2/edge-firewall/edge-firewall-version-service'
+import { httpService } from '@/services/v2/base/http/httpService'
+import { queryClient } from '@/services/v2/base/query/queryClient'
 import { useFirewallVersionReady } from '@/templates/release-composition/use-firewall-version-ready'
+
+/**
+ * Real service under test: the composable runs the real `edgeFirewallVersionService`
+ * (loadVersion → adapter normalization). Only the boundaries are stubbed — the
+ * HTTP client (`httpService.request`) and the query cache (`queryClient.ensureQueryData`,
+ * short-circuited to the fetch). Readiness is asserted by observing the HTTP call
+ * the composable drives and the refs it exposes.
+ */
 
 const runInScope = (factory) => {
   const scope = effectScope()
@@ -17,35 +19,40 @@ const runInScope = (factory) => {
   return { exposed, dispose: () => scope.stop() }
 }
 
+const versionUrl = (fwId, verId) => `v4/workspace/firewalls/${fwId}/versions/${verId}`
+
+let requestSpy
+
 beforeEach(() => {
   vi.spyOn(console, 'error').mockImplementation(() => {})
+  vi.spyOn(queryClient, 'ensureQueryData').mockImplementation(({ queryFn }) => queryFn())
+  requestSpy = vi.spyOn(httpService, 'request')
 })
 
 afterEach(() => {
   vi.restoreAllMocks()
-  edgeFirewallVersionService.loadVersion.mockReset()
 })
 
 describe('useFirewallVersionReady - gated off', () => {
-  it('should not call loadVersion and stay not ready when versionId is null', async () => {
+  it('should not request and stay not ready when versionId is null', async () => {
     const { exposed, dispose } = runInScope(() =>
       useFirewallVersionReady({ firewallId: ref('fw-1'), versionId: ref(null), enabled: true })
     )
     await flushPromises()
 
-    expect(edgeFirewallVersionService.loadVersion).not.toHaveBeenCalled()
+    expect(requestSpy).not.toHaveBeenCalled()
     expect(exposed.isReady.value).toBe(false)
 
     dispose()
   })
 
-  it('should not call loadVersion when enabled is false', async () => {
+  it('should not request when enabled is false', async () => {
     const { exposed, dispose } = runInScope(() =>
       useFirewallVersionReady({ firewallId: ref('fw-1'), versionId: ref('v-1'), enabled: false })
     )
     await flushPromises()
 
-    expect(edgeFirewallVersionService.loadVersion).not.toHaveBeenCalled()
+    expect(requestSpy).not.toHaveBeenCalled()
     expect(exposed.isReady.value).toBe(false)
 
     dispose()
@@ -54,7 +61,7 @@ describe('useFirewallVersionReady - gated off', () => {
 
 describe('useFirewallVersionReady - ready state', () => {
   it('should set isReady true and toggle isLoading when the version state is ready', async () => {
-    edgeFirewallVersionService.loadVersion.mockResolvedValue({ state: 'ready' })
+    requestSpy.mockResolvedValue({ data: { version_id: 'v-2', state: 'ready' } })
 
     const { exposed, dispose } = runInScope(() =>
       useFirewallVersionReady({ firewallId: ref('fw-2'), versionId: ref('v-2'), enabled: true })
@@ -63,7 +70,7 @@ describe('useFirewallVersionReady - ready state', () => {
     expect(exposed.isLoading.value).toBe(true)
     await flushPromises()
 
-    expect(edgeFirewallVersionService.loadVersion).toHaveBeenCalledWith('fw-2', 'v-2')
+    expect(requestSpy).toHaveBeenCalledWith({ method: 'GET', url: versionUrl('fw-2', 'v-2') })
     expect(exposed.isReady.value).toBe(true)
     expect(exposed.hasError.value).toBe(false)
     expect(exposed.isLoading.value).toBe(false)
@@ -71,8 +78,8 @@ describe('useFirewallVersionReady - ready state', () => {
     dispose()
   })
 
-  it('should set isReady true using the version_state fallback key', async () => {
-    edgeFirewallVersionService.loadVersion.mockResolvedValue({ version_state: 'ready' })
+  it('should set isReady true using the version_state key', async () => {
+    requestSpy.mockResolvedValue({ data: { version_id: 'v-3', version_state: 'ready' } })
 
     const { exposed, dispose } = runInScope(() =>
       useFirewallVersionReady({ firewallId: ref('fw-3'), versionId: ref('v-3'), enabled: true })
@@ -89,7 +96,7 @@ describe('useFirewallVersionReady - non-ready states', () => {
   it.each(['draft', 'building', 'active'])(
     'should keep isReady false when the version state is %s',
     async (state) => {
-      edgeFirewallVersionService.loadVersion.mockResolvedValue({ state })
+      requestSpy.mockResolvedValue({ data: { version_id: 'v-4', state } })
 
       const { exposed, dispose } = runInScope(() =>
         useFirewallVersionReady({ firewallId: ref('fw-4'), versionId: ref('v-4'), enabled: true })
@@ -105,8 +112,8 @@ describe('useFirewallVersionReady - non-ready states', () => {
 })
 
 describe('useFirewallVersionReady - error degradation', () => {
-  it('should degrade to not ready with hasError when loadVersion rejects', async () => {
-    edgeFirewallVersionService.loadVersion.mockRejectedValue(new Error('load boom'))
+  it('should degrade to not ready with hasError when the request rejects', async () => {
+    requestSpy.mockRejectedValue(new Error('load boom'))
 
     const { exposed, dispose } = runInScope(() =>
       useFirewallVersionReady({ firewallId: ref('fw-5'), versionId: ref('v-5'), enabled: true })
@@ -122,10 +129,10 @@ describe('useFirewallVersionReady - error degradation', () => {
 })
 
 describe('useFirewallVersionReady - retry', () => {
-  it('should re-run loadVersion for the current keys when retry is invoked after a failure', async () => {
-    edgeFirewallVersionService.loadVersion
+  it('should re-request for the current keys when retry is invoked after a failure', async () => {
+    requestSpy
       .mockRejectedValueOnce(new Error('transient boom'))
-      .mockResolvedValueOnce({ state: 'ready' })
+      .mockResolvedValueOnce({ data: { version_id: 'v-8', state: 'ready' } })
 
     const { exposed, dispose } = runInScope(() =>
       useFirewallVersionReady({ firewallId: ref('fw-8'), versionId: ref('v-8'), enabled: true })
@@ -138,16 +145,16 @@ describe('useFirewallVersionReady - retry', () => {
     await exposed.retry()
     await flushPromises()
 
-    expect(edgeFirewallVersionService.loadVersion).toHaveBeenLastCalledWith('fw-8', 'v-8')
+    expect(requestSpy).toHaveBeenLastCalledWith({ method: 'GET', url: versionUrl('fw-8', 'v-8') })
     expect(exposed.hasError.value).toBe(false)
     expect(exposed.isReady.value).toBe(true)
 
     dispose()
   })
 
-  it('should re-run loadVersion when versionId changes', async () => {
-    edgeFirewallVersionService.loadVersion.mockImplementation((_fwId, verId) =>
-      Promise.resolve(verId === 'v-7' ? { state: 'ready' } : { state: 'draft' })
+  it('should re-request when versionId changes', async () => {
+    requestSpy.mockImplementation(({ url }) =>
+      Promise.resolve({ data: { state: url.endsWith('v-7') ? 'ready' : 'draft' } })
     )
 
     const versionId = ref('v-6')
@@ -162,7 +169,7 @@ describe('useFirewallVersionReady - retry', () => {
     await nextTick()
     await flushPromises()
 
-    expect(edgeFirewallVersionService.loadVersion).toHaveBeenLastCalledWith('fw-6', 'v-7')
+    expect(requestSpy).toHaveBeenLastCalledWith({ method: 'GET', url: versionUrl('fw-6', 'v-7') })
     expect(exposed.isReady.value).toBe(true)
 
     dispose()

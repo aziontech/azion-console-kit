@@ -1,42 +1,27 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+import { flushPromises } from '@vue/test-utils'
 
 /**
  * Single shared action router (task 3.1). Asserts that every listing routes the
  * 5 menu actions identically: OPEN_CONFIGURATION → router.push by resourceType;
  * PROMOTE → drawer with { scopedType, pin, workloadId }; ROLLBACK → no-op;
- * ARCHIVE/DELETE → delegated to use-version-row-actions (the only mutation seam).
+ * ARCHIVE/DELETE → run through the REAL use-version-row-actions seam (Archive fires
+ * the service mutation immediately; Delete opens the confirm dialog first). Only
+ * the toast boundary is stubbed; the row-actions composable executes for real, so
+ * the delegation is proven by the service call / dialog it produces, not by a mock.
  */
 
-const rowHandle = vi.fn()
-const rowActionsApi = {
-  handleRowAction: rowHandle,
-  dialogConfig: { value: null },
-  dialogProps: { value: {} },
-  dialogVisible: { value: false },
-  isExecuting: { value: false },
-  handleConfirm: vi.fn(),
-  handleVisibility: vi.fn()
-}
-vi.mock('@/composables/versioning/use-version-row-actions', () => ({
-  useVersionRowActions: vi.fn(() => rowActionsApi)
-}))
-// The driver now calls useToast directly for NEW_DRAFT_FROM errors; provide a stub.
+// Toast is the external boundary shared by the driver and the row-actions seam.
 vi.mock('@aziontech/webkit/use-toast', () => ({ useToast: () => ({ add: vi.fn() }) }))
 
 import {
   useVersionMenuActions,
   RESOURCE_VERSION_ROUTES
 } from '@/composables/versioning/use-version-menu-actions'
-import { useVersionRowActions } from '@/composables/versioning/use-version-row-actions'
 
 const item = { id: 'v123', state: 'ready' }
 
 const makeRouter = () => ({ push: vi.fn() })
-
-beforeEach(() => {
-  rowHandle.mockReset()
-  useVersionRowActions.mockClear()
-})
 
 describe('useVersionMenuActions — OPEN_CONFIGURATION navigation', () => {
   const cases = Object.entries(RESOURCE_VERSION_ROUTES)
@@ -182,12 +167,14 @@ describe('useVersionMenuActions — PROMOTE drawer', () => {
 })
 
 describe('useVersionMenuActions — ROLLBACK deferred', () => {
-  it('does nothing (no navigation, no delegation)', () => {
+  it('does nothing (no navigation, no drawer, no mutation)', () => {
     const router = makeRouter()
     const openPromoteDrawer = vi.fn()
+    const versionService = { archive: vi.fn(), deleteVersion: vi.fn() }
     const api = useVersionMenuActions({
       resourceType: 'application',
       resourceId: 'res9',
+      versionService,
       router,
       openPromoteDrawer
     })
@@ -196,28 +183,19 @@ describe('useVersionMenuActions — ROLLBACK deferred', () => {
 
     expect(router.push).not.toHaveBeenCalled()
     expect(openPromoteDrawer).not.toHaveBeenCalled()
-    expect(rowHandle).not.toHaveBeenCalled()
+    expect(versionService.archive).not.toHaveBeenCalled()
+    expect(versionService.deleteVersion).not.toHaveBeenCalled()
   })
 })
 
-describe('useVersionMenuActions — ARCHIVE/DELETE delegation', () => {
-  it.each(['ARCHIVE', 'DELETE'])('delegates %s to use-version-row-actions', (action) => {
-    const api = useVersionMenuActions({
-      resourceType: 'application',
-      resourceId: 'res9',
-      versionService: {},
-      router: makeRouter()
-    })
-
-    api.handleRowAction({ action, item })
-
-    expect(rowHandle).toHaveBeenCalledWith({ action, item })
-  })
-
-  it('forwards resourceId/service/onSuccess into use-version-row-actions', () => {
-    const versionService = { archive: vi.fn(), deleteVersion: vi.fn() }
+describe('useVersionMenuActions — ARCHIVE/DELETE run through the row-actions seam', () => {
+  it('ARCHIVE fires the archive mutation immediately with a comment, then onSuccess', async () => {
+    const versionService = {
+      archive: vi.fn().mockResolvedValue(undefined),
+      deleteVersion: vi.fn()
+    }
     const onSuccess = vi.fn()
-    useVersionMenuActions({
+    const api = useVersionMenuActions({
       resourceType: 'application',
       resourceId: 'res9',
       versionService,
@@ -225,24 +203,63 @@ describe('useVersionMenuActions — ARCHIVE/DELETE delegation', () => {
       onSuccess
     })
 
-    expect(useVersionRowActions).toHaveBeenCalledWith({
-      resourceId: 'res9',
-      service: versionService,
-      onSuccess
-    })
+    api.handleRowAction({ action: 'ARCHIVE', item })
+
+    expect(versionService.archive).toHaveBeenCalledWith(
+      'res9',
+      'v123',
+      expect.objectContaining({ comment: expect.any(String) })
+    )
+    expect(versionService.deleteVersion).not.toHaveBeenCalled()
+    await flushPromises()
+    expect(onSuccess).toHaveBeenCalledTimes(1)
   })
 
-  it('re-exposes the row-actions dialog state/handlers for the host', () => {
+  it('DELETE opens the confirmation dialog and defers the mutation until confirmed', async () => {
+    const versionService = {
+      archive: vi.fn(),
+      deleteVersion: vi.fn().mockResolvedValue(undefined)
+    }
+    const onSuccess = vi.fn()
     const api = useVersionMenuActions({
       resourceType: 'application',
       resourceId: 'res9',
+      versionService,
+      router: makeRouter(),
+      onSuccess
+    })
+
+    api.handleRowAction({ action: 'DELETE', item })
+
+    // Opening the dialog is the observable delegation: the destructive confirm is
+    // wired and no mutation has fired yet.
+    expect(api.dialogVisible.value).toBe(true)
+    expect(api.dialogConfig.value).not.toBeNull()
+    expect(versionService.deleteVersion).not.toHaveBeenCalled()
+
+    api.handleConfirm()
+
+    expect(versionService.deleteVersion).toHaveBeenCalledWith('res9', 'v123')
+    await flushPromises()
+    expect(onSuccess).toHaveBeenCalledTimes(1)
+  })
+
+  it('closing the dialog via handleVisibility cancels the pending delete', () => {
+    const versionService = { archive: vi.fn(), deleteVersion: vi.fn() }
+    const api = useVersionMenuActions({
+      resourceType: 'application',
+      resourceId: 'res9',
+      versionService,
       router: makeRouter()
     })
 
-    expect(api.dialogConfig).toBe(rowActionsApi.dialogConfig)
-    expect(api.dialogProps).toBe(rowActionsApi.dialogProps)
-    expect(api.dialogVisible).toBe(rowActionsApi.dialogVisible)
-    expect(api.handleConfirm).toBe(rowActionsApi.handleConfirm)
-    expect(api.handleVisibility).toBe(rowActionsApi.handleVisibility)
+    api.handleRowAction({ action: 'DELETE', item })
+    expect(api.dialogVisible.value).toBe(true)
+
+    api.handleVisibility(false)
+
+    expect(api.dialogVisible.value).toBe(false)
+    api.handleConfirm()
+    expect(versionService.deleteVersion).not.toHaveBeenCalled()
   })
 })

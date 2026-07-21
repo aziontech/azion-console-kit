@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
 
 /**
  * Governance — Version Shell readOnly (single source of truth).
@@ -15,8 +16,11 @@ import { fileURLToPath } from 'node:url'
  * (b) a versioned form stops consuming the central flag — the exact regression that
  * left Firewall/WAF/CustomPages/Functions editable while Ready.
  */
-const read = (relative) =>
-  readFileSync(fileURLToPath(new URL(`../../../../${relative}`, import.meta.url)), 'utf8')
+// Resolve from the repo root via the current file's directory. NOTE: do NOT use
+// `new URL(dynamicPath, import.meta.url)` — Vite rewrites that pattern as a static
+// asset import and cannot resolve a dynamic argument, yielding a bogus path.
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../')
+const read = (relative) => readFileSync(resolve(REPO_ROOT, relative), 'utf8')
 
 // Form components rendered inside the version editors. Each MUST read the central
 // readOnly flag. Listing a new versioned form here without consuming readOnly fails.

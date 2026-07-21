@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
 
 // The uniform rollback/redeploy contract lives in two places: the shared
 // controller (`useReleaseDrawerController`, behaviorally tested in the composable
@@ -9,7 +10,7 @@ import { fileURLToPath } from 'node:url'
 // pattern or to a no-op action where it should be hidden.
 
 const read = (relative) =>
-  readFileSync(fileURLToPath(new URL(`../../../${relative}`, import.meta.url)), 'utf8')
+  readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), `../../../${relative}`), 'utf8')
 
 const CONSUMERS = {
   ReleasesTab: {

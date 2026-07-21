@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
 import {
   buildVersionMenuItems,
   mapVersionMenuItemsToMenu
@@ -18,7 +19,10 @@ const ALL_STATES = [...Object.values(VERSION_STATES), 'deleted', 'totally-unknow
 const byAction = (items, action) => items.find((entry) => entry.action === action)
 
 const VERSION_ACTIONS_SRC = readFileSync(
-  fileURLToPath(new URL('../../../composables/versioning/version-actions.js', import.meta.url)),
+  resolve(
+    dirname(fileURLToPath(import.meta.url)),
+    '../../../composables/versioning/version-actions.js'
+  ),
   'utf8'
 )
 

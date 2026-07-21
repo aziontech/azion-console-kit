@@ -35,9 +35,9 @@ vi.mock('@aziontech/webkit/prime-tag', () => ({
     template: '<span :data-value="value">{{ value }}</span>'
   }
 }))
-vi.mock('@/templates/version-shell-block/components/ProcessingOverlay.vue', () => ({
-  default: { name: 'ProcessingOverlay', template: '<div data-testid="overlay" />' }
-}))
+// ProcessingOverlay is the real versioning component: for the built states these
+// tests use (ready/active) it renders nothing (`v-if="isProcessing(state)"`), so
+// no stub is needed — mocking it would mask a regression in that guard.
 
 vi.mock('@/helpers/convert-date', () => ({
   formatExhibitionDate: () => 'Jan 1, 2026',

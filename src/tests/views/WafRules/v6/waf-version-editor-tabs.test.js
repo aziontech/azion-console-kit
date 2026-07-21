@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import VersionEditorTabs from '@/views/WafRules/v6/tabs/VersionEditorTabs.vue'
 import ListWafRulesAllowed from '@/views/WafRules/ListWafRulesAllowed.vue'
 import FormFieldsWafRules from '@/views/WafRules/FormFields/FormFieldsWafRules.vue'
+import { wafVersionService } from '@/services/v2/waf/waf-version-service'
 
 // Task 8.5 (optional): WAF version editor composition. The version editor body
 // exposes exactly Main Settings + Allowed Rules scoped to (wafId, versionId),
@@ -36,12 +37,8 @@ vi.mock('@/services/v2/waf/versioned/versioned-waf-exceptions-service', () => ({
   }
 }))
 
-vi.mock('@/services/v2/waf/waf-version-service', () => ({
-  wafVersionService: {
-    useLoadVersionQuery: vi.fn(() => ({ data: ref(null), isLoading: ref(false) })),
-    useListVersionsQuery: vi.fn(() => ({ data: ref({ body: [] }) }))
-  }
-}))
+// The REAL wafVersionService is used; only its query hooks (a data-fetch boundary)
+// are stubbed via vi.spyOn — the module itself is never mocked out.
 
 // Capture the `tabs` descriptor handed to the shared shell.
 let capturedTabs = []
@@ -57,6 +54,13 @@ const ShellStub = defineComponent({
 beforeEach(() => {
   capturedTabs = []
   vi.clearAllMocks()
+  vi.spyOn(wafVersionService, 'useLoadVersionQuery').mockReturnValue({
+    data: ref(null),
+    isLoading: ref(false)
+  })
+  vi.spyOn(wafVersionService, 'useListVersionsQuery').mockReturnValue({
+    data: ref({ body: [] })
+  })
 })
 
 afterEach(() => {

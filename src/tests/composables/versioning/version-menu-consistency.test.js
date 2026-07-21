@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
 
 /**
  * Property P6 — menu consistency across listings (task 7.3).
@@ -11,22 +12,11 @@ import { fileURLToPath } from 'node:url'
  *   (b) each renders an IDENTICAL menu — same set, order and enablement — built
  *       by the shared `mapVersionMenuItemsToMenu`, regardless of `resourceType`.
  * Divergence by listing is forbidden by construction (Req 1.4, 10.1, NFR-B.1).
+ *
+ * The driver runs the REAL use-version-row-actions seam; only the toast boundary
+ * is stubbed. Delegation is proven by the service call / dialog each action drives.
  */
 
-const rowHandle = vi.fn()
-const rowActionsApi = {
-  handleRowAction: rowHandle,
-  dialogConfig: { value: null },
-  dialogProps: { value: {} },
-  dialogVisible: { value: false },
-  isExecuting: { value: false },
-  handleConfirm: vi.fn(),
-  handleVisibility: vi.fn()
-}
-vi.mock('@/composables/versioning/use-version-row-actions', () => ({
-  useVersionRowActions: vi.fn(() => rowActionsApi)
-}))
-// The driver now calls useToast directly for NEW_DRAFT_FROM errors; provide a stub.
 vi.mock('@aziontech/webkit/use-toast', () => ({ useToast: () => ({ add: vi.fn() }) }))
 
 import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
@@ -93,8 +83,11 @@ const DEPLOYABLE_LISTINGS = LISTINGS.filter(
   ({ resourceType }) => !VERSIONED_ONLY_TYPES.has(resourceType)
 )
 
-const readSource = (relative) =>
-  readFileSync(fileURLToPath(new URL(`../../../../${relative}`, import.meta.url)), 'utf8')
+// Resolve from the repo root via the current file's directory. NOTE: do NOT use
+// `new URL(dynamicPath, import.meta.url)` — Vite rewrites that pattern as a static
+// asset import and cannot resolve a dynamic argument, yielding a bogus path.
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../')
+const readSource = (relative) => readFileSync(resolve(REPO_ROOT, relative), 'utf8')
 
 // Drop the per-item `command` closures (identity differs across calls) so two
 // rendered models compare by their visible/structural shape (label/icon/
@@ -108,9 +101,9 @@ const stripCommands = (model) =>
 
 const item = { id: 'v123', state: 'ready' }
 const makeRouter = () => ({ push: vi.fn() })
-
-beforeEach(() => {
-  rowHandle.mockReset()
+const makeVersionService = () => ({
+  archive: vi.fn().mockResolvedValue(undefined),
+  deleteVersion: vi.fn().mockResolvedValue(undefined)
 })
 
 describe('P6 — every listing wires the shared driver (no local menu handling)', () => {
@@ -162,29 +155,53 @@ describe('P6 — identical rendered menu across listings for the same state', ()
 
 describe('P6 — identical routing across listings (same driver, same outcome)', () => {
   it.each(LISTINGS)(
-    '$name: ARCHIVE/DELETE delegate to the single row-actions seam',
+    '$name: ARCHIVE fires the service mutation identically through the seam',
     ({ resourceType }) => {
+      const versionService = makeVersionService()
       const api = useVersionMenuActions({
         resourceType,
         resourceId: 'res1',
-        versionService: {},
+        versionService,
         router: makeRouter()
       })
 
       api.handleRowAction({ action: 'ARCHIVE', item })
+
+      expect(versionService.archive).toHaveBeenCalledWith(
+        'res1',
+        'v123',
+        expect.objectContaining({ comment: expect.any(String) })
+      )
+    }
+  )
+
+  it.each(LISTINGS)(
+    '$name: DELETE opens the confirm dialog and defers the mutation identically',
+    ({ resourceType }) => {
+      const versionService = makeVersionService()
+      const api = useVersionMenuActions({
+        resourceType,
+        resourceId: 'res1',
+        versionService,
+        router: makeRouter()
+      })
+
       api.handleRowAction({ action: 'DELETE', item })
 
-      expect(rowHandle).toHaveBeenNthCalledWith(1, { action: 'ARCHIVE', item })
-      expect(rowHandle).toHaveBeenNthCalledWith(2, { action: 'DELETE', item })
+      expect(api.dialogVisible.value).toBe(true)
+      expect(api.dialogConfig.value).not.toBeNull()
+      expect(versionService.deleteVersion).not.toHaveBeenCalled()
     }
   )
 
   it.each(LISTINGS)('$name: ROLLBACK is an identical no-op (deferred)', ({ resourceType }) => {
     const router = makeRouter()
     const openPromoteDrawer = vi.fn()
+    const versionService = makeVersionService()
     const api = useVersionMenuActions({
       resourceType,
       resourceId: 'res1',
+      versionService,
       router,
       openPromoteDrawer
     })
@@ -193,6 +210,7 @@ describe('P6 — identical routing across listings (same driver, same outcome)',
 
     expect(router.push).not.toHaveBeenCalled()
     expect(openPromoteDrawer).not.toHaveBeenCalled()
-    expect(rowHandle).not.toHaveBeenCalled()
+    expect(versionService.archive).not.toHaveBeenCalled()
+    expect(versionService.deleteVersion).not.toHaveBeenCalled()
   })
 })

@@ -37,8 +37,11 @@ describe('useActiveVersions', () => {
   })
 
   it('aggregates across pages until the reported count is reached', async () => {
-    listResourceUsage.mockImplementation(({ page }) =>
-      page === 1
+    // Mirror the real service signature (`params = {}`): stay tolerant of an
+    // argument-less invocation (the runner's post-test cleanup calls the spy with
+    // no args) instead of destructuring a possibly-undefined param.
+    listResourceUsage.mockImplementation((params = {}) =>
+      params.page === 1
         ? Promise.resolve({ body: [wafRow('D1', 'a', 'V1', 'ACTIVE')], count: 2 })
         : Promise.resolve({ body: [wafRow('D2', 'b', 'V2', 'VALID_URL')], count: 2 })
     )

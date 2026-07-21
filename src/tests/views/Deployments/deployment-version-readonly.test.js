@@ -1,9 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { join, relative, sep } from 'node:path'
+import { join, relative, sep, dirname, resolve } from 'node:path'
 
-const DEPLOYMENTS_DIR = fileURLToPath(new URL('../../../../src/views/Deployments', import.meta.url))
+const DEPLOYMENTS_DIR = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../../src/views/Deployments'
+)
 
 const SOURCE_EXTENSIONS = ['.vue', '.js', '.ts', '.jsx', '.tsx']
 

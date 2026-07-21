@@ -1,29 +1,19 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { afterEach, describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { ref } from 'vue'
+import { httpService } from '@/services/v2/base/http/httpService'
+import { queryClient } from '@/services/v2/base/query/queryClient'
 import {
   createVersionCommandBus,
   VERSION_COMMAND_BUS_KEY
 } from '@/composables/versioning/use-version-command-bus'
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 
-// One spy per service method so we can assert the adapter routes to the shared
-// version service without any real HTTP.
-const makeServiceMock = () => ({
-  updateDraft: vi.fn().mockResolvedValue({ id: 'v1' }),
-  build: vi.fn().mockResolvedValue(undefined),
-  archive: vi.fn().mockResolvedValue(undefined),
-  cancelBuild: vi.fn().mockResolvedValue(undefined),
-  createDraft: vi.fn().mockResolvedValue({ id: 'v2', name: 'cloned draft' }),
-  deleteVersion: vi.fn().mockResolvedValue(undefined)
-})
-
-const { functionService } = vi.hoisted(() => ({ functionService: {} }))
-
-vi.mock('@/services/v2/edge-function/edge-function-version-service', () => ({
-  edgeFunctionVersionService: functionService
-}))
-
+/**
+ * The REAL edgeFunctionVersionService runs here; only the HTTP client and the
+ * query cache are stubbed. The adapter's routing is proven by the HTTP request the
+ * chain drives (method + url + body) — never by a mocked version service.
+ */
 import EdgeFunctionVersionAdapter from '@/views/EdgeFunctions/v6/EdgeFunctionVersionAdapter.vue'
 
 // Satisfies the real Function schema: name + code required, defaultArgs valid JSON.
@@ -52,8 +42,24 @@ const mountAdapter = ({ bus, resource = VALID_RESOURCE, context = makeContext(),
     }
   })
 
+const FN_URL = 'v4/workspace/functions/10/versions/v1'
+
+let requestSpy
+const countReq = (method, urlPart) =>
+  requestSpy.mock.calls
+    .map(([req]) => req)
+    .filter((req) => req.method === method && req.url.includes(urlPart)).length
+
 beforeEach(() => {
-  Object.assign(functionService, makeServiceMock())
+  vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+  vi.spyOn(queryClient, 'invalidateQueries').mockImplementation(() => {})
+  requestSpy = vi
+    .spyOn(httpService, 'request')
+    .mockResolvedValue({ data: { version_id: 'v2', state: 'draft', name: 'cloned draft' } })
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
 })
 
 describe('EdgeFunctionVersionAdapter — thin adapter delegating to useVersionFormAdapter', () => {
@@ -63,36 +69,40 @@ describe('EdgeFunctionVersionAdapter — thin adapter delegating to useVersionFo
     expect(wrapper.find('[data-testid="form-fields"]').exists()).toBe(true)
   })
 
-  it('SAVE updates the draft; SAVE_AND_BUILD updates then builds (default strategy)', async () => {
+  it('SAVE PATCHes the draft; SAVE_AND_BUILD PATCHes then POSTs /build (default strategy)', async () => {
     const bus = createVersionCommandBus()
     mountAdapter({ bus })
     await flushPromises()
 
     await bus.emit('SAVE', { resourceId: '10', versionId: 'v1' })
-    expect(functionService.updateDraft).toHaveBeenCalledWith(
-      '10',
-      'v1',
-      expect.objectContaining({ name: 'my-fn' })
-    )
-    expect(functionService.build).not.toHaveBeenCalled()
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'PATCH',
+      url: FN_URL,
+      body: expect.objectContaining({ name: 'my-fn' })
+    })
+    expect(countReq('POST', '/build')).toBe(0)
 
     await bus.emit('SAVE_AND_BUILD', { comment: 'ship it' })
-    expect(functionService.updateDraft).toHaveBeenCalledTimes(2)
-    expect(functionService.build).toHaveBeenCalledWith('10', 'v1', { comment: 'ship it' })
+    expect(countReq('PATCH', FN_URL)).toBe(2)
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: `${FN_URL}/build`,
+      body: { comment: 'ship it' }
+    })
   })
 
-  it('SAVE with invalid form rejects and never mutates the draft', async () => {
+  it('SAVE with invalid form rejects and never issues a write request', async () => {
     const bus = createVersionCommandBus()
     // `code` is required by the Function schema; an empty value fails validation.
     mountAdapter({ bus, resource: { name: 'my-fn', code: '', defaultArgs: '{}' } })
     await flushPromises()
 
     await expect(bus.emit('SAVE', { resourceId: '10', versionId: 'v1' })).rejects.toThrow()
-    expect(functionService.updateDraft).not.toHaveBeenCalled()
-    expect(functionService.build).not.toHaveBeenCalled()
+    expect(countReq('PATCH', FN_URL)).toBe(0)
+    expect(countReq('POST', '/build')).toBe(0)
   })
 
-  it('NEW_DRAFT_FROM clones the source version and returns the new draft', async () => {
+  it('NEW_DRAFT_FROM POSTs the clone and returns the normalized new draft', async () => {
     const bus = createVersionCommandBus()
     mountAdapter({ bus })
     await flushPromises()
@@ -102,41 +112,50 @@ describe('EdgeFunctionVersionAdapter — thin adapter delegating to useVersionFo
       versionId: 'v1',
       comment: 'clone'
     })
-    expect(functionService.createDraft).toHaveBeenCalledWith('10', {
-      sourceVersionId: 'v1',
-      comment: 'clone'
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: 'v4/workspace/functions/10/versions',
+      body: expect.objectContaining({ source_version: 'v1', comment: 'clone' })
     })
-    expect(draft).toEqual({ id: 'v2', name: 'cloned draft' })
+    // The service returns the adapter-normalized version (id at the root, resource
+    // fields under config) — not the raw API body.
+    expect(draft.id).toBe('v2')
+    expect(draft.config).toMatchObject({ name: 'cloned draft' })
   })
 
-  it('ARCHIVE / CANCEL_BUILD / DELETE route to the shared service', async () => {
+  it('ARCHIVE / CANCEL_BUILD / DELETE hit their endpoints', async () => {
     const bus = createVersionCommandBus()
     mountAdapter({ bus })
     await flushPromises()
 
     await bus.emit('ARCHIVE', { resourceId: '10', versionId: 'v1', comment: 'done' })
-    expect(functionService.archive).toHaveBeenCalledWith('10', 'v1', { comment: 'done' })
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: `${FN_URL}/archive`,
+      body: { comment: 'done' }
+    })
 
     await bus.emit('CANCEL_BUILD', { resourceId: '10', versionId: 'v1', comment: 'stop' })
-    expect(functionService.cancelBuild).toHaveBeenCalledWith('10', 'v1', { comment: 'stop' })
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'POST',
+      url: `${FN_URL}/cancel`,
+      body: { comment: 'stop' }
+    })
 
     await bus.emit('DELETE', { resourceId: '10', versionId: 'v1' })
-    expect(functionService.deleteVersion).toHaveBeenCalledWith('10', 'v1')
+    expect(requestSpy).toHaveBeenCalledWith({ method: 'DELETE', url: FN_URL })
   })
 })
 
 describe('EdgeFunctionVersionAdapter — read-only in an immutable version state', () => {
   // The form fields delegate code read-only to code-editor.vue, which reads the
-  // shared version context. Render the real editor through the adapter slot.
+  // shared version context. Render a probe that reflects the injected readOnly flag
+  // as an observable DOM attribute.
   const CodeEditorStub = {
     name: 'code-editor',
-    template: '<div data-testid="code-editor" />',
     inject: { versionCtx: { from: VERSION_CONTEXT_KEY } },
-    computed: {
-      editorReadOnly() {
-        return Boolean(this.versionCtx?.readOnly?.value)
-      }
-    }
+    template:
+      '<div data-testid="code-editor" :data-readonly="String(Boolean(versionCtx?.readOnly?.value))" />'
   }
 
   const FormFieldsStub = {
@@ -145,6 +164,9 @@ describe('EdgeFunctionVersionAdapter — read-only in an immutable version state
     template: '<div><code-editor-stub /></div>'
   }
 
+  const readonlyAttr = (wrapper) =>
+    wrapper.get('[data-testid="code-editor"]').attributes('data-readonly')
+
   it('exposes an editable context by default (mutable draft)', () => {
     const bus = createVersionCommandBus()
     const wrapper = mountAdapter({
@@ -152,7 +174,7 @@ describe('EdgeFunctionVersionAdapter — read-only in an immutable version state
       context: makeContext({ readOnly: ref(false) }),
       slot: FormFieldsStub
     })
-    expect(wrapper.findComponent(CodeEditorStub).vm.editorReadOnly).toBe(false)
+    expect(readonlyAttr(wrapper)).toBe('false')
   })
 
   it('propagates readOnly to the form + code editor when the version is immutable', () => {
@@ -162,6 +184,6 @@ describe('EdgeFunctionVersionAdapter — read-only in an immutable version state
       context: makeContext({ readOnly: ref(true) }),
       slot: FormFieldsStub
     })
-    expect(wrapper.findComponent(CodeEditorStub).vm.editorReadOnly).toBe(true)
+    expect(readonlyAttr(wrapper)).toBe('true')
   })
 })

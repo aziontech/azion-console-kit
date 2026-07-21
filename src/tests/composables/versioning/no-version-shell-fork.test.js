@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
 
 /**
  * Property P4 — no Version Shell fork (Req 8.1, 8.4, NFR-A.1).
@@ -11,7 +12,8 @@ import { fileURLToPath } from 'node:url'
  * artifact is added to the allowlist on purpose; a resource-prefixed clone is not.
  */
 
-const resolveDir = (relative) => fileURLToPath(new URL(`../../../../${relative}`, import.meta.url))
+const resolveDir = (relative) =>
+  resolve(dirname(fileURLToPath(import.meta.url)), `../../../../${relative}`)
 
 const listFiles = (relative) => {
   const dir = resolveDir(relative)
