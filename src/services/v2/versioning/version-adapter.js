@@ -1,10 +1,22 @@
 // Shared version adapter: common normalization + payload logic. Each resource
 // passes only its exceptions (`normalizeConfig`, `mapResourceFields`). Version
 // identity is `version_id` (per-version ULID), kept in one place to avoid drift.
+//
+// `stripUndefinedDeep` scrubs `undefined` at EVERY depth before the payload hits
+// the wire (JSON.stringify turns an in-array `undefined` into `null`, which the
+// API reads as an explicit value). It recurses into arrays too: `undefined`
+// entries are dropped and each surviving item is cleaned recursively (objects
+// inside arrays have their `undefined` fields removed). `null` is a legitimate
+// value and is always preserved. An empty array stays an empty array; only
+// OBJECTS that become empty after stripping collapse to `undefined`.
 
 export const stripUndefinedDeep = (obj) => {
   if (obj === undefined) return undefined
-  if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) return obj
+  if (obj === null || typeof obj !== 'object') return obj
+
+  if (Array.isArray(obj)) {
+    return obj.map(stripUndefinedDeep).filter((item) => item !== undefined)
+  }
 
   const result = {}
   for (const [key, value] of Object.entries(obj)) {

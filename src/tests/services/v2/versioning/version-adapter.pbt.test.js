@@ -11,11 +11,13 @@ import { VERSION_STATES } from '@/composables/versioning/version-machine'
  *   - mapResourceFields: identity over the arbitrary body.
  *
  * Properties assert the REAL source behavior — notably that `stripUndefinedDeep`
- * treats arrays as OPAQUE LEAVES (it never recurses into them), so undefined is
- * only stripped from object-property positions while arrays are preserved verbatim.
+ * recurses into arrays too: `undefined` entries are dropped and each surviving
+ * item is cleaned recursively, so NO `undefined` survives at any depth (an
+ * in-array `undefined` would otherwise become `null` on the wire). `null` is a
+ * legitimate value and is preserved; arrays stay arrays (empty ones included).
  *
- *   a) transformDraftPayload strips undefined from every object-property depth;
- *      null and arrays pass through exactly.
+ *   a) transformDraftPayload strips undefined at EVERY depth, including inside
+ *      arrays; null and array structure are preserved, undefined entries removed.
  *   b) source_version / comment sit at the ROOT when defined, absent when undefined.
  *   c) normalizeVersion: id = version_id, state preserved, config = normalizeConfig(raw),
  *      and meta.* takes precedence over the flat keys when both are present.
@@ -67,40 +69,74 @@ const containsUndefinedDeep = (value) => {
   return Object.values(value).some(containsUndefinedDeep)
 }
 
-// A node that never contains `undefined` anywhere — used for array contents so
-// arrays remain clean (the adapter preserves them opaquely, undefined and all).
 const cleanLeafArb = fc.oneof(fc.integer(), fc.string(), fc.boolean(), fc.constant(null))
-const { cleanNode } = fc.letrec((tie) => ({
-  cleanNode: fc.oneof(
-    cleanLeafArb,
-    fc.array(tie('cleanNode'), { maxLength: 4 }),
-    fc.dictionary(safeKeyArb, tie('cleanNode'), { maxKeys: 4 })
+
+// A node that MAY hold `undefined` in ANY position — leaf, array entry, or object
+// field — at any depth. This is what exercises the array-recursion fix: arrays are
+// no longer opaque, so undefined must be scrubbed from inside them too.
+const dirtyLeafArb = fc.oneof(cleanLeafArb, fc.constant(undefined))
+const { dirtyNode } = fc.letrec((tie) => ({
+  dirtyNode: fc.oneof(
+    dirtyLeafArb,
+    fc.array(tie('dirtyNode'), { maxLength: 4 }),
+    fc.dictionary(safeKeyArb, tie('dirtyNode'), { maxKeys: 4 })
   )
 }))
 
-// A node whose object-property positions MAY be undefined (to exercise stripping),
-// while its arrays only ever hold clean nodes.
-const { strippableNode } = fc.letrec((tie) => ({
-  strippableNode: fc.oneof(
-    fc.oneof(cleanLeafArb, fc.constant(undefined)),
-    fc.array(cleanNode, { maxLength: 4 }),
-    fc.dictionary(safeKeyArb, tie('strippableNode'), { maxKeys: 4 })
-  )
-}))
+const dirtyObjArb = fc.dictionary(safeKeyArb, dirtyNode, { maxKeys: 6 })
 
-const strippableObjArb = fc.dictionary(safeKeyArb, strippableNode, { maxKeys: 6 })
+// Independent reference implementation of the expected cleaning, written with
+// explicit loops (not the SUT's map/filter) so it is a genuine oracle: drop
+// `undefined` everywhere (array entries AND object fields), keep `null`, keep
+// arrays as arrays, collapse only empty OBJECTS to `undefined`.
+const referenceClean = (value) => {
+  if (value === undefined) return undefined
+  if (value === null || typeof value !== 'object') return value
+  if (Array.isArray(value)) {
+    const out = []
+    for (const item of value) {
+      const cleaned = referenceClean(item)
+      if (cleaned !== undefined) out.push(cleaned)
+    }
+    return out
+  }
+  const out = {}
+  for (const key of Object.keys(value)) {
+    const cleaned = referenceClean(value[key])
+    if (cleaned !== undefined) out[key] = cleaned
+  }
+  return Object.keys(out).length > 0 ? out : undefined
+}
 
 const optionalString = fc.option(fc.string(), { nil: undefined })
 
 describe('version-adapter — property-based (Property 6)', () => {
-  it('a) transformDraftPayload strips undefined at every object depth; null/arrays preserved', () => {
+  it('a) transformDraftPayload strips undefined at EVERY depth incl. inside arrays; null/array structure preserved', () => {
     fc.assert(
-      fc.property(strippableObjArb, fc.array(cleanNode, { maxLength: 5 }), (body, keptArray) => {
-        const input = { ...body, keptArray, keptNull: null }
+      fc.property(dirtyObjArb, (body) => {
+        // Explicit markers make the intent legible; the oracle equality below
+        // proves it generically. `comment`/`sourceVersionId` are excluded from
+        // the arbitrary keys, so the payload is exactly the cleaned body.
+        const input = {
+          ...body,
+          keptNull: null,
+          keptNulls: [null, null],
+          dirtyArray: [1, undefined, null, { keep: 7, gone: undefined }],
+          emptyAfterStrip: [undefined, undefined]
+        }
         const payload = adapter.transformDraftPayload(input)
+
+        // No `undefined` survives anywhere — leaf, array entry, or nested field.
         expect(containsUndefinedDeep(payload)).toBe(false)
-        expect(payload.keptArray).toEqual(keptArray)
+        // `null` is preserved verbatim, at the root and inside arrays.
         expect(payload.keptNull).toBe(null)
+        expect(payload.keptNulls).toEqual([null, null])
+        // Arrays stay arrays: undefined entries dropped, object items cleaned,
+        // an all-undefined array collapses to an empty array (never undefined).
+        expect(payload.dirtyArray).toEqual([1, null, { keep: 7 }])
+        expect(payload.emptyAfterStrip).toEqual([])
+        // Full oracle: equals the independently-computed clean form.
+        expect(payload).toEqual(referenceClean(input))
       }),
       { numRuns: NUM_RUNS }
     )
