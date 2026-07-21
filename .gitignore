@@ -36,6 +36,10 @@ package-lock.json
 .env.*
 !.env.sample
 
+# Mutation testing (StrykerJS)
+reports/mutation
+.stryker-tmp
+
 #azion vulcan folder
 #azion
 .edge
@@ -66,3 +70,9 @@ AGENTS.md
 .kiro/
 /specs
 storybook/yarn.lock
+
+# Test run artifacts (spec versioning-test-coverage)
+.vitest-attachments
+playwright-report
+test-results
+src/tests/functional/__screenshots__

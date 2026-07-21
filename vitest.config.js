@@ -17,6 +17,9 @@ export default mergeConfig(
       },
       exclude: [
         ...configDefaults.exclude,
+        // Functional suite runs in BROWSER MODE via vitest.functional.config.js —
+        // it must never run under jsdom (real-browser assertions would fail).
+        'src/tests/functional/**',
         'azion',
         '.vscode',
         '.husky',
@@ -36,7 +39,9 @@ export default mergeConfig(
           'src/plugins/**',
           'src/modules/**'
         ],
-        reporter: ['text', 'lcov', 'html'],
+        // 'json' emits coverage-final.json (Istanbul), consumed by the merge script
+        // to build the unified Sonar lcov (scripts/merge-coverage.mjs, spec task 14.1).
+        reporter: ['text', 'lcov', 'html', 'json'],
         reportsDirectory: './coverage/unit'
       },
       reporters: ['default', 'vitest-sonar-reporter'],

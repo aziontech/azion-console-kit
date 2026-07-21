@@ -14,6 +14,10 @@ Module._resolveFilename = function (request, parent, isMain, options) {
 
 module.exports = {
   root: true,
+  // Binary test artifacts (browser-mode screenshots, vitest attachments) are not
+  // source: the anti-placebo lint globs match their `*version*`/`__screenshots__`
+  // paths, so exclude them explicitly to avoid parse errors on non-JS files.
+  ignorePatterns: ['**/__screenshots__/**', '**/*.png', '.vitest-attachments/**'],
   // Register security/xss/no-unsanitized plugins so eslint-disable directives for their rules
   // (added for .eslintrc-security.cjs) don't fail this main lint pass. Rule severities for those
   // plugins are configured in .eslintrc-security.cjs — here they stay 'off' (default).
@@ -65,9 +69,39 @@ module.exports = {
         'azion-architecture/no-raw-design-values': 'error'
       }
     },
+    // NOTE: the legacy cypress override was removed here (spec
+    // versioning-test-coverage, req 8.5): the cypress/ tree no longer exists in
+    // the repo and eslint-plugin-cypress is not installed — the block was dead
+    // config that broke any eslint invocation resolving it.
     {
-      files: ['cypress/**/*.{cy,spec}.{js,ts,jsx,tsx}'],
-      extends: ['plugin:cypress/recommended']
+      // Anti-placebo test rules (spec versioning-test-coverage, req 1.x).
+      // RATCHET SCOPE: the hard bar applies only to versioning test paths and
+      // the new tests/ tree — legacy tests are grandfathered (design ADR 7.8).
+      // Source of truth: .claude/rules/testing-versioning.md
+      files: [
+        'src/tests/**/*version*',
+        'src/tests/**/versioning/**',
+        'src/tests/**/v6/**',
+        'src/tests/functional/**',
+        'tests/**'
+      ],
+      plugins: ['vitest'],
+      rules: {
+        // P1 — no committed escape hatches (req 1.5)
+        'vitest/no-focused-tests': 'error',
+        'vitest/no-disabled-tests': 'error',
+        // P2 — every test asserts; asserts live inside tests (req 1.1)
+        'vitest/expect-expect': 'error',
+        'vitest/no-standalone-expect': 'error',
+        // P2 — no internal-state/class-string asserts (req 1.1, 1.7)
+        // P3 — never mock the versioning code under test (req 1.2, 1.3)
+        // Promoted to 'error' by spec task 2.3: enabling them as 'warn' surfaced
+        // 19 REAL placebo violations reachable by the scoped gate (2 vm-asserts,
+        // 17 module mocks); all were fixed (real HTTP-boundary mocks + observable
+        // assertions), so the bar is now hard. New violations break the build.
+        'azion-architecture/no-internal-state-assert': 'error',
+        'azion-architecture/no-versioning-module-mock': 'error'
+      }
     },
     {
       files: ['scripts/**/*.{cjs,mjs}'],
