@@ -1,8 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { resolve as pathResolve, dirname } from 'node:path'
 
-const resolve = (relative) => fileURLToPath(new URL(`../../../../${relative}`, import.meta.url))
+const ROOT = pathResolve(dirname(fileURLToPath(import.meta.url)), '../../../../')
+
+const resolve = (relative) => pathResolve(ROOT, relative)
 
 const DEPLOYMENTS_VIEWS_DIR = 'src/views/Deployments'
 const DEPLOYMENT_ROUTES_FILE = 'src/router/routes/deployment-routes/index.js'

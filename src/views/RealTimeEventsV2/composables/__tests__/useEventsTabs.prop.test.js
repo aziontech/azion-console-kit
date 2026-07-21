@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { ref } from 'vue'
 import fc from 'fast-check'
+
+// Fixed seed: this property suite was flaky under full-suite load because each run
+// drew a fresh random seed (upstream PR #3611). A pinned seed keeps runs reproducible;
+// bump it deliberately when the properties change.
+fc.configureGlobal({ seed: 1594213770 })
 import { useEventsTabs } from '../useEventsTabs.js'
 import { useTabLimit, MAX_TOTAL_TABS } from '../useTabLimit.js'
 

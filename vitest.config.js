@@ -20,6 +20,9 @@ export default mergeConfig(
         // Functional suite runs in BROWSER MODE via vitest.functional.config.js —
         // it must never run under jsdom (real-browser assertions would fail).
         'src/tests/functional/**',
+        '.stryker-tmp/**',
+        // Playwright-runner specs (contract-drift) — never collected by the unit runner.
+        'tests/**',
         'azion',
         '.vscode',
         '.husky',

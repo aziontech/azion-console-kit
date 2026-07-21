@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { resolve, dirname } from 'node:path'
 
 /**
  * Governance — FormFieldsDeployment is not a versioned form.
@@ -13,8 +14,9 @@ import { fileURLToPath } from 'node:url'
  *
  * This test fails if the form re-couples to the version shell read-only mechanism.
  */
-const read = (relative) =>
-  readFileSync(fileURLToPath(new URL(`../../../../${relative}`, import.meta.url)), 'utf8')
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../')
+
+const read = (relative) => readFileSync(resolve(ROOT, relative), 'utf8')
 
 const FORM_FIELDS_DEPLOYMENT = 'src/views/Deployments/FormFields/FormFieldsDeployment.vue'
 

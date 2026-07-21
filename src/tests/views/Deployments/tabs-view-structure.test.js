@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { resolve, dirname } from 'node:path'
 
-const read = (relative) =>
-  readFileSync(fileURLToPath(new URL(`../../../../${relative}`, import.meta.url)), 'utf8')
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../')
+
+const read = (relative) => readFileSync(resolve(ROOT, relative), 'utf8')
 
 const TABS_VIEW = 'src/views/Deployments/TabsView.vue'
 
