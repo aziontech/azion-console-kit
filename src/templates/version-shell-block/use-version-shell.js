@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import {
   isEditable,
   getAvailableActions,
@@ -39,6 +39,13 @@ export const useVersionShell = ({ useVersionQuery, resourceId, versionId, bus })
     return disabled
   })
 
+  // In-flight guard (fail-closed, same shape as the gates above): only one command
+  // may run at a time. Blocks the double-submit where a rapid second click would
+  // enqueue a second updateDraft/build before the first settles. Set before the
+  // emit and cleared in `finally` so a rejected handler can never lock the shell.
+  const pendingAction = ref(null)
+  const isDispatching = computed(() => pendingAction.value !== null)
+
   const dispatch = async (action, payload = {}) => {
     if (!isActionAvailable(state.value, action)) {
       // eslint-disable-next-line no-console
@@ -50,9 +57,21 @@ export const useVersionShell = ({ useVersionQuery, resourceId, versionId, bus })
       console.warn(`[VersionShell] No handler registered for ${action}`)
       return
     }
+    if (pendingAction.value) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[VersionShell] Action ${action} ignored — ${pendingAction.value} already in flight`
+      )
+      return
+    }
 
-    const ctx = { resourceId, versionId, comment: payload.comment }
-    return await bus.emit(action, ctx)
+    pendingAction.value = action
+    try {
+      const ctx = { resourceId, versionId, comment: payload.comment }
+      return await bus.emit(action, ctx)
+    } finally {
+      pendingAction.value = null
+    }
   }
 
   return {
@@ -62,6 +81,7 @@ export const useVersionShell = ({ useVersionQuery, resourceId, versionId, bus })
     availableActions,
     disabledActions,
     dispatch,
+    isDispatching,
     isLoading: versionQuery.isLoading,
     isError: versionQuery.isError
   }

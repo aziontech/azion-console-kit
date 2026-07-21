@@ -84,8 +84,10 @@
   }
 
   // Capability comes from the shell context; defaults to deployable outside it.
-  const { capability } = useVersionContext()
+  // `isDispatching` gates every button while a command is in flight (defaults false).
+  const { capability, isDispatching } = useVersionContext()
   const cap = computed(() => capability?.value ?? DEFAULT_CAPABILITY)
+  const dispatching = computed(() => isDispatching?.value ?? false)
 
   const banner = computed(() => BANNER[props.state] ?? FALLBACK)
 
@@ -107,7 +109,7 @@
   const readOnly = computed(() => isImmutable(props.state))
   const editable = computed(() => isEditable(props.state))
 
-  const isDisabled = (key) => props.disabledActions.includes(key)
+  const isDisabled = (key) => props.disabledActions.includes(key) || dispatching.value
 
   const handleClick = (key) => {
     if (isDisabled(key)) return

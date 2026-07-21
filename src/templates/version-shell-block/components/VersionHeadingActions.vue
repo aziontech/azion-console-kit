@@ -27,10 +27,11 @@
 
   const router = useRouter()
 
-  const { state, version, availableActions, disabledActions, dispatch, capability } =
+  const { state, version, availableActions, disabledActions, dispatch, capability, isDispatching } =
     useVersionContext()
 
   const cap = computed(() => capability?.value ?? DEFAULT_CAPABILITY)
+  const dispatching = computed(() => isDispatching?.value ?? false)
 
   // Same source + same availableActions intersection as VersionActionBar, so the
   // heading and the footer toolbar render an identical button set per state.
@@ -42,6 +43,7 @@
 
   const isDisabled = (key) =>
     disabledActions.value.includes(key) ||
+    dispatching.value ||
     (key === VERSION_ACTIONS.DEPLOY && !props.resourceContext && !props.deployRoute)
 
   // The Deploy action routes to the full-page composer, scoped to this version.

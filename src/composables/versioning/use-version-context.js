@@ -19,12 +19,16 @@ export const VERSION_CONTEXT_KEY = Symbol('versionContext')
  * `capability` is the resource class `{ canDeploy, canPromote, canRollback }`; it
  * defaults to `DEFAULT_CAPABILITY` (deployable) when consumed outside the shell.
  *
+ * `isDispatching` is true while a lifecycle command runs; surfaces disable their
+ * buttons on it so a second click can't double-submit. Defaults to false outside.
+ *
  * @returns {{
  *   state: import('vue').Ref<string>,
  *   readOnly: import('vue').ComputedRef<boolean> | { value: boolean },
  *   version: import('vue').Ref<object|null>,
  *   availableActions: import('vue').Ref<string[]>,
  *   disabledActions: import('vue').Ref<string[]>,
+ *   isDispatching: import('vue').Ref<boolean> | { value: boolean },
  *   isVersioned: import('vue').Ref<boolean>,
  *   capability: {canDeploy: boolean, canPromote: boolean, canRollback: boolean},
  *   dispatch: (action: string, payload?: object) => Promise<any>
@@ -37,6 +41,7 @@ export const useVersionContext = () => {
     version: readonly(ref(null)),
     availableActions: readonly(ref([])),
     disabledActions: readonly(ref([])),
+    isDispatching: readonly(ref(false)),
     isVersioned: readonly(ref(false)),
     capability: DEFAULT_CAPABILITY,
     dispatch: async () => {}

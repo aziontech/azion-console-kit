@@ -63,6 +63,7 @@
     availableActions,
     disabledActions,
     dispatch,
+    isDispatching,
     isLoading,
     isError
   } = useVersionShell({
@@ -87,6 +88,7 @@
     version,
     availableActions,
     disabledActions,
+    isDispatching,
     isVersioned: readonly(ref(true)),
     capability,
     dispatch: handleDispatch
