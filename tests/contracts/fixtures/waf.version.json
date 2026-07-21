@@ -1,0 +1,20 @@
+{
+  "id": 902,
+  "version_id": "AVWAF0001",
+  "version": 3,
+  "state": "draft",
+  "description": "draft note",
+  "created_at": "2026-06-18T10:00:00Z",
+  "ready_at": "2026-06-18T10:05:00Z",
+  "last_editor": "user@azion.com",
+  "name": "waf-main",
+  "active": true,
+  "engine_settings": {
+    "attributes": {
+      "thresholds": [
+        { "threat": "sql_injection", "sensitivity": "high" },
+        { "threat": "cross_site_scripting", "sensitivity": "low" }
+      ]
+    }
+  }
+}

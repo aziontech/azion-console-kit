@@ -1,0 +1,14 @@
+{
+  "id": 701,
+  "version_id": "AVNL0001",
+  "version": 3,
+  "state": "draft",
+  "description": "draft note",
+  "created_at": "2026-06-18T10:00:00Z",
+  "ready_at": "2026-06-18T10:05:00Z",
+  "last_editor": "user@azion.com",
+  "last_modified": "2026-06-18T10:00:00Z",
+  "name": "ip-list",
+  "type": "ip_cidr",
+  "items": ["10.0.0.0/24", "192.168.0.1"]
+}

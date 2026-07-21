@@ -1,0 +1,16 @@
+{
+  "id": 80002,
+  "version_id": "AVFN002",
+  "version": 2,
+  "state": "draft",
+  "description": "draft note",
+  "created_at": "2026-06-16T10:30:00Z",
+  "last_editor": "user@azion.com",
+  "name": "my-fn",
+  "active": true,
+  "code": "export default {}",
+  "language": "javascript",
+  "runtime_environment": "application",
+  "json_args": { "foo": "bar" },
+  "azion_form": { "fields": [] }
+}

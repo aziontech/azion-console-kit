@@ -1,0 +1,22 @@
+{
+  "id": 54321,
+  "version_id": "AY2JRCD3",
+  "version": 1,
+  "state": "ready",
+  "description": "first",
+  "created_at": "2026-06-16T10:30:00Z",
+  "ready_at": "2026-06-16T10:35:00Z",
+  "last_editor": "user@azion.com",
+  "deployment_id": "AXK29QMP",
+  "environment_id": "BZ3KSDE4",
+  "last_error": null,
+  "name": "prod-workload",
+  "active": true,
+  "infrastructure": 1,
+  "workload_domain": "prod.azion.app",
+  "workload_domain_allow_access": true,
+  "domains": [],
+  "tls": { "minimum_version": "tls_1_2", "ciphers": null },
+  "mtls": { "enabled": false, "config": { "verification": null, "certificate": null, "crl": null } },
+  "protocols": { "http": { "http_ports": [80], "https_ports": [443], "quic_ports": null } }
+}
