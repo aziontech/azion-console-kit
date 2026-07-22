@@ -2,9 +2,6 @@ import { toValue } from 'vue'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { versionListCachePolicy } from './version-cache-policy'
 
-// Shared base for resource version services: lifecycle endpoints under
-// `/{baseURL}/{resourceId}/versions` + cache invalidation. Subclasses set
-// `adapter`, `baseURL` and `versionKeys` (the queryKeys.<resource>.version group).
 export class VersionServiceBase extends BaseService {
   getUrl(resourceId, versionId, suffix = '') {
     const base = `${this.baseURL}/${resourceId}/versions`
@@ -12,15 +9,10 @@ export class VersionServiceBase extends BaseService {
     return `${base}/${versionId}${suffix}`
   }
 
-  // Overridable invalidation hook called by every mutation. Default removes the
-  // version cache; subclasses may extend it (e.g. also invalidating the resource
-  // detail). Protected by convention.
   invalidateAfterMutation(resourceId) {
     this.queryClient.removeQueries({ queryKey: this.versionKeys.all(resourceId) })
   }
 
-  // Splits caller `params` into the control flag and the request/key params, so
-  // `skipCache` never leaks into the HTTP query string nor the cache key.
   #splitListParams = (params) => {
     const { skipCache, ...rest } = params ?? {}
     const hasParams = Object.keys(rest).length > 0
@@ -49,8 +41,6 @@ export class VersionServiceBase extends BaseService {
       { persist: false }
     )
 
-  // `params` flow into the queryKey and the fetch; `skipCache` disables persist.
-  // Default (no params) keeps the previous behavior unchanged.
   useListVersionsQuery = (resourceId, params) => {
     const { skipCache, listParams } = this.#splitListParams(params)
     return this.useQuery(
@@ -60,9 +50,6 @@ export class VersionServiceBase extends BaseService {
     )
   }
 
-  // Async, cache-aware list reusable by callers that react to `resourceId`
-  // changes (e.g. watchers). Returns the adapted array (same shape as
-  // `useListVersionsQuery`'s `.data.body`).
   async listVersions(resourceId, params) {
     const id = toValue(resourceId)
     const { skipCache, listParams } = this.#splitListParams(params)

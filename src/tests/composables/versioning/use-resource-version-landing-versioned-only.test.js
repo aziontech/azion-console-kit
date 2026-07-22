@@ -3,13 +3,6 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { h, inject } from 'vue'
 import { resourceUsageService } from '@/services/v2/deployment/resource-usage-service'
 
-/**
- * Task 3.8 — Phase 1: the tabbed landing builds no deploy affordance for
- * versioned-only resources — no `openPromoteDrawer` on the shared
- * `versionMenuHost` — while the deployable default keeps it.
- * Requirement 2.5.
- */
-
 const { routeRef, routerStub } = vi.hoisted(() => ({
   routeRef: { params: { id: '42' } },
   routerStub: { replace: vi.fn(), push: vi.fn() }
@@ -28,14 +21,11 @@ vi.mock('@/services/v2/deployment/resource-usage-service', () => ({
 
 import { useResourceVersionLanding } from '@/composables/versioning/use-resource-version-landing'
 
-// Minimal version service: a list query exposing an empty body.
 const makeVersionService = () => ({
   useListVersionsQuery: vi.fn(() => ({ data: { value: { body: [] } }, refetch: vi.fn() })),
   createDraft: vi.fn()
 })
 
-// Captures the value provided under `versionMenuHost` so we can assert on the
-// promote seam without reaching into the composable internals.
 const captureMenuHost = (config) => {
   let captured = null
   const HostProbe = {
@@ -66,13 +56,6 @@ const baseConfig = (resourceType) => ({
 beforeEach(() => {
   routerStub.replace.mockClear()
   routerStub.push.mockClear()
-  // `useResourceVersionLanding` mounts `useActiveVersions`, whose immediate watcher
-  // fires an unawaited `load()` → `resourceUsageService.listResourceUsage` (real
-  // deployment-api I/O). Left un-stubbed it hits the network, rejects, and — because
-  // the watcher never awaits the promise — surfaces as an ORDER-DEPENDENT unhandled
-  // rejection that lands after this test has torn down. Stubbing the external service
-  // boundary (not the versioning code under test) makes that fetch resolve
-  // deterministically; `flushPromises()` in each test then drains it before teardown.
   vi.spyOn(resourceUsageService, 'listResourceUsage').mockResolvedValue({ body: [], count: 0 })
 })
 
@@ -84,7 +67,6 @@ describe('useResourceVersionLanding — promote seam gated by capability (Req 2.
   it('seams openPromoteDrawer for a deployable resource', async () => {
     const { getMenuHost } = captureMenuHost(baseConfig('edge_application'))
     expect(typeof getMenuHost().openPromoteDrawer).toBe('function')
-    // Drain the landing's async resource + active-versions loads before teardown.
     await flushPromises()
   })
 

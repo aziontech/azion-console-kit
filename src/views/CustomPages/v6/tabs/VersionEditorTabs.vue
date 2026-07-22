@@ -1,7 +1,4 @@
 <script setup>
-  // VersionEditorTabs — the version editor body for a Custom Page (atomic: a single
-  // Main Settings tab). Delegates the scaffold to the shared VersionEditorTabsShell;
-  // only the tab descriptor + deploy context specialize.
   import { ref } from 'vue'
   import CustomPageVersionAdapter from '@/views/CustomPages/v6/CustomPageVersionAdapter.vue'
   import VersionEditorTabsShell from '@/templates/version-shell-block/VersionEditorTabsShell.vue'
@@ -38,7 +35,6 @@
     currentVersionId: () => props.versionId
   })
 
-  // Atomic resource: a single Main Settings tab, no "+ Add".
   const customPageTabs = [
     {
       key: 'main-settings',

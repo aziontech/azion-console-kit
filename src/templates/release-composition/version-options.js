@@ -1,12 +1,5 @@
-// Surface-agnostic version helpers shared by every Release composition surface
-// (the legacy deploy drawer and the full-page Review & deploy view). Lives in a
-// neutral module so composition code never imports from a "drawer"-named file.
-
-// Sentinel for "Track latest Ready": pin to the newest Ready version at dispatch
-// time rather than a fixed short_id. Distinct from any real version id.
 export const LATEST_READY = 'LATEST'
 
-// A version is deployable when it is built — `ready` or `active` (serving).
 const DEPLOYABLE_STATES = ['ready', 'active']
 
 const toOption = (version) => ({
@@ -22,20 +15,12 @@ const mapVersions = (versions, isAllowed) =>
     .filter((version) => isAllowed(version?.state))
     .map(toOption)
 
-// Maps raw version records to the picker option shape consumed by
-// ResourceVersionField (label/value + metadata for the option row).
 export const toVersionOptions = (versions) =>
   mapVersions(versions, (state) => DEPLOYABLE_STATES.includes(state))
 
-// App-managed dependency versions (functions, connectors) are only selectable
-// when strictly `ready`; `active`, `draft`, `building`, etc. are excluded
-// (requirement 2.2).
 export const toReadyVersionOptions = (versions) =>
   mapVersions(versions, (state) => state === 'ready')
 
-// Resolves a chosen version to a concrete id for dispatch: the LATEST_READY
-// sentinel maps to the newest Ready option (first `isCurrent`, else the first
-// option); a pinned id is returned as-is.
 export const resolveLatestVersion = (options, selected) => {
   if (selected !== LATEST_READY) return selected
   const list = Array.isArray(options) ? options : []

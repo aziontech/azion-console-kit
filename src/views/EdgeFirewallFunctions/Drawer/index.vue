@@ -98,8 +98,6 @@
       type: String,
       required: true
     },
-    // Optional versioned facade (drop-in): when present, create/edit/load route
-    // through it instead of the non-versioned edgeFirewallFunctionService.
     service: {
       type: Object,
       default: null

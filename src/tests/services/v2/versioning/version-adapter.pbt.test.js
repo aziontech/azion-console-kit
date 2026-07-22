@@ -3,28 +3,6 @@ import fc from 'fast-check'
 import { createVersionAdapter } from '@/services/v2/versioning/version-adapter'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 
-/**
- * Spec: versioning-test-coverage — Task 11.2, Property 6 (version-adapter).
- *
- * Uses ONE test adapter built from the real factory:
- *   - normalizeConfig: pass-through of the known config fields (settings, rules).
- *   - mapResourceFields: identity over the arbitrary body.
- *
- * Properties assert the REAL source behavior — notably that `stripUndefinedDeep`
- * recurses into arrays too: `undefined` entries are dropped and each surviving
- * item is cleaned recursively, so NO `undefined` survives at any depth (an
- * in-array `undefined` would otherwise become `null` on the wire). `null` is a
- * legitimate value and is preserved; arrays stay arrays (empty ones included).
- *
- *   a) transformDraftPayload strips undefined at EVERY depth, including inside
- *      arrays; null and array structure are preserved, undefined entries removed.
- *   b) source_version / comment sit at the ROOT when defined, absent when undefined.
- *   c) normalizeVersion: id = version_id, state preserved, config = normalizeConfig(raw),
- *      and meta.* takes precedence over the flat keys when both are present.
- *   d) transformListVersions: count is honored, body.length === results.length,
- *      and the {results,count} envelope is equivalent to the bare array form.
- */
-
 const NUM_RUNS = 200
 
 const passthroughConfig = (raw) => ({ settings: raw?.settings, rules: raw?.rules })
@@ -37,8 +15,6 @@ const adapter = createVersionAdapter({
 
 const stateArb = fc.constantFrom(...Object.values(VERSION_STATES))
 
-// Keys that carry special adapter meaning; excluded from arbitrary noise so each
-// property isolates the behavior under test.
 const RESERVED_KEYS = [
   'version_id',
   'id',
@@ -71,9 +47,6 @@ const containsUndefinedDeep = (value) => {
 
 const cleanLeafArb = fc.oneof(fc.integer(), fc.string(), fc.boolean(), fc.constant(null))
 
-// A node that MAY hold `undefined` in ANY position — leaf, array entry, or object
-// field — at any depth. This is what exercises the array-recursion fix: arrays are
-// no longer opaque, so undefined must be scrubbed from inside them too.
 const dirtyLeafArb = fc.oneof(cleanLeafArb, fc.constant(undefined))
 const { dirtyNode } = fc.letrec((tie) => ({
   dirtyNode: fc.oneof(
@@ -85,10 +58,6 @@ const { dirtyNode } = fc.letrec((tie) => ({
 
 const dirtyObjArb = fc.dictionary(safeKeyArb, dirtyNode, { maxKeys: 6 })
 
-// Independent reference implementation of the expected cleaning, written with
-// explicit loops (not the SUT's map/filter) so it is a genuine oracle: drop
-// `undefined` everywhere (array entries AND object fields), keep `null`, keep
-// arrays as arrays, collapse only empty OBJECTS to `undefined`.
 const referenceClean = (value) => {
   if (value === undefined) return undefined
   if (value === null || typeof value !== 'object') return value
@@ -114,9 +83,6 @@ describe('version-adapter — property-based (Property 6)', () => {
   it('a) transformDraftPayload strips undefined at EVERY depth incl. inside arrays; null/array structure preserved', () => {
     fc.assert(
       fc.property(dirtyObjArb, (body) => {
-        // Explicit markers make the intent legible; the oracle equality below
-        // proves it generically. `comment`/`sourceVersionId` are excluded from
-        // the arbitrary keys, so the payload is exactly the cleaned body.
         const input = {
           ...body,
           keptNull: null,
@@ -126,16 +92,11 @@ describe('version-adapter — property-based (Property 6)', () => {
         }
         const payload = adapter.transformDraftPayload(input)
 
-        // No `undefined` survives anywhere — leaf, array entry, or nested field.
         expect(containsUndefinedDeep(payload)).toBe(false)
-        // `null` is preserved verbatim, at the root and inside arrays.
         expect(payload.keptNull).toBe(null)
         expect(payload.keptNulls).toEqual([null, null])
-        // Arrays stay arrays: undefined entries dropped, object items cleaned,
-        // an all-undefined array collapses to an empty array (never undefined).
         expect(payload.dirtyArray).toEqual([1, null, { keep: 7 }])
         expect(payload.emptyAfterStrip).toEqual([])
-        // Full oracle: equals the independently-computed clean form.
         expect(payload).toEqual(referenceClean(input))
       }),
       { numRuns: NUM_RUNS }

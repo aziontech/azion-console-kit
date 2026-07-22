@@ -6,19 +6,6 @@ import {
   VERSION_COMMAND_BUS_KEY
 } from '@/composables/versioning/use-version-command-bus'
 
-/**
- * Lifecycle contract of onVersionCommand, proven with REAL components mounted
- * and unmounted against the REAL command bus (createVersionCommandBus). No
- * module mocks: the bus is the collaborator under test, provided by injection
- * exactly as the VersionShell provides it in production.
- *
- * Guards the three things that keep the bus honest as editor tabs come and go:
- *   (a) unmount auto-unregisters (onBeforeUnmount),
- *   (b) using the composable outside a shell fails loud,
- *   (c) a fresh mount can re-register a command the previous one released.
- */
-
-// A minimal descendant that registers `command` on the injected bus at setup.
 const commandComponent = (command, execute = vi.fn()) => ({
   name: 'command-registrar',
   setup() {
@@ -60,8 +47,6 @@ describe('onVersionCommand — re-registration after unmount', () => {
     const first = mountInShell(commandComponent('SAVE'), bus)
     first.unmount()
 
-    // A live registration would make this throw the "already registered" error;
-    // clean unregister on unmount is what keeps re-mounting safe.
     let second
     expect(() => {
       second = mountInShell(commandComponent('SAVE'), bus)

@@ -1,9 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { contractSchemas } from '../../../tests/contracts/schemas'
 
-// REAL adapters under test — never mocked (anti-placebo, req 1.2/1.3). Each runs
-// its true resource transform (EdgeAppAdapter, WorkloadAdapter, …) so the payload
-// we validate is exactly what the front would send / read.
 import { EdgeAppVersionAdapter } from '@/services/v2/edge-app/edge-app-version-adapter'
 import { WorkloadVersionAdapter } from '@/services/v2/workload/workload-version-adapter'
 import { CustomPageVersionAdapter } from '@/services/v2/custom-page/custom-page-version-adapter'
@@ -14,8 +11,6 @@ import { NetworkListVersionAdapter } from '@/services/v2/network-lists/network-l
 import { WafVersionAdapter } from '@/services/v2/waf/waf-version-adapter'
 import { DeploymentVersionAdapter } from '@/services/v2/deployment/deployment-version-adapter'
 
-// Canonical response fixtures (same tree the fixture-gate validates). Importing
-// them here proves the exact shape the adapters consume is contract-valid.
 import applicationFixture from '../../../tests/contracts/fixtures/application.version.json'
 import workloadFixture from '../../../tests/contracts/fixtures/workload.version.json'
 import customPageFixture from '../../../tests/contracts/fixtures/customPage.version.json'
@@ -29,13 +24,11 @@ import deploymentFixture from '../../../tests/contracts/fixtures/deployment.vers
 const validateStrict = (schema, payload) =>
   schema.validateSync(payload, { strict: true, abortEarly: false })
 
-// A request payload is contract-valid when strict validation returns it unchanged.
 const expectRequestMatches = (resourceKey, requestKind, payload) => {
   const schema = contractSchemas[resourceKey][requestKind]
   expect(() => validateStrict(schema, payload)).not.toThrow()
 }
 
-// A response fixture is contract-valid when it passes versionResponse strictly.
 const expectResponseFixtureValid = (resourceKey, fixture) => {
   const { versionResponse } = contractSchemas[resourceKey]
   expect(() => validateStrict(versionResponse, fixture)).not.toThrow()
@@ -124,7 +117,6 @@ describe('contract consumer — workload', () => {
     expect(createDraft.source_version).toBe('PARENT1')
     expectRequestMatches('workload', 'draftRequest', createDraft)
 
-    // Workload overrides build/archive to a bare optional comment (no trace_id).
     expectRequestMatches(
       'workload',
       'buildRequest',
@@ -294,7 +286,6 @@ describe('contract consumer — edgeFunction', () => {
   })
 
   it('REQUEST: draft / create-draft / build / archive payloads satisfy their schemas', () => {
-    // The form's `runtime` carries the language code the edit form emits.
     const form = {
       name: 'edited-fn',
       active: false,

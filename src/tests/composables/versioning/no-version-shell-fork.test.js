@@ -4,15 +4,6 @@ import { readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
-/**
- * Property P4 — no Version Shell fork (Req 8.1, 8.4, NFR-A.1).
- * The `versioned-only` class is plugged by configuration (capability), never by
- * copying the framework. This structural test snapshots the file inventory of
- * `templates/version-shell-block` + `composables/versioning` and fails if a
- * per-resource copy of the shell/machine/bus appears. A genuinely new shared
- * artifact is added to the allowlist on purpose; a resource-prefixed clone is not.
- */
-
 const resolveDir = (relative) =>
   resolve(dirname(fileURLToPath(import.meta.url)), `../../../../${relative}`)
 
@@ -31,8 +22,6 @@ const listFiles = (relative) => {
 const SHELL_DIR = 'src/templates/version-shell-block'
 const COMPOSABLES_DIR = 'src/composables/versioning'
 
-// Allowlist of shared framework files. Every entry is generic (no resource name
-// baked in). Adding a file here must be a deliberate, shared addition.
 const SHELL_ALLOWLIST = [
   'ResourceOverviewBlock.vue',
   'ResourceVersionLanding.vue',
@@ -72,8 +61,6 @@ const COMPOSABLES_ALLOWLIST = [
   'version-machine.js'
 ]
 
-// Resource names that must never prefix a shell/machine/bus artifact — that is
-// exactly what a per-resource fork would look like.
 const RESOURCE_PREFIXES = [
   'application',
   'firewall',
@@ -87,7 +74,6 @@ const RESOURCE_PREFIXES = [
   'waf'
 ]
 
-// Core framework primitives that must remain single-sourced (Req 8.1).
 const FORKABLE_PRIMITIVES = [
   'VersionShell',
   'VersionMachine',

@@ -4,17 +4,6 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { resolve, dirname } from 'node:path'
 
-/**
- * Governance — FormFieldsDeployment is not a versioned form.
- *
- * With the version shell out of the Deployment flow, FormFieldsDeployment.vue is
- * shared only by CreateView and SettingsTab and must ALWAYS be editable. It must
- * NOT consume the version context readOnly flag: it does not appear in
- * VERSIONED_FORM_COMPONENTS (version-readonly-governance.test.js), so any
- * reintroduction of useVersionContext/readOnly here is a regression.
- *
- * This test fails if the form re-couples to the version shell read-only mechanism.
- */
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../')
 
 const read = (relative) => readFileSync(resolve(ROOT, relative), 'utf8')

@@ -2,12 +2,6 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { RulesEngineAdapter } from '@/services/v2/edge-app/edge-app-rules-engine-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
-/**
- * Versioned Rules Engine service — the combined (request + response) counterpart
- * of `RulesEngineService`, scoped to an application version. It mirrors the
- * non-versioned service method-for-method so the shared ListView/Drawer can use
- * it as a drop-in; the only difference is the `/versions/{versionId}/` URL prefix.
- */
 export class VersionedRulesEngineService extends BaseService {
   constructor() {
     super()

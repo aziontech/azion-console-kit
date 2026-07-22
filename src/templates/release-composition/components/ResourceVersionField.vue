@@ -1,13 +1,4 @@
 <script setup>
-  /**
-   * ResourceVersionField — pick a Ready version. Built on the webkit `Dropdown`
-   * (`@aziontech/webkit/inputs/dropdown`, a first-class webkit component — NOT the
-   * raw PrimeVue wrapper), using its `#value`/`#option` slots for the rich
-   * rendering: a sentinel "Track latest Ready" (`LATEST_READY`) on top, then a
-   * "Pin a Ready version" group with each version's short_id, relative age,
-   * author and a "Current" flag. Generic: all data comes from props; the parent
-   * owns selection and validity.
-   */
   import { computed } from 'vue'
   import Dropdown from '@aziontech/webkit/inputs/dropdown'
   import { convertToRelativeTime } from '@/helpers/convert-date'
@@ -48,16 +39,10 @@
       type: Boolean,
       default: false
     },
-    // Version catalog still loading — kept distinct from `disabled` so the empty
-    // state (below) is shown only once the load settled with zero options.
     loading: {
       type: Boolean,
       default: false
     },
-    // Router target to build a version of this resource. When provided AND there
-    // are no deployable versions, the field renders a "build a version" link
-    // instead of the picker (the "Track latest Ready" sentinel can't resolve
-    // without a Ready version). Omitted by the legacy drawer, so it is unaffected.
     buildRoute: {
       type: Object,
       default: null
@@ -74,14 +59,10 @@
 
   const hasVersions = computed(() => Array.isArray(props.versions) && props.versions.length > 0)
 
-  // No deployable version resolved (load settled, empty) and a build target is
-  // known → show the build link instead of the picker.
   const showBuildLink = computed(
     () => !props.loading && !hasVersions.value && Boolean(props.buildRoute)
   )
 
-  // Grouped: the sentinel "Track latest Ready" on top, then a labelled
-  // "Pin a Ready version" group with the pinnable Ready versions.
   const dropdownOptions = computed(() => [
     { label: '', items: [{ value: LATEST_READY, label: 'Track latest Ready', isLatest: true }] },
     { label: 'Pin a Ready version', items: props.versions }
@@ -255,10 +236,6 @@
 </template>
 
 <style scoped>
-  /* Tune the webkit Dropdown control to the app's surface tokens (the webkit
-     defaults — --bg-surface / --border-default — are a different DS layer). The
-     focus ring is left to the webkit component itself (its --ring-color token);
-     no per-component ring override here. */
   :deep(.release-composition-control) {
     background: var(--surface-section) !important;
     border-color: var(--surface-border) !important;

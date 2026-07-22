@@ -11,8 +11,6 @@
   import { useVersionContext } from '@/composables/versioning/use-version-context'
   import { STATUS_CODE_OPTIONS } from '@/views/CustomPages/Config/listStatusCode'
 
-  // readOnly defaults to false outside the VersionShell; immutable versions block
-  // adding/deleting page codes.
   const { readOnly } = useVersionContext()
 
   const drawerRef = ref(null)

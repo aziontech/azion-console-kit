@@ -3,10 +3,6 @@ import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 import { describeVersionServiceContract } from '@/tests/shared/versioning/version-service.contract'
 import { describeVersionAdapterContract } from '@/tests/shared/versioning/version-adapter.contract'
 
-// WAF — pilot for the registry-driven suite (TEST-ARCHITECTURE §3.3). The inherited
-// service + shared adapter contracts run from the descriptor; the WAF Main Settings
-// threat semantics (defaults, empty-thresholds clone, per-threat round trip) are
-// genuinely unique and stay bespoke below.
 const waf = RESOURCE_TEST_REGISTRY.waf
 const adapter = waf.adapter
 

@@ -1,20 +1,4 @@
 /**
- * HOP 1 strategy — `resourceUsageResolver` (the `resource-usage` endpoint).
- *
- * The strategy that was deferred (tasks.md D1) until the tenant-scoped
- * `GET /v4/resource_usage` was delivered. It asks the deployment-api directly
- * "which deployments have an ACTIVE link to these resources, and at what
- * version?" — one authoritative call per `resource_type` (the endpoint is
- * single-type, 1..100 ids) — instead of the fan-out's list-DS + scan-each-active-
- * release. Produces the SAME `ConsumingDeploymentsResult` contract so
- * `selectResolver()` swaps it for `fanoutResolver` without touching any caller
- * (Liskov; Property 3 in the contract spec runs against both).
- *
- * Match rule (req 1.5), encoded once in `matchIdValue`: every resource is matched
- * by `resource_id` (for `application` its value is the `global_id`). Dependencies
- * are a factory argument (services-as-args) so this is unit-testable without IO and
- * without a Vue context. Only the tenant resource-usage service is used.
- *
  * @typedef {import('./contract').ResolveConsumingDeployments} ResolveConsumingDeployments
  * @typedef {import('./contract').ResourceRef} ResourceRef
  */
@@ -24,8 +8,6 @@ import { emptyResult, normalizeResources, resourceKey } from './contract'
 import { matchesRow, rowResourceVersion } from './resource-usage-match'
 
 /**
- * Build the resource-usage resolver over the given tenant service.
- *
  * @param {object} [deps]
  * @param {typeof defaultResourceUsageService} [deps.resourceUsageService]
  * @returns {ResolveConsumingDeployments}
@@ -38,7 +20,6 @@ export const createResourceUsageResolver = ({
     const refs = normalizeResources(resources)
     if (refs.length === 0) return emptyResult()
 
-    // The endpoint is single-type: group refs by type and query once per type.
     const refsByType = new Map()
     for (const ref of refs) {
       const list = refsByType.get(ref.resource_type) ?? []
@@ -46,8 +27,6 @@ export const createResourceUsageResolver = ({
       refsByType.set(ref.resource_type, list)
     }
 
-    // Independent per-type fan-out: one failed type contributes no match, never
-    // rejects (req 1.6) and never blocks the others.
     const settled = await Promise.allSettled(
       [...refsByType.entries()].map(async ([resourceType, typeRefs]) => ({
         typeRefs,
@@ -58,8 +37,6 @@ export const createResourceUsageResolver = ({
       }))
     )
 
-    // Accumulate across the type-calls; a DS matched by more than one type merges
-    // its versions into a single entry (de-duplicated by deploymentId, req 1.7).
     const versionsByDs = new Map()
     const matchedByDeployment = new Map()
 
@@ -98,7 +75,4 @@ export const createResourceUsageResolver = ({
   }
 }
 
-/**
- * Production singleton wired to the real tenant `resourceUsageService`.
- */
 export const resourceUsageResolver = createResourceUsageResolver()

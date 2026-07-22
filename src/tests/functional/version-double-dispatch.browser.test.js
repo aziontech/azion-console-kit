@@ -1,17 +1,3 @@
-/**
- * Functional (real Chromium) — VersionShell in-flight dispatch guard (P0-1).
- *
- * Reproduces and then locks down the double-submit defect: two rapid clicks on
- * a lifecycle button (Save) must dispatch the underlying command only ONCE while
- * the first is still in flight. The whole chain runs for real — the shell, the
- * command bus, the teleported VersionActionBar and a form-adapter-shaped child
- * that registers a SAVE handler on the REAL bus via `onVersionCommand`. The only
- * boundary mocked is `vue-router` (the shell reads route intent + replaces the
- * query), per the versioning testing rule.
- *
- * The SAVE handler returns a caller-controlled pending promise so the "in flight"
- * window is deterministic: nothing resolves until the test resolves/rejects it.
- */
 import { render } from '@testing-library/vue'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { ref, nextTick } from 'vue'
@@ -24,12 +10,10 @@ vi.mock('vue-router', () => ({
   useRouter: () => ({ replace: vi.fn() })
 }))
 
-// Imported after the router mock so the shell picks up the fake router.
 import VersionShell from '@/templates/version-shell-block/index.vue'
 
 const primevue = { plugins: [PrimeVue], directives: { tooltip: Tooltip } }
 
-// Minimal shape `useVersionShell` consumes from the query factory.
 const makeVersionQueryFactory =
   (state = 'draft') =>
   () => ({
@@ -38,7 +22,6 @@ const makeVersionQueryFactory =
     isError: ref(false)
   })
 
-// A deferred whose settlement the test controls, so the in-flight window is exact.
 const makeDeferred = () => {
   let resolve
   let reject
@@ -49,8 +32,6 @@ const makeDeferred = () => {
   return { promise, resolve, reject }
 }
 
-// Child living in the default slot, registering a SAVE handler on the shell's real
-// bus — the exact registration path the form adapter uses in production.
 const makeChild = (handler) => ({
   name: 'SaveAdapterStub',
   setup() {
@@ -70,7 +51,6 @@ const mountShell = (handler, state = 'draft') =>
     global: primevue
   })
 
-// The action bar is teleported to #action-bar; query the real <button> from there.
 const saveButton = () => document.querySelector('[data-testid="version-action-bar__action-SAVE"]')
 
 const waitForSaveButton = async () => {
@@ -78,8 +58,6 @@ const waitForSaveButton = async () => {
   return saveButton()
 }
 
-// A real click on the real button element (bypasses actionability so a rapid
-// second click can be attempted even after the first flips the disabled flag).
 const click = (button) => button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
 
 beforeEach(() => {
@@ -92,8 +70,6 @@ afterEach(() => {
   document.getElementById('action-bar')?.remove()
 })
 
-// Handler factory: each call returns a fresh caller-controlled deferred so the
-// test decides exactly when (and how) each in-flight command settles.
 const makeControlledHandler = () => {
   const pending = []
   const handler = vi.fn(() => {
@@ -110,12 +86,10 @@ describe('VersionShell — in-flight dispatch guard (double-submit)', () => {
     mountShell(handler)
     const button = await waitForSaveButton()
 
-    // Two rapid clicks before the first command settles.
     click(button)
     click(button)
     await nextTick()
 
-    // The guard swallows the second click while the first is still in flight.
     expect(handler).toHaveBeenCalledTimes(1)
 
     pending[0].resolve('patched')
@@ -130,12 +104,10 @@ describe('VersionShell — in-flight dispatch guard (double-submit)', () => {
 
     click(button)
     await nextTick()
-    // In flight → visually disabled (feedback), and the handler ran exactly once.
     expect(button).toBeDisabled()
     expect(handler).toHaveBeenCalledTimes(1)
 
     pending[0].resolve('patched')
-    // finally clears the guard → the button becomes usable again.
     await vi.waitFor(() => expect(saveButton()).not.toBeDisabled())
   })
 
@@ -151,7 +123,6 @@ describe('VersionShell — in-flight dispatch guard (double-submit)', () => {
     pending[0].resolve('patched')
     await vi.waitFor(() => expect(saveButton()).not.toBeDisabled())
 
-    // A genuine subsequent click dispatches a second time — the guard never sticks.
     click(saveButton())
     await nextTick()
     expect(handler).toHaveBeenCalledTimes(2)
@@ -169,12 +140,9 @@ describe('VersionShell — in-flight dispatch guard (double-submit)', () => {
     expect(button).toBeDisabled()
     expect(handler).toHaveBeenCalledTimes(1)
 
-    // Handler REJECTS: the shell swallows it (command-error) and the finally must
-    // still clear pendingAction, or the shell would be permanently disabled.
     pending[0].reject(new Error('build failed'))
     await vi.waitFor(() => expect(saveButton()).not.toBeDisabled())
 
-    // Recovery: a new click works after the failed command.
     click(saveButton())
     await nextTick()
     expect(handler).toHaveBeenCalledTimes(2)

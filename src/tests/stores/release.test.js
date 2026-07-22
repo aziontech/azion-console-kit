@@ -1,11 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
-// The store owns NO I/O: it imports no service and only exposes selection state,
-// the deploy gate, and a PURE `composePayload()`. `DeploymentAdapter` is pure and
-// imported HERE (not by the store) so P6 can transform `composePayload().resources`
-// into the real build_and_activate payload and assert the sentinel never survives.
-// The per-DS dispatch fan-out (P7) lives in the composable and is tested there.
 import { DeploymentAdapter } from '@/services/v2/deployment/deployment-adapter'
 import { LATEST_READY } from '@/templates/release-composition/version-options'
 import { useReleaseStore } from '@/stores/release'
@@ -14,8 +9,6 @@ const APPLICATION_TYPE = 'application'
 const SINGLE_VERSION = 'single_version'
 const VERSIONED_URLS = 'versioned_urls'
 
-// Builds an active-release record whose `resources[]` does / does not pin an
-// application, so `deployCtx.hasApp` can be driven from the loaded release side.
 const releaseWithApp = (hasApp) => ({
   resources: hasApp ? [{ resource_type: APPLICATION_TYPE, global_id: 'app-1' }] : []
 })
@@ -24,12 +17,6 @@ beforeEach(() => {
   setActivePinia(createPinia())
 })
 
-// ---------------------------------------------------------------------------
-// Property 4 — `effDsId` is the only deployment read path.
-// effDsId === deploymentId || deploymentIds[0] || ''. After openRelease/pickDs,
-// deploymentId and deploymentIds[0] stay consistent, and gates resolve through it.
-// Exhaustive enumeration (fast-check absent) over arbitrary id combinations.
-// ---------------------------------------------------------------------------
 describe('Property 4 — effDsId is the single deployment read path', () => {
   const idUniverse = ['', 'ds-1', 'ds-2', 'ds-3']
   const idsUniverse = [
@@ -41,7 +28,6 @@ describe('Property 4 — effDsId is the single deployment read path', () => {
     ['ds-3', 'ds-1']
   ]
 
-  // The invariant as a pure reference: effDsId mirrors deploymentId || ids[0] || ''.
   const expectedEffDsId = (deploymentId, deploymentIds) => deploymentId || deploymentIds[0] || ''
 
   it('matches deploymentId || deploymentIds[0] || "" for every raw state combo', () => {
@@ -50,7 +36,6 @@ describe('Property 4 — effDsId is the single deployment read path', () => {
 
     idUniverse.forEach((deploymentId) => {
       idsUniverse.forEach((deploymentIds) => {
-        // Drive the raw state directly to assert the getter formula in isolation.
         store.deploymentId = deploymentId
         store.deploymentIds = [...deploymentIds]
 
@@ -66,9 +51,6 @@ describe('Property 4 — effDsId is the single deployment read path', () => {
   it('keeps deploymentId and deploymentIds[0] consistent after openRelease (>=100 iter)', () => {
     const store = useReleaseStore()
 
-    // Cartesian of "what the caller supplies": a singular id, an array of ids, or
-    // both. Each combination is asserted to leave effDsId === deploymentIds[0]
-    // and deploymentId === deploymentIds[0] (the synced invariant).
     const singulars = [undefined, null, '', 'ds-1', 'ds-9']
     const arrays = [
       undefined,
@@ -90,18 +72,11 @@ describe('Property 4 — effDsId is the single deployment read path', () => {
 
           store.openRelease(payload)
 
-          // The invariant under test: effDsId is ALWAYS the formula, so every
-          // read of "the deployment" routes through it regardless of which
-          // representation the caller supplied (P4). openRelease honors an
-          // explicit deploymentId even when it differs from deploymentIds[0]
-          // (the documented sync rule); effDsId still resolves deterministically.
           expect(store.effDsId).toBe(store.deploymentId || store.deploymentIds[0] || '')
 
-          // With no selection at all, effDsId is the empty sentinel.
           if (!store.deploymentId && store.deploymentIds.length === 0) {
             expect(store.effDsId).toBe('')
           } else {
-            // Otherwise effDsId is always one of the supplied ids, never invented.
             const candidates = [store.deploymentId, ...store.deploymentIds].filter(Boolean)
             expect(candidates).toContain(store.effDsId)
           }
@@ -119,8 +94,6 @@ describe('Property 4 — effDsId is the single deployment read path', () => {
     const toggles = ['ds-1', 'ds-2', 'ds-3', 'ds-4', 'ds-5']
     let iterations = 0
 
-    // Walk many pseudo-random-but-deterministic toggle sequences. After every
-    // single pickDs the invariant must hold.
     for (let seed = 0; seed < 40; seed += 1) {
       store.openRelease({})
       for (let step = 0; step < 6; step += 1) {
@@ -146,34 +119,20 @@ describe('Property 4 — effDsId is the single deployment read path', () => {
     store.setActiveReleaseByDs('ds-1', releaseWithApp(true))
     store.setActiveReleaseByDs('ds-2', releaseWithApp(true))
 
-    // Select ds-2 first then ds-1: effDsId tracks the first selected id (ds-2).
     store.pickDs('ds-2')
     store.pickDs('ds-1')
     expect(store.effDsId).toBe('ds-2')
 
-    // deployCtx() with no arg must resolve the SAME context as deployCtx(effDsId).
     expect(store.deployCtx()).toEqual(store.deployCtx(store.effDsId))
-    // ds-2 is single_version + deployed → app read-only, but deployable.
     expect(store.deployCtx().isVersioned).toBe(false)
     expect(store.deployCtx().appEditable).toBe(false)
   })
 })
 
-// ---------------------------------------------------------------------------
-// Property 5 — deployCtx is deterministic across the 5 cases.
-// Enumerate deployment_policy ∈ {single_version, versioned_urls}
-//          × deployed ∈ {true, false}
-//          × hasApp   ∈ {true, false}  (8 combos), assert appEditable / canDeploy.
-// ---------------------------------------------------------------------------
 describe('Property 5 — deployCtx 5-case gate (exhaustive 2x2x2)', () => {
-  // Reference oracle straight from §E / requirements 5.1–5.5:
-  //   !hasApp                  → !canDeploy, !appEditable                (case 1)
-  //   single & !deployed       → appEditable                            (case 2)
-  //   single & deployed        → !appEditable (locked Single Version)   (case 3)
-  //   versioned (any deployed) → appEditable when hasApp                (cases 4,5)
   const expected = (isVersioned, deployed, hasApp) => {
     const appEditable = hasApp && (isVersioned || !deployed)
-    const canDeploy = hasApp // atLimit is always false client-side
+    const canDeploy = hasApp
     return { appEditable, canDeploy }
   }
 
@@ -193,8 +152,6 @@ describe('Property 5 — deployCtx 5-case gate (exhaustive 2x2x2)', () => {
 
           store.setDeployments([{ id: dsId, deployment_policy: policy }])
           store.setActiveReleaseByDs(dsId, deployed ? releaseWithApp(hasApp) : null)
-          // Case 4: no active release yet, but the user is composing an app
-          // selection. Drive hasApp from the selection when not deployed.
           if (!deployed && hasApp) {
             store.setResName(APPLICATION_TYPE, 'app-1')
           }
@@ -210,16 +167,15 @@ describe('Property 5 — deployCtx 5-case gate (exhaustive 2x2x2)', () => {
           expect(ctx.appEditable).toBe(want.appEditable)
           expect(ctx.canDeploy).toBe(want.canDeploy)
 
-          // Spot-check the named cases the spec calls out explicitly.
           if (!hasApp) {
-            expect(ctx.canDeploy).toBe(false) // case 1
+            expect(ctx.canDeploy).toBe(false)
             expect(ctx.appEditable).toBe(false)
           }
           if (policy === SINGLE_VERSION && deployed && hasApp) {
-            expect(ctx.appEditable).toBe(false) // case 3 — locked Single Version
+            expect(ctx.appEditable).toBe(false)
           }
           if (isVersioned && hasApp) {
-            expect(ctx.appEditable).toBe(true) // cases 4 & 5
+            expect(ctx.appEditable).toBe(true)
           }
 
           iterations += 1
@@ -233,16 +189,8 @@ describe('Property 5 — deployCtx 5-case gate (exhaustive 2x2x2)', () => {
   })
 })
 
-// ---------------------------------------------------------------------------
-// Property 6 — 'LATEST' never reaches the payload. composeResources() resolves
-// every LATEST_READY sentinel to a concrete version_id using versionsByResource,
-// and the built build_and_activate payload contains concrete ids and NO 'LATEST'.
-// ---------------------------------------------------------------------------
 describe("Property 6 — 'LATEST' is resolved before the payload", () => {
   const seedSelection = (store) => {
-    // Application + an optional singleton + a collection item, all pinned to LATEST.
-    // Optional singletons default ON (firewall is included unless toggled off), so
-    // we simply pick its instance — no explicit enable needed.
     store.setResName(APPLICATION_TYPE, 'app-1')
     store.setResVer(APPLICATION_TYPE, LATEST_READY)
     store.setResName('firewall', 'fw-1')
@@ -253,8 +201,6 @@ describe("Property 6 — 'LATEST' is resolved before the payload", () => {
       item: { resourceId: 'fn-1', version: LATEST_READY }
     })
 
-    // Ready-version catalogs so the sentinel can resolve to a concrete id. The
-    // `isCurrent` option is the one a LATEST pick must land on.
     store.setVersionsByResource(APPLICATION_TYPE, 'app-1', [
       { value: 'app-v1', isCurrent: false },
       { value: 'app-v2', isCurrent: true }
@@ -279,7 +225,6 @@ describe("Property 6 — 'LATEST' is resolved before the payload", () => {
     expect(byType.firewall.resource_version).toBe('fw-v9')
     expect(byType.function.resource_version).toBe('fn-v5')
 
-    // Hard invariant: no resource_version is the sentinel.
     resources.forEach((resource) => {
       expect(resource.resource_version).not.toBe(LATEST_READY)
       expect(resource.resource_version).toBeTruthy()
@@ -289,35 +234,25 @@ describe("Property 6 — 'LATEST' is resolved before the payload", () => {
   it("the build_and_activate payload from composePayload() carries version_id and NO 'LATEST'", () => {
     const store = useReleaseStore()
     store.openRelease({ deploymentIds: ['ds-1'] })
-    seedSelection(store) // openRelease resets; re-seed after picking the DS.
+    seedSelection(store)
 
-    // The store hands the composable a PURE description; the composable (and this
-    // test) runs the adapter transform that ships to deployment-api. The sentinel
-    // must already be resolved by `composePayload()` before it reaches the adapter.
     const composed = store.composePayload()
     const payload = DeploymentAdapter.transformBuildAndActivatePayload(composed.resources)
 
     const serialized = JSON.stringify(payload)
     expect(serialized).not.toContain(LATEST_READY)
 
-    // Every resource ref carries a concrete version_id, never the sentinel.
     payload.resources.forEach((ref) => {
       expect(ref.version_id).toBeTruthy()
       expect(ref.version_id).not.toBe(LATEST_READY)
     })
 
-    // The application ref is keyed by resource_id (adapter contract), versioned.
     const appRef = payload.resources.find((ref) => ref.resource_type === APPLICATION_TYPE)
     expect(appRef.resource_id).toBe('app-1')
     expect(appRef.version_id).toBe('app-v2')
   })
 })
 
-// ---------------------------------------------------------------------------
-// coll is keyed by owning PARENT (application / firewall / custom_page), so a
-// dependency of one singleton never bleeds into another's card. Each seed
-// replaces only its own parent→type slot; an empty seed CLEARS that slot.
-// ---------------------------------------------------------------------------
 describe('coll — per-parent dependency isolation', () => {
   it('seeds application and firewall functions into independent slots', () => {
     const store = useReleaseStore()
@@ -377,10 +312,6 @@ describe('coll — per-parent dependency isolation', () => {
   })
 })
 
-// ---------------------------------------------------------------------------
-// composeResources — the flat payload dedupes a dependency referenced by two
-// parents (a resource pins a single version per flat release).
-// ---------------------------------------------------------------------------
 describe('composeResources — dedupes a dependency shared by two parents', () => {
   it('emits a single flat entry when the same function is under application and firewall', () => {
     const store = useReleaseStore()
@@ -406,14 +337,6 @@ describe('composeResources — dedupes a dependency shared by two parents', () =
   })
 })
 
-// ---------------------------------------------------------------------------
-// composePayload — DISCRIMINATED by entry context (task 17.1, req 5.6/5.7/5.8).
-// Non-scoped → the full composed `resources[]` (Scenario A, fanned out as one
-// body). Scoped → only the override intent `{ resource_type, resource_id,
-// version }` (Scenario B, the composable preserves & swaps per DS). The store
-// stays PURE: it never reads per-DS data and the LATEST sentinel is resolved
-// here so it never leaves the store (Property 6).
-// ---------------------------------------------------------------------------
 describe('composePayload — discriminated by entry context', () => {
   it('non-scoped → { scoped:false, resources, canary, canaryForm } (Scenario A)', () => {
     const store = useReleaseStore()
@@ -435,8 +358,6 @@ describe('composePayload — discriminated by entry context', () => {
 
   it('scoped → { scoped:true, override:{ type, id, version }, canary, canaryForm } (Scenario B)', () => {
     const store = useReleaseStore()
-    // Scenario B: opened from one resource version. `resourceId` is the route
-    // string id; `versionId` is the promoted version pinned into the scoped slot.
     store.openRelease({
       fromVersion: true,
       scopedType: APPLICATION_TYPE,
@@ -458,8 +379,6 @@ describe('composePayload — discriminated by entry context', () => {
   it('scoped → resolves the LATEST sentinel to a concrete version before it leaves the store', () => {
     const store = useReleaseStore()
     store.openRelease({ scopedType: 'firewall', resourceId: 'fw-1' })
-    // No pinned version → defaults to the LATEST sentinel, which composePayload
-    // must resolve against the loaded options (Property 6: no 'LATEST' escapes).
     store.setVersionsByResource('firewall', 'fw-1', [
       { value: 'fw-v1', isCurrent: false },
       { value: 'fw-v9', isCurrent: true }
@@ -873,12 +792,6 @@ describe('deployEnabled — the app-managed dependency gate', () => {
   })
 })
 
-// ---------------------------------------------------------------------------
-// appVersionChosen — the implicit LATEST default. The composer shows "Track
-// latest Ready" as a display default without seeding resVers; the gate must
-// treat that as chosen once an application is composed (mirrors composeResources'
-// `?? LATEST_READY`), or the pre-selected version would leave deploy disabled.
-// ---------------------------------------------------------------------------
 describe('appVersionChosen — implicit latest default (pre-selected version)', () => {
   it('is satisfied when the app is inherited from the active release and no version was picked', () => {
     const store = useReleaseStore()
@@ -1009,8 +922,6 @@ describe('composePayload scoped — dependencyOverrides', () => {
       resourceId: 'fw-1',
       versionId: 'fw-promoted'
     })
-    // Application functions present in coll must not leak into a firewall scope;
-    // the firewall has zero functions of its own.
     store.seedApplicationFunctions([{ functionId: 'fn-app' }])
     store.setCollVer('application', 'function', 0, 'fn-app-v3')
     store.seedFirewallFunctions([])
@@ -1024,11 +935,6 @@ describe('composePayload scoped — dependencyOverrides', () => {
   })
 })
 
-// ---------------------------------------------------------------------------
-// deployCtx.degraded — a failed active-release READ blocks publish (Fix 1).
-// A DS whose active release couldn't be read is DISTINCT from one with no
-// release: publishing anyway would drop resources the failed read never saw.
-// ---------------------------------------------------------------------------
 describe('deployCtx.degraded — a failed active-release read blocks canDeploy', () => {
   const setupSelectedDs = (store) => {
     store.setDeployments([{ id: 'ds-1', deployment_policy: VERSIONED_URLS }])
@@ -1081,11 +987,6 @@ describe('deployCtx.degraded — a failed active-release read blocks canDeploy',
   })
 })
 
-// ---------------------------------------------------------------------------
-// versionGateSatisfied — the extracted version gate (Fix 3). It lets the view
-// tell WHEN only the version confirmation is missing (to show a hint) without
-// re-deriving the branch.
-// ---------------------------------------------------------------------------
 describe('versionGateSatisfied — the extracted version gate', () => {
   it('non-scoped: gates on the application version', () => {
     const store = useReleaseStore()
@@ -1098,8 +999,6 @@ describe('versionGateSatisfied — the extracted version gate', () => {
   it('scoped application: gates on the application version', () => {
     const store = useReleaseStore()
     store.openRelease({ fromVersion: true, scopedType: APPLICATION_TYPE, resourceId: 'app-1' })
-    // openRelease seeds resVers[application] only when a versionId is present; here
-    // none is passed, so the gate is unmet until the app version is chosen.
     store.setResVer(APPLICATION_TYPE, 'app-v9')
     expect(store.versionGateSatisfied).toBe(true)
   })
@@ -1107,8 +1006,6 @@ describe('versionGateSatisfied — the extracted version gate', () => {
   it('scoped non-application: gates on the SCOPED resource version, not the app', () => {
     const store = useReleaseStore()
     store.openRelease({ fromVersion: true, scopedType: 'firewall', resourceId: 'fw-1' })
-    // The application card is not rendered in a firewall scope, so the app version
-    // is never chosen — the gate must read the firewall (scoped) version instead.
     expect(store.versionGateSatisfied).toBe(false)
 
     store.setResVer('firewall', 'fw-v3')

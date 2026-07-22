@@ -7,20 +7,6 @@ import { resolve, dirname } from 'node:path'
 
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 
-/**
- * Global read-only gate for list tables (single source of truth).
- *
- * A resource opened in an immutable version (ready/active/archived) exposes
- * `readOnly:true` through the version context. `useDataTable` consumes that flag
- * and drops EVERY row action, and `ListTable` strips the empty-state create
- * affordances — so no ListView has to gate them by hand. Outside a VersionShell
- * the injected default is `readOnly:false`, so legacy/non-versioned tables keep
- * their create button and actions untouched.
- */
-
-// useDataTable pulls router / dialog / toast / delete-dialog at setup; stub them
-// so the harness mounts without the full app shell. Pinia is active per test
-// (setup-tests.js), so the table-definitions store resolves normally.
 vi.mock('vue-router', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 vi.mock('@aziontech/webkit/use-dialog', () => ({ useDialog: () => ({ open: vi.fn() }) }))
 vi.mock('@aziontech/webkit/use-toast', () => ({ useToast: () => ({ add: vi.fn() }) }))
@@ -103,12 +89,9 @@ describe('useDataTable — read-only version drops row actions', () => {
 describe('list table empty-state create button is gated globally', () => {
   it('ListTable strips the webkit fallback button and gates the slot on readOnly', () => {
     const src = read('src/components/list-table/ListTable.vue')
-    // Consumes the central flag from useDataTable.
     expect(src).toContain('readOnly')
-    // Kills the webkit `createButtonLabel` fallback in read-only.
     expect(src).toContain('effectiveEmptyBlock')
     expect(src).toMatch(/:emptyBlock="effectiveEmptyBlock"/)
-    // Kills the ListView-provided create button in read-only.
     expect(src).toMatch(/#emptyBlockButton[\s\S]*v-if="!readOnly"/)
   })
 

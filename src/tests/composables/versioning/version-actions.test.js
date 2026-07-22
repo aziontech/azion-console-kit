@@ -8,16 +8,6 @@ import {
 } from '@/composables/versioning/version-actions'
 import { DEFAULT_CAPABILITY, VERSIONED_ONLY } from '@/composables/versioning/version-capability'
 
-/**
- * Presentation-layer contract for version-actions.js. The existing
- * `version-menu-items.test.js` locks the item SET/ORDER/enablement of
- * `buildVersionMenuItems`; this file locks the literal presentation values the
- * mutation run proved were unasserted: every ACTION_META label/icon/dialog,
- * the row-menu labels+tooltips, the `mapVersionMenuItemsToMenu` command closure,
- * and the per-state action-bar buttons. Values are read literally from the
- * source on THIS branch — no snapshots, so a changed string fails for a reason.
- */
-
 const ROLLBACK_DEFERRED_TOOLTIP =
   'Rollback depends on environment data and will be available in a later phase'
 const BUILD_DISABLED_TOOLTIP = 'Only draft versions can be built'
@@ -227,9 +217,7 @@ describe('buildVersionMenuItems — deployable presentation (labels/icons/toolti
     expect(byAction.BUILD).toMatchObject({ disabled: false, tooltip: null })
     expect(byAction.DEPLOY).toMatchObject({ disabled: true, tooltip: DEPLOY_DISABLED_TOOLTIP })
     expect(byAction.PROMOTE).toMatchObject({ disabled: true, tooltip: PROMOTE_DISABLED_TOOLTIP })
-    // Archive is disabled for draft but carries NO tooltip (override sets only `disabled`).
     expect(byAction.ARCHIVE).toMatchObject({ disabled: true, tooltip: null })
-    // Rollback stays deferred regardless of state.
     expect(byAction.ROLLBACK).toMatchObject({ disabled: true, tooltip: ROLLBACK_DEFERRED_TOOLTIP })
   })
 
@@ -314,20 +302,17 @@ describe('mapVersionMenuItemsToMenu — command closure + rendered menu model', 
     const deleteIndex = menu.findIndex((entry) => entry.label === 'Delete')
     expect(deleteIndex).toBeGreaterThan(0)
     expect(menu[deleteIndex - 1]).toEqual({ separator: true })
-    // Exactly one separator in the whole menu.
     expect(menu.filter((entry) => entry.separator === true)).toHaveLength(1)
   })
 
   it('produces exactly the 7 items + 1 separator, starting at Open configuration', () => {
     const menu = buildMenu('ready', { resourceType: 'edge_application' }, vi.fn(), { id: 1 })
-    // 7 deployable items + 1 injected separator, no stray leading entry.
     expect(menu).toHaveLength(8)
     expect(menu[0].label).toBe('Open configuration')
   })
 
   it('resolves the default (deployable) capability when ctx is omitted', () => {
     const menu = buildMenu('ready', undefined, vi.fn(), { id: 1 })
-    // Deployable menu → Deploy/Promote present; also proves no throw on missing ctx.
     expect(menu.map((entry) => entry.label)).toContain('Deploy')
     expect(menu.map((entry) => entry.label)).toContain('Promote version')
   })
@@ -340,7 +325,6 @@ describe('mapVersionMenuItemsToMenu — command closure + rendered menu model', 
 
     expect(deleteItem.class).toBe('danger')
     expect(openItem.class).toBeNull()
-    // Build is disabled and non-danger → class stays null.
     expect(disabledBuild.class).toBeNull()
   })
 
@@ -409,7 +393,6 @@ describe('mapVersionMenuItemsToMenu — command closure + rendered menu model', 
     const stopPropagation = vi.fn()
 
     expect(() => openItem.command({ originalEvent: { stopPropagation } })).not.toThrow()
-    // Propagation is still stopped even when there is no handler.
     expect(stopPropagation).toHaveBeenCalledTimes(1)
   })
 })

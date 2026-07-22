@@ -54,29 +54,13 @@ const parseLineList = (value) => {
 
 const buildProtectionContract = (protection) => {
   const source = protection ?? {}
-  // Azion Authentication, Password Protection and SSO Enforcement hidden until the API supports them.
-  // const azionAuthentication = source.azion_authentication ?? {}
-  // const passwordProtection = source.password_protection ?? {}
   const ipAllowlist = source.ip_allowlist ?? {}
-  // const ssoEnforcement = source.sso_enforcement ?? {}
 
   return {
-    // azion_authentication: {
-    //   enabled: Boolean(azionAuthentication.enabled)
-    // },
-    // password_protection: {
-    //   enabled: Boolean(passwordProtection.enabled),
-    //   secret_id: passwordProtection.secret_id || null
-    // },
     ip_allowlist: {
       enabled: Boolean(ipAllowlist.enabled),
       cidrs: parseLineList(ipAllowlist.cidrs)
     }
-    // sso_enforcement: {
-    //   enabled: Boolean(ssoEnforcement.enabled),
-    //   idp_id: ssoEnforcement.idp_id || null,
-    //   allowed_domains: parseLineList(ssoEnforcement.allowed_domains)
-    // }
   }
 }
 
@@ -106,31 +90,13 @@ const normalizePayloadToEnvironmentContract = (payload) => {
 
 const toProtectionForm = (protection) => {
   const source = protection ?? {}
-  // Azion Authentication, Password Protection and SSO Enforcement hidden until the API supports them.
-  // const azionAuthentication = source.azion_authentication ?? {}
-  // const passwordProtection = source.password_protection ?? {}
   const ipAllowlist = source.ip_allowlist ?? {}
-  // const ssoEnforcement = source.sso_enforcement ?? {}
 
   return {
-    // azion_authentication: {
-    //   enabled: Boolean(azionAuthentication.enabled)
-    // },
-    // password_protection: {
-    //   enabled: Boolean(passwordProtection.enabled),
-    //   secret_id: passwordProtection.secret_id ?? null
-    // },
     ip_allowlist: {
       enabled: Boolean(ipAllowlist.enabled),
       cidrs: Array.isArray(ipAllowlist.cidrs) ? ipAllowlist.cidrs.join('\n') : ''
     }
-    // sso_enforcement: {
-    //   enabled: Boolean(ssoEnforcement.enabled),
-    //   idp_id: ssoEnforcement.idp_id ?? null,
-    //   allowed_domains: Array.isArray(ssoEnforcement.allowed_domains)
-    //     ? ssoEnforcement.allowed_domains
-    //     : []
-    // }
   }
 }
 

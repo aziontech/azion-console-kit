@@ -42,7 +42,6 @@
   const rowMenuRef = ref(null)
   const rowMenuItems = ref([])
 
-  // This context can rollback/redeploy, so the drawer action stays enabled.
   const {
     visible: drawerVisible,
     selectedRelease: selectedVersion,

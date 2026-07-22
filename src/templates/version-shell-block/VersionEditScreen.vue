@@ -1,9 +1,4 @@
 <script setup>
-  // Shared chrome for the FULL version editor screen: loading / error / heading
-  // (with the version-lifecycle teleport target) + an `editor` slot. Resource
-  // specifics come from props + the slot; the screen logic lives in
-  // useVersionEditScreen. The tab "+ Add" button now lives in the tab bar (shell's
-  // #tab-actions slot), not the heading.
   import ProgressSpinner from '@aziontech/webkit/progressspinner'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import ContentBlock from '@/templates/content-block'

@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { EdgeAppVersionAdapter } from '@/services/v2/edge-app/edge-app-version-adapter'
 
-// Full version snapshot per `GET .../versions/{vid}`: a clone of the Application
-// row (name + modules + active + debug at the root) plus the version meta.
 const appSnapshot = (overrides = {}) => ({
   id: 60001,
   name: 'my-app',
@@ -134,8 +132,6 @@ describe('EdgeAppVersionAdapter payload transforms - form -> payload at the root
     const payload = EdgeAppVersionAdapter.transformCreateDraftPayload({
       sourceVersionId: 'AVAPP0000'
     })
-    // A bare clone has no form fields; transformPayload maps every module to
-    // { enabled: undefined }, which stripUndefinedDeep removes entirely.
     expect(payload).toEqual({ source_version: 'AVAPP0000' })
   })
 

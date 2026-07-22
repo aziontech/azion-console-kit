@@ -129,8 +129,6 @@
   import { useVersionContext } from '@/composables/versioning/use-version-context'
   import { computed, ref, watch } from 'vue'
 
-  // readOnly defaults to false outside the VersionShell; immutable versions disable
-  // the editable response fields (connector, URI, custom status code, TTL).
   const { readOnly } = useVersionContext()
 
   const { value: response } = useField('response')

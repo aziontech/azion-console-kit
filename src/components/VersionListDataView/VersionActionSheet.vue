@@ -18,8 +18,6 @@
       type: String,
       default: ''
     },
-    // The already-mapped row menu model (mapVersionMenuItemsToMenu): each entry is
-    // either { separator: true } or { label, icon, disabled, class, tooltip, command }.
     items: {
       type: Array,
       default: () => []
@@ -33,8 +31,6 @@
     set: (value) => emit('update:visible', value)
   })
 
-  // The item's command already stops propagation and dispatches `row-action`
-  // through the shared mapper; the sheet only forwards the tap and closes.
   const runItem = (item) => {
     if (item?.disabled) return
     item?.command?.()

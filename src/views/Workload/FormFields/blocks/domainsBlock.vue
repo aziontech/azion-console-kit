@@ -57,7 +57,7 @@
       }
       environmentMap.value = map
     } catch {
-      // intentionally swallowed: env labels are non-blocking UX
+      // Leave the environment map empty rather than blocking on a failed lookup.
     }
   }
 
@@ -245,7 +245,7 @@
         updateDomain(0, { ...current, ...seed })
       }
     } catch {
-      // intentionally swallowed: seeding is non-blocking
+      // intentionally swallowed: best-effort seeding of initial domain is non-blocking UX
     }
   }
 

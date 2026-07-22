@@ -11,29 +11,12 @@ import {
 } from '@/composables/versioning/version-capability'
 
 /**
- * Shared behavioral contract for the version CAPABILITY SURFACES — the three
- * pure functions that gate lifecycle affordances by resource class:
- *   - `getAvailableActions` (the authoritative state→actions matrix, capability-filtered),
- *   - `getVersionBarActions` (the footer / heading action-bar buttons),
- *   - `buildVersionMenuItems` (the per-row kebab menu).
- *
- * Every resource declares a `capabilityClass` ('deployable' | 'versioned-only')
- * in the test registry. This suite proves — per class, across ALL 8 canonical
- * states — that the surfaces expose (deployable) or withhold (versioned-only)
- * Deploy/Promote/Rollback exactly as the source dictates. Expectations are
- * DERIVED from the real source (`version-actions.js` / `version-machine.js` /
- * `version-capability.js`), not from a duplicated matrix.
- *
- * @param {object} descriptor resource descriptor from `RESOURCE_TEST_REGISTRY`
+ * @param {object} descriptor
  */
 export const describeCapabilitySurfaces = (descriptor) => {
   const STATES = Object.values(VERSION_STATES)
   const GATED = ['DEPLOY', 'PROMOTE', 'ROLLBACK']
 
-  // Fixed menu action order, read straight from `buildVersionMenuItems`:
-  //   deployable →   OPEN_CONFIGURATION, BUILD, DEPLOY, PROMOTE, ROLLBACK, ARCHIVE, DELETE
-  //   versioned-only OPEN_CONFIGURATION, BUILD, NEW_DRAFT_FROM, ARCHIVE, DELETE
-  // (ARCHIVE stays via never-hide; DELETE is present for every non-'deleted' state.)
   const DEPLOYABLE_MENU = [
     'OPEN_CONFIGURATION',
     'BUILD',

@@ -3,25 +3,6 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { nextTick, ref } from 'vue'
 
-// Functional gate for the DS-first flow (Scenario A of the authoritative
-// `vue-preview.html`): when the user selects a Deployment Settings, the Release
-// Composition must load — the three uniform resource cards (Application
-// *Required*; Firewall + Custom Page with header toggles, default ON), each with
-// a Resource selector + a "Version (Ready)" picker defaulting to "latest Ready",
-// plus the nested Dependencies (Function/Connector under Application; WAF/
-// Network List under Firewall) each showing their empty state + "Add".
-//
-// This test uses REAL pinia (the store is the single source of truth) and mocks
-// ONLY the async composable (returns realistic data) + stubs the router/toast.
-// It drives the real `ReleaseCompositionTree`/`ReleaseDependenciesSection`/
-// `DeploymentSettingsPicker` so the rendered composition is genuinely exercised.
-
-// --- realistic composable data ------------------------------------------------
-// Two deployments carrying `deployment_policy`. The DS under test
-// ("storefront-canary", versioned) has an active release pinning
-// application/firewall/custom_page + two dependency instances
-// (function/network_list) so all three cards are editable (Case 4: versioned)
-// and the dependency-seed path is exercised — matching the editable Scenario A.
 const DEPLOYMENTS = [
   { id: 'storefront-canary', name: 'storefront-canary', deployment_policy: 'versioned_urls' },
   { id: 'magalu-storefront', name: 'magalu-storefront', deployment_policy: 'single_version' }
@@ -53,8 +34,6 @@ const CATALOG = {
   network_list: [{ label: 'blocklist-br', value: 'nl-1' }]
 }
 
-// A single reactive `activeReleaseByDs` so selecting the DS makes the active
-// release reachable to the view's `activeReleaseResources` computed.
 const activeReleaseByDs = ref({})
 
 const dependencyResourcesByDs = {
@@ -73,8 +52,6 @@ const loadActiveRelease = vi.fn((dsId) => {
 
 vi.mock('@/templates/release-composition/use-release-composition', async () => {
   const { watch, toValue } = await import('vue')
-  // Stable per-type list service (memoised so the picker prop identity never
-  // thrashes), backed by the same CATALOG the name resolver reads.
   const listServiceCache = {}
   const listServiceFor = (type) => {
     if (!listServiceCache[type]) {
@@ -89,8 +66,6 @@ vi.mock('@/templates/release-composition/use-release-composition', async () => {
     (CATALOG[type] ?? []).find((option) => String(option.value) === String(id))?.label ?? null
   return {
     useReleaseComposition: ({ selectedDsIds } = {}) => {
-      // Mirror the real composable's internal watcher: loading the active release
-      // for each newly selected DS on demand (the real one fans out per-DS reads).
       watch(
         () => (toValue(selectedDsIds) ?? []).map(String).join('|'),
         () => {
@@ -177,9 +152,6 @@ vi.mock('@/templates/release-composition/use-application-connector-dependencies'
   }
 })
 
-// The view also composes firewall + custom-page version-ready gates and their
-// nested dependency discoveries; stub each with its own return shape so the
-// composition renders without reaching the real (vue-query-backed) composables.
 vi.mock('@/templates/release-composition/use-application-version-ready', async () => {
   const { ref } = await import('vue')
   return {
@@ -259,7 +231,6 @@ vi.mock('@/templates/release-composition/use-custom-page-connector-dependencies'
   }
 })
 
-// --- router + toast -----------------------------------------------------------
 const routerPush = vi.fn()
 const routerResolve = vi.fn(() => ({ href: '/deployments' }))
 vi.mock('vue-router', () => ({
@@ -279,13 +250,9 @@ const mountView = () =>
     attachTo: document.body,
     global: {
       stubs: {
-        // Stub the heavy/irrelevant peripheral blocks so the test focuses on the
-        // composition tree. The DS picker, tree and dependencies are REAL.
         PageHeadingBlock: true,
         CanaryStrategyField: true,
         ImpactPanel: true,
-        // Webkit Dropdown renders an overlay we don't need; reduce it to an
-        // observable surface that still emits `update:modelValue`.
         Dropdown: {
           name: 'Dropdown',
           props: ['modelValue', 'options', 'disabled', 'placeholder'],
@@ -322,22 +289,17 @@ describe('ReleaseComposerView — DS-first flow (Scenario A)', () => {
     const picker = wrapper.findComponent({ name: 'release-deployment-settings-picker' })
     expect(picker.exists()).toBe(true)
 
-    // Simulate selecting a DS by emitting the picker's update:model-value (the
-    // same path the real Checkbox v-model takes).
     picker.vm.$emit('update:modelValue', [SELECTED_DS])
     await flushPromises()
     await nextTick()
 
-    // Composition section + tree render.
     expect(wrapper.find('[data-testid="release-composition__composition"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="release-composition__tree"]').exists()).toBe(true)
 
-    // The three singleton cards.
     expect(findCard(wrapper, 'application').exists()).toBe(true)
     expect(findCard(wrapper, 'firewall').exists()).toBe(true)
     expect(findCard(wrapper, 'custom_page').exists()).toBe(true)
 
-    // Application is Required (tag, no toggle); optional singletons have a toggle.
     expect(
       wrapper.find('[data-testid="release-composition__tag-required-application"]').exists()
     ).toBe(true)
@@ -356,7 +318,6 @@ describe('ReleaseComposerView — DS-first flow (Scenario A)', () => {
     await flushPromises()
     await nextTick()
 
-    // Each singleton card exposes its 2-col Resource + Version body.
     ;['application', 'firewall', 'custom_page'].forEach((type) => {
       expect(wrapper.find(`[data-testid="release-composition__fields-${type}"]`).exists()).toBe(
         true
@@ -373,7 +334,6 @@ describe('ReleaseComposerView — DS-first flow (Scenario A)', () => {
     await flushPromises()
     await nextTick()
 
-    // Application owns function + connector; Firewall owns waf + network_list.
     expect(wrapper.find('[data-testid="release-composition__deps-application"]').exists()).toBe(
       true
     )
@@ -389,9 +349,6 @@ describe('ReleaseComposerView — DS-first flow (Scenario A)', () => {
       wrapper.find('[data-testid="release-composition__deps-group-network_list"]').exists()
     ).toBe(true)
 
-    // Auto-detected dependency instances are seeded; a separate "Additional
-    // dependencies" section provides the manual Add control for connectors/network
-    // lists referenced dynamically (allow-add), so the control is present.
     const connectorAdd = wrapper.find('[data-testid="release-composition__deps-add-connector"]')
     expect(connectorAdd.exists()).toBe(true)
   })
@@ -405,10 +362,6 @@ describe('ReleaseComposerView — DS-first flow (Scenario A)', () => {
     await flushPromises()
     await nextTick()
 
-    // The version field of every singleton card binds LATEST_READY ('LATEST') —
-    // the target's "latest Ready" default, NOT the active release's pinned id.
-    // (Inherited dependency instances keep their pinned version, so only the
-    // singleton cards' own version fields are asserted here.)
     ;['application', 'firewall', 'custom_page'].forEach((type) => {
       const card = findCard(wrapper, type)
       expect(card.exists()).toBe(true)

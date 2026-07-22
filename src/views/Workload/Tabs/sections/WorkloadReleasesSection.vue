@@ -27,8 +27,6 @@
   const paginatorFirst = ref(0)
   const paginatorRows = ref(10)
 
-  // Read-only context (no rollback/redeploy here), so the drawer action is
-  // hidden rather than wired to a handler that does nothing.
   const {
     visible: drawerVisible,
     selectedRelease,

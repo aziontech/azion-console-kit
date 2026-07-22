@@ -17,10 +17,6 @@ vi.mock('@/services/v2/base/auth', () => ({
 }))
 
 describe('accountGuard hasSession check', () => {
-  // The no-session branch has a debug-only escape hatch gated on VITE_DEBUG_LOGIN
-  // (accountGuard.js). These tests cover the PRODUCTION redirect path, so pin the
-  // flag off — otherwise a local `.env.local` with VITE_DEBUG_LOGIN=true makes the
-  // guard take the debug branch and the outcome is env-dependent.
   beforeEach(() => {
     vi.stubEnv('VITE_DEBUG_LOGIN', 'false')
   })

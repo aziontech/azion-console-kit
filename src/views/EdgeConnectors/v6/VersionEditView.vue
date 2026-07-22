@@ -1,7 +1,4 @@
 <script setup>
-  // VersionEditView — the FULL version editor screen for a Connector, gated by
-  // `use_v6_configurations`. Logic lives in useVersionEditScreen; chrome in
-  // VersionEditScreen. This view only wires the Connector config + editor tabs.
   import VersionEditScreen from '@/templates/version-shell-block/VersionEditScreen.vue'
   import VersionEditorTabs from '@/views/EdgeConnectors/v6/tabs/VersionEditorTabs.vue'
   import { useVersionEditScreen } from '@/composables/versioning/use-version-edit-screen'

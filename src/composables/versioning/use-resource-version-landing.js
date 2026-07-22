@@ -7,8 +7,6 @@ import { getVersionCapability } from '@/composables/versioning/version-capabilit
 import { useActiveVersions } from '@/composables/versioning/use-active-versions'
 import { releaseComposerRouteFromResource } from '@/templates/release-composition/release-composer-route'
 
-// Landing tab route keys — the numeric index is derived from `showOverview` so
-// callers that opt out of Overview keep VERSIONS at index 0 without regressions.
 export const LANDING_TAB_KEYS = ['overview', 'versions', 'settings', 'variables']
 
 const tabIndexer = (showOverview) => {
@@ -22,8 +20,6 @@ const tabIndexer = (showOverview) => {
   }
 }
 
-// Back-compat: existing callers that read LANDING_TAB.VERSIONS/SETTINGS/VARIABLES
-// keep working — these are the indexes for the classic (no Overview) layout.
 export const LANDING_TAB = { VERSIONS: 0, SETTINGS: 1, VARIABLES: 2 }
 
 const SUCCESS_SUMMARY = {
@@ -36,22 +32,13 @@ const SUCCESS_SUMMARY = {
 }
 
 /**
- * useResourceVersionLanding — the shared logic for the TABBED landing screen
- * (Versions listing + Settings = Main Settings of the latest version), used by
- * Custom Pages and Firewall. Owns: resource load + provide, the latest-version
- * resolver, the route-driven active tab, the Deploy/Promote entries (which route
- * to the full-page release composer) plus the legacy drawer's resourceContext
- * (kept as a rollback fallback, via the shared version-option mapper), toast +
- * navigation, and the command-success/error handlers. Markup lives in
- * <ResourceVersionLanding>.
- *
  * @param {{
- *   load: (id: string) => Promise<object>,
- *   provideKey: string,
- *   versionService: object,
- *   resourceType: string,
- *   routeName: string,           // listing route name (carries optional `tab`)
- *   versionRouteName: string     // route name for a specific version
+ * load: (id: string) => Promise<object>,
+ * provideKey: string,
+ * versionService: object,
+ * resourceType: string,
+ * routeName: string,           // listing route name (carries optional `tab`)
+ * versionRouteName: string     // route name for a specific version
  * }} config
  */
 export function useResourceVersionLanding({
@@ -68,7 +55,6 @@ export function useResourceVersionLanding({
   const router = useRouter()
   const toast = useToast()
 
-  // versioned-only resources have no Deploy/Promote affordance — no drawer wiring.
   const capability = getVersionCapability(resourceType)
 
   const resourceId = computed(() => String(route.params.id))
@@ -79,9 +65,6 @@ export function useResourceVersionLanding({
 
   provide(provideKey, resource)
 
-  // Shared seam consumed by the slotted Versions tab to wire the single
-  // row-menu router (useVersionMenuActions); avoids per-resource menu logic.
-  // Promote is only seamed for deployable resources (capability.canDeploy).
   provide('versionMenuHost', {
     resourceType,
     resourceId,
@@ -114,9 +97,6 @@ export function useResourceVersionLanding({
   const versionsQuery = versionService.useListVersionsQuery(resourceId.value)
   const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
 
-  // Overview needs the active-versions map to render Live Deployments; kept at
-  // the landing level so both the Overview slot and the Versions slot can share
-  // the same fetch (and a single refresh after a mutation).
   const activeVersionsResourceRef = computed(() => ({ resourceType, resourceId: resourceId.value }))
   const {
     activeVersions,
@@ -137,25 +117,19 @@ export function useResourceVersionLanding({
     get: () => {
       const key = String(route.params.tab ?? '')
       if (tabs.keys.includes(key)) return tabs.indexOf(key)
-      // Default: Overview when enabled, otherwise Versions.
       return showOverview ? tabs.indexOf('overview') : tabs.indexOf('versions')
     },
     set: (index) => {
       const key = tabs.keyAt(index)
       const params = { id: resourceId.value }
-      // Keep URLs clean for the default tab (no `?tab=overview` in the URL when
-      // Overview is the landing default).
       const defaultKey = showOverview ? 'overview' : 'versions'
       if (key && key !== defaultKey) params.tab = key
       router.replace({ name: routeName, params })
     }
   })
 
-  // Deployable (Ready) version options; the shared mapper orders them newest-first.
   const deployableVersionOptions = computed(() => toDeployableVersionOptions(rawVersions.value))
 
-  // Heading/footer Deploy: route to the composer scoped to this resource, pinning
-  // the newest Ready version so the composer opens with a concrete selection.
   const openRelease = () => {
     router.push(
       releaseComposerRouteFromResource({
@@ -167,7 +141,6 @@ export function useResourceVersionLanding({
     )
   }
 
-  // Promote from the row menu: route to the composer with this version pinned.
   const openPromoteRelease = ({ pin } = {}) => {
     router.push(
       releaseComposerRouteFromResource({
@@ -237,7 +210,6 @@ export function useResourceVersionLanding({
     handleCommandSuccess,
     handleCommandError,
     handleCancel,
-    // Overview support
     versionsQuery,
     rawVersions,
     activeVersions,

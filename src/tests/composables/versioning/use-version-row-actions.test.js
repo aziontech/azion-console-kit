@@ -1,13 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-/**
- * Row-menu Archive/Delete execution (task 3.2). Asserts the post-3.2 contract:
- * ARCHIVE runs with no modal + success toast; DELETE opens the destructive
- * confirm dialog and only mutates after confirmation; a backend rejection
- * (e.g. "version in use as Current") surfaces as an error toast; and the
- * retired BUILD/NEW_DRAFT_FROM/CANCEL_BUILD actions are no-ops on this path.
- */
-
 const toastAdd = vi.fn()
 vi.mock('@aziontech/webkit/use-toast', () => ({ useToast: () => ({ add: toastAdd }) }))
 
@@ -109,8 +101,6 @@ describe('useVersionRowActions — backend authority on "in use"', () => {
     expect(showErrors).toHaveBeenCalledOnce()
   })
 
-  // Property 5: a rejection must not produce a false success — no success toast
-  // and no view reload/navigation; the list stays consistent (Req 3.1/3.2/3.4).
   it('does not signal success nor reload when Archive is rejected', async () => {
     const onSuccess = vi.fn()
     const service = makeService({

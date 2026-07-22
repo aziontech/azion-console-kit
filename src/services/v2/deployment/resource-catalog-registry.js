@@ -15,10 +15,6 @@ import { wafVersionService } from '@/services/v2/waf/waf-version-service'
 
 const CATALOG_PAGE_SIZE = 100
 
-// Versions are fetched in one large page so the picker lists EVERY Ready version
-// (the endpoint default page is small — it returned only the newest 2). `pageSize`
-// is mapped to `page_size` by buildQueryParams. `toVersionOptions` then keeps only
-// the deployable (ready/active) ones.
 const VERSIONS_PAGE_SIZE = 100
 
 const toName = (name) => (name && typeof name === 'object' ? (name.text ?? '') : (name ?? ''))

@@ -1,13 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
-/**
- * Coverage for v6 workload binding domains.
- *
- * Bindings carry real domains only — there is no `auto_domain` / `auto_domain_allow_access`
- * inside a binding. `workload_domain_allow_access` is a top-level field: never displayed or
- * edited, sent as `false` on create and round-tripped unchanged on update.
- */
-
 const hasFlagUseV6Configurations = vi.fn()
 vi.mock('@/composables/user-flag', () => ({
   hasFlagUseV6Configurations: () => hasFlagUseV6Configurations(),

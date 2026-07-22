@@ -1,11 +1,3 @@
-/**
- * Functional (real Chromium) — VersionHeadingActions (spec task 4.3).
- *
- * The component teleports its buttons into #version-lifecycle-action, so the
- * target is created in the real DOM before each render and queried from
- * document.body. `vue-router` is a legitimate boundary mock (useRouter → push
- * spy); the version-context is provided for real via VERSION_CONTEXT_KEY.
- */
 import { render } from '@testing-library/vue'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { ref } from 'vue'
@@ -17,7 +9,6 @@ import { DEFAULT_CAPABILITY, VERSIONED_ONLY } from '@/composables/versioning/ver
 const { pushMock } = vi.hoisted(() => ({ pushMock: vi.fn() }))
 vi.mock('vue-router', () => ({ useRouter: () => ({ push: pushMock }) }))
 
-// Imported after the mock is declared so the component picks up the fake router.
 import VersionHeadingActions from '@/templates/version-shell-block/components/VersionHeadingActions.vue'
 
 const primevue = { plugins: [PrimeVue], directives: { tooltip: Tooltip } }
@@ -38,8 +29,6 @@ const renderHeading = (props = {}, context = buildContext()) =>
     global: { ...primevue, provide: { [VERSION_CONTEXT_KEY]: context } }
   })
 
-// Teleport content lands in document.body under the target, so waitFor watches
-// there (onMounted flips the isMounted guard on the next tick).
 const findInTarget = async (testId) => {
   const target = document.getElementById('version-lifecycle-action')
   await vi.waitFor(() => {
@@ -73,7 +62,6 @@ describe('VersionHeadingActions (functional)', () => {
         availableActions: ref(['NEW_DRAFT_FROM'])
       })
     )
-    // New Version stays available, proving the heading rendered — only Deploy is gone.
     await findInTarget('version-heading__action-NEW_DRAFT_FROM')
     const target = document.getElementById('version-lifecycle-action')
     expect(target.querySelector('[data-testid="version-heading__deploy"]')).toBeNull()

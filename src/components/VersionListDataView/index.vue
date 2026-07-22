@@ -130,9 +130,6 @@
       type: String,
       default: ''
     },
-    // Hide the toolbar (search/filter/sort + `toolbar-actions` slot). Used by the
-    // Overview's Live Deployments table, which is a small, non-searchable list
-    // but must still share this component's table shell for visual consistency.
     showToolbar: {
       type: Boolean,
       default: true
@@ -256,10 +253,6 @@
     return 'align-start'
   }
 
-  // Card layout is the default responsive presentation (< lg). The card model is
-  // derived from `visibleColumns`: the `version` column is the title, `status`
-  // renders unlabeled below it, and the rest become labeled rows. Explicit
-  // `mobileSlot` hints still win when provided.
   const cardPrimaryColumn = computed(() => {
     const explicit = visibleColumns.value.find((col) => col?.mobileSlot === 'primary')
     if (explicit) return explicit
@@ -296,7 +289,6 @@
   const isForbiddenError = computed(() => props.errorKind === 'forbidden')
   const isNotFoundError = computed(() => props.errorKind === 'notFound')
 
-  // 403 has no useful Retry; 404 should route back to the list, not retry.
   const hasErrorAction = computed(() => {
     if (isForbiddenError.value) return false
     return !!(props.errorState?.buttonLabel && props.errorState?.buttonAction)
@@ -316,16 +308,12 @@
     return count == null || count === '' ? '--' : count
   }
 
-  // The row menu always offers the fixed 5-item model (never-hide pattern);
-  // the only state with no menu is `deleted`, where every item is gone.
   const hasRowActions = (version) =>
     buildVersionMenuItems(version?.state, { resourceType: props.resourceType }).length > 0
 
   const overflowMenuRef = ref(null)
   const rowMenuModel = ref([])
 
-  // On phones the popup menu is cramped against the trigger; the same model is
-  // presented as a bottom action sheet instead (popup stays on tablet/desktop).
   const isMobileSheet = useMediaQuery('(max-width: 767.98px)')
   const actionSheetVisible = ref(false)
   const actionSheetVersion = ref(null)
@@ -346,8 +334,6 @@
     overflowMenuRef.value?.toggle?.(event)
   }
 
-  // Below `lg` the filter + sort dropdowns are collapsed behind a single filter
-  // button + overlay so they don't crowd the toolbar.
   const isCompactViewport = useMediaQuery('(max-width: 1023.98px)')
 
   const hasCollapsibleFilters = computed(
@@ -1353,7 +1339,6 @@
     }
   }
 
-  /* Tablet: two-column card grid */
   @media (min-width: 768px) and (max-width: 1023.98px) {
     .has-card-layout :deep(.p-grid) {
       display: grid;
@@ -1365,7 +1350,6 @@
     }
   }
 
-  /* Mobile: single-column cards + icon-only filter button */
   @media (max-width: 767.98px) {
     .has-card-layout :deep(.p-grid) {
       display: grid;

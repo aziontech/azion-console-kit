@@ -1,15 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
-/**
- * Property P5 — v6 version routes are gated by `meta.flag` (task 10.4).
- * For network-lists and waf, the version-editor route carries
- * `meta.flag: 'use_v6_configurations'`; `flagGuard` must redirect to
- * `/not-found` when the flag is absent and let the navigation through when
- * present. Drives the SAME guard the router runs, against the REAL route meta,
- * so a route losing its flag (or the guard regressing) fails here
- * (Req 1.1, 1.4, 1.5, NFR-B.1).
- */
-
 const hasFlagUseV6Configurations = vi.fn()
 vi.mock('@/composables/user-flag', () => ({
   hasFlagUseV6Configurations: () => hasFlagUseV6Configurations(),

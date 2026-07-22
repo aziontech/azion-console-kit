@@ -3,22 +3,11 @@ import { httpService } from '@/services/v2/base/http/httpService'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { VersionServiceBase } from '@/services/v2/versioning/version-service-base'
 
-// These exercise the SHARED read/list machinery on `VersionServiceBase` directly,
-// via a minimal subclass — the parts every resource inherits but no single
-// resource test isolates: the URL builder, the `skipCache` param split, and the
-// `result.body ?? []` unwrap in `listVersions`. The HTTP boundary is spied
-// (`httpService.request`) and the cache is stubbed at `queryClient.ensureQueryData`
-// exactly like the real version-service tests in this repo; the code under test
-// (the base class) is never mocked.
-
 const RID = 'res-9'
 const VID = 'AVTEST01'
 const BASE = 'v4/workspace/tests'
 const VERSIONS_URL = `${BASE}/${RID}/versions`
 
-// Param-aware key group mirroring the real resources whose `list` distinguishes
-// "no params" from "with params" (e.g. application/edgeFunction). This lets the
-// split be observed on the generated queryKey itself.
 const versionKeys = {
   all: (rid) => ['test-version', rid, 'versions'],
   list: (rid, params) =>
@@ -33,7 +22,6 @@ class TestVersionService extends VersionServiceBase {
   versionKeys = versionKeys
   adapter = {
     transformLoadVersion: vi.fn((data) => ({ loaded: true, raw: data })),
-    // passthrough: `listVersions` reads `.body` off whatever the adapter returns.
     transformListVersions: vi.fn((data) => data)
   }
 }
@@ -100,7 +88,6 @@ describe('VersionServiceBase.listVersions', () => {
 
   it('falls back to an empty array when the result has no body', async () => {
     stubEnsure()
-    // adapter passthrough returns `{}` — no `.body`
     vi.spyOn(httpService, 'request').mockResolvedValueOnce({ data: {} })
 
     const result = await service.listVersions(RID)
@@ -124,10 +111,8 @@ describe('VersionServiceBase.useListVersionsQuery — skipCache / params split',
     const { queryKey, queryFn, options } = service.useListVersionsQuery(RID, { skipCache: true })
     await queryFn()
 
-    // skipCache-only ⇒ no real params ⇒ unparameterized key
     expect(queryKey).toEqual(versionKeys.list(RID))
     expect(options).toMatchObject({ persist: false, skipCache: true })
-    // no `params` on the request — skipCache never reaches the query string
     expect(requestSpy).toHaveBeenCalledWith({ method: 'GET', url: VERSIONS_URL })
     expect(useQuerySpy).toHaveBeenCalledTimes(1)
   })
@@ -182,7 +167,6 @@ describe('VersionServiceBase.useListVersionsQuery — skipCache / params split',
 
     expect(withoutParams).toEqual(versionKeys.list(RID))
     expect(withParams).toEqual(versionKeys.list(RID, { page: 2 }))
-    // the parameterized key carries one extra (params) segment
     expect(withParams.length).toBe(withoutParams.length + 1)
     expect(withoutParams).not.toEqual(withParams)
   })

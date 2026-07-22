@@ -1,23 +1,4 @@
 <script setup>
-  /**
-   * ReleaseCompositionField — renders the generic Release composition: an
-   * Application card (editable | read-only | no-application), an optional scoped
-   * resource card (when the scoped type is not the application) and the carried
-   * read-only resources of the active Release. Presentational only: every value
-   * comes from the composable; selection flows back through v-model events.
-   *
-   * @slot dependencies — optional, scoped per parent resource card. Receives
-   *   `{ resourceType }` so a surface (e.g. the full-page composer) can nest its
-   *   owned dependencies inside the matching parent card (Application →
-   *   Functions/Connectors; Edge Firewall → WAF/Network Lists). Surfaces that do
-   *   not own dependencies (the legacy drawer) simply omit the slot and nothing
-   *   is rendered — the field stays presentational and unforked.
-   * @slot card-actions — optional, pinned to the RIGHT of each editable resource
-   *   card header. Receives `{ resourceType }` so a surface can inject a control
-   *   (e.g. the composer's "include in this release" toggle) without forking the
-   *   field. When the slot is empty (the legacy drawer), the optional cards fall
-   *   back to the neutral "Optional" tag and the header is unchanged.
-   */
   import { useSlots } from 'vue'
 
   import LabelBlock from '@aziontech/webkit/label'
@@ -30,9 +11,6 @@
 
   defineOptions({ name: 'release-composition-field' })
 
-  // When a surface fills `#card-actions`, optional cards show that control
-  // (the composer's header toggle) instead of the neutral "Optional" tag, so
-  // the legacy drawer (no slot) keeps its tag and stays untouched.
   const slots = useSlots()
   const hasCardActions = () => Boolean(slots['card-actions'])
 
@@ -41,10 +19,6 @@
       type: String,
       default: ''
     },
-    // When false, the field hides its own "Release composition" header + intro so
-    // a surface (e.g. the full-page composer) can render a screen-specific intro
-    // above it without duplication. Defaults to true so the legacy surface is
-    // unchanged.
     showHeader: {
       type: Boolean,
       default: true

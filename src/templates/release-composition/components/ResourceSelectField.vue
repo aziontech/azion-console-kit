@@ -1,11 +1,4 @@
 <script setup>
-  /**
-   * ResourceSelectField — generic presentational select for picking a resource
-   * from a catalog. Built on the webkit `Dropdown` (`@aziontech/webkit/inputs/dropdown`,
-   * a first-class webkit component — NOT the raw PrimeVue wrapper), so it carries
-   * the design-system field styling. No fetching/derivation: the parent feeds
-   * `options` (`{ label, value }`) and reacts to selection via `update:modelValue`.
-   */
   import { computed } from 'vue'
   import Dropdown from '@aziontech/webkit/inputs/dropdown'
 
@@ -54,8 +47,6 @@
     () => props.options.find((option) => option.value === props.modelValue) ?? null
   )
 
-  // Options sorted ascending by label (case-insensitive, natural numeric order) so
-  // the resource list is predictable regardless of the catalog's API order.
   const sortedOptions = computed(() =>
     [...props.options].sort((left, right) =>
       String(left?.label ?? '').localeCompare(String(right?.label ?? ''), undefined, {
@@ -116,10 +107,6 @@
 </template>
 
 <style scoped>
-  /* Tune the webkit Dropdown control to the app's surface tokens (the webkit
-     defaults — --bg-surface / --border-default — are a different DS layer). The
-     focus ring is left to the webkit component itself (its --ring-color token);
-     no per-component ring override here. */
   :deep(.release-composition-control) {
     background: var(--surface-section) !important;
     border-color: var(--surface-border) !important;

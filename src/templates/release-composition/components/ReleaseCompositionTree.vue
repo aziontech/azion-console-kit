@@ -1,45 +1,4 @@
 <script setup>
-  /**
-   * ReleaseCompositionTree — the full-page "Review & deploy" composition renderer
-   * (matches the authoritative `vue-preview.html` `resources` renderer). It is the
-   * page-owned alternative to the drawer's `ReleaseCompositionField`: same shared
-   * LEAVES (`LazyResourceSelectField`, `ResourceVersionField`, `ReleaseDependenciesSection`)
-   * but the uniform-card tree structure of the new screen.
-   *
-   * Presentational only: every value comes in through `resources`, every mutation
-   * flows back out as an event. No fetching, no derivation, no business logic — the
-   * view builds the `resources` view-model from the store + composable and reacts to
-   * the events here.
-   *
-   * Each entry of `resources` is:
-   *   {
-   *     type, label, icon,
-   *     required,        // application — shows a "Required" tag, no toggle
-   *     readonly,        // deploy case locks it — selectors render disabled + lock hint
-   *     canToggle,       // optional, non-scoped — header ToggleSwitch (orange when on)
-   *     enabled,         // included in the release
-   *     name,            // selected resource id (singleton)
-   *     version,         // selected version (LATEST sentinel | pinned id)
-   *     nameService,     // (params) => { body, count } for LazyResourceSelectField
-   *     nameLoadService, // (id) => { id, name } — resolves a pre-selected label
-   *     versionOptions,  // version picker options for ResourceVersionField
-   *     isLoadingVersions,
-   *     lockReason,      // text for the read-only row
-   *     hasOwned,        // render the nested Dependencies block
-   *     ownedCollections, // collections for ReleaseDependenciesSection
-   *     dependenciesLoading, // this card's own dependency discovery is in flight
-   *     dependenciesLoadingMessage // text shown below the "Dependencies" title while loading
-   *   }
-   *
-   * @event toggle(type)                       — flip an optional singleton on/off.
-   * @event update:resource({ type, value })   — pick the singleton resource instance.
-   * @event update:version({ type, value })    — pick the singleton version.
-   * @event toggle-group({ type, group })      — collapse/expand a dependency group.
-   * @event add-instance({ type, group })      — append a blank dependency instance.
-   * @event update:instance-resource({ type, group, id, value })
-   * @event update:instance-version({ type, group, id, value })
-   * @event remove-instance({ type, group, id })
-   */
   import InputSwitch from '@aziontech/webkit/inputswitch'
 
   import LazyResourceSelectField from '@/templates/release-composition/components/LazyResourceSelectField.vue'
@@ -70,8 +29,6 @@
   const onResource = (type, value) => emit('update:resource', { type, value })
   const onVersion = (type, value) => emit('update:version', { type, value })
 
-  // Re-tag the nested ReleaseDependenciesSection events with the owning parent
-  // singleton `type` so the view's store mutations stay unambiguous per card.
   const onToggleGroup = (type, group) => emit('toggle-group', { type, group })
   const onAddInstance = (type, group) => emit('add-instance', { type, group })
   const onInstanceResource = (type, payload) =>

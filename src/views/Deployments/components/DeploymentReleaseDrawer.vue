@@ -18,8 +18,6 @@
       type: Object,
       default: null
     },
-    // Uniform rollback/redeploy contract: when false, the secondary button is
-    // hidden so a context that cannot act never emits a no-op that only toasts.
     actionable: {
       type: Boolean,
       default: true
@@ -30,8 +28,6 @@
 
   const toast = useToast()
 
-  // The composable owns all drawer state; the component stays thin and only
-  // surfaces fetch errors as a toast (DOM-bound concern kept out of the composable).
   const onError = (error) =>
     toast.add({
       closable: true,

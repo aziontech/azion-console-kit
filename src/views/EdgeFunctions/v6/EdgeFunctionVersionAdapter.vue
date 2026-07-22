@@ -1,6 +1,4 @@
 <script setup>
-  // Edge Function VersionShell form child. Thin adapter: wires the shared service +
-  // schema into the framework's useVersionFormAdapter with the default save strategy.
   import {
     useVersionFormAdapter,
     defaultSaveStrategy

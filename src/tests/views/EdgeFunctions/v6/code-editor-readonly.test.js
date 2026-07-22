@@ -4,12 +4,10 @@ import { ref } from 'vue'
 import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 
-// The theme store reads window.matchMedia (absent in jsdom); mock it out of scope here.
 vi.mock('@/stores/theme', () => ({
   useThemeStore: () => ({ resolvedTheme: 'light' })
 }))
 
-// Stub the Monaco wrapper so we can read the resolved `options` prop it receives.
 const MonacoStub = {
   name: 'vue-monaco-editor',
   props: ['value', 'language', 'theme', 'options'],

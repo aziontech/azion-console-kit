@@ -1,7 +1,4 @@
 <script setup>
-  // VersionEditView — the FULL version editor screen for an Edge Function, gated by
-  // `use_v6_configurations`. Logic lives in useVersionEditScreen; chrome in
-  // VersionEditScreen. This view only wires the Edge Function config + editor tabs.
   import VersionEditScreen from '@/templates/version-shell-block/VersionEditScreen.vue'
   import VersionEditorTabs from '@/views/EdgeFunctions/v6/tabs/VersionEditorTabs.vue'
   import { useVersionEditScreen } from '@/composables/versioning/use-version-edit-screen'
@@ -25,7 +22,6 @@
     provideKey: 'edgeFunction',
     listRoute: (id) => ({ name: 'edit-functions', params: { id } }),
     versionRouteName: 'edit-functions-version',
-    // Edge Function is versioned-only: no deploy drawer to open on DEPLOY.
     supportsDeployDrawer: false
   })
 </script>

@@ -3,13 +3,6 @@ import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { EdgeFirewallFunctionAdapter } from '@/services/v2/edge-firewall/edge-firewall-function-adapter'
 import { enrichFunctionInstanceNames } from '@/services/v2/utils/enrichFunctionInstanceNames'
 
-/**
- * Versioned Firewall Function service, scoped to (firewallId, versionId).
- *
- * Endpoints under `/v4/workspace/firewalls/{id}/versions/{vid}/functions`.
- * Mirrors the non-versioned function service so the shared Functions ListView
- * can use it as a drop-in.
- */
 export class VersionedFirewallFunctionService extends BaseService {
   constructor() {
     super()

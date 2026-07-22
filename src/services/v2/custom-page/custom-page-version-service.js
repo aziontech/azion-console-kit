@@ -3,10 +3,6 @@ import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { CustomPageVersionAdapter } from './custom-page-version-adapter'
 import { extractCustomPageConnectorDependencies } from './custom-page-adapter'
 
-/**
- * Custom Page version service. All lifecycle endpoints + cache invalidation are
- * inherited from `VersionServiceBase`; only the resource bindings differ.
- */
 export class CustomPageVersionService extends VersionServiceBase {
   constructor() {
     super()

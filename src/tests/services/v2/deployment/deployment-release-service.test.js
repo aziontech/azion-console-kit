@@ -57,7 +57,6 @@ describe('DeploymentReleaseService - getActiveReleaseComposition', () => {
     const latest = { id: 'rel-latest', traffic_role: 'valid', resources: [] }
     vi.spyOn(httpService, 'request').mockResolvedValueOnce({
       data: {
-        // Ordered -created_at,-id, so the first item is the most recent release.
         results: [latest, { id: 'rel-older', traffic_role: 'valid' }]
       }
     })
@@ -91,7 +90,6 @@ describe('DeploymentReleaseService - getActiveReleaseComposition', () => {
     stubEnsureQueryData()
     const active = { id: 'rel-active', traffic_role: 'ACTIVE' }
     vi.spyOn(httpService, 'request').mockResolvedValueOnce({
-      // Newest first: a fresh CANDIDATE precedes the ACTIVE release, which must win.
       data: { results: [{ id: 'rel-candidate', traffic_role: 'CANDIDATE' }, active] }
     })
 
@@ -147,15 +145,12 @@ describe('DeploymentReleaseService - buildAndActivate (P3, P6)', () => {
 
     await service.buildAndActivate(DEPLOYMENT_ID, payload)
 
-    // Drawer caches (active-release composition + history) are removed outright.
     expect(removeSpy).toHaveBeenCalledWith({ queryKey: queryKeys.deployments.history.all })
     expect(removeSpy).toHaveBeenCalledWith({ queryKey: queryKeys.release.all(DEPLOYMENT_ID) })
-    // Releases + deployments listings are removed so imperative reads refetch fresh.
     expect(removeSpy).toHaveBeenCalledWith({
       queryKey: queryKeys.deployments.releases.all(DEPLOYMENT_ID)
     })
     expect(removeSpy).toHaveBeenCalledWith({ queryKey: queryKeys.deployments.all })
-    // The deployment detail has no imperative cache consumer, so it stays a soft invalidate.
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: queryKeys.deployments.detail(DEPLOYMENT_ID)
     })

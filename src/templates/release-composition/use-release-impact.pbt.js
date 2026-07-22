@@ -19,9 +19,6 @@ const withFc = (build) => (fc ? build(fc) : null)
 
 const DS_ID = 'ds-target'
 
-// A row as `buildReverseLookupByDs` emits it. `id` is drawn from a small pool so
-// runs regularly repeat ids (exercising the DISTINCT-by-`id` count), and
-// `environmentName` mixes valid names with the omit-worthy values (null / '').
 const rowArb = withFc((arb) =>
   arb.record({
     id: arb.constantFrom('wl-1', 'wl-2', 'wl-3'),

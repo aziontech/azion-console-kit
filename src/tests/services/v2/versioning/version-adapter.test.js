@@ -1,14 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { createVersionAdapter, stripUndefinedDeep } from '@/services/v2/versioning/version-adapter'
 
-/**
- * Task 5.5 — `referenceCount` is normalized by the SHARED adapter factory so
- * every resource inherits it without a fork. It is INFORMATIVE only: present
- * when the API exposes `reference_count` (e.g. Edge Function), `null` when the
- * API omits it (Network List / WAF). `meta.reference_count` wins over the flat
- * key, mirroring the precedence of the other version fields (Req 3.3, 5.2).
- */
-
 const adapter = createVersionAdapter()
 
 describe('createVersionAdapter — referenceCount normalization', () => {
@@ -88,17 +80,8 @@ describe('createVersionAdapter — state normalization', () => {
   })
 })
 
-/**
- * `normalizeVersion` resolves every field through a `??` fallback chain (source
- * lines ~36-49). `??` only falls through on `null`/`undefined`, so a falsy-but-
- * present value (`''`, `0`, `false`) must STOP the chain. This table exercises
- * each tie-break level of each chain in isolation: a case where ONLY level N is
- * present (higher levels null or absent) plus a case proving a falsy value at a
- * level is NOT skipped. Req 3.3, 5.2.
- */
 describe('normalizeVersion — fallback precedence chains', () => {
   const cases = [
-    // id: meta.version_id -> raw.version_id -> raw.id
     ['id: meta.version_id wins', { meta: { version_id: 'M' }, version_id: 'F', id: 1 }, 'id', 'M'],
     [
       'id: raw.version_id when meta.version_id is null',
@@ -116,7 +99,6 @@ describe('normalizeVersion — fallback precedence chains', () => {
       ''
     ],
 
-    // state: meta.version_state -> meta.state -> raw.version_state -> raw.state
     [
       'state: meta.version_state wins',
       { meta: { version_state: 'A', state: 'B' }, version_state: 'C', state: 'D' },
@@ -150,7 +132,6 @@ describe('normalizeVersion — fallback precedence chains', () => {
       ''
     ],
 
-    // version: meta.version -> raw.version -> null
     ['version: meta.version wins', { meta: { version: 2 }, version: 3 }, 'version', 2],
     [
       'version: raw.version when meta.version is null',
@@ -162,7 +143,6 @@ describe('normalizeVersion — fallback precedence chains', () => {
     ['version: null terminal when all absent', { version_id: 'v' }, 'version', null],
     ['version: zero does NOT fall through to null', { version: 0 }, 'version', 0],
 
-    // comment: meta.description -> raw.description -> raw.comment -> ''
     [
       'comment: meta.description wins',
       { meta: { description: 'A' }, description: 'B', comment: 'C' },
@@ -196,7 +176,6 @@ describe('normalizeVersion — fallback precedence chains', () => {
       ''
     ],
 
-    // createdAt: meta.created_at -> raw.created_at -> null
     [
       'createdAt: meta.created_at wins',
       { meta: { created_at: 'm' }, created_at: 'r' },
@@ -212,7 +191,6 @@ describe('normalizeVersion — fallback precedence chains', () => {
     ['createdAt: raw.created_at when meta absent', { created_at: 'r' }, 'createdAt', 'r'],
     ['createdAt: null terminal when all absent', { version_id: 'v' }, 'createdAt', null],
 
-    // readyAt: meta.ready_at -> raw.ready_at -> null
     ['readyAt: meta.ready_at wins', { meta: { ready_at: 'm' }, ready_at: 'r' }, 'readyAt', 'm'],
     [
       'readyAt: raw.ready_at when meta.ready_at is null',
@@ -223,7 +201,6 @@ describe('normalizeVersion — fallback precedence chains', () => {
     ['readyAt: raw.ready_at when meta absent', { ready_at: 'r' }, 'readyAt', 'r'],
     ['readyAt: null terminal when all absent', { version_id: 'v' }, 'readyAt', null],
 
-    // lastModified: meta.last_modified -> raw.last_modified -> raw.ready_at -> raw.created_at -> null
     [
       'lastModified: meta.last_modified wins over all 3 flat keys',
       { meta: { last_modified: 'm' }, last_modified: 'lm', ready_at: 'ra', created_at: 'ca' },
@@ -268,7 +245,6 @@ describe('normalizeVersion — fallback precedence chains', () => {
     ],
     ['lastModified: null terminal when all 4 absent', { version_id: 'v' }, 'lastModified', null],
 
-    // lastEditor: meta.last_editor -> raw.last_editor -> null
     [
       'lastEditor: meta.last_editor wins',
       { meta: { last_editor: 'm' }, last_editor: 'r' },
@@ -284,7 +260,6 @@ describe('normalizeVersion — fallback precedence chains', () => {
     ['lastEditor: raw.last_editor when meta absent', { last_editor: 'r' }, 'lastEditor', 'r'],
     ['lastEditor: null terminal when all absent', { version_id: 'v' }, 'lastEditor', null],
 
-    // sourceVersionId: meta.source_version_id -> raw.source_version_id -> null
     [
       'sourceVersionId: meta.source_version_id wins',
       { meta: { source_version_id: 'm' }, source_version_id: 'r' },
@@ -310,7 +285,6 @@ describe('normalizeVersion — fallback precedence chains', () => {
       null
     ],
 
-    // referenceCount: meta.reference_count -> raw.reference_count -> null
     [
       'referenceCount: meta.reference_count wins',
       { meta: { reference_count: 9 }, reference_count: 1 },
@@ -344,8 +318,6 @@ describe('normalizeVersion — fallback precedence chains', () => {
 })
 
 describe('normalizeVersion — non-object / falsy raw is returned verbatim', () => {
-  // Guards the `if (!raw || typeof raw !== 'object') return raw` short-circuit:
-  // a primitive or null must pass straight through (no meta/field reads).
   it('returns null unchanged', () => {
     expect(adapter.normalizeVersion(null)).toBeNull()
   })
@@ -383,16 +355,12 @@ describe('createVersionAdapter — factory fallbacks (toConfig / mapMeta / mapRe
   })
 
   it('mapResourceFields defaults to an empty object, so a draft payload carries only comment/source', () => {
-    // Default adapter: toFields() returns {} which strips to undefined, so the
-    // payload is exactly the explicit comment/source_version keys.
     const payload = createVersionAdapter().transformDraftPayload({ comment: 'c' })
     expect(payload).toStrictEqual({ comment: 'c' })
   })
 })
 
 describe('transformDraftPayload — comment/source at the root (clean adapter)', () => {
-  // Default adapter (no mapResourceFields) so comment/source come ONLY from the
-  // explicit branches, not echoed back through mapResourceFields.
   const clean = createVersionAdapter()
 
   it('writes comment and source_version when defined', () => {
@@ -511,23 +479,16 @@ describe('stripUndefinedDeep', () => {
   it('recurses into arrays: drops undefined entries and cleans each item', () => {
     const input = { items: [1, undefined, null, { keep: 2, gone: undefined }] }
     const result = stripUndefinedDeep(input)
-    // The undefined entry is removed; null is preserved; the object item keeps its
-    // defined field and loses `gone`. (Before the fix the array was opaque, so the
-    // in-array `undefined` leaked to the wire as `null` via JSON.stringify.)
     expect(result.items).toEqual([1, null, { keep: 2 }])
   })
 
   it('drops an array item that collapses to an empty object', () => {
-    // Each item is cleaned recursively; an object whose only field is undefined
-    // collapses to undefined and is then filtered out of the array.
     expect(stripUndefinedDeep({ items: [{ gone: undefined }, { keep: 1 }] })).toEqual({
       items: [{ keep: 1 }]
     })
   })
 
   it('keeps an empty array as an empty array (arrays never collapse to undefined)', () => {
-    // Only OBJECTS collapse to undefined when empty; an array stays a (possibly
-    // empty) array so callers still send `[]` rather than dropping the key.
     expect(stripUndefinedDeep({ items: [] })).toEqual({ items: [] })
     expect(stripUndefinedDeep({ items: [undefined, undefined] })).toEqual({ items: [] })
   })

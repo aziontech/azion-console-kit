@@ -3,27 +3,12 @@ import { useToast } from '@aziontech/webkit/use-toast'
 import { metaFor } from '@/composables/versioning/version-actions'
 
 /**
- * Handles the row-menu management actions (Archive / Delete) emitted by
- * `VersionListDataView`'s `row-action` event. Clone/Build are NOT routed here —
- * they live in the shell action bar, not the row menu (spec version-actions-menu
- * §3.4). ARCHIVE runs immediately (no modal) with a success toast; DELETE opens
- * a destructive confirmation dialog first.
- *
- * Execution goes DIRECTLY through the version service — the VersionShell command
- * bus is shell-scoped and is not available here (and the list manages many
- * versions, not one). Each service mutation already invalidates the vue-query
- * cache, so the list refetches with no extra work. The backend stays the
- * authority on "in use as Current": its rejection surfaces as an error toast.
- *
  * @param {object} cfg
- * @param {import('vue').MaybeRefOrGetter<string>} cfg.resourceId application id (ref/getter/plain)
- * @param {object} cfg.service version service exposing deleteVersion/archive
- * @param {() => void} [cfg.onSuccess] called after a successful action, so the
- *   consuming view can reload the list and reflect the new version status
- * @returns dialog state + handlers to wire into the view and VersionActionDialog
+ * @param {import('vue').MaybeRefOrGetter<string>} cfg.resourceId
+ * @param {object} cfg.service
+ * @param {() => void} [cfg.onSuccess]
+ * @returns
  */
-// Default archive note: the row-menu Archive runs without a modal (Req 5.2),
-// but the version service requires a non-empty comment — supply a stable one.
 const DEFAULT_ARCHIVE_COMMENT = 'Archived from the versions list'
 
 export function useVersionRowActions({ resourceId, service, onSuccess } = {}) {
@@ -65,8 +50,6 @@ export function useVersionRowActions({ resourceId, service, onSuccess } = {}) {
     }
   }
 
-  // Only Archive/Delete reach the row-action path; everything else is a no-op
-  // here (Clone/Build stay in the shell action bar).
   const execute = async (action, item) => {
     const rid = toValue(resourceId)
     switch (action) {
@@ -89,10 +72,6 @@ export function useVersionRowActions({ resourceId, service, onSuccess } = {}) {
     })
   }
 
-  // The backend is the authority on "in use as Current". We mutate, then react:
-  // success toast + view reload run ONLY after the API confirms. A rejection
-  // (e.g. in use) surfaces the returned error and leaves the list untouched —
-  // no optimistic remove/archive, no navigation (Req 3.1, 3.2, 3.4).
   const run = async (action, item) => {
     if (isExecuting.value) return
     isExecuting.value = true
@@ -105,13 +84,10 @@ export function useVersionRowActions({ resourceId, service, onSuccess } = {}) {
     } finally {
       isExecuting.value = false
     }
-    // Post-confirmation view sync — outside the mutation try so a failing
-    // reload never reads as the action itself having failed.
     notifySuccess(action)
     onSuccess?.()
   }
 
-  // DELETE opens the destructive confirm dialog; ARCHIVE runs with no modal.
   const handleRowAction = ({ action, item } = {}) => {
     if (action !== 'ARCHIVE' && action !== 'DELETE') return
     if (!item) return

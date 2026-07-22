@@ -4,31 +4,12 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
-/**
- * Property P6 — menu consistency across listings (task 7.3).
- * Enumerates every version listing/consumer and asserts two things for the SAME
- * version state:
- *   (a) each routes `row-action` through the shared `useVersionMenuActions`
- *       (the single driver) and never builds/handles the menu locally; and
- *   (b) each renders an IDENTICAL menu — same set, order and enablement — built
- *       by the shared `mapVersionMenuItemsToMenu`, regardless of `resourceType`.
- * Divergence by listing is forbidden by construction (Req 1.4, 10.1, NFR-B.1).
- *
- * The driver runs the REAL use-version-row-actions seam; only the toast boundary
- * is stubbed. Delegation is proven by the service call / dialog each action drives.
- */
-
 vi.mock('@aziontech/webkit/use-toast', () => ({ useToast: () => ({ add: vi.fn() }) }))
 
 import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
 import { mapVersionMenuItemsToMenu } from '@/composables/versioning/version-actions'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 
-/**
- * Every version listing/consumer wired to the shared driver, with the
- * `resourceType` it injects and the source file that proves the wiring.
- * Adding a new listing without the shared driver makes this enumeration fail.
- */
 const LISTINGS = [
   {
     name: 'EdgeApplications VersionsTab',
@@ -74,25 +55,14 @@ const LISTINGS = [
 
 const ALL_STATES = [...Object.values(VERSION_STATES), 'deleted', 'totally-unknown']
 
-// Cross-listing menu equality holds within a capability class. Versioned-only
-// resources (function/network_list/waf) intentionally diverge — no Promote/
-// Rollback, a "New version from this" item — so they are excluded from the
-// byte-identical assertions (Req 2.2, 2.3); their menu is locked by the
-// capability enumeration test.
 const VERSIONED_ONLY_TYPES = new Set(['function', 'network_list', 'waf'])
 const DEPLOYABLE_LISTINGS = LISTINGS.filter(
   ({ resourceType }) => !VERSIONED_ONLY_TYPES.has(resourceType)
 )
 
-// Resolve from the repo root via the current file's directory. NOTE: do NOT use
-// `new URL(dynamicPath, import.meta.url)` — Vite rewrites that pattern as a static
-// asset import and cannot resolve a dynamic argument, yielding a bogus path.
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../')
 const readSource = (relative) => readFileSync(resolve(REPO_ROOT, relative), 'utf8')
 
-// Drop the per-item `command` closures (identity differs across calls) so two
-// rendered models compare by their visible/structural shape (label/icon/
-// disabled/class/tooltip/separator) — what the user actually perceives.
 const stripCommands = (model) =>
   model.map((entry) => {
     const rest = { ...entry }
@@ -120,7 +90,6 @@ describe('P6 — every listing wires the shared driver (no local menu handling)'
     const rendersMenu =
       src.includes('mapVersionMenuItemsToMenu') || src.includes('VersionListDataView')
     expect(rendersMenu).toBe(true)
-    // No listing may hardcode menu labels — those live only in version-actions.js.
     expect(src).not.toContain('Promote version')
     expect(src).not.toContain('Open configuration')
     expect(src).not.toContain('Rollback to this version')

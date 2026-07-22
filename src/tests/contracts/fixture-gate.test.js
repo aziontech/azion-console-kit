@@ -4,13 +4,8 @@ import { resolve } from 'node:path'
 import process from 'node:process'
 import { contractSchemas } from '../../../tests/contracts/schemas'
 
-// The canonical fixture tree lives at the repo root (shared by the consumer suite
-// and the pre-deploy drift check); the unit runner only includes `src/tests`, so
-// resolve the sibling `tests/contracts/fixtures` directory from the Vitest root.
 const fixturesDir = resolve(process.cwd(), 'tests/contracts/fixtures')
 
-// A fixture is named `<resourceKey>.version.json`; the key must exist in the
-// contract registry so every snapshot is anchored to exactly one response schema.
 const resourceKeyFromFile = (fileName) => fileName.replace(/\.version\.json$/, '')
 
 const fixtureFiles = readdirSync(fixturesDir).filter((fileName) =>
@@ -19,9 +14,6 @@ const fixtureFiles = readdirSync(fixturesDir).filter((fileName) =>
 
 const readFixture = (fileName) => JSON.parse(readFileSync(`${fixturesDir}/${fileName}`, 'utf-8'))
 
-// This is the "lying fixture" gate (req 5.3): every committed snapshot MUST match
-// the shape the API actually returns, as encoded by `versionResponse`. Editing a
-// fixture into a shape the API never emits breaks this test with the yup errors.
 describe('contract fixtures — gate against versionResponse', () => {
   it('discovers at least one fixture per registered resource', () => {
     const discoveredKeys = fixtureFiles.map(resourceKeyFromFile).sort()

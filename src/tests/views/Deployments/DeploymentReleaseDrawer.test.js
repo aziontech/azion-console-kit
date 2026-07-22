@@ -2,8 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { ref, computed } from 'vue'
 
-// Webkit primitives reduced to plain DOM so the contract (button presence +
-// click → emit) is observable in jsdom without the real component internals.
 vi.mock('@aziontech/webkit/button', () => ({
   default: {
     name: 'Button',
@@ -30,8 +28,6 @@ vi.mock('@/views/Deployments/components/DeploymentReleaseDetails.vue', () => ({
   default: { name: 'DeploymentReleaseDetails', props: ['release'], template: '<div />' }
 }))
 
-// Drive the composable directly: this isolates the component's job, which is the
-// uniform rollback/redeploy contract (actionable gate) + forwarding the emit.
 const onSecondaryAction = vi.fn()
 const secondaryButtonLabel = ref('Rollback')
 let capturedEmit
@@ -99,7 +95,6 @@ describe('DeploymentReleaseDrawer — uniform rollback/redeploy contract', () =>
 
     expect(wrapper.emitted('rollback')).toEqual([[{ id: 'R1' }]])
     expect(wrapper.emitted('redeploy')).toEqual([[{ id: 'R1' }]])
-    // `error` is a DOM-bound concern: it toasts and is NOT re-emitted upward.
     expect(wrapper.emitted('error')).toBeUndefined()
     expect(toastAdd).toHaveBeenCalledTimes(1)
     expect(toastAdd).toHaveBeenCalledWith(expect.objectContaining({ severity: 'error' }))

@@ -40,8 +40,6 @@
       required: true,
       type: Function
     },
-    // Optional versioned facade (drop-in). When provided, list/delete/create/edit/
-    // load route through it instead of the non-versioned edgeFirewallFunctionService.
     service: {
       type: Object,
       default: null

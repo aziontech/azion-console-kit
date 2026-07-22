@@ -6,18 +6,11 @@ import {
 } from '@/composables/versioning/version-machine'
 
 /**
- * Internal VersionShell composable.
- *
- * - Reads the version by calling a factory passed via prop (`useVersionQuery`).
- *   The service behind it controls queryKey, refetchInterval and cache.
- * - Derives state/readOnly/availableActions/disabledActions.
- * - Dispatches commands through the shell's command bus. Does not touch cache.
- *
  * @param {Object} params
- * @param {Function}      params.useVersionQuery — factory returning UseQueryReturn
+ * @param {Function} params.useVersionQuery
  * @param {string|number} params.resourceId
- * @param {string}        params.versionId
- * @param {Object}        params.bus
+ * @param {string} params.versionId
+ * @param {Object} params.bus
  */
 export const useVersionShell = ({ useVersionQuery, resourceId, versionId, bus }) => {
   const versionQuery = useVersionQuery()
@@ -39,10 +32,6 @@ export const useVersionShell = ({ useVersionQuery, resourceId, versionId, bus })
     return disabled
   })
 
-  // In-flight guard (fail-closed, same shape as the gates above): only one command
-  // may run at a time. Blocks the double-submit where a rapid second click would
-  // enqueue a second updateDraft/build before the first settles. Set before the
-  // emit and cleared in `finally` so a rejected handler can never lock the shell.
   const pendingAction = ref(null)
   const isDispatching = computed(() => pendingAction.value !== null)
 

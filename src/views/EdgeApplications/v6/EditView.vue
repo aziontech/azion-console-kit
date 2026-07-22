@@ -1,15 +1,4 @@
 <script setup>
-  /**
-   * v6 EditView — the Application landing screen, gated by
-   * `use_v6_configurations`. Uses the shared ResourceVersionLanding shell
-   * (mirrors Firewall) and plugs into it three tabs: Overview + Versions +
-   * Variables. The version editor lives in a separate screen
-   * (`edit-application-version`); Deploy from the heading routes to the
-   * full-page release composer.
-   *
-   * The flag check stays centralized in the router (req 10.1) — this view never
-   * imports user-flag.
-   */
   import PrimeButton from '@aziontech/webkit/button'
 
   import ResourceVersionLanding from '@/templates/version-shell-block/ResourceVersionLanding.vue'

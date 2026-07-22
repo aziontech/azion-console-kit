@@ -27,8 +27,6 @@
 
   const code = ref(props.initialValue)
 
-  // Effective read-only: explicit prop OR immutable version state.
-  // Outside the VersionShell the context default is false, so non-versioned usage is unchanged.
   const { readOnly: versionReadOnly } = useVersionContext()
   const isReadOnly = computed(() => props.readOnly || Boolean(versionReadOnly.value))
 

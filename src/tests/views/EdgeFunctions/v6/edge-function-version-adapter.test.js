@@ -9,14 +9,8 @@ import {
 } from '@/composables/versioning/use-version-command-bus'
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 
-/**
- * The REAL edgeFunctionVersionService runs here; only the HTTP client and the
- * query cache are stubbed. The adapter's routing is proven by the HTTP request the
- * chain drives (method + url + body) — never by a mocked version service.
- */
 import EdgeFunctionVersionAdapter from '@/views/EdgeFunctions/v6/EdgeFunctionVersionAdapter.vue'
 
-// Satisfies the real Function schema: name + code required, defaultArgs valid JSON.
 const VALID_RESOURCE = { name: 'my-fn', code: 'export default {}', defaultArgs: '{}' }
 
 const makeContext = (overrides = {}) => ({
@@ -93,7 +87,6 @@ describe('EdgeFunctionVersionAdapter — thin adapter delegating to useVersionFo
 
   it('SAVE with invalid form rejects and never issues a write request', async () => {
     const bus = createVersionCommandBus()
-    // `code` is required by the Function schema; an empty value fails validation.
     mountAdapter({ bus, resource: { name: 'my-fn', code: '', defaultArgs: '{}' } })
     await flushPromises()
 
@@ -117,8 +110,6 @@ describe('EdgeFunctionVersionAdapter — thin adapter delegating to useVersionFo
       url: 'v4/workspace/functions/10/versions',
       body: expect.objectContaining({ source_version: 'v1', comment: 'clone' })
     })
-    // The service returns the adapter-normalized version (id at the root, resource
-    // fields under config) — not the raw API body.
     expect(draft.id).toBe('v2')
     expect(draft.config).toMatchObject({ name: 'cloned draft' })
   })
@@ -148,9 +139,6 @@ describe('EdgeFunctionVersionAdapter — thin adapter delegating to useVersionFo
 })
 
 describe('EdgeFunctionVersionAdapter — read-only in an immutable version state', () => {
-  // The form fields delegate code read-only to code-editor.vue, which reads the
-  // shared version context. Render a probe that reflects the injected readOnly flag
-  // as an observable DOM attribute.
   const CodeEditorStub = {
     name: 'code-editor',
     inject: { versionCtx: { from: VERSION_CONTEXT_KEY } },

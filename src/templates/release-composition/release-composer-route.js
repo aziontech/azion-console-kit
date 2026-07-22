@@ -1,32 +1,13 @@
-// Surface-agnostic entry helpers for the full-page Review & deploy screen
-// (route `release-composer`, path `releases/new`). Lives in the neutral
-// release-composition module so entry code never imports from a "drawer"-named
-// file. Pure: builds a Vue Router location from the inputs; the host pushes it.
-//
-// The page reads these on mount and calls `store.openRelease` (spec §A). Only
-// what the spec lists is passed in the query; `consumingDsIds` is intentionally
-// omitted — the page resolves the consuming Deployment Settings client-side.
-
 export const RELEASE_COMPOSER_ROUTE = 'release-composer'
 
-// scopedType is the resource kind the composer scopes to. The composer accepts
-// `application` | `firewall` | `custom_page`; other resource kinds open DS-first.
 const SCOPED_RESOURCE_TYPES = ['application', 'firewall', 'custom_page']
 
 /**
- * Route location for opening the composer scoped to a specific resource version
- * ("Deploy <version>"). The composer pre-selects the consuming Deployment
- * Settings itself, so no DS ids travel in the query.
- *
- * Resolves the version id from a pinned version, else the first deployable
- * option. Returns the plain DS-first location when the inputs can't form a
- * resource-scoped entry (unknown type or missing id) — never fabricates state.
- *
  * @param {{
- *   resourceType?: string,
- *   resourceId?: string|number,
- *   version?: { id?: string|number }|null,
- *   versions?: Array<{ value?: string|number }>
+ * resourceType?: string,
+ * resourceId?: string|number,
+ * version?: { id?: string|number }|null,
+ * versions?: Array<{ value?: string|number }>
  * }} resourceContext the shape already built per deployable resource
  * @returns {{ name: string, query?: Record<string, string> }}
  */
@@ -71,23 +52,11 @@ export const releaseComposerRouteFromDeployment = (deploymentId) => {
 }
 
 /**
- * Route location for the "Compose first release" CTA: a Deployment Settings
- * reached from a resource-scoped entry that has no active release to override.
- * Opens the composer DS-first (full composition, Application editable) for that
- * single DS and carries the scoped resource forward as a seed so the resource +
- * version the user came from arrive pre-filled — only the Application is left to
- * pick.
- *
- * The seed travels under `seed*` keys (not `scopedType`/`fromVersion`) so it does
- * NOT collapse the composition to a scoped entry. Falls back to the plain
- * DS-first location when the seed can't be formed (unknown type or missing id) —
- * never fabricates state.
- *
  * @param {{
- *   deploymentId?: string|number,
- *   scopedType?: string,
- *   resourceId?: string|number,
- *   versionId?: string|number
+ * deploymentId?: string|number,
+ * scopedType?: string,
+ * resourceId?: string|number,
+ * versionId?: string|number
  * }} [context]
  * @returns {{ name: string, query?: Record<string, string> }}
  */

@@ -3,12 +3,6 @@ import { buildVersionMenuItems } from '@/composables/versioning/version-actions'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 import { VERSIONED_ONLY, getVersionCapability } from '@/composables/versioning/version-capability'
 
-/**
- * Task 3.8 — Phase 1: the kebab menu for `versioned-only` resources drops
- * Promote/Rollback and inserts "New version from this", while the deployable
- * default stays byte-identical. Requirements 2.2, 2.3.
- */
-
 const VERSIONED_ONLY_ORDER = ['OPEN_CONFIGURATION', 'BUILD', 'NEW_DRAFT_FROM', 'ARCHIVE', 'DELETE']
 const DEPLOYABLE_ORDER = [
   'OPEN_CONFIGURATION',
@@ -20,7 +14,6 @@ const DEPLOYABLE_ORDER = [
   'DELETE'
 ]
 
-// Canonical states plus the synthetic `deleted` (Delete omitted).
 const STATES_WITH_DELETE = Object.values(VERSION_STATES)
 const VERSIONED_ONLY_TYPES = ['function', 'network_list', 'waf']
 
@@ -59,8 +52,6 @@ describe('buildVersionMenuItems — "New version from this" override (Req 2.3)',
   )
 
   it('does NOT mutate ACTION_META — deployable NEW_DRAFT_FROM keeps "Clone as Draft"', () => {
-    // versioned-only relabels the kebab item; the deployable menu has no
-    // NEW_DRAFT_FROM item, so the shell action bar keeps "Clone as Draft".
     buildVersionMenuItems(VERSION_STATES.READY, {}, VERSIONED_ONLY)
     const deployable = buildVersionMenuItems(VERSION_STATES.READY)
     expect(byAction(deployable, 'NEW_DRAFT_FROM')).toBeUndefined()
@@ -71,7 +62,6 @@ describe('buildVersionMenuItems — capability resolved from resourceType', () =
   it.each(VERSIONED_ONLY_TYPES)(
     'resourceType "%s" resolves to the versioned-only menu without an explicit capability',
     (resourceType) => {
-      // No capability arg: it must be derived from ctx.resourceType via the map.
       const items = buildVersionMenuItems(VERSION_STATES.READY, { resourceType })
       expect(actionsOf(items)).toEqual(VERSIONED_ONLY_ORDER)
       expect(getVersionCapability(resourceType)).toBe(VERSIONED_ONLY)

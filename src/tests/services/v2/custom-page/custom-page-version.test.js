@@ -3,9 +3,6 @@ import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 import { describeVersionServiceContract } from '@/tests/shared/versioning/version-service.contract'
 import { describeVersionAdapterContract } from '@/tests/shared/versioning/version-adapter.contract'
 
-// Custom Page — registry-driven suite. The inherited service + shared adapter
-// contracts run from the descriptor (name/active markers). Bespoke below: the
-// `pages[]` snapshot, which is the Custom-Page-specific part of the config.
 const customPage = RESOURCE_TEST_REGISTRY.custom_page
 const adapter = customPage.adapter
 

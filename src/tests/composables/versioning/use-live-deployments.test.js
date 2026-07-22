@@ -55,7 +55,6 @@ describe('useLiveDeployments', () => {
     expect(row.environments).toEqual(['prod', 'staging'])
     expect(row.workloads).toEqual([])
     expect(row.deployments).toHaveLength(2)
-    // latestDeployedAt is the most recent across the deployments.
     expect(row.latestDeployedAt).toBe('2026-01-02T00:00:00Z')
     expect(row.version).toMatchObject({ id: 'v1', label: 'Version 1' })
   })

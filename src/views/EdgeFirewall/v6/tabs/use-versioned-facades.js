@@ -2,14 +2,8 @@ import { versionedFirewallFunctionService } from '@/services/v2/edge-firewall/ve
 import { versionedFirewallRulesEngineService } from '@/services/v2/edge-firewall/versioned/versioned-firewall-rules-engine-service'
 
 /**
- * Builds one facade per Edge Firewall versioned sub-resource, each pre-bound to a
- * `(resourceId, versionId)` pair and delegating to the versioned services.
- *
- * Method signatures mirror how the existing Functions / Rules Engine ListViews
- * already call `props.service.*`, so the shared components stay drop-in (no fork).
- *
- * @param {string|number} resourceId Edge Firewall id.
- * @param {string} versionId Version id the tabs are scoped to.
+ * @param {string|number} resourceId
+ * @param {string} versionId
  * @returns {{ functions: object, rulesEngine: object }}
  */
 export const useVersionedFacades = (resourceId, versionId) => {

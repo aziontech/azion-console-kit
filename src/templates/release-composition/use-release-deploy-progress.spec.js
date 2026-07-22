@@ -51,7 +51,6 @@ describe('useReleaseDeployProgress', () => {
     expect(byId['ds-2'].status).toBe('failed')
     expect(byId['ds-2'].errorType).toBe('versioned_urls_active_limit')
     expect(byId['ds-3'].status).toBe('skipped')
-    // `failed` folds failed + skipped (both did not go live).
     expect(progress.counts.value).toMatchObject({
       total: 3,
       done: 1,

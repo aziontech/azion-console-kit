@@ -219,9 +219,6 @@
     return 'align-start'
   }
 
-  // Card layout is the default responsive presentation (< lg). The card model is
-  // derived from `columns`, so consumers don't have to declare a per-column
-  // `mobileSlot`; explicit `mobileSlot` hints still win when provided.
   const cardPrimaryColumn = computed(() => {
     const explicit = props.columns.find((col) => col?.mobileSlot === 'primary')
     if (explicit) return explicit
@@ -252,8 +249,6 @@
   const hasAllowedFilters = computed(() => props.allowedFilters?.length > 0)
   const hasAppliedFilters = computed(() => props.appliedFilters?.length > 0)
 
-  // Below `lg` the slotted toolbar filters (`#toolbar-extras`) are collapsed
-  // behind a single filter button + overlay so they don't crowd the toolbar.
   const slots = useSlots()
   const hasToolbarExtras = computed(() => !!slots['toolbar-extras'])
   const isCompactViewport = useMediaQuery('(max-width: 1023.98px)')
@@ -1009,7 +1004,6 @@
     }
   }
 
-  /* Tablet: two-column card grid */
   @media (min-width: 768px) and (max-width: 1023.98px) {
     .has-card-layout :deep(.p-grid) {
       display: grid;
@@ -1021,7 +1015,6 @@
     }
   }
 
-  /* Mobile: single-column cards + icon-only filter button */
   @media (max-width: 767.98px) {
     .has-card-layout :deep(.p-grid) {
       display: grid;

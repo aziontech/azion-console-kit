@@ -2,7 +2,6 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import ActionBarBlock from '@/templates/action-bar-block/index.vue'
 
-// Distinct-class stubs so assertions never depend on webkit button internals.
 const stubs = {
   ButtonSave: { template: '<button class="stub-save" />' },
   ButtonCancel: { template: '<button class="stub-cancel" />' }

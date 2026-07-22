@@ -1,18 +1,4 @@
 <script setup>
-  /**
-   * ResourceOverviewBlock — shared Overview tab body for versionable resources.
-   * Renders (top-down): Metrics placeholder (out-of-scope this delivery), Live
-   * Deployments table (versions currently receiving traffic) and Version History
-   * (remaining versions with search/filter/paginate).
-   *
-   * Plug-and-play: reads getOverviewConfig(resourceType) for the workload
-   * resolver; every version-list plumbing (activeVersions, useVersionList, row
-   * menu actions) is reused from the shared versioning composables.
-   *
-   * Both tables render through the same VersionListDataView so the visual shell
-   * (header, borders, row rhythm) matches — Live Deployments hides the toolbar
-   * and row menu since it's a small, non-searchable list.
-   */
   import { computed, inject, toRef } from 'vue'
   import { useRouter } from 'vue-router'
   import PrimeTag from '@aziontech/webkit/prime-tag'
@@ -46,9 +32,6 @@
 
   const config = computed(() => getOverviewConfig(props.resourceType))
 
-  // Row-menu driver shared with the Versions tab: OPEN_CONFIGURATION on row-click
-  // navigates to the version editor; kebab actions (Archive, Delete, Promote…)
-  // open the confirmation dialog rendered below.
   const {
     handleRowAction,
     dialogConfig,
@@ -65,17 +48,10 @@
     onSuccess: menuHost.onSuccess
   })
 
-  // Live Deployments rows carry a composite `id` (versionId::deploymentId) so
-  // DataView's dataKey stays unique when a version fans out to N deployments.
-  // Before handing the payload to the shared driver, restore the true version id.
   const handleLiveRowAction = ({ action, item }) => {
     handleRowAction({ action, item: { ...item, id: item?.versionId ?? item?.id } })
   }
 
-  // Tenant-wide directories used by the workload resolver to fill the
-  // Environment and Workload columns of Live Deployments. Both are keyed by
-  // deployment_id; on error each falls back to an empty Map and the resolver
-  // renders "—" in the corresponding column.
   const {
     deploymentToWorkload,
     deploymentToEnvironment,
@@ -97,11 +73,6 @@
 
   const liveColumns = getLiveDeploymentColumns()
 
-  // One row per version — Environment and Workload columns render every
-  // deployment the version is currently pinned to (see #cell-environment /
-  // #cell-workload slots below). The Deployed column reads `deployedAt` +
-  // `lastEditor` (carried via `...row.version`) and is rendered by
-  // VersionListDataView with the same two-line pattern as "Created by".
   const liveItems = computed(() =>
     liveDeployments.value.map((row) => ({
       ...row.version,
@@ -114,8 +85,6 @@
     }))
   )
 
-  // Version History = raw versions minus those with active traffic. useVersionList
-  // owns search/filter/sort/paginator state; feed it the filtered set.
   const historyVersions = computed(() => {
     const active = props.activeVersions
     return props.rawVersions.filter((version) => !active.has(String(version?.id)))
@@ -128,9 +97,6 @@
 
   const historyColumns = getVersionListColumns({ includeTraffic: false })
 
-  // Both tables show the skeleton until BOTH the version list AND the active-
-  // versions query have settled — otherwise, whichever finishes first would
-  // flash an empty state before its counterpart's rows arrive.
   const isLoading = computed(
     () =>
       Boolean(props.versionsQuery?.isLoading?.value) ||
@@ -145,13 +111,6 @@
     class="flex flex-col gap-[var(--spacing-6)]"
     :data-testid="testidPrefix"
   >
-    <!--
-      Metrics section (Requests / Errors / CPU Time per Figma node 1300-39067)
-      is out of scope this delivery and will be inserted above Live Deployments
-      in a follow-up.
-    -->
-
-    <!-- Live Deployments -->
     <section
       class="flex flex-col gap-[var(--spacing-3)]"
       :data-testid="`${testidPrefix}__live`"
@@ -237,7 +196,6 @@
       </VersionListDataView>
     </section>
 
-    <!-- Version History -->
     <section
       class="flex flex-col gap-[var(--spacing-3)]"
       :data-testid="`${testidPrefix}__history`"

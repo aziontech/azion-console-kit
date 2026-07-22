@@ -6,22 +6,12 @@ import { LATEST_READY } from '@/templates/release-composition/version-options'
 const APPLICATION_TYPE = 'application'
 const DS_ID = 'ds-1'
 
-// Builds an active-release record whose `resources[]` pin a version per entry,
-// mirroring the shape `getActiveReleaseComposition` resolves (mixed
-// `resource_id`/`global_id` and `version_id`/`resource_version_id`/
-// `resource_version` fallbacks — the same ones `seedVersionsFromRelease` reads).
 const release = (resources) => ({ resources })
 
 beforeEach(() => {
   setActivePinia(createPinia())
 })
 
-// ---------------------------------------------------------------------------
-// Singletons — resVers[type] seeded from the active release's pin, only when
-// that pin resolves against the LOADED catalog; "user pick wins" doubles as
-// the one-shot guard (a defined slot, including a prior seed, is never
-// revisited).
-// ---------------------------------------------------------------------------
 describe('seedVersionsFromRelease — singletons', () => {
   it('seeds resVers[type] with the option value (native type) when the pin matches the catalog', () => {
     const store = useReleaseStore()
@@ -29,9 +19,6 @@ describe('seedVersionsFromRelease — singletons', () => {
       DS_ID,
       release([{ resource_type: APPLICATION_TYPE, global_id: 'app-1', version_id: '42' }])
     )
-    // The catalog carries a NUMERIC option value; the release pins it as a
-    // STRING — the match is by String() equality, but the WRITE must use the
-    // option's native value (42, not '42'), since the dropdown compares with `===`.
     store.setVersionsByResource(APPLICATION_TYPE, 'app-1', [
       { value: 7, isCurrent: false },
       { value: 42, isCurrent: false }
@@ -84,19 +71,13 @@ describe('seedVersionsFromRelease — singletons', () => {
   })
 })
 
-// ---------------------------------------------------------------------------
-// Dependencies — coll[parent][type][].version seeded only for instances still
-// `version == null`, matched by `resource_type` + `resource_id` against the
-// release composition, then validated against the loaded catalog exactly like
-// the singleton path.
-// ---------------------------------------------------------------------------
 describe('seedVersionsFromRelease — dependencies', () => {
   it('seeds a version==null instance with a release+catalog match; leaves a no-match instance null; leaves an off-catalog pin null', () => {
     const store = useReleaseStore()
     store.seedApplicationFunctions([
-      { functionId: 'fn-1' }, // matches release + catalog
-      { functionId: 'fn-2' }, // no entry in the release composition
-      { functionId: 'fn-3' } // matches release, pin missing from catalog
+      { functionId: 'fn-1' },
+      { functionId: 'fn-2' },
+      { functionId: 'fn-3' }
     ])
     store.setActiveReleaseByDs(
       DS_ID,
@@ -135,11 +116,6 @@ describe('seedVersionsFromRelease — dependencies', () => {
   })
 })
 
-// ---------------------------------------------------------------------------
-// Idempotency — a second call over the SAME loaded data is a no-op: every slot
-// the action could write is already resolved (defined resVers / non-null coll
-// version), so the state is left byte-for-byte identical.
-// ---------------------------------------------------------------------------
 describe('seedVersionsFromRelease — idempotency', () => {
   it('a second call with the same state makes no further change', () => {
     const store = useReleaseStore()
@@ -167,10 +143,6 @@ describe('seedVersionsFromRelease — idempotency', () => {
   })
 })
 
-// ---------------------------------------------------------------------------
-// composeResources — after the seed, the singleton's flat payload entry ships
-// the PINNED concrete version, without going through the LATEST resolve path.
-// ---------------------------------------------------------------------------
 describe('seedVersionsFromRelease — composeResources reflects the seeded pin', () => {
   it('resource_version is the concrete pin, not a LATEST-resolved id', () => {
     const store = useReleaseStore()
@@ -179,9 +151,6 @@ describe('seedVersionsFromRelease — composeResources reflects the seeded pin',
       DS_ID,
       release([{ resource_type: APPLICATION_TYPE, global_id: 'app-1', version_id: 'app-v1' }])
     )
-    // A newer version is `isCurrent` in the catalog — if the seed were skipped
-    // and LATEST_READY resolved instead, this test would catch it landing on
-    // 'app-v2' rather than the release's pinned 'app-v1'.
     store.setVersionsByResource(APPLICATION_TYPE, 'app-1', [
       { value: 'app-v1', isCurrent: false },
       { value: 'app-v2', isCurrent: true }

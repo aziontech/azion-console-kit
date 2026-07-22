@@ -3,9 +3,6 @@ import { EdgeApplicationFunctionsAdapter } from '@/services/v2/edge-app/edge-app
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { enrichFunctionInstanceNames } from '@/services/v2/utils/enrichFunctionInstanceNames'
 
-// Fields forced on the versioned list request so the linked Function id
-// (`function`) is present for name enrichment — mirrors the non-versioned
-// EdgeApplicationFunctionService.
 const LIST_FIELDS = ['id', 'name', 'last_editor', 'last_modified', 'function']
 
 const service = createVersionedSubResourceService({
@@ -22,9 +19,6 @@ const service = createVersionedSubResourceService({
   updatedMessage: 'Your Function has been updated'
 })
 
-// The shared ListView renders the linked Function name in a `functionInstanced`
-// column. The generic factory list doesn't resolve it, so enrich here (keeping
-// every row) the same way the non-versioned service does.
 const baseList = service.list.bind(service)
 service.list = async (appId, versionId, params = {}) => {
   const result = await baseList(appId, versionId, { ...params, fields: LIST_FIELDS })

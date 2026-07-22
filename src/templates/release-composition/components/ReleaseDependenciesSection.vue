@@ -1,38 +1,4 @@
 <script setup>
-  /**
-   * ReleaseDependenciesSection — presentational owned dependencies nested inside
-   * a parent resource card (Application → Functions/Connectors; Firewall →
-   * Network Lists/WAF). Renders one collapsible group per collection; each open
-   * group lists its instances as a `LazyResourceSelectField` (instance) +
-   * `ResourceVersionField` (version). Instances are usually seeded automatically
-   * from their source (the application's function instances / the active release).
-   * When `allowAdd` is set (the "Additional dependencies" section) each group also
-   * renders an "Add" button so the user can append manual instances.
-   *
-   * Fully controlled: every value (including each group's `open` flag) comes
-   * from props; all mutation flows back through events. No fetching, no
-   * derivation, no business logic. The disable cascade (hiding the section when
-   * the parent resource is toggled off) is the PARENT's responsibility via
-   * `v-if`; this component only renders what it is given.
-   *
-   * @prop collections — array of `{ type, label, icon, count, open, instances }`
-   *   where each instance is `{ id, resourceId, name, nameService, nameLoadService,
-   *   version, versionOptions, locked?, required?, buildRoute?, sharedWith? }`. A
-   *   `locked` instance is app-managed: its resource is fixed (rendered as a label,
-   *   no dropdown) and it offers no remove. A `required` instance marks its version
-   *   selector as required, and signals when no version is selectable (empty
-   *   `versionOptions`); in that state it links to `buildRoute` (the dependency's
-   *   edit page) so the user can build a Ready version for it. `sharedWith` is the
-   *   list of OTHER parent labels that reference this same dependency instance —
-   *   when non-empty the row shows a "Shared" badge + a hint, because the same
-   *   Connector/Network List pins ONE version across every parent that uses it, so
-   *   picking a version here also sets it there (and vice versa).
-   * @event toggle-group(type) — request to collapse/expand a collection group.
-   * @event update:instance-resource({ type, id, value }) — instance selection.
-   * @event update:instance-version({ type, id, value }) — version selection.
-   * @event remove-instance({ type, id }) — remove an instance from a group.
-   * @event add-instance(type) — request to append a manual instance (allowAdd only).
-   */
   import PrimeButton from '@aziontech/webkit/button'
 
   import LazyResourceSelectField from '@/templates/release-composition/components/LazyResourceSelectField.vue'

@@ -1,7 +1,4 @@
 <script setup>
-  // v6 EditView — the Edge Function landing (Versions + Settings tabs), gated by
-  // `use_v6_configurations`. Logic lives in useResourceVersionLanding; chrome in
-  // ResourceVersionLanding. This view only wires the Edge Function config + tabs.
   import VersionsTab from '@/views/EdgeFunctions/v6/tabs/VersionsTab.vue'
   import ResourceVersionLanding from '@/templates/version-shell-block/ResourceVersionLanding.vue'
   import { useResourceVersionLanding } from '@/composables/versioning/use-resource-version-landing'
@@ -10,7 +7,6 @@
 
   defineOptions({ name: 'edge-functions-v6-edit-view' })
 
-  // Edge Function is versioned-only: the landing yields no deploy context/drawer.
   const { resource, resourceId, isLoading, loadError } = useResourceVersionLanding({
     load: (id) => edgeFunctionService.loadEdgeFunctionService({ id }),
     provideKey: 'edgeFunction',

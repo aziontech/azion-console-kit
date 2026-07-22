@@ -4,8 +4,6 @@ import { onVersionCommand } from './use-version-command'
 import { useVersionContext } from './use-version-context'
 import { DEFAULT_CAPABILITY } from './version-capability'
 
-// SAVE persists the draft; SAVE_AND_BUILD persists then builds. The version service
-// owns its own cache invalidation.
 export const defaultSaveStrategy = {
   save: ({ service, resourceId, versionId, values }) =>
     service.updateDraft(resourceId, versionId, values),
@@ -16,8 +14,6 @@ export const defaultSaveStrategy = {
   }
 }
 
-// Workloads auto-build on PUT (doc §3): SAVE and SAVE_AND_BUILD are the same write,
-// with no separate build call.
 export const workloadSaveStrategy = {
   save: ({ service, resourceId, versionId, values }) =>
     service.updateDraft(resourceId, versionId, values),
@@ -25,20 +21,6 @@ export const workloadSaveStrategy = {
     service.updateDraft(resourceId, versionId, values)
 }
 
-/**
- * useVersionFormAdapter — the single source of truth for a VersionShell form child.
- *
- * Hosts the VeeValidate form (resource base merged under the version config) and
- * registers the 7 lifecycle handlers on the command bus ONCE. Each resource adapter
- * is a thin `<script setup>` that calls this with its three specializations:
- * `versionService`, `validationSchema` and `saveStrategy` (defaults to save/build).
- * DEPLOY is a deployable-only no-op (the deploy drawer in the heading owns it);
- * for `versioned-only` it is not registered, so the footer drops it and dispatch
- * fail-closes. `capability` defaults to the version-context's (deployable outside).
- *
- * `resource`, `resourceId` and `versionId` accept refs/getters so the form stays in
- * sync with the host props.
- */
 export function useVersionFormAdapter({
   resource,
   resourceId,
@@ -49,13 +31,10 @@ export function useVersionFormAdapter({
   capability
 }) {
   const { version, capability: contextCapability } = useVersionContext()
-  // Option override wins; otherwise the shell-provided capability; deployable if absent.
   const resolvedCapability = computed(
     () => toValue(capability) ?? toValue(contextCapability) ?? DEFAULT_CAPABILITY
   )
 
-  // Parent resource base merged under the version config (the draft's saved state
-  // wins). Nested arrays (e.g. custom page `pages[]`) are preserved by the service.
   const mergedValues = computed(() => ({
     ...(toValue(resource) ?? {}),
     ...(version.value?.config ?? {})
@@ -78,8 +57,6 @@ export function useVersionFormAdapter({
 
   const runSave = async ({ build, comment }) => {
     const { valid } = await validate()
-    // Throw (not silent return) so the shell emits `command-error`, not a false
-    // `updated` success that would toast + navigate without anything being saved.
     if (!valid) throw new Error('Please review the highlighted fields and try again.')
     const ctx = {
       service: versionService,
@@ -112,8 +89,6 @@ export function useVersionFormAdapter({
   onVersionCommand('DELETE', ({ resourceId: rid, versionId: vid }) =>
     versionService.deleteVersion(rid, vid)
   )
-  // Register DEPLOY only for deployable classes; versioned-only omits it so the
-  // footer (availableActions ∩ registered) drops it and dispatch fail-closes.
   if (resolvedCapability.value.canDeploy) {
     onVersionCommand('DEPLOY', () => {})
   }

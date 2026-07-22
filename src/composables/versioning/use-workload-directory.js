@@ -3,21 +3,6 @@ import { workloadService } from '@/services/v2/workload/workload-service'
 import { environmentService } from '@/services/v2/environment/environment-service'
 import { deploymentService } from '@/services/v2/deployment/deployment-service'
 
-// Tenant-scoped directories consumed by the Overview tab's Live Deployments
-// table. Every map is keyed by `deployment_id` so the workload-resolver
-// (called per deployment) can enrich each row in O(1):
-//   - deploymentToWorkload:    deployment_id → workload.name
-//   - deploymentToEnvironment: deployment_id → environment.name
-//   - deploymentToMeta:        deployment_id → { updatedAt, lastModifiedBy }
-//
-// The resource_usage endpoint (source of the live deployments) only exposes
-// `deployment_id` and the deployment's own name. Environment names live in
-// `/v4/workspace/environments`, and the deployed-at timestamp + author live on
-// each Deployment row (`/v4/deployments`). The workload→deployment bridge is
-// the `bindings[]` array carried by every workload. One paginated pull each
-// (workloads + environments + deployments) is enough for the whole tenant —
-// cost = O(pages), not O(active deployments).
-
 const PAGE_SIZE = 100
 const MAX_PAGES = 20
 
@@ -28,9 +13,6 @@ const readWorkloadName = (workload) => {
   return name.text ?? null
 }
 
-// Paginate a listing that returns `{ body, count }`. Tolerates the DRF quirk of
-// answering 404 for a page beyond the last one — treats it as end-of-list on
-// pages > 1, but propagates a genuine failure on page 1.
 const paginate = async (fetchPage) => {
   const rows = []
   let page = 1
@@ -63,8 +45,6 @@ export function useWorkloadDirectory({ enabled } = {}) {
       workloadService.listWorkloads({
         page,
         pageSize: PAGE_SIZE,
-        // Backend follows DRF snake_case; ship both to be tolerant of either
-        // wire format (axios serializes the params object verbatim).
         page_size: PAGE_SIZE,
         ordering: '-last_modified'
       })
@@ -75,7 +55,6 @@ export function useWorkloadDirectory({ enabled } = {}) {
       const result = await environmentService.listEnvironmentsService()
       return Array.isArray(result?.body) ? result.body : []
     } catch {
-      // Environments API failure must not block the other directories.
       return []
     }
   }
@@ -86,8 +65,6 @@ export function useWorkloadDirectory({ enabled } = {}) {
         deploymentService.listDeploymentsService({ page, pageSize: PAGE_SIZE })
       )
     } catch {
-      // Deployments API failure only blanks the Deployed column; workload +
-      // environment still resolve.
       return []
     }
   }
@@ -115,8 +92,6 @@ export function useWorkloadDirectory({ enabled } = {}) {
 
     for (const workload of workloads) {
       const workloadName = readWorkloadName(workload)
-      // v6 workloads may expose the mapping as `bindings: [{deployment_id, environment_id}]`
-      // OR flat as top-level `deployment_id` + `environment_id`. Handle both.
       const bindings = Array.isArray(workload?.bindings) ? workload.bindings : []
       const flatBinding =
         workload?.deployment_id != null || workload?.environment_id != null
@@ -162,8 +137,6 @@ export function useWorkloadDirectory({ enabled } = {}) {
       deploymentToEnvironment.value = environmentDir
       deploymentToMeta.value = metaDir
     } catch {
-      // Silently fall back to empty directories — the affected columns render
-      // "—" instead of blocking the Overview.
       deploymentToWorkload.value = new Map()
       deploymentToEnvironment.value = new Map()
       deploymentToMeta.value = new Map()
@@ -172,8 +145,6 @@ export function useWorkloadDirectory({ enabled } = {}) {
     }
   }
 
-  // Skip the fetch entirely when the caller (e.g., resources that don't opt into
-  // the Overview registry) marks it as disabled. Defaults to always enabled.
   watch(
     () => (typeof enabled === 'function' ? enabled() : (enabled ?? true)),
     (isEnabled, _prev, onCleanup) => {

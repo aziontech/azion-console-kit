@@ -3,14 +3,6 @@ import { describe, it, expect, vi } from 'vitest'
 import VersionListDataView from '@/components/VersionListDataView/index.vue'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 
-/**
- * Task 5.5 — the informative "In use" column renders the version reference count
- * (no UI lock), and the error state branches by `errorKind`: 'network' offers
- * Retry, 'forbidden' (403) hides it, 'notFound' (404) offers back-to-list
- * instead (Req 5.2, 5.4, 6.1). The count is informative only; the backend stays
- * the authority on whether a version may be archived/deleted.
- */
-
 vi.mock('@aziontech/webkit/menu', () => ({
   default: {
     name: 'Menu',
@@ -41,7 +33,6 @@ vi.mock('@aziontech/webkit/empty-results-block', () => ({
   default: { name: 'EmptyResultsBlock', template: '<div><slot /></div>' }
 }))
 
-// DataView stub: render the #list slot once per item so each row exists.
 const DataViewStub = {
   name: 'DataView',
   props: ['value'],
@@ -49,8 +40,6 @@ const DataViewStub = {
     '<div><template v-for="row in value" :key="row.id"><slot name="list" :data="row" /></template></div>'
 }
 
-// The cell reads `version.referenceCount`; the optional column auto-hides via
-// `columnHasData`, which inspects `column.field`, so it points at the same field.
 const IN_USE_COLUMNS = [
   { key: 'version', label: 'Version' },
   { key: 'inUse', field: 'referenceCount', label: 'In use', optional: true }
@@ -73,7 +62,6 @@ describe('VersionListDataView — informative "In use" column', () => {
   })
 
   it('renders a placeholder for a null row while the column stays visible', () => {
-    // The column shows because v1 carries a count; v2's null cell reads "--".
     const items = [
       { id: 'v1', state: VERSION_STATES.READY, referenceCount: 2 },
       { id: 'v2', state: VERSION_STATES.READY, referenceCount: null }

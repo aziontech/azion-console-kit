@@ -1,7 +1,4 @@
 <script setup>
-  // VersionEditView — the FULL version editor screen for an Application, gated by
-  // `use_v6_configurations`. Logic lives in useVersionEditScreen; chrome in
-  // VersionEditScreen. Forwards the router-injected listOriginsService to the tabs.
   import VersionEditScreen from '@/templates/version-shell-block/VersionEditScreen.vue'
   import VersionEditorTabs from '@/views/EdgeApplications/v6/tabs/VersionEditorTabs.vue'
   import { useVersionEditScreen } from '@/composables/versioning/use-version-edit-screen'

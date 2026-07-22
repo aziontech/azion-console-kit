@@ -5,16 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { edgeFirewallVersionService } from '@/services/v2/edge-firewall/edge-firewall-version-service'
 import VersionEditorTabs from '@/views/EdgeFirewall/v6/tabs/VersionEditorTabs.vue'
 
-// The Functions Instances tab is gated by the VERSION config (edgeFunctionsEnabled),
-// read from the same useLoadVersionQuery the shell uses. After a SAVE the service
-// removes (does not refetch) the version cache, so the tab component refetches the
-// gating query on `command-success` to stay reactive without a remount.
-//
-// The REAL edgeFirewallVersionService is used: only its query hooks are stubbed
-// (via vi.spyOn), a data-fetch boundary the tab-gating logic reads. The real
-// useDeployResourceContext runs too — reading the stubbed useListVersionsQuery —
-// so no versioning module is mocked out.
-
 const FIREWALL_ID = '101'
 const VERSION_ID = 'AVFW0001'
 
@@ -66,8 +56,6 @@ const ShellStub = defineComponent({
 beforeEach(() => {
   capturedTabs = []
   mocks.query = { data: ref({ config: {} }), refetch: vi.fn() }
-  // Stub the query hooks (data-fetch boundary) on the real service. useLoadVersionQuery
-  // drives the tab gating; useListVersionsQuery feeds the real useDeployResourceContext.
   vi.spyOn(edgeFirewallVersionService, 'useLoadVersionQuery').mockImplementation(() => mocks.query)
   vi.spyOn(edgeFirewallVersionService, 'useListVersionsQuery').mockReturnValue({
     data: ref({ body: [] })

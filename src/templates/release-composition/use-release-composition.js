@@ -1,15 +1,3 @@
-// Surface-agnostic async-loading composable for the Release composition. The
-// store (`useReleaseStore`) owns selection state; THIS owns loaded data and the
-// derivations on top of it: the deployments listing, the active release per
-// selected Deployment Settings, the per-type catalog versions, the client-side
-// resource -> consuming-DS scan, and the (degraded-by-default) impact VM.
-//
-// It orchestrates existing v2 services through vue-query + plain service calls;
-// it never issues raw fetch/axios and never touches the service-to-service
-// reverse-lookup endpoints (verified 401, see spec §K) — Property 8 forbids
-// fabricating impact or per-DS counts, so with no reverse-lookup data the impact
-// is reported as unavailable with zero synthetic rows.
-
 import { ref, computed, watch, toValue } from 'vue'
 import { deploymentService } from '@/services/v2/deployment/deployment-service'
 import { deploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
@@ -32,28 +20,16 @@ import { COLLECTION_TYPES } from '@/stores/release'
 
 const versionsKey = (resourceType, resourceId) => `${resourceType}:${resourceId}`
 
-// Publish is asynchronous: `build_and_activate` answers `202 { trace_id }` and we
-// never poll (req 5.2). The service returns `{ data }` where `data` is the raw
-// `202` body, so the trace id lives one or two levels in depending on whether the
-// API wraps it under `data`. Read it defensively and never fabricate one.
 const extractTraceId = (settledValue) => {
   const body = settledValue?.data ?? settledValue ?? null
   return body?.trace_id ?? body?.data?.trace_id ?? body?.traceId ?? null
 }
 
-// The single barrier for the versioned-URLs active limit is the publish API's
-// `422` carrying error code `43007` (req 5.5/7.2): we do NOT pre-block on an
-// active-count we cannot compute authoritatively — we let the request go and map
-// this specific rejection to a typed marker the consumer can branch on.
 export const VERSIONED_URLS_ACTIVE_LIMIT_CODE = '43007'
 export const BUILD_AND_ACTIVATE_ERROR_TYPES = Object.freeze({
   VERSIONED_URLS_ACTIVE_LIMIT: 'versioned_urls_active_limit'
 })
 
-// The rejection reaching the fan-out may be an `ErrorHandler` (the v2 services'
-// thrown shape: `{ status, message[], code }`) or — defensively — a raw axios
-// error (`{ response: { status, data: { errors: [{ code }] } } }`). Detect the
-// `422 43007` signature across both without assuming a single shape.
 const isVersionedUrlsActiveLimit = (reason) => {
   const status = reason?.status ?? reason?.response?.status ?? null
   if (Number(status) !== 422) return false
@@ -69,29 +45,16 @@ const isVersionedUrlsActiveLimit = (reason) => {
   return hasCodedError || String(reason?.code ?? '') === VERSIONED_URLS_ACTIVE_LIMIT_CODE
 }
 
-// Classify a per-DS rejection: the versioned-URLs active limit becomes a typed
-// `errorType` the consumer matches on; everything else stays `null` (still
-// surfaced via the raw `error`). No retry is implied — classification only.
 const classifyBuildAndActivateError = (reason) =>
   isVersionedUrlsActiveLimit(reason)
     ? BUILD_AND_ACTIVATE_ERROR_TYPES.VERSIONED_URLS_ACTIVE_LIMIT
     : null
 
-// The active release returns each consumed resource's id under `resource_id`
-// (for `application` its value is the `global_id`; `global_id` is kept as a
-// legacy fallback); version is pinned in `version_id` (spec §L). This reads the
-// id for the dependency-instance seed.
 const releaseResourceId = (resource) => resource?.resource_id ?? resource?.global_id ?? null
 
-// The release pins the chosen version in `version_id` (spec §L); fall back to the
-// other shapes the API has used so the seeded instance always carries the real id.
 const releaseResourceVersion = (resource) =>
   resource?.version_id ?? resource?.resource_version_id ?? resource?.resource_version ?? null
 
-// Does an active-release resource match the scoped override? Every resource is
-// matched by `resource_id` (for `application` its value is the `global_id`, with a
-// `global_id` fallback for the legacy shape) via {@link matchIdValue} — the same
-// rule the HOP 1 contract encodes, reused here so it is never re-derived (req 1.5).
 const matchesOverride = (releaseResource, override) => {
   const id = matchIdValue(releaseResource)
   return (
@@ -101,12 +64,6 @@ const matchesOverride = (releaseResource, override) => {
   )
 }
 
-// Map a DS's active-release resources (deployment-api shape: every id under
-// `resource_id`, version pinned in `version_id`) into the FLAT
-// `{ resource_id, resource_version, resource_type }` shape the adapter consumes —
-// the same shape `store.composeResources()` produces, so the payload keys every
-// resource by `resource_id` uniformly. Every non-scoped resource is carried over
-// BYTE-FOR-BYTE: same id, same pinned version (req 5.6).
 const toAdapterResources = (releaseResources) =>
   (Array.isArray(releaseResources) ? releaseResources : []).map((resource) => ({
     resource_id: releaseResourceId(resource),
@@ -114,14 +71,6 @@ const toAdapterResources = (releaseResources) =>
     resource_type: resource?.resource_type
   }))
 
-// Per-DS outcome markers for the scoped swap/add path: a DS whose active
-// composition cannot be READ is DEGRADED and excluded. A scoped override whose
-// version did NOT resolve to a concrete id (the LATEST sentinel had no loaded
-// versions, so it resolved to `null`) is UNRESOLVED_VERSION: a hard error
-// surfaced to the consumer, never published as `version_id: null` (the API
-// rejects that). MISMATCH is retained for back-compat but no longer produced —
-// a DS lacking the scoped resource now RECEIVES it (add/link) instead of being
-// skipped. Reported to the consumer, never published.
 export const SCOPED_PUBLISH_SKIP_REASONS = Object.freeze({
   DEGRADED: 'degraded',
   MISMATCH: 'mismatch',
@@ -130,25 +79,11 @@ export const SCOPED_PUBLISH_SKIP_REASONS = Object.freeze({
 
 /**
  * @param {object} options
- * @param {import('vue').Ref<boolean>|(() => boolean)} [options.enabled] - Gates
- *   fetching to the screen's active state (closed/hidden never fetches; reopen
- *   reuses the vue-query cache).
- * @param {import('vue').Ref<Array>|(() => Array)} [options.selectedDsIds] - The
- *   currently selected Deployment Settings ids (owned by the store). Active
- *   releases are loaded only for these, on demand.
- * @param {import('vue').Ref<Array>|(() => Array)} [options.versionedResources] -
- *   The `{ resourceType, resourceId }` pairs whose Ready versions must be loaded
- *   for the version pickers (owned by the store's composition).
- * @param {import('vue').Ref<object>} [options.reverseLookupByDs] - SEAM 1: the
- *   DS -> Workload[] reverse index the impact engine reads. Optional; defaults to
- *   an empty internal `ref({})` so the engine degrades by default. A sibling
- *   composable (`useReleaseImpact`) owns and populates this ref when injected,
- *   feeding the engine with zero change to `buildDsImpact`/`impact` (req 9.5).
- * @param {import('@/services/v2/release-impact/consuming-deployments').ResolveConsumingDeployments} [options.resolveConsumingDeployments] -
- *   HOP 1 seam (req 1.2 / 8.3): the strategy that resolves `resource(s) ->
- *   consuming deployments`. Factory argument with a default that scans the
- *   already-loaded active releases (the in-browser strategy; tests inject a
- *   fake, the future `resourceUsageResolver` swaps in without caller change).
+ * @param {import('vue').Ref<boolean>|(() => boolean)} [options.enabled]
+ * @param {import('vue').Ref<Array>|(() => Array)} [options.selectedDsIds]
+ * @param {import('vue').Ref<Array>|(() => Array)} [options.versionedResources]
+ * @param {import('vue').Ref<object>} [options.reverseLookupByDs]
+ * @param {import('@/services/v2/release-impact/consuming-deployments').ResolveConsumingDeployments} [options.resolveConsumingDeployments]
  */
 export function useReleaseComposition({
   enabled,
@@ -161,8 +96,6 @@ export function useReleaseComposition({
 } = {}) {
   const isEnabled = computed(() => Boolean(toValue(enabled) ?? true))
 
-  // --- Deployments listing (vue-query, gated) ------------------------------
-
   const deploymentsQuery = deploymentService.useDeploymentsListQuery({ enabled: isEnabled })
 
   const deployments = computed(() => deploymentsQuery.data.value?.body ?? [])
@@ -170,20 +103,9 @@ export function useReleaseComposition({
   const hasDeploymentsError = computed(() => deploymentsQuery.isError.value)
   const refetchDeployments = () => deploymentsQuery.refetch()
 
-  // --- Active release per selected DS --------------------------------------
-
-  // Keyed by DS id. Each entry is the raw active release (`{ resources: [...] }`)
-  // or `null` when the DS has none. The scan and the case derivation read it.
   const activeReleaseByDs = ref({})
   const activeReleaseLoadingByDs = ref({})
   const loadedDsIds = ref(new Set())
-  // Keyed by DS id; `true` when the active-release READ failed. A failure keeps
-  // `activeReleaseByDs[dsId] === null` (so existing readers don't break) but this
-  // flag lets the consumer tell a genuine "no release" apart from "couldn't read":
-  // the former is a real first-release case, the latter must BLOCK publish (a
-  // re-release would drop resources the failed read never saw). A failed DS is NOT
-  // added to `loadedDsIds`, so a selection change re-attempts it; `retryActiveReleases`
-  // forces an immediate re-attempt without a selection change.
   const activeReleaseErrorByDs = ref({})
 
   const loadActiveRelease = async (dsId) => {
@@ -194,14 +116,8 @@ export function useReleaseComposition({
       const release = await deploymentReleaseService.getActiveReleaseComposition(dsId)
       activeReleaseByDs.value = { ...activeReleaseByDs.value, [dsId]: release ?? null }
       loadedDsIds.value = new Set(loadedDsIds.value).add(dsId)
-      // A successful read clears the failure flag for this DS. Always written
-      // (even when it was already clear) so the store watcher propagates `false`
-      // and a previously-degraded DS re-enables — see `retryActiveReleases`.
       activeReleaseErrorByDs.value = { ...activeReleaseErrorByDs.value, [dsId]: false }
     } catch {
-      // A per-DS read failure must not block the others (independent fan-out,
-      // §7.3): keep `null` (never fabricate a composition) but FLAG the failure so
-      // it is not mistaken for "no active release".
       activeReleaseByDs.value = { ...activeReleaseByDs.value, [dsId]: null }
       activeReleaseErrorByDs.value = { ...activeReleaseErrorByDs.value, [dsId]: true }
     } finally {
@@ -209,11 +125,6 @@ export function useReleaseComposition({
     }
   }
 
-  // Explicit retry for DSs whose active-release read failed: re-attempt each (a
-  // failed DS was never added to `loadedDsIds`, so the guard doesn't short-circuit).
-  // The flag is NOT pre-cleared here — `loadActiveRelease` writes `false` on success
-  // or `true` on a repeat failure, so the store watcher always sees the resolved
-  // state (pre-clearing to `{}` would drop the entry and never propagate `false`).
   const retryActiveReleases = () => {
     const failedDsIds = Object.keys(activeReleaseErrorByDs.value).filter(
       (dsId) => activeReleaseErrorByDs.value[dsId]
@@ -234,8 +145,6 @@ export function useReleaseComposition({
     })
   }
 
-  // Load the active release for each newly selected DS once. Deselecting a DS
-  // keeps its cached release (cheap, and re-selection is instant).
   watch(
     () => (toValue(selectedDsIds) ?? []).map((id) => String(id)).join('|'),
     () => {
@@ -248,24 +157,12 @@ export function useReleaseComposition({
     Object.values(activeReleaseLoadingByDs.value).some(Boolean)
   )
 
-  // --- Per-type Ready versions (registry) ----------------------------------
-
-  // Keyed `${type}:${id}`; each value is the picker options from `toVersionOptions`.
   const versionsByResource = ref({})
   const versionsLoadingByResource = ref({})
-  // Keyed `${type}:${id}`; `true` once a load FAILED. A failed load does NOT
-  // write an (empty) entry into `versionsByResource` — otherwise the empty array
-  // would be indistinguishable from a resource that genuinely has no versions and
-  // the sentinel `LATEST` would silently resolve to `null` (posting an invalid
-  // `version_id: null`). The flag both blocks the reactive watcher from retrying
-  // in a loop AND is what `retryResourceVersions()` clears to re-fetch on demand.
   const versionsErrorByResource = ref({})
 
   const loadResourceVersions = async (resourceType, resourceId) => {
     const key = versionsKey(resourceType, resourceId)
-    // Retry is EXPLICIT: a key already loaded, in flight, or failed is skipped so
-    // the reactive watcher never re-fires it. `retryResourceVersions()` clears the
-    // error flag to allow a fresh attempt.
     if (
       key in versionsByResource.value ||
       versionsLoadingByResource.value[key] ||
@@ -283,8 +180,6 @@ export function useReleaseComposition({
         : toVersionOptions
       versionsByResource.value = { ...versionsByResource.value, [key]: mapVersions(raw) }
     } catch {
-      // Record the FAILURE (not an empty result) so the consumer can surface a
-      // retryable error instead of treating it as "no versions available".
       versionsErrorByResource.value = { ...versionsErrorByResource.value, [key]: true }
     } finally {
       versionsLoadingByResource.value = { ...versionsLoadingByResource.value, [key]: false }
@@ -320,9 +215,6 @@ export function useReleaseComposition({
     Object.values(versionsErrorByResource.value).some(Boolean)
   )
 
-  // Explicit retry (req 7.4-style): clear every version error flag so the reactive
-  // watcher re-fetches the currently-tracked resources on its next run, and kick
-  // the currently-tracked resources immediately.
   const retryResourceVersions = () => {
     versionsErrorByResource.value = {}
     ;(toValue(versionedResources) ?? []).forEach((resource) => {
@@ -332,23 +224,12 @@ export function useReleaseComposition({
     })
   }
 
-  // --- Per-type instance catalog (registry) --------------------------------
-
-  // Keyed by resource type; each value is the picker options
-  // (`{ label: name, value: id }`) the resource selectors render. Mirrors the
-  // version-loading pattern above: services-only (registry `listCatalog`), no
-  // raw HTTP, cached once per type.
   const catalogByType = ref({})
   const catalogLoadingByType = ref({})
-  // Keyed by resource type; `true` once a catalog load FAILED. As with versions,
-  // a failure does NOT write an empty catalog (which would look like "no resources
-  // exist" and never recover) — it records a retryable error instead.
   const catalogErrorByType = ref({})
 
   const loadCatalog = async (resourceType) => {
     if (!resourceType) return
-    // Retry is EXPLICIT: loaded, in flight, or failed types are skipped so the
-    // reactive watcher never loops. `retryCatalogs()` clears the error to re-fetch.
     if (
       resourceType in catalogByType.value ||
       catalogLoadingByType.value[resourceType] ||
@@ -363,8 +244,6 @@ export function useReleaseComposition({
       const raw = await registry.listCatalog()
       catalogByType.value = { ...catalogByType.value, [resourceType]: raw ?? [] }
     } catch {
-      // A per-type catalog failure must not break the others or the screen:
-      // record a retryable error and let the selector show no options for now.
       catalogErrorByType.value = { ...catalogErrorByType.value, [resourceType]: true }
     } finally {
       catalogLoadingByType.value = { ...catalogLoadingByType.value, [resourceType]: false }
@@ -381,8 +260,6 @@ export function useReleaseComposition({
 
   const hasAnyCatalogError = computed(() => Object.values(catalogErrorByType.value).some(Boolean))
 
-  // Explicit retry: clear the catalog error flags and re-load the failed types
-  // (a type stays skipped once cached, so this only re-fetches the failed ones).
   const retryCatalogs = () => {
     const failedTypes = Object.keys(catalogErrorByType.value).filter(
       (type) => catalogErrorByType.value[type]
@@ -391,12 +268,6 @@ export function useReleaseComposition({
     failedTypes.forEach((type) => loadCatalog(type))
   }
 
-  // --- Lazy resource picker: paginated/searchable services + name resolver ----
-
-  // `catalogByType` (page 1) stays the "first option" default + fast name cache;
-  // `resourceNameById` resolves the label of any id NOT on that page so the
-  // screen-level lookups stay correct regardless of pagination. The service
-  // factories memoise a stable reference per type.
   const listServiceCache = {}
   const resourceListService = (resourceType) => {
     if (!(resourceType in listServiceCache)) {
@@ -417,8 +288,6 @@ export function useReleaseComposition({
     return loadServiceCache[resourceType]
   }
 
-  // `${type}:${id}` -> { id, name }; `resourceNameLoading`
-  // guards in-flight ids against duplicate by-id requests.
   const resourceNameById = ref({})
   const resourceNameLoading = {}
 
@@ -455,23 +324,6 @@ export function useReleaseComposition({
     return fromCatalog?.name ?? null
   }
 
-  // --- Resource -> consuming Deployment Settings (HOP 1, delegated) ---------
-
-  // req 1.2 / 8.3: HOP 1 (`resource -> consuming deployments`) goes through the
-  // `resolveConsumingDeployments` interface. The match rule (every resource by
-  // `resource_id`) and the `{ deployments, matchedByDeployment }` result shape are
-  // owned by that interface's contract
-  // (`@/services/v2/release-impact/consuming-deployments`) and reused here via
-  // its helpers — never re-encoded.
-  //
-  // The DEFAULT strategy scans the already-loaded active releases: req 11.1
-  // confirms there is no `resource_id` filter on the DS list (verified 400), so
-  // consumption is assembled in the browser. It is a pure read over data this
-  // composable already holds — no extra request, no s2s call (req 11.2) — and it
-  // resolves synchronously so the route-entry preselect stays a plain array. A
-  // caller injects the production fan-out resolver (or the future
-  // `resourceUsageResolver`) via the `resolveConsumingDeployments` factory-arg to
-  // resolve over the full inventory; the swap touches no caller.
   const matchesResource = (releaseResource, resource) => {
     const id = matchIdValue(releaseResource)
     return (
@@ -481,10 +333,6 @@ export function useReleaseComposition({
     )
   }
 
-  // Per-DS deploy context for the strictest-case gate (req 6.3): the policy and
-  // the inputs `store.deployCtx` folds over (`isVersioned`/`deployed`/`hasApp`),
-  // surfaced from data already loaded so the consumer can block on the most
-  // restrictive selected DS without re-reading the store.
   const deployContextForDs = (dsId) => {
     const deployment = deployments.value.find((item) => String(item?.id) === String(dsId)) ?? null
     const release = activeReleaseByDs.value[dsId] ?? null
@@ -499,13 +347,6 @@ export function useReleaseComposition({
     }
   }
 
-  // The in-browser default honouring the `resolveConsumingDeployments` contract
-  // (same `{ deployments, matchedByDeployment }` shape, req 1.7). It scans the
-  // loaded releases over already-resident data, so it returns SYNCHRONOUSLY —
-  // the route-entry preselect contract (a plain `string[]`) depends on that.
-  // Each deployment additionally carries `deployContext` (req 6.3). An injected
-  // resolver (the production fan-out or the future `resourceUsageResolver`) may
-  // be async; `resolveConsumingDsIds` handles either shape.
   const scanLoadedReleases = (resources) => {
     const refs = normalizeResources(resources)
     const consumingDeployments = []
@@ -538,11 +379,6 @@ export function useReleaseComposition({
 
   const resolveConsuming = resolveConsumingDeployments ?? scanLoadedReleases
 
-  // Backwards-compatible caller contract (req 1.3): the route-entry preselect
-  // reads a synchronous `string[]` of DS ids for a single `(type, id)` pair. It
-  // is a thin shim over the HOP 1 interface — the default resolves synchronously
-  // so the array is available immediately; an injected async resolver would make
-  // this a thenable the caller can await without changing the id shape.
   const resolveConsumingDsIds = (resourceType, resourceId) => {
     if (!resourceType || resourceId == null) return []
     const result = resolveConsuming({ resource_type: resourceType, resource_id: resourceId })
@@ -552,13 +388,6 @@ export function useReleaseComposition({
     return result.deployments.map((entry) => entry.deploymentId)
   }
 
-  // --- Dependency instances inherited from a DS's active release ------------
-
-  // Pure read over the already-loaded active release: groups its dependency-type
-  // resources (`function`/`connector`/`waf`/`network_list`) into the
-  // `{ [type]: [{ resourceId, version }] }` shape `store.seedColl` consumes. The
-  // instance set is INHERITED (spec: no "Add"); `version` is the release's pinned
-  // id, NOT the LATEST sentinel. No request, no s2s — same constraints as the scan.
   const dependencyResourcesFor = (dsId) => {
     const byType = {}
     COLLECTION_TYPES.forEach((type) => {
@@ -577,22 +406,6 @@ export function useReleaseComposition({
     return byType
   }
 
-  // --- Impact (degraded by default; never fabricated) ----------------------
-
-  // The DS -> workloads/domains reverse lookup is service-to-service only
-  // (edge-api GraphQL `workloadsByDeployment`; a tenant Token gets 401, the REST
-  // `deployment_id` filter is ignored — spec §F/§K). There is therefore NO
-  // browser-reachable source for the blast-radius today, so this composable does
-  // not attempt the call: `reverseLookupByDs` stays empty and impact degrades.
-  //
-  // Property 8: with no reverse-lookup data the impact is reported as
-  // unavailable and carries zero rows/totals. The aggregation below ONLY runs
-  // for a DS whose reverse-lookup data is actually present — it can never
-  // invent environments, workloads, domains or counts.
-  //
-  // SEAM 1: `reverseLookupByDs` is the engine's input ref. It is an optional
-  // factory argument (default `ref({})`) so an injected, populated ref feeds the
-  // engine below with zero logic change (req 9.5).
   const buildDsImpact = (dsId) => {
     const workloads = reverseLookupByDs.value[dsId] ?? []
     const environments = new Map()
@@ -627,8 +440,6 @@ export function useReleaseComposition({
   const impact = computed(() => {
     const dsIds = toValue(selectedDsIds) ?? []
 
-    // Nothing selected => no impact to preview (not "unavailable"). `totals` is
-    // always a non-null object so the panel can read it unguarded.
     if (dsIds.length === 0) {
       return {
         hasSelection: false,
@@ -639,8 +450,6 @@ export function useReleaseComposition({
       }
     }
 
-    // While the tenant-wide lookup is in flight we can't tell "zero bindings"
-    // from "not loaded yet" — surface a loading state instead of flashing zeros.
     if (toValue(impactLoading)) {
       return {
         hasSelection: true,
@@ -651,8 +460,6 @@ export function useReleaseComposition({
       }
     }
 
-    // Only a genuine lookup FAILURE degrades to "unavailable" (retry may help).
-    // A successful load with no rows for a DS is a real zero, not a failure.
     if (toValue(impactFailed)) {
       return {
         hasSelection: true,
@@ -663,9 +470,6 @@ export function useReleaseComposition({
       }
     }
 
-    // Loaded: build a branch for EVERY selected DS. A DS with no workload
-    // bindings yet is a real zero (no environments, 0 workloads/domains) — shown
-    // as such (Property 8: still no fabrication), never blanking the whole panel.
     const perDs = dsIds.map((dsId) => {
       const built = buildDsImpact(dsId)
       const deployment = deployments.value.find((item) => String(item.id) === String(dsId))
@@ -704,43 +508,12 @@ export function useReleaseComposition({
 
   const impactUnavailable = computed(() => impact.value.impactUnavailable)
 
-  // `Retry impact` action: no s2s call is made, so it only re-primes the inputs
-  // the (future) browser-reachable lookup would feed on. Until that lookup ships
-  // it is a no-op beyond refreshing the deployments listing, and impact stays
-  // degraded — by design, not by failure to fabricate.
   const retryImpact = () => {
     refetchDeployments()
   }
 
-  // --- Dispatch: build_and_activate fan-out (Property 7) -------------------
-
-  // The composable is the layer allowed to call services, so the per-DS dispatch
-  // lives here. The store hands over a
-  // PURE, DISCRIMINATED `composePayload()`; this branches on `payload.scoped`:
-  //
-  //   non-scoped (Scenario A) → build ONE adapter payload from `payload.resources`
-  //     (resources are DS-agnostic) and fan it out to every DS unchanged (req 5.1).
-  //
-  //   scoped (Scenario B) → build a PER-DS body: each DS's own active composition
-  //     with the scoped singleton REPLACED (same resource → swap version; different
-  //     resource of the same type → swap the entry) or ADDED when the DS is not
-  //     linked yet (create/link), preserving every other resource byte-for-byte.
-  //     A DS whose active composition cannot be READ is DEGRADED and excluded,
-  //     reported and never published.
-  //
-  // Either way the dispatch fans out one independent `build_and_activate` per DS
-  // via `Promise.allSettled` — a per-DS settled `{ id, ok, traceId, value, error,
-  // errorType }`, NO retry (req 5.3). Each success carries the async `trace_id`
-  // (req 5.2/11.1); the API `422 43007` is the versioned-URLs limit barrier,
-  // surfaced as a typed `errorType` (req 5.5/7.2).
   const isDeploying = ref(false)
 
-  // Read a DS's active composition for the scoped swap/add. Returns
-  // `{ ok: true, resources }` (empty array when the DS has no active release, so
-  // the caller can CREATE) or `{ ok: false }` only on a genuine read failure (so
-  // the caller degrades). A definitively-loaded DS is keyed off `loadedDsIds`, so
-  // a cached `null` from a prior failed prefetch is re-fetched, not mistaken for
-  // "no release".
   const activeReleaseResourcesFor = async (dsId) => {
     if (loadedDsIds.value.has(dsId)) {
       const loaded = activeReleaseByDs.value[dsId]
@@ -756,8 +529,6 @@ export function useReleaseComposition({
     }
   }
 
-  // Settle one DS's `build_and_activate` call into the per-DS outcome shape (the
-  // fulfilled/rejected fold shared by both write paths). No retry — classify only.
   const settleOutcome = (id, settled) => {
     if (settled.status === 'fulfilled') {
       return {
@@ -790,10 +561,6 @@ export function useReleaseComposition({
     errorType: null
   })
 
-  // Fan out one call per target, reporting each settled outcome to `onOutcome` as it
-  // resolves. Every service call is issued synchronously in the `map` before any
-  // await (parallel dispatch, positional order, no retry) — unchanged from before,
-  // plus the per-settle `onOutcome` seam.
   const dispatchFanOut = async (targets, onOutcome) => {
     const outcomes = new Array(targets.length)
     const report = (index, outcome) => {
@@ -813,15 +580,7 @@ export function useReleaseComposition({
     return outcomes
   }
 
-  // Non-scoped (Scenario A): the DS-agnostic base payload fanned out to every
-  // selected DS.
   const buildAndActivateShared = async (ids, resources, strategy, onOutcome) => {
-    // Guard the null-version leak (mirrors the scoped path): the store resolves the
-    // LATEST sentinel to a concrete `version_id` in `composePayload()`, but when a
-    // resource's versions never loaded (or failed) that resolution yields `null`.
-    // Posting `resource_version: null` is rejected by the API, so NEVER dispatch it:
-    // surface every target DS as an UNRESOLVED_VERSION skip instead — the consumer
-    // branches on `skipReason` exactly as for the scoped degraded / mismatch cases.
     const list = Array.isArray(resources) ? resources : []
     if (list.some((resource) => resource?.resource_version == null)) {
       return ids.map((id) => {
@@ -835,11 +594,6 @@ export function useReleaseComposition({
     return dispatchFanOut(targets, onOutcome)
   }
 
-  // Scoped (Scenario B): per-DS preserve & swap. For each DS, take its active
-  // composition, swap ONLY the scoped resource's version, preserve everything
-  // else byte-for-byte, and POST a per-DS body. DSs that degrade (no composition)
-  // or mismatch (scoped resource absent) are excluded from the fan-out and
-  // reported as `{ id, ok: false, skipped: true, skipReason }`.
   const applyDependencyOverrides = (base, dependencyOverrides) => {
     let next = base
     ;(Array.isArray(dependencyOverrides) ? dependencyOverrides : []).forEach(
@@ -883,13 +637,6 @@ export function useReleaseComposition({
     strategy,
     onOutcome
   ) => {
-    // Guard the null-version leak: the store resolves the LATEST sentinel to a
-    // concrete `version_id` in `composePayload()` (Property 6), but when the
-    // scoped resource's versions were never loaded that resolution yields `null`.
-    // Posting `version_id: null` is rejected by the API, so NEVER dispatch it:
-    // surface every target DS as an UNRESOLVED_VERSION hard error instead of a
-    // null pin. The consumer branches on `skipReason` exactly as for degraded /
-    // mismatch.
     if (override?.version == null) {
       return ids.map((id) => {
         const outcome = skipOutcome(id, SCOPED_PUBLISH_SKIP_REASONS.UNRESOLVED_VERSION)
@@ -903,7 +650,6 @@ export function useReleaseComposition({
 
     for (const id of ids) {
       const result = await activeReleaseResourcesFor(id)
-      // A genuine read failure → degraded, excluded, never fabricated.
       if (!result.ok) {
         const outcome = skipOutcome(id, SCOPED_PUBLISH_SKIP_REASONS.DEGRADED)
         skipped.push(outcome)
@@ -911,10 +657,6 @@ export function useReleaseComposition({
         continue
       }
       const base = result.resources
-      // The scoped type is a singleton (application/firewall/custom_page): at most
-      // one resource of that type per release. Replace the existing one when
-      // present (same resource → preserve fields, swap version; different resource
-      // → swap the whole entry), or ADD it when the DS is not linked yet.
       const scopedEntry = {
         resource_id: override.resource_id,
         resource_type: override.resource_type,
@@ -943,7 +685,6 @@ export function useReleaseComposition({
 
     const published = await dispatchFanOut(targets, onOutcome)
 
-    // Return in the caller's original `ids` order so the consumer can correlate.
     const byId = new Map([...published, ...skipped].map((outcome) => [String(outcome.id), outcome]))
     return ids.map((id) => byId.get(String(id)))
   }
@@ -976,19 +717,16 @@ export function useReleaseComposition({
   }
 
   return {
-    // deployments
     deployments,
     isLoadingDeployments,
     hasDeploymentsError,
     refetchDeployments,
-    // active release per DS
     activeReleaseByDs,
     activeReleaseErrorByDs,
     isLoadingActiveRelease,
     loadActiveRelease,
     ensureActiveReleases,
     retryActiveReleases,
-    // versions per resource
     versionsByResource,
     versionOptionsFor,
     isLoadingVersionsFor,
@@ -996,40 +734,25 @@ export function useReleaseComposition({
     hasAnyVersionsError,
     loadResourceVersions,
     retryResourceVersions,
-    // instance catalog per type
     catalogByType,
     catalogOptionsFor,
     isLoadingCatalog,
     hasAnyCatalogError,
     loadCatalog,
     retryCatalogs,
-    // lazy resource picker: paginated/searchable services + off-page name resolver
     resourceListService,
     resourceLoadService,
     ensureResourceNames,
     resourceNameFor,
-    // resource -> consuming DS: the backwards-compatible `string[]` shim (req 1.3)
     resolveConsumingDsIds,
-    // resource -> consuming deployments: the full HOP 1 result (de-duped union +
-    // `matchedByDeployment` + per-DS `deployContext`) for the strictest-case gate
-    // (req 6.3, 8.3). Same `{ deployments, matchedByDeployment }` contract a
-    // caller can also obtain by injecting the production resolver.
     resolveConsumingDeployments: resolveConsuming,
-    // dependency instances inherited from a DS's active release (seeds coll)
     dependencyResourcesFor,
-    // impact (degraded by default — Property 8 / req 7.2, 7.3, 11.2)
     impact,
     impactUnavailable,
     retryImpact,
-    // dispatch (per-DS build_and_activate fan-out — Property 7). Each result
-    // carries `traceId` (req 11.1) and a typed `errorType` for the versioned-URLs
-    // active limit (req 5.5); the type catalog is re-exported so the consumer
-    // matches on it without re-encoding the magic code.
     isDeploying,
     buildAndActivate,
     buildAndActivateErrorTypes: BUILD_AND_ACTIVATE_ERROR_TYPES,
-    // Per-DS skip reasons for the scoped preserve-&-swap path (req 5.7/5.8) so the
-    // consumer can branch on `degraded` vs `mismatch` without re-encoding them.
     scopedPublishSkipReasons: SCOPED_PUBLISH_SKIP_REASONS
   }
 }

@@ -86,11 +86,6 @@ export class WorkloadService extends BaseService {
     return this.usePrefetchQuery(queryKeys.workload.list(params), () => this.#fetchList(params))
   }
 
-  /**
-   * Reactive workloads listing for the deploy drawer. Mirrors
-   * `edgeAppVersionService.useListVersionsQuery`: `enabled` (a ref/getter) gates
-   * fetching to the drawer's open state, while reopens reuse the vue-query cache.
-   */
   useWorkloadsListQuery = ({
     enabled,
     params = { page: 1, pageSize: 100, ordering: '-last_modified' }

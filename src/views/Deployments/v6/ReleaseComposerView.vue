@@ -1,21 +1,4 @@
 <script setup>
-  /**
-   * ReleaseComposerView — the full-page "Review & deploy" screen (spec §B). It is
-   * a THIN view: every piece of selection state lives in `useReleaseStore` (the
-   * single source of truth) and every async load lives in `useReleaseComposition`.
-   * This file only:
-   *   - opens the release from the route on mount (`store.openRelease`),
-   *   - feeds the composable's loaded data back into the store via its setters
-   *     (watchers, so the store stays the source of truth),
-   *   - lays out the two columns + fixed footer with shared, surface-agnostic
-   *     blocks,
-   *   - gates `Build & activate` on the strictest selected DS, and
-   *   - confirms then fans out `composition.buildAndActivate(store.composePayload(),
-   *     store.deploymentIds)` (async 202, no polling). The composable is the layer
-   *     allowed to dispatch; the store only describes the selection (`composePayload`).
-   *
-   * No HTTP, no business logic here — that all belongs to the store/composable.
-   */
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { storeToRefs } from 'pinia'
@@ -62,29 +45,16 @@
 
   defineOptions({ name: 'release-composer-view' })
 
-  // The full composition order (preview): the application + the two optional
-  // singletons. A scoped entry (opened from a single resource version) collapses
-  // to just that one type.
   const SINGLETON_TYPES = ['application', 'firewall', 'custom_page']
   const OPTIONAL_SINGLETON_TYPES = ['firewall', 'custom_page']
 
-  // UI grouping only — the payload is a flat `resources[]`. Each parent singleton
-  // card nests the dependency collections it owns (the preview's `OWNED_BY`,
-  // re-keyed to the real resource types: `function`/`connector`/`network_list`).
   const OWNED_COLLECTIONS = {
     application: ['function', 'connector'],
     firewall: ['function', 'network_list', 'waf'],
     custom_page: ['connector'],
-    // The "Additional dependencies" bucket — resources the user adds manually
-    // (mirrors MANUAL_DEP_TYPES in the store). Not a singleton card; only feeds
-    // `collectionsFor(ADDITIONAL_PARENT)` and the catalog preload.
     [ADDITIONAL_PARENT]: ['connector', 'network_list']
   }
 
-  // Composition labels follow the Azion product names (plural for the dependency
-  // collections + Custom Pages), matching the design mock. Icons still come from
-  // the shared resolveResourceMeta. Kept local to this screen so the singular
-  // labels resolveResourceMeta serves elsewhere stay intact.
   const COMPOSITION_LABELS = {
     application: 'Application',
     firewall: 'Firewall',
@@ -102,36 +72,14 @@
   const breadcrumbs = useBreadcrumbs()
   const toast = useToast()
 
-  // The footer action bar teleports into ContentBlock's sticky `#action-bar`
-  // target, which only exists after this view mounts (same pattern as the
-  // Version Shell footer). Gate the <Teleport> on it.
   const isMounted = ref(false)
 
-  // Which entry flow this screen serves — captured ONCE on mount from the route, so
-  // it never changes as the user edits the selection:
-  //   'from-resource'   = Scenario B (scoped resource + Deployment Settings picker)
-  //   'from-deployment' = Scenario A (one fixed deployment, no picker, impact only)
-  //   'from-workload'   = opened from a Workload bound to MANY Deployment Settings
-  //                       (one per environment) — keeps the picker, scoped to those
-  //                       DSs, with all of them pre-selected so the impact is the
-  //                       true aggregate across every environment (user may narrow)
-  //   'global'          = opened with neither (top-of-list "Deploy" button — keeps
-  //                       the picker so the user chooses targets)
   const entryScenario = ref('global')
   const isFromDeployment = computed(() => entryScenario.value === 'from-deployment')
   const isFromWorkload = computed(() => entryScenario.value === 'from-workload')
 
-  // The Workload's bound Deployment Settings — the CANDIDATE set the picker is
-  // restricted to in the 'from-workload' flow (a release started from a Workload
-  // targets only that Workload's environments, never the whole tenant list).
   const workloadCandidateDsIds = ref([])
 
-  // The consuming Deployment Settings resolved for a scoped (Scenario B) entry.
-  // Populated async on mount via the HOP 1 strategy. It is NOT used to FILTER the
-  // picker — filtering to these would drop the `available` and `needsFirstRelease`
-  // groups (HOP 1 only returns DSs that ALREADY consume the resource). Instead it
-  // is used to SORT: the consuming DSs float to the top so they land inside the
-  // display cap (`DS_DISPLAY_CAP`) instead of being cut off in a large tenant.
   const scopedCandidateDsIds = ref([])
 
   const candidateResolutionFailed = ref(false)
@@ -155,12 +103,6 @@
     versionGateSatisfied
   } = storeToRefs(store)
 
-  // Resources the version pickers must keep Ready versions loaded for. It tracks
-  // the EFFECTIVE composition — not only the user's explicit picks (`resNames`) but
-  // also the defaults pre-filled from the effective DS's active release — so
-  // versions load identically whether the resource was picked by the user (it lands
-  // in `resNames`) or pre-filled (Scenario A reads it from the active release).
-  // Reads only store state (no composable output), so it's a pure input computed.
   const versionedResources = computed(() => {
     const pairs = []
     const seen = new Set()
@@ -171,10 +113,7 @@
       seen.add(key)
       pairs.push({ resourceType, resourceId })
     }
-    // Explicit singleton picks.
     Object.entries(resNames.value).forEach(([type, resourceId]) => add(type, resourceId))
-    // Singletons pre-filled from the effective DS's active release (Scenario A),
-    // unless the user already overrode them above.
     const activeResources = activeReleaseByDs.value[effDsId.value]?.resources ?? []
     activeResources.forEach((resource) => {
       const type = resource?.resource_type
@@ -182,7 +121,6 @@
         add(type, resource?.resource_id ?? resource?.global_id)
       }
     })
-    // Dependency instances (nested by parent → depType).
     Object.values(coll.value).forEach((byType) => {
       Object.entries(byType ?? {}).forEach(([type, instances]) => {
         ;(instances ?? []).forEach((instance) => add(type, instance?.resourceId))
@@ -198,19 +136,11 @@
     selectedDsIds: deploymentIds,
     versionedResources,
     reverseLookupByDs: impact.reverseLookupByDs,
-    // Loading/failure signals so the impact VM can show a zero branch for a DS
-    // with no bindings (real zero) yet still degrade to "unavailable" only on a
-    // genuine fetch failure — and avoid flashing zeros while the lookup loads.
     impactLoading: impact.isLoading,
     impactFailed: computed(() => impact.degradationReason.value === 'fetch_failed'),
     resolveConsumingDeployments
   })
 
-  // The application id the composition is built around: the explicit Application
-  // pick first, else the scoped entry id when the screen is scoped to an
-  // application version, else the application pinned by the effective DS's active
-  // release. Coerced to a stable string so the composable's gate/cache key never
-  // thrashes between numeric and string ids.
   const composedApplicationId = computed(() => {
     const explicit = resNames.value['application']
     const scopedAppId =
@@ -229,9 +159,6 @@
     return candidate == null || candidate === '' ? null : String(candidate)
   })
 
-  // The version pinned for a resource type by the effective DS's active release —
-  // the fallback used when the user hasn't picked a version and no catalog version
-  // has resolved yet.
   const activeReleaseVersionForDs = (dsId, type) => {
     const match = (activeReleaseByDs.value[dsId]?.resources ?? []).find(
       (resource) => resource?.resource_type === type
@@ -241,12 +168,6 @@
 
   const activeReleaseVersionFor = (type) => activeReleaseVersionForDs(effDsId.value, type)
 
-  // The version whose dependencies each singleton exposes. Dependencies are always
-  // discovered from the VERSION being released, and it is REACTIVE to the user's
-  // pick in BOTH scenarios: `resVers[type]` (a scoped entry seeds it from the URL
-  // version, so changing the version re-checks deps), resolved to a concrete id
-  // (LATEST → latest Ready), falling back to the URL version / the version pinned
-  // by the effective DS's active release.
   const composedApplicationVersionId = computed(() => {
     if (composedApplicationId.value == null) return null
     const isScopedApp = scopedType.value === 'application'
@@ -260,11 +181,7 @@
     return pin != null ? String(pin) : null
   })
 
-  // A singleton is "composed" (its own deps must load) when its id + version
-  // resolve AND it is part of the current composition: in a scoped entry ONLY the
   // scoped type; in the global flow the application (always) plus each enabled
-  // optional singleton. Runs the per-resource dependency endpoints in BOTH
-  // scenarios so every card shows only its OWN dependencies.
   const isApplicationComposed = computed(
     () =>
       composedApplicationId.value != null &&
@@ -416,18 +333,12 @@
     enabled: customPageDependenciesEnabled
   })
 
-  // Per-card loading text (shown below the "Dependencies" title of the OWNING
-  // resource's own card) — distinct per singleton so the message never implies
-  // work that belongs to a different card (req: individualize the indicator).
   const DEPENDENCIES_LOADING_MESSAGES = {
     application: 'Detecting Functions and Connectors used by this Application…',
     firewall: 'Detecting Functions, Network Lists and WAF used by this Firewall…',
     custom_page: 'Detecting Connectors used by this Custom Page…'
   }
 
-  // Per-singleton loading flag, split out of the old single aggregate so each
-  // card's own "Dependencies" block can show its own indicator instead of one
-  // shared top-of-page banner that only ever named the Application.
   const applicationDependenciesLoading = computed(
     () =>
       isApplicationComposed.value &&
@@ -467,9 +378,6 @@
           firewallNetworkListDeps.hasError.value)) ||
       (isCustomPageComposed.value &&
         (customPageVersionReady.hasError.value || customPageConnectorDeps.hasError.value)) ||
-      // A failed version-catalog or instance-catalog load (cached as an error, not
-      // an empty list) also surfaces the retryable banner — otherwise the empty
-      // pickers would look like "nothing to pick" with no way to recover.
       composition.hasAnyVersionsError.value ||
       composition.hasAnyCatalogError.value
   )
@@ -483,8 +391,6 @@
     firewallNetworkListDeps.retry()
     customPageVersionReady.retry()
     customPageConnectorDeps.retry()
-    // Re-fetch the version + instance catalogs whose loads failed (no-op when none
-    // failed, since a successful load stays cached).
     composition.retryResourceVersions()
     composition.retryCatalogs()
   }
@@ -504,9 +410,6 @@
     { immediate: true, deep: true }
   )
 
-  // Feed the per-DS active-release READ-failure flag into the store so `deployCtx`
-  // blocks publish on a degraded DS. Iterate ALL entries (including `false`) so a
-  // recovered read clears the store flag and re-enables the deploy.
   watch(
     composition.activeReleaseErrorByDs,
     (byDs) => {
@@ -530,14 +433,6 @@
     { immediate: true, deep: true }
   )
 
-  // Seed each COMPOSED singleton's OWN dependency slots from its per-version
-  // dependency endpoints, keyed by parent so one resource's deps never bleed into
-  // another's card. Each seed runs UNCONDITIONALLY (empty array when the parent
-  // isn't composed or has no deps) so a stale/other-resource slot is always
-  // CLEARED, never retained — this is what stops the leak in both scenarios.
-  // `restoreCollVersions` re-applies the user's picked versions across re-runs.
-  // Non-scoped singletons' inherited deps are preserved by the composable's per-DS
-  // read at dispatch, so they never enter `coll` here.
   watch(
     [
       effDsId,
@@ -591,23 +486,6 @@
     { immediate: true, deep: true }
   )
 
-  // Pre-select the singleton + dependency versions from the effective DS's active
-  // release for a 'from-deployment' entry (`store.seedVersionsFromRelease` is a
-  // no-op past its first successful write per slot — see its docblock). Watched
-  // sources, each arriving async on its own schedule:
-  //   - `activeReleaseByDs` / `store.versionsByResource`: the release and the
-  //     version catalogs load independently; the seed can only match a pin once
-  //     BOTH are in (the action itself no-ops until the catalog entry exists —
-  //     recall `versionedResources` above already includes the release's pinned
-  //     resources, so their catalogs get requested without waiting on this seed).
-  //   - `coll`: dependency instances surface later (discovered from the pinned
-  //     singleton's VERSION, once seeded), so a re-run here is what lets deps
-  //     seeded on a later tick still get their pin applied.
-  //   - `resVers`: re-fires after `openRelease`'s reset on a same-route re-entry,
-  //     re-arming the seed for the new deployment.
-  // Recursion is harmless: every slot the action can write is guarded by
-  // "already defined" (singleton) / "already non-null" (dependency), so once a
-  // slot is seeded, further re-runs simply skip it.
   watch(
     [activeReleaseByDs, effDsId, resVers, coll, () => store.versionsByResource],
     () => {
@@ -617,20 +495,11 @@
     { immediate: true, deep: true }
   )
 
-  // Monotonic entry token: bumped on every `openFromRoute`. The async HOP 1
-  // resolution captures the token at call time and only writes its result if the
-  // token is still current — a same-route re-entry (e.g. the "Compose first
-  // release" CTA) thus discards a stale resolution from the previous entry instead
-  // of letting it overwrite the new entry's candidate set.
   let entrySeq = 0
 
   const openFromRoute = () => {
     const seq = ++entrySeq
 
-    // Reset the entry-derived refs so a re-entry (same-route navigation) never
-    // inherits the previous entry's scenario/candidate state. `dsQuery` is view-local
-    // (not part of the store's `openRelease` reset), so clear the picker search here
-    // too, or a term typed in the previous entry would persist.
     entryScenario.value = 'global'
     scopedCandidateDsIds.value = []
     workloadCandidateDsIds.value = []
@@ -650,10 +519,6 @@
         ? String(rawDeploymentIds).split(',').filter(Boolean)
         : []
 
-    // "Compose first release" CTA seed: a resource + version carried into a FULL
-    // (non-scoped) composition so it arrives pre-filled. Distinct from `scopedType`
-    // (which would collapse the composition), so reading it never triggers a scoped
-    // Scenario B — the DS opens DS-first with the Application editable.
     const seedType = query.seedType ?? params.seedType ?? null
     const seed = seedType
       ? {
@@ -663,9 +528,6 @@
         }
       : null
 
-    // A Workload entry with several bound Deployment Settings carries `pickTarget`
-    // so the composer shows the picker (scoped to those DSs) instead of treating a
-    // single pre-selected deployment as the fixed target.
     const isPickTarget = String(query.pickTarget ?? params.pickTarget ?? '') === 'true'
 
     if (isFromVersion && incomingScopedType && resourceId) {
@@ -677,7 +539,6 @@
         })
       )
         .then((result) => {
-          // Ignore a resolution that belongs to a superseded entry (Fix 4).
           if (seq !== entrySeq) return
           candidateResolutionFailed.value = false
           scopedCandidateDsIds.value = (result?.deployments ?? []).map((entry) =>
@@ -691,9 +552,6 @@
         })
     }
 
-    // Capture the entry flow once: a scoped resource is Scenario B; a Workload
-    // with many bound DSs (`pickTarget`) is the multi-environment picker flow; a
-    // single deployment pre-selected with no scoped resource is Scenario A; none of
     // the above is the global "Deploy" entry (the user picks a DS first).
     entryScenario.value = incomingScopedType
       ? 'from-resource'
@@ -703,7 +561,6 @@
           ? 'from-deployment'
           : 'global'
 
-    // The 'from-workload' flow restricts the picker to the Workload's bound DSs.
     if (entryScenario.value === 'from-workload') {
       workloadCandidateDsIds.value = preselectedDsIds.map(String)
     }
@@ -717,9 +574,6 @@
       seed
     })
 
-    // Prime the selectable instance catalogs the singleton selectors render:
-    // the Application and each optional singleton (the composable caches per
-    // type, so this never refetches on reopen).
     composition.loadCatalog('application')
     OPTIONAL_SINGLETON_TYPES.forEach((type) => composition.loadCatalog(type))
   }
@@ -729,11 +583,6 @@
     isMounted.value = true
   })
 
-  // Same-route navigation (e.g. the "Compose first release" CTA re-targets the
-  // composer with new query params) reuses this component instance, so onMounted
-  // never fires again. Re-run the entry logic on every location change so the
-  // screen re-initialises for the new deployment/seed. Guard on the route name so
-  // navigating AWAY (to deployments/edit) never re-opens the release.
   watch(
     () => route.fullPath,
     () => {
@@ -745,25 +594,15 @@
 
   const hasSelectedDs = computed(() => deploymentIds.value.length > 0)
 
-  // True when the screen was opened scoped to a single resource version (the
-  // composition collapses to just that one type, which is then editable).
   const isScoped = computed(() => Boolean(scopedType.value))
 
   const showComposition = computed(() => hasSelectedDs.value || isScoped.value)
 
-  // The name of the single deployment in scope (Scenario A) — for the intro/notice.
   const deploymentName = computed(() => {
     const match = deployments.value.find((ds) => String(ds.id) === String(effDsId.value))
     return match?.name ?? ''
   })
 
-  // Breadcrumb middle segment. Only the 'from-deployment' entry names the single
-  // deployment in scope AND links back to it ("Deployments › <name> › New
-  // release"); every other entry (resource, workload, global) keeps the generic,
-  // linkless "Releases" fallback — a Workload binds many Deployment Settings, so
-  // naming/linking just one would misrepresent scope. The link is resolved here
-  // (not via the store's param-based `toRoute`) because the originating deployment
-  // id travels in the query (`deploymentIds`), not the route params.
   const breadcrumbItems = computed(() => {
     const items = route.meta?.breadCrumbs ?? []
     const name = deploymentName.value
@@ -780,30 +619,17 @@
     )
   })
 
-  // The name resolves async (deployments query), so re-run update whenever the
-  // resolved items change; PageHeadingBlock's one-shot setup update isn't enough.
   watch(breadcrumbItems, (items) => breadcrumbs.update(items), { immediate: true })
 
-  // Composition intro (the eyebrow line above the tree):
-  //   Scenario A → leads with the deployment ("a new release to <deployment>");
   //   Scenario B / global → the scoped resource (or "resources") + DS count.
   const scopedLabel = computed(() => (scopedType.value ? labelFor(scopedType.value) : ''))
 
-  // The resource whose version the footer's version-gate hint asks the user to
-  // confirm: the scoped resource in a scoped non-application entry, else the
-  // Application (mirrors the store's `versionGateSatisfied` branch).
   const versionGateLabel = computed(() =>
     scopedType.value && scopedType.value !== 'application' ? scopedLabel.value : 'Application'
   )
 
-  // The notice under the intro: Scenario B names the single scoped resource that
-  // changes; Scenario A states the release reaches every environment of the
-  // deployment (the template branches on `isFromDeployment`).
   const noticeLabel = computed(() => (isScoped.value ? scopedLabel.value : 'selected resource'))
 
-  // The active-release resources for the effective DS, keyed by type. This is the
-  // base name/version each singleton/dependency card defaults to (overridden by
-  // the store's explicit selection). Mirrors the preview's `d.resources` read.
   const activeReleaseResources = computed(() => {
     const byType = {}
     const resources = activeReleaseByDs.value[effDsId.value]?.resources ?? []
@@ -819,9 +645,6 @@
     return byType
   })
 
-  // The dependency-collection VM for a parent card, in the shape
-  // ReleaseDependenciesSection expects. Versions come from the composable;
-  // instance selection (and the open flag + count) is store state.
   const collectionsFor = (parentType) =>
     (OWNED_COLLECTIONS[parentType] ?? []).map((type) => {
       const meta = resolveResourceMeta(type)
@@ -837,10 +660,6 @@
         locked: instance.locked,
         required: instance.required,
         buildRoute: resourceBuildRoute({ type, resourceId: instance.resourceId }),
-        // Labels of the OTHER parent cards that reference this SAME dependency
-        // instance. A shared Connector/Network List pins one version for the whole
-        // release (the store keeps every card in sync via `setCollVer`), so the row
-        // shows it moves together with those parents.
         sharedWith: store
           .sharedDependencyParentsFor(type, instance.resourceId, parentType)
           .map((parent) => labelFor(parent))
@@ -850,7 +669,6 @@
         label,
         icon: meta.icon,
         count: instances.length,
-        // Expanded by default (mock); collapse only when explicitly toggled off.
         open: collOpen.value[`${parentType}:${type}`] !== false,
         instances
       }
@@ -868,26 +686,17 @@
     }
   }
 
-  // The additional-dependencies VM: same shape as a parent's collections, but with
-  // the picker narrowed to not-yet-used resources.
   const additionalCollections = computed(() =>
     collectionsFor(ADDITIONAL_PARENT).map((collection) => ({
       ...collection,
       instances: collection.instances.map((instance) => ({
         ...instance,
         nameService: excludeUsedResourcesService(collection.type, instance.resourceId),
-        // Only enforce the version (and the "no Ready version" warning) once a
-        // resource is actually chosen — a blank row must not read as blocking.
         required: instance.resourceId != null
       }))
     }))
   )
 
-  // A resource whose version catalog actually LOADED (its key is present in
-  // `versionsByResource`) but resolved to zero deployable versions — the "Track
-  // latest Ready" default can't resolve, so it needs a build. Distinct from "still
-  // loading" or "never requested" (key absent), both of which return false so the
-  // build prompt never flashes for a resource whose versions simply aren't in yet.
   const resourceHasNoReadyVersion = (resourceType, resourceId) => {
     if (resourceId == null || resourceId === '') return false
     const key = `${resourceType}:${resourceId}`
@@ -897,9 +706,6 @@
     )
   }
 
-  // The composition tree view-model — a faithful port of the preview's
-  // `resources` computed, re-keyed to the real resource types and wired to the
-  // real store + composable. One uniform card per type.
   const resources = computed(() => {
     if (!showComposition.value) return []
 
@@ -910,44 +716,18 @@
       const meta = resolveResourceMeta(type)
       const isApp = type === 'application'
       const isScopedType = type === scopedType.value
-      // This is the New Release composer: every rendered resource is editable so
-      // the user can pick what to publish (Application included). A scoped entry
-      // renders only its one type (also editable). Nothing is locked here — the
-      // deploy gate lives on the Build & activate button (deployCtx/canDeploy).
       const editable = isScopedType || !scoped
       const canToggle = !isApp && !scoped
-      // Application + the scoped type are always included; the optional
-      // singletons default ON until explicitly toggled off.
       const enabled = isApp || isScopedType ? true : resEnabled.value[type] !== false
 
-      // Base from the effective DS's active release, overridden by store state.
-      // The Resource defaults to the active release's instance when present, else
-      // the catalog's first option (never fabricated — only real data). The
-      // Version itself is resolved below (see `version`): in a 'from-deployment'
-      // entry it is PRE-SEEDED into `resVers[type]` by `store.seedVersionsFromRelease`
-      // with the active release's pinned id whenever that pin resolves against the
-      // loaded catalog; every other scenario, and a from-deployment pin that misses
-      // the catalog, falls through to the LATEST_READY sentinel.
       const base = activeReleaseResources.value[type] ?? { resourceId: null, version: null }
       const catalogOptions = composition.catalogOptionsFor(type)
       const fallbackResourceId = base.resourceId ?? catalogOptions[0]?.value ?? null
       const rawName = resNames.value[type] !== undefined ? resNames.value[type] : fallbackResourceId
-      // Normalise the selected id to the catalog option's NATIVE value type so the
-      // dropdown's strict-equality match resolves the label. A scoped entry seeds
-      // `resNames[scopedType]` from the route (always a STRING), while the catalog
-      // options carry numeric ids — without this coercion the strict `===` in
-      // ResourceSelectField fails and the card shows the placeholder ("Select
-      // Application") instead of the selected resource name + version. Fall back to
-      // the raw id when the catalog has not loaded yet (never fabricated).
       const matchedOption = catalogOptions.find(
         (option) => String(option.value) === String(rawName)
       )
       const name = matchedOption ? matchedOption.value : rawName
-      // `resVers[type]` is the single source of truth once set — either an
-      // explicit user pick, OR (for a 'from-deployment' entry) the version seeded
-      // by `store.seedVersionsFromRelease` from the active release's pin. With no
-      // slot set yet: a scoped-from-version entry pins the promoted version,
-      // otherwise default to LATEST_READY. The user picks/confirms before deploy.
       const version =
         resVers.value[type] !== undefined
           ? resVers.value[type]
@@ -969,9 +749,6 @@
         nameService: composition.resourceListService(type),
         nameLoadService: composition.resourceLoadService(type),
         version,
-        // Version options are loaded under the RAW id (`versionedResources` keys
-        // off `resNames`/the active release), so look them up by `rawName` to stay
-        // on the same store key — `name` may be the coerced catalog value.
         versionOptions: composition.versionOptionsFor(type, rawName),
         isLoadingVersions: composition.isLoadingVersionsFor(type, rawName),
         buildRoute: resourceHasNoReadyVersion(type, rawName)
@@ -990,7 +767,6 @@
     () => !isFromDeployment.value || showComposition.value
   )
 
-  // Resolve the name of every referenced resource so off-page ids still show a name.
   watch(
     versionedResources,
     (pairs) => {
@@ -1001,10 +777,6 @@
     { immediate: true, deep: true }
   )
 
-  // Load the dependency-collection catalogs (function/connector, waf/network_list)
-  // for parents whose dependencies are visible — the Application is always
-  // required, the optional singletons load their dependencies once enabled. The
-  // composable caches per type, so re-enabling a parent never refetches.
   const dependenciesVisibleFor = (parentType) => {
     if (!OWNED_COLLECTIONS[parentType]?.length) return false
     if (parentType === 'application') return true
@@ -1031,8 +803,6 @@
     store.setCollResource({ parent: type, type: group, id, resourceId: value })
   const onInstanceVersion = ({ type, group, id, value }) => store.setCollVer(type, group, id, value)
   const onRemoveInstance = ({ type, group, id }) => store.removeCollItem(type, group, id)
-  // Append a blank instance the user then configures (resource + version); keep
-  // the group open so the new row is visible immediately.
   const onAddInstance = ({ type, group }) => {
     store.addCollItem({
       parent: type,
@@ -1042,9 +812,6 @@
     if (collOpen.value[`${type}:${group}`] === false) store.toggleCollOpen(type, group)
   }
 
-  // The section's events carry the depType directly (no parent), so route them all
-  // to the ADDITIONAL_PARENT bucket. A manual instance starts blank + required so
-  // the "no Ready version" guard applies once a resource is picked.
   const onAdditionalToggle = (type) => store.toggleCollOpen(ADDITIONAL_PARENT, type)
 
   const onAdditionalAdd = (type) => {
@@ -1094,12 +861,7 @@
   const dsQuery = ref('')
   const enrichedDeployments = computed(() => {
     const term = dsQuery.value.trim().toLowerCase()
-    // 'from-workload': the picker is restricted to the Workload's bound DSs, so a
-    // release started from a Workload never lists unrelated tenant deployments.
     const candidateIds = isFromWorkload.value ? new Set(workloadCandidateDsIds.value) : null
-    // Scoped entry: float the HOP 1 consuming DSs to the top so they survive the
-    // display cap. A stable sort keeps the original order within each partition, and
-    // it's skipped on a failed resolution (the candidate set is empty/unreliable).
     const priorityIds =
       isScoped.value && !candidateResolutionFailed.value
         ? new Set(scopedCandidateDsIds.value)
@@ -1132,9 +894,6 @@
 
   watch(enrichedDeploymentIds, (ids) => composition.ensureActiveReleases(ids), { immediate: true })
 
-  // DS ids whose active-release read FAILED — fed to the classifier so a scoped
-  // entry segregates them into `loadFailed` (Retry) instead of `needsFirstRelease`
-  // (which would offer a first release that overwrites the unread composition).
   const failedDsIds = computed(() =>
     Object.entries(store.activeReleaseErrorByDs)
       .filter(([, failed]) => failed)
@@ -1157,8 +916,6 @@
       needsFirstRelease: 'Needs a first release',
       loadFailed: "Couldn't load the active release"
     }
-    // Per-group notice + inline action for the non-selectable rows (the picker is
-    // presentational and renders whatever arrives here).
     const NOTICES = {
       needsFirstRelease:
         'No active release — compose a full first release (with an Application) to publish here.',
@@ -1190,10 +947,6 @@
     window.open(href, '_blank', 'noopener')
   }
 
-  // A scoped entry can't override a DS with no active release. The picker offers
-  // that DS a "Compose first release" action instead — reopen the composer DS-first
-  // (full composition) for it, carrying the scoped resource + version forward as a
-  // seed so only the Application is left to pick.
   const onComposeFirstRelease = (dsId) =>
     router.push(
       releaseComposerRouteFirstRelease({
@@ -1204,9 +957,6 @@
       })
     )
 
-  // The picker emits a single generic `group-action`; route it by group key. A DS
-  // whose active-release read failed offers Retry (re-fetch just the failed reads);
-  // one with no release at all offers "Compose first release".
   const onGroupAction = ({ groupKey, dsId }) => {
     if (groupKey === 'loadFailed') {
       composition.retryActiveReleases()
@@ -1215,9 +965,6 @@
     if (groupKey === 'needsFirstRelease') onComposeFirstRelease(dsId)
   }
 
-  // The strictest blocking DS, carrying WHY (`reason`) so the footer explains it:
-  //   'degraded' → its active release couldn't be read (offer Retry)
-  //   'no_app'   → it has no Application to publish
   const blockingDs = computed(() => {
     for (const id of deploymentIds.value) {
       const ctx = store.deployCtx(id)
@@ -1229,18 +976,12 @@
     return null
   })
 
-  // Versions still loading for a composed resource: the LATEST sentinel resolves to
-  // `null` mid-load, which the dispatch guard would turn into an "unresolved" skip.
-  // Gate the button on that so a too-early click can't misfire (footer shows a hint).
   const versionsStillLoading = computed(() =>
     versionedResources.value.some((resource) =>
       composition.isLoadingVersionsFor(resource.resourceType, resource.resourceId)
     )
   )
 
-  // Composed resources whose version catalog settled (not loading, not errored)
-  // with ZERO deployable versions: the "Track latest Ready" default can't resolve,
-  // so the deploy is blocked and each such card renders a "build a version" link.
   const resourcesMissingReadyVersion = computed(() =>
     versionedResources.value.filter((resource) =>
       resourceHasNoReadyVersion(resource.resourceType, resource.resourceId)
@@ -1252,9 +993,6 @@
     return first ? labelFor(first.resourceType) : ''
   })
 
-  // `deployEnabled` already gates on the effective DS; combine with the multi-DS
-  // fold so any blocking DS disables the button (the store covers app/version), and
-  // block when any composed resource has no deployable version to resolve.
   const canBuildAndActivate = computed(
     () =>
       deployEnabled.value &&
@@ -1328,12 +1066,6 @@
     })
   }
 
-  // Async (202), no polling: surface a per-DS toast on the settled outcome and
-  // navigate to the first deployment whose build actually started — never await
-  // completion. The store only describes the selection (pure `composePayload`);
-  // the composable owns the per-DS dispatch. Fall back to the effective DS when
-  // no multi-select. If every target failed or was skipped, stay on the composer
-  // so the user can read the errors and retry.
   const confirmBuildAndActivate = async () => {
     confirmVisible.value = false
     const targetDsIds = deploymentIds.value.length
@@ -1341,8 +1073,6 @@
       : effDsId.value
         ? [effDsId.value]
         : []
-    // A multi-DS release hands off to the progress dialog (per-DS status, no toasts,
-    // no auto-navigation): the user watches every release settle and closes when done.
     if (targetDsIds.length > 1) {
       await deployProgress.run(targetDsIds)
       return
@@ -1355,9 +1085,6 @@
     }
   }
 
-  // Closing the progress dialog after a fully successful multi-DS release sends the
-  // user to that deployment's releases tab (the single-DS path navigates the same
-  // way). A partial/failed batch stays put so the user can read the failures.
   const onDeployProgressClose = () => {
     const items = deployProgress.items.value
     const allSucceeded = items.length > 0 && items.every((item) => item.status === 'done')

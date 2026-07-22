@@ -10,27 +10,10 @@ import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 
 import { versionedRulesEngineService } from '@/services/v2/edge-app/versioned/versioned-rules-engine-service'
 
-/**
- * Edge Application versioned sub-resources — registry-driven (TEST-ARCHITECTURE §3.3).
- *
- * `cacheSettings`, `deviceGroups` and `functions` are produced by
- * `createVersionedSubResourceService`, so they run the shared factory-contract suite,
- * fed entirely from `RESOURCE_TEST_REGISTRY.application.subresources` (path/idKey/
- * queryKeyGroup/buildPayload all live in the registry). `rulesEngine` has its own
- * (request/response phase) signature — flagged `bespoke` in the registry — so it is
- * covered by hand below.
- */
-
 RESOURCE_TEST_REGISTRY.application.subresources
   .filter((sub) => !sub.bespoke)
   .forEach((sub) => describeVersionedSubresourceCrud({ ownerLabel: 'edge-app', ...sub }))
 
-/**
- * Bespoke — Rules Engine carries a phase-aware API (`request_rules` /
- * `response_rules`) and object-shaped arguments, so it diverges from the generic
- * factory interface. The inherited version-scoping guarantee still holds and is
- * proven here directly.
- */
 describe('versioned sub-resource CRUD (bespoke): edge-app / rulesEngine', () => {
   const RID_A = 'app-A'
   const RID_B = 'app-B'

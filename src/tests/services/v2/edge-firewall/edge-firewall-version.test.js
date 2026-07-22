@@ -3,10 +3,6 @@ import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 import { describeVersionServiceContract } from '@/tests/shared/versioning/version-service.contract'
 import { describeVersionAdapterContract } from '@/tests/shared/versioning/version-adapter.contract'
 
-// Edge Firewall — registry-driven suite. The inherited service + shared adapter
-// contracts run from the descriptor (the fixture uses the FLAT module flags, so the
-// shared config/payload markers prove that surface). Bespoke below: the NESTED
-// `modules` snapshot shape and the partial-config omission, which are firewall-specific.
 const firewall = RESOURCE_TEST_REGISTRY.firewall
 const adapter = firewall.adapter
 

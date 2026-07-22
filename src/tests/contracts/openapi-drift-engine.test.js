@@ -1,8 +1,5 @@
 import { describe, it, expect } from 'vitest'
 
-// The engine and the sample spec live in the repo-root `tests/contracts` tree
-// (shared with the Playwright drift spec); the unit runner only includes
-// `src/tests`, so import across — same pattern as the other contract tests.
 import {
   YUP_TO_OPENAPI,
   resolveRef,
@@ -19,8 +16,6 @@ import {
 import { contractSchemas } from '../../../tests/contracts/schemas'
 import sampleSpec from '../../../tests/contracts/fixtures/openapi.sample.json'
 
-// Resolves the item schema behind an operation's response for a given segment,
-// so the response-side assertions read exactly what the Playwright spec reads.
 const detailItem = (segment) => {
   const { detail } = findVersionPaths(sampleSpec, segment)
   const schema = getResponseSchema(sampleSpec, sampleSpec.paths[detail], 'get')
@@ -35,10 +30,8 @@ describe('openapi-drift-engine — $ref resolution', () => {
   })
 
   it('is cyclic-safe: a self-referential $ref does not hang', () => {
-    // ApplicationVersion.self points back at ApplicationVersion.
     const app = resolveRef(sampleSpec, { $ref: '#/components/schemas/ApplicationVersion' })
     const self = resolveRef(sampleSpec, app.properties.self)
-    // Resolves one hop to the object; re-resolving the same ref stops at the ref.
     expect(self.type).toBe('object')
     expect(self.properties).toHaveProperty('self')
   })
@@ -58,7 +51,6 @@ describe('openapi-drift-engine — describeFields (yup → field list)', () => {
     expect(byName.name.type).toBe('string')
     expect(byName.type.type).toBe('string')
     expect(byName.items.type).toBe('array')
-    // A nullable common field keeps its nullable flag.
     expect(byName.version.type).toBe('number')
     expect(byName.version.nullable).toBe(true)
   })
@@ -88,7 +80,6 @@ describe('openapi-drift-engine — path discovery', () => {
   })
 
   it('returns nulls for a resource with no version endpoints (drives the FAIL path)', () => {
-    // `wafs` is intentionally absent from the sample spec.
     const paths = findVersionPaths(sampleSpec, 'wafs')
     expect(paths.list).toBeNull()
     expect(paths.detail).toBeNull()
@@ -115,8 +106,8 @@ describe('openapi-drift-engine — response-side drift (the core)', () => {
   it('passes fields that are present with a compatible type (incl. nested $ref)', () => {
     const { itemSchema } = detailItem('applications')
     const ourFields = [
-      { name: 'name', type: 'string' }, // present, ok
-      { name: 'modules', type: 'object' } // present via nested $ref -> object, ok
+      { name: 'name', type: 'string' },
+      { name: 'modules', type: 'object' }
     ]
     expect(compareResponseFields(ourFields, itemSchema, sampleSpec)).toEqual([])
   })
@@ -146,10 +137,10 @@ describe('openapi-drift-engine — response-side drift (the core)', () => {
   it('reports every drifting field at once for the application version schema', () => {
     const { itemSchema } = detailItem('applications')
     const ourFields = [
-      { name: 'name', type: 'string' }, // ok
-      { name: 'active', type: 'boolean' }, // type drift
-      { name: 'debug', type: 'boolean' }, // absent
-      { name: 'modules', type: 'object' } // ok (nested $ref)
+      { name: 'name', type: 'string' },
+      { name: 'active', type: 'boolean' },
+      { name: 'debug', type: 'boolean' },
+      { name: 'modules', type: 'object' }
     ]
     const issues = compareResponseFields(ourFields, itemSchema, sampleSpec)
     expect(issues.map((issue) => `${issue.field}:${issue.kind}`).sort()).toEqual([
@@ -183,12 +174,11 @@ describe('openapi-drift-engine — request-side drift (lighter)', () => {
       sampleSpec.paths['/v4/workspace/applications/{id}/versions'],
       'post'
     )
-    // The app draft request only declares `comment` + `name`, and forbids extras.
     const ourFields = [
-      { name: 'comment' }, // present -> ok
-      { name: 'name' }, // present -> ok
-      { name: 'active' }, // absent + strict -> FAIL
-      { name: 'source_version' } // absent + strict -> FAIL
+      { name: 'comment' },
+      { name: 'name' },
+      { name: 'active' },
+      { name: 'source_version' }
     ]
     const { issues, warnings, resolvable } = compareRequestFields(ourFields, post, sampleSpec)
     expect(resolvable).toBe(true)
@@ -202,11 +192,7 @@ describe('openapi-drift-engine — request-side drift (lighter)', () => {
       sampleSpec.paths['/v4/workspace/network_lists/{id}/versions'],
       'post'
     )
-    const ourFields = [
-      { name: 'name' }, // present
-      { name: 'items' }, // absent, extras allowed -> warning
-      { name: 'source_version' } // absent, extras allowed -> warning
-    ]
+    const ourFields = [{ name: 'name' }, { name: 'items' }, { name: 'source_version' }]
     const { issues, warnings } = compareRequestFields(ourFields, post, sampleSpec)
     expect(issues).toEqual([])
     expect(warnings.map((warning) => warning.field).sort()).toEqual(['items', 'source_version'])
@@ -221,7 +207,6 @@ describe('openapi-drift-engine — request-side drift (lighter)', () => {
     const fields = describeFields(contractSchemas.application.draftRequest).map(
       (field) => field.name
     )
-    // Sanity: the real app draft carries the common + resource-specific writes.
     expect(fields).toEqual(expect.arrayContaining(['comment', 'source_version', 'name', 'active']))
   })
 })

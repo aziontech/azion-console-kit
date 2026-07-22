@@ -8,8 +8,6 @@
   import { CODE_OPTIONS } from '@/views/CustomPages/Config/listStatusCode'
   import { useVersionContext } from '@/composables/versioning/use-version-context'
 
-  // readOnly defaults to false outside the VersionShell; inside an immutable
-  // version it blocks saving page-code edits (and disables the fields).
   const { readOnly } = useVersionContext()
 
   defineOptions({

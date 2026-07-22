@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { WafVersionAdapter } from '@/services/v2/waf/waf-version-adapter'
 
-// Version snapshot per `GET .../versions/{vid}`: clone of the WAF row (Main
-// Settings) with engine_settings thresholds per threat at the root.
 const wafSnapshot = (overrides = {}) => ({
   id: 902,
   name: 'waf-main',

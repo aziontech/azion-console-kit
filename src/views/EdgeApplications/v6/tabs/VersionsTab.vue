@@ -1,12 +1,4 @@
 <script setup>
-  /**
-   * VersionsTab — the version LISTING body of the Application v6 screen.
-   *
-   * Lists every version of the Application with search/filter/sort and per-row
-   * actions (Clone / Archive / Delete / Promote). Clicking a version opens its
-   * FULL editor (VersionEditView). Owns its own versions query (deduped by
-   * queryKey), and reads the shared menu host provided by ResourceVersionLanding.
-   */
   import { computed, inject, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from '@aziontech/webkit/use-toast'

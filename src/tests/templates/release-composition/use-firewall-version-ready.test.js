@@ -5,14 +5,6 @@ import { httpService } from '@/services/v2/base/http/httpService'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { useFirewallVersionReady } from '@/templates/release-composition/use-firewall-version-ready'
 
-/**
- * Real service under test: the composable runs the real `edgeFirewallVersionService`
- * (loadVersion → adapter normalization). Only the boundaries are stubbed — the
- * HTTP client (`httpService.request`) and the query cache (`queryClient.ensureQueryData`,
- * short-circuited to the fetch). Readiness is asserted by observing the HTTP call
- * the composable drives and the refs it exposes.
- */
-
 const runInScope = (factory) => {
   const scope = effectScope()
   const exposed = scope.run(factory)

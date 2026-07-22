@@ -28,8 +28,6 @@
 
   const emit = defineEmits(['dispatch', 'cancel'])
 
-  // Per-state banner COPY only (icon/title/subtitle). The action buttons come from
-  // the shared getVersionBarActions so the footer and heading never diverge.
   const BANNER = {
     draft: {
       icon: 'pi pi-file-edit',
@@ -46,7 +44,6 @@
       title: 'Viewing a Ready version',
       subtitle:
         'This version is read-only. Create a new version to make changes, or deploy it to go live.',
-      // versioned-only resources never deploy: drop the Deploy mention from the copy.
       subtitleVersionedOnly: 'This version is read-only. Create a new version to make changes.'
     },
     active: {
@@ -83,23 +80,18 @@
     subtitle: 'Create a new version to make changes.'
   }
 
-  // Capability comes from the shell context; defaults to deployable outside it.
-  // `isDispatching` gates every button while a command is in flight (defaults false).
   const { capability, isDispatching } = useVersionContext()
   const cap = computed(() => capability?.value ?? DEFAULT_CAPABILITY)
   const dispatching = computed(() => isDispatching?.value ?? false)
 
   const banner = computed(() => BANNER[props.state] ?? FALLBACK)
 
-  // Drop Deploy-related copy when the resource can't deploy (versioned-only).
   const subtitle = computed(() =>
     !cap.value.canDeploy && banner.value.subtitleVersionedOnly
       ? banner.value.subtitleVersionedOnly
       : banner.value.subtitle
   )
 
-  // Buttons from the shared single source, intersected with the state-allowed +
-  // registered handlers (availableActions) — identical to the heading's set.
   const actions = computed(() =>
     getVersionBarActions(props.state, cap.value).filter((action) =>
       props.availableActions.includes(action.key)

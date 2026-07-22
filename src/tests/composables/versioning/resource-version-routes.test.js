@@ -1,12 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { RESOURCE_VERSION_ROUTES } from '@/composables/versioning/use-version-menu-actions'
 
-/**
- * Regression guard: every versioned resourceType must have a version-editor route
- * in RESOURCE_VERSION_ROUTES, or row-menu "Open configuration" (and the row click,
- * which routes through OPEN_CONFIGURATION) silently no-ops — the bug that left
- * network_list/waf unable to open their version editor.
- */
 const VERSIONED_RESOURCE_TYPES = [
   'application',
   'firewall',

@@ -1,99 +1,42 @@
 /**
- * HOP 1 — `resolveConsumingDeployments` interface contract (single source of
- * truth for the shape every strategy must honour).
- *
- * This module owns ONLY the contract: the input/output shapes and the small,
- * pure helpers that encode the contract's invariants. It performs no IO and
- * imports nothing reactive. The concrete strategies (`fanoutResolver` today,
- * `resourceUsageResolver` later) live in sibling files and MUST produce a
- * result that satisfies {@link assertConsumingDeploymentsShape} — that is the
- * Liskov guarantee that lets `selectResolver()` swap one for the other without
- * touching any caller (req 1.2 / 1.4 / 8.3).
- *
- * Property 3 (task 9.3) is written directly against the helpers here and is
- * therefore reusable, unchanged, for the future `resourceUsageResolver`.
- */
-
-/**
- * A resource reference accepted by the interface. A single value or a list of
- * 1..N is accepted (req 6.1); callers normalise via {@link normalizeResources}.
- *
  * @typedef {object} ResourceRef
- * @property {string} resource_type - e.g. `'application'`, `'function'`, `'waf'`.
- * @property {string|number} resource_id - the resource identifier (for
- *   `application` this is its `global_id` value). Matched against the active
- *   release resource's `resource_id`, falling back to `global_id` for the legacy
- *   response shape (req 1.5).
+ * @property {string} resource_type
+ * @property {string|number} resource_id
  */
 
 /**
- * A consuming deployment in the resolver output. `activeVersionByResource`
- * carries the version of each matched resource pinned in THIS deployment's
- * active release (req 1.1); its keys are {@link resourceKey} values so a 1..N
- * resolution can disambiguate per resource.
- *
  * @typedef {object} ConsumingDeployment
- * @property {string} deploymentId - the consuming Deployment Settings id.
- * @property {Object<string, (string|number|null)>} activeVersionByResource -
- *   `{ [resourceKey]: version_id|null }` for each resource matched in this DS.
+ * @property {string} deploymentId
+ * @property {Object<string, (string|number|null)>} activeVersionByResource
  */
 
 /**
- * The interface output (req 1.7). `deployments` is the union of consuming
- * deployments de-duplicated by `deploymentId`; `matchedByDeployment` preserves
- * which resource(s) matched each deployment, keyed by deployment id.
- *
  * @typedef {object} ConsumingDeploymentsResult
- * @property {ConsumingDeployment[]} deployments - de-duplicated by `deploymentId`.
- * @property {Map<string, ResourceRef[]>} matchedByDeployment - per-DS the list
- *   of resources that matched it (so the consumer knows why a DS was selected).
+ * @property {ConsumingDeployment[]} deployments
+ * @property {Map<string, ResourceRef[]>} matchedByDeployment
  */
 
 /**
- * The resolver function contract every strategy implements.
- *
  * @callback ResolveConsumingDeployments
- * @param {ResourceRef|ResourceRef[]} resources - one or many resource refs (req 6.1).
- * @returns {Promise<ConsumingDeploymentsResult>} the de-duplicated union (req 1.7).
- *   When no resource has an active binding, resolves to the EMPTY result, never
- *   rejects (req 1.6); see {@link emptyResult}.
+ * @param {ResourceRef|ResourceRef[]} resources
+ * @returns {Promise<ConsumingDeploymentsResult>}
  */
 
-/**
- * The `application` resource type. Kept as a named constant so the domain type is
- * referenced in one place.
- */
 export const APPLICATION_RESOURCE_TYPE = 'application'
 
 /**
- * Stable key for a resource ref, used as the `activeVersionByResource` key and
- * to de-duplicate a resource list. `resource_type` is part of the key because
- * the same numeric id can exist across different types.
- *
  * @param {ResourceRef} resource
  * @returns {string}
  */
 export const resourceKey = (resource) => `${resource?.resource_type}:${resource?.resource_id}`
 
 /**
- * Read the id an active-release resource is matched against. The deployment-api
- * now returns every resource id under `resource_id` (for `application` its value
- * is the `global_id`); `global_id` is kept as a fallback for the legacy response
- * shape so matching survives a mixed rollout (req 1.5). Encoding this once keeps
- * the rule out of every strategy.
- *
- * @param {object} resource - one entry of an active release `resources[]` (or a
- *   `resource_usage` row resource).
+ * @param {object} resource
  * @returns {string|number|null}
  */
 export const matchIdValue = (resource) => resource?.resource_id ?? resource?.global_id ?? null
 
 /**
- * Normalise the 1..N input into a clean `ResourceRef[]` (req 6.1): wraps a
- * single ref, drops nullish entries and entries missing a `resource_id`, and
- * de-duplicates by {@link resourceKey} so a strategy never scans the same
- * resource twice.
- *
  * @param {ResourceRef|ResourceRef[]} resources
  * @returns {ResourceRef[]}
  */
@@ -112,30 +55,13 @@ export const normalizeResources = (resources) => {
 }
 
 /**
- * The canonical empty result (req 1.6): no consuming deployments, empty match
- * map. Strategies return this when nothing matches; callers can read it
- * unguarded.
- *
  * @returns {ConsumingDeploymentsResult}
  */
 export const emptyResult = () => ({ deployments: [], matchedByDeployment: new Map() })
 
 /**
- * Assert that a value satisfies the {@link ConsumingDeploymentsResult} contract.
- * Used by Property 3 (task 9.3) and any strategy's own tests; throws an
- * `Error` with a precise message on the first violation so the failing
- * invariant is obvious.
- *
- * Invariants checked:
- *  - top-level `{ deployments: array, matchedByDeployment: Map }`;
- *  - every deployment is `{ deploymentId, activeVersionByResource: object }`;
- *  - `deployments` is de-duplicated by `deploymentId` (req 1.7);
- *  - every `matchedByDeployment` key has a corresponding deployment and a
- *    non-empty `ResourceRef[]` value (a DS is only matched because a resource
- *    matched it).
- *
  * @param {unknown} result
- * @returns {true} when valid (otherwise throws).
+ * @returns {true}
  */
 export const assertConsumingDeploymentsShape = (result) => {
   if (!result || typeof result !== 'object') {

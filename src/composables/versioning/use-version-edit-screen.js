@@ -13,21 +13,13 @@ const SUCCESS_SUMMARY = {
 }
 
 /**
- * useVersionEditScreen — the single source of truth for the FULL version editor
- * screen shared by every resource (CustomPage / Application / Firewall / Workload).
- *
- * Owns: route params, the missing-versionId redirect, resource load + watch, the
- * page title, the editor ref (so the footer DEPLOY routes to the release composer
- * via the heading's entry), toast + navigation, and the command-success/error
- * handlers. Each view specializes via config; markup lives in <VersionEditScreen>.
- *
  * @param {{
- *   load: (id: string) => Promise<object>,
- *   provideKey?: string | null,        // provide(resource) for nested fields; null = none (Workload)
- *   listRoute: (id: string) => object, // router location for the versions listing
- *   versionRouteName: string,          // route name for a specific version
- *   titleWithVersion?: boolean,        // `${name} — Version ${id}` vs bare name (Workload)
- *   supportsDeployDrawer?: boolean     // DEPLOY opens the drawer; false falls through (Workload)
+ * load: (id: string) => Promise<object>,
+ * provideKey?: string | null,        // provide(resource) for nested fields; null = none (Workload)
+ * listRoute: (id: string) => object, // router location for the versions listing
+ * versionRouteName: string,          // route name for a specific version
+ * titleWithVersion?: boolean,        // `${name} — Version ${id}` vs bare name (Workload)
+ * supportsDeployDrawer?: boolean     // DEPLOY opens the drawer; false falls through (Workload)
  * }} config
  */
 export function useVersionEditScreen({
@@ -82,9 +74,6 @@ export function useVersionEditScreen({
   const handleCancel = () => goToVersionsList()
 
   const handleCommandSuccess = ({ action, result }) => {
-    // DEPLOY routes to the full-page composer, the SAME entry the heading Deploy
-    // owns. Resources without a deploy affordance (Workload) fall through to the
-    // generic toast.
     if (action === VERSION_ACTIONS.DEPLOY && supportsDeployDrawer) {
       editorRef.value?.openRelease()
       return

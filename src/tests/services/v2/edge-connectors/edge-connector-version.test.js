@@ -3,11 +3,6 @@ import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 import { describeVersionServiceContract } from '@/tests/shared/versioning/version-service.contract'
 import { describeVersionAdapterContract } from '@/tests/shared/versioning/version-adapter.contract'
 
-// Edge Connector — registry-driven suite. The inherited service + shared adapter
-// contracts run from the descriptor (HTTP config markers from the fixture, Storage
-// payload markers from the form). Bespoke below: the HTTP/Storage/LiveIngest
-// polymorphism — nested HTTP blocks (addresses, load_balancer, origin_shield/hmac)
-// and the per-type connectionOptions — which is genuinely connector-specific.
 const connector = RESOURCE_TEST_REGISTRY.connector
 const adapter = connector.adapter
 

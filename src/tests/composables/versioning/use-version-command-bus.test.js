@@ -52,7 +52,6 @@ describe('createVersionCommandBus - reactive registry', () => {
     await nextTick()
     expect(bus.registered.value.has('SAVE')).toBe(false)
 
-    // Each mutation replaced the Map (shallowRef), firing the watcher every time.
     expect(seen).toEqual([[], ['SAVE'], []])
   })
 
@@ -76,8 +75,6 @@ describe('createVersionCommandBus - ready ref is not unwrapped (shallowRef regre
 
     const entry = bus.registered.value.get('SAVE')
 
-    // A deep ref registry would have unwrapped `ready` to a boolean, breaking
-    // `.value` — the whole reason the bus uses shallowRef.
     expect(isRef(entry.ready)).toBe(true)
     expect(entry.ready.value).toBe(false)
 

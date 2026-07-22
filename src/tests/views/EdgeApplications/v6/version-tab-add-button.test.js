@@ -5,14 +5,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import VersionTabAddButton from '@/views/EdgeApplications/v6/tabs/VersionTabAddButton.vue'
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 
-// The button is the active-tab "+ Add" action. It renders only when the active tab
-// supports create AND the version is editable, derives its label from the tab, and
-// forwards a click to the active tab component's openCreateDrawer(). The real
-// useVersionContext runs (inject with the default editable context, or a provided
-// read-only one) — no versioning module is mocked. PrimeButton is stubbed to a
-// native <button> so assertions target rendered DOM and the parent callback, never
-// internal state.
-
 const TESTID = 'application-v6-edit__add-button'
 
 const PrimeButtonStub = defineComponent({
@@ -108,7 +100,6 @@ describe('VersionTabAddButton — click behavior', () => {
     const button = wrapper.find(`[data-testid="${TESTID}"]`)
     await button.trigger('click')
 
-    // No crash on the optional-chained call; the button remains rendered.
     expect(button.exists()).toBe(true)
   })
 })

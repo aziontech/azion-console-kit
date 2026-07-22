@@ -5,13 +5,8 @@ import { describe, expect, it, vi } from 'vitest'
 import ListWafRulesAllowed from '@/views/WafRules/ListWafRulesAllowed.vue'
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 
-// Task 8.3 (Property P6, WAF): the Allowed Rules list is a drop-in — when a
-// versioned `service` facade is injected its CRUD routes through the facade
-// (no fork to wafService), and an immutable version disables every write.
-
 vi.mock('vue-router', () => ({ useRoute: () => ({ params: { id: 'legacy-id' } }) }))
 
-// Stub ListTable to surface the `actions` and CRUD services the component wires.
 const ListTableStub = defineComponent({
   name: 'ListTable',
   props: ['listService', 'actions'],

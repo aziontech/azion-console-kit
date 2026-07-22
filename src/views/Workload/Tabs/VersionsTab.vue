@@ -43,9 +43,6 @@
     { key: 'created', label: 'Created by', size: 'minmax(180px, 1.2fr)' }
   ]
 
-  // Single shared driver: every workload version surface (the list AND the
-  // current-by-environment band) routes row-action through the same composable
-  // and renders the same model, so the menu can never diverge (Req 1.4, 3.3).
   const {
     handleRowAction,
     dialogConfig,
@@ -62,8 +59,6 @@
     onSuccess: () => versionsQuery.refetch?.()
   })
 
-  // The band has no per-row emitter, so it renders the shared model into a popup
-  // Menu and forwards the command to the same handler used by the list.
   const bandMenuRef = ref(null)
   const bandMenuModel = ref([])
 

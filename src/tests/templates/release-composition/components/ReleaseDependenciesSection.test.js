@@ -3,11 +3,6 @@ import { describe, expect, it } from 'vitest'
 
 import ReleaseDependenciesSection from '@/templates/release-composition/components/ReleaseDependenciesSection.vue'
 
-// The two nested fields are exercised in their own suites; here they are stubbed
-// to plain emitters so this suite isolates the section's job: grouping, counts,
-// the per-group "Add" affordance, per-row remove, the empty group message, and
-// forwarding add/instance/version/remove/toggle events with the right payload
-// shape.
 const stubs = {
   LazyResourceSelectField: {
     name: 'release-lazy-resource-select-field',
@@ -109,7 +104,6 @@ describe('ReleaseDependenciesSection', () => {
       wrapper.find('[data-testid="release-composition__deps-remove-function-0"]').exists()
     ).toBe(true)
 
-    // Both function instances render (the group is open).
     expect(wrapper.find('[data-testid="release-composition__deps-row-function-1"]').exists()).toBe(
       true
     )
@@ -118,9 +112,6 @@ describe('ReleaseDependenciesSection', () => {
   it('hides the body (rows) for a collapsed group', () => {
     const wrapper = makeWrapper()
 
-    // connector group is closed. The body stays mounted (grid-rows collapse
-    // animation) but is collapsed and marked aria-hidden so it is out of the
-    // accessibility tree.
     const panel = wrapper.find('[data-testid="release-composition__deps-panel-connector"]')
     expect(panel.exists()).toBe(true)
     expect(panel.classes()).toContain('grid-rows-[0fr]')

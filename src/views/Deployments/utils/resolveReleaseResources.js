@@ -12,17 +12,6 @@ import { networkListVersionService } from '@/services/v2/network-lists/network-l
 import { wafService } from '@/services/v2/waf/waf-service'
 import { wafVersionService } from '@/services/v2/waf/waf-version-service'
 
-/**
- * Registry of release-resource resolvers, keyed by `resource_type`.
- *
- * To support a new resource type when it is implemented, add one entry:
- *   - listNames(): returns the service listing ({ body }) used to resolve the
- *     resource display name by id. Omit if the name should not be resolved.
- *   - resolveVersionName(id, versionId): optional; returns the version label for
- *     that resource. Omit for non-versioned types (keeps the raw version id).
- *
- * Anything not registered here passes through untouched.
- */
 const RESOURCE_RESOLVERS = {
   application: {
     listNames: () => edgeAppService.listEdgeApplicationsService({ page: 1, pageSize: 100 }),

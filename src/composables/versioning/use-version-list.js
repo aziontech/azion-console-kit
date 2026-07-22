@@ -1,21 +1,6 @@
-/**
- * Headless list logic for the versions listing (search + status filter + sort).
- *
- * Owns the reactive search/filter/sort state and derives the visible `items`
- * from an already-normalized version array. Decoupling this from the view keeps
- * the SFC declarative and the logic unit-testable.
- *
- * PURE: depends only on `vue` and the version state machine. No services, no
- * stores, no HTTP, no flag reads — callers pass the normalized versions in.
- */
-
 import { ref, computed, toValue } from 'vue'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 
-/**
- * Human-readable label per canonical version state. Kept in declaration order
- * of `VERSION_STATES` so the status filter stays in sync with the state machine.
- */
 const STATE_LABELS = {
   [VERSION_STATES.DRAFT]: 'Draft',
   [VERSION_STATES.QUEUED]: 'Queued',
@@ -27,10 +12,6 @@ const STATE_LABELS = {
   [VERSION_STATES.ERROR]: 'Error'
 }
 
-/**
- * Sort comparators keyed by the toolbar's sort value. Each compares two
- * normalized versions; missing keys coerce to '' so the sort stays stable.
- */
 const COMPARATORS = {
   'lastModified-desc': (left, right) =>
     String(right.lastModified || '').localeCompare(String(left.lastModified || '')),
@@ -41,13 +22,10 @@ const COMPARATORS = {
 
 /**
  * @param {import('vue').MaybeRefOrGetter<Array<object>>} rawVersions
- *   Normalized version array (UI shape: `{ id, state, comment, createdAt, lastModified, ... }`).
  * @param {object} [options]
- * @param {string[]} [options.searchableFields] Fields the search term matches against.
- * @param {string} [options.defaultSort] Initial sort value (a `COMPARATORS` key).
+ * @param {string[]} [options.searchableFields]
+ * @param {string} [options.defaultSort]
  * @param {import('vue').MaybeRefOrGetter<Map<string, {deployments: Array<object>}>>} [options.activeVersions]
- *   Lookup of versions currently serving traffic, keyed by `version.id`. When
- *   present, each item is enriched with `activeTraffic` for the traffic column.
  */
 export function useVersionList(rawVersions, options = {}) {
   const {

@@ -1,13 +1,4 @@
 <script setup>
-  // Shared scaffold for the multi-tab version editor body: VersionShell → the
-  // per-resource form adapter → a TabView driven by a `tabs` descriptor array, plus
-  // the "+ Add" button and the version heading actions (both teleported to the
-  // page heading from inside the shell slot, so they get the real version context).
-  //
-  // Everything resource-specific arrives as props: the `adapter` component, the
-  // `tabs` array (built per resource with its own gating/facades), the deploy
-  // `resourceContext`, and a `testidPrefix`. `openRelease` is exposed so the
-  // host VersionEditView can route to the composer on a footer DEPLOY.
   import { computed, ref } from 'vue'
   import TabView from 'primevue/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
@@ -25,24 +16,15 @@
     adapter: { type: [Object, Function], required: true },
     tabs: { type: Array, default: () => [] },
     resourceContext: { type: Object, default: null },
-    // Resolves the version capability inside the editor; omitted/unknown stays
-    // deployable so existing resources keep their current behavior.
     resourceType: { type: String, default: undefined },
     testidPrefix: { type: String, required: true },
-    // Render the single tab's component directly, without the outer TabView. For
-    // resources whose form already provides its own tabs (e.g. Functions).
     bare: { type: Boolean, default: false }
   })
 
   const emit = defineEmits(['command-success', 'command-error', 'cancel'])
 
-  // Two-way so a tab body can jump the editor to another tab (e.g. the Rules form
-  // CTA that points to Main Settings). Defaults to the first tab when unbound.
   const activeTabIndex = defineModel('activeTabIndex', { type: Number, default: 0 })
 
-  // Component instances of the rendered tabs, keyed by index, so the "+ Add" button
-  // can reach `openCreateDrawer` on the active tab. Index-keyed function refs keep
-  // the mapping stable regardless of TabView's render order.
   const componentsRefs = ref({})
   const setComponentRef = (index) => (instance) => {
     if (instance) componentsRefs.value[index] = instance
@@ -59,9 +41,6 @@
 </script>
 
 <template>
-  <!-- Keyed by versionId at the host: the shell calls the query factory once in
-       setup and captures resourceId/versionId by value, so a version switch
-       remounts shell + adapter to renew query, ctx and form. -->
   <VersionShell
     :use-version-query="useVersionQuery"
     :resource-id="resourceId"

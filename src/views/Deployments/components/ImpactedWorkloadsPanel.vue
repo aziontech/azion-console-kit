@@ -1,12 +1,4 @@
 <script setup>
-  /**
-   * ImpactedWorkloadsPanel — read-only impact-radius warning for the
-   * deployment-anchored deploy flow. Fixed-footprint, 3-layer progressive
-   * disclosure: constant-height summary → clickable environment pills that filter
-   * the list → collapsible scrollable list grouped by environment with a name
-   * search. Dumb/presentational: `workloads` arrive already derived
-   * (`{ id, name, environments: [name] }`).
-   */
   import { computed, ref, watch } from 'vue'
   import LabelBlock from '@aziontech/webkit/label'
   import InputText from '@aziontech/webkit/inputtext'
@@ -58,8 +50,6 @@
 
   const expanded = ref(resolveExpanded(props.count))
 
-  // Until the user decides, the list auto-follows the threshold as the count
-  // resolves (the drawer's queries land after the panel mounts).
   watch(
     () => props.count,
     (count) => {

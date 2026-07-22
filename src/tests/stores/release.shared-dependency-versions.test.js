@@ -7,13 +7,6 @@ beforeEach(() => {
   setActivePinia(createPinia())
 })
 
-// ---------------------------------------------------------------------------
-// Shared-version invariant: a dependency of a SHARED type (connector,
-// network_list) used by more than one parent pins ONE version for the whole
-// release. Picking its version under one parent must apply to every parent that
-// references the same instance (and vice versa), so the two cards never diverge
-// and the flat payload dedup can never silently drop a pick.
-// ---------------------------------------------------------------------------
 describe('SHARED_VERSION_DEP_TYPES', () => {
   it('locks version-sharing to connector and network_list', () => {
     expect(SHARED_VERSION_DEP_TYPES).toEqual(['connector', 'network_list'])
@@ -51,7 +44,6 @@ describe('setCollVer — shared-version propagation', () => {
     store.setCollVer('application', 'connector', 0, 'cn-v2')
 
     expect(store.coll.application.connector[0].version).toBe('cn-v2')
-    // A different connector under another parent is left untouched.
     expect(store.coll.custom_page.connector[0].version).toBe(null)
   })
 
@@ -63,7 +55,6 @@ describe('setCollVer — shared-version propagation', () => {
     store.setCollVer('application', 'function', 0, 'fn-v2')
 
     expect(store.coll.application.function[0].version).toBe('fn-v2')
-    // `function` is not in SHARED_VERSION_DEP_TYPES, so the firewall slot is not synced.
     expect(store.coll.firewall.function[0].version).toBe(null)
   })
 })
@@ -104,7 +95,6 @@ describe('reconcileSharedVersions — seed-timing convergence', () => {
     store.seedApplicationConnectors([{ connectorId: 'cn-1' }])
     store.setCollVer('application', 'connector', 0, 'cn-v2')
 
-    // Custom Pages gains the same connector after the pick was made.
     store.seedCustomPageConnectors([{ connectorId: 'cn-1' }])
     store.restoreCollVersions({ 'application:connector:cn-1': 'cn-v2' })
 

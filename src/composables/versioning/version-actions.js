@@ -1,13 +1,3 @@
-/**
- * Presentation metadata for version lifecycle actions, shared between the
- * VersionShell action bar (`VersionActionBar.vue`) and the version listing's
- * per-row action menu (`VersionListDataView`). Single source of truth for
- * labels and dialog config so the two surfaces never drift.
- *
- * The state→actions matrix itself lives in `version-machine.js`
- * (`getAvailableActions`); this module only adds the *presentation* layer plus
- * the fixed row-menu model (`buildVersionMenuItems`).
- */
 import {
   isReady,
   isEditable,
@@ -18,19 +8,6 @@ import {
 } from './version-machine'
 import { getVersionCapability, DEFAULT_CAPABILITY } from './version-capability'
 
-/**
- * Intrinsic, state-independent metadata for each action:
- *  - `label`: button / menu-item text.
- *  - `danger`: destructive/negative action → red emphasis wherever it renders.
- *  - `dialog`: when present, the action opens VersionActionDialog before
- *    dispatching. Its shape maps to the dialog props (required → require-comment,
- *    title, actionLabel, placeholder, message, showComment, confirmSeverity).
- *      • comment dialog (ARCHIVE/CANCEL_BUILD/NEW_DRAFT_FROM) — collects a comment.
- *      • confirmation dialog (DELETE) — `showComment: false`, warning copy,
- *        danger confirm button.
- *  CANCEL_BUILD is marked `danger` so it keeps the red emphasis it had as the
- *  `building` primary.
- */
 export const ACTION_META = {
   SAVE: { label: 'Save Draft' },
   SAVE_AND_BUILD: { label: 'Save and Build' },
@@ -84,45 +61,18 @@ export const ACTION_META = {
 
 export const metaFor = (action) => ACTION_META[action] ?? { label: action }
 
-// Build/Deploy now surface in the row menu next to the management actions,
-// derived from the same version-machine state the shell action bar uses. They
-// follow the never-hide rule (present, disabled + tooltip outside their valid
-// state); Deploy is dropped for versioned-only. Clone stays shell-only.
-
-/**
- * Tooltip shown while Rollback stays disabled (Phase 2 — depends on the
- * version↔release↔environment data not available in the list yet).
- */
 const ROLLBACK_DEFERRED_TOOLTIP =
   'Rollback depends on environment data and will be available in a later phase'
 
-/**
- * Label shown for NEW_DRAFT_FROM in the versioned-only kebab. Overridden on the
- * item only — `ACTION_META.NEW_DRAFT_FROM` ('Clone as Draft') stays untouched so
- * the shell action bar keeps its copy.
- */
 const VERSIONED_ONLY_NEW_DRAFT_LABEL = 'New version from this'
 
 const BUILD_DISABLED_TOOLTIP = 'Only draft versions can be built'
 const DEPLOY_DISABLED_TOOLTIP = 'Only Ready versions can be deployed'
 
 /**
- * Builds the version row menu, gated by the resource `capability`. Pure:
- * enablement derives only from `state` (via version-machine predicates), no I/O.
- * The "never hide" pattern — items stay visible+disabled with a tooltip; only
- * DELETE is omitted when the version is already `deleted`.
- *
- * Deployable (default) order:
- * `[OPEN_CONFIGURATION, BUILD, DEPLOY, PROMOTE, ROLLBACK, ARCHIVE, DELETE]`.
- * BUILD/DEPLOY follow the never-hide rule — present, disabled + tooltip outside
- * their valid state (BUILD enabled while editable; DEPLOY while ready/active).
- * When the capability denies Promote (versioned-only), DEPLOY, PROMOTE and
- * ROLLBACK are omitted and NEW_DRAFT_FROM is inserted with a "New version from
- * this" label override → `[OPEN_CONFIGURATION, BUILD, NEW_DRAFT_FROM, ARCHIVE, DELETE]`.
- * @param {string} state version lifecycle state
- * @param {object} [ctx] context; `resourceType` resolves the default capability
- * @param {object} [capability] `{canDeploy,canPromote,canRollback}`; defaults
- *   from `ctx.resourceType` (deployable when unknown)
+ * @param {string} state
+ * @param {object} [ctx]
+ * @param {object} [capability]
  * @returns {Array<{action,label,icon,disabled,tooltip,danger,separatorBefore}>}
  */
 export const buildVersionMenuItems = (
@@ -173,8 +123,6 @@ export const buildVersionMenuItems = (
         disabled: promoteDisabled,
         tooltip: promoteDisabled ? 'Only Ready versions can be promoted' : null
       }),
-      // Phase 2 (Req 11): Rollback stays always-disabled until the
-      // version↔release↔environment data lands; no behavior wired here yet.
       item('ROLLBACK', { disabled: true, tooltip: ROLLBACK_DEFERRED_TOOLTIP })
     )
   } else {
@@ -191,17 +139,11 @@ export const buildVersionMenuItems = (
 }
 
 /**
- * Maps the pure menu model to PrimeVue MenuItems, injecting a native separator
- * before Delete and forwarding `tooltip`/`danger` for the styled item slot. The
- * single mapper shared by every listing (VersionListDataView, deployment VersionsTab)
- * so the rendered menu is byte-identical (Req 1.4). The command stops propagation
- * so the click never bubbles to the row (Req 2.4), then calls `onAction`.
- * @param {string} state version lifecycle state
- * @param {object} ctx context forwarded to buildVersionMenuItems (Phase 2)
- * @param {(payload:{action:string,item:object})=>void} onAction row-action handler
- * @param {object} item the version row the menu acts on
- * @param {object} [capability] capability passed through to buildVersionMenuItems;
- *   defaults from `ctx.resourceType` (deployable when unknown)
+ * @param {string} state
+ * @param {object} ctx
+ * @param {(payload:{action:string,item:object})=>void} onAction
+ * @param {object} item
+ * @param {object} [capability]
  */
 export const mapVersionMenuItemsToMenu = (
   state,
@@ -228,13 +170,8 @@ export const mapVersionMenuItemsToMenu = (
   return menu
 }
 
-/**
- * Capability-gated lifecycle actions: hidden entirely when the resource class
- * (versioned-only) denies them. Deploy/Promote/Rollback only.
- */
 const BAR_CAPABILITY_FLAG = { DEPLOY: 'canDeploy', PROMOTE: 'canPromote', ROLLBACK: 'canRollback' }
 
-// Single definition per button (key/label/icon/emphasis), reused across states.
 const BAR_SAVE = { key: 'SAVE', label: 'Save', icon: 'pi pi-save', emphasis: 'secondary' }
 const BAR_SAVE_AND_BUILD = {
   key: 'SAVE_AND_BUILD',
@@ -267,13 +204,6 @@ const BAR_REDEPLOY = {
   emphasis: 'secondary'
 }
 
-/**
- * SINGLE source of the lifecycle action buttons per state (ordered, with
- * emphasis). Shared by the footer action bar AND the heading actions so the two
- * surfaces never diverge. Deploy appears only on built states (ready/active) and
- * is removed for versioned-only via capability. Callers still intersect with
- * `availableActions` (state ∩ registered) and disable via `disabledActions`.
- */
 const VERSION_BAR_ACTIONS = {
   draft: [BAR_SAVE, BAR_SAVE_AND_BUILD],
   canceled: [BAR_SAVE, BAR_SAVE_AND_BUILD],

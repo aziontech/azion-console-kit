@@ -38,9 +38,6 @@ const LEGITIMATE_RELEASE_TOKENS = [
   '.archive('
 ]
 
-// ENG-46694: revert is now an allowed version-history operation. It generates a
-// NEW version from the chosen version's config (it is not a draft/build mutation),
-// so it stays out of VERSION_MUTATION_TOKENS on purpose.
 const LEGITIMATE_VERSION_HISTORY_TOKENS = ['deploymentVersionService.revert', '.revert(']
 
 const toPosix = (value) => value.split(sep).join('/')

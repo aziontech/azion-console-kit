@@ -1,8 +1,4 @@
 <script setup>
-  // VersionEditorTabs — the version editor body for a Connector (atomic: a single
-  // Main Settings tab; nested HTTP/Storage/LiveIngest blocks travel in the snapshot).
-  // Delegates the scaffold to the shared VersionEditorTabsShell; only the tab
-  // descriptor + deploy context specialize.
   import { ref } from 'vue'
   import EdgeConnectorVersionAdapter from '@/views/EdgeConnectors/v6/EdgeConnectorVersionAdapter.vue'
   import VersionEditorTabsShell from '@/templates/version-shell-block/VersionEditorTabsShell.vue'
@@ -39,7 +35,6 @@
     currentVersionId: () => props.versionId
   })
 
-  // Atomic resource: a single Main Settings tab, no "+ Add".
   const connectorTabs = [
     {
       key: 'main-settings',

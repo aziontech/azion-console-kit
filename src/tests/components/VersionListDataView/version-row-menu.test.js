@@ -3,15 +3,6 @@ import { describe, it, expect, vi } from 'vitest'
 import VersionListDataView from '@/components/VersionListDataView/index.vue'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 
-/**
- * Task 5.1 — the kebab renders the FIXED model from
- * `buildVersionMenuItems` mapped to the webkit Menu (appendTo=body), with a
- * native separator before Delete and disabled/tooltip/danger per item.
- * UI/a11y (keyboard, z-index) is task 5.3.
- */
-
-// Webkit Menu stub: a no-op toggle (the model lives in the `model` prop, read
-// after the click flushes) so the SFC's openRowMenu wiring runs untouched.
 vi.mock('@aziontech/webkit/menu', () => ({
   default: {
     name: 'Menu',
@@ -21,7 +12,6 @@ vi.mock('@aziontech/webkit/menu', () => ({
   }
 }))
 
-// Lightweight stubs for the rest of the webkit surface used by the SFC.
 vi.mock('@aziontech/webkit/button', () => ({
   default: {
     name: 'PrimeButton',
@@ -43,7 +33,6 @@ vi.mock('@aziontech/webkit/empty-results-block', () => ({
   default: { name: 'EmptyResultsBlock', template: '<div><slot /></div>' }
 }))
 
-// DataView stub: render the #list slot once per item so the row + kebab exist.
 const DataViewStub = {
   name: 'DataView',
   props: ['value'],
@@ -64,7 +53,6 @@ const mountList = (version) =>
     global: { directives: { tooltip: {} }, stubs: { DataView: DataViewStub } }
   })
 
-// Opens the row kebab and returns the model the webkit Menu received.
 const openMenuModel = async (wrapper, version) => {
   const trigger = wrapper.get(`[data-testid="version-list-data-view__row-${version.id}__menu"]`)
   await trigger.trigger('click')
@@ -148,7 +136,6 @@ describe('VersionListDataView — row/menu interactions (task 5.2)', () => {
     const actions = wrapper.emitted('row-action')
     expect(actions).toBeTruthy()
     expect(actions[0][0]).toEqual({ action: 'OPEN_CONFIGURATION', item: version })
-    // Legacy row-click is preserved for not-yet-migrated consumers.
     expect(wrapper.emitted('row-click')[0][0]).toEqual(version)
   })
 
@@ -163,7 +150,6 @@ describe('VersionListDataView — row/menu interactions (task 5.2)', () => {
 
     expect(stopPropagation).toHaveBeenCalledTimes(1)
     const actions = wrapper.emitted('row-action')
-    // Only the menu action fired — the row click was not triggered.
     expect(actions.at(-1)[0]).toEqual({ action: 'ARCHIVE', item: version })
     expect(wrapper.emitted('row-click')).toBeFalsy()
   })

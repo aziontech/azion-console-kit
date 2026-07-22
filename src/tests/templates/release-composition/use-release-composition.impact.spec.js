@@ -2,11 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { flushPromises } from '@vue/test-utils'
 
-// The impact VM reads the injected `reverseLookupByDs` seam (SEAM 1): a DS -> Workload[]
-// index the engine groups by environment. It resolves DS names off the (mocked) deployments
-// listing. Mock the same three service seams the sibling suite mocks and spy on raw HTTP /
-// fetch so any accidental network/s2s call fails loudly (Property 8).
-
 vi.mock('@/services/v2/deployment/deployment-service', () => ({
   deploymentService: { useDeploymentsListQuery: vi.fn() }
 }))
@@ -35,8 +30,6 @@ const queryStub = (body = []) => ({
   refetch: vi.fn()
 })
 
-// A reverse-lookup workload entry as the SEAM 1 ref carries it: `{ id, name,
-// environmentId, environmentName, domains: [...] }`.
 const workload = (id, name, environmentId, environmentName, domains) => ({
   id,
   name,
@@ -93,11 +86,9 @@ describe('useReleaseComposition - impact VM (environment grouping + totals)', ()
 
     const [ds] = impact.value.perDs
     expect(ds.name).toBe('Checkout DS')
-    // 3 distinct workloads, 4 domains total (2 + 1 + 1).
     expect(ds.wlCount).toBe(3)
     expect(ds.domains).toBe(4)
 
-    // Two environments; each env.domains is the sum of its rows' domains.
     expect(ds.environments).toHaveLength(2)
     const byEnv = Object.fromEntries(ds.environments.map((env) => [env.name, env]))
     expect(byEnv.Production.wlCount).toBe(2)
@@ -119,8 +110,6 @@ describe('useReleaseComposition - impact VM (environment grouping + totals)', ()
       queryStub([{ id: 'ds-1', name: 'Shared DS' }])
     )
 
-    // The SAME workload id (wl-shared) shows up in two environment branches of the
-    // same DS. wlCount must count it ONCE (distinct by id) though it renders twice.
     const reverseLookupByDs = ref({
       'ds-1': [
         workload('wl-shared', 'multi-env', 'env-prod', 'Production', ['p.com']),
@@ -137,12 +126,10 @@ describe('useReleaseComposition - impact VM (environment grouping + totals)', ()
     await flushPromises()
 
     const [ds] = impact.value.perDs
-    // Distinct by id => 1, even though it appears in both environment branches.
     expect(ds.wlCount).toBe(1)
     expect(ds.environments).toHaveLength(2)
     const envWlCounts = ds.environments.map((env) => env.wlCount)
     expect(envWlCounts).toEqual([1, 1])
-    // Domains still sum every occurrence across environments.
     expect(ds.domains).toBe(2)
   })
 
@@ -170,8 +157,6 @@ describe('useReleaseComposition - impact VM (environment grouping + totals)', ()
     })
     await flushPromises()
 
-    // dsCount = number of selected DSs; totalWorkloads = sum of per-DS wlCount
-    // (2 + 1); totalDomains = sum of per-DS domains (3 + 1).
     expect(impact.value.totals).toEqual({
       dsCount: 2,
       totalWorkloads: 3,

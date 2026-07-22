@@ -4,7 +4,6 @@ import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { contractSchemas } from '../../../../tests/contracts/schemas'
 import { buildVersionResponse, buildFormValues } from './builders'
 
-// Services
 import {
   EdgeAppVersionService,
   edgeAppVersionService
@@ -39,7 +38,6 @@ import {
   edgeConnectorVersionService
 } from '@/services/v2/edge-connectors/edge-connector-version-service'
 
-// Adapters
 import { EdgeAppVersionAdapter } from '@/services/v2/edge-app/edge-app-version-adapter'
 import { WafVersionAdapter } from '@/services/v2/waf/waf-version-adapter'
 import { NetworkListVersionAdapter } from '@/services/v2/network-lists/network-list-version-adapter'
@@ -50,7 +48,6 @@ import { CustomPageVersionAdapter } from '@/services/v2/custom-page/custom-page-
 import { EdgeFirewallVersionAdapter } from '@/services/v2/edge-firewall/edge-firewall-version-adapter'
 import { EdgeConnectorVersionAdapter } from '@/services/v2/edge-connectors/edge-connector-version-adapter'
 
-// Versioned sub-resource services (metadata for the Phase 3 subresource suite)
 import { versionedCacheSettingsService } from '@/services/v2/edge-app/versioned/versioned-cache-settings-service'
 import { versionedDeviceGroupService } from '@/services/v2/edge-app/versioned/versioned-device-group-service'
 import { versionedFunctionService } from '@/services/v2/edge-app/versioned/versioned-function-service'
@@ -59,48 +56,7 @@ import { versionedWafExceptionsService } from '@/services/v2/waf/versioned/versi
 import { versionedFirewallFunctionService } from '@/services/v2/edge-firewall/versioned/versioned-firewall-function-service'
 import { versionedFirewallRulesEngineService } from '@/services/v2/edge-firewall/versioned/versioned-firewall-rules-engine-service'
 
-/**
- * Test Registry — one descriptor per versioned resource, mirroring (and derived
- * from) the production registries (`RESOURCE_CAPABILITY`, `RESOURCE_VERSION_ROUTES`,
- * `contractSchemas`, each `*-version-service`/`-adapter`). The shared behavioral
- * suites depend ONLY on this descriptor, never on a concrete resource, so plugging
- * a resource becomes a single entry.
- *
- * Field reference:
- *   resourceType  — key of RESOURCE_VERSION_ROUTES (capability/routing identity)
- *   resourceKey   — key of contractSchemas / fixtures / builders
- *   capabilityClass — 'deployable' | 'versioned-only' (validated vs RESOURCE_CAPABILITY)
- *   ServiceClass  — constructor for a fresh instance per test
- *   service       — getter for the shared singleton
- *   adapter       — the resource adapter object
- *   schemas       — contract schemas (source of the builder fixtures)
- *   baseURL       — service baseURL
- *   versionKeys   — queryKeys.<resource>.version group
- *   serviceModulePath — absolute path (for the import-purity assertion)
- *   buildVersion  — () => validated raw snapshot from the builder
- *   buildFormValues — () => realistic UI form values
- *   configMarkers — expected config subset produced by transformLoadVersion
- *   payloadMarkers — expected root payload subset produced by transformDraftPayload
- *   metadataOnly  — { config, exact } expected config for a metadata-only snapshot
- *   saveStrategy  — 'default' | 'workload' | 'customPage' | 'deployment'
- *   updateVerb    — HTTP verb the base uses for updateDraft (PATCH)
- *   envelope      — 'standard' | 'wrapped' (deployment unwraps { data })
- *   polymorphic   — connector variants share one version surface
- *   mapMetaFields — extra meta fields the adapter adds (workload)
- *   extraMutations — non-base mutations (workload: rollback)
- *   overridesActionPayloads — true when archive/build payloads are overridden
- *   draftCarriesSourceVersion — false when transformDraftPayload drops source_version
- *                    (workload's PUT is a full-resource write; base adapters echo it)
- *   subresources  — versioned sub-resource entries (Phase 3 suite)
- *
- * NOTE (Phase 2b): every versioned resource now carries its test-data fields and
- * runs the shared contracts, EXCEPT `deployment` — its wrapped envelope, overridden
- * reads/wrappers and dual invalidation make it fully bespoke, so it does not consume
- * the shared service/adapter suites (proven in its own resource file instead).
- */
-
 const CURRENT_DIR = dirname(fileURLToPath(import.meta.url))
-// support/versioning -> src/services/v2 (3 levels up to src).
 const servicePath = (relative) => resolve(CURRENT_DIR, '../../../services/v2', relative)
 
 export const RESOURCE_TEST_REGISTRY = {
@@ -136,11 +92,6 @@ export const RESOURCE_TEST_REGISTRY = {
     mapMetaFields: [],
     extraMutations: [],
     overridesActionPayloads: false,
-    // Sub-resource descriptors drive the shared CRUD contract directly (path/
-    // queryKeyGroup/idKey/buildPayload live HERE, not in the instantiation file).
-    // `bespoke: true` marks a sub-resource whose service diverges from the generic
-    // factory interface (its own signatures) — the instantiation file covers it by
-    // hand and the shared suite skips it.
     subresources: [
       {
         key: 'cacheSettings',
@@ -308,8 +259,6 @@ export const RESOURCE_TEST_REGISTRY = {
     serviceModulePath: servicePath('workload/workload-version-service.js'),
     buildVersion: (overrides) => buildVersionResponse('workload', overrides),
     buildFormValues: () => buildFormValues('workload'),
-    // transformLoadWorkload derives these identically in v6 and legacy, so the
-    // markers are feature-flag-independent (the resource file still pins legacy).
     configMarkers: {
       id: 54321,
       name: 'prod-workload',
@@ -328,8 +277,6 @@ export const RESOURCE_TEST_REGISTRY = {
     mapMetaFields: ['deploymentId', 'environmentId', 'lastError'],
     extraMutations: ['rollback'],
     overridesActionPayloads: true,
-    // Workload overrides transformDraftPayload to a full-resource PUT that carries
-    // NO source_version (that is a create-only field); the base adapters do carry it.
     draftCarriesSourceVersion: false,
     subresources: []
   },
@@ -401,9 +348,6 @@ export const RESOURCE_TEST_REGISTRY = {
     mapMetaFields: [],
     extraMutations: [],
     overridesActionPayloads: false,
-    // Both firewall sub-resource services are hand-written classes (name enrichment,
-    // phase paths, reorder) — they do NOT come from the generic factory, so they run
-    // bespoke in the instantiation file, not the shared CRUD contract.
     subresources: [
       { key: 'firewallFunction', service: () => versionedFirewallFunctionService, bespoke: true },
       {
@@ -427,8 +371,6 @@ export const RESOURCE_TEST_REGISTRY = {
     serviceModulePath: servicePath('edge-connectors/edge-connector-version-service.js'),
     buildVersion: (overrides) => buildVersionResponse('edgeConnector', overrides),
     buildFormValues: () => buildFormValues('edgeConnector'),
-    // Config markers come from the HTTP fixture (buildVersion); the payload markers
-    // come from the Storage form (buildFormValues) — both are shared-contract inputs.
     configMarkers: { id: 901, name: 'http-connector', type: 'http', active: true },
     payloadMarkers: { name: 'storage-connector', type: 'storage', active: true },
     metadataOnly: { config: {}, exact: true },

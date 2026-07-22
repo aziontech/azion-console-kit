@@ -1,7 +1,4 @@
 <script setup>
-  // VersionEditorTabs — the version editor body for an Edge Function (atomic: a single
-  // Main Settings tab). Delegates the scaffold to the shared VersionEditorTabsShell.
-  // Edge Function is versioned-only: no deploy context/drawer, only the tab descriptor.
   import EdgeFunctionVersionAdapter from '@/views/EdgeFunctions/v6/EdgeFunctionVersionAdapter.vue'
   import VersionEditorTabsShell from '@/templates/version-shell-block/VersionEditorTabsShell.vue'
   import FormFieldsEditEdgeFunctions from '@/views/EdgeFunctions/FormFields/FormFieldsEditEdgeFunctions.vue'
@@ -29,8 +26,6 @@
   const useVersionQuery = () =>
     edgeFunctionVersionService.useLoadVersionQuery(props.resourceId, props.versionId)
 
-  // The Function form already provides its own tabs (Main Settings/Code/Arguments),
-  // so render it bare (no outer Main Settings tab) to avoid a duplicate tab strip.
   const edgeFunctionTabs = [
     {
       key: 'main-settings',

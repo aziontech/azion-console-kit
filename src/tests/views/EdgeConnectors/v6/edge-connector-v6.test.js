@@ -11,13 +11,6 @@ import ConnectorTypeBlock from '@/views/EdgeConnectors/FormFields/blocks/Connect
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 import { createFormHarness } from '@/tests/kit/vee-validate-setup'
 
-// Task 11.4 (optional): Connector v6 across the 3 connector types
-// (HTTP / Storage / LiveIngest). Verifies the framework contract a new resource
-// must honor: read-only in immutable states, state-eligible row actions, and a
-// thin version adapter.
-
-// ConnectorType reads the route to lock the type selector on edit screens; a
-// version is always an edit context, so stub it deterministically.
 vi.mock('vue-router', () => ({
   useRoute: () => ({ name: 'edit-connectors-version', path: '/connectors/edit/1/versions/2' })
 }))
@@ -28,9 +21,6 @@ const NAME_FIELD = 'edge-connectors-form__general__name-field'
 const ACTIVE_FIELD = 'edge-connectors-form__status__active-field'
 const TYPE_FIELD = 'edge-connectors-form__connector-type__type-field'
 
-// Lightweight stubs that surface the resolved `disabled` so we can assert the
-// read-only contract without pulling the real webkit stack. The real block
-// passes data-testid through, so we read by the block's own testid.
 const FieldTextStub = defineComponent({
   props: { name: String, disabled: Boolean },
   template: '<input :data-disabled="String(disabled)" />'
@@ -81,7 +71,6 @@ describe('EdgeConnectors v6 — read-only in immutable state (3 types)', () => {
     const wrapper = mountBlocks({ type, readOnly: true })
     expect(disabledOf(wrapper, NAME_FIELD)).toBe('true')
     expect(disabledOf(wrapper, ACTIVE_FIELD)).toBe('true')
-    // The connector type selector is locked in any version (edit route) too.
     expect(disabledOf(wrapper, TYPE_FIELD)).toBe('true')
   })
 
@@ -104,11 +93,6 @@ describe('EdgeConnectors v6 — read-only in immutable state (3 types)', () => {
     expect(disabledOf(wrapper, NAME_FIELD)).toBe('true')
   })
 })
-
-// The legacy Clone/Build row-eligibility suite (getRowActions) was retired in
-// Phase 4 (task 9.1). The fixed 5-item row menu is now covered by
-// `src/tests/composables/versioning/version-menu-items.test.js` (Properties P1–P4),
-// and Clone as Draft / Build remain available in the shell action bar.
 
 describe('EdgeConnectors v6 — thin version adapter', () => {
   const __dirname = dirname(fileURLToPath(import.meta.url))

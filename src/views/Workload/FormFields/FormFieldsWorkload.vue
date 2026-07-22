@@ -19,9 +19,6 @@
     noBorder: { type: Boolean }
   })
 
-  // Read-only is owned by the VersionShell context (default false outside it, so
-  // the non-versioned/legacy flow is untouched). Immutable versions render the
-  // form disabled.
   const { readOnly } = useVersionContext()
 
   const { value: isLocked } = useField('isLocked')

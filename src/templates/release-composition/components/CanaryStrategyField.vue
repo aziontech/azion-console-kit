@@ -24,11 +24,6 @@
 
   const emit = defineEmits(['update:enabled', 'update:form'])
 
-  // Intentional exception to the "fully externally-controlled field" rule: the
-  // canary strategy has interdependent, conditionally-required fields (mode →
-  // weight/header rules), so the vee-validate form lives INSIDE this component and
-  // only the validated values are emitted out. The component stays presentational
-  // (no fetch, no business logic) — it just owns its own form validation.
   const { values } = useForm({
     validationSchema: canaryStrategyValidationSchema,
     initialValues: buildCanaryInitialValues()
@@ -220,10 +215,6 @@
 </template>
 
 <style scoped>
-  /* Match the resource/dependency dropdowns: tune the webkit controls to the
-     app's surface tokens (the webkit defaults — --bg-surface / --border-default —
-     are a different DS layer). Covers the Dropdown root plus the inner inputs of
-     InputText / InputNumber so every control in the card reads the same. */
   :deep(.release-composition-control),
   :deep(.release-composition-control .p-inputtext),
   :deep(.release-composition-control .p-inputnumber-input) {
@@ -231,8 +222,6 @@
     border-color: var(--surface-border) !important;
   }
 
-  /* Normalize every control to the Dropdown's 40px height so the Traffic /
-     Session pinning fields line up regardless of the underlying widget. */
   :deep(.release-composition-control.p-dropdown),
   :deep(.release-composition-control.p-inputtext),
   :deep(.release-composition-control .p-inputtext),

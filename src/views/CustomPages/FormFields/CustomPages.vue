@@ -27,6 +27,5 @@
 
   const { value: active } = useField('active')
 
-  // readOnly defaults to false outside the VersionShell; immutable versions disable it.
   const { readOnly } = useVersionContext()
 </script>

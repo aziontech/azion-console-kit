@@ -32,8 +32,6 @@
   const { value: itemsValuesCountry, errorMessage: itemsValuesCountryError } =
     useField('itemsValuesCountry')
 
-  // readOnly defaults to false outside the VersionShell, so non-versioned
-  // create/edit forms keep their current editable behavior.
   const { readOnly } = useVersionContext()
 
   const networkGrouRadio = computed(() => handleTypeNetwork(true, networkListType.value))

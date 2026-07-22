@@ -1,15 +1,4 @@
 <script setup>
-  /**
-   * VersionEditorTabs — the FULL version editor body for Edge Firewall.
-   *
-   * Rendered by VersionEditView. Edits ONE version across Main Settings,
-   * Functions Instances (gated by edge_functions_enabled in the version config)
-   * and Rules Engine. The VersionShell derives editability from the version
-   * state; sub-resource tabs receive a versioned `service` facade (drop-in).
-   *
-   * Owns NO routing/toast: lifecycle commands bubble up as
-   * `command-success`/`command-error`/`cancel`. Keyed by versionId at the parent.
-   */
   import { computed, ref } from 'vue'
 
   import FirewallVersionAdapter from '@/views/EdgeFirewall/v6/FirewallVersionAdapter.vue'
@@ -42,14 +31,9 @@
 
   const emit = defineEmits(['command-success', 'command-error', 'cancel'])
 
-  // Per-resource facades pre-bound to (firewallId, versionId). Built once: the
-  // parent keys this component by versionId, so it remounts on a version switch.
   const facades = useVersionedFacades(props.resourceId, props.versionId)
   const firewallId = computed(() => String(props.resourceId))
 
-  // Module enablement gates the Functions tab. Read from the VERSION config merged
-  // over the parent Firewall (same precedence Main Settings uses), via the same
-  // vue-query the shell uses (deduped by queryKey, no extra request).
   const versionModuleQuery = edgeFirewallVersionService.useLoadVersionQuery(
     props.resourceId,
     props.versionId
@@ -130,8 +114,6 @@
   const useVersionQuery = () =>
     edgeFirewallVersionService.useLoadVersionQuery(props.resourceId, props.versionId)
 
-  // The deploy `resourceContext` (ready versions of this Firewall) scopes the shared
-  // heading's Deploy route to the release composer.
   const { resourceContext } = useDeployResourceContext({
     resourceType: 'firewall',
     injectionKey: 'edgeFirewall',
@@ -139,8 +121,6 @@
     currentVersionId: () => props.versionId
   })
 
-  // Forward the editor shell's openRelease so VersionEditView can route to the
-  // composer when the VersionShell footer dispatches DEPLOY.
   const shellRef = ref(null)
   const openRelease = () => shellRef.value?.openRelease()
 
@@ -148,9 +128,6 @@
 </script>
 
 <template>
-  <!-- Keyed by versionId at the parent: the shell calls the query factory once in
-       setup and captures resourceId/versionId by value, so a version switch
-       remounts shell + adapter to renew query, ctx and form. -->
   <VersionEditorTabsShell
     ref="shellRef"
     :use-version-query="useVersionQuery"

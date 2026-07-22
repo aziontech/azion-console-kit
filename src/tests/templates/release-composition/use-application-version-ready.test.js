@@ -5,28 +5,18 @@ import { httpService } from '@/services/v2/base/http/httpService'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { useApplicationVersionReady } from '@/templates/release-composition/use-application-version-ready'
 
-/**
- * Real service under test: the composable runs the real `edgeAppVersionService`
- * (loadVersion → adapter normalization). Only the boundaries are stubbed — the
- * HTTP client (`httpService.request`) and the query cache (`queryClient.ensureQueryData`,
- * short-circuited to the fetch so no cross-test cache leaks). The composable's
- * readiness is asserted by observing the HTTP call it drives and the refs it exposes.
- */
-
 const runInScope = (factory) => {
   const scope = effectScope()
   const exposed = scope.run(factory)
   return { exposed, dispose: () => scope.stop() }
 }
 
-// The application version detail URL the real service GETs.
 const versionUrl = (appId, verId) => `v4/workspace/applications/${appId}/versions/${verId}`
 
 let requestSpy
 
 beforeEach(() => {
   vi.spyOn(console, 'error').mockImplementation(() => {})
-  // Short-circuit the cache to the fetch so each load hits the HTTP boundary.
   vi.spyOn(queryClient, 'ensureQueryData').mockImplementation(({ queryFn }) => queryFn())
   requestSpy = vi.spyOn(httpService, 'request')
 })

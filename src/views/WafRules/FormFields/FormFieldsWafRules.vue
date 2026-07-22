@@ -20,8 +20,6 @@
 
   const { value: name } = useField('name')
 
-  // readOnly defaults to false outside the VersionShell; inside an immutable
-  // version (ready/active/archived/...) it disables every field.
   const { readOnly } = useVersionContext()
 
   const sensitivity = ref([

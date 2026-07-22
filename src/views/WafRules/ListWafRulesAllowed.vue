@@ -32,8 +32,6 @@
       required: true,
       type: Function
     },
-    // Optional versioned facade (drop-in). When present, CRUD routes through it
-    // instead of the non-versioned wafService; absent in the legacy flow.
     service: {
       type: Object,
       default: null
@@ -48,8 +46,6 @@
     }
   })
 
-  // Outside the VersionShell (legacy flow) readOnly defaults to false, so legacy
-  // behavior is unchanged; inside an immutable version it disables writes.
   const { readOnly } = useVersionContext()
   const isReadOnly = computed(() => readOnly.value)
 
@@ -243,7 +239,6 @@
     showCreateWafRulesAllowedDrawer.value = true
   }
 
-  // No write actions on an immutable version (req 4.4 / 6.5).
   const actions = computed(() => {
     if (isReadOnly.value) return []
     return [
