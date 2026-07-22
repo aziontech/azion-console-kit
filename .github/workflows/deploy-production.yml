@@ -9,9 +9,16 @@ env:
   HUSKY: 0
   CLI_VERSION: 4.15.0
 
+# spec ci-maturity (req 4.1): least-privilege token — deploy auth uses its own
+# secrets, the GITHUB_TOKEN only reads the repo.
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # spec ci-maturity (req 3.1): ~2x the measured typical duration (8.2 min).
+    timeout-minutes: 20
     concurrency:
       group: deploy-console-production
       cancel-in-progress: false
@@ -20,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         
       - name: Install SO deps
         run: apk add curl git bash jq
@@ -45,6 +52,7 @@ jobs:
       # Unreachable/non-JSON -> spec skips -> step is green. Real drift -> step is
       # red but does NOT block the deploy (flip to blocking is an explicit decision).
       - name: Contract drift pre-deploy check
+        id: drift
         continue-on-error: true
         run: npx playwright test --project=contract-drift
         env:

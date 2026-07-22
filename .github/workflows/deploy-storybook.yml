@@ -7,19 +7,26 @@ on:
     paths:
       - 'storybook/**'
 
+concurrency:
+  group: deploy-storybook
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
+    # spec ci-maturity (req 4.1): the job only builds and deploys via the Azion
+    # CLI token — the GITHUB_TOKEN needs read only.
     permissions:
-      contents: write
+      contents: read
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
           cache: 'yarn'

@@ -12,6 +12,13 @@ on:
 env:
   HUSKY: 0
 
+permissions:
+  contents: read
+
+concurrency:
+  group: versioning-mutation
+  cancel-in-progress: false
+
 jobs:
   mutation:
     runs-on: ubuntu-latest
@@ -23,7 +30,7 @@ jobs:
         run: apk add curl bash git
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -33,7 +40,7 @@ jobs:
 
       - name: Upload mutation report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mutation-report
           path: reports/mutation
