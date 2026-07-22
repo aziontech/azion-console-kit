@@ -23,8 +23,6 @@ vi.mock('@/services/v2/deployment/deployment-service', () => ({
   }
 }))
 
-// Import AFTER the mocks are registered so the composable resolves the mocked
-// modules instead of the real services.
 const { useWorkloadDirectory } = await import('@/composables/versioning/use-workload-directory')
 
 const flushLoad = async () => {
@@ -82,7 +80,6 @@ describe('useWorkloadDirectory', () => {
       updatedAt: '2026-06-10T14:32:11Z',
       lastModifiedBy: 'ops@example.com'
     })
-    // Falls back to created_at / created_by when updated_at / last_modified_by are null.
     expect(deploymentToMeta.value.get('ADEP0002')).toEqual({
       updatedAt: '2026-05-05T10:00:00Z',
       lastModifiedBy: 'admin@example.com'

@@ -1,8 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// One spy per service method the registry calls; the factories below forward to
-// these so every entry (application/firewall/connector/function/custom_page) can
-// be driven independently.
 const listEdgeApplicationsService = vi.fn()
 const loadAppVersion = vi.fn()
 const listEdgeFirewallService = vi.fn()
@@ -57,7 +54,6 @@ describe('resolveReleaseResources — name resolution for the new resource types
   it('returns the input untouched when there is nothing to resolve', async () => {
     expect(await resolveReleaseResources([])).toEqual([])
     expect(await resolveReleaseResources(null)).toBeNull()
-    // Unknown type or missing id passes through with no service call.
     const passthrough = [{ type: 'unknown', id: 'x' }, { type: 'connector' }]
     expect(await resolveReleaseResources(passthrough)).toEqual(passthrough)
     expect(listEdgeConnectorsService).not.toHaveBeenCalled()
@@ -119,7 +115,6 @@ describe('resolveReleaseResources — name resolution for the new resource types
       { type: 'function', id: 'f1' }
     ])
 
-    // One list call per type, not per resource.
     expect(listEdgeConnectorsService).toHaveBeenCalledTimes(1)
     expect(listEdgeFunctionsService).toHaveBeenCalledTimes(1)
     expect(resolved.map((resource) => resource.name)).toEqual(['Conn A', 'Conn B', 'Fn A'])

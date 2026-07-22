@@ -3,9 +3,6 @@ import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 import { describeVersionServiceContract } from '@/tests/shared/versioning/version-service.contract'
 import { describeVersionAdapterContract } from '@/tests/shared/versioning/version-adapter.contract'
 
-// Application — pilot for the registry-driven suite (TEST-ARCHITECTURE §3.3). The
-// inherited service + shared adapter contracts run from the descriptor; only the
-// genuinely Application-specific module extraction/mapping stays bespoke below.
 const application = RESOURCE_TEST_REGISTRY.application
 const adapter = application.adapter
 

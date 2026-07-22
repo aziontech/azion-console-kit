@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { resolveDeploymentIds } from '@/views/Workload/utils/resolveDeploymentIds'
+import { resolveDeploymentIds } from '@/views/Workload/v6/utils/resolveDeploymentIds'
 
 describe('resolveDeploymentIds', () => {
   it('returns an empty array for missing or non-array input', () => {

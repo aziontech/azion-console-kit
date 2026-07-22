@@ -227,7 +227,6 @@
   const { value: type } = useField('type')
 
   const { readOnly } = useVersionContext()
-  // Inputs are blocked while data loads or the version is immutable (read-only).
   const isDisabled = computed(() => props.isLoadingData || readOnly.value)
 
   const dnsResolutionList = [

@@ -127,7 +127,6 @@ describe('firewall dependencies — deploy gate getters', () => {
     store.seedFirewallWafs([{ wafId: 'waf-1' }])
     store.seedFirewallNetworkLists([{ networkListId: 30 }])
 
-    // Order follows OWNED_COLLECTIONS.firewall (function, network_list, waf).
     expect(store.pendingDependencySelections).toEqual([
       { type: 'network_list', resourceId: 30 },
       { type: 'waf', resourceId: 'waf-1' }

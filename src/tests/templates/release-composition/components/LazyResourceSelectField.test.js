@@ -4,10 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import LazyResourceSelectField from '@/templates/release-composition/components/LazyResourceSelectField.vue'
 
-// Stub the PrimeVue Dropdown so the test can drive its lazy-load hook directly and
-// observe the header search input, without mounting the real virtual-scroller
-// overlay. It renders the `#header` slot (the search box) and exposes the lazy
-// hook the real virtual scroller would call as the user scrolls to the end.
 const DropdownStub = defineComponent({
   name: 'DropdownStub',
   props: {
@@ -83,12 +79,10 @@ describe('LazyResourceSelectField', () => {
     const wrapper = mountField({ service, loadService: vi.fn() })
     await flushPromises()
 
-    // Below the 0.7 threshold of the 4 loaded rows (2.8): no load.
     wrapper.findComponent(DropdownStub).vm.triggerLazyLoad(2)
     await flushPromises()
     expect(service).toHaveBeenCalledTimes(1)
 
-    // Past the threshold (count=250 => 3 pages), page 2 loads and dedupes id 4.
     wrapper.findComponent(DropdownStub).vm.triggerLazyLoad(3)
     await flushPromises()
     expect(service).toHaveBeenCalledTimes(2)
@@ -111,20 +105,16 @@ describe('LazyResourceSelectField', () => {
       wrapper.find('[data-testid="release-composition__resource-select-loading-more"]')
     expect(dropdown().props('options')).toHaveLength(10)
 
-    // Prefetch fires at the 0.7 threshold (index 7 of 10) but the user is NOT at the
-    // end — page 2 loads silently, no loading row.
     dropdown().vm.triggerLazyLoad(7)
     await flushPromises()
     expect(service).toHaveBeenCalledTimes(2)
     expect(loadingRow().exists()).toBe(false)
 
-    // The user scrolls to the very end while page 2 is still in flight → loading row.
     dropdown().vm.triggerLazyLoad(9)
     await flushPromises()
     expect(dropdown().props('loading')).toBe(false)
     expect(loadingRow().exists()).toBe(true)
 
-    // Page arrives: rows appended below and the loading row is replaced/removed.
     resolvePage2(page([11, 12, 13, 14], 250))
     await flushPromises()
     expect(loadingRow().exists()).toBe(false)
@@ -149,7 +139,6 @@ describe('LazyResourceSelectField', () => {
     service.mockClear()
 
     await wrapper.find('.search-input').setValue('aut')
-    // Below the debounce window: no request yet.
     vi.advanceTimersByTime(400)
     expect(service).not.toHaveBeenCalled()
 
@@ -166,7 +155,6 @@ describe('LazyResourceSelectField', () => {
     await flushPromises()
 
     expect(loadService).toHaveBeenCalledWith(99)
-    // The resolved option is prepended so the trigger can render its label.
     expect(wrapper.findComponent(DropdownStub).props('options')[0]).toMatchObject({
       value: 99,
       label: 'name-99'

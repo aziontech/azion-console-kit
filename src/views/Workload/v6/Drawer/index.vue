@@ -6,7 +6,7 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { useWorkloadDomainDrawerServices } from '@/composables/useWorkloadDomainDrawerServices'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
-  import FormFieldsCreateDomains from '../FormFields/FormFieldsCreateDomains.vue'
+  import FormFieldsCreateDomains from '@/views/Workload/v6/FormFields/FormFieldsCreateDomains.vue'
   import { useRoute } from 'vue-router'
   import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 

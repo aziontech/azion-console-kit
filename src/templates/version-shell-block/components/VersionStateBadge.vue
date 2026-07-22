@@ -4,8 +4,6 @@
 
   defineOptions({ name: 'version-state-badge' })
 
-  // `isCurrent` lets the host mark the version in use when the API has no
-  // current field: a built (ready/active) version then reads as "Current".
   const props = defineProps({
     state: {
       type: String,
@@ -17,12 +15,6 @@
     }
   })
 
-  /**
-   * Visual mapping for the 7 canonical Version states.
-   * Severity values come from the PrimeVue Tag: 'success' | 'info' | 'warning' | 'danger' | 'secondary'.
-   * `active` is the version in use, labelled "Current" to disambiguate from the
-   * resource Active/Inactive enablement tag.
-   */
   const STATE_VISUAL = {
     draft: { severity: 'warning', label: 'Draft', icon: 'pi pi-file-edit' },
     queued: { severity: 'info', label: 'Queued', icon: 'pi pi-clock' },
@@ -35,8 +27,6 @@
     error: { severity: 'danger', label: 'Error', icon: 'pi pi-exclamation-triangle' }
   }
 
-  // Latest-Ready fallback: a built version flagged current borrows the "Current"
-  // presentation without depending on an `active` state from the API.
   const CURRENT_VISUAL = { severity: 'success', label: 'Current', icon: 'pi pi-circle-fill' }
 
   const visual = computed(() => {
@@ -60,8 +50,6 @@
 </template>
 
 <style scoped>
-  /* The state dot uses the default PrimeIcons size, which reads oversized inside a
-     small status tag — shrink it for a subtler badge. */
   :deep(.p-tag-icon) {
     font-size: 0.625rem;
   }

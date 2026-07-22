@@ -21,8 +21,8 @@ export const workloadRoutes = {
       name: 'create-workload',
       component: () =>
         hasFlagUseV6Configurations()
-          ? import('@views/Workload/CreateView.vue')
-          : import('@views/Workload/legacy/CreateView.vue'),
+          ? import('@views/Workload/v6/CreateView.vue')
+          : import('@views/Workload/CreateView.vue'),
       meta: {
         title: 'Create Workload',
         flag: 'checkout_access_without_flag',
@@ -37,8 +37,8 @@ export const workloadRoutes = {
       name: `edit-workload`,
       component: () =>
         hasFlagUseV6Configurations()
-          ? import('@views/Workload/TabsView.vue')
-          : import('@views/Workload/legacy/EditView.vue'),
+          ? import('@views/Workload/v6/TabsView.vue')
+          : import('@views/Workload/EditView.vue'),
       props: {
         updatedRedirect: `list-workloads`
       },
@@ -78,7 +78,7 @@ export const workloadRoutes = {
     {
       path: 'edit/:id/deployment/:versionId',
       name: 'workload-deployment-details',
-      component: () => import('@views/Workload/DeploymentDetailsView.vue'),
+      component: () => import('@views/Workload/v6/DeploymentDetailsView.vue'),
       meta: {
         title: 'Deployment Details',
         flag: 'use_v6_configurations'

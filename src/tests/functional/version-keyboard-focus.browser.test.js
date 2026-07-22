@@ -1,11 +1,3 @@
-/**
- * Functional (real Chromium) — keyboard & focus (spec task 4.6).
- *
- * These assertions are only meaningful in a real browser: jsdom no-ops focus and
- * key activation. We drive the real focus engine (document.activeElement) and real
- * key events (Tab / Enter) and assert the same observable consequences as a mouse
- * click — keyboard parity for the action bar and the dialog.
- */
 import { render } from '@testing-library/vue'
 import { describe, it, expect, vi } from 'vitest'
 import { nextTick } from 'vue'
@@ -37,7 +29,6 @@ describe('keyboard & focus (functional)', () => {
     })
     const button = getByTestId('version-action-bar__action-SAVE_AND_BUILD')
     button.focus()
-    // Real focus engine — this is exactly what jsdom cannot do.
     expect(document.activeElement).toBe(button)
 
     await userEvent.keyboard('{Enter}')
@@ -60,7 +51,6 @@ describe('keyboard & focus (functional)', () => {
     expect(document.activeElement).toBe(textarea)
 
     await userEvent.tab()
-    // Focus really left the textarea and landed on one of the dialog buttons.
     const cancel = inBody('version-action-dialog__cancel')
     const confirm = inBody('version-action-dialog__confirm')
     expect(document.activeElement).not.toBe(textarea)

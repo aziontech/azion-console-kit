@@ -29,17 +29,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { flushPromises } from '@vue/test-utils'
 
-// Read seams fire at composable setup (`useDeploymentsListQuery`) and from the
-// `selectedDsIds` watcher (`getActiveReleaseComposition`). Stub both so the
-// write path under test runs in isolation, with no network and no s2s path.
 vi.mock('@/services/v2/deployment/deployment-service', () => ({
   deploymentService: { useDeploymentsListQuery: vi.fn() }
 }))
 vi.mock('@/services/v2/deployment/deployment-release-service', () => ({
   deploymentReleaseService: { getActiveReleaseComposition: vi.fn(), buildAndActivate: vi.fn() }
 }))
-// No resource is versioned in these fixtures, so an empty registry keeps the
-// version watcher inert (no IO, no options loaded).
 vi.mock('@/services/v2/deployment/resource-catalog-registry', () => ({
   RESOURCE_CATALOG_REGISTRY: {}
 }))
@@ -53,8 +48,6 @@ import {
   VERSIONED_URLS_ACTIVE_LIMIT_CODE
 } from '@/templates/release-composition/use-release-composition'
 
-// Mirrors the `useQuery`-shaped object the composable reads from
-// `useDeploymentsListQuery` (`data.value.body`, `isLoading`, `isError`, `refetch`).
 const queryStub = (body = []) => ({
   data: ref({ body }),
   isLoading: ref(false),
@@ -62,9 +55,6 @@ const queryStub = (body = []) => ({
   refetch: vi.fn()
 })
 
-// A pure payload as `store.composePayload()` would produce it: a single
-// already-resolved application resource (no canary). The composable feeds this
-// through the real adapter to build the DS-agnostic deployment-api payload.
 const composedPayload = () => ({
   resources: [{ resource_id: 'app-1', resource_version: 'app-v1', resource_type: 'application' }],
   canary: false,
@@ -86,8 +76,6 @@ beforeEach(() => {
   deploymentReleaseService.getActiveReleaseComposition.mockResolvedValue(null)
   deploymentReleaseService.buildAndActivate.mockReset()
 
-  // Any raw HTTP or fetch attempt would have to go through one of these two;
-  // spying lets the suite assert the write never bypasses the injected service.
   httpSpy = vi.spyOn(httpService, 'request').mockResolvedValue({ data: {} })
   fetchSpy = vi.fn()
   vi.stubGlobal('fetch', fetchSpy)
@@ -106,7 +94,6 @@ describe('build_and_activate write path — Property 7 (integration)', () => {
 
     const results = await buildAndActivate(composedPayload(), ['ds-1', 'ds-2', 'ds-3'])
 
-    // One POST per deployment_id, in selection order, never bundled.
     expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(3)
     expect(deploymentReleaseService.buildAndActivate.mock.calls.map(([id]) => id)).toEqual([
       'ds-1',
@@ -115,8 +102,6 @@ describe('build_and_activate write path — Property 7 (integration)', () => {
     ])
     expect(results).toHaveLength(3)
 
-    // Reached the backend exclusively through the injected service — no raw IO
-    // and no service-to-service path (req 10.2).
     expect(httpSpy).not.toHaveBeenCalled()
     expect(fetchSpy).not.toHaveBeenCalled()
   })
@@ -131,18 +116,13 @@ describe('build_and_activate write path — Property 7 (integration)', () => {
     const payloads = deploymentReleaseService.buildAndActivate.mock.calls.map(
       ([, payload]) => payload
     )
-    // Every resource is keyed by `resource_id`, the version pinned in `version_id`
-    // (deployment-api schema), produced by the real `DeploymentAdapter`.
     const appRef = payloads[0].resources.find((entry) => entry.resource_type === 'application')
     expect(appRef.resource_id).toBe('app-1')
     expect(appRef.version_id).toBe('app-v1')
-    // Every DS receives the identical built payload (resources are DS-agnostic).
     payloads.forEach((payload) => expect(payload).toEqual(payloads[0]))
   })
 
   it('settles all DS with Promise.allSettled — a partial failure never aborts siblings (req 5.3)', async () => {
-    // The middle DS rejects; the first and the LATER one must still complete and
-    // report their own outcome (proof the fan-out is settled, not short-circuited).
     const boom = new Error('build_and_activate failed for ds-fail')
     deploymentReleaseService.buildAndActivate.mockImplementation((id) =>
       id === 'ds-fail'
@@ -154,18 +134,14 @@ describe('build_and_activate write path — Property 7 (integration)', () => {
 
     const results = await buildAndActivate(composedPayload(), ['ds-ok', 'ds-fail', 'ds-after'])
 
-    // Positional, per-DS settled outcome — the rejection is isolated to its DS.
     expect(results.map((entry) => ({ id: entry.id, ok: entry.ok }))).toEqual([
       { id: 'ds-ok', ok: true },
       { id: 'ds-fail', ok: false },
       { id: 'ds-after', ok: true }
     ])
-    // The DS after the failure still ran and carried its own trace_id (req 11.1):
-    // the failure did not abort the batch.
     const after = results.find((entry) => entry.id === 'ds-after')
     expect(after.traceId).toBe('trace-ds-after')
     expect(after.error).toBeNull()
-    // The failing DS surfaces its raw error and no trace id.
     const failed = results.find((entry) => entry.id === 'ds-fail')
     expect(failed.error).toBe(boom)
     expect(failed.traceId).toBeNull()
@@ -178,20 +154,15 @@ describe('build_and_activate write path — Property 7 (integration)', () => {
 
     const results = await buildAndActivate(composedPayload(), ['ds-fail'])
 
-    // The service is invoked once and never re-invoked on rejection.
     expect(
       deploymentReleaseService.buildAndActivate.mock.calls.filter(([id]) => id === 'ds-fail')
     ).toHaveLength(1)
     expect(results).toHaveLength(1)
     expect(results[0].ok).toBe(false)
-    // `isDeploying` is reset even after rejection (the `finally` block).
     expect(isDeploying.value).toBe(false)
   })
 
   it('maps the versioned-URLs active limit (422 43007) to a typed errorType (req 5.5)', async () => {
-    // The barrier for the versioned-URLs limit is the publish API's `422 43007`
-    // (req 5.5/7.2): we let the request go and map ONLY this signature to a typed
-    // error — across both the v2 ErrorHandler shape and a raw axios shape.
     const errorHandlerShaped = {
       status: 422,
       message: ['Versioned URLs active limit reached'],
@@ -218,16 +189,11 @@ describe('build_and_activate write path — Property 7 (integration)', () => {
     expect(byId['ds-axios'].errorType).toBe(
       BUILD_AND_ACTIVATE_ERROR_TYPES.VERSIONED_URLS_ACTIVE_LIMIT
     )
-    // The typed catalog is re-exported so the consumer matches without re-encoding
-    // the magic code — the composable's export equals the module constant.
     expect(buildAndActivateErrorTypes).toBe(BUILD_AND_ACTIVATE_ERROR_TYPES)
-    // The succeeding DS is unaffected and carries its async trace_id.
     expect(byId['ds-ok']).toMatchObject({ ok: true, errorType: null, traceId: 'trace-ds-ok' })
   })
 
   it('does NOT type a generic 422 lacking the 43007 code (no active-count assumed, req 7.2)', async () => {
-    // A 422 without `43007` is just a validation error: surfaced via `error`,
-    // never typed as the versioned-URLs limit (the limit is trusted, not computed).
     const plain422 = { status: 422, message: ['Some other validation error'] }
     deploymentReleaseService.buildAndActivate.mockRejectedValue(plain422)
     const { buildAndActivate } = mountComposable()
@@ -265,15 +231,10 @@ describe('build_and_activate write path — Property 7 (integration)', () => {
     )
 
     const [, payload] = deploymentReleaseService.buildAndActivate.mock.calls[0]
-    // The real `buildStrategy` + adapter produced a strategy block from the form.
     expect(payload.strategy).toBeTruthy()
   })
 })
 
-// A resource whose version never resolved (LATEST over an empty/failed catalog)
-// arrives as `resource_version: null`. Posting that is rejected by the API, so the
-// non-scoped path must skip-all instead of dispatching — mirroring the scoped
-// guard (Fix 2).
 describe('build_and_activate write path — non-scoped unresolved-version guard (Fix 2)', () => {
   it('skips ALL DS with unresolved_version and issues NO service call when a resource has a null version', async () => {
     const { buildAndActivate } = mountComposable()
@@ -319,8 +280,6 @@ describe('build_and_activate write path — non-scoped unresolved-version guard 
   })
 })
 
-// The `onOutcome` seam lets a progress consumer flag each DS AS IT SETTLES, without
-// changing the parallel dispatch, the positional return, or the skip semantics.
 describe('build_and_activate write path — onOutcome progress seam', () => {
   it('reports every settled DS to onOutcome exactly once, matching the returned outcomes', async () => {
     deploymentReleaseService.buildAndActivate.mockImplementation((id) =>
@@ -337,7 +296,6 @@ describe('build_and_activate write path — onOutcome progress seam', () => {
     expect(reported).toHaveLength(3)
     expect(reported.map((entry) => entry.id).sort()).toEqual(['ds-1', 'ds-2', 'ds-3'])
     expect(reported.every((entry) => entry.ok)).toBe(true)
-    // The reported object is the SAME instance the batch returns (no divergence).
     results.forEach((result) => expect(reported).toContain(result))
   })
 

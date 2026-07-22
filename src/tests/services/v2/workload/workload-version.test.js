@@ -4,13 +4,6 @@ import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 import { describeVersionServiceContract } from '@/tests/shared/versioning/version-service.contract'
 import { describeVersionAdapterContract } from '@/tests/shared/versioning/version-adapter.contract'
 
-// Workload — registry-driven suite. The inherited service contract (incl. the
-// rollback extra-mutation) and the shared adapter contract run from the descriptor.
-// The shared config/payload markers are flag-independent, but transformLoadWorkload/
-// transformCreateWorkload branch on the v6 flag, so we pin the legacy surface for the
-// whole file (mirrors workload-version-adapter-real.test.js). Bespoke below: the
-// full-resource-PUT draft (no source_version), the comment-only action payloads, the
-// exact normalized meta shape and the config snapshot gating — all workload-specific.
 const workload = RESOURCE_TEST_REGISTRY.workload
 const adapter = workload.adapter
 

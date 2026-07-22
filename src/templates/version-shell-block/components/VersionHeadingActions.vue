@@ -12,8 +12,6 @@
 
   defineOptions({ name: 'version-heading-actions' })
 
-  // `resourceContext` scopes the Deploy route to this resource/version; null (e.g.
-  // versioned-only) means no Deploy action.
   const props = defineProps({
     resourceContext: {
       type: Object,
@@ -33,8 +31,6 @@
   const cap = computed(() => capability?.value ?? DEFAULT_CAPABILITY)
   const dispatching = computed(() => isDispatching?.value ?? false)
 
-  // Same source + same availableActions intersection as VersionActionBar, so the
-  // heading and the footer toolbar render an identical button set per state.
   const actions = computed(() =>
     getVersionBarActions(state.value, cap.value).filter((action) =>
       availableActions.value.includes(action.key)
@@ -46,7 +42,6 @@
     dispatching.value ||
     (key === VERSION_ACTIONS.DEPLOY && !props.resourceContext && !props.deployRoute)
 
-  // The Deploy action routes to the full-page composer, scoped to this version.
   const openRelease = () => {
     if (props.deployRoute) {
       router.push(props.deployRoute)
@@ -60,7 +55,6 @@
     )
   }
 
-  // Deploy opens the full-page composer; every other action dispatches on the bus.
   const handleAction = (key) => {
     if (isDisabled(key)) return
     if (key === VERSION_ACTIONS.DEPLOY) return openRelease()
@@ -70,12 +64,8 @@
   const testIdFor = (key) =>
     key === VERSION_ACTIONS.DEPLOY ? 'version-heading__deploy' : `version-heading__action-${key}`
 
-  // Exposed so the host view can route to the composer from the VersionShell
-  // footer Deploy action (DEPLOY command-success), unifying both Deploy entrypoints.
   defineExpose({ openRelease })
 
-  // Guard the teleport until mount: the target (#version-lifecycle-action) lives in
-  // the heading and a cached version query can render this slot before it exists.
   const isMounted = ref(false)
   onMounted(() => {
     isMounted.value = true

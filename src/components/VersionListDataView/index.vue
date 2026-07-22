@@ -42,9 +42,6 @@
       type: Boolean,
       default: false
     },
-    // Distinguishes the failure so the error state shows the right affordance:
-    // 'network' offers Retry, 'forbidden' (403) hides it, 'notFound' (404)
-    // offers a back-to-list action instead (Req 5.2, 6.1).
     errorKind: {
       type: String,
       default: 'network'
@@ -133,9 +130,6 @@
       type: String,
       default: ''
     },
-    // Hide the toolbar (search/filter/sort + `toolbar-actions` slot). Used by the
-    // Overview's Live Deployments table, which is a small, non-searchable list
-    // but must still share this component's table shell for visual consistency.
     showToolbar: {
       type: Boolean,
       default: true
@@ -259,10 +253,6 @@
     return 'align-start'
   }
 
-  // Card layout is the default responsive presentation (< lg). The card model is
-  // derived from `visibleColumns`: the `version` column is the title, `status`
-  // renders unlabeled below it, and the rest become labeled rows. Explicit
-  // `mobileSlot` hints still win when provided.
   const cardPrimaryColumn = computed(() => {
     const explicit = visibleColumns.value.find((col) => col?.mobileSlot === 'primary')
     if (explicit) return explicit
@@ -291,9 +281,6 @@
 
   const isPrimaryColumn = (column) => column?.key === 'version'
 
-  // Clicking anywhere on the row opens the version configuration — same outcome
-  // as the menu's "Open configuration" item, routed through the shared driver
-  // (Req 2.2). `row-click` is kept for legacy consumers until they migrate.
   const triggerRowClick = (item) => {
     emit('row-action', { action: 'OPEN_CONFIGURATION', item })
     emit('row-click', item)
@@ -302,7 +289,6 @@
   const isForbiddenError = computed(() => props.errorKind === 'forbidden')
   const isNotFoundError = computed(() => props.errorKind === 'notFound')
 
-  // 403 has no useful Retry; 404 should route back to the list, not retry.
   const hasErrorAction = computed(() => {
     if (isForbiddenError.value) return false
     return !!(props.errorState?.buttonLabel && props.errorState?.buttonAction)
@@ -317,29 +303,21 @@
   const runErrorAction = () => props.errorState?.buttonAction?.()
   const runEmptyAction = () => props.emptyState?.buttonAction?.()
 
-  // Informative "In use" count; null/absent means the API does not expose it
-  // (Network List / WAF) and the column auto-hides (Req 5.4). No UI lock here.
   const resolveReferenceCount = (version) => {
     const count = version?.referenceCount
     return count == null || count === '' ? '--' : count
   }
 
-  // The row menu always offers the fixed 5-item model (never-hide pattern);
-  // the only state with no menu is `deleted`, where every item is gone.
   const hasRowActions = (version) =>
     buildVersionMenuItems(version?.state, { resourceType: props.resourceType }).length > 0
 
   const overflowMenuRef = ref(null)
   const rowMenuModel = ref([])
 
-  // On phones the popup menu is cramped against the trigger; the same model is
-  // presented as a bottom action sheet instead (popup stays on tablet/desktop).
   const isMobileSheet = useMediaQuery('(max-width: 767.98px)')
   const actionSheetVisible = ref(false)
   const actionSheetVersion = ref(null)
 
-  // Opening the kebab must not bubble into the row click (Req 2.4). The model is
-  // built by the shared mapper so every listing renders an identical menu (Req 1.4).
   const openRowMenu = (event, version) => {
     event?.stopPropagation?.()
     rowMenuModel.value = mapVersionMenuItemsToMenu(
@@ -356,8 +334,6 @@
     overflowMenuRef.value?.toggle?.(event)
   }
 
-  // Below `lg` the filter + sort dropdowns are collapsed behind a single filter
-  // button + overlay so they don't crowd the toolbar.
   const isCompactViewport = useMediaQuery('(max-width: 1023.98px)')
 
   const hasCollapsibleFilters = computed(
@@ -448,7 +424,7 @@
         </template>
 
         <OverlayPanel ref="filtersOverlayRef">
-          <div class="dataview-filters-overlay-content">
+          <div class="dataview-filters-overlay-content flex min-w-[13rem] flex-col gap-3">
             <template v-if="isCompactViewport">
               <Dropdown
                 v-for="filter in filters"
@@ -563,7 +539,7 @@
 
     <div
       v-else
-      class="table-surface overflow-hidden rounded-md border border-[var(--surface-border)]"
+      class="overflow-hidden rounded-md border border-[var(--surface-border)] bg-[var(--surface-section)]"
       :class="{ 'has-card-layout': hasMobileCardLayout }"
       data-testid="version-list-data-view__table"
     >
@@ -628,19 +604,21 @@
                       <button
                         v-if="column.key === 'version'"
                         type="button"
-                        class="version-cell-button flex max-w-full min-w-0 flex-col items-start gap-1 border-0 bg-transparent p-0 text-left text-[var(--text-color)]"
+                        class="flex max-w-full min-w-0 cursor-pointer flex-col items-start gap-1 border-0 bg-transparent p-0 text-left text-[var(--text-color)]"
                         :data-testid="`version-list-data-view__row-${version.id}__primary`"
                         @click="triggerRowClick(version)"
                       >
                         <span class="inline-flex max-w-full min-w-0 flex-wrap items-center gap-2">
-                          <span class="version-hash text-sm leading-5">
+                          <span
+                            class="inline-flex items-center whitespace-nowrap text-sm leading-5 text-[var(--text-color)]"
+                          >
                             {{ version.id }}
                           </span>
                           <span
                             v-if="version.state === 'active'"
-                            class="version-current-tag inline-flex items-center gap-1 rounded text-xs font-medium leading-4"
+                            class="version-current-tag inline-flex items-center gap-1 rounded bg-[color-mix(in_srgb,var(--primary-color)_15%,transparent)] px-[0.4375rem] py-0.5 text-xs font-medium leading-4 text-[var(--primary-color)]"
                           >
-                            <i class="pi pi-circle-on" />
+                            <i class="pi pi-circle-on text-[0.5625rem]" />
                             Current
                           </span>
                           <span
@@ -659,7 +637,7 @@
                         </span>
                         <span
                           v-if="version.comment"
-                          class="version-comment min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs text-[var(--text-color-secondary)]"
+                          class="inline-block min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs text-[var(--text-color-secondary)]"
                         >
                           {{ version.comment }}
                         </span>
@@ -668,7 +646,7 @@
                       <button
                         v-else-if="column.key === 'status'"
                         type="button"
-                        class="status-cell-button inline-flex min-w-0 max-w-full items-center border-0 bg-transparent p-0 text-left"
+                        class="inline-flex min-w-0 max-w-full cursor-pointer items-center border-0 bg-transparent p-0 text-left"
                         @click="triggerRowClick(version)"
                       >
                         <VersionStateBadge :state="version.state" />
@@ -677,7 +655,7 @@
                       <button
                         v-else-if="column.key === 'created'"
                         type="button"
-                        class="created-cell-button flex max-w-full min-w-0 flex-col items-start gap-0.5 border-0 bg-transparent p-0 text-left"
+                        class="flex max-w-full min-w-0 cursor-pointer flex-col items-start gap-0.5 border-0 bg-transparent p-0 text-left"
                         @click="triggerRowClick(version)"
                       >
                         <span
@@ -700,7 +678,7 @@
                       <button
                         v-else-if="column.key === 'deployed'"
                         type="button"
-                        class="created-cell-button flex max-w-full min-w-0 flex-col items-start gap-0.5 border-0 bg-transparent p-0 text-left"
+                        class="flex max-w-full min-w-0 cursor-pointer flex-col items-start gap-0.5 border-0 bg-transparent p-0 text-left"
                         @click="triggerRowClick(version)"
                       >
                         <span
@@ -723,7 +701,7 @@
                       <button
                         v-else-if="column.key === 'inUse'"
                         type="button"
-                        class="in-use-cell-button inline-flex min-w-0 max-w-full items-center border-0 bg-transparent p-0 text-left"
+                        class="inline-flex min-w-0 max-w-full cursor-pointer items-center border-0 bg-transparent p-0 text-left"
                         :data-testid="`version-list-data-view__row-${version.id}__in-use`"
                         @click="triggerRowClick(version)"
                       >
@@ -749,7 +727,7 @@
 
                       <span
                         v-else
-                        class="cell-default"
+                        class="block min-w-0 truncate"
                         :class="{ 'cursor-pointer hover:underline': isPrimaryColumn(column) }"
                         @click="isPrimaryColumn(column) ? triggerRowClick(version) : null"
                       >
@@ -794,14 +772,16 @@
                       >
                         <template v-if="cardPrimaryColumn.key === 'version'">
                           <span class="inline-flex max-w-full min-w-0 flex-wrap items-center gap-2">
-                            <span class="version-hash text-sm">
+                            <span
+                              class="inline-flex items-center whitespace-nowrap text-sm text-[var(--text-color)]"
+                            >
                               {{ version.id }}
                             </span>
                             <span
                               v-if="version.state === 'active'"
-                              class="version-current-tag inline-flex items-center gap-1 rounded text-xs font-medium leading-4"
+                              class="version-current-tag inline-flex items-center gap-1 rounded bg-[color-mix(in_srgb,var(--primary-color)_15%,transparent)] px-[0.4375rem] py-0.5 text-xs font-medium leading-4 text-[var(--primary-color)]"
                             >
-                              <i class="pi pi-circle-on" />
+                              <i class="pi pi-circle-on text-[0.5625rem]" />
                               Current
                             </span>
                             <PrimeTag
@@ -813,14 +793,14 @@
                           </span>
                           <span
                             v-if="version.comment"
-                            class="version-comment mt-1 block min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs text-[var(--text-color-secondary)]"
+                            class="mt-1 block min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs text-[var(--text-color-secondary)]"
                           >
                             {{ version.comment }}
                           </span>
                         </template>
                         <span
                           v-else
-                          class="cell-default"
+                          class="block min-w-0 truncate"
                         >
                           {{ resolveDisplayValue(version, cardPrimaryColumn) }}
                         </span>
@@ -1044,10 +1024,6 @@
     color: var(--text-color-secondary);
   }
 
-  .dataview-search > i {
-    color: var(--text-color-secondary);
-  }
-
   :deep(.dataview-toolbar-action.p-button) {
     width: 2.5rem !important;
     height: 2.5rem !important;
@@ -1055,7 +1031,6 @@
     border-radius: 0.375rem;
   }
 
-  /* Kebab trigger: text/secondary, 32px square (Req 8.1). */
   :deep(.version-row-menu__trigger.p-button) {
     width: 2rem;
     height: 2rem;
@@ -1117,10 +1092,6 @@
 
   :deep(.p-dataview-emptymessage) {
     color: var(--text-color-secondary);
-  }
-
-  .table-surface {
-    background: var(--surface-section);
   }
 
   .table-scroll {
@@ -1209,51 +1180,6 @@
     min-width: 0;
   }
 
-  .cell-default {
-    display: block;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .version-cell-button {
-    cursor: pointer;
-  }
-
-  .version-hash {
-    display: inline-flex;
-    align-items: center;
-    white-space: nowrap;
-    color: var(--text-color);
-  }
-
-  .version-current-tag {
-    padding: 0.125rem 0.4375rem;
-    background: color-mix(in srgb, var(--primary-color) 15%, transparent);
-    color: var(--primary-color);
-  }
-
-  .version-current-tag .pi {
-    font-size: 0.5625rem;
-  }
-
-  .version-comment {
-    display: inline-block;
-  }
-
-  .created-cell-button {
-    cursor: pointer;
-  }
-
-  .status-cell-button {
-    cursor: pointer;
-  }
-
-  .in-use-cell-button {
-    cursor: pointer;
-  }
-
   .mobile-label {
     display: none;
   }
@@ -1295,13 +1221,6 @@
     color: var(--primary-color-text);
     font-size: 0.6875rem;
     font-weight: 600;
-  }
-
-  .dataview-filters-overlay-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    min-width: 13rem;
   }
 
   .dataview-filters-overlay-content :deep(.p-dropdown) {
@@ -1420,7 +1339,6 @@
     }
   }
 
-  /* Tablet: two-column card grid */
   @media (min-width: 768px) and (max-width: 1023.98px) {
     .has-card-layout :deep(.p-grid) {
       display: grid;
@@ -1432,7 +1350,6 @@
     }
   }
 
-  /* Mobile: single-column cards + icon-only filter button */
   @media (max-width: 767.98px) {
     .has-card-layout :deep(.p-grid) {
       display: grid;

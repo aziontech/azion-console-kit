@@ -49,8 +49,6 @@
     router.push({ name: 'deployments-edit', params: { id: deployment.id, tab: 'settings' } })
   }
 
-  // Entry "from a Deployment Settings": pre-selects this DS so the composer
-  // loads its full Release Composition + inherited dependencies on mount.
   const newReleaseFromDeployment = (deployment) => {
     if (!deployment?.id) return
     router.push(releaseComposerRouteFromDeployment(deployment.id))

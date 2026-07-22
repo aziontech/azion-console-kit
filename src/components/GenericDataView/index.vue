@@ -219,9 +219,6 @@
     return 'align-start'
   }
 
-  // Card layout is the default responsive presentation (< lg). The card model is
-  // derived from `columns`, so consumers don't have to declare a per-column
-  // `mobileSlot`; explicit `mobileSlot` hints still win when provided.
   const cardPrimaryColumn = computed(() => {
     const explicit = props.columns.find((col) => col?.mobileSlot === 'primary')
     if (explicit) return explicit
@@ -252,8 +249,6 @@
   const hasAllowedFilters = computed(() => props.allowedFilters?.length > 0)
   const hasAppliedFilters = computed(() => props.appliedFilters?.length > 0)
 
-  // Below `lg` the slotted toolbar filters (`#toolbar-extras`) are collapsed
-  // behind a single filter button + overlay so they don't crowd the toolbar.
   const slots = useSlots()
   const hasToolbarExtras = computed(() => !!slots['toolbar-extras'])
   const isCompactViewport = useMediaQuery('(max-width: 1023.98px)')
@@ -431,7 +426,7 @@
         :model="overflowMenuItems"
       />
       <OverlayPanel ref="filtersOverlayRef">
-        <div class="dataview-filters-overlay-content">
+        <div class="flex min-w-[13rem] flex-col gap-3">
           <slot
             v-if="isCompactViewport"
             name="toolbar-extras"
@@ -496,7 +491,7 @@
     <div
       v-else
       :class="[
-        'table-surface',
+        'bg-[var(--surface-section)]',
         { 'has-card-layout': hasMobileCardLayout },
         isCompactMode ? '' : 'overflow-hidden rounded-md border border-[var(--surface-border)]'
       ]"
@@ -561,7 +556,7 @@
                       :onPrimaryClick="() => triggerPrimaryClick(deployment)"
                     >
                       <span
-                        class="cell-default"
+                        class="block min-w-0 truncate"
                         :class="{ 'cursor-pointer hover:underline': isPrimaryColumn(column) }"
                         @click="isPrimaryColumn(column) ? triggerPrimaryClick(deployment) : null"
                       >
@@ -602,7 +597,7 @@
                         :onPrimaryClick="() => triggerPrimaryClick(deployment)"
                         :cardMode="true"
                       >
-                        <span class="cell-default">
+                        <span class="block min-w-0 truncate">
                           {{ resolveDisplayValue(deployment, cardPrimaryColumn) }}
                         </span>
                       </slot>
@@ -628,7 +623,7 @@
                       :column="cardStatusColumn"
                       :cardMode="true"
                     >
-                      <span class="cell-default">
+                      <span class="block min-w-0 truncate">
                         {{ resolveDisplayValue(deployment, cardStatusColumn) }}
                       </span>
                     </slot>
@@ -707,10 +702,6 @@
     color: var(--text-color-secondary);
   }
 
-  .dataview-search > i {
-    color: var(--text-color-secondary);
-  }
-
   :deep(.dataview-dropdown .p-dropdown-label) {
     color: var(--text-color);
     padding-block: 0.5rem;
@@ -759,10 +750,6 @@
 
   :deep(.p-dataview-emptymessage) {
     color: var(--text-color-secondary);
-  }
-
-  .table-surface {
-    background: var(--surface-section);
   }
 
   .table-scroll {
@@ -851,14 +838,6 @@
     min-width: 0;
   }
 
-  .cell-default {
-    display: block;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
   .mobile-label {
     display: none;
   }
@@ -900,13 +879,6 @@
     color: var(--primary-color-text);
     font-size: 0.6875rem;
     font-weight: 600;
-  }
-
-  .dataview-filters-overlay-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    min-width: 13rem;
   }
 
   @media (max-width: 1023.98px) {
@@ -1032,7 +1004,6 @@
     }
   }
 
-  /* Tablet: two-column card grid */
   @media (min-width: 768px) and (max-width: 1023.98px) {
     .has-card-layout :deep(.p-grid) {
       display: grid;
@@ -1044,7 +1015,6 @@
     }
   }
 
-  /* Mobile: single-column cards + icon-only filter button */
   @media (max-width: 767.98px) {
     .has-card-layout :deep(.p-grid) {
       display: grid;

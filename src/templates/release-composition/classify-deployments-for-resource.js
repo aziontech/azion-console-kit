@@ -1,8 +1,5 @@
 import { releaseResourceId } from '@/stores/release'
 
-// `loadFailed` is appended LAST so the positional destructuring below
-// (`[linkedGroup, availableGroup, needsFirstReleaseGroup]`) — and any consumer
-// that reads the first three groups by index — stays intact.
 const emptyResult = () => ({
   groups: [
     { key: 'linked', deployments: [] },
@@ -43,20 +40,11 @@ export const classifyDeploymentsForResource = ({
   deployments.forEach((deployment) => {
     const release = releasesByDs[deployment?.id] ?? null
 
-    // A scoped entry whose active-release READ failed (null + flagged) must NOT be
-    // treated as "needs a first release": its composition may well exist and a
-    // full first release would overwrite it. Segregate it so the picker offers a
-    // Retry instead of the "Compose first release" CTA. Checked BEFORE the
-    // genuine-null branch below.
     if (scopedType && release == null && failed.has(String(deployment?.id))) {
       loadFailedGroup.deployments.push(deployment)
       return
     }
 
-    // A scoped entry publishes an override that preserves each DS's active
-    // composition; a DS with no active release has nothing to anchor it and
-    // needs a full first release instead. Only segregates in scoped mode —
-    // non-scoped entries compose a full release and handle the zero-state.
     if (scopedType && release == null) {
       needsFirstReleaseGroup.deployments.push(deployment)
       return

@@ -1,8 +1,3 @@
-/**
- * Smoke of the functional (browser mode) pipeline — proves the environment is a
- * REAL browser and that a real versioning component renders through the same
- * vite pipeline the app uses. Expanded by spec tasks 4.x (Wave 1).
- */
 import { render } from '@testing-library/vue'
 import { describe, expect, it } from 'vitest'
 import PrimeVue from 'primevue/config'
@@ -13,7 +8,6 @@ describe('functional environment (real Chromium)', () => {
     const button = document.createElement('button')
     document.body.appendChild(button)
     button.focus()
-    // jsdom no-ops focus(); a real browser moves activeElement.
     expect(document.activeElement).toBe(button)
     button.remove()
   })
@@ -27,7 +21,6 @@ describe('functional environment (real Chromium)', () => {
     expect(badge).toHaveTextContent('Draft')
     expect(badge).toHaveAttribute('data-state', 'draft')
 
-    // Label mapping as declared in VersionStateBadge.vue on THIS branch.
     return rerender({ state: 'active' }).then(() => {
       expect(getByTestId('version-state-badge')).toHaveTextContent('Active')
     })

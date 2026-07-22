@@ -1,45 +1,4 @@
 <script setup>
-  /**
-   * ReleaseCompositionTree — the full-page "Review & deploy" composition renderer
-   * (matches the authoritative `vue-preview.html` `resources` renderer). It is the
-   * page-owned alternative to the drawer's `ReleaseCompositionField`: same shared
-   * LEAVES (`LazyResourceSelectField`, `ResourceVersionField`, `ReleaseDependenciesSection`)
-   * but the uniform-card tree structure of the new screen.
-   *
-   * Presentational only: every value comes in through `resources`, every mutation
-   * flows back out as an event. No fetching, no derivation, no business logic — the
-   * view builds the `resources` view-model from the store + composable and reacts to
-   * the events here.
-   *
-   * Each entry of `resources` is:
-   *   {
-   *     type, label, icon,
-   *     required,        // application — shows a "Required" tag, no toggle
-   *     readonly,        // deploy case locks it — selectors render disabled + lock hint
-   *     canToggle,       // optional, non-scoped — header ToggleSwitch (orange when on)
-   *     enabled,         // included in the release
-   *     name,            // selected resource id (singleton)
-   *     version,         // selected version (LATEST sentinel | pinned id)
-   *     nameService,     // (params) => { body, count } for LazyResourceSelectField
-   *     nameLoadService, // (id) => { id, name } — resolves a pre-selected label
-   *     versionOptions,  // version picker options for ResourceVersionField
-   *     isLoadingVersions,
-   *     lockReason,      // text for the read-only row
-   *     hasOwned,        // render the nested Dependencies block
-   *     ownedCollections, // collections for ReleaseDependenciesSection
-   *     dependenciesLoading, // this card's own dependency discovery is in flight
-   *     dependenciesLoadingMessage // text shown below the "Dependencies" title while loading
-   *   }
-   *
-   * @event toggle(type)                       — flip an optional singleton on/off.
-   * @event update:resource({ type, value })   — pick the singleton resource instance.
-   * @event update:version({ type, value })    — pick the singleton version.
-   * @event toggle-group({ type, group })      — collapse/expand a dependency group.
-   * @event add-instance({ type, group })      — append a blank dependency instance.
-   * @event update:instance-resource({ type, group, id, value })
-   * @event update:instance-version({ type, group, id, value })
-   * @event remove-instance({ type, group, id })
-   */
   import InputSwitch from '@aziontech/webkit/inputswitch'
 
   import LazyResourceSelectField from '@/templates/release-composition/components/LazyResourceSelectField.vue'
@@ -70,8 +29,6 @@
   const onResource = (type, value) => emit('update:resource', { type, value })
   const onVersion = (type, value) => emit('update:version', { type, value })
 
-  // Re-tag the nested ReleaseDependenciesSection events with the owning parent
-  // singleton `type` so the view's store mutations stay unambiguous per card.
   const onToggleGroup = (type, group) => emit('toggle-group', { type, group })
   const onAddInstance = (type, group) => emit('add-instance', { type, group })
   const onInstanceResource = (type, payload) =>
@@ -103,14 +60,11 @@
       class="flex flex-col gap-[var(--spacing-4)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] px-[var(--spacing-4)] py-[var(--spacing-5)]"
       :data-testid="`release-composition__card-${resource.type}`"
     >
-      <!-- header: icon + label + (Required | Read-only | toggle). The icon is
-           flush-left (no chip box) so it lines up exactly with the "Resource"
-           label and the field column below it (all at the card's left edge). -->
       <div class="flex items-center gap-[var(--spacing-2)]">
         <i
           :class="[
             resource.icon,
-            'release-composition__card-icon shrink-0 text-body-md text-[var(--text-color-secondary)]'
+            '-ml-[2px] shrink-0 text-body-md text-[var(--text-color-secondary)]'
           ]"
         />
         <span class="flex-1 text-body-sm font-semibold text-[var(--text-color)]">
@@ -141,9 +95,6 @@
         />
       </div>
 
-      <!-- body: the SAME Resource + Version selectors for every resource
-           (disabled when the deploy case locks it); a lock hint sits below.
-           Optional resources toggled off collapse to a short note. -->
       <div
         v-if="resource.enabled"
         class="flex flex-col gap-[var(--spacing-2)]"
@@ -191,9 +142,6 @@
         Not included in this release.
       </p>
 
-      <!-- dependencies (when the parent owns collections and is enabled).
-           The `border-t` divider mirrors the mock's `.deps { border-top }`,
-           separating the resource fields from the nested collections. -->
       <ReleaseDependenciesSection
         v-if="resource.hasOwned"
         class="border-t border-[var(--surface-border)] pt-[var(--spacing-4)]"
@@ -210,12 +158,3 @@
     </div>
   </div>
 </template>
-
-<style scoped>
-  /* The `ai ai-*` (azionicons) glyphs carry a small intrinsic left-bearing, so
-     the drawn icon sits a couple px right of its box. Pull it back so the icon
-     lines up flush with the "Resource" label and the field column below it. */
-  .release-composition__card-icon {
-    margin-left: -2px;
-  }
-</style>

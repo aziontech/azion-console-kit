@@ -2,19 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { reactive, ref, computed } from 'vue'
 
-// Property 4 / req 5.4: the "Deploy release" button
-// (`release-composition__build-and-activate`) stays ENABLED regardless of the
-// impact state (loading, partial/capped, unavailable) as long as publishing
-// itself is enabled. The real gate is
-//   canBuildAndActivate = deployEnabled && !blockingDs
-// which reads NOTHING from `impact`. This suite keeps publishing enabled
-// (`deployEnabled=true`, `deployCtx.ok/canDeploy=true` so `blockingDs=null`) and
-// only varies the impact state through the `useReleaseImpact` +
-// `useReleaseComposition` mocks. The final case is the contrapositive: closing
-// the publishing gate (or a blocking DS) disables the button — proving the gate
-// depends on publishing, not on impact.
-
-// --- store mock: reactive state + spy actions + tunable publishing gate -------
 const composePayload = vi.fn(() => ({ resources: [], canary: false, canaryForm: {} }))
 const openRelease = vi.fn()
 const deployCtx = vi.fn(() => ({ ok: true, canDeploy: true }))
@@ -127,8 +114,6 @@ vi.mock('pinia', async () => {
   }
 })
 
-// --- impact seam: `isLoading` is the knob for the "impact loading" case -------
-// The view feeds `impact.isLoading.value` to the picker's `:is-loading-meta`.
 const impactIsLoading = ref(false)
 const impactReverseLookupByDs = ref({})
 const impactDegradationReason = ref(null)
@@ -144,7 +129,6 @@ vi.mock('@/templates/release-composition/use-release-impact', () => ({
   })
 }))
 
-// --- composition mock: impact payload (partial/unavailable) is tunable --------
 const retryImpact = vi.fn()
 const buildAndActivate = vi.fn().mockResolvedValue([])
 const isDeploying = ref(false)
@@ -183,9 +167,6 @@ vi.mock('@/templates/release-composition/use-release-composition', () => ({
   })
 }))
 
-// --- dependency composables: quiet (not the subject of this suite) ------------
-// Hoisted so the (hoisted) vi.mock factories below can reference them without a
-// temporal-dead-zone error.
 const { quietVersionReady, quietDeps } = await vi.hoisted(async () => {
   const { ref: hoistedRef } = await import('vue')
   return {
@@ -236,13 +217,11 @@ vi.mock('@/services/v2/release-impact/consuming-deployments', () => ({
   resolveConsumingDeployments: vi.fn().mockResolvedValue({ deployments: [] })
 }))
 
-// --- adapter mock: pure mapping, no HTTP --------------------------------------
 vi.mock('@/services/v2/deployment/deployment-adapter', () => ({
   resolveResourceMeta: (type) => ({ label: type, icon: 'pi pi-box' }),
   mapPolicyToLabel: (policy) => (policy === 'versioned_urls' ? 'Versioned URLs' : 'Single Version')
 }))
 
-// --- router + toast -----------------------------------------------------------
 const routerPush = vi.fn()
 const routerResolve = vi.fn(() => ({ href: '/deployments' }))
 vi.mock('vue-router', () => ({
@@ -253,7 +232,6 @@ vi.mock('vue-router', () => ({
 const toastAdd = vi.fn()
 vi.mock('@aziontech/webkit/use-toast', () => ({ useToast: () => ({ add: toastAdd }) }))
 
-// --- webkit + child components reduced to the observable surface --------------
 vi.mock('@aziontech/webkit/dialog', () => ({
   default: {
     name: 'PrimeDialog',
@@ -291,8 +269,6 @@ vi.mock('@/templates/release-composition/components/ReleaseCompositionTree.vue',
     template: '<div :class="$attrs.class" data-stub="ReleaseCompositionTree" />'
   }
 }))
-// The picker stub exposes `is-loading-meta` so the test can assert the prop the
-// view binds from `impact.isLoading.value`.
 vi.mock('@/templates/release-composition/components/DeploymentSettingsPicker.vue', () => ({
   default: {
     name: 'DeploymentSettingsPicker',
@@ -320,8 +296,6 @@ vi.mock('@/templates/release-composition/components/ImpactPanel.vue', () => ({
 import { flushPromises } from '@vue/test-utils'
 import ReleaseComposerView from '@/views/Deployments/v6/ReleaseComposerView.vue'
 
-// The Deploy button lives in a `<Teleport v-if="isMounted">`; `isMounted` flips in
-// `onMounted`, a re-render that only lands next tick — await it before querying.
 const mountView = async () => {
   const wrapper = mount(ReleaseComposerView, { global: { stubs: { teleport: true } } })
   await flushPromises()
@@ -354,10 +328,8 @@ describe('ReleaseComposerView — impact state never gates the Deploy button (Pr
     impactIsLoading.value = true
     const wrapper = await mountView()
 
-    // Publishing is enabled → the button is not gated by the impact load.
     expect(deployButton(wrapper).attributes('disabled')).toBeUndefined()
 
-    // The picker receives the loading flag straight from `impact.isLoading.value`.
     const picker = wrapper.findComponent({ name: 'DeploymentSettingsPicker' })
     expect(picker.exists()).toBe(true)
     expect(picker.props('isLoadingMeta')).toBe(true)
@@ -384,8 +356,6 @@ describe('ReleaseComposerView — impact state never gates the Deploy button (Pr
   })
 
   it('disables Deploy only when PUBLISHING is closed — proving the gate ignores impact', async () => {
-    // Contrapositive: with a healthy impact, closing the publishing gate
-    // (deployEnabled=false) or introducing a blocking DS disables the button.
     storeState.deployEnabled = false
     const closedGate = await mountView()
     expect(deployButton(closedGate).attributes('disabled')).toBeDefined()

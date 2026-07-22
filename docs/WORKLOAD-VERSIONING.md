@@ -35,17 +35,17 @@ flowchart TD
 
     RL --> LV["ListView v6 - dados pela API por conta"]
 
-    RC -->|com flag| CV6["CreateView.vue v6<br/>buildV6Schema + createWorkload payload, true"]
-    RC -->|sem flag| CLG["legacy/CreateView.vue<br/>buildLegacySchema + createWorkload payload, false"]
+    RC -->|com flag| CV6["v6/CreateView.vue<br/>buildV6Schema + createWorkload payload, true"]
+    RC -->|sem flag| CLG["CreateView.vue (legado)<br/>buildLegacySchema + createWorkload payload, false"]
 
-    RE -->|com flag| TV["TabsView.vue - abas Overview, Deployment, Settings"]
-    RE -->|sem flag| LEV["legacy/EditView.vue - pagina flat"]
-    TV --> EV["EditView.vue - aba Settings<br/>buildV6Schema + editWorkload payload, true"]
+    RE -->|com flag| TV["v6/TabsView.vue - abas Overview, Deployment, Settings"]
+    RE -->|sem flag| LEV["EditView.vue (legado) - pagina flat"]
+    TV --> EV["v6/EditView.vue - aba Settings<br/>buildV6Schema + editWorkload payload, true"]
     LEV --> LE2["buildLegacySchema + editWorkload payload, false"]
 
-    CV6 --> FF6["FormFields/FormFieldsWorkload.vue v6<br/>General, Domains drawer + environment + cert por dominio<br/>DeploymentSettings cards por ambiente, Protocol sem cert<br/>mTLS, Status"]
+    CV6 --> FF6["v6/FormFields/FormFieldsWorkload.vue<br/>General, Domains drawer + environment + cert por dominio<br/>DeploymentSettings cards por ambiente, Protocol sem cert<br/>mTLS, Status"]
     EV --> FF6
-    CLG --> FFL["legacy/FormFields/FormFieldsWorkload.vue<br/>General, Infrastructure, Domains lista inline<br/>DeploymentSettings dropdowns flat, Protocol cert global<br/>mTLS, Status"]
+    CLG --> FFL["FormFields/FormFieldsWorkload.vue (legado)<br/>General, Infrastructure, Domains lista inline<br/>DeploymentSettings dropdowns flat, Protocol cert global<br/>mTLS, Status"]
     LE2 --> FFL
 
     FF6 --> ADP
@@ -81,26 +81,27 @@ flowchart TD
      o chunk correto é lazy-loaded — nenhum componente carregado contém branching.
    - `workload-deployment-details` é a única rota gated por `flagGuard` (`meta.flag: 'use_v6_configurations'`) → conta
      legada vai para `/not-found`.
-   - `edit/:id/:tab?` continua com o mesmo nome de rota (`edit-workload`); o `:tab` é lido pelo `TabsView` (v6) e
-     simplesmente ignorado pelo `legacy/EditView`.
+   - `edit/:id/:tab?` continua com o mesmo nome de rota (`edit-workload`); o `:tab` é lido pelo `v6/TabsView` (v6) e
+     simplesmente ignorado pelo `EditView` legado (na raiz).
 
 2. **Create** — dois arquivos independentes
-   - `src/views/Workload/CreateView.vue` (v6): `buildV6Schema()`, `initialValues` v6, `createWorkload(payload, true)`.
-   - `src/views/Workload/legacy/CreateView.vue` (legado): `buildLegacySchema()`, `initialValues` legado,
+   - `src/views/Workload/v6/CreateView.vue` (v6): `buildV6Schema()`, `initialValues` v6, `createWorkload(payload, true)`.
+   - `src/views/Workload/CreateView.vue` (legado, na raiz): `buildLegacySchema()`, `initialValues` legado,
      `createWorkload(payload, false)`.
    - Nenhum dos dois importa `user-flag.js`.
 
 3. **Edit** — sem dispatcher de runtime
-   - V6 carrega `TabsView.vue` (Overview / Deployment / Settings); a aba Settings monta `EditView.vue` com
+   - V6 carrega `v6/TabsView.vue` (Overview / Deployment / Settings); a aba Settings monta `v6/EditView.vue` com
      `buildV6Schema()` + `editWorkload(payload, true)`.
-   - Legado carrega `legacy/EditView.vue` diretamente (página flat) com `buildLegacySchema()` +
+   - Legado carrega `EditView.vue` (na raiz) diretamente (página flat) com `buildLegacySchema()` +
      `editWorkload(payload, false)`.
 
 4. **Composição** (`FormFields/FormFieldsWorkload.vue`) — duas variantes, sem seletor
-   - `src/views/Workload/FormFields/FormFieldsWorkload.vue` (v6): General, Domains, DeploymentSettings, ProtocolSettings,
-     MutualAuthentication, Status. **Não** monta `Infrastructure`.
-   - `src/views/Workload/legacy/FormFields/FormFieldsWorkload.vue`: idem v6 + `Infrastructure`; importa
-     `domains/deploymentSettings/protocolSettings` de `legacy/blocks/`. Os blocos `General`, `MutualAuthentication`,
+   - `src/views/Workload/v6/FormFields/FormFieldsWorkload.vue` (v6): General, Domains, DeploymentSettings, ProtocolSettings,
+     MutualAuthentication, Status. **Não** monta `Infrastructure`. Importa `domains/deploymentSettings/protocolSettings`
+     de `v6/FormFields/blocks/` e reusa `General`/`MutualAuthentication` de `FormFields/blocks/` (compartilhados).
+   - `src/views/Workload/FormFields/FormFieldsWorkload.vue` (legado, na raiz): idem v6 + `Infrastructure`; importa
+     `domains/deploymentSettings/protocolSettings` de `FormFields/blocks/`. Os blocos `General`, `MutualAuthentication`,
      `Infrastructure` são reusados de `FormFields/blocks/` (compartilhados).
    - Nenhuma das duas tem `v-if`/`v-else` por flag — só uma das variantes é carregada pelo router por vez.
 
@@ -115,29 +116,35 @@ flowchart TD
      passam `true` e as legadas passam `false`.
    - `fetch` / `list` / `deployment` / `cache` são idênticos e permanecem compartilhados.
 
-## Mapa de arquivos
+## Layout de arquivos (atual)
 
-**Criados**
-- `src/views/Workload/legacy/CreateView.vue`
-- `src/views/Workload/legacy/EditView.vue`
-- `src/views/Workload/legacy/FormFields/FormFieldsWorkload.vue`
-- `src/views/Workload/legacy/blocks/{domainsBlock,deploymentSettingsBlock,protocolSettingsBlock}.vue`
+O Workload segue o layout canônico do `docs/V6-GUIDELINES.md`: **legado na raiz**, **v6 isolado em
+`v6/`**, **compartilhado na raiz**, com imports por **alias absoluto** (`@/views/Workload/...`).
 
-**Modificados**
-- `src/router/routes/workload-routes/index.js` (dispatch por flag em create/edit)
-- `src/views/Workload/Config/validation.js` (`buildV6Schema` / `buildLegacySchema`)
-- `src/views/Workload/FormFields/FormFieldsWorkload.vue` (agora v6-only)
-- `src/views/Workload/CreateView.vue` (agora v6-only)
-- `src/views/Workload/EditView.vue` (usa `buildV6Schema`)
-- `src/services/v2/workload/workload-adapter.js`
-- `src/services/v2/workload/workload-service.js`
+**Raiz de `src/views/Workload/` — legado + compartilhado**
+- `CreateView.vue`, `EditView.vue` — variantes **legadas** (`buildLegacySchema`).
+- `ListView.vue` — compartilhada (flag-aware via prop `isV6`).
+- `Config/validation.js` — compartilhado; exporta `buildV6Schema` **e** `buildLegacySchema`.
+- `FormFields/FormFieldsWorkload.vue` — composição **legada** do formulário.
+- `FormFields/blocks/{generalBlock,mutualAuthenticationSettingsBlock,infrastructureBlock}.vue` — blocos **compartilhados** (usados por v6 e legado).
+- `FormFields/blocks/{domainsBlock,deploymentSettingsBlock,protocolSettingsBlock}.vue` — blocos **legados**.
+- `components/FormSkeleton.vue` — skeleton **compartilhado**.
 
-**Removidos**
-- `src/views/Workload/EditDispatcher.vue` (substituído pelo dispatch no router)
+**`src/views/Workload/v6/` — tudo que é exclusivo do v6**
+- Views: `CreateView.vue`, `EditView.vue`, `TabsView.vue`, `DeploymentDetailsView.vue`, `VersionEditView.vue`.
+- `WorkloadSettingsTab.vue`, `WorkloadVersionAdapter.vue`.
+- `FormFields/FormFieldsWorkload.vue` + `FormFieldsCreateDomains.vue`, `FormFieldsEditDomains.vue`.
+- `FormFields/blocks/{domainsBlock,deploymentSettingsBlock,protocolSettingsBlock}.vue` (variantes v6).
+- `FormFields/components/{CreateDeploymentVersionDrawer,DomainDrawer,DomainRow}.vue`.
+- `Tabs/**`, `Drawer/`, `Dialog/`, `components/EditViewSkeleton.vue`, `composables/`, `utils/`.
 
-**Reutilizados / sem mudança**
-- `TabsView.vue`, `DeploymentDetailsView.vue`, `Tabs/**`, drawers v6, blocos v6
-- `FormFields/blocks/{generalBlock,mutualAuthenticationSettingsBlock,infrastructureBlock}.vue`
+**Regra de import:** a composição v6 (em `v6/`) importa os blocos **compartilhados** da raiz por
+alias absoluto (`@/views/Workload/FormFields/blocks/generalBlock.vue`) e os blocos **v6** de
+`@/views/Workload/v6/FormFields/blocks/`. A composição legada (na raiz) importa tudo de
+`@/views/Workload/FormFields/...`.
+
+**Compartilhado fora de Workload (sem mudança)**
+- `src/services/v2/workload/workload-adapter.js`, `workload-service.js`
 - `src/composables/user-flag.js`, `src/router/hooks/guards/flagGuard.js`
 
 ## Como verificar
@@ -145,9 +152,9 @@ flowchart TD
 Alternar `use_v6_configurations` em `client_flags` (fixture `cypress/fixtures/account/info/*` ou conta de teste):
 
 - **Com flag:** ao navegar para `/workloads/create` ou `/workloads/edit/:id`, o router carrega o chunk v6
-  (`CreateView.vue` / `TabsView.vue`); abas Overview/Deployment/Settings; certificado por domínio; sem bloco
+  (`v6/CreateView.vue` / `v6/TabsView.vue`); abas Overview/Deployment/Settings; certificado por domínio; sem bloco
   Infrastructure; `/workloads/edit/:id/deployment/:versionId` carrega.
-- **Sem flag:** o router carrega o chunk legado (`legacy/CreateView.vue` / `legacy/EditView.vue`); bloco Infrastructure
+- **Sem flag:** o router carrega o chunk legado (`CreateView.vue` / `EditView.vue`, na raiz); bloco Infrastructure
   presente; dropdown de certificado global no Protocol; dropdowns flat de deployment; edição em página única sem abas;
   `/workloads/edit/:id/deployment/:versionId` → `/not-found`. Observação: rotas como `/workloads/edit/:id/overview`
   permanecem renderizando a página legada (o `:tab` é silenciosamente ignorado).

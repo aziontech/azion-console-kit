@@ -13,8 +13,6 @@
 
   const META_BY_KEY = Object.fromEntries(resourcePackTypeMeta.map((meta) => [meta.key, meta]))
 
-  // Keys currently surfaced by the workload/deployments API (workload-adapter.transformLoadWorkload)
-  // TODO: extend as the deployments API starts returning more resources (wafRule, dataStream, ...)
   const ORDERED_KEYS = ['application', 'firewall', 'customPage']
 
   const RESOURCE_LOADERS = {
@@ -23,12 +21,8 @@
     customPage: ({ id }) => customPageService.loadCustomPagesService({ id })
   }
 
-  // Per-resource versions are intentionally NOT shown: the /workload/deployments
-  // API does not return them yet. Surface a real version here once it does — never
-  // a fabricated placeholder.
   const LONG_NAME_THRESHOLD = 22
 
-  // nested cache: { [key]: { [id]: name } }
   const nameMap = ref({})
 
   const resolveName = async (key, id) => {
@@ -44,7 +38,7 @@
         [key]: { ...(nameMap.value[key] || {}), [id]: name }
       }
     } catch {
-      // non-blocking — fall back to id when display
+      // Leave the raw id visible rather than blocking on a failed lookup.
     }
   }
 

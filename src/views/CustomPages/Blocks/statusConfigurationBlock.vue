@@ -40,8 +40,6 @@
   import { useVersionContext } from '@/composables/versioning/use-version-context'
   import { computed } from 'vue'
 
-  // readOnly defaults to false outside the VersionShell; immutable versions disable
-  // the editable Page Code dropdown.
   const { readOnly } = useVersionContext()
 
   const listTypes = [

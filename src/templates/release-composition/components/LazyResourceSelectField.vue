@@ -1,9 +1,4 @@
 <script setup>
-  /**
-   * LazyResourceSelectField — server-paginated, server-searched resource picker.
-   * `service({ page, pageSize, search, ordering }) => { body, count }`;
-   * `loadService(id) => { id, name }` resolves a pre-selected value beyond page 1.
-   */
   import { computed, onMounted, ref, watch } from 'vue'
   import { watchDebounced } from '@vueuse/core'
   import Dropdown from 'primevue/dropdown'
@@ -53,22 +48,14 @@
   const SEARCH_DEBOUNCE = 500
   const SEARCH_MAX_WAIT = 1000
   const MIN_SEARCH_LENGTH = 3
-  // Prefetch the next page once the user scrolls past this fraction of the loaded
-  // items (before the end), silently, so the data is usually ready before they
-  // reach the bottom.
   const LOAD_MORE_THRESHOLD_RATIO = 0.7
 
   const data = ref([])
   const page = ref(INITIAL_PAGE)
   const totalCount = ref(0)
   const search = ref('')
-  // `loading`: initial/search load (list is empty). `loadingMore`: next-page
-  // append in flight — the loaded list stays visible; a loading row shows at the
-  // end ONLY if the user has scrolled to it (see `showLoadingRow`).
   const loading = ref(false)
   const loadingMore = ref(false)
-  // Last item index the virtual scroller reported as visible; used to tell whether
-  // the user has actually reached the end of the loaded list.
   const lastVisibleIndex = ref(-1)
 
   const toText = (name) => (name && typeof name === 'object' ? (name.text ?? '') : (name ?? ''))
@@ -81,8 +68,6 @@
   const fetchData = async (currentPage = INITIAL_PAGE) => {
     if (!props.service) return
     const isFirstPage = currentPage === INITIAL_PAGE
-    // First page clears + shows the empty/loading state; a next page keeps the
-    // current list on screen and only flags the footer spinner.
     if (isFirstPage) {
       loading.value = true
       data.value = []
@@ -101,8 +86,6 @@
       if (isFirstPage) {
         data.value = results
       } else {
-        // Append below the last item of the previous page (deduped) so the
-        // current view never shifts.
         const seen = new Set(data.value.map((option) => String(option.value)))
         data.value = [...data.value, ...results.filter((option) => !seen.has(String(option.value)))]
       }
@@ -117,8 +100,6 @@
 
   const handleLazyLoad = async (event) => {
     const { last } = event
-    // Track scroll position on every range change (even when we don't fetch) so
-    // `showLoadingRow` knows when the user is actually at the end.
     lastVisibleIndex.value = last
     const numberOfPages = Math.ceil(totalCount.value / PAGE_SIZE)
     const reachedThreshold = last >= data.value.length * LOAD_MORE_THRESHOLD_RATIO
@@ -128,9 +109,6 @@
     }
   }
 
-  // The loading row is a bottom-of-list item shown ONLY when the user reached the
-  // end of the loaded items and the next page is still loading; it is replaced by
-  // the appended items once they arrive (`loadingMore` clears / the list grows).
   const showLoadingRow = computed(
     () => loadingMore.value && lastVisibleIndex.value >= data.value.length - 1
   )
@@ -171,9 +149,6 @@
 
   onMounted(() => fetchData(INITIAL_PAGE))
 
-  // No `showLoader`/`loading` here: the built-in loader replaces the rows with
-  // skeletons. Next-page progress is shown as a loading row at the end of the
-  // list instead, keeping the loaded list on screen while the append happens.
   const VIRTUAL_SCROLLER_OPTIONS = {
     lazy: true,
     onLazyLoad: handleLazyLoad,
@@ -278,8 +253,6 @@
     border-color: var(--surface-border) !important;
   }
 
-  /* Match the webkit ResourceVersionField dropdown (h-10 / 40px) so the Resource
-     and Version selectors line up — mirrors CanaryStrategyField's normalization. */
   :deep(.release-composition-control.p-dropdown) {
     height: 40px;
     min-height: 40px;

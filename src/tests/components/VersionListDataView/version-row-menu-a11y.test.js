@@ -5,15 +5,6 @@ import { WebkitPlugin } from '@aziontech/webkit/plugin'
 import VersionListDataView from '@/components/VersionListDataView/index.vue'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 
-/**
- * Task 5.3 — UI/a11y of the VersionListDataView kebab. Unlike task 5.1/5.2
- * (model-level, stubbed Menu), these mount the REAL webkit/PrimeVue popup via
- * WebkitPlugin and assert on the rendered DOM: Property P5 (only DS tokens +
- * appendTo=body), keyboard navigation, accessible disabled items, and that the
- * panel renders above a drawer (Req 8.5). _Requirements: 8.5, 8.6, NFR-A.1_
- */
-
-// DataView stub: render the #list slot once per item so a row + kebab exist.
 const DataViewStub = {
   name: 'DataView',
   props: ['value'],
@@ -24,8 +15,6 @@ const DataViewStub = {
 const COLUMNS = [{ key: 'version', label: 'Version' }]
 const PANEL = '.version-row-menu'
 
-// Mounts the SFC with the real popup machinery (PrimeVue config + tooltip from
-// WebkitPlugin), opens the row kebab, and returns the teleported panel element.
 const openRealMenu = async (state) => {
   const version = { id: 'v-x', state }
   const wrapper = mount(VersionListDataView, {
@@ -48,7 +37,6 @@ const openRealMenu = async (state) => {
 }
 
 afterEach(() => {
-  // Popups teleport to body; clear any leftover panel between tests.
   document.querySelectorAll(PANEL).forEach((node) => node.remove())
 })
 
@@ -57,7 +45,6 @@ describe('VersionListDataView kebab — Property P5: DS tokens only + appendTo=b
     const { wrapper, panel } = await openRealMenu(VERSION_STATES.READY)
     expect(panel).not.toBeNull()
     expect(document.body.contains(panel)).toBe(true)
-    // Escaping the SFC subtree is what lets it stack over a drawer (Req 8.5).
     expect(wrapper.element.contains(panel)).toBe(false)
     expect(wrapper.findComponent({ name: 'Menu' }).props('appendTo')).toBe('body')
     wrapper.unmount()
@@ -66,7 +53,6 @@ describe('VersionListDataView kebab — Property P5: DS tokens only + appendTo=b
   it('carries no hardcoded hex/rgb colors in the rendered markup', async () => {
     const { wrapper, panel } = await openRealMenu(VERSION_STATES.READY)
     const html = panel.outerHTML
-    // No raw color literals — color comes from DS tokens in the stylesheet.
     expect(html.match(/#[0-9a-fA-F]{3,8}\b/g)).toBeNull()
     expect(html).not.toMatch(/rgba?\(/)
     wrapper.unmount()
@@ -117,7 +103,6 @@ describe('VersionListDataView kebab — accessible disabled items (task 5.3)', (
     const rollback = items.find((node) => node.textContent.includes('Rollback'))
     expect(rollback.classList.contains('p-disabled')).toBe(true)
     expect(rollback.getAttribute('aria-disabled')).toBe('true')
-    // Disabled means present-but-blocked, never removed (never-hide pattern).
     expect(items).toHaveLength(7)
     wrapper.unmount()
   })
@@ -131,7 +116,6 @@ describe('VersionListDataView kebab — accessible disabled items (task 5.3)', (
     expect(disabledLabels).toEqual(
       expect.arrayContaining(['Promote version', 'Rollback to this version', 'Archive'])
     )
-    // Open configuration stays enabled in every state.
     const open = items.find((node) => node.textContent.includes('Open configuration'))
     expect(open.getAttribute('aria-disabled')).not.toBe('true')
     wrapper.unmount()
@@ -180,7 +164,6 @@ describe('VersionListDataView kebab — renders above a drawer (task 5.3 / Req 8
   let drawer
 
   beforeEach(() => {
-    // A drawer establishes its own stacking/overflow context on the page.
     drawer = document.createElement('div')
     drawer.className = 'p-sidebar p-component'
     drawer.style.zIndex = '1101'
@@ -194,10 +177,8 @@ describe('VersionListDataView kebab — renders above a drawer (task 5.3 / Req 8
 
   it('teleports the overlay panel to body so the drawer cannot clip or trap it', async () => {
     const { wrapper, panel } = await openRealMenu(VERSION_STATES.READY)
-    // Panel is a body-level overlay, never nested inside the drawer subtree.
     expect(document.body.contains(panel)).toBe(true)
     expect(drawer.contains(panel)).toBe(false)
-    // The overlay class is what the DS theme z-indexes above drawers.
     expect(panel.classList.contains('p-menu-overlay')).toBe(true)
     wrapper.unmount()
   })

@@ -16,8 +16,6 @@ const firstPageBody = () =>
         : []
   }))
 
-// vue-query's suspense() resolves to the QueryObserverResult, so the service
-// payload ({ body, count }) is nested under `.data` — mirror that here.
 const workloadsFirstPageQuery = () => ({
   suspense: async () => ({ data: { body: firstPageBody(), count: TOTAL_COUNT } })
 })
@@ -54,8 +52,6 @@ describe('releaseImpactLookupService.getReverseLookup — fan-out concurrency (P
     expect(pagesSeen).toHaveLength(FANOUT_PAGES)
     expect(maxInFlight).toBeGreaterThan(1)
     expect(maxInFlight).toBeLessThanOrEqual(3)
-    // Regression guard: the first-page payload must be read from `.data.body`,
-    // so the active workload's binding lands in the index (not an empty index).
     expect(result.index['dep-1']).toHaveLength(1)
   })
 

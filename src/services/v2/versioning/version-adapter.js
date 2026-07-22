@@ -1,15 +1,3 @@
-// Shared version adapter: common normalization + payload logic. Each resource
-// passes only its exceptions (`normalizeConfig`, `mapResourceFields`). Version
-// identity is `version_id` (per-version ULID), kept in one place to avoid drift.
-//
-// `stripUndefinedDeep` scrubs `undefined` at EVERY depth before the payload hits
-// the wire (JSON.stringify turns an in-array `undefined` into `null`, which the
-// API reads as an explicit value). It recurses into arrays too: `undefined`
-// entries are dropped and each surviving item is cleaned recursively (objects
-// inside arrays have their `undefined` fields removed). `null` is a legitimate
-// value and is always preserved. An empty array stays an empty array; only
-// OBJECTS that become empty after stripping collapse to `undefined`.
-
 export const stripUndefinedDeep = (obj) => {
   if (obj === undefined) return undefined
   if (obj === null || typeof obj !== 'object') return obj
@@ -34,13 +22,8 @@ const isDefined = (value) => value !== undefined && value !== null
 export const createVersionAdapter = ({ normalizeConfig, mapResourceFields, mapMeta } = {}) => {
   const toConfig = typeof normalizeConfig === 'function' ? normalizeConfig : () => ({})
   const toFields = typeof mapResourceFields === 'function' ? mapResourceFields : () => ({})
-  // `mapMeta` lets a resource add extra meta fields (e.g. deploymentId); without it
-  // the output is byte-identical to the base meta.
   const toMeta = typeof mapMeta === 'function' ? mapMeta : null
 
-  // v6 endpoints may wrap version fields under `meta`; list/flat payloads keep them
-  // at the root. `meta.*` wins, then the flat keys (where `version_state` precedes
-  // `state`). `id` is the version's `version_id`, NOT the base resource id.
   const normalizeVersion = (raw) => {
     if (!raw || typeof raw !== 'object') return raw
     const meta = raw.meta && typeof raw.meta === 'object' ? raw.meta : null
@@ -56,7 +39,6 @@ export const createVersionAdapter = ({ normalizeConfig, mapResourceFields, mapMe
         meta?.last_modified ?? raw.last_modified ?? raw.ready_at ?? raw.created_at ?? null,
       lastEditor: meta?.last_editor ?? raw.last_editor ?? null,
       sourceVersionId: meta?.source_version_id ?? raw.source_version_id ?? null,
-      // Informative only; null when the API omits it (e.g. Network List / WAF).
       referenceCount: meta?.reference_count ?? raw.reference_count ?? null
     }
 

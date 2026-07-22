@@ -3,15 +3,6 @@ import { setFeatureFlags } from '@/composables/user-flag'
 import { SUPPORTED_VERSIONS } from '@/helpers'
 import { WorkloadVersionAdapter } from '@/services/v2/workload/workload-version-adapter'
 
-// The sibling `workload-version-adapter.test.js` stubs the WorkloadAdapter base so
-// it can isolate the version adapter's own glue. This suite is the complement: it
-// runs the version adapter against the REAL WorkloadAdapter (no vi.mock anywhere),
-// so the actual create/load transforms are exercised end-to-end through
-// transformDraftPayload / normalizeConfig. The v6 flag is pinned via the repo's own
-// `setFeatureFlags` mechanism (not a module mock); legacy is the default surface.
-
-// A realistic workload edit form (legacy configuration surface: flat domains, no
-// bindings). transformCreateWorkload reads every one of these fields.
 const makeFormValues = (overrides = {}) => ({
   name: 'my-workload',
   active: true,
@@ -34,8 +25,6 @@ const makeFormValues = (overrides = {}) => ({
   ...overrides
 })
 
-// A full API detail snapshot (has protocols/tls/mtls, so normalizeConfig runs the
-// real transformLoadWorkload) plus the workload-only meta fields.
 const makeSnapshot = (overrides = {}) => ({
   version_id: 'AY2JRCD3',
   version: 3,
@@ -58,7 +47,7 @@ const makeSnapshot = (overrides = {}) => ({
 })
 
 beforeEach(() => {
-  setFeatureFlags([]) // legacy configuration surface
+  setFeatureFlags([])
 })
 
 afterEach(() => {
@@ -111,8 +100,6 @@ describe('WorkloadVersionAdapter.transformLoadVersion — normalizeConfig (real 
   it('runs the real transformLoadWorkload on a full snapshot and returns the UI form shape', () => {
     const { config } = WorkloadVersionAdapter.transformLoadVersion(makeSnapshot())
 
-    // Markers that only the REAL transformLoadWorkload can produce (the stub used
-    // by the sibling suite would return `{ loadedFrom: ... }` instead).
     expect(config).toMatchObject({
       id: 42,
       name: 'prod-workload',

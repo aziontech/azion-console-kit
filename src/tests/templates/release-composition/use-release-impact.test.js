@@ -2,37 +2,18 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { flushPromises } from '@vue/test-utils'
 
-// Unit test for the `useReleaseImpact` composable (spec task 6.2).
-//
-// The composable takes `lookupService` as a FACTORY ARGUMENT with a production
-// default (design §3.1 / §11), so these tests inject a FAKE exposing the same
-// `getReverseLookup` contract — no `provide/inject`, no module mocking, no IO.
-// Every assertion drives only the injected fake; the real lookup service (and
-// therefore vue-query / the tenant services) is never touched.
-//
-// Covers:
-//   - legacy tenant (empty index after a successful load) => degradationReason
-//     === 'legacy_no_bindings' (req 3.5, 11.2).
-//   - dsMetaFor omits any field it cannot derive (req 3.6, 7.3).
-//   - retry() re-triggers the lookup (req 7.4).
-
 import {
   useReleaseImpact,
   DEGRADATION_REASON
 } from '@/templates/release-composition/use-release-impact'
 
-// A fake lookup service whose `getReverseLookup` resolves to the supplied
-// result. The mock fn is exposed so tests can assert call counts (retry) and
-// queue distinct results per call (initial vs retry).
 const fakeLookupService = (...results) => {
   const getReverseLookup = vi.fn()
   results.forEach((result) => getReverseLookup.mockResolvedValueOnce(result))
-  // Anything beyond the queued results resolves to an empty, healthy index.
   getReverseLookup.mockResolvedValue({ index: {}, isPartial: false })
   return { getReverseLookup }
 }
 
-// A single reverse-lookup row as `buildReverseLookupByDs` emits it (design §3.2).
 const row = (overrides = {}) => ({
   id: 'wl-1',
   name: 'Workload 1',
@@ -162,7 +143,6 @@ describe('useReleaseImpact - dsMetaFor omits unknown fields', () => {
 
 describe('useReleaseImpact - retry re-triggers the lookup', () => {
   it('re-invokes the lookup service and republishes the fresh index', async () => {
-    // 1st call (initial): a fetch failure. 2nd call (retry): a healthy index.
     const lookupService = {
       getReverseLookup: vi
         .fn()
@@ -173,12 +153,10 @@ describe('useReleaseImpact - retry re-triggers the lookup', () => {
     const { degradationReason, reverseLookupByDs, retry } = useReleaseImpact({ lookupService })
     await flushPromises()
 
-    // After the initial (failed) lookup.
     expect(lookupService.getReverseLookup).toHaveBeenCalledTimes(1)
     expect(degradationReason.value).toBe(DEGRADATION_REASON.FETCH_FAILED)
     expect(reverseLookupByDs.value).toEqual({})
 
-    // Retry re-triggers the lookup and clears the failure.
     await retry()
 
     expect(lookupService.getReverseLookup).toHaveBeenCalledTimes(2)

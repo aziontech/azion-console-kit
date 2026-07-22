@@ -2,9 +2,6 @@ import * as yup from 'yup'
 import { deploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
 import { buildStrategy } from '@/services/v2/deployment/strategy-builder'
 
-// Re-exported for backward compatibility; `buildStrategy` now lives in the
-// shared `strategy-builder` util (B2) so services can consume it without
-// importing from `views/`.
 export { buildStrategy }
 
 export const ROLLOUT_MODE_OPTIONS = [

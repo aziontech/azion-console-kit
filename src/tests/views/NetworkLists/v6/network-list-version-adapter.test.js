@@ -12,12 +12,6 @@ import {
 } from '@/composables/versioning/use-version-command-bus'
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 
-// Task 6.4 (optional): NetworkListVersionAdapter is a thin child that delegates
-// the whole version lifecycle to useVersionFormAdapter. The REAL networkListVersionService
-// runs; only the HTTP client and the query cache are stubbed. We assert the framework
-// contract a new atomic resource must honor via the HTTP request the chain drives:
-// SAVE invalid never writes, read-only propagates to the form, and NEW_DRAFT_FROM clones.
-
 import NetworkListVersionAdapter from '@/views/NetworkLists/v6/NetworkListVersionAdapter.vue'
 
 const NL_URL = 'v4/workspace/network_lists/10/versions/v1'
@@ -28,8 +22,6 @@ const countReq = (method, urlPart) =>
     .map(([req]) => req)
     .filter((req) => req.method === method && req.url.includes(urlPart)).length
 
-// Satisfies the real Network List schema: name required; ip_cidr requires a
-// non-empty itemsValues with no blank lines.
 const VALID_RESOURCE = {
   name: 'my-list',
   networkListType: 'ip_cidr',
@@ -62,8 +54,6 @@ const mountAdapter = ({ bus, resource = VALID_RESOURCE, context = makeContext(),
 beforeEach(() => {
   vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
   vi.spyOn(queryClient, 'invalidateQueries').mockImplementation(() => {})
-  // Metadata-only snapshot (no `type`) so the adapter's config normalizer no-ops;
-  // the response body is not asserted, only the request the chain drives.
   requestSpy = vi
     .spyOn(httpService, 'request')
     .mockResolvedValue({ data: { version_id: 'v2', state: 'draft' } })
@@ -104,7 +94,6 @@ describe('NetworkListVersionAdapter — thin adapter delegating to useVersionFor
 
   it('SAVE with invalid form rejects and never issues a write request', async () => {
     const bus = createVersionCommandBus()
-    // `name` is required by the Network List schema; an empty value fails validation.
     mountAdapter({ bus, resource: { ...VALID_RESOURCE, name: '' } })
     await flushPromises()
 
@@ -128,7 +117,6 @@ describe('NetworkListVersionAdapter — thin adapter delegating to useVersionFor
       url: 'v4/workspace/network_lists/10/versions',
       body: expect.objectContaining({ source_version: 'v1', comment: 'clone' })
     })
-    // The service returns the adapter-normalized version (id at the root), not raw.
     expect(draft.id).toBe('v2')
   })
 
@@ -157,8 +145,6 @@ describe('NetworkListVersionAdapter — thin adapter delegating to useVersionFor
 })
 
 describe('NetworkListVersionAdapter — read-only disables the form in an immutable state', () => {
-  // The form fields read the shared version context for `:disabled`. Render a stub
-  // that mirrors the real block contract through the adapter slot.
   const NameFieldStub = defineComponent({
     name: 'name-field',
     inject: { versionCtx: { from: VERSION_CONTEXT_KEY } },
@@ -200,9 +186,6 @@ describe('NetworkListVersionAdapter — read-only disables the form in an immuta
   })
 })
 
-// Property P4 (structural, build-breaking): the version adapter is thin and owns
-// no lifecycle wiring of its own. Mirrors the EdgeConnectors reference suite so a
-// new atomic resource can't drift into a fat adapter or inline bus handlers.
 describe('NetworkListVersionAdapter — thin (source-level P4 contract)', () => {
   const __dirname = dirname(fileURLToPath(import.meta.url))
   const adapterPath = resolve(

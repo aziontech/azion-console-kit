@@ -6,17 +6,11 @@ import FormFieldsEditNetworkLists from '@/views/NetworkLists/FormFields/FormFiel
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 import { createFormHarness } from '@/tests/kit/vee-validate-setup'
 
-// Task 6.3 (Property P6): the Network List form honors read-only in immutable
-// version states (:disabled from useVersionContext().readOnly), and stays
-// editable for the non-versioned create/edit forms (default readOnly=false).
-
 const NAME_FIELD = 'network-list-form__name'
 const ASN_FIELD = 'network-list-form__asn-list'
 const IPCIDR_FIELD = 'network-list-form__ipcidr-list'
 const COUNTRIES_FIELD = 'network-list-form__countries__multiselect'
 
-// Stubs surface the resolved `disabled` so we assert the read-only contract
-// without the real webkit stack. The blocks pass data-testid through.
 const FieldTextStub = defineComponent({
   props: { name: String, disabled: Boolean },
   template: '<input :data-disabled="String(disabled)" />'

@@ -1,12 +1,4 @@
 <script setup>
-  /**
-   * ImpactedWorkloadsPanel — read-only impact-radius warning for the
-   * deployment-anchored deploy flow. Fixed-footprint, 3-layer progressive
-   * disclosure: constant-height summary → clickable environment pills that filter
-   * the list → collapsible scrollable list grouped by environment with a name
-   * search. Dumb/presentational: `workloads` arrive already derived
-   * (`{ id, name, environments: [name] }`).
-   */
   import { computed, ref, watch } from 'vue'
   import LabelBlock from '@aziontech/webkit/label'
   import InputText from '@aziontech/webkit/inputtext'
@@ -58,8 +50,6 @@
 
   const expanded = ref(resolveExpanded(props.count))
 
-  // Until the user decides, the list auto-follows the threshold as the count
-  // resolves (the drawer's queries land after the panel mounts).
   watch(
     () => props.count,
     (count) => {
@@ -220,7 +210,7 @@
               class="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs transition-colors"
               :class="
                 activeEnv === ALL
-                  ? 'impacted-pill--active border-[var(--primary-color)] text-[var(--primary-color)]'
+                  ? 'bg-[color-mix(in_srgb,var(--primary-color)_14%,transparent)] border-[var(--primary-color)] text-[var(--primary-color)]'
                   : 'border-[var(--surface-border)] bg-[var(--surface-section)] text-[var(--text-color-secondary)] hover:text-[var(--text-color)]'
               "
               data-testid="deploy-drawer__impacted-workloads-pill-all"
@@ -247,7 +237,7 @@
               class="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs transition-colors"
               :class="
                 activeEnv === entry.environment
-                  ? 'impacted-pill--active border-[var(--primary-color)] text-[var(--primary-color)]'
+                  ? 'bg-[color-mix(in_srgb,var(--primary-color)_14%,transparent)] border-[var(--primary-color)] text-[var(--primary-color)]'
                   : 'border-[var(--surface-border)] bg-[var(--surface-section)] text-[var(--text-color-secondary)] hover:text-[var(--text-color)]'
               "
               :data-testid="`deploy-drawer__impacted-workloads-pill-${entry.environment}`"
@@ -341,9 +331,3 @@
     </template>
   </div>
 </template>
-
-<style scoped>
-  .impacted-pill--active {
-    background: color-mix(in srgb, var(--primary-color) 14%, transparent);
-  }
-</style>

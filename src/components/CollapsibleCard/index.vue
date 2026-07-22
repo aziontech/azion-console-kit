@@ -102,11 +102,11 @@
 
     <div
       v-if="!disableToggle"
-      class="collapsible-panel"
-      :class="{ 'is-expanded': isExpanded }"
+      class="grid transition-[grid-template-rows,opacity] duration-200 ease-in-out"
+      :class="isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'"
       :aria-hidden="!isExpanded"
     >
-      <div class="collapsible-panel__inner">
+      <div class="min-h-0 overflow-hidden">
         <div class="flex flex-col">
           <slot />
           <div
@@ -120,22 +120,3 @@
     </div>
   </div>
 </template>
-
-<style scoped>
-  .collapsible-panel {
-    display: grid;
-    grid-template-rows: 0fr;
-    opacity: 0;
-    transition:
-      grid-template-rows 0.2s ease,
-      opacity 0.2s ease;
-  }
-  .collapsible-panel.is-expanded {
-    grid-template-rows: 1fr;
-    opacity: 1;
-  }
-  .collapsible-panel__inner {
-    min-height: 0;
-    overflow: hidden;
-  }
-</style>

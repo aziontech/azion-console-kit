@@ -1,10 +1,6 @@
 import { describe, it, expect } from 'vitest'
-// The schemas live in the repo-root `tests/contracts` tree (consumer + drift
-// share them); the unit runner only includes `src/tests`, so import across.
 import { contractSchemas } from '../../../tests/contracts/schemas'
 
-// Minimal valid fixtures: just the envelope invariants the front depends on
-// (identity + a valid state). Deployment keys identity off `id`, not version_id.
 const validFixtures = {
   application: { version_id: 'AVAPP01', state: 'draft' },
   workload: { version_id: 'AVWKL01', state: 'ready' },

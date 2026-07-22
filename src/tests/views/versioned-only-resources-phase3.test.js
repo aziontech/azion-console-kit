@@ -2,17 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { ref } from 'vue'
 
-/**
- * Task 7.5 — Phase 3: per-resource end-to-end wiring. Each of the three
- * versioned-only resources (function/network_list/waf) declares its
- * `resourceType` so the SHARED shell resolves the versioned-only capability and
- * drops Deploy/Promote/Rollback; the listing shows Current + Active/Inactive; the
- * legacy path stays gated by the flag; and the release picker hides all three.
- * Requirements 1.5, 2.5, 2.7, 7.1, 7.4, 9.3, NFR-B.1.
- */
-
-// Webkit/Prime primitives the shell + list import → plain DOM so jsdom renders
-// and queries by data-testid resolve.
 vi.mock('@aziontech/webkit/progressspinner', () => ({
   default: { name: 'ProgressSpinner', template: '<div data-testid="spinner" />' }
 }))
@@ -35,9 +24,6 @@ vi.mock('@aziontech/webkit/prime-tag', () => ({
     template: '<span :data-value="value">{{ value }}</span>'
   }
 }))
-// ProcessingOverlay is the real versioning component: for the built states these
-// tests use (ready/active) it renders nothing (`v-if="isProcessing(state)"`), so
-// no stub is needed — mocking it would mask a regression in that guard.
 
 vi.mock('@/helpers/convert-date', () => ({
   formatExhibitionDate: () => 'Jan 1, 2026',
@@ -51,8 +37,6 @@ import VersionListDataView from '@/components/VersionListDataView'
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 import { VERSIONED_ONLY, getVersionCapability } from '@/composables/versioning/version-capability'
 
-// PrimeVue's paginator needs a config; the listing tests render the rows via a
-// DataView stub (the #list slot per item) so jsdom never hits the paginator.
 const DataViewStub = {
   name: 'DataView',
   props: ['value'],
@@ -67,12 +51,8 @@ const mountList = (props) =>
     global: { plugins: [WebkitPlugin], stubs: { DataView: DataViewStub } }
   })
 
-// The three resources reclassified to versioned-only, by the exact `resourceType`
-// string their v6 views declare to the shell/list (req 1.5).
 const VERSIONED_ONLY_RESOURCES = ['function', 'network_list', 'waf']
 
-// Read-only built states where Deploy/Redeploy would otherwise appear for a
-// deployable resource (the regression surface we must keep clean).
 const BUILT_STATES = ['ready', 'active']
 
 const makeVersionQueryFactory =
@@ -83,8 +63,6 @@ const makeVersionQueryFactory =
     isError: ref(false)
   })
 
-// Mounts the SHARED shell exactly as the per-resource VersionEditorTabs do:
-// only `resourceType` distinguishes them — no per-resource fork.
 const mountShellFor = (resourceType, state = 'ready') =>
   mount(VersionShell, {
     attachTo: document.body,
@@ -97,7 +75,6 @@ const mountShellFor = (resourceType, state = 'ready') =>
   })
 
 beforeEach(() => {
-  // Footer + heading teleport to these targets — provide them in the document.
   for (const id of ['action-bar', 'version-lifecycle-action']) {
     const target = document.createElement('div')
     target.id = id
@@ -113,10 +90,8 @@ describe('Phase 3 — shell resolves versioned-only from each resourceType (Req 
   it.each(VERSIONED_ONLY_RESOURCES)(
     '"%s" provides the versioned-only capability in the version context',
     async (resourceType) => {
-      // The resolved capability is the single source the in-shell surfaces read.
       expect(getVersionCapability(resourceType)).toBe(VERSIONED_ONLY)
 
-      // Prove the shell actually wires it: a probe child reads the provided ctx.
       let captured = null
       const Probe = {
         name: 'CapabilityProbe',
@@ -153,7 +128,6 @@ describe('Phase 3 — no Deploy in the footer for any versioned-only resource (R
       const footer = document.querySelector('[data-testid="version-action-bar"]')
       expect(footer).not.toBeNull()
       expect(document.querySelector('[data-testid="version-action-bar__action-DEPLOY"]')).toBeNull()
-      // The "New Version" affordance stays — only Deploy is gone.
       expect(footer.textContent).not.toContain('deploy it to go live')
     }
   )
@@ -174,7 +148,6 @@ describe('Phase 3 — no Deploy button in the heading for versioned-only (Req 2.
   it.each(VERSIONED_ONLY_RESOURCES)('"%s" heading shows no Deploy button', async (resourceType) => {
     mount(VersionHeadingActions, {
       attachTo: document.body,
-      // resource-context is null by design for versioned-only views.
       props: { resourceContext: null },
       global: {
         provide: { [VERSION_CONTEXT_KEY]: makeCtx(getVersionCapability(resourceType), 'ready') }
@@ -203,7 +176,6 @@ describe('Phase 3 — row menu drops Promote/Rollback for each resource (Req 2.2
     })
     await wrapper.find('[data-testid="version-list-data-view__row-v1__menu"]').trigger('click')
     await flushPromises()
-    // The shared Menu renders the model; read labels from the popup in the body.
     document
       .querySelectorAll('.version-row-menu__label')
       .forEach((el) => captured.push(el.textContent.trim()))
@@ -257,7 +229,6 @@ describe('Phase 3 — listing shows Current and the informative In use column (R
   })
 
   it('auto-hides the optional In use column for NL/WAF (no referenceCount) (req 5.4)', () => {
-    // No referenceCount on any row → optional column with no data hides.
     const wrapper = mountList({
       items: [{ id: 'v1', state: 'ready' }],
       columns: [
@@ -275,7 +246,6 @@ describe('Phase 3 — listing shows Current and the informative In use column (R
 })
 
 describe('Phase 3 — release picker hides all three versioned-only resources (Req 2.7)', () => {
-  // The picker drops a type when its capability cannot deploy.
   it.each(VERSIONED_ONLY_RESOURCES)('"%s" is not selectable (canDeploy false)', (resourceType) => {
     expect(getVersionCapability(resourceType).canDeploy).toBe(false)
   })

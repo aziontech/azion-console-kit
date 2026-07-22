@@ -6,36 +6,14 @@ import {
 } from '@/tests/support/versioning/boundaries'
 
 /**
- * Shared behavioral contract for a versioned SUB-RESOURCE service — the CRUDL
- * surface produced by `createVersionedSubResourceService`
- * (`src/services/v2/edge-app/versioned/create-versioned-sub-resource-service.js`).
- *
- * Every factory sub-resource inherits the same shape: version-scoped URLs
- * (`{baseURL}/{rid}/versions/{vid}/{path}`), adapter-normalized reads, and
- * mutations that invalidate a `queryKeyGroup.all(rid, vid)` cache entry. This
- * suite proves that inherited contract ONCE, parametrized by a descriptor, and
- * runs the REAL service against the kit boundaries only (HTTP client + the
- * shared `queryClient` — never the versioning code under test).
- *
- * The heart of the suite is the SCOPE isolation test: a mutation on (A, v1)
- * must invalidate ONLY (A, v1) — never (A, v2) nor (B, v1). That is the proof
- * of the sub-resource's version isolation.
- *
- * Titles are prefixed with owner/sub-resource so a failure names it and the
- * per-owner instantiation file anchors the stack trace.
- *
- * The `key`, `service`, `path`, `queryKeyGroup`, `idKey` and `buildPayload` fields
- * come straight from a `RESOURCE_TEST_REGISTRY[owner].subresources` entry (spread
- * into this call), so the instantiation file adds only `ownerLabel`.
- *
- * @param {object}   args
- * @param {string}   args.ownerLabel     Parent resource label (e.g. 'edge-app').
- * @param {string}   args.key            Sub-resource label (e.g. 'cacheSettings').
- * @param {() => object} args.service    Getter for the sub-resource service singleton.
- * @param {string}   args.path           API path segment (e.g. 'cache_settings').
- * @param {object}   args.queryKeyGroup  Versioned query-key group with `all`/`list`/`detail`.
- * @param {string}   [args.idKey='id']   Key under which `create` returns the new id.
- * @param {() => object} args.buildPayload Factory for a create/edit payload the adapter accepts.
+ * @param {object} args
+ * @param {string} args.ownerLabel
+ * @param {string} args.key
+ * @param {() => object} args.service
+ * @param {string} args.path
+ * @param {object} args.queryKeyGroup
+ * @param {string} [args.idKey='id']
+ * @param {() => object} args.buildPayload
  */
 export const describeVersionedSubresourceCrud = ({
   ownerLabel,
@@ -73,8 +51,6 @@ export const describeVersionedSubresourceCrud = ({
     })
 
     describe('list', () => {
-      // A row rich enough that every sub-resource adapter's list transform runs
-      // without throwing (conditions[] for WAF, a valid date for name enrichment).
       const rawResults = [
         {
           id: 1,
@@ -98,7 +74,6 @@ export const describeVersionedSubresourceCrud = ({
           url: urlFor(RID_A, VID_1),
           params: expect.objectContaining({ page: 1 })
         })
-        // No filter/search → the read is served through the shared query cache.
         expect(cache.ensureQueryData).toHaveBeenCalled()
         expect(result.count).toBe(1)
         if (listSpy) {
@@ -167,7 +142,6 @@ export const describeVersionedSubresourceCrud = ({
           body: expectedBody
         })
         expect(cache.removeQueries).toHaveBeenCalledWith(allKey(RID_A, VID_1))
-        // Exact drawer-compatible shape: only the id (under idKey) + a feedback string.
         expect(result).toEqual({ [idKey]: CREATED_ID, feedback: expect.any(String) })
         expect(result.feedback.length).toBeGreaterThan(0)
         if (svc.createdMessage) {
@@ -230,9 +204,6 @@ export const describeVersionedSubresourceCrud = ({
 
         const scopedKey = queryKeyGroup.all(RID_A, VID_1)
         expect(cache.removeQueries).toHaveBeenCalledWith({ queryKey: scopedKey })
-        // The invalidation key encodes BOTH rid and vid, so it can never collide
-        // with a sibling version of the same resource, nor the same version of
-        // another resource — the essence of sub-resource version isolation.
         expect(scopedKey).not.toEqual(queryKeyGroup.all(RID_A, VID_2))
         expect(scopedKey).not.toEqual(queryKeyGroup.all(RID_B, VID_1))
         expect(cache.removeQueries).not.toHaveBeenCalledWith({

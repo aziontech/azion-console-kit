@@ -1,7 +1,5 @@
 import * as yup from 'yup'
 
-// Shared WAF Rule form schema. Single source of truth for the create/edit
-// forms and the VersionShell adapter (mirrors EdgeConnectors/Config/validation).
 const validationSchema = yup.object({
   name: yup.string().required(),
   sqlInjection: yup.boolean(),

@@ -11,22 +11,11 @@ import {
   isTypeOnlyImport
 } from '../../../../eslint/plugin/lib/utils/import-resolver.js'
 
-// Structural property checks for the version framework (tasks.md task 1.5).
-// P1: every *-version-service.js extends VersionServiceBase (not BaseService).
-// P2: no version adapter redefines stripUndefinedDeep / hand-rolls normalizeVersion.
-// P3: the services-http-only lint glob covers the version-service paths + an AST
-//     scan confirms no composable/store/DOM imports leak into them.
-
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const V2_ROOT = resolve(__dirname, '../../../services/v2')
 
-// Pre-hardening drift that later tasks remove. Each entry MUST cite the task that
-// dissolves it; delete the entry when that task lands (the test then enforces it).
-// Empty: deployment-version-service migrated to VersionServiceBase (task 4.1).
 const P1_PENDING_BASE = {}
 const P2_KNOWN_EXCEPTIONS = {
-  // deployment-version-adapter is bespoke by design (design §3.14): it normalizes
-  // resources[]/status/last_modified_by, a shape createVersionAdapter does not model.
   'deployment/deployment-version-adapter.js': 'design §3.14 (bespoke normalization)'
 }
 
@@ -52,7 +41,6 @@ const importSourcesOf = (code) =>
     .program.body.filter((node) => node.type === 'ImportDeclaration')
     .map((node) => node.source.value)
 
-// Reads the superclass name of the first exported class declaration in a module.
 const superclassOf = (code) => {
   const ast = parseModule(code)
   for (const node of ast.program.body) {
@@ -67,9 +55,6 @@ const superclassOf = (code) => {
 const serviceFiles = listFiles('-version-service.js')
 const adapterFiles = listFiles('-version-adapter.js')
 
-// Versioned sub-resource services live under */versioned/ and don't carry the
-// -version-service.js suffix, but are version-scoped mutators that must obey P3.
-// Drop the create-* factory (it's the shared builder, not a leaf service).
 const versionedSubResourceServiceFiles = listFiles('-service.js').filter(
   (file) =>
     file.includes(`${sep}versioned${sep}`) &&
@@ -78,8 +63,6 @@ const versionedSubResourceServiceFiles = listFiles('-service.js').filter(
 
 const httpOnlyServiceFiles = [...serviceFiles, ...versionedSubResourceServiceFiles].sort()
 
-// Resources whose version coverage is contractual, not incidental: a rename or a
-// move must fail this test, not silently drop the file from the data-driven globs.
 const REQUIRED_VERSION_SERVICES = [
   'network-lists/network-list-version-service.js',
   'waf/waf-version-service.js'
@@ -119,7 +102,6 @@ describe('versioning structural properties', () => {
       (key, file) => {
         const superclass = superclassOf(readFileSync(file, 'utf-8'))
         if (P1_PENDING_BASE[key]) {
-          // Documented pre-hardening drift: must NOT yet be VersionServiceBase.
           expect(
             superclass,
             `${key}: remove from P1_PENDING_BASE once ${P1_PENDING_BASE[key]} lands`
@@ -175,7 +157,6 @@ describe('versioning structural properties', () => {
   })
 
   describe('P3 — services-http-only covers version services', () => {
-    // The architecture eslint config (CJS) applies services-http-only to src/services/v2/**.
     const requireCjs = createRequire(import.meta.url)
     const archConfig = requireCjs('../../../../.eslintrc-architecture.cjs')
     const v2Override = archConfig.overrides.find((entry) =>

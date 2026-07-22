@@ -9,13 +9,6 @@ import {
 } from '@/composables/versioning/version-actions'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 
-/**
- * Phase 2 deferral guard (task 9.3). Locks the scope boundary of this phase:
- * Rollback stays always-disabled with a tooltip, no pre-emptive "in use as
- * Current" disabling of Archive/Delete leaks in, and no Current pill (env-driven)
- * was introduced. If Phase 2 lands, these guards are expected to be revisited.
- */
-
 const ALL_STATES = [...Object.values(VERSION_STATES), 'deleted', 'totally-unknown']
 const byAction = (items, action) => items.find((entry) => entry.action === action)
 
@@ -55,8 +48,6 @@ describe('Phase 2 deferral guard — Rollback stays disabled', () => {
 })
 
 describe('Phase 2 deferral guard — no pre-emptive "in use as Current" disabling', () => {
-  // Archive/Delete enablement is STATE-only; the backend is the authority on
-  // "in use". Passing isCurrentSomewhere/environments must NOT change the model.
   const ctxVariants = [
     { resourceType: 'application' },
     { resourceType: 'application', isCurrentSomewhere: true },
@@ -75,7 +66,6 @@ describe('Phase 2 deferral guard — no pre-emptive "in use as Current" disablin
     const baseline = byAction(buildVersionMenuItems(state, ctxVariants[0]), 'DELETE')
     ctxVariants.forEach((ctx) => {
       const deleteItem = byAction(buildVersionMenuItems(state, ctx), 'DELETE')
-      // Same presence and same enablement regardless of Current hints.
       expect(Boolean(deleteItem)).toBe(Boolean(baseline))
       if (baseline) expect(deleteItem.disabled).toBe(baseline.disabled)
     })

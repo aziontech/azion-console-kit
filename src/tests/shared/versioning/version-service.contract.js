@@ -13,18 +13,7 @@ import {
 } from '@/tests/support/versioning/boundaries'
 
 /**
- * Shared behavioral contract for a resource VERSION SERVICE.
- *
- * Every version service inherits its lifecycle endpoints + cache invalidation from
- * `VersionServiceBase`; this suite proves that inherited contract ONCE, parametrized
- * by a registry descriptor, running the REAL service against the HTTP + query-cache
- * boundaries only. Resource-specific divergences (workload rollback, deployment
- * envelope) are declared as descriptor flags — never as scattered if/else.
- *
- * Titles are prefixed with the resource so a failure names it and the per-resource
- * file that instantiated the suite anchors the stack trace.
- *
- * @param {object} descriptor resource descriptor from `RESOURCE_TEST_REGISTRY`
+ * @param {object} descriptor
  */
 export const describeVersionServiceContract = (descriptor) => {
   const RID = 'res-1'
@@ -50,8 +39,6 @@ export const describeVersionServiceContract = (descriptor) => {
       })
     })
 
-    // Deployment (wrapped envelope) overrides the query methods entirely; its reads
-    // are covered bespoke. The standard base reads are proven here for everyone else.
     if (descriptor.envelope === 'standard') {
       describe('reads normalize via the adapter', () => {
         it('fetchList GETs /versions and normalizes to { count, body } with config per item', async () => {

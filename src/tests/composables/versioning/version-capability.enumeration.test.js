@@ -11,27 +11,10 @@ import {
   getVersionCapability
 } from '@/composables/versioning/version-capability'
 
-/**
- * Property 1 (anti-regression) + Property 2 (fallback). Enumerates the 8 canonical
- * version states × {deployable, versioned-only} over `getAvailableActions` and
- * `buildVersionMenuItems`:
- *   - deployable keeps DEPLOY/PROMOTE/ROLLBACK exactly where they were today
- *     (byte-identical baseline — guards App/Firewall/Workload/Custom Page/Connector
- *     and legacy/v3 against regression);
- *   - versioned-only NEVER exposes DEPLOY/PROMOTE/ROLLBACK in any state.
- * The authoritative gating lives in the state machine (`getAvailableActions`);
- * the row menu is checked for the same invariant plus a stable deployable baseline.
- * _Requirements: 1.6, 7.5_
- */
-
-// The 8 canonical states (the enumeration axis for Property 1).
 const STATES = Object.values(VERSION_STATES)
 
-// Lifecycle actions a `versioned-only` resource must never surface.
 const GATED_ACTIONS = ['DEPLOY', 'PROMOTE', 'ROLLBACK']
 
-// Pinned deployable baseline: a copy of the current state→actions matrix. If the
-// shared machine regresses for deployable resources, this comparison fails.
 const DEPLOYABLE_BASELINE = {
   draft: ['SAVE', 'SAVE_AND_BUILD', 'NEW_DRAFT_FROM', 'DELETE'],
   queued: ['CANCEL_BUILD'],
@@ -85,7 +68,6 @@ describe('getAvailableActions — Property 1: versioned-only never exposes gated
 })
 
 describe('buildVersionMenuItems — Property 1: deployable menu baseline never regresses', () => {
-  // Stable per-state action order for deployable resources (current shared model).
   const MENU_BASELINE = [
     'OPEN_CONFIGURATION',
     'BUILD',
@@ -109,9 +91,6 @@ describe('buildVersionMenuItems — Property 1: deployable menu baseline never r
 })
 
 describe('buildVersionMenuItems — Property 1: DEPLOY row item gated by capability', () => {
-  // DEPLOY now surfaces in the deployable row menu (execution delegated to the
-  // shell) but is dropped entirely for versioned-only, mirroring PROMOTE/ROLLBACK.
-  // The authoritative state gate for the lifecycle action stays `getAvailableActions`.
   it.each(STATES)('state "%s" exposes no DEPLOY row item (versioned-only)', (state) => {
     const items = buildVersionMenuItems(state, { resourceType: 'function' }, VERSIONED_ONLY)
     expect(actionsOf(items)).not.toContain('DEPLOY')

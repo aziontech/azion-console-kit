@@ -1,7 +1,4 @@
 <script setup>
-  // v6 EditView — the Network List landing (Versions + Settings tabs), gated by
-  // `use_v6_configurations`. Logic lives in useResourceVersionLanding; chrome in
-  // ResourceVersionLanding. This view only wires the Network List config + tabs.
   import VersionsTab from '@/views/NetworkLists/v6/tabs/VersionsTab.vue'
   import ResourceVersionLanding from '@/templates/version-shell-block/ResourceVersionLanding.vue'
   import { useResourceVersionLanding } from '@/composables/versioning/use-resource-version-landing'

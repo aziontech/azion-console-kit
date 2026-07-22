@@ -1,12 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-/**
- * Backend-authority integration for the shared router (task 3.3). Unlike the
- * sibling spec, this does NOT mock use-version-row-actions: it routes ARCHIVE/
- * DELETE end-to-end through useVersionMenuActions so a backend "in use as
- * Current" rejection surfaces as an error toast via the real delegation path.
- */
-
 const toastAdd = vi.fn()
 vi.mock('@aziontech/webkit/use-toast', () => ({ useToast: () => ({ add: toastAdd }) }))
 

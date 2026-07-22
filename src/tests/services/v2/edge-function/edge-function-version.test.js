@@ -3,11 +3,6 @@ import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 import { describeVersionServiceContract } from '@/tests/shared/versioning/version-service.contract'
 import { describeVersionAdapterContract } from '@/tests/shared/versioning/version-adapter.contract'
 
-// Edge Function — registry-driven suite. The inherited service + shared adapter
-// contracts run from the descriptor (the fixture uses the legacy serializer keys,
-// so the shared config markers already prove coalescence of the happy path).
-// Bespoke below: the canonical-over-legacy precedence, the runtime→UI mapping and
-// the default_args JSON round-trip, which are genuinely Function-specific.
 const edgeFunction = RESOURCE_TEST_REGISTRY.function
 const adapter = edgeFunction.adapter
 

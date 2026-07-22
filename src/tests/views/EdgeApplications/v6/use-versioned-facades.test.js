@@ -6,20 +6,8 @@ import { versionedFunctionService } from '@/services/v2/edge-app/versioned/versi
 import { versionedRulesEngineService } from '@/services/v2/edge-app/versioned/versioned-rules-engine-service'
 import { useVersionedFacades } from '@/views/EdgeApplications/v6/tabs/use-versioned-facades'
 
-// The facades are Adapters: each pre-binds the (resourceId, versionId) pair and
-// delegates to the REAL versioned services. The regression that matters is the
-// ARGUMENT CONTRACT — order/shape of what reaches the underlying service, and the
-// consumer args the facade intentionally DROPS (the leading edgeApplicationId).
-//
-// So the underlying versioned services run for REAL; only their methods are spied
-// (via vi.spyOn, an empty impl) — the data-fetch boundary. No versioning module is
-// mocked. Each test drives a facade call the way a ListView/Drawer would, and
-// asserts the delegated call's positional/object args.
-
 const RESOURCE_ID = 'app-1'
 const VERSION_ID = 'v-9'
-// A live-application id a consumer might still pass; the facade must ignore it in
-// favor of the closed-over RESOURCE_ID for the appId-leading sub-resources.
 const IGNORED_APP_ID = 'live-app-999'
 
 let facades

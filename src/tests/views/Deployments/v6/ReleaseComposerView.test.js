@@ -2,18 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { reactive, ref, computed } from 'vue'
 
-// ReleaseComposerView is a THIN view: the store is the single source of truth and
-// the composable does the async loads. This suite keeps BOTH mocked so it tests
-// only the view's own job — layout/order of the composition blocks, the
-// Build & activate gate, the confirm dialog, and dispatching buildAndActivate on
-// confirm. Router + toast are stubbed; webkit/child components are reduced to the
-// observable surface (button, dialog visibility, order class).
-
-// --- store mock: a reactive state + spy actions + a tunable gate -------------
-// The dispatch (`buildAndActivate`) and its `isDeploying` flag moved to the
-// COMPOSABLE (the layer allowed to call services); the store now only describes
-// the selection via a pure `composePayload()`. The view calls
-// `composition.buildAndActivate(store.composePayload(), targetDsIds)`.
 const composePayload = vi.fn(() => ({ resources: [], canary: false, canaryForm: {} }))
 const openRelease = vi.fn()
 const deployCtx = vi.fn(() => ({ ok: true, canDeploy: true }))
@@ -38,9 +26,6 @@ const storeState = reactive({
   versionGateSatisfied: true
 })
 
-// The store mock delegates every state key back to the SAME reactive
-// `storeState` (not a spread snapshot) so mutating `storeState` in a test is
-// observed by the view through both `storeToRefs` and direct `store.x` reads.
 const storeMock = {
   deployCtx,
   composePayload,
@@ -88,10 +73,6 @@ vi.mock('@/stores/release', () => ({
   ADDITIONAL_PARENT: 'additional'
 }))
 
-// storeToRefs is only used to destructure reactive state; return live refs onto
-// the same reactive object so the view stays in sync with our mutations.
-// `defineStore` is passed through to the real implementation so other stores in
-// the import chain (e.g. `stores/account` via `convert-date`) still construct.
 vi.mock('pinia', async () => {
   const actual = await vi.importActual('pinia')
   return {
@@ -128,8 +109,6 @@ vi.mock('pinia', async () => {
   }
 })
 
-// --- composable mock: degraded impact by default + the seams the view reads ---
-// `buildAndActivate` + `isDeploying` now live HERE (the composable owns dispatch).
 const retryImpact = vi.fn()
 const buildAndActivate = vi.fn().mockResolvedValue([])
 const isDeploying = ref(false)
@@ -168,9 +147,6 @@ vi.mock('@/templates/release-composition/use-release-composition', () => ({
   })
 }))
 
-// The view also composes the impact hook + per-resource version-ready gates and
-// their nested dependency discoveries at setup; stub each so the thin view mounts
-// without reaching the real (vue-query-backed) composables.
 vi.mock('@/templates/release-composition/use-release-impact', async () => {
   const { ref, computed } = await import('vue')
   return {
@@ -287,7 +263,6 @@ vi.mock('@/templates/release-composition/use-custom-page-connector-dependencies'
   }
 })
 
-// --- adapter mock: pure mapping, no HTTP --------------------------------------
 vi.mock('@/services/v2/deployment/deployment-adapter', () => ({
   resolveResourceMeta: (type) => ({ label: type, icon: 'pi pi-box' }),
   mapPolicyToLabel: (policy) => (policy === 'versioned_urls' ? 'Versioned URLs' : 'Single Version'),
@@ -296,7 +271,6 @@ vi.mock('@/services/v2/deployment/deployment-adapter', () => ({
   }
 }))
 
-// --- router + toast -----------------------------------------------------------
 const routerPush = vi.fn()
 const routerResolve = vi.fn(() => ({ href: '/deployments' }))
 vi.mock('vue-router', () => ({
@@ -307,7 +281,6 @@ vi.mock('vue-router', () => ({
 const toastAdd = vi.fn()
 vi.mock('@aziontech/webkit/use-toast', () => ({ useToast: () => ({ add: toastAdd }) }))
 
-// --- webkit + child components reduced to the observable surface --------------
 vi.mock('@aziontech/webkit/card', () => ({
   default: {
     name: 'Card',
@@ -338,10 +311,6 @@ vi.mock('@aziontech/webkit/inputswitch', () => ({
   default: { name: 'InputSwitch', props: ['modelValue'], template: '<span class="switch" />' }
 }))
 
-// `vi.mock` factories are hoisted above all top-level declarations, so each stub
-// is defined inline (no shared closure variable). `inheritAttrs` keeps the
-// `order-N`/`class` bindings the view passes through on the stub root so the
-// composition order is assertable.
 vi.mock('@/templates/page-heading-block/index.vue', () => ({
   default: { name: 'PageHeadingBlock', template: '<div data-stub="PageHeadingBlock" />' }
 }))
@@ -390,9 +359,6 @@ vi.mock('@/templates/release-composition/components/ImpactPanel.vue', () => ({
 
 import ReleaseComposerView from '@/views/Deployments/v6/ReleaseComposerView.vue'
 
-// The action bar (Cancel/Deploy buttons) lives in a `<Teleport v-if="isMounted">`,
-// and `isMounted` flips true in `onMounted` — a re-render that only lands on the
-// next tick. Await it so the teleported footer is present before querying.
 const mountView = async () => {
   const wrapper = mount(ReleaseComposerView, { global: { stubs: { teleport: true } } })
   await flushPromises()
@@ -407,9 +373,6 @@ beforeEach(() => {
   storeState.versionId = ''
   isDeploying.value = false
   deployCtx.mockReturnValue({ ok: true, canDeploy: true })
-  // `clearAllMocks` (afterEach) wipes implementations too; re-arm the resolved
-  // value so `confirmBuildAndActivate` always gets an iterable outcome list, and
-  // re-arm the pure payload the view hands to the composable on confirm.
   buildAndActivate.mockResolvedValue([])
   composePayload.mockReturnValue({ resources: [], canary: false, canaryForm: {} })
 })
@@ -429,9 +392,6 @@ describe('ReleaseComposerView — composition blocks', () => {
   it('renders the composition tree, the DS picker and the Canary block', async () => {
     const wrapper = await mountView()
 
-    // The composition now renders as a `ReleaseCompositionTree` (the old
-    // `ReleaseCompositionField` + flex `order-N` layout was removed); the DS
-    // picker and Canary block still compose alongside it.
     expect(wrapper.findComponent({ name: 'ReleaseCompositionTree' }).exists()).toBe(true)
     expect(wrapper.findComponent({ name: 'DeploymentSettingsPicker' }).exists()).toBe(true)
     expect(wrapper.findComponent({ name: 'CanaryStrategyField' }).exists()).toBe(true)
@@ -490,8 +450,6 @@ describe('ReleaseComposerView — confirm + dispatch', () => {
     await wrapper.find('[data-testid="release-composition__confirm-build"]').trigger('click')
     await flushPromises()
 
-    // The view hands the composable the store's PURE payload and the target ids;
-    // the composable (not the store) owns the per-DS dispatch.
     expect(composePayload).toHaveBeenCalledTimes(1)
     expect(buildAndActivate).toHaveBeenCalledTimes(1)
     expect(buildAndActivate).toHaveBeenCalledWith(
@@ -633,8 +591,6 @@ describe('ReleaseComposerView — first-release CTA', () => {
     const wrapper = await mountView()
     await flushPromises()
 
-    // The picker now emits a single generic `group-action`; the view routes the
-    // `needsFirstRelease` group to the first-release composer route.
     const picker = wrapper.findComponent({ name: 'DeploymentSettingsPicker' })
     picker.vm.$emit('group-action', { groupKey: 'needsFirstRelease', dsId: 'ds-new' })
     await flushPromises()

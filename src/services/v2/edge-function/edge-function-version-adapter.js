@@ -1,7 +1,3 @@
-/**
- * Edge Function version adapter — only the Function-specific exceptions; the
- * common normalization/payload logic comes from `createVersionAdapter`.
- */
 import { createVersionAdapter } from '@/services/v2/versioning/version-adapter'
 import { EdgeFunctionsAdapter } from './edge-function-adapter'
 
@@ -12,12 +8,8 @@ const RUNTIME_TO_UI = {
   lua: 'azion_lua'
 }
 
-// The version snapshot may carry legacy serializer keys; coalesce them onto the
-// canonical ones (`runtime`/`execution_environment`/`default_args`) before reuse.
 const pick = (raw, canonical, legacy) => (raw[canonical] != null ? raw[canonical] : raw[legacy])
 
-// Extracts the Function config from a full version snapshot (GET .../versions/{vid}).
-// Output mirrors the edit form shape so it can initialize `useForm` directly.
 const normalizeConfig = (raw) => {
   if (!raw || typeof raw !== 'object') return {}
   if (raw.code == null && raw.name == null) return {}
@@ -38,8 +30,6 @@ const normalizeConfig = (raw) => {
   return ui
 }
 
-// Maps UI form values into the resource payload at the root. Returns `{}` for a
-// bare clone so the API keeps the cloned values.
 const mapResourceFields = (source = {}) => {
   const hasResourceFields =
     source.name !== undefined || source.code !== undefined || source.runtime !== undefined

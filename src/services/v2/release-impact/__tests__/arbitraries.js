@@ -1,20 +1,3 @@
-/**
- * fast-check arbitraries for the release-impact PBTs (Property 1 / Property 6,
- * tasks 3.2 / 3.4). These generate v6 workloads, bindings and environment maps
- * shaped exactly like {@link ./fixtures.js}.
- *
- * fast-check is NOT yet a devDependency of this repo (see task 1.2 blockers).
- * To keep the harness importable today, fast-check is loaded LAZILY and the
- * arbitrary factories throw a clear, actionable error if it is missing. Each
- * factory receives the `fc` module so PBT specs can do:
- *
- *   import fc from 'fast-check'
- *   import { workloadArb } from './arbitraries'
- *   fc.assert(fc.property(workloadArb(fc), (wl) => { ... }), { numRuns: 100 })
- *
- * Once fast-check is installed, these factories work unchanged.
- */
-
 const ENVIRONMENT_IDS = ['env-prod', 'env-stg', 'env-dev', 'env-orphan']
 const DEPLOYMENT_IDS = ['ds-1', 'ds-2', 'ds-3', 'ds-4']
 
@@ -29,7 +12,6 @@ const requireFc = (fc) => {
   return fc
 }
 
-/** A domain string arbitrary. */
 export const domainArb = (fc) => {
   requireFc(fc)
   return fc
@@ -40,16 +22,11 @@ export const domainArb = (fc) => {
     .map(([sub, base]) => `${sub}.${base}`)
 }
 
-/** An environment_id arbitrary (may include an id absent from the env map). */
 export const environmentIdArb = (fc) => {
   requireFc(fc)
   return fc.constantFrom(...ENVIRONMENT_IDS)
 }
 
-/**
- * A binding arbitrary using ONLY the three guaranteed fields. `deployment_id`
- * may be null (binding not attributable to a DS — must be skipped downstream).
- */
 export const bindingArb = (fc, { allowNullDeployment = true } = {}) => {
   requireFc(fc)
   const deploymentIdArb = allowNullDeployment
@@ -63,10 +40,6 @@ export const bindingArb = (fc, { allowNullDeployment = true } = {}) => {
   })
 }
 
-/**
- * A workload arbitrary in the transformed-list shape, with
- * `active: { content: 'Active' | 'Inactive' }` and `bindings[]`.
- */
 export const workloadArb = (fc) => {
   requireFc(fc)
   return fc.record({
@@ -86,17 +59,11 @@ export const workloadArb = (fc) => {
   })
 }
 
-/** A workloads-list arbitrary (the array consumers iterate). */
 export const workloadsListArb = (fc, { maxLength = 8 } = {}) => {
   requireFc(fc)
   return fc.array(workloadArb(fc), { maxLength })
 }
 
-/**
- * An `envNameById` Map arbitrary covering a subset of environment ids, so PBTs
- * can assert that ids absent from the map resolve to a null name (never
- * fabricated).
- */
 export const envNameMapArb = (fc) => {
   requireFc(fc)
   return fc

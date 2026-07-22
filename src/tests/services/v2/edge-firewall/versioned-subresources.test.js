@@ -8,22 +8,6 @@ import {
 import { VersionedFirewallFunctionService } from '@/services/v2/edge-firewall/versioned/versioned-firewall-function-service'
 import { VersionedFirewallRulesEngineService } from '@/services/v2/edge-firewall/versioned/versioned-firewall-rules-engine-service'
 
-/**
- * Edge Firewall versioned sub-resources.
- *
- * BESPOKE: neither service is produced by `createVersionedSubResourceService` —
- * both are hand-written classes with resource-specific signatures (Function name
- * enrichment; Rules Engine phase paths + reorder). They cannot run the shared
- * factory-contract suite (flagged `bespoke` in the registry), so this file is the
- * SINGLE canonical home for their CRUD + version-scope ISOLATION invariant.
- *
- * F4 consolidation: the former `versioned-firewall-sub-resource-service.test.js`
- * was deleted and its unique its folded in here (Function {list, remove}, Rules
- * Engine {list, reorder, create, delete}) — rewritten onto the kit boundaries so no
- * seam is re-implemented. There was zero overlap between the two files (disjoint
- * methods), so nothing was dropped; see the F4 parity table in the PR notes.
- */
-
 describe('versioned sub-resource CRUD (bespoke): edge-firewall / firewallFunction', () => {
   const RID_A = 'fw-A'
   const RID_B = 'fw-B'
@@ -50,7 +34,6 @@ describe('versioned sub-resource CRUD (bespoke): edge-firewall / firewallFunctio
       count: 1,
       results: [{ id: 1, name: 'fn', function: 9, last_modified: null }]
     })
-    // Name enrichment resolves the linked Function (id 9) name via a second GET.
     http.respondWith({ count: 1, results: [{ id: 9, name: 'my-function' }] })
 
     const result = await svc.list(RID_A, VID_1, { page: 1 })

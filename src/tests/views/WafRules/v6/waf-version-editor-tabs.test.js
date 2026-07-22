@@ -7,16 +7,9 @@ import ListWafRulesAllowed from '@/views/WafRules/ListWafRulesAllowed.vue'
 import FormFieldsWafRules from '@/views/WafRules/FormFields/FormFieldsWafRules.vue'
 import { wafVersionService } from '@/services/v2/waf/waf-version-service'
 
-// Task 8.5 (optional): WAF version editor composition. The version editor body
-// exposes exactly Main Settings + Allowed Rules scoped to (wafId, versionId),
-// the Allowed Rules tab gets the versioned exceptions facade injected, and
-// Tuning is absent from the version context.
-
 const WAF_ID = '42'
 const VERSION_ID = 'AVWAF0001'
 
-// The versioned exceptions service backs the injected Allowed Rules facade; spy
-// on it to prove the facade is pre-bound to (wafId, versionId).
 const exceptionsSpies = {
   list: vi.fn(() => Promise.resolve({ count: 0, body: [] })),
   load: vi.fn(() => Promise.resolve({})),
@@ -37,10 +30,6 @@ vi.mock('@/services/v2/waf/versioned/versioned-waf-exceptions-service', () => ({
   }
 }))
 
-// The REAL wafVersionService is used; only its query hooks (a data-fetch boundary)
-// are stubbed via vi.spyOn — the module itself is never mocked out.
-
-// Capture the `tabs` descriptor handed to the shared shell.
 let capturedTabs = []
 const ShellStub = defineComponent({
   name: 'VersionEditorTabsShell',

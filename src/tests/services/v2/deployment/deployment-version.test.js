@@ -5,13 +5,6 @@ import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 import { DeploymentVersionService } from '@/services/v2/deployment/deployment-version-service'
 
-// Deployment — FULLY BESPOKE (declared in the registry). It does NOT consume the
-// shared service/adapter contracts: the API answers with a `{ data }` / `{ results }`
-// wrapped envelope the base doesn't unwrap, so the service overrides the reads and
-// exposes bespoke wrappers (listVersionsService/createVersionService), and every
-// mutation invalidates BOTH the version cache and the deployment detail. The adapter
-// returns a bare array (no `{ count, body }`), keys identity on `id` (no version_id)
-// and carries no `config`. This file preserves the its of the two deleted files.
 const deployment = RESOURCE_TEST_REGISTRY.deployment
 const adapter = deployment.adapter
 

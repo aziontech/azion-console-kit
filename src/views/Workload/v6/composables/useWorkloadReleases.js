@@ -3,8 +3,8 @@ import { useToast } from '@aziontech/webkit/use-toast'
 import { deploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
 import { deploymentService } from '@/services/v2/deployment/deployment-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
-import { aggregateReleasesByBindings } from '@/views/Workload/utils/aggregateReleasesByBindings'
-import { resolveDeploymentIds } from '@/views/Workload/utils/resolveDeploymentIds'
+import { aggregateReleasesByBindings } from '@/views/Workload/v6/utils/aggregateReleasesByBindings'
+import { resolveDeploymentIds } from '@/views/Workload/v6/utils/resolveDeploymentIds'
 
 export function useWorkloadReleases({ workloadId, getWorkload } = {}) {
   const toast = useToast()

@@ -20,9 +20,6 @@
       type: String,
       default: 'max-w-4xl'
     },
-    // Opt-in: present as a bottom sheet on mobile (slide up from the bottom)
-    // instead of the right-side drawer. Default keeps existing behavior so the
-    // other InfoDrawerBlock consumers are unaffected.
     bottomSheetOnMobile: {
       type: Boolean,
       default: false

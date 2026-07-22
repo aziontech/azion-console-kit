@@ -96,9 +96,6 @@ const normalizeReasonPayload = (payload = {}) =>
     comment: payload.comment
   })
 
-// Deployment version adapter aligned to the VersionServiceBase contract,
-// preserving deployment-specific normalization (resources[], status via
-// mapStateToStatus, last_modified_by). Build/cancel share the reason payload.
 export const DeploymentVersionAdapter = {
   transformListVersions(data) {
     if (!Array.isArray(data)) return []
@@ -127,8 +124,6 @@ export const DeploymentVersionAdapter = {
   }
 }
 
-// Backward-compatible aliases: deployment-version-service.js still calls the
-// pre-contract names until tasks 4.1/4.3 reconcile the consumers.
 DeploymentVersionAdapter.transformList = DeploymentVersionAdapter.transformListVersions
 DeploymentVersionAdapter.transformItem = DeploymentVersionAdapter.transformLoadVersion
 DeploymentVersionAdapter.transformCreatePayload =

@@ -1,11 +1,3 @@
-/**
- * Functional (real Chromium) — VersionActionBar (spec task 4.1).
- *
- * Drives real user actions and asserts observable consequences only: rendered
- * buttons/labels per state, banner copy (incl. the versioned-only variation),
- * the disabled attribute, and the exact `dispatch` payload. Capability arrives
- * through the real version-context provide (VERSION_CONTEXT_KEY), never mocked.
- */
 import { render } from '@testing-library/vue'
 import { describe, it, expect } from 'vitest'
 import { ref } from 'vue'
@@ -23,8 +15,6 @@ const renderBar = (props, capability) =>
     props,
     global: {
       ...primevue,
-      // Only `capability` is read from the context by this component; providing a
-      // ref matches the shell's shape (component reads `capability?.value`).
       provide: capability ? { [VERSION_CONTEXT_KEY]: { capability: ref(capability) } } : {}
     }
   })
@@ -40,7 +30,6 @@ describe('VersionActionBar (functional)', () => {
       'Save and Build'
     )
     expect(getByTestId('version-action-bar')).toHaveTextContent('Editing version')
-    // draft is editable → the Editable tag shows (not the Read Only chip).
     expect(getByTestId('version-action-bar__editable')).toBeInTheDocument()
   })
 
@@ -64,7 +53,6 @@ describe('VersionActionBar (functional)', () => {
     )
     expect(getByTestId('version-action-bar__action-DEPLOY')).toHaveTextContent('Deploy')
     expect(getByTestId('version-action-bar')).toHaveTextContent('Viewing a Ready version')
-    // ready is immutable → Read Only chip, not the Editable tag.
     expect(getByTestId('version-action-bar__readonly')).toBeInTheDocument()
   })
 
@@ -105,7 +93,6 @@ describe('VersionActionBar (functional)', () => {
       { state: 'ready', availableActions: ['NEW_DRAFT_FROM', 'DEPLOY'] },
       VERSIONED_ONLY
     )
-    // capability gates DEPLOY out of getVersionBarActions even though it is available.
     expect(queryByTestId('version-action-bar__action-DEPLOY')).toBeNull()
     const bar = getByTestId('version-action-bar')
     expect(bar).toHaveTextContent(
@@ -131,9 +118,6 @@ describe('VersionActionBar (functional)', () => {
     })
     const button = getByTestId('version-action-bar__action-SAVE_AND_BUILD')
     expect(button).toBeDisabled()
-    // A native click event dispatched straight at the element still invokes the
-    // Vue @click handler, exercising the handler's guard directly — it must still
-    // refuse to emit dispatch for a disabled action.
     button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     expect(emitted().dispatch).toBeUndefined()
   })

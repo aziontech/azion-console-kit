@@ -51,8 +51,6 @@ export const enrichFunctionInstanceNames = async ({
       page += 1
     }
   } catch {
-    // Best-effort: a failed name lookup must never break the listing —
-    // rows are still shown, just without the resolved Function name.
     return items
   }
 

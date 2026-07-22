@@ -5,16 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
 import VersionEditorTabs from '@/views/EdgeApplications/v6/tabs/VersionEditorTabs.vue'
 
-// The Functions tab is gated by the VERSION config (edgeFunctionsEnabled), read from
-// the same useLoadVersionQuery the shell uses — NOT from the live Application. The
-// version config is merged OVER the Application, so an explicit version flag wins.
-//
-// The REAL edgeAppVersionService is used: only its query hooks are stubbed via
-// vi.spyOn (a data-fetch boundary) — useLoadVersionQuery drives the gating and
-// useListVersionsQuery feeds the real useDeployResourceContext. The REAL
-// useVersionedFacades runs too, so the service the tabs receive is the real facade.
-// No versioning module is mocked; only vue-router (an external boundary) is.
-
 const RESOURCE_ID = '77'
 const VERSION_ID = 'AV0001'
 
@@ -71,7 +61,6 @@ describe('Application v6 — Functions tab gating is driven by the VERSION, not 
     mocks.query.data.value = {
       config: { edgeFunctionsEnabled: false, applicationAcceleratorEnabled: true }
     }
-    // Live Application says the module is ON — the version config must win.
     mountTabs({ id: RESOURCE_ID, name: 'app', edgeFunctionsEnabled: true })
     expect(tabKeys()).not.toContain('functions')
   })
@@ -125,7 +114,6 @@ describe('Application v6 — tabs receive the versioned facade service and the i
     expect(cacheTab.props.versionId).toBe(VERSION_ID)
     expect(typeof cacheTab.props.service.list).toBe('function')
     expect(typeof cacheTab.props.service.create).toBe('function')
-    // The accelerator flag flows from the version config into the tab props.
     expect(cacheTab.props.isApplicationAcceleratorEnabled).toBe(true)
   })
 

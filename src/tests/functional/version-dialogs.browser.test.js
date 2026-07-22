@@ -1,13 +1,3 @@
-/**
- * Functional (real Chromium) — VersionActionDialog + ProcessingOverlay
- * (spec task 4.5).
- *
- * Real user actions + observable consequences: the confirm button's disabled
- * state gates on a real comment, confirming emits the exact ('confirm', comment)
- * payload and closes, cancel closes; the overlay renders only for processing
- * states and its Cancel emits. Clicks are dispatched as native DOM events so they
- * do not depend on PrimeVue theme CSS for actionability.
- */
 import { render } from '@testing-library/vue'
 import { describe, it, expect, vi } from 'vitest'
 import { nextTick } from 'vue'
@@ -18,7 +8,6 @@ import ProcessingOverlay from '@/templates/version-shell-block/components/Proces
 
 const primevue = { plugins: [PrimeVue], directives: { tooltip: Tooltip } }
 
-// The dialog teleports to <body>; find its testids there.
 const inBody = (testId) => document.body.querySelector(`[data-testid="${testId}"]`)
 const waitInBody = async (testId) => {
   await vi.waitFor(() => expect(inBody(testId)).not.toBeNull())

@@ -1,87 +1,77 @@
 <template>
-  <EditFormBlock
-    :editService="editWorkload"
-    :loadService="workloadService.loadWorkload"
-    :schema="validationSchema"
-    :updatedRedirect="updatedRedirect"
-    :initialValues="cachedWorkload"
-    :isTabs="embeddedInTabs"
-    @loaded-service-object="(workload) => $emit('loaded-service-object', workload)"
-    @on-edit-success="handleTrackEditEvent"
-    @on-edit-fail="handleTrackFailEditEvent"
-  >
-    <template #form="{ loading }">
-      <div class="relative flex flex-col gap-8 max-md:gap-6">
-        <FormFieldsWorkload isEdit />
-        <div
-          v-if="loading"
-          class="absolute inset-0 z-10 bg-[var(--surface-ground)]"
-        >
-          <FormSkeleton />
-        </div>
-      </div>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        :pageTitle="workloadName"
+        description="Configure domains, protocols, certificates, and select the security and application settings executed by this Workload."
+      />
     </template>
-    <template #action-bar="{ onSubmit, onCancel, loading }">
-      <Teleport
-        to="#action-bar"
-        v-if="isMounted"
+    <template #content>
+      <EditFormBlock
+        :editService="editWorkload"
+        :loadService="workloadService.loadWorkload"
+        :schema="validationSchema"
+        :updatedRedirect="updatedRedirect"
+        :initialValues="cachedWorkload"
+        @loaded-service-object="setWorkloadName"
+        @on-edit-success="handleTrackEditEvent"
+        @on-edit-fail="handleTrackFailEditEvent"
       >
-        <ActionBarBlock>
-          <PrimeButton
-            outlined
-            type="button"
-            label="Cancel"
-            class="max-md:min-w-max"
-            :disabled="loading"
-            data-testid="workload-settings__cancel"
-            @click="onCancel"
-          />
-          <PrimeButton
-            type="button"
-            label="Save"
+        <template #form="{ loading }">
+          <div class="relative flex flex-col gap-8 max-md:gap-6">
+            <FormFieldsWorkload isEdit />
+            <div
+              v-if="loading"
+              class="absolute inset-0 z-10 bg-[var(--surface-ground)]"
+            >
+              <FormSkeleton />
+            </div>
+          </div>
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
             :loading="loading"
-            data-testid="workload-settings__save"
-            @click="onSubmit"
           />
-        </ActionBarBlock>
-      </Teleport>
+        </template>
+      </EditFormBlock>
     </template>
-  </EditFormBlock>
+  </ContentBlock>
 </template>
 
 <script setup>
-  import { inject, ref, onMounted } from 'vue'
+  import { ref, inject } from 'vue'
   import { useRoute } from 'vue-router'
   import EditFormBlock from '@/templates/edit-form-block'
-  import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
-  import FormSkeleton from './components/FormSkeleton.vue'
-  import ActionBarBlock from '@/templates/action-bar-block'
-  import PrimeButton from '@aziontech/webkit/button'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import FormFieldsWorkload from '@/views/Workload/FormFields/FormFieldsWorkload.vue'
+  import FormSkeleton from '@/views/Workload/components/FormSkeleton.vue'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { buildV6Schema } from './Config/validation'
+  import { buildLegacySchema } from '@/views/Workload/Config/validation'
+  import { useBreadcrumbs } from '@/stores/breadcrumbs'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
   const route = useRoute()
-
-  const isMounted = ref(false)
-  onMounted(() => {
-    isMounted.value = true
-  })
+  const breadcrumbs = useBreadcrumbs()
 
   defineProps({
-    updatedRedirect: { type: String, required: true },
-    embeddedInTabs: { type: Boolean, default: false }
+    updatedRedirect: { type: String, required: true }
   })
 
-  defineEmits(['loaded-service-object'])
-
   const cachedWorkload = workloadService.getWorkloadFromCache(route.params.id) ?? {}
-  const validationSchema = buildV6Schema()
+  const validationSchema = buildLegacySchema()
+  const editWorkload = (payload) => workloadService.editWorkload(payload, false)
+  const workloadName = ref(cachedWorkload?.name)
 
-  const editWorkload = (payload) => workloadService.editWorkload(payload, true)
+  if (cachedWorkload?.name) {
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, cachedWorkload.name)
+  }
 
   const handleTrackEditEvent = () => {
     tracker.product.productEdited({
@@ -99,5 +89,10 @@
         errorMessage: message
       })
       .track()
+  }
+
+  const setWorkloadName = async (workload) => {
+    workloadName.value = workload.name
+    breadcrumbs.update(route.meta.breadCrumbs ?? [], route, workload.name)
   }
 </script>

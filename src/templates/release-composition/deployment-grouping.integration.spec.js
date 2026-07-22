@@ -214,7 +214,6 @@ describe('release-composition deployment grouping (integration)', () => {
     const dsWithRelease = { id: 'ds-has-release', binding_policy: 'FLEXIBLE' }
     const dsNoRelease = { id: 'ds-no-release', binding_policy: 'FLEXIBLE' }
 
-    // `dsNoRelease` has NO entry — a scoped override has nothing to anchor to.
     const activeReleaseByDs = {
       [dsWithRelease.id]: { resources: [{ resource_type: 'application', global_id: 'app-1' }] }
     }
@@ -269,8 +268,6 @@ describe('release-composition deployment grouping (integration)', () => {
     const dsReadFailed = { id: 'ds-read-failed', binding_policy: 'FLEXIBLE' }
     const dsNoRelease = { id: 'ds-no-release', binding_policy: 'FLEXIBLE' }
 
-    // Both `dsReadFailed` and `dsNoRelease` are absent from the map (null release);
-    // only `dsReadFailed` is flagged as a failed READ.
     const activeReleaseByDs = {
       [dsWithRelease.id]: { resources: [{ resource_type: scopedType, resource_id: 'fw-7' }] }
     }

@@ -27,7 +27,6 @@
 
   const { value: name } = useField('name')
 
-  // readOnly defaults to false outside the VersionShell; immutable versions disable it.
   const { readOnly } = useVersionContext()
 
   const props = defineProps({

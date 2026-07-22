@@ -2,10 +2,6 @@ import { VersionServiceBase } from '@/services/v2/versioning/version-service-bas
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { EdgeAppVersionAdapter } from './edge-app-version-adapter'
 
-/**
- * Application version service. All lifecycle endpoints + cache invalidation are
- * inherited from `VersionServiceBase`; only the resource bindings differ.
- */
 export class EdgeAppVersionService extends VersionServiceBase {
   constructor() {
     super()

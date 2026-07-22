@@ -17,8 +17,6 @@ const RID = 'waf-1'
 const VID = 'AVWAF0001'
 const BASE = `v4/workspace/wafs/${RID}/versions`
 
-// Version snapshot mirroring `GET .../versions/{vid}`: WAF Main Settings clone
-// (name/active + engine_settings thresholds per threat).
 const wafSnapshot = (overrides = {}) => ({
   version_id: VID,
   version: 2,

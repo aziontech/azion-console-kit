@@ -1,17 +1,3 @@
-/**
- * Load-failure semantics inside `useReleaseComposition` (robustness fixes).
- *
- * Fix 1 — a FAILED active-release read is recorded distinctly from a genuine
- *   "no release": `activeReleaseErrorByDs[dsId]` flags it, `activeReleaseByDs`
- *   stays `null`, and `retryActiveReleases()` re-attempts and clears the flag.
- *
- * Fix 2 — a FAILED version/catalog load is NOT cached as an empty result (which
- *   would look like "no versions exist" forever): the key is absent, an error
- *   flag is set, the reactive watcher does NOT auto-retry, and the explicit
- *   `retryResourceVersions()` / `retryCatalogs()` recover it.
- *
- * Only the IO seams are mocked; the composable runs for real.
- */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { flushPromises } from '@vue/test-utils'
@@ -23,8 +9,6 @@ vi.mock('@/services/v2/deployment/deployment-release-service', () => ({
   deploymentReleaseService: { getActiveReleaseComposition: vi.fn(), buildAndActivate: vi.fn() }
 }))
 
-// A registry with a single controllable `listVersions` / `listCatalog` for the
-// `application` type, so the version + catalog loaders can be driven to fail/recover.
 const listVersionsMock = vi.fn()
 const listCatalogMock = vi.fn()
 vi.mock('@/services/v2/deployment/resource-catalog-registry', () => ({
@@ -69,12 +53,9 @@ describe('active-release read failure (Fix 1)', () => {
     })
     await flushPromises()
 
-    // Failure recorded distinctly: flag true, but the composition stays null (not
-    // fabricated) so downstream readers still work.
     expect(composition.activeReleaseErrorByDs.value['ds-1']).toBe(true)
     expect(composition.activeReleaseByDs.value['ds-1']).toBeNull()
 
-    // Retry: the read now succeeds → flag cleared, real release loaded.
     const release = { resources: [{ resource_type: 'application', global_id: 'app-1' }] }
     deploymentReleaseService.getActiveReleaseComposition.mockResolvedValueOnce(release)
 
@@ -113,14 +94,12 @@ describe('version-load failure (Fix 2)', () => {
     })
     await flushPromises()
 
-    // Error flagged; NO empty entry cached (so it is not read as "no versions").
     expect(composition.hasAnyVersionsError.value).toBe(true)
     expect(composition.hasVersionsErrorFor('application', 'app-1')).toBe(true)
     expect(composition.versionOptionsFor('application', 'app-1')).toEqual([])
     expect('application:app-1' in composition.versionsByResource.value).toBe(false)
 
     const callsAfterFirst = listVersionsMock.mock.calls.length
-    // The reactive watcher must NOT keep retrying on its own.
     await flushPromises()
     expect(listVersionsMock.mock.calls.length).toBe(callsAfterFirst)
   })

@@ -154,7 +154,6 @@ describe('DeploymentAdapter.transformBuildAndActivatePayload', () => {
     }
   ]
 
-  // P1 — application is keyed by resource_id + version_id (schema shape), no name.
   it('emits the application resource by resource_id + version_id (no strategy)', () => {
     const payload = DeploymentAdapter.transformBuildAndActivatePayload(singleResource)
 
@@ -198,7 +197,6 @@ describe('DeploymentAdapter.transformBuildAndActivatePayload', () => {
     expect(DeploymentAdapter.transformBuildAndActivatePayload()).toEqual({ resources: [] })
   })
 
-  // P2 — without canary: no `strategy` key (independent of resource count).
   it('omits the strategy key entirely when no canary strategy is provided', () => {
     const noStrategy = DeploymentAdapter.transformBuildAndActivatePayload(singleResource, undefined)
     expect(noStrategy).not.toHaveProperty('strategy')
@@ -210,7 +208,6 @@ describe('DeploymentAdapter.transformBuildAndActivatePayload', () => {
     expect(multiNoStrategy).not.toHaveProperty('strategy')
   })
 
-  // P2 — canary: strategy present, GRADUAL with gradual_rollout, B1 mapping applied.
   it('includes the strategy and maps gradual_rollout to candidate_from_release_id (B1)', () => {
     const strategy = {
       rollout_mode: 'GRADUAL',
@@ -229,14 +226,12 @@ describe('DeploymentAdapter.transformBuildAndActivatePayload', () => {
     expect(payload).toHaveProperty('strategy')
     expect(payload.strategy.rollout_mode).toBe('GRADUAL')
     expect(payload.strategy).toHaveProperty('gradual_rollout')
-    // B1: legacy key dropped, candidate_from_release_id emitted as null.
     expect(payload.strategy.gradual_rollout).not.toHaveProperty(
       'candidate_from_deployment_version_id'
     )
     expect(payload.strategy.gradual_rollout).toHaveProperty('candidate_from_release_id')
     expect(payload.strategy.gradual_rollout.candidate_from_release_id).toBeNull()
     expect(payload.strategy.gradual_rollout.candidate_percentage).toBe(25)
-    // The resources block is unaffected by the strategy.
     expect(payload.resources).toEqual([
       {
         resource_id: 42,

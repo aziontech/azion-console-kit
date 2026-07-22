@@ -4,15 +4,8 @@ import { versionedFunctionService } from '@/services/v2/edge-app/versioned/versi
 import { versionedRulesEngineService } from '@/services/v2/edge-app/versioned/versioned-rules-engine-service'
 
 /**
- * Builds one facade per Edge Application sub-resource, each pre-bound to a
- * `(resourceId, versionId)` pair and delegating to the versioned services.
- *
- * Method signatures intentionally mirror how each ListView/Drawer already calls
- * `props.service.*` (those components were refactored first), so the leading
- * `edgeApplicationId` some of them pass is dropped in favor of the closed-over ids.
- *
- * @param {string|number} resourceId Edge Application id.
- * @param {string|number} versionId  Version id the tabs are scoped to.
+ * @param {string|number} resourceId
+ * @param {string|number} versionId
  * @returns {{ cacheSettings: object, deviceGroups: object, functions: object, rulesEngine: object }}
  */
 export const useVersionedFacades = (resourceId, versionId) => {

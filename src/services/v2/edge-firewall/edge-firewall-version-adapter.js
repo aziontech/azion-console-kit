@@ -1,11 +1,5 @@
-/**
- * Edge Firewall version adapter — only the Firewall-specific exceptions; the
- * common normalization/payload logic comes from `createVersionAdapter`.
- */
 import { createVersionAdapter } from '@/services/v2/versioning/version-adapter'
 
-// Extracts the Firewall main-settings fields from a version snapshot into the UI
-// form shape (camelCase, matching the legacy edge-firewall-adapter).
 const normalizeConfig = (raw) => {
   if (!raw || typeof raw !== 'object') return {}
 

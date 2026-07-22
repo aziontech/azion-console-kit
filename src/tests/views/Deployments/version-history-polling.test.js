@@ -4,10 +4,6 @@ import { VERSION_POLL_INTERVAL_MS } from '@/services/v2/versioning/version-cache
 import { httpService } from '@/services/v2/base/http/httpService'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 
-// The REAL deploymentVersionService runs; only the HTTP client and the query cache
-// are stubbed. The tab's polling lifecycle is proven by the HTTP GETs it drives
-// (count, timing, params incl. skipCache) — not by a mocked version service.
-
 vi.mock('@aziontech/webkit/use-toast', () => ({
   useToast: () => ({ add: vi.fn() })
 }))
@@ -74,18 +70,14 @@ vi.mock('@/components/VersionListDataView', () => ({
 
 import VersionHistoryTab from '@/views/Deployments/tabs/VersionHistoryTab.vue'
 
-// The deployment versions list endpoint the real service GETs.
 const VERSIONS_URL = '/deployment-api/v4/deployments/dep-1/versions'
 
-// API list envelope → the service normalizes it to { body, count }.
 const listResponse = (versions) => ({
   data: { results: versions, count: versions.length }
 })
 
 let requestSpy
 
-// Stub the boundaries so every listVersionsService call reaches the HTTP client
-// (bypassing the cache) and mutations never touch the real query cache.
 const setupBoundary = () => {
   vi.spyOn(queryClient, 'ensureQueryData').mockImplementation(({ queryFn }) => queryFn())
   vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})

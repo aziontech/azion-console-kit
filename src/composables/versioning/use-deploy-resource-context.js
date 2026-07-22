@@ -4,20 +4,8 @@ import { toDeployableVersionOptions, toVersionOption } from './to-version-option
 import { getVersionCapability } from './version-capability'
 
 /**
- * useDeployResourceContext — builds the `resourceContext` consumed by the shared
- * VersionHeadingActions to scope the Deploy route to the release composer. Shared
- * by every deployable resource (Application / Custom Page / Firewall); specializes
- * via config only.
- *
- * The resource (for id/name) is read from the editor's `provide`d ref under
- * `injectionKey`; the deployable versions come from the resource's version list.
- *
- * `currentVersionId` (the version being edited) is passed in from the host's props
- * — NOT injected from the version context — because this composable runs in the
- * host's setup, which is OUTSIDE the VersionShell that provides that context.
- *
  * @param {{ resourceType: string, injectionKey: string, versionService: object,
- *   currentVersionId?: import('vue').Ref<string>|(() => string)|string }} config
+ * currentVersionId?: import('vue').Ref<string>|(() => string)|string }} config
  */
 export function useDeployResourceContext({
   resourceType,
@@ -27,7 +15,6 @@ export function useDeployResourceContext({
 }) {
   const route = useRoute()
 
-  // versioned-only resources expose no deploy drawer — yield a null context.
   const capability = getVersionCapability(resourceType)
 
   const resource = inject(injectionKey, ref(null))
@@ -42,8 +29,6 @@ export function useDeployResourceContext({
     toDeployableVersionOptions(rawVersions.value, currentId.value)
   )
 
-  // Fallback: with no deployable versions, show the current version alone (enriched
-  // from the list when present) so the drawer is never empty mid-edit.
   const versionOptions = computed(() => {
     if (readyVersionOptions.value.length) return readyVersionOptions.value
     if (!currentId.value) return []

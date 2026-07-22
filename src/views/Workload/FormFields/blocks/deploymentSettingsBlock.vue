@@ -1,267 +1,217 @@
 <script setup>
-  import { ref, computed, onMounted, watch } from 'vue'
-  import { useField } from 'vee-validate'
-  import { useRouter } from 'vue-router'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
-  import MessageCard from '@/components/MessageCard'
-  import Dropdown from '@aziontech/webkit/dropdown'
+  import FieldDropdownLazyLoader from '@aziontech/webkit/field-dropdown-lazy-loader'
+
   import PrimeButton from '@aziontech/webkit/button'
-  import Tag from '@aziontech/webkit/prime-tag'
-  import { environmentService } from '@/services/v2/environment/environment-service'
-  import { deploymentService } from '@/services/v2/deployment/deployment-service'
-  import { mapPolicyToLabel } from '@/services/v2/deployment/deployment-adapter'
+  import { useField } from 'vee-validate'
+  import DrawerEdgeFirewall from '@/views/EdgeFirewall/Drawer'
+  import DrawerCustomPages from '@/views/CustomPages/Drawer'
+  import DrawerEdgeApplication from '@/views/EdgeApplications/Drawer'
+  import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
+  import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+  import { customPageService } from '@/services/v2/custom-page/custom-page-service'
 
-  defineOptions({ name: 'deployment-settings-block' })
+  import { ref } from 'vue'
 
-  const props = defineProps({
-    isDrawer: { type: Boolean, default: false },
-    noBorder: { type: Boolean, default: false }
-  })
+  const { value: application } = useField('application')
+  const { value: firewall } = useField('firewall')
+  const { value: customPage } = useField('customPage')
 
-  const router = useRouter()
+  const drawerRef = ref('')
+  const drawerEdgeFirewallRef = ref('')
+  const drawerCustomPagesRef = ref(null)
 
-  const { value: domainsValue } = useField('domains')
-  const { value: environmentDeployments, setValue: setEnvironmentDeployments } =
-    useField('environmentDeployments')
+  const hasEdgeFirewallAccess = ref(true)
 
-  const domainList = computed(() => (Array.isArray(domainsValue.value) ? domainsValue.value : []))
-  const envDeploymentsState = computed(() => environmentDeployments.value ?? {})
-
-  const environmentMap = ref({})
-
-  const loadEnvironments = async () => {
-    try {
-      const { body } = await environmentService.listEnvironmentsService()
-      const map = {}
-      for (const env of body ?? []) {
-        if (env?.id == null) continue
-        map[String(env.id)] = {
-          name: env.name,
-          policyLabel: env.deployment_policy ?? ''
-        }
-      }
-      environmentMap.value = map
-    } catch {
-      // intentionally swallowed: env metadata is non-blocking UX
-    }
+  const handleEdgeFirewallClear = () => {
+    firewall.value = null
   }
 
-  const environmentsInUse = computed(() => {
-    const seen = new Map()
-    for (const domain of domainList.value) {
-      const envId = domain?.environment
-      if (envId == null) continue
-      if (!seen.has(envId)) {
-        seen.set(envId, {
-          id: envId,
-          name: environmentMap.value[String(envId)]?.name || 'Environment'
-        })
-      }
-    }
-    return Array.from(seen.values())
-  })
-
-  const deploymentOptions = ref([])
-  const isLoadingDeployments = ref(false)
-
-  const loadDeployments = async () => {
-    isLoadingDeployments.value = true
-    try {
-      const { body } = await deploymentService.listDeploymentsService()
-      deploymentOptions.value = Array.isArray(body) ? body : []
-    } finally {
-      isLoadingDeployments.value = false
-    }
-    await ensureBoundDeploymentsInOptions()
+  const handleCustomPageClear = () => {
+    customPage.value = null
   }
 
-  const ensureBoundDeploymentsInOptions = async () => {
-    const boundIds = Object.values(envDeploymentsState.value)
-      .map((entry) => entry?.deploymentId)
-      .filter(Boolean)
-
-    const missingIds = boundIds.filter(
-      (id) => !deploymentOptions.value.some((deployment) => String(deployment.id) === String(id))
-    )
-
-    for (const id of missingIds) {
-      try {
-        const { data } = await deploymentService.getDeploymentByIdService(id)
-        if (data?.id != null) {
-          deploymentOptions.value = [
-            ...deploymentOptions.value,
-            { ...data, policyLabel: mapPolicyToLabel(data.deployment_policy) }
-          ]
-        }
-      } catch {
-        // intentionally swallowed: keeping the bound deployment visible is best-effort
-      }
-    }
+  const openDrawerEdgeApplication = () => {
+    drawerRef.value.openCreateDrawer()
   }
 
-  watch(envDeploymentsState, () => {
-    if (!isLoadingDeployments.value) ensureBoundDeploymentsInOptions()
-  })
-
-  onMounted(() => {
-    loadEnvironments()
-    loadDeployments()
-  })
-
-  const policyLabelFor = (envId) => environmentMap.value[String(envId)]?.policyLabel || ''
-
-  const deploymentPolicyLabel = (deployment) =>
-    deployment?.policyLabel ?? mapPolicyToLabel(deployment?.deployment_policy)
-
-  const isDeploymentCompatible = (envId, deployment) => {
-    const policyLabel = policyLabelFor(envId)
-    if (!policyLabel) return true
-    return deploymentPolicyLabel(deployment) === policyLabel
+  const openDrawerEdgeFirewall = () => {
+    drawerEdgeFirewallRef.value.openCreateDrawer()
   }
 
-  const isOptionDisabledFor = (envId) => (deployment) => !isDeploymentCompatible(envId, deployment)
-
-  const compatibleCountFor = (envId) =>
-    deploymentOptions.value.filter((deployment) => isDeploymentCompatible(envId, deployment)).length
-
-  const compatibilityNoteFor = (envId) => {
-    const label = policyLabelFor(envId)
-    const total = deploymentOptions.value.length
-    const compatible = compatibleCountFor(envId)
-    const disabled = total - compatible
-
-    if (!label) {
-      return `${total} deployment${total === 1 ? '' : 's'} available`
-    }
-
-    if (disabled > 0) {
-      return `Only ${label} deployments can be linked — ${compatible} compatible, ${disabled} disabled.`
-    }
-
-    return `Only ${label} deployments can be linked — ${compatible} compatible.`
+  const openDrawerCustomPages = () => {
+    drawerCustomPagesRef.value.openCreateDrawer()
   }
 
-  const hasMissingDeployment = computed(() =>
-    environmentsInUse.value.some((env) => !envDeploymentsState.value[env.id]?.deploymentId)
-  )
+  const handleEdgeFirewallAccessDenied = () => {
+    hasEdgeFirewallAccess.value = false
+  }
 
-  const deploymentIdFor = (envId) => envDeploymentsState.value[envId]?.deploymentId ?? null
+  const handleEdgeApplicationCreated = (id) => {
+    application.value = id
+  }
 
-  const setDeployment = (envId, deploymentId) => {
-    const current = envDeploymentsState.value[envId] || {}
-    setEnvironmentDeployments({
-      ...envDeploymentsState.value,
-      [envId]: { ...current, deploymentId }
+  const handleCustomPagesCreated = (id) => {
+    customPage.value = id
+  }
+
+  const handleQuery = (queryParams) => {
+    const query = {
+      ...queryParams,
+      fields: ['id', 'name'],
+      active: true
+    }
+    return query
+  }
+
+  const listEdgeApplicationsDecorator = async (queryParams) => {
+    return await edgeAppService.listEdgeApplicationsServiceDropdown({
+      ...handleQuery(queryParams)
     })
   }
 
-  const clearSelection = (envId) => setDeployment(envId, null)
+  const listEdgeFirewallDropdown = async (queryParams) => {
+    return await edgeFirewallService.listEdgeFirewallServiceDropdown({
+      ...handleQuery(queryParams)
+    })
+  }
 
-  const navigateToDeployments = () => {
-    router.push('/deployments')
+  const handleListCustomPages = async (queryParams) => {
+    return await customPageService.listCustomPagesService({ ...handleQuery(queryParams) })
+  }
+
+  const handleEdgeFirewallCreated = (id) => {
+    firewall.value = id
   }
 </script>
-
 <template>
   <form-horizontal
-    title="Environments"
-    description="Each environment needs Deployment Settings before you can run workloads. Link settings once—routing, security, and custom responses apply everywhere that environment is used."
-    :isDrawer="props.isDrawer"
-    :noBorder="props.noBorder"
+    title="Deployment Settings"
+    description="Configure the deployment of your Workload by selecting the appropriate Application and Firewall. The Application handles traffic routing and processing at the edge, while the Firewall provides security by filtering and blocking malicious traffic."
   >
     <template #inputs>
-      <div class="flex flex-col gap-3 max-w-3xl w-full">
-        <MessageCard
-          type="info"
-          title="Start with Deployment Settings"
-          description="Deployment Settings centralize the configuration shared across your environments, including applications, firewall policies, and custom pages."
-          dataTestid="deployment-settings__info-banner"
-        >
-          <template #actions>
-            <PrimeButton
-              text
-              size="small"
-              label="Manage Deployment Settings"
-              data-testid="deployment-settings__manage-button"
-              @click="navigateToDeployments"
-            />
-          </template>
-        </MessageCard>
-
-        <MessageCard
-          v-if="hasMissingDeployment"
-          type="warning"
-          title="Link Deployment Settings to enable workloads"
-          dataTestid="deployment-settings__warning-banner"
+      <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <DrawerEdgeApplication
+          ref="drawerRef"
+          @onEdgeApplicationCreated="handleEdgeApplicationCreated"
         />
-
-        <div
-          v-if="!environmentsInUse.length"
-          class="text-color-secondary text-xs"
-          data-testid="deployment-settings__empty"
+        <FieldDropdownLazyLoader
+          label="Application"
+          required
+          data-testid="domains-form__edge-application-field"
+          name="application"
+          :service="listEdgeApplicationsDecorator"
+          :loadService="edgeAppService.loadEdgeApplicationService"
+          optionLabel="name"
+          optionValue="value"
+          :value="application"
+          appendTo="self"
+          placeholder="Select an Application"
         >
-          Add at least one domain to configure a deployment per environment.
-        </div>
-
-        <div
-          v-for="env in environmentsInUse"
-          :key="env.id"
-          class="flex flex-col gap-3 p-4 rounded surface-section border surface-border"
-          :data-testid="`deployment-settings__card-${env.id}`"
-        >
-          <div class="flex items-center gap-2">
-            <i class="pi pi-box text-color-secondary" />
-            <span class="text-sm font-medium text-color truncate">{{ env.name }}</span>
-            <Tag
-              v-if="policyLabelFor(env.id)"
-              severity="info"
-              :value="policyLabelFor(env.id)"
-              :data-testid="`deployment-settings__policy-${env.id}`"
-            />
-            <PrimeButton
-              text
-              rounded
-              size="small"
-              icon="pi pi-times"
-              class="ml-auto"
-              aria-label="Clear deployment"
-              :data-testid="`deployment-settings__clear-${env.id}`"
-              @click="clearSelection(env.id)"
-            />
-          </div>
-
-          <MessageCard
-            type="info"
-            :description="compatibilityNoteFor(env.id)"
-            :dataTestid="`deployment-settings__compat-${env.id}`"
-          />
-
-          <Dropdown
-            :inputId="`deployment-settings__dropdown-${env.id}`"
-            :modelValue="deploymentIdFor(env.id)"
-            :options="deploymentOptions"
-            optionLabel="name"
-            optionValue="id"
-            :optionDisabled="isOptionDisabledFor(env.id)"
-            :loading="isLoadingDeployments"
-            placeholder="Select a Deployment"
-            emptyMessage="No deployments available"
-            appendTo="self"
-            :data-testid="`deployment-settings__dropdown-${env.id}`"
-            @update:modelValue="setDeployment(env.id, $event)"
-          >
-            <template #option="{ option }">
-              <div class="flex items-center justify-between gap-2 w-full">
-                <span class="truncate">{{ option.name }}</span>
-                <Tag
-                  v-if="option.policyLabel"
-                  severity="info"
-                  :value="option.policyLabel"
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawerEdgeApplication"
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-edge-application-button"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Application"
                 />
-              </div>
-            </template>
-          </Dropdown>
-        </div>
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
+      </div>
+
+      <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <DrawerEdgeFirewall
+          ref="drawerEdgeFirewallRef"
+          @onSuccess="handleEdgeFirewallCreated"
+        />
+        <FieldDropdownLazyLoader
+          label="Firewall"
+          :enableClearOption="!!firewall"
+          data-testid="domains-form__edge-firewall-field"
+          name="firewall"
+          @onClear="handleEdgeFirewallClear"
+          :service="listEdgeFirewallDropdown"
+          :loadService="edgeFirewallService.loadEdgeFirewallService"
+          @onAccessDenied="handleEdgeFirewallAccessDenied"
+          v-if="hasEdgeFirewallAccess"
+          optionLabel="name"
+          optionValue="value"
+          :value="firewall"
+          appendTo="self"
+          placeholder="Select a Firewall"
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawerEdgeFirewall"
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-edge-firewall-button"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Firewall"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
+      </div>
+
+      <div class="flex flex-col w-full sm:max-w-xs gap-2">
+        <DrawerCustomPages
+          ref="drawerCustomPagesRef"
+          @onSuccess="handleCustomPagesCreated"
+        />
+        <FieldDropdownLazyLoader
+          label="Custom Page"
+          :enableClearOption="!!customPage"
+          data-testid="domains-form__custom-page-field"
+          name="customPage"
+          @onClear="handleCustomPageClear"
+          :service="handleListCustomPages"
+          :loadService="customPageService.loadCustomPagesService"
+          optionLabel="name"
+          optionValue="value"
+          :value="customPage"
+          appendTo="self"
+          placeholder="Select a custom page"
+        >
+          <template #footer>
+            <ul class="p-2">
+              <li>
+                <PrimeButton
+                  @click="openDrawerCustomPages"
+                  class="w-full whitespace-nowrap flex"
+                  data-testid="domains-form__create-custom-pages-button"
+                  text
+                  size="small"
+                  icon="pi pi-plus-circle"
+                  :pt="{
+                    label: { class: 'w-full text-left' },
+                    root: { class: 'p-2' }
+                  }"
+                  label="Create Custom Page"
+                />
+              </li>
+            </ul>
+          </template>
+        </FieldDropdownLazyLoader>
       </div>
     </template>
   </form-horizontal>

@@ -5,14 +5,6 @@ import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-contex
 import { DEFAULT_CAPABILITY, VERSIONED_ONLY } from '@/composables/versioning/version-capability'
 import { getAvailableActions } from '@/composables/versioning/version-machine'
 
-/**
- * Task 3.8 — Phase 1: the shell surfaces (heading + footer) expose Deploy only
- * for deployable resources. For versioned-only the Deploy button is removed
- * (not just disabled) and the footer copy drops the Deploy mention.
- * Requirements 2.1, 2.4.
- */
-
-// Webkit primitives → plain DOM so jsdom renders and we can query by testid.
 vi.mock('@aziontech/webkit/button', () => ({
   default: {
     name: 'PrimeButton',
@@ -29,7 +21,6 @@ vi.mock('@aziontech/webkit/prime-tag', () => ({
   }
 }))
 
-// Stable date so the heading renders without touching real time.
 vi.mock('@/helpers/convert-date', () => ({ formatExhibitionDate: () => 'Jan 1, 2026' }))
 
 import VersionHeadingActions from '@/templates/version-shell-block/components/VersionHeadingActions.vue'
@@ -39,8 +30,6 @@ const makeContext = ({ capability, state = 'ready' }) => ({
   state: ref(state),
   readOnly: ref(true),
   version: ref({ id: 'v1', createdAt: '2026-01-01T00:00:00Z', lastEditor: 'ada' }),
-  // Mirror the real shell: availableActions = state-allowed ∩ capability. The
-  // heading and footer both intersect the shared button set with this.
   availableActions: ref(getAvailableActions(state, capability)),
   disabledActions: ref([]),
   isVersioned: ref(true),
@@ -55,8 +44,6 @@ const mountHeading = ({ capability, resourceContext = { resourceType: 'edge_appl
     global: { provide: { [VERSION_CONTEXT_KEY]: makeContext({ capability }) } }
   })
 
-// The heading teleports its buttons to #version-lifecycle-action, so they land
-// in the document target rather than the wrapper subtree — query there.
 const hasDeployButton = () => !!document.querySelector('[data-testid="version-heading__deploy"]')
 
 const mountFooter = ({ capability, state = 'ready', availableActions = [] }) =>
@@ -66,7 +53,6 @@ const mountFooter = ({ capability, state = 'ready', availableActions = [] }) =>
   })
 
 beforeEach(() => {
-  // Heading teleports to #version-lifecycle-action — provide the target in body.
   const target = document.createElement('div')
   target.id = 'version-lifecycle-action'
   document.body.appendChild(target)
@@ -77,8 +63,6 @@ afterEach(() => {
 })
 
 describe('VersionHeadingActions — Deploy button gated by capability (Req 2.1)', () => {
-  // The teleport is guarded by `v-if="isMounted"` (set in onMounted), so a tick
-  // is needed before the teleported buttons land in the document target.
   it('renders the Deploy button for a deployable resource', async () => {
     mountHeading({ capability: DEFAULT_CAPABILITY })
     await flushPromises()
@@ -103,7 +87,6 @@ describe('VersionActionBar — footer Deploy gated by availableActions + copy (R
   })
 
   it('drops the Deploy action for versioned-only even if listed (filtered set)', () => {
-    // versioned-only never registers DEPLOY → availableActions excludes it.
     const wrapper = mountFooter({
       capability: VERSIONED_ONLY,
       state: 'ready',

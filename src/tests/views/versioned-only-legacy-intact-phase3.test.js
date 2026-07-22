@@ -5,22 +5,12 @@ import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { setFeatureFlags, hasFlagUseV6Configurations } from '@/composables/user-flag'
 
-/**
- * Task 7.5 — Phase 3: the v6/legacy fork for the three versioned-only resources
- * stays driven by the SAME `use_v6_configurations` gate. With the flag OFF the
- * edit route resolves the legacy view; with it ON it resolves the v6 view; the
- * dedicated version route is gated by `meta.flag`. Driven by a `client_flags`
- * fixture so the legacy behavior is provably untouched. Req 7.1, 7.3, 7.4, NFR-B.1.
- */
-
 const read = (relative) =>
   readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), `../../${relative}`), 'utf8')
 
-// Real-shaped account payloads: feature flags arrive as the `client_flags` array.
 const accountWithFlag = { client_flags: ['use_v6_configurations'] }
 const accountLegacy = { client_flags: [] }
 
-// One route module per resource, each declaring the v6/legacy fork + version route.
 const RESOURCES = {
   function: {
     routesFile: 'router/routes/edge-functions-routes/index.js',
@@ -63,7 +53,6 @@ describe('Phase 3 — each resource keeps the canonical v6/legacy route fork (Re
 
       it('forks the edit route on hasFlagUseV6Configurations() (component-level, no runtime dispatcher in a component)', () => {
         expect(source).toContain('hasFlagUseV6Configurations()')
-        // Flag ON path imports the v6 view; OFF path imports the legacy view.
         expect(source).toContain(cfg.v6View)
         expect(source).toContain(cfg.legacyView)
       })
@@ -77,8 +66,6 @@ describe('Phase 3 — each resource keeps the canonical v6/legacy route fork (Re
 })
 
 describe('Phase 3 — the fork picks legacy vs v6 by the fixture flag (Req 7.1)', () => {
-  // Mirror the exact predicate the route component factories call, proving the
-  // legacy view is selected with the flag OFF and the v6 view with it ON.
   const pickView = (cfg) => (hasFlagUseV6Configurations() ? cfg.v6View : cfg.legacyView)
 
   for (const [resourceType, cfg] of Object.entries(RESOURCES)) {

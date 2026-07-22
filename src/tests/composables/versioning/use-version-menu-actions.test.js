@@ -1,17 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { flushPromises } from '@vue/test-utils'
 
-/**
- * Single shared action router (task 3.1). Asserts that every listing routes the
- * 5 menu actions identically: OPEN_CONFIGURATION → router.push by resourceType;
- * PROMOTE → drawer with { scopedType, pin, workloadId }; ROLLBACK → no-op;
- * ARCHIVE/DELETE → run through the REAL use-version-row-actions seam (Archive fires
- * the service mutation immediately; Delete opens the confirm dialog first). Only
- * the toast boundary is stubbed; the row-actions composable executes for real, so
- * the delegation is proven by the service call / dialog it produces, not by a mock.
- */
-
-// Toast is the external boundary shared by the driver and the row-actions seam.
 vi.mock('@aziontech/webkit/use-toast', () => ({ useToast: () => ({ add: vi.fn() }) }))
 
 import {
@@ -231,8 +220,6 @@ describe('useVersionMenuActions — ARCHIVE/DELETE run through the row-actions s
 
     api.handleRowAction({ action: 'DELETE', item })
 
-    // Opening the dialog is the observable delegation: the destructive confirm is
-    // wired and no mutation has fired yet.
     expect(api.dialogVisible.value).toBe(true)
     expect(api.dialogConfig.value).not.toBeNull()
     expect(versionService.deleteVersion).not.toHaveBeenCalled()

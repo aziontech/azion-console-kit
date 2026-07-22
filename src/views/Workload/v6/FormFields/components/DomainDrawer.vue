@@ -302,7 +302,7 @@
             name="domain"
             required
           />
-          <div class="domain-drawer__domain-control flex items-start">
+          <div class="flex min-h-10 items-start">
             <FieldDropdown
               name="domain"
               editable
@@ -321,7 +321,7 @@
                 v-if="isAzionDomain"
                 label=".azion.app"
                 size="small"
-                class="domain-drawer__tag rounded-md rounded-l-none select-none focus:outline-none focus:ring-0"
+                class="h-[34px] shrink-0 select-none rounded-md rounded-l-none focus:outline-none focus:ring-0"
                 outlined
                 tabindex="-1"
               />
@@ -433,15 +433,6 @@
 </template>
 
 <style scoped>
-  .domain-drawer__domain-control {
-    min-height: 2.5rem;
-  }
-
-  .domain-drawer__tag {
-    flex-shrink: 0;
-    height: 34px;
-  }
-
   .tag-enter-active,
   .tag-leave-active {
     transition:

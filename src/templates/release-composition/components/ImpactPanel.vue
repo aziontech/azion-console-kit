@@ -1,29 +1,4 @@
 <script setup>
-  /**
-   * ImpactPanel — presentational, read-only blast-radius preview for the
-   * selected Deployment Settings. It renders one of three states from the
-   * single `impact` prop and never fetches, derives or blocks anything:
-   * Build & activate stays enabled regardless of what this panel shows
-   * (req 7.3). All numbers and labels arrive already computed from the
-   * composable; the panel only displays them.
-   *
-   * States (mutually exclusive, evaluated in order):
-   *   1. No selection (`!hasSelection`)  — prompt to select Deployment
-   *      Settings (req 7.1).
-   *   2. Unavailable (`impactUnavailable`) — degraded message + Retry; the
-   *      blast-radius could not be computed (req 7.3).
-   *   3. Available — per-DS tree (DS → Environment → workloads → domains)
-   *      with a footer totals summary (req 7.2).
-   *
-   * @prop {Object} impact The fully-resolved impact view-model.
-   * @prop {boolean} impact.hasSelection Whether any Deployment Setting is selected.
-   * @prop {boolean} impact.impactUnavailable Whether the blast-radius could not be computed.
-   * @prop {Array<{ name, domains, env, wlCount, rows: Array<{ name, domains }> }>} impact.perDs
-   *   One entry per selected DS; `rows` are the top workloads to surface.
-   * @prop {{ domains, workloads, dsCount }} impact.totals Footer summary counts.
-   *
-   * @emits retry Request to recompute the impact (only from the unavailable state).
-   */
   import { computed } from 'vue'
   import PrimeButton from '@aziontech/webkit/button'
 
@@ -39,9 +14,6 @@
         totals: { domains: 0, workloads: 0, dsCount: 0 }
       })
     },
-    // Machine-readable reason the blast radius couldn't be computed (req 11.2):
-    // 'fetch_failed' | 'legacy_no_bindings' | 'capped' | null. Drives the
-    // unavailable-state copy so the operator knows WHY (and whether Retry helps).
     degradationReason: {
       type: String,
       default: null
@@ -52,8 +24,6 @@
 
   const onRetry = () => emit('retry')
 
-  // Reason-specific copy for the unavailable state; falls back to the generic
-  // message when no machine-readable reason is provided.
   const UNAVAILABLE_MESSAGES = {
     fetch_failed:
       "Couldn't load the workloads needed to compute the impact. Retry, or publish anyway — the impact won't be shown.",

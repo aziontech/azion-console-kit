@@ -10,10 +10,6 @@ import {
 } from '@/tests/support/versioning/boundaries'
 import { NetworkListVersionService } from '@/services/v2/network-lists/network-list-version-service'
 
-// Network List — registry-driven suite. The inherited service + shared adapter
-// contracts run from the descriptor (IP/CIDR config markers + payload markers).
-// Bespoke below: the per-type item semantics (ASN/Countries) and the global-list
-// scoping guard, which are genuinely list-specific.
 const networkList = RESOURCE_TEST_REGISTRY.network_list
 const adapter = networkList.adapter
 

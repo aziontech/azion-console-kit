@@ -58,8 +58,6 @@
       type: Function,
       required: true
     },
-    // Optional versioned facade (drop-in). When present, list/delete/reorder route
-    // through it instead of the non-versioned edgeFirewallRulesEngineService.
     service: {
       type: Object,
       default: null
@@ -70,8 +68,6 @@
     }
   })
 
-  // Outside the VersionShell (legacy flow) this defaults to readOnly=false, so the
-  // legacy behavior is unchanged; inside an immutable version it disables writes.
   const { readOnly, isVersioned } = useVersionContext()
   const isReadOnly = computed(() => readOnly.value)
 

@@ -1,22 +1,12 @@
 import { shallowRef, shallowReadonly } from 'vue'
 
-/**
- * Inject key used by the VersionShell to provide the bus to descendants.
- * Children consume it via @/composables/versioning/use-version-command.
- */
 export const VERSION_COMMAND_BUS_KEY = Symbol('versionCommandBus')
 
 /**
- * Creates an isolated command bus for a VersionShell instance.
- *
- * Each command supports ONE handler. Registering twice throws.
- * Emitting without a handler throws. `registered` is reactive so the shell
- * can recompute availableActions/disabledActions when children mount/unmount.
- *
  * @returns {{
- *   register: (command: string, opts: { execute: Function, ready?: import('vue').Ref<boolean> }) => () => void,
- *   emit: (command: string, ctx: object) => Promise<any>,
- *   registered: import('vue').Ref<Map<string, { execute: Function, ready: import('vue').Ref<boolean>|null }>>
+ * register: (command: string, opts: { execute: Function, ready?: import('vue').Ref<boolean> }) => () => void,
+ * emit: (command: string, ctx: object) => Promise<any>,
+ * registered: import('vue').Ref<Map<string, { execute: Function, ready: import('vue').Ref<boolean>|null }>>
  * }}
  */
 export const createVersionCommandBus = () => {

@@ -9,8 +9,6 @@ import {
   canDelete
 } from '@/composables/versioning/version-machine'
 
-// The eight canonical states, enumerated once so every predicate is checked
-// against the FULL domain — a happy-path-only test would miss a flipped case.
 const ALL_STATES = [
   VERSION_STATES.DRAFT,
   VERSION_STATES.QUEUED,
@@ -64,8 +62,6 @@ describe('isProcessing — platform is queuing or building', () => {
 })
 
 describe('isImmutable / isEditable / isProcessing are mutually exclusive per state', () => {
-  // Every state is editable XOR processing XOR immutable — a state that answered
-  // true (or false) to two of them would break the shell's lock/edit branching.
   it.each(ALL_STATES)('`%s` matches exactly one lifecycle predicate', (state) => {
     const matches = [isEditable(state), isProcessing(state), isImmutable(state)].filter(Boolean)
     expect(matches).toHaveLength(1)

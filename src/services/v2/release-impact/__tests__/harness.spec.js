@@ -9,7 +9,6 @@ import {
   asListResponse
 } from './harness'
 
-// Guaranteed binding fields the reverse-lookup is allowed to read (design §3.2).
 const ALLOWED_BINDING_KEYS = ['deployment_id', 'environment_id', 'domains']
 
 describe('release-impact harness — fixtures', () => {
@@ -34,13 +33,10 @@ describe('release-impact harness — fixtures', () => {
   it('includes the edge cases the reverse-lookup must handle', () => {
     const bindings = v6WorkloadsList.body.flatMap((workload) => workload.bindings)
 
-    // an inactive workload exists (active-only filtering target)
     expect(v6WorkloadsList.body.some((workload) => workload.active.content === 'Inactive')).toBe(
       true
     )
-    // a binding with null deployment_id exists (must be skipped)
     expect(bindings.some((binding) => binding.deployment_id === null)).toBe(true)
-    // an environment_id absent from the env map exists (name must stay null)
     expect(bindings.some((binding) => !envNameById.has(binding.environment_id))).toBe(true)
   })
 

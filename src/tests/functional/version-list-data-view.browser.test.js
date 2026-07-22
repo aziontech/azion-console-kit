@@ -1,12 +1,3 @@
-/**
- * Functional (real Chromium) — VersionListDataView (spec task 4.2).
- *
- * Real user actions + observable consequences: the primary cell opens the config
- * (row-action OPEN_CONFIGURATION), the kebab opens the menu without dispatching a
- * row open, a menu item dispatches its action, an optional column auto-hides when
- * no row carries its data, and — at a phone viewport (real matchMedia) — the kebab
- * opens the bottom action sheet without the card's row-click firing.
- */
 import { render } from '@testing-library/vue'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import PrimeVue from 'primevue/config'
@@ -41,22 +32,19 @@ const renderList = (props = {}) =>
     global: primevue
   })
 
-// The popup Menu and the action sheet teleport to <body>; find their items there.
 const findInBody = async (text) => {
+  const selector = '.version-row-menu__item, [data-testid="version-action-sheet__item"]'
   await vi.waitFor(() => {
-    const hit = [
-      ...document.body.querySelectorAll('.version-row-menu__item, .action-sheet__button')
-    ].some((el) => el.textContent.includes(text))
+    const hit = [...document.body.querySelectorAll(selector)].some((el) =>
+      el.textContent.includes(text)
+    )
     expect(hit).toBe(true)
   })
-  return [...document.body.querySelectorAll('.version-row-menu__item, .action-sheet__button')].find(
-    (el) => el.textContent.includes(text)
-  )
+  return [...document.body.querySelectorAll(selector)].find((el) => el.textContent.includes(text))
 }
 
 describe('VersionListDataView (functional)', () => {
   beforeEach(async () => {
-    // Desktop by default (table + popup menu). The phone test overrides this.
     await page.viewport(1280, 800)
   })
 
@@ -70,9 +58,7 @@ describe('VersionListDataView (functional)', () => {
   it('kebab opens the menu and does NOT emit a row open', async () => {
     const { getByTestId, emitted } = renderList()
     await userEvent.click(getByTestId('version-list-data-view__row-abc123__menu'))
-    // The menu content proves it opened…
     await findInBody('Open configuration')
-    // …and opening the menu is not a row open.
     expect(emitted()['row-action']).toBeUndefined()
   })
 
@@ -94,7 +80,6 @@ describe('VersionListDataView (functional)', () => {
       columns,
       items: [makeItem({ referenceCount: null })]
     })
-    // No header cell for the auto-hidden column, and no in-use cell in the row.
     expect(container.querySelector('.header-row').textContent).not.toContain('In use')
     expect(queryByTestId('version-list-data-view__row-abc123__in-use')).toBeNull()
   })
@@ -121,9 +106,7 @@ describe('VersionListDataView (functional)', () => {
       return el
     })
     await userEvent.click(cardKebab)
-    // The bottom sheet opened (its buttons live in <body>)…
     await findInBody('Open configuration')
-    // …and the tap did not bubble to the card's row-click (stopPropagation).
     expect(emitted()['row-action']).toBeUndefined()
   })
 })

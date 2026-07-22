@@ -1,7 +1,5 @@
 import * as yup from 'yup'
 
-// Shared Edge Function form schema, reused by the legacy EditView and the v6
-// VersionShell adapter so both validate the same fields.
 export const validationSchema = yup.object({
   name: yup.string().required('Name is a required field'),
   code: yup.string().required('Code is a required field'),

@@ -1,9 +1,3 @@
-// Orchestrator composable for the Deployment Release drawer: centralizes the
-// state duplicated across its consumers (visibility, selected release, detail
-// fetch, an explicit resolving flag + stale guard) and is the SINGLE source of
-// truth for resource-name resolution, applying a deterministic fallback so a
-// name never renders silently blank.
-
 import { ref, computed, watch, toValue } from 'vue'
 import { deploymentReleaseService } from '@/services/v2/deployment/deployment-release-service'
 import { workloadService } from '@/services/v2/workload/workload-service'
@@ -11,8 +5,6 @@ import { environmentService } from '@/services/v2/environment/environment-servic
 import { deploymentService } from '@/services/v2/deployment/deployment-service'
 import { resolveReleaseResources } from '@/views/Deployments/utils/resolveReleaseResources'
 
-// Deterministic fallback when name resolution yields nothing: never a silent
-// blank. Order: resolved/adapter name → resource id → label → em dash.
 const FALLBACK_LABEL = '--'
 
 const getUtcDayRange = (isoDate) => {
@@ -40,15 +32,9 @@ export function useDeploymentReleaseDrawer({ release, visible, emit } = {}) {
   const isLoading = ref(false)
   const logs = ref([])
   const isLoadingLogs = ref(false)
-  // Raw resources for the current detail; the final display fallback is applied
-  // once in `displayRelease` so this stays the single resolution pipeline.
   const resolvedResources = ref([])
-  // Explicit resolving flag: true while names resolve, so the UI can show a
-  // placeholder instead of blanks.
   const isResolvingResources = ref(false)
 
-  // Stale guard: rapid release switches must not let an older async resolution
-  // overwrite a newer one (a monotonic seq counter).
   let resolveSeq = 0
 
   const currentRelease = computed(() => toValue(release))
@@ -58,10 +44,6 @@ export function useDeploymentReleaseDrawer({ release, visible, emit } = {}) {
     set: (value) => emit?.('update:visible', value)
   })
 
-  // Single fallback pass over the resolved resources: the adapter seeds `name`,
-  // `resolveReleaseResources` enriches it, here we guarantee a deterministic value.
-  // Every release resource is shown; the adapter already orders them so the main
-  // ones (application, firewall, custom_page) come first.
   const displayRelease = computed(() => {
     const base = detail.value ?? currentRelease.value
     if (!base) return base
@@ -75,13 +57,10 @@ export function useDeploymentReleaseDrawer({ release, visible, emit } = {}) {
       displayRelease.value?.urls?.deployment_url || displayRelease.value?.urls?.canonical_url || ''
   )
 
-  // Rollback for the live version, Redeploy otherwise (current behavior).
   const secondaryButtonLabel = computed(() =>
     displayRelease.value?.isCurrent ? 'Rollback' : 'Redeploy'
   )
 
-  // Uniform rollback/redeploy contract: emit only when a release exists, so the
-  // action is never a silent no-op.
   const onSecondaryAction = () => {
     const target = displayRelease.value
     if (!target) return
@@ -185,8 +164,6 @@ export function useDeploymentReleaseDrawer({ release, visible, emit } = {}) {
       const releaseResources = toResourceList(data?.resources)
       resolvedResources.value = releaseResources
 
-      // Single resolution pipeline: enrich names via the util, guarded against
-      // stale writes from a newer release selection.
       const enriched = await resolveReleaseResources(releaseResources)
       if (seq !== resolveSeq) return
       resolvedResources.value = enriched
@@ -239,11 +216,6 @@ export function useDeploymentReleaseDrawer({ release, visible, emit } = {}) {
   }
 }
 
-// Consumer-facing half of the drawer composable: owns the visibility + selected
-// release state that used to be duplicated as local refs in every consumer
-// (`ReleasesTab`, `WorkloadReleasesSection`).
-// `actionable` declares whether this context can run rollback/redeploy so the
-// drawer hides the button instead of emitting a no-op that only toasts.
 export function useReleaseDrawerController({ actionable = false } = {}) {
   const visible = ref(false)
   const selectedRelease = ref(null)

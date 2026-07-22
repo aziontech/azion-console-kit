@@ -80,13 +80,6 @@ const parseReleaseList = (data) => {
   return []
 }
 
-/**
- * One-shot release dispatch (`build_and_activate`) + active-release read, plus
- * the full releases CRUD (list/create/build/activate/promote/rollback/...).
- * `build_and_activate` invalidates both the drawer's active-release cache and
- * the releases/deployments caches; API errors (404/422) propagate untouched so
- * the drawer can surface them without losing form state.
- */
 export class DeploymentReleaseService extends BaseService {
   #baseURL = '/deployment-api/v4/deployments'
 
@@ -354,13 +347,6 @@ export class DeploymentReleaseService extends BaseService {
 
         const releases = parseReleaseList(data)
 
-        // A new release inherits the composition of the DS's CURRENT release.
-        // A single_version DS has exactly one release serving traffic
-        // (traffic_role ACTIVE); a versioned_urls DS has NONE — several versions
-        // can be live at once, so its releases stay 'valid'. Prefer the ACTIVE
-        // release, else fall back to the most recent one (the list is ordered
-        // -created_at,-id) — the composition a new release inherits from. Only a
-        // DS with no release at all resolves to null.
         const active = releases.find(
           (release) => String(release?.traffic_role).toUpperCase() === ACTIVE_TRAFFIC_ROLE
         )

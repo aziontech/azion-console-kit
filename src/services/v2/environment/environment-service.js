@@ -114,11 +114,6 @@ export class EnvironmentService extends BaseService {
     return this.usePrefetchQuery(queryKeys.environments.list(), () => this.#fetchList())
   }
 
-  /**
-   * Reactive environments listing for the deploy drawer. Mirrors
-   * `edgeAppVersionService.useListVersionsQuery`: `enabled` (a ref/getter) gates
-   * fetching to the drawer's open state; reopens reuse the vue-query cache.
-   */
   useEnvironmentsListQuery = ({ enabled } = {}) =>
     this.useQuery(queryKeys.environments.list(), () => this.#fetchList(), {
       persist: false,

@@ -58,9 +58,6 @@ const mountFormFields = ({ initialValues, secretChangeValueOnly, disabled = fals
 }
 
 describe('FormFieldsVariables', () => {
-  // The V6 rework dropped the secret/loading field-lock from this component (its
-  // parents no longer pass `disabled`/`secretChangeValueOnly`), so no field is
-  // ever disabled here and the value placeholder is static.
   it('renders key, value and secret fields without locking any of them', () => {
     const wrapper = mountFormFields({
       initialValues: { key: 'SECRET_KEY', value: '', secret: true }

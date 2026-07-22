@@ -4,38 +4,14 @@ import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 
-/**
- * REGISTRY-GUARD — the `enforce-test-exists` of the versioning domain
- * (TEST-ARCHITECTURE.md §3.2 "Registry-guard").
- *
- * The production Version Shell is registry-driven: a resource is plugged with a
- * single entry in `RESOURCE_VERSION_ROUTES` (+ a `RESOURCE_CAPABILITY` class).
- * The suite MUST mirror that: every plugged resource needs a test descriptor in
- * `RESOURCE_TEST_REGISTRY` AND a thin per-resource instantiator file. This guard
- * makes "complete coverage" a structural consequence instead of a manual chore —
- * a resource cannot be plugged into production without also being plugged into
- * the test architecture, or this file goes red with a didactic message pointing
- * at TEST-ARCHITECTURE.md.
- *
- * It parses the PRODUCTION source (not an import) so a rename/removal there is
- * caught here, and it never mocks anything: it reads real files and the real
- * registry object.
- */
-
 const HERE = dirname(fileURLToPath(import.meta.url))
-const SRC_ROOT = resolve(HERE, '../../..') // .../src
+const SRC_ROOT = resolve(HERE, '../../..')
 const ROUTES_SRC = resolve(SRC_ROOT, 'composables/versioning/use-version-menu-actions.js')
 const CAPABILITY_SRC = resolve(SRC_ROOT, 'composables/versioning/version-capability.js')
 const THIN_ROOT = resolve(SRC_ROOT, 'tests/services/v2')
 
 const DOC = 'TEST-ARCHITECTURE.md §3.2/§3.3'
 
-/**
- * Extracts the top-level keys of an `export const NAME = { ... }` (or
- * `Object.freeze({ ... })`) object literal from raw source. The versioning
- * registries have no nested braces, so a non-greedy match to the first `}` is
- * exact.
- */
 const parseObjectKeys = (source, declarationRe, label) => {
   const match = source.match(declarationRe)
   if (!match) {
@@ -62,9 +38,6 @@ const versionedOnlyTypes = parseObjectKeys(
   'RESOURCE_CAPABILITY'
 )
 
-// The thin per-resource instantiator files, each declaring which descriptor it
-// runs via `RESOURCE_TEST_REGISTRY.<key>`. Matched by content, not by filename,
-// because the file path (edge-app) rarely equals the resource type (application).
 const thinFileContents = readdirSync(THIN_ROOT)
   .map((entry) => resolve(THIN_ROOT, entry))
   .filter((path) => statSync(path).isDirectory())
@@ -127,9 +100,6 @@ describe('registry-guard (b) — every descriptor carries the mandatory fields',
   it.each(entries)(
     '%s declares a non-empty configMarkers when it runs the shared contracts',
     (resourceType, descriptor) => {
-      // configMarkers only feeds the shared adapter/service read contracts, which the
-      // wrapped-envelope resource (deployment) does not run — its reads are bespoke.
-      // The gate keys on the same declared divergence the shared suite already uses.
       if (descriptor.envelope !== 'standard') return
       expect(
         descriptor.configMarkers && Object.keys(descriptor.configMarkers).length,

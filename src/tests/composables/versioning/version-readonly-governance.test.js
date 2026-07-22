@@ -4,27 +4,9 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
-/**
- * Governance — Version Shell readOnly (single source of truth).
- *
- * The "what is editable" RULE lives in exactly ONE place: version-machine.isEditable
- * (draft/canceled/error). The shell derives a single `readOnly` flag from it once
- * (use-version-shell) and provides it via the version context. Every versioned form
- * component must CONSUME that flag (useVersionContext + readOnly) so an immutable
- * version (ready/active/archived/queued/building) cannot be edited.
- *
- * This test fails if (a) the rule is duplicated/moved out of version-machine, or
- * (b) a versioned form stops consuming the central flag — the exact regression that
- * left Firewall/WAF/CustomPages/Functions editable while Ready.
- */
-// Resolve from the repo root via the current file's directory. NOTE: do NOT use
-// `new URL(dynamicPath, import.meta.url)` — Vite rewrites that pattern as a static
-// asset import and cannot resolve a dynamic argument, yielding a bogus path.
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../')
 const read = (relative) => readFileSync(resolve(REPO_ROOT, relative), 'utf8')
 
-// Form components rendered inside the version editors. Each MUST read the central
-// readOnly flag. Listing a new versioned form here without consuming readOnly fails.
 const VERSIONED_FORM_COMPONENTS = [
   'src/views/EdgeFirewall/FormFields/FormFieldsEdgeFirewall.vue',
   'src/views/WafRules/FormFields/FormFieldsWafRules.vue',
@@ -48,7 +30,6 @@ describe('Version Shell readOnly — single rule, consumed by every versioned fo
     expect(machine).toContain("'canceled'")
     expect(machine).toContain("'error'")
 
-    // The shell derives readOnly from the rule once (not re-implemented per form).
     const shell = read('src/templates/version-shell-block/use-version-shell.js')
     expect(shell).toMatch(/readOnly\s*=\s*computed\(\(\)\s*=>\s*!isEditable\(state\.value\)\)/)
   })

@@ -1,7 +1,4 @@
 <script setup>
-  // VersionsTab — the version LISTING body of the v6 Network Lists screen.
-  // Lists every version with search/filter/sort and per-row actions
-  // (Clone / Archive / Delete). Clicking a version opens its full editor.
   import { computed, inject, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from '@aziontech/webkit/use-toast'
@@ -56,8 +53,6 @@
     })
   }
 
-  // The landing owns the release drawer; the tab only routes through the
-  // single shared row-menu driver (spec §3.3/3.6, Req 1.4/10.1).
   const menuHost = inject('versionMenuHost', {})
 
   const {

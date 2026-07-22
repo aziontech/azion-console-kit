@@ -14,9 +14,6 @@ vi.mock('@/views/Deployments/utils/resolveReleaseResources', () => ({
   resolveReleaseResources: (...args) => resolveReleaseResources(...args)
 }))
 
-// The composable now derives impacted workloads + deployment name from three
-// list queries. Stub them as query-shaped objects so the composable is
-// constructible outside a component's vue-query injection context.
 vi.mock('@/services/v2/workload/workload-service', () => ({
   workloadService: {
     useWorkloadsListQuery: () => ({ data: { value: { body: [] } }, isLoading: { value: false } })
@@ -84,7 +81,6 @@ describe('useDeploymentReleaseDrawer', () => {
         resources: [{ type: 'application', id: 'res-1', label: 'Application', name: '' }]
       }
     })
-    // Single resolution source returns the resource still without a name.
     resolveReleaseResources.mockResolvedValue([
       { type: 'application', id: 'res-1', label: 'Application', name: '' }
     ])
@@ -136,8 +132,6 @@ describe('useDeploymentReleaseDrawer', () => {
   })
 
   it('shows every release resource, in the order the adapter provides them', async () => {
-    // The adapter already orders resources main-first (application, firewall,
-    // custom_page) ahead of the rest; the drawer surfaces all of them untouched.
     const allResources = [
       { type: 'application', id: 'app-1', name: 'app' },
       { type: 'firewall', id: 'fw-1', name: 'fw' },
@@ -173,7 +167,6 @@ describe('useDeploymentReleaseDrawer', () => {
     release.value = { id: 'R2', deployment_id: 'D1' }
     await flush()
 
-    // The late first fetch resolves last but must not clobber R2.
     resolveFirst()
     await flush()
 
@@ -199,8 +192,6 @@ describe('useDeploymentReleaseDrawer', () => {
     await flush()
 
     expect(emit).toHaveBeenCalledWith('error', expect.any(Error))
-    // Detail is cleared, but the drawer still shows the passed-in release
-    // (deterministic fallback, never a blank panel).
     expect(api.displayRelease.value).toMatchObject({ id: 'R1' })
     expect(api.isResolvingResources.value).toBe(false)
   })

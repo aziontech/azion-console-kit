@@ -1,7 +1,4 @@
 <script setup>
-  // Workload VersionShell form child. PUT auto-builds (doc §3): SAVE and
-  // SAVE_AND_BUILD are the same write, so it overrides the save strategy on top of
-  // the shared service + schema.
   import {
     useVersionFormAdapter,
     workloadSaveStrategy

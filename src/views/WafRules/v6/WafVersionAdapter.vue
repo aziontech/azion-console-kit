@@ -1,6 +1,4 @@
 <script setup>
-  // WAF VersionShell form child. Thin adapter: wires the shared service +
-  // existing WAF schema into the version form lifecycle.
   import {
     useVersionFormAdapter,
     defaultSaveStrategy

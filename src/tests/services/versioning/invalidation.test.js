@@ -11,17 +11,9 @@ import { NetworkListVersionService } from '@/services/v2/network-lists/network-l
 import { WafVersionService } from '@/services/v2/waf/waf-version-service'
 import { versionedWafExceptionsService } from '@/services/v2/waf/versioned/versioned-waf-exceptions-service'
 
-// Property 7 contract test (task 1.4): the Wave-0 base generalization (list
-// params + overridable `invalidateAfterMutation`) must not change the behavior
-// of the 4 existing version services. EVERY mutation invalidates the version
-// cache, and load/list keep their previous shape/queryKeys.
-
 const RID = 'res-1'
 const VID = 'AV000001'
 
-// Each service under test + its expected version queryKey namespace. The first
-// four shipped before the rollout; `network-list`/`waf` join the same contract
-// (task 1.3, P7) by extending `VersionServiceBase` with their own bindings.
 const SERVICES = [
   {
     name: 'EdgeAppVersionService',
@@ -61,8 +53,6 @@ const SERVICES = [
   }
 ]
 
-// Every base-defined mutation + how to invoke it. `archive` needs a non-empty
-// comment (base guard); the rest carry minimal payloads.
 const MUTATIONS = [
   { name: 'createDraft', invoke: (svc) => svc.createDraft(RID, { sourceVersionId: VID }) },
   { name: 'updateDraft', invoke: (svc) => svc.updateDraft(RID, VID, { name: 'x' }) },
@@ -79,9 +69,6 @@ const stubRequest = () =>
 const stubEnsure = () =>
   vi.spyOn(queryClient, 'ensureQueryData').mockImplementation(({ queryFn }) => queryFn())
 
-// The invalidation contract is independent of resource-specific payload shaping.
-// Neutralize the adapter transforms so a minimal payload reaches every service
-// without tripping resource form expectations (covered by adapter-specific tests).
 const stubAdapterTransforms = (service) => {
   const passthrough = (value) => value ?? {}
   for (const name of [
@@ -250,9 +237,6 @@ describe('Regression — load/list keep their previous queryKeys/shape', () => {
 })
 
 describe('Regression — Workload rollback still invalidates the same version cache', () => {
-  // `rollback` is a Workload-only mutation (no `/rollback` on the base). It does
-  // not route through `invalidateAfterMutation`, but removes the SAME version
-  // cache key, so the observable cache behavior matches the base hook.
   it('rollback removes queryKeys.workload.version.all even though it bypasses the hook', async () => {
     const service = new WorkloadVersionService()
     stubRequest()
@@ -267,10 +251,6 @@ describe('Regression — Workload rollback still invalidates the same version ca
 })
 
 describe('Property 7 — versioned WAF exceptions invalidate the version cache', () => {
-  // The exceptions sub-resource is built via `createVersionedSubResourceService`
-  // (not `VersionServiceBase`), so it is scoped to (wafId, versionId) and lives
-  // outside the SERVICES array. Every mutation still removes its own version
-  // cache key, keeping the shared Allowed Rules ListView fresh.
   const WAF_ID = 'waf-1'
   const exceptionsKey = queryKeys.waf.version.exceptions.all(WAF_ID, VID)
 
@@ -302,8 +282,6 @@ describe('Property 7 — versioned WAF exceptions invalidate the version cache',
 })
 
 describe('Structural — every base mutation routes through the hook', () => {
-  // Guards Property 7 at the source: a new mutation added to the base that
-  // forgets to call the hook fails here without needing a per-service test.
   it.each(MUTATIONS.map((mutation) => mutation.name))(
     '%s is defined on VersionServiceBase.prototype or as an instance field',
     (methodName) => {

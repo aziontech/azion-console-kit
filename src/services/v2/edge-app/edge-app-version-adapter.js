@@ -1,12 +1,6 @@
-/**
- * Application version adapter — only the Application-specific exceptions; the
- * common normalization/payload logic comes from `createVersionAdapter`.
- */
 import { createVersionAdapter } from '@/services/v2/versioning/version-adapter'
 import { EdgeAppAdapter } from './edge-app-adapter'
 
-// Extracts the Application config fields (name, modules, active, debug) from a
-// version snapshot into the UI form shape, including only the present keys.
 const normalizeConfig = (raw) => {
   if (!raw || typeof raw !== 'object') return {}
 

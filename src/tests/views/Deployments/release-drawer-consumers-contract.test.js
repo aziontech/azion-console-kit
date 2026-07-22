@@ -4,12 +4,6 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
-// The uniform rollback/redeploy contract lives in two places: the shared
-// controller (`useReleaseDrawerController`, behaviorally tested in the composable
-// suite) and how each consumer declares its `actionable` value + wires the drawer.
-// This suite pins that wiring so a consumer can't silently regress to a local-ref
-// pattern or to a no-op action where it should be hidden.
-
 const read = (relative) =>
   readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), `../../../${relative}`), 'utf8')
 
@@ -32,7 +26,6 @@ describe('Release drawer — uniform contract across consumers', () => {
       it('uses the shared controller (no duplicated local drawer refs)', () => {
         expect(source).toContain('useReleaseDrawerController')
         expect(source).toContain("from '@/composables/versioning/use-deployment-release-drawer'")
-        // The shared state is the single source of visibility/selection.
         expect(source).toContain('DeploymentReleaseDrawer')
       })
 
@@ -52,8 +45,6 @@ describe('Release drawer — uniform contract across consumers', () => {
 
     for (const file of [CONSUMERS.WorkloadReleasesSection.file]) {
       const source = read(file)
-      // No-op + toast is forbidden: a non-actionable consumer must not bind the
-      // action handlers at all (the drawer hides the button instead).
       expect(source).not.toContain('@rollback')
       expect(source).not.toContain('@redeploy')
     }

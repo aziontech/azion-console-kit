@@ -1,6 +1,4 @@
 <script setup>
-  // Network List VersionShell form child. Thin adapter: wires the shared
-  // service + existing Network List schema into the version form lifecycle.
   import {
     useVersionFormAdapter,
     defaultSaveStrategy

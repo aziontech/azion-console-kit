@@ -3,9 +3,6 @@ import { describe, expect, it } from 'vitest'
 
 import ImpactPanel from '@/templates/release-composition/components/ImpactPanel.vue'
 
-// Webkit Message/InlineMessage/Button reduced to plain DOM so the three
-// mutually-exclusive states (empty / unavailable+Retry / available tree+totals)
-// and the retry contract are observable in jsdom.
 const stubs = {
   Message: {
     name: 'Message',
@@ -51,8 +48,6 @@ describe('ImpactPanel', () => {
     it('defaults to the empty state when no impact prop is provided', () => {
       const wrapper = makeWrapper()
 
-      // The default impact prop has hasSelection: false → empty branch wins even
-      // though impactUnavailable defaults to true.
       expect(wrapper.find('[data-testid="release-composition__impact-empty"]').exists()).toBe(true)
     })
   })

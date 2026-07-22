@@ -3,8 +3,6 @@ import { mount } from '@vue/test-utils'
 import { ref } from 'vue'
 import { useDeployResourceContext } from '@/composables/versioning/use-deploy-resource-context'
 
-// Boundary mock: vue-router only. The version service is a fake injected by
-// PARAMETER (a permitted boundary-by-injection), never a vi.mock of the module.
 const { route } = vi.hoisted(() => ({ route: { params: {} } }))
 vi.mock('vue-router', () => ({ useRoute: () => route }))
 
@@ -66,7 +64,6 @@ describe('useDeployResourceContext — capability gating', () => {
       resourceName: 'App',
       version: { id: 'v1' }
     })
-    // Only the deployable (ready) version is offered.
     expect(context.versions.map((option) => option.id)).toEqual(['v-ready'])
   })
 })

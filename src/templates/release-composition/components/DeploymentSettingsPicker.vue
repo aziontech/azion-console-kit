@@ -1,45 +1,4 @@
 <script setup>
-  /**
-   * DeploymentSettingsPicker — presentational multi-select list of Deployment
-   * Settings (the atomic deploy unit) with search and a selected counter. It
-   * does not fetch, filter, derive or resolve anything: `deployments` arrive
-   * already enriched from the composable, `query` is owned by the parent, and
-   * selection is a plain array of ids surfaced through `modelValue`.
-   *
-   * A Deployment Setting row never fabricates data: it renders only the icon,
-   * `name`, the `policyLabel` tag and, when present, the impact metadata
-   * (`workloadsCount`, `environmentNames`) that already arrives on each object.
-   *
-   * @prop {Array<{ id, name, policyLabel, workloadsCount?, environmentNames? }>} deployments
-   *   Flat list of Deployment Settings. Used as a fallback when `groups` is empty.
-   *   `workloadsCount` (number) renders a "{N} Workloads affected" line and is
-   *   omitted when absent (never fabricated to 0). `environmentNames` (string[])
-   *   renders up to three tags plus a "+K" overflow chip.
-   * @prop {Array<{ key: string, label: string, selectable?: boolean, notice?: string, action?: { label: string, icon?: string }, deployments: Array<{ id, name, policyLabel, workloadsCount?, environmentNames? }> }>} groups
-   *   Sectioned Deployment Settings. When populated, rows render grouped under
-   *   `label` headers (empty groups omitted). A group with `selectable: false`
-   *   (default true) renders read-only rows — a per-group `notice` line and, when
-   *   `action` is present, a single button that emits `group-action` — instead of a
-   *   checkbox, and is excluded from the counter, select-all/clear-all and union
-   *   math (the selectable set driving those is the union of the selectable groups
-   *   only). The picker is presentational: it never derives `notice`/`action`, they
-   *   arrive per group from the parent.
-   * @prop {Array<string|number>} modelValue Selected Deployment Setting ids.
-   * @prop {string} query Search string (owned by the parent).
-   * @prop {boolean} isLoadingMeta When true, the impact metadata (workloads
-   *   count and environment tags) is replaced by a discrete skeleton placeholder.
-   * @prop {boolean} metaUnavailable When true, a row with no resolved workload
-   *   count surfaces an "impact unavailable" note instead of the "no workloads"
-   *   line — so a failed impact load is never misread as "zero workloads". Rows
-   *   always render a second metadata line (count, unavailable, or "no workloads")
-   *   so every card keeps the same height.
-   *
-   * @emits update:modelValue When the selection changes.
-   * @emits update:query When the search string changes.
-   * @emits bind-environment When the empty-state action is triggered.
-   * @emits group-action ({ groupKey, dsId }) When a non-selectable row's action
-   *   button is triggered (e.g. "Compose first release" or "Retry").
-   */
   import { computed } from 'vue'
   import Checkbox from '@aziontech/webkit/checkbox'
   import InputText from '@aziontech/webkit/inputtext'
@@ -96,13 +55,6 @@
     set: (value) => emit('update:modelValue', value)
   })
 
-  // Selection is driven by the ROW click (single source of truth) and the visual
-  // Checkbox is a controlled, non-interactive reflection of `modelValue`. This
-  // avoids the double-toggle a label-wrapped self-toggling Checkbox produced — a
-  // click on the box fired PrimeVue's own toggle AND the wrapping <label>
-  // forwarded a second toggle to the native input, netting to no change (the
-  // reported "first click does nothing", with the box left visually checked but
-  // the model — and so the counter/impact — never updated).
   const toggle = (id) => {
     const isSelected = props.modelValue.some((item) => String(item) === String(id))
     selectedIds.value = isSelected
@@ -115,25 +67,16 @@
     set: (value) => emit('update:query', value)
   })
 
-  // When `groups` is populated the picker renders sectioned rows; the flat
-  // "listed" set is the union of every group's deployments in group order.
-  // With no groups it falls back to the plain `deployments` prop.
   const visibleGroups = computed(() =>
     props.groups.filter((group) => group.deployments && group.deployments.length > 0)
   )
 
   const hasGroups = computed(() => visibleGroups.value.length > 0)
 
-  // Every listed row — selectable or not — drives the list vs empty-state and the
-  // search count. A `selectable: false` group still lists its rows (they surface
-  // an inline action instead of a checkbox), so they must count here or a picker
-  // showing only non-selectable rows would fall through to the empty-state.
   const listedDeployments = computed(() =>
     hasGroups.value ? visibleGroups.value.flatMap((group) => group.deployments) : props.deployments
   )
 
-  // Only the SELECTABLE rows — drives the counter, select-all/clear-all and the
-  // union math, so bulk selection never picks a row the parent can't accept.
   const selectableListed = computed(() =>
     hasGroups.value
       ? visibleGroups.value
@@ -150,8 +93,6 @@
   const hasDeployments = computed(() => total.value > 0)
   const hasSelectable = computed(() => selectableListed.value.length > 0)
 
-  // Normalized render model: grouped mode yields one section per non-empty
-  // group (with a header), flat mode yields a single header-less section.
   const sections = computed(() =>
     hasGroups.value
       ? visibleGroups.value.map((group) => ({
@@ -174,24 +115,13 @@
         ]
   )
 
-  // Select-all / clear-all over the LISTED candidate set (req 1.9 / NRS §4.5).
-  // `deployments` may be a filtered/capped view (search term, display cap), so
-  // these operate ONLY on the currently LISTED rows and never disturb selections
-  // hidden by the search. They emit through the array contract
-  // (`update:modelValue`) exactly like a row toggle, so the parent's selection
-  // wiring stays single-sourced.
   const isSelected = (id) => props.modelValue.some((item) => String(item) === String(id))
 
-  // `allSelected` reflects whether every LISTED row is already in the selection
-  // (so it disables select-all once the visible set is fully picked), regardless
-  // of selections hidden by the current search.
   const allSelected = computed(
     () =>
       hasSelectable.value && selectableListed.value.every((deployment) => isSelected(deployment.id))
   )
 
-  // Select-all UNIONS the listed SELECTABLE ids with the existing selection so
-  // rows hidden by the search/cap stay selected (never dropped).
   const selectAll = () => {
     const listedToAdd = selectableListed.value
       .map((deployment) => deployment.id)
@@ -199,8 +129,6 @@
     selectedIds.value = [...props.modelValue, ...listedToAdd]
   }
 
-  // Clear-all removes ONLY the listed selectable rows from the selection,
-  // preserving any selections hidden by the search/cap.
   const clearAll = () => {
     const listedIds = new Set(selectableListed.value.map((deployment) => String(deployment.id)))
     selectedIds.value = props.modelValue.filter((item) => !listedIds.has(String(item)))
@@ -281,10 +209,6 @@
         >
           {{ section.label }}
         </span>
-        <!-- Selectable groups render the checkbox row; the empty-array branch
-             stops this loop from rendering non-selectable rows, which use the
-             action row below instead (a DS with no active release can't be
-             scoped-overridden — it needs a full first release). -->
         <div
           v-for="ds in section.selectable ? section.deployments : []"
           :key="ds.id"

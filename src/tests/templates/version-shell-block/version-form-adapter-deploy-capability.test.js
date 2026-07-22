@@ -10,13 +10,6 @@ import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-contex
 import { DEFAULT_CAPABILITY, VERSIONED_ONLY } from '@/composables/versioning/version-capability'
 import { useVersionFormAdapter } from '@/composables/versioning/use-version-form-adapter'
 
-/**
- * Task 3.8 — Phase 1: the form adapter registers the DEPLOY command only for
- * deployable resources. versioned-only omits it so the footer (availableActions
- * ∩ registered) drops Deploy and `dispatch('DEPLOY')` fail-closes.
- * Requirements 2.1, 2.4, 2.6.
- */
-
 const makeService = () => ({
   updateDraft: vi.fn().mockResolvedValue({ id: 'v1' }),
   build: vi.fn(),

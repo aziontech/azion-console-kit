@@ -11,8 +11,6 @@ import {
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 import { DEFAULT_CAPABILITY, VERSIONED_ONLY } from '@/composables/versioning/version-capability'
 
-// A single form field that joins the composable's VeeValidate form so a test can
-// dirty it through a real user edit (setValue), the way a form child would.
 const NameField = {
   setup() {
     const { value } = useField('name')
@@ -21,8 +19,6 @@ const NameField = {
   template: '<input data-testid="name" v-model="value" />'
 }
 
-// Harness: drives the REAL useVersionFormAdapter with an INJECTED fake service
-// (boundary by injection — permitted). No versioning module is mocked.
 const Harness = {
   components: { NameField },
   props: ['resource', 'resourceId', 'versionId', 'versionService', 'schema', 'capability'],
@@ -178,7 +174,6 @@ describe('useVersionFormAdapter — DEPLOY registration gated by capability', ()
     await flushPromises()
 
     expect(bus.registered.value.has('DEPLOY')).toBe(false)
-    // The lifecycle handlers that do NOT depend on capability are still present.
     expect(bus.registered.value.has('SAVE')).toBe(true)
     expect(bus.registered.value.has('ARCHIVE')).toBe(true)
   })

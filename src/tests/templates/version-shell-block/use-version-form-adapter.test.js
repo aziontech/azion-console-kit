@@ -11,17 +11,6 @@ import {
 } from '@/composables/versioning/use-version-command-bus'
 import { VERSION_CONTEXT_KEY } from '@/composables/versioning/use-version-context'
 
-/**
- * The REAL resource version services run here (edge-app / firewall / custom-page /
- * workload). Only the boundaries are stubbed: the HTTP client (`httpService.request`)
- * and the query cache (`queryClient.removeQueries`/`invalidateQueries`). Each adapter
- * component wires its own service + save strategy, so the routing is proven by the
- * HTTP request the chain drives — never by a mocked version service.
- *
- * The Custom Page base service (`custom-page-service`) is NOT a versioning module:
- * its content save hits edge-api 10109 directly, so it stays a legitimate boundary
- * mock (asserted below).
- */
 const { customPageBaseService } = vi.hoisted(() => ({
   customPageBaseService: { editCustomPagesService: null }
 }))
@@ -30,8 +19,6 @@ vi.mock('@/services/v2/custom-page/custom-page-service', () => ({
   customPageService: customPageBaseService
 }))
 
-// Keep imported schemas trivial so validate() passes and the test isolates the
-// save routing (App/Firewall declare their own inline schema requiring `name`).
 vi.mock('@/views/CustomPages/Config/validationSchema', () => ({ validationSchema: yup.object({}) }))
 vi.mock('@/views/Workload/Config/validation', () => ({ buildV6Schema: () => yup.object({}) }))
 
@@ -62,7 +49,6 @@ const mountAdapter = (component, bus, resource = { name: 'res-x' }) =>
 
 let requestSpy
 
-// The service methods each drive exactly one HTTP request; assert on that boundary.
 const requests = () => requestSpy.mock.calls.map(([req]) => req)
 const countReq = (method, urlPart) =>
   requests().filter((req) => req.method === method && req.url.includes(urlPart)).length
@@ -81,8 +67,6 @@ afterEach(() => {
   setFeatureFlags([])
 })
 
-// A full v6 workload snapshot the REAL workload adapter can map without throwing
-// (the base workload transform reads protocols/mtls/domains unconditionally).
 const workloadResource = {
   name: 'res-x',
   active: true,

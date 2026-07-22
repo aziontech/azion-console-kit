@@ -1,11 +1,4 @@
 <script setup>
-  /**
-   * VersionsTab — the version LISTING body of the WAF v6 screen.
-   *
-   * Lists every version of the WAF with search/filter/sort and per-row actions
-   * (Clone / Archive / Delete). Clicking a version opens its FULL editor
-   * (VersionEditView). Owns its own versions query (deduped by queryKey).
-   */
   import { computed, inject, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useToast } from '@aziontech/webkit/use-toast'
@@ -54,8 +47,6 @@
     router.push(`/waf/edit/${wafId.value}/versions/${id}`)
   }
 
-  // The landing owns the release drawer; the tab only routes through the
-  // single shared row-menu driver (spec §3.3/3.6, Req 1.4/10.1).
   const menuHost = inject('versionMenuHost', {})
 
   const {

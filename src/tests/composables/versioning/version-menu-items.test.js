@@ -2,13 +2,6 @@ import { describe, it, expect } from 'vitest'
 import { buildVersionMenuItems } from '@/composables/versioning/version-actions'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 
-/**
- * Properties P1–P4 of the shared version row-menu model.
- * `buildVersionMenuItems(state, ctx)` is the single source of the deployable
- * items; these tests enumerate every VersionState × a few resourceTypes to lock
- * its set+order (P1), never-hide rule (P2), enablement matrix (P3) and purity (P4).
- */
-
 const FIXED_ORDER = [
   'OPEN_CONFIGURATION',
   'BUILD',
@@ -20,13 +13,10 @@ const FIXED_ORDER = [
 ]
 const ORDER_WITHOUT_DELETE = FIXED_ORDER.slice(0, -1)
 
-// Canonical states + the synthetic `deleted` (Delete omitted) and an unknown state.
 const ALL_STATES = [...Object.values(VERSION_STATES), 'deleted', 'totally-unknown']
 
-// resourceType is purely contextual: the model must not branch on it.
 const RESOURCE_TYPES = ['edge_application', 'edge_firewall', 'edge_connector', 'custom_pages']
 
-// Expected enablement per state, derived from the spec matrix (P3).
 const BUILD_ENABLED_STATES = [VERSION_STATES.DRAFT, VERSION_STATES.CANCELED, VERSION_STATES.ERROR]
 const DEPLOY_ENABLED_STATES = [VERSION_STATES.READY, VERSION_STATES.ACTIVE]
 const PROMOTE_ENABLED_STATES = [VERSION_STATES.READY]
@@ -73,9 +63,7 @@ describe('buildVersionMenuItems — P2: never hide (items present, disabled not 
 
   it.each(ALL_STATES)('unavailable actions are disabled, never removed (state "%s")', (state) => {
     const items = buildVersionMenuItems(state)
-    // Every present item must carry a boolean `disabled` flag (never silently dropped).
     items.forEach((entry) => expect(typeof entry.disabled).toBe('boolean'))
-    // The lifecycle/management items always stay present regardless of state.
     ;['OPEN_CONFIGURATION', 'BUILD', 'DEPLOY', 'PROMOTE', 'ROLLBACK', 'ARCHIVE'].forEach(
       (action) => {
         expect(byAction(items, action)).toBeDefined()

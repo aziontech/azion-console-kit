@@ -2,12 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { flushPromises } from '@vue/test-utils'
 
-// The composable orchestrates ONLY the injected v2 services + the catalog
-// registry. It must never reach the service-to-service reverse-lookup endpoint
-// (verified 401, spec §K) nor any raw HTTP path. Mock all three seams and, on
-// top of that, spy on `httpService.request` and the global `fetch` so any
-// accidental network/s2s call would fail the assertions loudly (Property 8).
-
 vi.mock('@/services/v2/deployment/deployment-service', () => ({
   deploymentService: { useDeploymentsListQuery: vi.fn() }
 }))
@@ -34,8 +28,6 @@ import {
   SCOPED_PUBLISH_SKIP_REASONS
 } from '@/templates/release-composition/use-release-composition'
 
-// Mirrors the `useQuery`-shaped object the composable reads from
-// `useDeploymentsListQuery` (`data.value.body`, `isLoading`, `isError`, `refetch`).
 const queryStub = (body = []) => ({
   data: ref({ body }),
   isLoading: ref(false),
@@ -43,9 +35,6 @@ const queryStub = (body = []) => ({
   refetch: vi.fn()
 })
 
-// An active release as returned by `getActiveReleaseComposition`: a raw
-// `{ resources: [...] }` where `application` is keyed by `global_id` and every
-// other type by `resource_id`, with the version pinned in `version_id`.
 const release = (resources) => ({ resources })
 
 let httpSpy
@@ -60,7 +49,6 @@ beforeEach(() => {
   RESOURCE_CATALOG_REGISTRY.function.listVersions.mockResolvedValue([])
   RESOURCE_CATALOG_REGISTRY.function.listCatalog.mockResolvedValue([])
 
-  // Any HTTP or s2s/GraphQL attempt would have to go through one of these two.
   httpSpy = vi.spyOn(httpService, 'request').mockResolvedValue({ data: {} })
   fetchSpy = vi.fn()
   vi.stubGlobal('fetch', fetchSpy)
@@ -80,9 +68,6 @@ describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
     })
     await flushPromises()
 
-    // req 7.1: nothing selected is "no impact to preview", NOT "unavailable". The
-    // panel reads `totals` unguarded, so it is a zeroed object (NOT null) with no
-    // fabricated rows — Scenario B opens here with 0 DSs selected (req 3.9).
     expect(impactUnavailable.value).toBe(false)
     expect(impact.value.hasSelection).toBe(false)
     expect(impact.value.perDs).toEqual([])
@@ -101,10 +86,6 @@ describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
     })
     await flushPromises()
 
-    // No reverse-lookup data for these DSs => each renders as a real zero (no
-    // environments, 0 workloads/domains). Impact stays available (non-blocking)
-    // and `totals.dsCount` reflects the REAL selection. Nothing synthetic is
-    // produced — a missing key is a real zero, never fabricated (Property 8).
     expect(impactUnavailable.value).toBe(false)
     expect(impact.value.hasSelection).toBe(true)
     expect(impact.value.perDs).toEqual([
@@ -129,10 +110,6 @@ describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
     })
     await flushPromises()
 
-    // Even with an active release loaded (so resources are known), there is no
-    // blast-radius data — the selected DS renders as a real zero (no derived rows),
-    // impact stays available, and only the REAL dsCount is surfaced (no fabricated
-    // workloads/domains).
     expect(impact.value).toEqual({
       hasSelection: true,
       isLoading: false,
@@ -182,20 +159,15 @@ describe('useReleaseComposition - Property 8 (impact never fabricated)', () => {
     })
     await flushPromises()
 
-    // No raw HTTP request and no raw fetch: the composable reaches the backend
-    // exclusively through the (mocked) v2 services.
     expect(httpSpy).not.toHaveBeenCalled()
     expect(fetchSpy).not.toHaveBeenCalled()
 
-    // Confirm it DID go through the injected service seams instead.
     expect(deploymentService.useDeploymentsListQuery).toHaveBeenCalled()
     expect(deploymentReleaseService.getActiveReleaseComposition).toHaveBeenCalled()
   })
 })
 
 describe('useReleaseComposition - resolveConsumingDsIds (resource -> DS scan)', () => {
-  // Each selected DS resolves to its own active release: ds-1 consumes the app
-  // (global_id 42) + firewall 7; ds-2 consumes a different app; ds-3 has none.
   const wireReleases = () => {
     deploymentReleaseService.getActiveReleaseComposition.mockImplementation((dsId) => {
       if (dsId === 'ds-1') {
@@ -224,9 +196,7 @@ describe('useReleaseComposition - resolveConsumingDsIds (resource -> DS scan)', 
     })
     await flushPromises()
 
-    // application keyed by global_id; only ds-1 holds app 42.
     expect(resolveConsumingDsIds('application', 42)).toEqual(['ds-1'])
-    // ds-2 holds a different app; ds-3 holds nothing.
     expect(resolveConsumingDsIds('application', 99)).toEqual(['ds-2'])
   })
 
@@ -239,11 +209,8 @@ describe('useReleaseComposition - resolveConsumingDsIds (resource -> DS scan)', 
     })
     await flushPromises()
 
-    // firewall keyed by resource_id; only ds-1 consumes firewall 7.
     expect(resolveConsumingDsIds('firewall', 7)).toEqual(['ds-1'])
-    // A firewall id present in no release resolves to nothing (not fabricated).
     expect(resolveConsumingDsIds('firewall', 12345)).toEqual([])
-    // Right id but wrong type must not match the application's global_id 42.
     expect(resolveConsumingDsIds('firewall', 42)).toEqual([])
   })
 
@@ -276,8 +243,6 @@ describe('useReleaseComposition - resolveConsumingDsIds (resource -> DS scan)', 
 })
 
 describe('useReleaseComposition - dependencyResourcesFor (inherited dep instances)', () => {
-  // ds-1 pins one of each dependency type plus a singleton (firewall) that must
-  // be ignored; the application is keyed by global_id and also ignored.
   const wireReleases = () => {
     deploymentReleaseService.getActiveReleaseComposition.mockImplementation((dsId) => {
       if (dsId === 'ds-1') {
@@ -361,8 +326,6 @@ describe('useReleaseComposition - versionOptionsFor (registry toVersionOptions m
     })
     await flushPromises()
 
-    // Only deployable states (ready/active) survive; draft is dropped. Shape
-    // and ordering come straight from `toVersionOptions`.
     expect(versionOptionsFor('application', 42)).toEqual([
       {
         label: 'Ready one',
@@ -411,7 +374,6 @@ describe('useReleaseComposition - versionOptionsFor (registry toVersionOptions m
     })
     await flushPromises()
 
-    // Empty comment falls back to the id for the label.
     expect(versionOptionsFor('firewall', 7)).toEqual([
       { label: 'fw-1', value: 'fw-1', createdAt: null, author: null, isCurrent: false }
     ])
@@ -421,18 +383,7 @@ describe('useReleaseComposition - versionOptionsFor (registry toVersionOptions m
   })
 })
 
-// ---------------------------------------------------------------------------
-// Property 7 — buildAndActivate is the composable's dispatch seam (the layer
-// allowed to call services). Multi-DS
-// is N independent calls via Promise.allSettled, a per-DS settled outcome, and
-// NO retry. The store hands over a PURE `composePayload()` (`{ resources, canary,
-// canaryForm }`); the composable builds the strategy + adapter payload and fans
-// it out. `DeploymentAdapter` and `buildStrategy` stay real (pure) so the genuine
-// payload reaches the (mocked) service.
-// ---------------------------------------------------------------------------
 describe('useReleaseComposition - Property 7 (buildAndActivate fan-out, no retry)', () => {
-  // A pure payload as `store.composePayload()` would produce it: a single,
-  // already-resolved application resource and no canary strategy.
   const composedPayload = () => ({
     resources: [{ resource_id: 'app-1', resource_version: 'app-v1', resource_type: 'application' }],
     canary: false,
@@ -457,8 +408,6 @@ describe('useReleaseComposition - Property 7 (buildAndActivate fan-out, no retry
     const calledIds = deploymentReleaseService.buildAndActivate.mock.calls.map(([id]) => id)
     expect(calledIds).toEqual(['ds-1', 'ds-2', 'ds-3'])
 
-    // The DS-agnostic payload is built once: every call gets the SAME adapter
-    // shape (resources keyed for deployment-api, every resource by resource_id).
     const payloads = deploymentReleaseService.buildAndActivate.mock.calls.map(
       ([, payload]) => payload
     )
@@ -508,8 +457,6 @@ describe('useReleaseComposition - Property 7 (buildAndActivate fan-out, no retry
   })
 
   it('collects the async trace_id per DS from a 202 build_and_activate body (req 5.2/11.1)', async () => {
-    // The service returns `{ data }` with the raw 202 body; trace_id may sit at
-    // the top level or one level under `data` depending on API wrapping.
     deploymentReleaseService.buildAndActivate.mockImplementation((id) =>
       id === 'ds-wrapped'
         ? Promise.resolve({ data: { data: { trace_id: `trace-${id}` } } })
@@ -527,9 +474,6 @@ describe('useReleaseComposition - Property 7 (buildAndActivate fan-out, no retry
   })
 
   it('maps the versioned-URLs active limit (422 43007) to a typed errorType (req 5.5/7.2)', async () => {
-    // The versioned-URLs active limit barrier: the service throws the v2
-    // ErrorHandler-shaped rejection carrying the API error code; the raw axios
-    // shape is also recognised. NO pre-block, NO active-count — we trust the 422.
     const errorHandlerShaped = {
       status: 422,
       message: ['Versioned URLs active limit reached'],
@@ -564,7 +508,6 @@ describe('useReleaseComposition - Property 7 (buildAndActivate fan-out, no retry
     expect(byId['ds-axios'].errorType).toBe(
       BUILD_AND_ACTIVATE_ERROR_TYPES.VERSIONED_URLS_ACTIVE_LIMIT
     )
-    // A non-limit failure stays untyped (still surfaced via `error`); no retry.
     expect(byId['ds-500'].errorType).toBeNull()
     expect(byId['ds-500'].error).toBe(otherFailure)
     expect(byId['ds-ok']).toMatchObject({ ok: true, errorType: null, traceId: 'trace-ds-ok' })
@@ -590,7 +533,6 @@ describe('useReleaseComposition - Property 7 (buildAndActivate fan-out, no retry
 
     const results = await buildAndActivate(composedPayload(), ['ds-fail'])
 
-    // The failure surfaces once; the composable never re-invokes the service.
     const failCalls = deploymentReleaseService.buildAndActivate.mock.calls.filter(
       ([id]) => id === 'ds-fail'
     )
@@ -598,7 +540,6 @@ describe('useReleaseComposition - Property 7 (buildAndActivate fan-out, no retry
     expect(results).toHaveLength(1)
     expect(results[0].ok).toBe(false)
 
-    // isDeploying is reset even after rejection (finally block).
     expect(isDeploying.value).toBe(false)
   })
 
@@ -627,33 +568,11 @@ describe('useReleaseComposition - Property 7 (buildAndActivate fan-out, no retry
     )
 
     const [, payload] = deploymentReleaseService.buildAndActivate.mock.calls[0]
-    // The real buildStrategy + adapter produced a strategy block from the form.
     expect(payload.strategy).toBeTruthy()
   })
 })
 
-// ---------------------------------------------------------------------------
-// Property 8 (scoped publish) — buildAndActivate's PER-DS singleton reconcile.
-// In a scoped (Scenario B) entry the store hands over `{ scoped: true, override:
-// { resource_type, resource_id, version } }`. The scoped resource is a SINGLETON
-// (application/firewall/custom_page). The composable builds a SEPARATE body per
-// selected DS from that DS's OWN active composition and reconciles the scoped
-// singleton against it:
-//   - same type + same id (matchesOverride) → preserve every field, swap only
-//     `version_id` (unchanged swap behaviour, other resources carried byte-for-byte);
-//   - same type but a DIFFERENT id → replace the whole entry with the scoped
-//     `{ resource_id, resource_type, version_id }` (flexible swap);
-//   - no resource of that type → ADD the scoped entry (create/link).
-// DEGRADED excludes a DS ONLY when reading its active release actually FAILS
-// (`getActiveReleaseComposition` rejects). A DS whose read resolves `null` (no
-// release) is NOT degraded — it is the CREATE path. MISMATCH survives in the
-// enum for back-compat but is never produced.
-// `DeploymentAdapter` stays real so the genuine deployment-api body is asserted.
-// ---------------------------------------------------------------------------
 describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton reconcile)', () => {
-  // ds-keep holds the scoped application (global_id 42) plus other resources that
-  // must survive untouched; ds-other holds a different app (flexible swap); ds-gone
-  // has no active release (create path).
   const wireScopedReleases = () => {
     deploymentReleaseService.getActiveReleaseComposition.mockImplementation((dsId) => {
       if (dsId === 'ds-keep') {
@@ -698,8 +617,6 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
     const [calledId, payload] = deploymentReleaseService.buildAndActivate.mock.calls[0]
     expect(calledId).toBe('ds-keep')
 
-    // The application is keyed by global_id (adapter contract) and ONLY its version
-    // changed to the override; firewall + function keep their pinned versions.
     const byType = Object.fromEntries(
       payload.resources.map((resource) => [resource.resource_type, resource])
     )
@@ -733,7 +650,6 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
     })
     await flushPromises()
 
-    // The override id is the application's id; the swap must land on it.
     await buildAndActivate(scopedAppOverride(), ['ds-keep'])
     const [, payload] = deploymentReleaseService.buildAndActivate.mock.calls[0]
     const appRef = payload.resources.find((resource) => resource.resource_type === 'application')
@@ -752,9 +668,6 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
     })
     await flushPromises()
 
-    // ds-other holds app 99 (a different application). The scoped singleton
-    // replaces it wholesale — the DS ends up with the scoped app 42 and no
-    // duplicate application entry.
     const results = await buildAndActivate(scopedAppOverride(), ['ds-other'])
 
     expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
@@ -779,8 +692,6 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
     })
     await flushPromises()
 
-    // ds-gone resolves `null` (no release) → the scoped singleton is ADDED,
-    // creating a fresh composition instead of being skipped.
     const results = await buildAndActivate(scopedAppOverride(), ['ds-gone'])
 
     expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(1)
@@ -804,8 +715,6 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
     })
     await flushPromises()
 
-    // The read genuinely rejects → the DS is DEGRADED and excluded; nothing is
-    // published and no body is borrowed from another DS.
     const results = await buildAndActivate(scopedAppOverride(), ['ds-fail-read'])
 
     expect(deploymentReleaseService.buildAndActivate).not.toHaveBeenCalled()
@@ -836,15 +745,12 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
 
     const results = await buildAndActivate(scopedAppOverride(), ['ds-keep', 'ds-other', 'ds-gone'])
 
-    // ds-keep swaps the same app, ds-other swaps a different app, ds-gone creates:
-    // all three publish their own body.
     expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(3)
     const calledIds = deploymentReleaseService.buildAndActivate.mock.calls.map(([id]) => id)
     expect(calledIds).toContain('ds-keep')
     expect(calledIds).toContain('ds-other')
     expect(calledIds).toContain('ds-gone')
 
-    // Results preserve the caller's id order with per-DS outcome.
     expect(results.map((entry) => ({ id: entry.id, ok: entry.ok }))).toEqual([
       { id: 'ds-keep', ok: true },
       { id: 'ds-other', ok: true },
@@ -853,10 +759,6 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
   })
 
   it('never POSTs version_id:null — a null/undefined override version is a hard UNRESOLVED_VERSION error (Issue 3)', async () => {
-    // The store resolves the LATEST sentinel in composePayload(), but when the
-    // scoped resource's versions were never loaded that resolution yields null.
-    // The composable must NEVER dispatch `version_id: null` (the API rejects it):
-    // every target DS is surfaced as a hard UNRESOLVED_VERSION error instead.
     wireScopedReleases()
     deploymentReleaseService.buildAndActivate.mockResolvedValue({ data: { trace_id: 't' } })
 
@@ -875,7 +777,6 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
     }
     const results = await buildAndActivate(nullVersionOverride, ['ds-keep'])
 
-    // No publish was issued — a null pin never left the composable.
     expect(deploymentReleaseService.buildAndActivate).not.toHaveBeenCalled()
     expect(results).toEqual([
       {
@@ -892,8 +793,6 @@ describe('useReleaseComposition - Property 8 (scoped publish: per-DS singleton r
   })
 
   it('reads the active composition on demand when it was not pre-loaded (req 2.1)', async () => {
-    // No selectedDsIds, so the watcher never pre-loads — buildAndActivate must
-    // fetch the composition itself for the target DS.
     deploymentReleaseService.getActiveReleaseComposition.mockResolvedValue(
       release([{ resource_type: 'application', global_id: 42, version_id: 'app-old' }])
     )
@@ -932,8 +831,6 @@ describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-
     return call?.[1]
   }
 
-  // ds-with-fn already pins function fn-1 plus a connector that must survive untouched;
-  // ds-no-fn has the scoped application but NO function, so the override is INSERTED.
   const wireFunctionReleases = () => {
     deploymentReleaseService.getActiveReleaseComposition.mockImplementation((dsId) => {
       if (dsId === 'ds-with-fn') {
@@ -1161,7 +1058,6 @@ describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-
       version_id: 'app-new',
       resource_type: 'application'
     })
-    // The pre-existing connector conn-9 (a different id) survives untouched.
     expect(findConnectorById(payload, 'conn-9')).toEqual({
       resource_id: 'conn-9',
       version_id: 'conn-keep-9',
@@ -1243,9 +1139,6 @@ describe('useReleaseComposition - Property 6 (scoped publish: per-DS dependency-
       ['ds-with-fn', 'ds-gone']
     )
 
-    // Both DSs publish: ds-with-fn reconciles its existing composition, while
-    // ds-gone (no release) CREATES one carrying the scoped app plus the dependency
-    // override.
     expect(deploymentReleaseService.buildAndActivate).toHaveBeenCalledTimes(2)
 
     const gonePayload = lastPayloadFor('ds-gone')

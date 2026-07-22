@@ -8,14 +8,9 @@ import {
   makeBinding,
   asListResponse
 } from './harness'
-// `environmentsList` is also used directly by the no-s2s trap test below.
 
-// A reactive list-query stub: mirrors what `useXxxListQuery` returns to a setup
-// context — only the `suspense()` promise is exercised by the lookup service.
 const queryStub = (response) => ({ suspense: () => Promise.resolve(response) })
 
-// Build the two tenant services the lookup composes. `useWorkloadsListQuery`
-// resolves PAGE 1; `listWorkloads` serves the imperative fan-out pages.
 const makeServices = ({ firstPage, environments = environmentsList, pages = {} } = {}) => {
   const useWorkloadsListQuery = vi.fn(() => queryStub(firstPage))
   const useEnvironmentsListQuery = vi.fn(() => queryStub(environments))
@@ -28,7 +23,6 @@ const makeServices = ({ firstPage, environments = environmentsList, pages = {} }
   }
 }
 
-// A page of N synthetic active workloads, each bound to one DS, for paging math.
 const pageOf = (size, dsPrefix) =>
   asListResponse(
     Array.from({ length: size }, (unused, position) =>
@@ -54,10 +48,8 @@ describe('releaseImpactLookupService.getReverseLookup', () => {
     const { index, isPartial } = await service.getReverseLookup({ enabled: true })
 
     expect(isPartial).toBe(false)
-    // ds-1 aggregates the two ACTIVE workloads bound to it (inactive wl-3 dropped).
     expect(index['ds-1'].map((row) => row.id)).toEqual(['wl-1', 'wl-2'])
     expect(index['ds-1'][0].environmentName).toBe('Production')
-    // env absent from the map stays null (never fabricated).
     expect(index['ds-3'][0].environmentName).toBe(null)
   })
 
@@ -73,7 +65,6 @@ describe('releaseImpactLookupService.getReverseLookup', () => {
   })
 
   it('fans out remaining pages via the cached imperative listWorkloads when count > 100', async () => {
-    // count = 150 => page 1 (100) + page 2 (50). Page 1 carries the count.
     const firstPage = { body: pageOf(100, 'p1').body, count: 150 }
     const { workloadService, environmentService, spies } = makeServices({
       firstPage,
@@ -92,7 +83,6 @@ describe('releaseImpactLookupService.getReverseLookup', () => {
   })
 
   it('marks isPartial when the hard page cap truncates the fan-out', async () => {
-    // count far beyond cap (100 pages * 100 = 10k) => truncated => isPartial.
     const firstPage = { body: pageOf(100, 'p1').body, count: 100 * 100 * 2 }
     const { workloadService, environmentService } = makeServices({
       firstPage,
@@ -117,7 +107,6 @@ describe('releaseImpactLookupService.getReverseLookup', () => {
 
     const { index, isPartial } = await service.getReverseLookup({ enabled: true })
 
-    // page 1 still contributes; the failed page only flips isPartial.
     expect(isPartial).toBe(true)
     expect(Object.keys(index)).toHaveLength(100)
   })
@@ -151,10 +140,6 @@ describe('releaseImpactLookupService.getReverseLookup', () => {
   })
 
   it('never reaches a service-to-service reverse-lookup path (tenant-only, req 10.1/10.2)', async () => {
-    // Trap every method on the injected tenant services. The lookup may ONLY
-    // touch the three tenant entry points below; any extra method call (e.g. a
-    // workloadsByDeployment s2s reverse-lookup) would surface here. count > 100
-    // exercises BOTH the reactive query and the imperative fan-out path.
     const allowedTenantMethods = [
       'useWorkloadsListQuery',
       'listWorkloads',
@@ -173,8 +158,6 @@ describe('releaseImpactLookupService.getReverseLookup', () => {
       listWorkloads: trap('listWorkloads', ({ page }) =>
         Promise.resolve(page === 2 ? pageOf(100, 'p2') : asListResponse([]))
       ),
-      // An s2s reverse-lookup endpoint a careless refactor might add. It must
-      // stay untouched: the index is built from the tenant workloads list.
       workloadsByDeployment: trap('workloadsByDeployment', () =>
         Promise.reject(new Error('s2s path must never be called'))
       )

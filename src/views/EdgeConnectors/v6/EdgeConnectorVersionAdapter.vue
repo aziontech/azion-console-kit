@@ -1,6 +1,4 @@
 <script setup>
-  // Edge Connector VersionShell form child. Thin adapter: wires the shared
-  // service + existing Connector schema into the version form lifecycle.
   import {
     useVersionFormAdapter,
     defaultSaveStrategy

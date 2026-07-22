@@ -3,7 +3,6 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { reactive } from 'vue'
 import { useVersionEditScreen } from '@/composables/versioning/use-version-edit-screen'
 
-// Boundary mocks only: the router and the toast. The composable under test runs real.
 const { route, routerPush, routerReplace, toastAdd } = vi.hoisted(() => ({
   route: { params: {} },
   routerPush: vi.fn(),

@@ -4,11 +4,6 @@ import { queryClient } from '@/services/v2/base/query/queryClient'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { EdgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
 
-// Application inherits every lifecycle endpoint + invalidation from
-// VersionServiceBase; these exercise the REAL service (httpService + queryClient
-// spied at the boundary) so the inherited path is proven for `application`, not
-// only asserted structurally.
-
 const RID = 'app-42'
 const VID = 'AVAPP0001'
 const BASE = `v4/workspace/applications/${RID}/versions`

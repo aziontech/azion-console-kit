@@ -92,7 +92,7 @@
 
   <Accordion
     :multiple="true"
-    class="deployment-version-form__advanced"
+    class="mt-2"
     data-testid="deployment-version-form__advanced"
   >
     <AccordionTab header="Advanced — Strategy">
@@ -249,9 +249,3 @@
     </AccordionTab>
   </Accordion>
 </template>
-
-<style scoped>
-  .deployment-version-form__advanced {
-    margin-top: 0.5rem;
-  }
-</style>

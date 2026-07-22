@@ -11,8 +11,6 @@
 
   const { value: name } = useField('name')
 
-  // readOnly defaults to false outside the VersionShell (non-versioned create/edit
-  // stays editable); inside an immutable version it disables every field.
   const { readOnly } = useVersionContext()
 
   const switchOptions = [

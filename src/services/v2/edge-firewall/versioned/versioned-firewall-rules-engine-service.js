@@ -2,13 +2,6 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { EdgeFirewallRulesEngineAdapter } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-adapter'
 
-/**
- * Versioned Firewall Rules Engine service, scoped to (firewallId, versionId).
- *
- * Endpoints under `/v4/workspace/firewalls/{id}/versions/{vid}/request_rules`
- * (+ `/order` for reorder). Mirrors the non-versioned service method-for-method
- * so the shared Rules Engine ListView can use it as a drop-in.
- */
 export class VersionedFirewallRulesEngineService extends BaseService {
   constructor() {
     super()

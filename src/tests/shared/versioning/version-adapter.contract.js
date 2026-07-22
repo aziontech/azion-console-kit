@@ -1,20 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 /**
- * Shared behavioral contract for a resource VERSION ADAPTER.
- *
- * Every resource adapter is built by `createVersionAdapter`, sharing the same
- * envelope handling, list normalization, root-payload mapping and `undefined`
- * stripping; only `normalizeConfig`/`mapResourceFields`/`mapMeta` differ. This
- * suite proves the shared factory contract ONCE, with the expected values coming
- * from the descriptor (`configMarkers`, `payloadMarkers`, `metadataOnly`,
- * `mapMetaFields`) — never hardcoded here.
- *
- * @param {object} descriptor resource descriptor from `RESOURCE_TEST_REGISTRY`
+ * @param {object} descriptor
  */
 
-// Deep scan for a surviving `undefined` — proves `stripUndefinedDeep` ran before
-// the payload would hit the wire (a leaked `undefined` becomes `null` over JSON).
 const hasUndefinedDeep = (value) => {
   if (value === undefined) return true
   if (value === null || typeof value !== 'object') return false
@@ -114,8 +103,6 @@ export const describeVersionAdapterContract = (descriptor) => {
         })
 
         expect(payload.comment).toBe('note')
-        // A draft PUT is a full-resource write; base adapters echo source_version,
-        // but a resource may declare it create-only (workload) via the descriptor.
         if (descriptor.draftCarriesSourceVersion === false) {
           expect(payload).not.toHaveProperty('source_version')
         } else {

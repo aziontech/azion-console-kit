@@ -1,35 +1,6 @@
-/**
- * Behavioral contract test for the Impact engine inside `useReleaseComposition`
- * (spec task 7.3, Property 5).
- *
- * Property 5 — the Impact engine consumes the injected `reverseLookupByDs` ref
- *   WITHOUT a change in behavior:
- *
- *     Given a `reverseLookupByDs` fixture injected through the factory arg
- *     (SEAM 1, design §7.2), `impact()` produces exactly the tree + totals that
- *     `buildDsImpact`/`impact` derive from that ref — no fabrication, no extra
- *     reads. The engine is byte-for-byte unchanged (req 9.5); this test pins its
- *     observable contract so a future edit that DID change behavior would fail.
- *
- * Validates requirement 9.5.
- *
- * This is a BEHAVIORAL CONTRACT test (not a PBT): it does not require fast-check.
- * It exercises the real composable with the IO services stubbed (no fetch/axios
- * ever runs), injects a hand-built reverse-lookup ref, and asserts the engine's
- * output. Stubbing only the IO seams keeps the engine itself under test.
- */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { ref, nextTick } from 'vue'
 
-// --- IO seams stubbed: the engine must run with zero real fetch/axios --------
-// `use-release-composition.js` calls `useDeploymentsListQuery` at setup and
-// `getActiveReleaseComposition` from a `selectedDsIds` watcher. We stub both so
-// the composable is constructible in a test without touching the network; the
-// Impact engine under test reads `deployments` (names) + the injected ref only.
-
-// `vi.mock` factories are hoisted above the module, so the shared stubs they
-// reference must be created with `vi.hoisted` (also hoisted) — this lets the
-// tests mutate `deploymentsData` while the mocked services read the same ref.
 const { deploymentsData, useDeploymentsListQuery, getActiveReleaseComposition, buildAndActivate } =
   await vi.hoisted(async () => {
     const { ref: hoistedRef } = await import('vue')
@@ -55,21 +26,16 @@ vi.mock('@/services/v2/deployment/deployment-release-service', () => ({
   deploymentReleaseService: { getActiveReleaseComposition, buildAndActivate }
 }))
 
-// The version pickers' registry: no resource is versioned in these fixtures, so
-// an empty registry keeps the version watcher inert (no IO, no options loaded).
 vi.mock('@/services/v2/deployment/resource-catalog-registry', () => ({
   RESOURCE_CATALOG_REGISTRY: {}
 }))
 
 import { useReleaseComposition } from './use-release-composition'
 
-// Set the deployments listing the engine reads for DS display names.
 const setDeployments = (list) => {
   deploymentsData.value = { body: list }
 }
 
-// A reverse-lookup row exactly as `buildReverseLookupByDs` emits it (design §3.2):
-// the engine reads { id, name, domains, environmentId, environmentName } only.
 const row = ({ id, name, domains = [], environmentId = null, environmentName = null }) => ({
   id,
   name,
@@ -90,8 +56,6 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
       { id: 'ds-2', name: 'Checkout' }
     ])
 
-    // Injected fixture: ds-1 has two workloads in one env (3 domains total),
-    // ds-2 has a single workload in another env (1 domain).
     const reverseLookupByDs = ref({
       'ds-1': [
         row({
@@ -131,8 +95,6 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
     expect(result.hasSelection).toBe(true)
     expect(result.impactUnavailable).toBe(false)
 
-    // Per-DS tree: name from the deployments listing; workloads grouped under
-    // `environments[]` (DS → environment → workload rows); domains/wlCount per DS.
     expect(result.perDs).toEqual([
       {
         deploymentId: 'ds-1',
@@ -167,7 +129,6 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
       }
     ])
 
-    // Aggregate totals are the sum across the selected DS.
     expect(result.totals).toEqual({
       dsCount: 2,
       totalWorkloads: 3,
@@ -178,8 +139,6 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
   it('groups workloads of one DS by environment in the engine tree', () => {
     setDeployments([{ id: 'ds-1', name: 'Multi-env DS' }])
 
-    // Two workloads in distinct environments under the SAME DS: the engine groups
-    // by `environmentId` into `environments[]` (one entry per environment).
     const reverseLookupByDs = ref({
       'ds-1': [
         row({
@@ -208,7 +167,6 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
     const entry = impact.value.perDs[0]
     expect(entry.wlCount).toBe(2)
     expect(entry.domains).toBe(3)
-    // Grouped by environment: one entry per env, each carrying its own rows.
     expect(entry.environments).toEqual([
       { name: 'Production', wlCount: 1, domains: 2, rows: [{ name: 'prod-wl', domains: 2 }] },
       { name: 'Staging', wlCount: 1, domains: 1, rows: [{ name: 'stage-wl', domains: 1 }] }
@@ -221,10 +179,6 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
       { id: 'ds-2', name: 'No data' }
     ])
 
-    // ds-1 resolved, ds-2 absent => the engine renders ds-2 as a real zero (no
-    // environments, 0 workloads/domains) and keeps impact available. A missing
-    // key is non-blocking, never fabricated (Property 8); only a genuine lookup
-    // FAILURE degrades to unavailable.
     const reverseLookupByDs = ref({
       'ds-1': [row({ id: 'wl-a', name: 'web-a', domains: ['a1.example.com'] })]
     })
@@ -276,9 +230,6 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
   it('consumes the injected ref REACTIVELY and unchanged (mutation flows through the engine)', async () => {
     setDeployments([{ id: 'ds-1', name: 'Storefront' }])
 
-    // Start with the DS absent => resolved-with-zero (non-blocking). Then populate
-    // the SAME injected ref and assert the engine re-derives the tree from it with
-    // no other input: proof the engine reads the ref it was handed (req 9.5).
     const reverseLookupByDs = ref({})
 
     const { impact } = useReleaseComposition({
@@ -324,8 +275,6 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
   it('treats an empty workload array for a DS as resolved-with-zero (not unavailable)', () => {
     setDeployments([{ id: 'ds-1', name: 'Empty DS' }])
 
-    // An empty array is PRESENT data (the DS has no active workloads), distinct
-    // from an absent key: the engine renders a zero-row, zero-total entry.
     const reverseLookupByDs = ref({ 'ds-1': [] })
 
     const { impact } = useReleaseComposition({
@@ -343,8 +292,6 @@ describe('useReleaseComposition — Impact engine behavioral contract (Property 
   })
 
   it('falls back to the DS id as the name when the deployments listing lacks it', () => {
-    // No deployments loaded => the engine uses the id string as the display name,
-    // still reading env/domains from the injected ref (no fabricated name).
     const reverseLookupByDs = ref({
       'ds-orphan': [
         row({

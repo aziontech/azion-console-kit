@@ -1,14 +1,4 @@
 <script setup>
-  // Shared chrome for the TABBED landing screen (Overview + Versions listing +
-  // Settings = Main Settings of the latest version + Variables), used by
-  // Custom Pages, Firewall and Application. Owns the heading (with the
-  // version-lifecycle teleport target), the tab shell and the "no version yet"
-  // empty state. The per-resource tab bodies arrive
-  // through the `overview`, `versions`, `settings` and `variables` slots;
-  // logic lives in useResourceVersionLanding.
-  //
-  // `showOverview` is opt-in — only resource types wired via the Overview
-  // registry (overview-resource-config) should enable it.
   import { computed } from 'vue'
   import ProgressSpinner from '@aziontech/webkit/progressspinner'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
@@ -40,8 +30,6 @@
 
   const activeTab = defineModel('activeTab', { type: Number, default: 0 })
 
-  // Compute the numeric tab index per section so slots stay stable regardless of
-  // whether Overview is enabled. Order: Overview? → Versions → Settings? → Variables?
   const tabIndexes = computed(() => {
     let cursor = 0
     const map = {}

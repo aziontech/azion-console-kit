@@ -1,8 +1,4 @@
 <script setup>
-  // VersionEditView — the FULL version editor screen for a Workload. Logic lives in
-  // useVersionEditScreen; chrome in VersionEditScreen. Workload deploys via its own
-  // legacy flow, so there is no deploy drawer (supportsDeployDrawer: false), no
-  // resource provide, and a bare title.
   import VersionEditScreen from '@/templates/version-shell-block/VersionEditScreen.vue'
   import WorkloadSettingsTab from '@/views/Workload/v6/WorkloadSettingsTab.vue'
   import { useVersionEditScreen } from '@/composables/versioning/use-version-edit-screen'

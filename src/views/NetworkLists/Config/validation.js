@@ -1,7 +1,5 @@
 import * as yup from 'yup'
 
-// Shared Network List edit schema. Single source of truth reused by the legacy
-// EditView and the versioned form adapter.
 export const networkListTypeOptions = [
   { name: 'ASN', value: 'asn' },
   { name: 'Countries', value: 'countries' },

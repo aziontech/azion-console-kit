@@ -1,7 +1,4 @@
 <script setup>
-  // VersionEditView — the FULL version editor screen for a Network List, gated by
-  // `use_v6_configurations`. Logic lives in useVersionEditScreen; chrome in
-  // VersionEditScreen. This view only wires the Network List config + editor tabs.
   import VersionEditScreen from '@/templates/version-shell-block/VersionEditScreen.vue'
   import VersionEditorTabs from '@/views/NetworkLists/v6/tabs/VersionEditorTabs.vue'
   import { useVersionEditScreen } from '@/composables/versioning/use-version-edit-screen'
@@ -9,7 +6,6 @@
 
   defineOptions({ name: 'network-lists-v6-version-edit-view' })
 
-  // Countries dropdown loader forwarded to the form fields; supplied by the route.
   defineProps({
     listCountriesService: { type: Function, required: true }
   })

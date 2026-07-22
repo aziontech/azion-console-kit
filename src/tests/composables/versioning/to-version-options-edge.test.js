@@ -5,16 +5,6 @@ import {
   toDeployableVersionOptions
 } from '@/composables/versioning/to-version-options'
 
-/**
- * Edge / empty-input contract for the to-version-options module.
- *
- * The deploy dropdown feeds these helpers whatever the versions query returns —
- * which is `null`/`undefined` before the first load and `[]` for a resource with
- * no versions. None of those may throw or leak a nullish array. This file owns
- * the degenerate-input surface across EVERY export; the happy-path mapping lives
- * in to-version-options.test.js.
- */
-
 describe('toDeployableVersionOptions — degenerate inputs never throw', () => {
   it.each([
     ['null', null],
@@ -48,8 +38,6 @@ describe('toVersionOption — empty object maps to a safe, fully-shaped option',
       option = toVersionOption({}, null)
     }).not.toThrow()
 
-    // Passing an explicit currentVersionId (as toDeployableVersionOptions always
-    // does) keeps isCurrent false for an id-less item.
     expect(option).toEqual({
       id: undefined,
       value: undefined,
@@ -61,10 +49,6 @@ describe('toVersionOption — empty object maps to a safe, fully-shaped option',
   })
 
   it('marks {} as current when currentVersionId is omitted (undefined === undefined)', () => {
-    // toVersionOption has no default for currentVersionId (unlike
-    // toDeployableVersionOptions). Calling it with a single arg compares
-    // undefined === undefined, so an id-less item reports itself current. This
-    // pins that edge so a future default can't silently change it.
     expect(toVersionOption({}).isCurrent).toBe(true)
   })
 

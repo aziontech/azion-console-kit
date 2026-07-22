@@ -1,14 +1,4 @@
 <script setup>
-  /**
-   * VersionEditorTabs — the FULL version editor body for WAF.
-   *
-   * Rendered by VersionEditView. Edits ONE version across Main Settings and
-   * Allowed Rules. The VersionShell derives editability from the version state;
-   * the Allowed Rules tab receives a versioned `service` facade (drop-in).
-   *
-   * Owns NO routing/toast: lifecycle commands bubble up as
-   * `command-success`/`command-error`/`cancel`. Keyed by versionId at the parent.
-   */
   import { computed, ref } from 'vue'
 
   import WafVersionAdapter from '@/views/WafRules/v6/WafVersionAdapter.vue'
@@ -39,14 +29,9 @@
 
   const emit = defineEmits(['command-success', 'command-error', 'cancel'])
 
-  // Per-resource facades pre-bound to (wafId, versionId). Built once: the parent
-  // keys this component by versionId, so it remounts on a version switch.
   const facades = useVersionedFacades(props.resourceId, props.versionId)
   const wafId = computed(() => String(props.resourceId))
 
-  // Version editor scope = Main Settings + Allowed Rules only. Tuning (attack
-  // analysis/learning) is NOT part of the version snapshot, so it is excluded
-  // here; it stays reachable only outside the version context (legacy TabsView).
   const wafTabs = computed(() => {
     if (!props.waf) return []
 
@@ -77,8 +62,6 @@
   const useVersionQuery = () =>
     wafVersionService.useLoadVersionQuery(props.resourceId, props.versionId)
 
-  // WAF is versioned-only: no Deploy/Promote/Rollback. The shell resolves this
-  // from resourceType="waf", so no deploy context is built nor a composer routed.
   const shellRef = ref(null)
   const openRelease = () => shellRef.value?.openRelease()
 
@@ -86,9 +69,6 @@
 </script>
 
 <template>
-  <!-- Keyed by versionId at the parent: the shell calls the query factory once in
-       setup and captures resourceId/versionId by value, so a version switch
-       remounts shell + adapter to renew query, ctx and form. -->
   <VersionEditorTabsShell
     ref="shellRef"
     :use-version-query="useVersionQuery"

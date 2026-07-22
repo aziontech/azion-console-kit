@@ -4,8 +4,6 @@ import { versionListCachePolicy } from '@/services/v2/versioning/version-cache-p
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { DeploymentVersionAdapter } from '@/services/v2/deployment/deployment-version-adapter'
 
-// The list endpoint may answer with a bare array or a `{ results|data, count }`
-// envelope; the adapter only normalizes items, so the service unwraps both.
 const parseListResponse = (data) => {
   if (Array.isArray(data)) {
     return { results: data, count: data.length }
@@ -21,11 +19,6 @@ const parseListResponse = (data) => {
 const unwrapItem = (data) =>
   data && typeof data === 'object' && !Array.isArray(data) && data.data ? data.data : data
 
-/**
- * Deployment version service. Lifecycle endpoints + cache invalidation are
- * inherited from `VersionServiceBase`; only the resource bindings differ and
- * the thin wrappers below preserve the return shapes the consumers expect.
- */
 export class DeploymentVersionService extends VersionServiceBase {
   constructor() {
     super()
@@ -34,16 +27,11 @@ export class DeploymentVersionService extends VersionServiceBase {
     this.versionKeys = queryKeys.deployments.versions
   }
 
-  // Deployment mutations also change the deployment row (state/last release), so
-  // we invalidate the deployment detail on top of the inherited version cache.
   invalidateAfterMutation(deploymentId) {
     super.invalidateAfterMutation(deploymentId)
     this.queryClient.invalidateQueries({ queryKey: queryKeys.deployments.detail(deploymentId) })
   }
 
-  // Reactive list query. Overrides the base because the deployment list endpoint
-  // answers with a `{ results|data, count }` envelope the bespoke adapter doesn't
-  // unwrap; this normalizes to the `{ body, count }` shape consumers read.
   useListVersionsQuery = (deploymentId, params) => {
     const { skipCache, ...rest } = params ?? {}
     const hasParams = Object.keys(rest).length > 0
@@ -67,8 +55,6 @@ export class DeploymentVersionService extends VersionServiceBase {
     )
   }
 
-  // Reactive single-version query. Overrides the base to unwrap the `{ data }`
-  // envelope before the bespoke adapter normalizes the version.
   useLoadVersionQuery = (deploymentId, versionId) =>
     this.useQuery(
       this.versionKeys.detail(toValue(deploymentId), toValue(versionId)),
@@ -82,7 +68,6 @@ export class DeploymentVersionService extends VersionServiceBase {
       { persist: false, enabled: true }
     )
 
-  // Params-aware list (Wave 0): preserves `{ body, count }` and skipCache/params.
   listVersionsService = async (deploymentId, params = {}) => {
     const id = toValue(deploymentId)
     const skipCache = Boolean(params?.skipCache || params?.hasFilter || params?.search)
@@ -104,8 +89,6 @@ export class DeploymentVersionService extends VersionServiceBase {
     return { body: result?.body ?? [], count: result?.count ?? 0 }
   }
 
-  // Thin alias over the create lifecycle; preserves `{ data }` and the extra
-  // deployment-detail invalidation via `invalidateAfterMutation`.
   createVersionService = async (deploymentId, payload = {}) => {
     const id = toValue(deploymentId)
     const body = this.adapter.transformCreateDraftPayload(payload)
@@ -121,9 +104,6 @@ export class DeploymentVersionService extends VersionServiceBase {
     return { data: this.adapter.transformLoadVersion(unwrapItem(data)) }
   }
 
-  // Version-history revert: the API generates a NEW version from the chosen
-  // version's configuration (does not just re-point). Mirrors the variables /
-  // certificates `revert` shape so the shared RevertDialog can call it directly.
   revert = async ({ id, versionId }) => {
     const deploymentId = toValue(id)
 

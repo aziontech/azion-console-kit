@@ -103,8 +103,6 @@ describe('ReleaseCompositionField', () => {
     })
 
     it('emits update:selectedApplicationVersionId when the version changes', () => {
-      // hasScopedResource: false drops the top scoped card, leaving the
-      // Application card as the only resource-version field.
       const wrapper = makeWrapper({
         hasScopedResource: false,
         applicationOptions,
@@ -278,7 +276,6 @@ describe('ReleaseCompositionField', () => {
       expect(firewall.find('[data-testid="release-composition__resource-select"]').exists()).toBe(
         true
       )
-      // versioned + selectedId != null -> version field present
       expect(firewall.find('[data-testid="release-composition__version-select"]').exists()).toBe(
         true
       )
@@ -299,8 +296,6 @@ describe('ReleaseCompositionField', () => {
         editableResources
       })
 
-      // noApplication drops the Application select, so the first select field
-      // is the editable firewall resource.
       wrapper
         .findAllComponents({ name: 'release-resource-select-field' })[0]
         .vm.$emit('update:modelValue', 'fw-3')
@@ -317,8 +312,6 @@ describe('ReleaseCompositionField', () => {
         editableResources
       })
 
-      // noApplication drops the Application card, so the first version field is
-      // the editable firewall resource (versioned with a selected id).
       wrapper
         .findAllComponents({ name: 'release-resource-version-field' })[0]
         .vm.$emit('update:modelValue', 'fw-ver-2')

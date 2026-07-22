@@ -8,31 +8,11 @@ import {
 } from '@/composables/versioning/version-machine'
 import { DEFAULT_CAPABILITY, VERSIONED_ONLY } from '@/composables/versioning/version-capability'
 
-/**
- * Spec: versioning-test-coverage — Task 11.1, Property 5 (version-machine).
- *
- * All constants are DERIVED FROM THE REAL MODULE (STATE_ACTIONS, VERSION_ACTIONS)
- * so the properties track the source of truth rather than a hand-copied matrix.
- *
- * Properties (Requirements 2.1 fail-closed + capability gating):
- *   a) result is always a subset of STATE_ACTIONS[state] — never invents an action.
- *   b) VERSIONED_ONLY never yields DEPLOY / PROMOTE / ROLLBACK.
- *   c) any string outside the declared states returns [] (fail-closed) — the
- *      unknown-state generator deliberately includes prototype-chain keys
- *      ('toString', 'constructor', 'hasOwnProperty', …) which the naive lookup
- *      resolved through the prototype (the bug this task fixed).
- *   d) isActionAvailable(state, action, cap) === getAvailableActions(...).includes(action).
- *   e) any capability with canDeploy=true reproduces the DEFAULT_CAPABILITY output
- *      exactly (no regression of the default for non-gated actions).
- */
-
 const NUM_RUNS = 200
 
 const KNOWN_STATES = Object.keys(STATE_ACTIONS)
 const GATED_ACTIONS = ['DEPLOY', 'PROMOTE', 'ROLLBACK']
 
-// Prototype-chain keys: none is a declared state, yet a naive `STATE_ACTIONS[key]`
-// resolves them to inherited members (functions/objects) instead of undefined.
 const PROTOTYPE_KEYS = [
   'toString',
   'valueOf',
@@ -50,9 +30,6 @@ const PROTOTYPE_KEYS = [
 
 const knownStateArb = fc.constantFrom(...KNOWN_STATES)
 
-// Honest unknown-state generator: arbitrary strings that are NOT declared states,
-// with the prototype-chain keys forced in so the fail-closed contract is exercised
-// against exactly the inputs that used to throw.
 const unknownStateArb = fc.oneof(
   fc.constantFrom(...PROTOTYPE_KEYS),
   fc.string().filter((candidate) => !KNOWN_STATES.includes(candidate))

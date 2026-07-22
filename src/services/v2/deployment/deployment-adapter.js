@@ -14,10 +14,6 @@ const pickDefined = (payload) => {
   }, {})
 }
 
-// The deployment-api expects every resource id under `resource_id` as a number
-// (for `application` the value is its `global_id`); the scoped entry point and
-// catalog picks may carry them as strings. Coerce numeric-looking ids to Number,
-// leaving non-numeric/nullish values untouched.
 const toNumericId = (value) => {
   if (value == null) return value
   const numeric = Number(value)
@@ -180,18 +176,11 @@ export const DeploymentAdapter = {
   },
 
   /**
-   * Splits the active release into the raw parts the composable recombines.
-   *
-   * - `applicationFromRelease`: the `application` resource of the active
-   *   release (`{ resourceId, resourceName, resourceVersion }`), or `null`.
-   * - `readOnlyResources`: the active release resources EXCLUDING both
-   *   `application` and `context.resourceType` (those own dedicated slots).
-   *
-   * @param {{ resources?: Array<object> } | null} release - Active release as returned by the API.
-   * @param {{ resourceType?: string }} [context={}] - Resource under promotion.
+   * @param {{ resources?: Array<object> } | null} release
+   * @param {{ resourceType?: string }}
    * @returns {{
-   *   applicationFromRelease: { resourceId: (number|string), resourceName: (string|null), resourceVersion: (string|null) } | null,
-   *   readOnlyResources: Array<{ resourceType: string, resourceId: (number|string), resourceName: (string|null), resourceVersion: (string|null) }>
+   * applicationFromRelease: { resourceId: (number|string), resourceName: (string|null), resourceVersion: (string|null) } | null,
+   * readOnlyResources: Array<{ resourceType: string, resourceId: (number|string), resourceName: (string|null), resourceVersion: (string|null) }>
    * }}
    */
   transformReleaseComposition(release, context = {}) {
@@ -236,9 +225,6 @@ export const DeploymentAdapter = {
 
   transformBuildAndActivatePayload(resources = [], strategy) {
     const resourceRefs = (Array.isArray(resources) ? resources : []).map((resource) =>
-      // deployment-api schema: version is `version_id`; every resource id is sent
-      // under `resource_id` (for `application` its value is the `global_id`).
-      // `name`/`resource_version` are rejected as unrecognized keys.
       pickDefined({
         resource_id: toNumericId(resource?.resource_id),
         version_id: resource?.resource_version,

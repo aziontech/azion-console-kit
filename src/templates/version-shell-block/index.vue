@@ -20,14 +20,6 @@
 
   defineOptions({ name: 'version-shell-block' })
 
-  /**
-   * Props:
-   *  - useVersionQuery: () => UseQueryReturn — factory returning the version's useQuery.
-   *                    Typically `() => service.useLoadVersionQuery(rid, vid)`.
-   *                    The service controls queryKey, queryFn and refetchInterval.
-   *  - resourceId, versionId — used to build the command ctx.
-   *  - resourceType — resolves the version capability; omitted/unknown stays deployable.
-   */
   const props = defineProps({
     useVersionQuery: {
       type: Function,
@@ -47,8 +39,6 @@
     }
   })
 
-  // Provided as a ref so in-shell surfaces read `capability.value` (deployable by
-  // default); resourceType resolves the class once at mount.
   const capability = readonly(ref(getVersionCapability(props.resourceType)))
 
   const emit = defineEmits(['updated', 'command-error', 'cancel'])
@@ -102,10 +92,6 @@
 
   const showOverlay = computed(() => isProcessing(state.value))
 
-  // Build launched from a listing routes here with `?intent=build`. The shell
-  // owns the transition: once the version has loaded and the form child has
-  // registered SAVE_AND_BUILD, it dispatches it once, then strips the query so a
-  // refetch/re-mount never rebuilds. Router calls run after mount only.
   const route = useRoute()
   const router = useRouter()
   let autoBuildHandled = false
@@ -119,7 +105,6 @@
 
   const maybeAutoBuild = () => {
     if (autoBuildHandled) return
-    // Act only once the real version has loaded — never on the default `draft`.
     if (route?.query?.intent !== 'build' || isLoading.value || !version.value) return
     if (!isActionAvailable(state.value, VERSION_ACTIONS.SAVE_AND_BUILD)) {
       autoBuildHandled = true

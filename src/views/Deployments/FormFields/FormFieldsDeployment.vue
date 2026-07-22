@@ -3,9 +3,6 @@
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldText from '@aziontech/webkit/field-text'
   import FieldTextArea from '@aziontech/webkit/field-text-area'
-  // Strategy Defaults hidden until the API supports strategy_defaults.
-  // import FieldSwitchBlock from '@aziontech/webkit/field-switch-block'
-  // import FieldNumber from '@aziontech/webkit/field-number'
   import RadioButton from '@aziontech/webkit/radiobutton'
   import LabelBlock from '@aziontech/webkit/label'
   import ScopedVariablesInfoTable from '@/views/Variables/v6/components/ScopedVariablesInfoTable.vue'
@@ -35,11 +32,6 @@
     setValue: setDeploymentVersionPolicy,
     errorMessage: deploymentVersionPolicyError
   } = useField('deployment_policy')
-  // Strategy Defaults hidden until the API supports strategy_defaults.
-  // const { value: strategyCanaryEnabled } = useField('strategy_canary_enabled')
-  // const { value: strategyCanaryDefaultPercentage } = useField('strategy_canary_default_percentage')
-  // const { value: strategySkewEnabled } = useField('strategy_skew_enabled')
-  // const { value: strategySkewDefaultTtlSeconds } = useField('strategy_skew_default_ttl_seconds')
 
   const bindingPolicyOptions = [
     {
@@ -199,79 +191,6 @@
       </div>
     </template>
   </FormHorizontal>
-
-  <!--
-    Strategy Defaults hidden until the API supports strategy_defaults.
-  <FormHorizontal
-    title="Strategy Defaults"
-    description="Default rollout behavior applied to new versions of this deployment."
-  >
-    <template #inputs>
-      <div class="flex flex-col w-full gap-6">
-        <div class="flex flex-col w-full gap-3">
-          <FieldSwitchBlock
-            nameField="strategy_canary_enabled"
-            name="strategy_canary_enabled"
-            :value="strategyCanaryEnabled"
-            auto
-            :isCard="false"
-            title="Canary"
-            description="Enable gradual rollout to a percentage of traffic before promoting the new version."
-            data-testid="deployment-form__canary-enabled-field"
-          />
-
-          <div
-            v-if="strategyCanaryEnabled"
-            class="flex flex-col sm:max-w-xs w-full gap-2"
-          >
-            <FieldNumber
-              label="Canary Default Percentage"
-              name="strategy_canary_default_percentage"
-              :min="0"
-              :max="100"
-              :value="strategyCanaryDefaultPercentage"
-              description="Percentage of traffic routed to the candidate version (0-100)."
-              placeholder="10"
-              :useGrouping="false"
-              suffix="%"
-              data-testid="deployment-form__canary-percentage-field"
-            />
-          </div>
-        </div>
-
-        <div class="flex flex-col w-full gap-3">
-          <FieldSwitchBlock
-            nameField="strategy_skew_enabled"
-            name="strategy_skew_enabled"
-            :value="strategySkewEnabled"
-            auto
-            :isCard="false"
-            title="Skew Protection"
-            description="Keep the previous version reachable via versioned URL after a new version is promoted."
-            data-testid="deployment-form__skew-enabled-field"
-          />
-
-          <div
-            v-if="strategySkewEnabled"
-            class="flex flex-col sm:max-w-xs w-full gap-2"
-          >
-            <FieldNumber
-              label="Skew Protection TTL"
-              name="strategy_skew_default_ttl_seconds"
-              :min="0"
-              :value="strategySkewDefaultTtlSeconds"
-              description="How long the previous version stays reachable, in seconds."
-              placeholder="3600"
-              :useGrouping="false"
-              suffix=" s"
-              data-testid="deployment-form__skew-ttl-field"
-            />
-          </div>
-        </div>
-      </div>
-    </template>
-  </FormHorizontal>
-  -->
 
   <FormHorizontal
     v-if="props.isEdit && props.resourceId"

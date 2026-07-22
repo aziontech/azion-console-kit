@@ -1,6 +1,6 @@
 <script setup>
-  import WorkloadMetricsSection from './sections/WorkloadMetricsSection.vue'
-  import WorkloadReleasesSection from './sections/WorkloadReleasesSection.vue'
+  import WorkloadMetricsSection from '@/views/Workload/v6/Tabs/sections/WorkloadMetricsSection.vue'
+  import WorkloadReleasesSection from '@/views/Workload/v6/Tabs/sections/WorkloadReleasesSection.vue'
 
   defineOptions({ name: 'workload-overview-tab' })
 

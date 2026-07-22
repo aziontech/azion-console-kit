@@ -3,12 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import DeploymentSettingsPicker from '@/templates/release-composition/components/DeploymentSettingsPicker.vue'
 
-// Webkit primitives reduced to plain DOM so the contract (rows, search, counter,
-// empty-state action, multi-select) is observable in jsdom without coupling the
-// test to the real component internals.
 const stubs = {
-  // The visual Checkbox is now controlled + non-interactive (binary `modelValue`
-  // boolean); selection is driven by the row click, so the stub only reflects state.
   Checkbox: {
     name: 'Checkbox',
     props: ['modelValue', 'value', 'inputId', 'binary'],
@@ -77,7 +72,6 @@ describe('DeploymentSettingsPicker', () => {
     expect(rowOne.exists()).toBe(true)
     expect(rowOne.text()).toContain('production-edge')
 
-    // req 4.4: every row carries the deployment policy tag.
     const policyOne = wrapper.find('[data-testid="release-composition__ds-policy-ds-1"]')
     expect(policyOne.exists()).toBe(true)
     expect(policyOne.text()).toBe('Single Version')
@@ -134,7 +128,6 @@ describe('DeploymentSettingsPicker', () => {
       expect(wrapper.find('[data-testid="release-composition__ds-selected-counter"]').text()).toBe(
         '0 selected'
       )
-      // No row carries the selected styling/aria when nothing is pre-selected.
       expect(
         wrapper.find('[data-testid="release-composition__ds-row-ds-1"]').attributes('aria-checked')
       ).toBe('false')
@@ -175,12 +168,7 @@ describe('DeploymentSettingsPicker', () => {
       ).toBeDefined()
     })
 
-    // Issue 4(a): `deployments` is a filtered/capped VIEW (search, display cap),
-    // so select-all/clear-all must operate over the LISTED rows only and never
-    // drop selections hidden by the search.
     it('select-all UNIONS the listed ids with selections hidden by the search (never drops them)', async () => {
-      // `ds-hidden` is selected but NOT in the listed `deployments` (search/cap
-      // narrowed the view to ds-1/ds-2). Select-all must keep ds-hidden.
       const wrapper = makeWrapper({ modelValue: ['ds-hidden'] })
 
       await wrapper.find('[data-testid="release-composition__ds-select-all"]').trigger('click')
@@ -193,20 +181,15 @@ describe('DeploymentSettingsPicker', () => {
 
       await wrapper.find('[data-testid="release-composition__ds-clear-all"]').trigger('click')
 
-      // ds-1/ds-2 (listed) are cleared; ds-hidden (not listed) survives.
       expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['ds-hidden']])
     })
 
     it('allSelected (disabling select-all) compares against the LISTED rows, ignoring hidden selections', () => {
-      // Every LISTED row (ds-1, ds-2) is already selected → select-all disabled,
-      // regardless of the extra hidden selection.
       const wrapper = makeWrapper({ modelValue: ['ds-1', 'ds-2', 'ds-hidden'] })
       expect(
         wrapper.find('[data-testid="release-composition__ds-select-all"]').attributes('disabled')
       ).toBeDefined()
 
-      // A listed row NOT selected → select-all stays enabled even though another
-      // (hidden) id is selected.
       const partial = makeWrapper({ modelValue: ['ds-1', 'ds-hidden'] })
       expect(
         partial.find('[data-testid="release-composition__ds-select-all"]').attributes('disabled')

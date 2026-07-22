@@ -1,8 +1,4 @@
 <script setup>
-  // VersionEditorTabs — the version editor body for a Network List (atomic: a single
-  // Main Settings tab; the items/type/name snapshot travels in the version).
-  // Delegates the scaffold to the shared VersionEditorTabsShell; only the tab
-  // descriptor specializes. network_list is versioned-only: no deploy context/drawer.
   import NetworkListVersionAdapter from '@/views/NetworkLists/v6/NetworkListVersionAdapter.vue'
   import VersionEditorTabsShell from '@/templates/version-shell-block/VersionEditorTabsShell.vue'
   import FormFieldsEditNetworkLists from '@/views/NetworkLists/FormFields/FormFieldsEditNetworkLists.vue'
@@ -23,8 +19,6 @@
       type: String,
       required: true
     },
-    // Countries dropdown loader for the Countries network list type. Injected
-    // from the route (as the legacy views do), keeping the service out of here.
     listCountriesService: {
       type: Function,
       required: true
@@ -36,7 +30,6 @@
   const useVersionQuery = () =>
     networkListVersionService.useLoadVersionQuery(props.resourceId, props.versionId)
 
-  // Atomic resource: a single Main Settings tab, no "+ Add".
   const networkListTabs = [
     {
       key: 'main-settings',

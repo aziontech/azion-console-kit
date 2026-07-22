@@ -47,8 +47,6 @@
 
   const { value: name } = useField('name')
 
-  // readOnly defaults to false outside the VersionShell; inside an immutable
-  // version it disables every field (the code/args editors read it on their own).
   const { readOnly } = useVersionContext()
   const { value: azionForm } = useField('azionForm')
   const { value: isProprietaryCode } = useField('isProprietaryCode')
