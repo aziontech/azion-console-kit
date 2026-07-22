@@ -53,7 +53,6 @@ src/views/Playground/PlaygroundView.vue
 .edge/
 .vulcan
 
-docs/ARCHITECTURE.md
 
 storybook/yarn.lock
 
