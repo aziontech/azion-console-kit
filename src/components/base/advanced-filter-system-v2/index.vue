@@ -9,7 +9,7 @@
   import { useAccountStore } from '@/stores/account'
   import { createUtcDateFromUserTimezoneParts } from '@/helpers/convert-date'
   import { createRelativeRange } from '@utils/date.js'
-  import { listTimezonesService } from '@/services/users-services'
+  import { useAdvancedFilterServices } from '@/composables/useAdvancedFilterServices'
   import { useVisibility } from '@/views/RealTimeEventsV2/composables/useVisibility'
   import { useBreakpoint } from '@/views/RealTimeEventsV2/composables/useBreakpoint'
   import { convertUnitToMilliseconds } from '@/helpers'
@@ -19,6 +19,7 @@
 
   const userUTC = accountStore.accountUtcOffset
   const userTimezone = accountStore.accountTimezone
+  const { listTimezones } = useAdvancedFilterServices()
   const emit = defineEmits(['updatedFilter'])
 
   const props = defineProps({
@@ -439,7 +440,7 @@
             :maxDays="props.filterDateRangeMaxDays"
             :defaultUtcOffset="userUTC"
             :userTimezone="userTimezone"
-            :listTimezonesService="listTimezonesService"
+            :listTimezonesService="listTimezones"
             @select="onDateRangeSelect"
             @autoRefresh="onAutoRefreshTick"
           />

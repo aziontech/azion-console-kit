@@ -142,7 +142,7 @@
   import Aql from './azion-query-language.js'
   import { OPERATOR_MAPPING_ADVANCED_FILTER } from '@/templates/advanced-filter/component/index'
   import { onClickOutside } from '@vueuse/core'
-  import { listWorkloadsDynamicFieldsService } from '@/services/workloads-services/list-workloads-dynamic-fields-service.js'
+  import { useAdvancedFilterServices } from '@/composables/useAdvancedFilterServices'
   import { useQueryHistory } from '@/views/RealTimeEventsV2/composables/useQueryHistory'
 
   import { OPERATOR_MAPPING } from '@/components/base/advanced-filter-system-v2/filterFields/filterRow/component'
@@ -260,9 +260,11 @@
     }
   })
 
+  const { listWorkloadsDynamicFields } = useAdvancedFilterServices()
+
   const loaderDomainWorkloads = async () => {
     try {
-      const response = await listWorkloadsDynamicFieldsService({ fields: 'id,name' })
+      const response = await listWorkloadsDynamicFields({ fields: 'id,name' })
       domains.value = response.results.map((el) => {
         return {
           label: el.name,
