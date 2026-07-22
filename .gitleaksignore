@@ -5,7 +5,7 @@
 
 # .claude/skills/storybook-add-component/SKILL.md: jwt.io canonical example token fragment in a docs skill
 8610205d88cb820abfcd3c40c5acda5815168dd3:.claude/skills/storybook-add-component/SKILL.md:generic-api-key:292
-# .env.sample: historical sample env with a real-FORMAT personal token (file deleted). TRIAGED 2026-07-22: token flagged for precautionary revocation — see security-office
+# .env.sample: historical sample env with a real-FORMAT personal token (file deleted). RESOLVED 2026-07-22: token revoked (confirmed by the team) — no live credential remains
 6abb7906b222c395aeb49a97b201cb0fdf803fa1:.env.sample:generic-api-key:1
 # docs/edge-api/VERSIONING_TLS_API_REQS.md: throwaway self-signed example.com key used ONLY as API-doc example (file deleted)
 093b5f3febe42ae30b0b240e787316a853d25242:docs/edge-api/VERSIONING_TLS_API_REQS.md:private-key:9
