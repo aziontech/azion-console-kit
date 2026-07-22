@@ -51,6 +51,13 @@ export default mergeConfig(
         ui: false
       },
       retry: process.env.CI ? 2 : 0,
+      // 'json' feeds the pre-merge gate summary (scripts/ci/suite-summary.mjs) —
+      // each CI shard uploads its own artifact from this same local path
+      // (spec ci-maturity, req 6.3/6.3.1).
+      reporters: ['default', 'json'],
+      outputFile: {
+        json: './test-results/functional-summary.json'
+      },
       root: fileURLToPath(new URL('./', import.meta.url)),
       // Coverage is collected by the CI functional job and merged with the unit
       // lcov via monocart (spec task 14.1); disabled by default to keep the

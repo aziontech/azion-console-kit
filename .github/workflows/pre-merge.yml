@@ -1,4 +1,12 @@
 name: Pre-merge
+
+# THE single validation path before any merge (spec ci-maturity, req 1.x):
+# static checks (lint/security/governance/build) + unit + contracts + functional
+# all converge into ONE aggregate gate (`pre-merge-gate`) — the intended single
+# required check for branch protection. Suite stages follow the dependency
+# pyramid: contracts (foundation) gate the functional suite (behavior on top),
+# while unit runs in parallel (longest job — chaining it would delay every PR;
+# measured analysis: CI-FLUXO-DE-TESTES / spec ci-maturity ADR in design.md).
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -8,6 +16,12 @@ on:
 
 env:
   HUSKY: 0
+  # Workspace-relative yarn cache so actions/cache behaves identically inside
+  # any container image (alpine, playwright-jammy) — spec ci-maturity ADR-7.
+  YARN_CACHE_FOLDER: .yarn-ci-cache
+
+permissions:
+  contents: read
 
 # Cancel superseded runs of the SAME ref on pull_request only. On push to `dev`
 # we let runs finish (cancel-in-progress false) so we never abort a merge-commit
@@ -17,19 +31,171 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # ── Stage 0: static (migrated from eslint.yml — same commands, spec req 8.3) ──
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: node:22-alpine
+    steps:
+      - name: Install SO deps
+        run: apk add --no-cache curl bash git
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Restore yarn cache
+        uses: actions/cache@v6
+        with:
+          path: .yarn-ci-cache
+          key: yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-cache-
+
+      - name: Install dependencies --frozen-lockfile
+        run: yarn install:lock
+
+      - name: Run Prettier Formatting
+        run: yarn prettier --check src/
+
+      - name: Run ESLint
+        run: yarn lint
+
+  # Migrated from eslint-security-check.yaml — same commands (spec req 8.3).
+  lint-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    container:
+      image: node:22-alpine
+    steps:
+      - name: Install SO deps
+        run: apk add curl bash git
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Trust checkout directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Restore yarn cache
+        uses: actions/cache@v6
+        with:
+          path: .yarn-ci-cache
+          key: yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-cache-
+
+      - name: Install dependencies --frozen-lockfile
+        run: yarn install:lock
+
+      - name: Run eslint security check
+        if: github.event_name == 'pull_request'
+        run: yarn lint:security-check:changed --base origin/${{ github.base_ref }}
+
+      - name: Run eslint security check
+        if: github.event_name == 'push'
+        run: yarn lint:security-check:changed --base ${{ github.event.before }}
+
+  # Migrated from eslint-azion-governance.yml — same commands (spec req 8.3).
+  lint-governance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    container:
+      image: node:22-alpine
+    steps:
+      - name: Install SO deps
+        run: apk add --no-cache curl bash git
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Trust checkout directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Fetch PR base branch
+        if: github.event_name == 'pull_request'
+        run: git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+
+      - name: Restore yarn cache
+        uses: actions/cache@v6
+        with:
+          path: .yarn-ci-cache
+          key: yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-cache-
+
+      - name: Install dependencies --frozen-lockfile
+        run: yarn install:lock
+
+      - name: Architecture Lint (Changed Files)
+        if: github.event_name == 'pull_request'
+        run: yarn lint:architecture:changed --base origin/${{ github.base_ref }}
+
+      - name: Architecture Conformance Report
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          yarn architecture:report --format markdown >> $GITHUB_STEP_SUMMARY
+
+  # Build integrity — extracted from the old eslint.yml (same command block).
+  build-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: node:22-alpine
+    steps:
+      - name: Install SO deps
+        run: apk add --no-cache curl bash git
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Restore yarn cache
+        uses: actions/cache@v6
+        with:
+          path: .yarn-ci-cache
+          key: yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-cache-
+
+      - name: Install dependencies --frozen-lockfile
+        run: yarn install:lock
+
+      - name: Checking Build Integrity
+        run: |
+          yarn build
+          rm -rf dist
+          rm -rf coverage
+
+  # ── Stage 1: hermetic suites ──
   run-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     container:
       image: node:22-alpine
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Install SO deps
         run: apk add curl bash git
+
+      - name: Restore yarn cache
+        uses: actions/cache@v6
+        with:
+          path: .yarn-ci-cache
+          key: yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-cache-
 
       - name: Install dependencies --frozen-lockfile
         run: yarn install:lock
@@ -38,7 +204,7 @@ jobs:
         run: yarn test:unit:coverage
 
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage_unit_report
           path: |
@@ -46,20 +212,35 @@ jobs:
             coverage/unit/sonar-report.xml
           retention-days: 1
 
+      # Gate summary input (req 6.3/6.3.1) — runs even on failure so the gate
+      # can report WHERE and WHY.
+      - name: Build suite summary
+        if: always()
+        run: node scripts/ci/suite-summary.mjs coverage/unit/vitest-summary.json unit .gate/suite-summary-unit.json
+
+      - name: Upload suite summary
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: suite-summary-unit
+          path: .gate/suite-summary-unit.json
+          retention-days: 1
+
   # Detect whether this PR/push touches versioning surfaces. Downstream jobs
   # (functional, contract-consumer) only run when `versioning == 'true'`, so
   # unrelated changes pay zero extra CI cost.
   changes:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       versioning: ${{ steps.filter.outputs.versioning }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Filter changed paths
         id: filter
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
         with:
           # On pull_request the action auto-detects the PR base; on push to dev
           # we compare against the dev branch explicitly.
@@ -78,14 +259,65 @@ jobs:
               - 'playwright.config.ts'
               - '.github/workflows/pre-merge.yml'
 
+  # Consumer contract tests for the versioning services (schema sanity checks).
+  # Runs in the same node:22-alpine container as run-tests for parity.
+  # FOUNDATION of the dependency pyramid: functional only runs on top of a
+  # green contract (req 1.7).
+  contract-consumer:
+    needs: [changes]
+    if: needs.changes.outputs.versioning == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: node:22-alpine
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Install SO deps
+        run: apk add curl bash git
+
+      - name: Restore yarn cache
+        uses: actions/cache@v6
+        with:
+          path: .yarn-ci-cache
+          key: yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-cache-
+
+      - name: Install dependencies --frozen-lockfile
+        run: yarn install:lock
+
+      # verbose: the 80 contract tests listed by name; coverage suppressed —
+      # it measured nothing useful in this job and buried the story (req 6.1).
+      - name: Run consumer contract tests
+        run: TZ=UTC npx vitest run --config vitest.config.js --coverage.enabled=false --reporter=verbose --reporter=json --outputFile.json=.gate/contract-report.json src/tests/contracts
+
+      - name: Build suite summary
+        if: always()
+        run: node scripts/ci/suite-summary.mjs .gate/contract-report.json contract .gate/suite-summary-contract.json
+
+      - name: Upload suite summary
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: suite-summary-contract
+          path: .gate/suite-summary-contract.json
+          retention-days: 1
+
+  # ── Stage 2: real browser (runs only on a green contract foundation) ──
   # Functional suite = Vitest BROWSER MODE (real Chromium via Playwright).
   # Runs in the official Playwright image pinned to the SAME version resolved in
   # yarn.lock (playwright 1.61.1) so the pre-installed browsers match the
   # @vitest/browser-playwright runtime exactly — no browser download at runtime.
   functional:
-    needs: [changes]
+    # contract-consumer is a prerequisite (req 1.7): a broken contract fails in
+    # ~1 min without spinning 2 browser runners. Wall-clock cost of the chain is
+    # zero — the critical path remains run-tests (see design.md).
+    needs: [changes, contract-consumer]
     if: needs.changes.outputs.versioning == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     container:
       # SENTINEL: this tag MUST match the playwright version pinned in yarn.lock
       # (see the playwright entry in yarn.lock). A lockfile bump without bumping this tag
@@ -97,7 +329,15 @@ jobs:
         shard: [1, 2]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+
+      - name: Restore yarn cache
+        uses: actions/cache@v6
+        with:
+          path: .yarn-ci-cache
+          key: yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            yarn-cache-
 
       - name: Install dependencies --frozen-lockfile
         run: yarn install:lock
@@ -107,7 +347,7 @@ jobs:
 
       - name: Upload failure artifacts
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: functional-artifacts-shard-${{ matrix.shard }}
           path: |
@@ -115,46 +355,83 @@ jobs:
             test-results
           retention-days: 4
 
-  # Consumer contract tests for the versioning services (schema sanity checks).
-  # Runs in the same node:22-alpine container as run-tests for parity.
-  contract-consumer:
-    needs: [changes]
-    if: needs.changes.outputs.versioning == 'true'
-    runs-on: ubuntu-latest
-    container:
-      image: node:22-alpine
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Build suite summary
+        if: always()
+        run: node scripts/ci/suite-summary.mjs test-results/functional-summary.json functional-shard-${{ matrix.shard }} .gate/suite-summary-functional-${{ matrix.shard }}.json
 
-      - name: Install SO deps
-        run: apk add curl bash git
+      - name: Upload suite summary
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: suite-summary-functional-${{ matrix.shard }}
+          path: .gate/suite-summary-functional-${{ matrix.shard }}.json
+          retention-days: 1
 
-      - name: Install dependencies --frozen-lockfile
-        run: yarn install:lock
-
-      - name: Run consumer contract tests
-        run: TZ=UTC npx vitest run --config vitest.config.js src/tests/contracts
-
-  # Aggregate gate for the versioning test suites. This is the intended FUTURE
-  # single required check for branch protection (do NOT add it to required
-  # checks here — that is branch-protection config, out of scope for this file).
-  # Passes when every upstream need is 'success' OR 'skipped' (skipped == the PR
-  # did not touch versioning surfaces).
-  versioning-tests-gate:
-    needs: [functional, contract-consumer]
+  # ── The gate: ONE stable name aggregating EVERY suite (req 1.2/1.8) ──
+  # This is the intended single required check for branch protection (applying
+  # it is repo config — spec ci-maturity ADR-15, only with explicit team
+  # approval). Mandatory jobs must be 'success'; functional/contract may be
+  # 'skipped' ONLY via the path filter (skip-by-dependency-failure is caught
+  # because the failing dependency itself reddens the gate).
+  pre-merge-gate:
+    needs:
+      [
+        lint,
+        lint-security,
+        lint-governance,
+        build-integrity,
+        run-tests,
+        changes,
+        functional,
+        contract-consumer
+      ]
     if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Download suite summaries
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: suite-summary-*
+          path: .gate-summaries
+          merge-multiple: true
+
+      # The report (req 6.3/6.3.1): totals per suite + where/why it failed.
+      - name: Publish consolidated report
+        run: node scripts/ci/gate-summary.mjs .gate-summaries
+
       - name: Evaluate upstream results
         run: |
-          functional='${{ needs.functional.result }}'
-          contract='${{ needs.contract-consumer.result }}'
-          echo "functional=$functional contract-consumer=$contract"
-          for result in "$functional" "$contract"; do
-            if [ "$result" != "success" ] && [ "$result" != "skipped" ]; then
-              echo "::error::versioning-tests-gate failed (a required suite did not succeed)"
-              exit 1
+          fail=0
+
+          check_required() {
+            if [ "$2" != "success" ]; then
+              echo "::error::pre-merge-gate: required job '$1' did not succeed (result: $2)"
+              fail=1
             fi
-          done
-          echo "versioning-tests-gate passed"
+          }
+          check_skippable() {
+            if [ "$2" != "success" ] && [ "$2" != "skipped" ]; then
+              echo "::error::pre-merge-gate: job '$1' failed (result: $2)"
+              fail=1
+            fi
+          }
+
+          check_required "lint"            '${{ needs.lint.result }}'
+          check_required "lint-security"   '${{ needs.lint-security.result }}'
+          check_required "lint-governance" '${{ needs.lint-governance.result }}'
+          check_required "build-integrity" '${{ needs.build-integrity.result }}'
+          check_required "run-tests"       '${{ needs.run-tests.result }}'
+          check_required "changes"         '${{ needs.changes.result }}'
+          check_skippable "contract-consumer" '${{ needs.contract-consumer.result }}'
+          check_skippable "functional"        '${{ needs.functional.result }}'
+
+          if [ "$fail" -ne 0 ]; then
+            echo "::error::pre-merge-gate failed — see the consolidated report in the run summary"
+            exit 1
+          fi
+          echo "pre-merge-gate passed"
