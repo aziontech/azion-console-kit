@@ -42,12 +42,13 @@ jobs:
         run: apk add --no-cache curl bash git tar zstd
 
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Restore yarn cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .yarn-ci-cache
           key: yarn-cache-${{ hashFiles('yarn.lock') }}
@@ -74,15 +75,16 @@ jobs:
         run: apk add curl bash git tar zstd
 
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Trust checkout directory
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       - name: Restore yarn cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .yarn-ci-cache
           key: yarn-cache-${{ hashFiles('yarn.lock') }}
@@ -92,13 +94,19 @@ jobs:
       - name: Install dependencies --frozen-lockfile
         run: yarn install:lock
 
+      # Context values flow through env (never interpolated into run blocks) —
+      # zizmor template-injection hardening (spec fix-compliance-check, phase 2).
       - name: Run eslint security check
         if: github.event_name == 'pull_request'
-        run: yarn lint:security-check:changed --base origin/${{ github.base_ref }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: yarn lint:security-check:changed --base "origin/$BASE_REF"
 
       - name: Run eslint security check
         if: github.event_name == 'push'
-        run: yarn lint:security-check:changed --base ${{ github.event.before }}
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: yarn lint:security-check:changed --base "$BEFORE_SHA"
 
   # Migrated from eslint-azion-governance.yml — same commands (spec req 8.3).
   lint-governance:
@@ -111,8 +119,9 @@ jobs:
         run: apk add --no-cache curl bash git tar zstd
 
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Trust checkout directory
@@ -120,10 +129,12 @@ jobs:
 
       - name: Fetch PR base branch
         if: github.event_name == 'pull_request'
-        run: git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: git fetch origin "$BASE_REF:refs/remotes/origin/$BASE_REF"
 
       - name: Restore yarn cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .yarn-ci-cache
           key: yarn-cache-${{ hashFiles('yarn.lock') }}
@@ -135,7 +146,9 @@ jobs:
 
       - name: Architecture Lint (Changed Files)
         if: github.event_name == 'pull_request'
-        run: yarn lint:architecture:changed --base origin/${{ github.base_ref }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: yarn lint:architecture:changed --base "origin/$BASE_REF"
 
       - name: Architecture Conformance Report
         if: github.event_name == 'pull_request'
@@ -154,10 +167,12 @@ jobs:
         run: apk add --no-cache curl bash git tar zstd
 
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Restore yarn cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .yarn-ci-cache
           key: yarn-cache-${{ hashFiles('yarn.lock') }}
@@ -182,15 +197,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Install SO deps
         run: apk add curl bash git tar zstd
 
       - name: Restore yarn cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .yarn-ci-cache
           key: yarn-cache-${{ hashFiles('yarn.lock') }}
@@ -204,7 +220,7 @@ jobs:
         run: yarn test:unit:coverage
 
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: coverage_unit_report
           path: |
@@ -220,7 +236,7 @@ jobs:
 
       - name: Upload suite summary
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: suite-summary-unit
           path: .gate/suite-summary-unit.json
@@ -236,7 +252,9 @@ jobs:
       versioning: ${{ steps.filter.outputs.versioning }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Filter changed paths
         id: filter
@@ -244,7 +262,7 @@ jobs:
         with:
           # On pull_request the action auto-detects the PR base; on push to dev
           # we compare against the dev branch explicitly.
-          base: ${{ github.event_name == 'pull_request' && '' || 'dev' }}
+          base: ${{ github.event_name == 'push' && 'dev' || github.base_ref }}
           filters: |
             versioning:
               - 'src/composables/versioning/**'
@@ -272,13 +290,15 @@ jobs:
       image: node:22-alpine
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install SO deps
         run: apk add curl bash git tar zstd
 
       - name: Restore yarn cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .yarn-ci-cache
           key: yarn-cache-${{ hashFiles('yarn.lock') }}
@@ -299,7 +319,7 @@ jobs:
 
       - name: Upload suite summary
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: suite-summary-contract
           path: .gate/suite-summary-contract.json
@@ -329,10 +349,12 @@ jobs:
         shard: [1, 2]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Restore yarn cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .yarn-ci-cache
           key: yarn-cache-${{ hashFiles('yarn.lock') }}
@@ -347,7 +369,7 @@ jobs:
 
       - name: Upload failure artifacts
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: functional-artifacts-shard-${{ matrix.shard }}
           path: |
@@ -361,7 +383,7 @@ jobs:
 
       - name: Upload suite summary
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: suite-summary-functional-${{ matrix.shard }}
           path: .gate/suite-summary-functional-${{ matrix.shard }}.json
@@ -390,11 +412,13 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Download suite summaries
         continue-on-error: true
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: suite-summary-*
           path: .gate-summaries
