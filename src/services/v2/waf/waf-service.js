@@ -5,6 +5,8 @@ import { transformSnakeToCamel } from '@/services/v2/utils/adaptServiceDataRespo
 import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
 import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
+const WAF_DOMAINS_PAGE_SIZE = 100
+
 const ALL_THREATS = [
   'cross_site_scripting',
   'directory_traversal',
@@ -268,15 +270,36 @@ export class WafService extends BaseService {
     )
   }
 
-  #fetchWafDomains = async (wafId) => {
+  #fetchWafDomainsPage = async (wafId, page) => {
     const { data } = await this.http.request({
       url: `/api/v3/waf/${wafId}/domains`,
       method: 'GET',
-      params: { page_size: 100 }
+      params: { page, page_size: WAF_DOMAINS_PAGE_SIZE }
     })
 
-    const results = Array.isArray(data.results) ? data.results : []
-    return results.map((domain) => ({
+    return {
+      count: Number(data?.count) || 0,
+      results: Array.isArray(data?.results) ? data.results : []
+    }
+  }
+
+  #fetchWafDomains = async (wafId) => {
+    const { count, results } = await this.#fetchWafDomainsPage(wafId, 1)
+    const allDomains = [...results]
+
+    const totalPages = Math.ceil(count / WAF_DOMAINS_PAGE_SIZE)
+
+    if (totalPages > 1) {
+      const pagePromises = []
+      for (let page = 2; page <= totalPages; page++) {
+        pagePromises.push(this.#fetchWafDomainsPage(wafId, page))
+      }
+
+      const pagesResponses = await Promise.all(pagePromises)
+      pagesResponses.forEach((pageResponse) => allDomains.push(...pageResponse.results))
+    }
+
+    return allDomains.map((domain) => ({
       domain: domain.domain,
       id: domain.id,
       name: domain.name
