@@ -163,18 +163,19 @@ export const FLAG_FORK_INVENTORY = {
     {
       resource: 'workload',
       routeFile: 'src/router/routes/workload-routes/index.js',
+      // 2026-07-22: the team adopted the standard v6/ subfolder layout for
+      // workload (commit 9cd7f559e) — the inverted naming this registry first
+      // documented is gone; the fork now follows the convention.
       forks: [
         {
           routeName: 'create-workload',
-          v6View: '@views/Workload/CreateView.vue',
-          legacyView: '@views/Workload/legacy/CreateView.vue',
-          inverted: true
+          v6View: '@views/Workload/v6/CreateView.vue',
+          legacyView: '@views/Workload/CreateView.vue'
         },
         {
           routeName: 'edit-workload',
-          v6View: '@views/Workload/TabsView.vue',
-          legacyView: '@views/Workload/legacy/EditView.vue',
-          inverted: true
+          v6View: '@views/Workload/v6/TabsView.vue',
+          legacyView: '@views/Workload/EditView.vue'
         }
       ],
       extras: [
