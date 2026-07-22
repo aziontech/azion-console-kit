@@ -36,12 +36,12 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
+  import FormFieldsWorkload from '@/views/Workload/v6/FormFields/FormFieldsWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { buildLegacySchema } from '../Config/validation'
+  import { buildV6Schema } from '@/views/Workload/Config/validation'
   import { clipboardWrite } from '@/helpers/clipboard'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -88,8 +88,8 @@
       .track()
   }
 
-  const validationSchema = buildLegacySchema()
-  const createWorkload = (payload) => workloadService.createWorkload(payload, false)
+  const validationSchema = buildV6Schema()
+  const createWorkload = (payload) => workloadService.createWorkload(payload, true)
 
   const initialValues = {
     name: '',
@@ -114,8 +114,9 @@
     },
     useCustomDomain: false,
     customDomain: '',
-    workloadHostnameAllowAccess: true,
-    tls: { certificate: 0, ciphers: 7, minimumVersion: 'tls_1_3' },
-    domains: [{ subdomain: '', domain: '' }]
+    workloadHostnameAllowAccess: false,
+    tls: { ciphers: 7, minimumVersion: 'tls_1_3' },
+    domains: [],
+    environmentDeployments: {}
   }
 </script>

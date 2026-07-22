@@ -4,13 +4,13 @@
   import { useField } from 'vee-validate'
   import { INFORMATION_TEXTS } from '@/helpers'
   import { computed } from 'vue'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
-  import BlocksGeneral from '../../FormFields/blocks/generalBlock.vue'
-  import BlocksMutualAuthenticationSettings from '../../FormFields/blocks/mutualAuthenticationSettingsBlock.vue'
-  import BlocksInfrastructure from '../../FormFields/blocks/infrastructureBlock.vue'
-  import BlocksDomains from '../blocks/domainsBlock.vue'
-  import BlocksDeploymentSettings from '../blocks/deploymentSettingsBlock.vue'
-  import BlocksProtocolSettings from '../blocks/protocolSettingsBlock.vue'
+  import BlocksGeneral from '@/views/Workload/FormFields/blocks/generalBlock.vue'
+  import BlocksMutualAuthenticationSettings from '@/views/Workload/FormFields/blocks/mutualAuthenticationSettingsBlock.vue'
+  import BlocksDomains from '@/views/Workload/v6/FormFields/blocks/domainsBlock.vue'
+  import BlocksDeploymentSettings from '@/views/Workload/v6/FormFields/blocks/deploymentSettingsBlock.vue'
+  import BlocksProtocolSettings from '@/views/Workload/v6/FormFields/blocks/protocolSettingsBlock.vue'
 
   const props = defineProps({
     isEdit: { type: Boolean, default: false },
@@ -18,6 +18,8 @@
     isDrawer: { type: Boolean },
     noBorder: { type: Boolean }
   })
+
+  const { readOnly } = useVersionContext()
 
   const { value: isLocked } = useField('isLocked')
   const showWarningMessage = computed(() => props.isEdit && isLocked.value)
@@ -36,12 +38,7 @@
     :isEdit="props.isEdit"
     :isDrawer="props.isDrawer"
     :noBorder="props.noBorder"
-  />
-
-  <BlocksInfrastructure
-    :isEdit="props.isEdit"
-    :isDrawer="props.isDrawer"
-    :noBorder="props.noBorder"
+    :readOnly="readOnly"
   />
 
   <BlocksDomains
@@ -77,6 +74,7 @@
         name="active"
         auto
         :isCard="false"
+        :disabled="readOnly"
         title="Active"
       />
     </template>

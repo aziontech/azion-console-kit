@@ -6,7 +6,7 @@
   import CurrentBadge from '@/components/CurrentBadge'
   import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
-  import { useWorkloadReleases } from '@/views/Workload/composables/useWorkloadReleases'
+  import { useWorkloadReleases } from '@/views/Workload/v6/composables/useWorkloadReleases'
   import { useReleaseDrawerController } from '@/composables/versioning/use-deployment-release-drawer'
 
   defineOptions({ name: 'workload-releases-section' })

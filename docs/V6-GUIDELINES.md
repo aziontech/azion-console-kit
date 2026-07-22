@@ -108,10 +108,12 @@ Adapters (ex.: `*-adapter.js`) **podem** ler o flag diretamente, pois não são 
 
 `docs/WORKLOAD-VERSIONING.md` documenta o fork completo do Workload e é referência **conceitual**
 do padrão (fork por flag no router, services flag-aware, formas de divergir UI por estado de
-versão). No entanto, o **layout de arquivos** do Workload precede esta guideline: ele usa
-`legacy/` no root (variante antiga) em vez de `v6/` em subpasta. **Workload será migrado
-futuramente para o padrão atual** — até lá, a guideline canônica de layout é a desta seção, não a
-do Workload.
+versão). O Workload **já segue o layout canônico** desta seção: o código legado vive na raiz de
+`@views/Workload/` e todo o código v6 (views, FormFields, blocks, Tabs, Drawer, etc.) fica isolado
+em `@views/Workload/v6/`, com imports por **alias absoluto** (`@/views/Workload/...`) em vez de
+relativos. Por ter o fork mais profundo do console — Create, Edit e a composição de formulário
+divergem entre versões —, o `v6/` do Workload é o exemplo mais completo de aplicação desta
+convenção.
 
 ## Como verificar
 
