@@ -1,0 +1,44 @@
+name: Notify failure
+# spec ci-maturity (req 2.1–2.4): no CI failure is silent. Sends a Slack message
+# (incoming webhook) with workflow, job, ref and the run URL. When the webhook
+# secret is not provisioned, it emits a VISIBLE ::warning:: and exits 0 — the
+# notifier never breaks the workflow that carries it (req 2.4).
+description: Sends a CI failure notification to Slack; warns visibly when the webhook is absent
+
+inputs:
+  webhook-url:
+    description: Slack incoming-webhook URL (pass secrets.SLACK_CI_WEBHOOK_URL)
+    required: false
+    default: ''
+  context:
+    description: Short human context for the failure (what broke, in one line)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Send notification
+      shell: bash
+      # Values flow through env (never inline-interpolated into the script) so
+      # special characters in the context cannot break or inject shell.
+      env:
+        WEBHOOK_URL: ${{ inputs.webhook-url }}
+        CONTEXT: ${{ inputs.context }}
+        WORKFLOW: ${{ github.workflow }}
+        JOB: ${{ github.job }}
+        REF: ${{ github.ref_name }}
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        if [ -z "$WEBHOOK_URL" ]; then
+          echo "::warning::notify-failure: SLACK_CI_WEBHOOK_URL is NOT configured — failure was NOT notified. Context: $CONTEXT ($RUN_URL)"
+          exit 0
+        fi
+
+        # Minimal JSON escaping for the fields we control (quotes/backslashes).
+        esc() { printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'; }
+        text=":rotating_light: *CI failure* — $(esc "$CONTEXT")\n*Workflow:* $(esc "$WORKFLOW") · *Job:* $(esc "$JOB") · *Ref:* $(esc "$REF")\n<$RUN_URL|Abrir o run>"
+
+        if ! curl -sf -X POST -H 'Content-type: application/json' \
+          --data "{\"text\":\"$text\"}" "$WEBHOOK_URL" > /dev/null; then
+          echo "::warning::notify-failure: Slack delivery failed — check the webhook. Context: $CONTEXT ($RUN_URL)"
+        fi

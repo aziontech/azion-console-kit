@@ -61,6 +61,14 @@ jobs:
           # Unreachable/non-JSON -> spec skips all tests and exits 0 (see guard).
           OPENAPI_SCHEMA_URL: ${{ inputs.schema_url || vars.OPENAPI_SCHEMA_URL || 'https://api.azion.com/v4/openapi/openapi.yaml' }}
 
+      # spec ci-maturity (req 2.1): scheduled failures are never silent.
+      - name: Notify failure
+        if: failure()
+        uses: ./.github/actions/notify-failure
+        with:
+          webhook-url: ${{ secrets.SLACK_CI_WEBHOOK_URL }}
+          context: 'Drift de contrato agendado falhou (OpenAPI publicado × schemas do front)'
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v7
