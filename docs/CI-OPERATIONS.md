@@ -7,7 +7,7 @@
 
 | Portão | Modo HOJE | Modo alvo | Quando vira bloqueante |
 | --- | --- | --- | --- |
-| `pre-merge-gate` (agrega lint, security, governance, build, unit, contrato, functional) | **Informativo** — o GitHub ainda não exige o check | **Required check** no branch protection | Após 1–2 semanas de PRs sem falso-positivo (seção 2) |
+| `pre-merge-gate` (agrega lint, security, governance, build, unit, contrato, functional) | **Informativo** — o GitHub ainda não exige o check | **Required check** no branch protection | **✅ APROVADO pelo time (2026-07-22).** Aplicar IMEDIATAMENTE APÓS o merge do PR #3647 em `dev` — nunca antes (o job só existe no novo pre-merge.yml; exigir antes travaria todos os outros PRs). Passos na seção 2 |
 | Drift de contrato pré-deploy (`deploy-stage`/`deploy-production`) | **Informativo** — `continue-on-error: true`; drift real notifica no Slack mas o deploy segue | Bloqueante (deploy para em drift real) | Mesma janela de observação; remover o `continue-on-error` (1 linha em cada deploy-*.yml) |
 | Drift agendado (dias úteis 06:00 UTC) | Aviso via Slack | Aviso (permanece) | — |
 | Mutation agendado (segundas 04:00 UTC) | Relatório (Stryker `break: null`) | Piso de score que quebra | Decisão após o relatório estabilizar |
@@ -18,8 +18,18 @@ Verifique o primeiro run real em Actions após o merge (critério da spec, req 7
 
 ## 2. Como ligar o bloqueio (branch protection)
 
-Required check único e estável: **`pre-merge-gate`**. Aplicar **só com decisão
-explícita do time**, no fim da janela de observação:
+Required check único e estável: **`pre-merge-gate`**. **Decisão já tomada
+(2026-07-22): será bloqueante.** Sequência obrigatória:
+
+1. Mergear o PR #3647 (`feat/versioning` → `dev`) — leva o novo `pre-merge.yml`.
+2. IMEDIATAMENTE depois, um admin aplica a proteção (o token de CI local não tem
+   a permissão *Administration*; use a UI ou o comando abaixo com token admin):
+
+   **Pela UI**: Settings → Branches → Add branch protection rule → branch `dev` →
+   marcar *Require status checks to pass* → buscar e selecionar `pre-merge-gate`
+   → Save.
+
+   **Por comando**:
 
 ```bash
 gh api repos/aziontech/azion-console-kit/branches/dev/protection \
