@@ -39,7 +39,7 @@ const LISTINGS = [
   {
     name: 'Workload VersionsTab',
     resourceType: 'workload',
-    file: 'src/views/Workload/Tabs/VersionsTab.vue'
+    file: 'src/views/Workload/v6/Tabs/VersionsTab.vue'
   },
   {
     name: 'NetworkLists VersionsTab',

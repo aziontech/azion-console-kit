@@ -13,7 +13,7 @@ const VERSIONED_FORM_COMPONENTS = [
   'src/views/EdgeFunctions/FormFields/FormFieldsEditEdgeFunctions.vue',
   'src/views/EdgeFunctions/components/code-editor.vue',
   'src/views/NetworkLists/FormFields/FormFieldsEditNetworkLists.vue',
-  'src/views/Workload/FormFields/FormFieldsWorkload.vue',
+  'src/views/Workload/v6/FormFields/FormFieldsWorkload.vue',
   'src/views/CustomPages/FormFields/CustomPages.vue',
   'src/views/CustomPages/Blocks/customPageBlock.vue',
   'src/views/CustomPages/Blocks/pagesCodeBlock.vue',

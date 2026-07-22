@@ -13,7 +13,7 @@ const CONSUMERS = {
     actionable: true
   },
   WorkloadReleasesSection: {
-    file: 'views/Workload/Tabs/sections/WorkloadReleasesSection.vue',
+    file: 'views/Workload/v6/Tabs/sections/WorkloadReleasesSection.vue',
     actionable: false
   }
 }

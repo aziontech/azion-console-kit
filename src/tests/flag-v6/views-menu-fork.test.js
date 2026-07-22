@@ -46,7 +46,12 @@ const stubQueryCache = () => {
 const freshRouter = () =>
   createRouter({
     history: createMemoryHistory(),
-    routes: [{ path: '/:pathMatch(.*)*', name: 'catch-all', component: { template: '<div />' } }]
+    routes: [
+      // FormFieldsEnvironment renders a RouterLink to the NAMED route
+      // 'list-variables' — named targets must exist or the link setup throws.
+      { path: '/variables', name: 'list-variables', component: { render: () => null } },
+      { path: '/:pathMatch(.*)*', name: 'catch-all', component: { render: () => null } }
+    ]
   })
 
 describe('sidebar menu — Deployments item visibility forks on account client_flags (req 5.3)', () => {
