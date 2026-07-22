@@ -515,8 +515,6 @@
     top: 100%;
     left: 0;
     right: 0;
-    /* Below the suggestions dropdown (z-50): while the user is picking a
-       suggestion the validation message must not cover the options. */
     z-index: 49;
     display: flex;
     flex-direction: column;

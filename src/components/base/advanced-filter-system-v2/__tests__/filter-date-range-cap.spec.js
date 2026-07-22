@@ -1,13 +1,4 @@
 /* eslint-disable xss/no-mixed-html -- `template` strings here are Vue stub component templates, not HTML sinks */
-/**
- * filterDateRangeMaxDays — final clamp at the tsRange choke point
- * ---------------------------------------------------------------------
- * Every picker path (preset, typed "Last N", calendar, persisted label
- * re-parse) materializes the applied range in `updatedTime()`. A span over
- * the cap must be clamped by moving BEGIN up — END ("now") preserved — so
- * no consumer ever receives a tsRange wider than the cap (RTE v2 events
- * raw retention: 7 days).
- */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { nextTick } from 'vue'

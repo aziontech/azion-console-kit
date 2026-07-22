@@ -216,12 +216,7 @@
     emit('resizeend', { sizes: [sizeA, sizeB] })
     hasAppliedInitial = true
   }
-  // Keep-alive-safe lifecycle: acquire on mount/activate, release on
-  // unmount/deactivate. `applyInitialSizes` runs once per live period (before it
-  // ran on both onMounted and onActivated, doubling up on the first mount).
-  // KeepAlive reactivation matters here because the container may have had zero
-  // dimensions while deactivated, so the percentage-to-pixel conversion in
-  // panelAStyle would have produced 0px — re-applying restores the widths.
+
   const acquireResources = () => {
     applyInitialSizes()
     // Re-apply once when the element becomes visible and has dimensions (e.g., after tab switch)

@@ -72,10 +72,11 @@ describe('BUG4 — FilterRow responsive layout', () => {
     // field + operator + value = 3 controls with the wrap floor.
     expect(controls.length).toBe(3)
 
-    // Each control also keeps `min-w-0` so long labels truncate rather than
-    // pushing the row past the panel width.
+    // Each control carries the `min-w-44` (11rem) wrap floor so it keeps a
+    // comfortable width and wraps to the next line instead of overflowing
+    // and being clipped by the panel.
     controls.forEach((control) => {
-      expect(control.classes()).toContain('min-w-0')
+      expect(control.classes()).toContain('min-w-44')
     })
   })
 

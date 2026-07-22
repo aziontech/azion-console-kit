@@ -1,10 +1,17 @@
 <template>
+  <!--
+    whitespace-pre é FUNCIONAL (não cosmético): mantém a query em uma linha e
+    preserva o espaço final que o usuário digita após um valor (ex.: `status = 200 `).
+    Sem ele o innerText descarta esse espaço e o AQL nunca avança para o logicOperator,
+    então as sugestões de AND/OR não aparecem. overflow-x-hidden recorta texto longo
+    que senão pintaria por cima do divisor/ações à direita.
+  -->
   <div
     id="editableDiv"
     ref="editable"
     contenteditable
     placeholder="Filter using Azion Query Language syntax..."
-    class="contenteditable p-inputtext font-normal text-sm w-full h-auto"
+    class="contenteditable p-inputtext font-normal text-sm w-full h-auto whitespace-pre font-mono min-h-9 max-h-24 min-w-0 overflow-x-hidden overflow-y-auto empty:before:content-[attr(placeholder)] empty:before:block empty:before:text-[color:var(--input-placeholder-text-color)] empty:before:whitespace-nowrap empty:before:overflow-hidden empty:before:text-ellipsis empty:before:pointer-events-none"
     @input="handleInput"
     @keyup="updateCursorOffset"
     @mouseup="updateCursorOffset"
@@ -89,40 +96,3 @@
     getCursorOffset: () => cursorOffset.value
   })
 </script>
-
-<style>
-  .contenteditable {
-    /* `pre` keeps the query on a single line (no wrapping) AND preserves
-       whitespace — crucially the TRAILING space the user types after a value
-       (e.g. `status = 200 `). `innerText` is render-aware: with `nowrap`
-       (like `normal`) the browser drops that trailing space, so the AQL step
-       never advances to `logicOperator` and the AND/OR suggestions never show.
-       `pre` preserves it, matching RTE v1's `pre-wrap` behaviour while still
-       not wrapping.
-       `overflow-x: hidden` clips long text that would otherwise visibly
-       extend past the input boundary and cover the gap/divider/actions
-       group on the right (default overflow-x is `visible`, which lets
-       overflowing inline content paint outside its own box). */
-    white-space: pre;
-    font-family:
-      ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
-    min-height: 2.25rem;
-    max-height: 6rem;
-    /* Flex-item shrink permission: without it the single-line (`pre`) content /
-       nowrap placeholder sets min-content and the input overflows the filter
-       card on narrow viewports instead of shrinking with it. */
-    min-width: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  .contenteditable:empty:before {
-    content: attr(placeholder);
-    color: var(--input-placeholder-text-color);
-    pointer-events: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-  }
-</style>

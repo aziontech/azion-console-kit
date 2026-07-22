@@ -2,11 +2,11 @@
   <div class="flex flex-col gap-3">
     <!-- Filter Row Content
          The row is a single wrapping flex line: field / operator / value
-         controls each carry a min-width floor (via `.filter-row__control`)
-         so that when the popover narrows (tablet band ~640-780px, mobile),
-         they WRAP to the next line instead of overflowing and being clipped
-         by the panel. `min-w-0` on each control lets long labels truncate
-         rather than push the row wider than the panel. -->
+         controls each carry a min-width floor (`min-w-44` = 11rem) so that
+         when the popover narrows (tablet band ~640-780px, mobile), they WRAP
+         to the next line instead of overflowing and being clipped by the
+         panel. The `.filter-row__control` class is kept only as a test/query
+         hook (see filter-row-responsive.spec.js). -->
     <div class="flex flex-wrap items-center gap-3 w-full min-w-0">
       <Dropdown
         ref="fieldDropdownRef"
@@ -19,7 +19,7 @@
         autoFilterFocus
         optionLabel="label"
         optionValue="value"
-        class="filter-row__control flex-1 min-w-0"
+        class="filter-row__control flex-1 min-w-44"
         placeholder="Select a field"
         filterIcon="pi pi-search"
         @show="onDropdownShow"
@@ -33,14 +33,14 @@
         :options="listOperators"
         optionLabel="label"
         placeholder="Select an operator"
-        class="filter-row__control flex-1 min-w-0"
+        class="filter-row__control flex-1 min-w-44"
       />
 
       <component
         :is="componentRender"
         v-model:value="filterValue"
         v-bind="selectedOperator?.props"
-        class="filter-row__control flex-1 min-w-0"
+        class="filter-row__control flex-1 min-w-44"
         :placeholder="selectedField ? 'Enter value...' : 'Please select a field first...'"
         :disabled="!selectedField"
       />
@@ -78,10 +78,12 @@
       </div>
     </div>
 
-    <!-- Operator Dropdown (hidden by default) -->
+    <!-- Operator Dropdown (hidden by default).
+         inset-x-0 + max-w-full keep this absolutely-positioned overlay inside
+         the row's box so it can't escape the panel horizontally. -->
     <div
       v-if="showOperatorDropdown"
-      class="filter-row__operator-overlay absolute z-50 mt-1 max-w-full"
+      class="absolute inset-x-0 z-50 mt-1 max-w-full"
     >
       <Dropdown
         v-model="selectedOperator"
@@ -236,25 +238,3 @@
     filterValue.value = modelValue.value.rawValue ?? modelValue.value.value ?? null
   }
 </script>
-
-<style scoped>
-  /* Wrapping floor for the field / operator / value controls.
-     Each control keeps a minimum comfortable width; once three controls
-     no longer fit on one line (narrow popover / tablet band / mobile) they
-     wrap to the next line instead of overflowing the panel and being
-     clipped by its `overflow: hidden`. `flex-basis: 0` + `flex-grow: 1`
-     (from the utility `flex-1`) lets them share the remaining width evenly
-     while `min-width` provides the wrap threshold. */
-  .filter-row__control {
-    min-width: 11rem;
-  }
-
-  /* The floating operator dropdown is absolutely positioned; without a
-     width cap it can escape the panel horizontally. Keep it inside the
-     row's box. */
-  .filter-row__operator-overlay {
-    left: 0;
-    right: 0;
-    max-width: 100%;
-  }
-</style>

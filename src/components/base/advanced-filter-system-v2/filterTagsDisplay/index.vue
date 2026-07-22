@@ -38,13 +38,6 @@
         return {
           ...item,
           field: label,
-          // Keep a reference to the raw filter this chip was projected from.
-          // `processedFilters` is a FILTERED + projected view: any raw filter
-          // whose field/operator isn't in `fieldsInFilter` (or is disabled) is
-          // dropped, so a chip's position here does NOT map to its position in
-          // `props.filters`. Removal must therefore identify the exact raw
-          // filter by reference — not by the rendered index — otherwise the
-          // wrong chip is removed whenever a raw filter is hidden (C6/SR-4).
           __source: item
         }
       })
