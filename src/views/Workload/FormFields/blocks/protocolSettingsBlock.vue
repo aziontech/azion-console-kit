@@ -88,8 +88,15 @@
 
   const selectCertificate = (option) => {
     statusDigitalCertificate.value = option.status
-    authorityCertificate.value = option.authority
-    subjectNameCertificate.value = option.subjectName
+    const normalizedAuthority = option.authority ?? null
+    const normalizedSubjectName = option.subjectName ?? null
+
+    if (authorityCertificate.value !== normalizedAuthority) {
+      authorityCertificate.value = normalizedAuthority
+    }
+    if (subjectNameCertificate.value !== normalizedSubjectName) {
+      subjectNameCertificate.value = normalizedSubjectName
+    }
   }
 
   const loadInitialTls = {
