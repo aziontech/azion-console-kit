@@ -1,0 +1,33 @@
+# Security scanning on every PR (spec: MCP security guide / skill fix-compliance-check).
+# The composite action auto-detects the stack (node-yarn) and runs:
+# Semgrep (SAST, blocking for JS/TS) + yarn audit (SCA, blocking) +
+# osv-scanner (catch-all) + Gitleaks (secrets, blocking) + zizmor (actions).
+name: Security
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  schedule:
+    # Window 03h-06h UTC (distinct from the compliance window) — random slot.
+    - cron: '17 4 * * 3'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write # SARIF upload to GitHub Security tab
+  pull-requests: write # PR comment with scan report
+
+concurrency:
+  group: ci-security-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest # public repo — OSS strategy
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: aziontech/azion-action-security@v0
