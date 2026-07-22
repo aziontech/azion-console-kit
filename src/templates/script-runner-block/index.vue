@@ -182,15 +182,17 @@
     }
   }
 
+  const HIGHLIGHT_CLASSES = ['bg-red-500/20', 'transition-colors', 'duration-300']
+
   const scrollToLog = (logId) => {
     const element = document.getElementById(logId)
     if (!element) {
       return
     }
     element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    element.classList.add('highlight-log')
+    element.classList.add(...HIGHLIGHT_CLASSES)
     setTimeout(() => {
-      element.classList.remove('highlight-log')
+      element.classList.remove(...HIGHLIGHT_CLASSES)
     }, HIGHLIGHT_DURATION)
   }
 
@@ -297,10 +299,6 @@
 </script>
 
 <style scoped>
-  .highlight-log {
-    background-color: rgba(239, 68, 68, 0.2);
-    transition: background-color 0.3s ease;
-  }
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

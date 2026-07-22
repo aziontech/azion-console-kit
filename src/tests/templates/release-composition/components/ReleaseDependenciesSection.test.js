@@ -121,11 +121,10 @@ describe('ReleaseDependenciesSection', () => {
     // connector group is closed. The body stays mounted (grid-rows collapse
     // animation) but is collapsed and marked aria-hidden so it is out of the
     // accessibility tree.
-    const body = wrapper.find('[data-testid="release-composition__deps-body-connector"]')
-    const panel = body.element.closest('.collapsible-panel')
-    expect(panel).not.toBeNull()
-    expect(panel.classList.contains('is-expanded')).toBe(false)
-    expect(panel.getAttribute('aria-hidden')).toBe('true')
+    const panel = wrapper.find('[data-testid="release-composition__deps-panel-connector"]')
+    expect(panel.exists()).toBe(true)
+    expect(panel.classes()).toContain('grid-rows-[0fr]')
+    expect(panel.attributes('aria-hidden')).toBe('true')
   })
 
   it('shows the empty "No {label} instances" message for an open group with no instances', () => {

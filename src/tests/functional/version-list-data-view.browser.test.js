@@ -43,15 +43,14 @@ const renderList = (props = {}) =>
 
 // The popup Menu and the action sheet teleport to <body>; find their items there.
 const findInBody = async (text) => {
+  const selector = '.version-row-menu__item, [data-testid="version-action-sheet__item"]'
   await vi.waitFor(() => {
-    const hit = [
-      ...document.body.querySelectorAll('.version-row-menu__item, .action-sheet__button')
-    ].some((el) => el.textContent.includes(text))
+    const hit = [...document.body.querySelectorAll(selector)].some((el) =>
+      el.textContent.includes(text)
+    )
     expect(hit).toBe(true)
   })
-  return [...document.body.querySelectorAll('.version-row-menu__item, .action-sheet__button')].find(
-    (el) => el.textContent.includes(text)
-  )
+  return [...document.body.querySelectorAll(selector)].find((el) => el.textContent.includes(text))
 }
 
 describe('VersionListDataView (functional)', () => {

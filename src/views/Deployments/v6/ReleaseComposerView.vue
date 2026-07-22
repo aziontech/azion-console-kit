@@ -134,11 +134,6 @@
   // display cap (`DS_DISPLAY_CAP`) instead of being cut off in a large tenant.
   const scopedCandidateDsIds = ref([])
 
-  // Whether the scoped candidate resolution FAILED (vs genuinely resolving to an
-  // empty set). On failure we must NOT filter the picker to an empty candidate
-  // set — that hides every row and blocks the user (§7.4). Instead we fall back
-  // to the FULL DS list so the user can still pick. A genuine empty resolution
-  // (the resource truly has no consuming DS) keeps the empty filter.
   const candidateResolutionFailed = ref(false)
 
   const store = useReleaseStore()
@@ -196,14 +191,7 @@
     return pairs
   })
 
-  // SEAM 1 + SEAM 3: the sibling impact composable OWNS the blast-radius data —
-  // it populates `reverseLookupByDs` (read unchanged by the composition's impact
-  // engine) and exposes `dsMetaFor(id)` for the picker rows. It performs no IO
-  // itself (delegates to its injected lookup service); created before the
-  // composition so the engine reads the populated ref (design §3.1, §3.6).
   const impact = useReleaseImpact({ selectedDsIds: deploymentIds })
-  // Surfaced to the ImpactPanel so the unavailable state explains WHY (req 11.2):
-  // 'fetch_failed' (Retry may help) vs 'legacy_no_bindings' (data gap, Retry won't).
   const impactReason = impact.degradationReason
 
   const composition = useReleaseComposition({
@@ -215,13 +203,6 @@
     // genuine fetch failure — and avoid flashing zeros while the lookup loads.
     impactLoading: impact.isLoading,
     impactFailed: computed(() => impact.degradationReason.value === 'fetch_failed'),
-    // HOP 1 (req 1.2 / 8.3): inject the REAL consuming-deployments resolver so a
-    // scoped entry resolves its candidate set over the full tenant inventory
-    // (resource-usage endpoint, falling back to the client-side fan-out) instead
-    // of the composable's `scanLoadedReleases` default — which only sees already
-    // SELECTED DSs and so resolves to `[]` on a scoped entry (it opens with none
-    // selected). `scanLoadedReleases` stays the no-injection default for callers
-    // that intentionally scan only the loaded releases.
     resolveConsumingDeployments
   })
 
@@ -313,11 +294,6 @@
     enabled: dependenciesEnabled
   })
 
-  // The firewall id the composition is built around: mirrors `composedApplicationId`
-  // (explicit Firewall pick → scoped firewall entry id → firewall pinned by the
-  // effective DS's active release). Firewall dependencies (functions, WAF, network
-  // lists) are discovered from the firewall VERSION passed in the URL, only when
-  // that version is `ready` (deployable) — mirroring the application flow (§7.2).
   const composedFirewallId = computed(() => {
     const explicit = resNames.value['firewall']
     const scopedFirewallId =
@@ -384,11 +360,6 @@
     enabled: firewallDependenciesEnabled
   })
 
-  // The custom page id the composition is built around: mirrors
-  // `composedApplicationId` (explicit Custom Page pick → scoped custom_page entry
-  // id → custom page pinned by the effective DS's active release). Connector
-  // dependencies are discovered from the custom page VERSION passed in the URL,
-  // only when that version is `ready` (deployable) — mirroring the application flow.
   const composedCustomPageId = computed(() => {
     const explicit = resNames.value['custom_page']
     const scopedCustomPageId =
@@ -518,8 +489,6 @@
     composition.retryCatalogs()
   }
 
-  // --- Feed composable-loaded data back into the store (single source of truth) ---
-
   watch(composition.deployments, (list) => store.setDeployments(list), {
     immediate: true,
     deep: true
@@ -648,8 +617,6 @@
     { immediate: true, deep: true }
   )
 
-  // --- Entry: open the release from the route, full reset (spec §A, req 1.2) ----
-
   // Monotonic entry token: bumped on every `openFromRoute`. The async HOP 1
   // resolution captures the token at call time and only writes its result if the
   // token is still current — a same-route re-entry (e.g. the "Compose first
@@ -701,13 +668,6 @@
     // single pre-selected deployment as the fixed target.
     const isPickTarget = String(query.pickTarget ?? params.pickTarget ?? '') === 'true'
 
-    // Resource-scoped entry (Scenario B): resolve the consuming Deployment
-    // Settings as the selectable CANDIDATE set and present them in the picker,
-    // but pre-select NONE — the user must explicitly choose which DSs to publish
-    // into (req 1.9). The screen NEVER opens with deployments pre-selected.
-    // `resolveConsumingDeployments` runs through the active HOP 1 strategy
-    // (`resourceUsageResolver`); it may be async, so resolve it into the
-    // candidate ref without ever feeding `openRelease`'s selection.
     if (isFromVersion && incomingScopedType && resourceId) {
       candidateResolutionFailed.value = false
       Promise.resolve(
@@ -726,10 +686,6 @@
         })
         .catch(() => {
           if (seq !== entrySeq) return
-          // A resolution FAILURE must not block the screen (req 7.4). It is NOT a
-          // genuine-empty candidate set: filtering the picker to `[]` would hide
-          // every row. Flag the failure so `enrichedDeployments` lists the FULL DS
-          // set instead, letting the user still pick a target.
           candidateResolutionFailed.value = true
           scopedCandidateDsIds.value = []
         })
@@ -752,9 +708,6 @@
       workloadCandidateDsIds.value = preselectedDsIds.map(String)
     }
 
-    // Scenario B opens with ZERO selected DSs (req 1.9); Scenario A and the
-    // 'from-workload' flow carry their pre-selected deployment(s) forward — the
-    // latter pre-selects EVERY bound DS so the impact opens as the aggregate.
     store.openRelease({
       fromVersion: isFromVersion,
       scopedType: incomingScopedType,
@@ -790,18 +743,12 @@
     }
   )
 
-  // --- Composition view-models (translate store state → tree props) ------------
-
   const hasSelectedDs = computed(() => deploymentIds.value.length > 0)
 
   // True when the screen was opened scoped to a single resource version (the
   // composition collapses to just that one type, which is then editable).
   const isScoped = computed(() => Boolean(scopedType.value))
 
-  // The scoped composition (one resource version) is shown as soon as the screen
-  // opens — it does NOT wait for a Deployment Settings selection (req 1.9: the
-  // screen opens with the resource filled and 0 DSs selected; the picker is the
-  // final step). Non-scoped flows still gate the composition on a selected DS.
   const showComposition = computed(() => hasSelectedDs.value || isScoped.value)
 
   // The name of the single deployment in scope (Scenario A) — for the intro/notice.
@@ -909,12 +856,6 @@
       }
     })
 
-  // Resource picker for the "Additional dependencies" section: the base catalog
-  // service minus resources already in the composition (ENG-46674 — a resource can
-  // only be added once; its version is managed where it already appears). The
-  // row's own current pick is kept selectable. `LazyResourceSelectField` reads the
-  // service at fetch time (mount/search/scroll) and never on prop identity, so a
-  // fresh closure per render is cheap.
   const excludeUsedResourcesService = (type, ownResourceId) => async (params) => {
     const response = await composition.resourceListService(type)(params)
     const used = store.usedDependencyIds(type)
@@ -1081,8 +1022,6 @@
     { immediate: true }
   )
 
-  // --- Tree events → store mutations -------------------------------------------
-
   const onTreeResource = ({ type, value }) => store.setResName(type, value)
   const onTreeVersion = ({ type, value }) => store.setResVer(type, value)
   const toggleOptional = (type) => store.toggleResource(type)
@@ -1103,7 +1042,6 @@
     if (collOpen.value[`${type}:${group}`] === false) store.toggleCollOpen(type, group)
   }
 
-  // --- Additional (manual) dependencies → store mutations ----------------------
   // The section's events carry the depType directly (no parent), so route them all
   // to the ADDITIONAL_PARENT bucket. A manual instance starts blank + required so
   // the "no Ready version" guard applies once a resource is picked.
@@ -1146,20 +1084,11 @@
   const onCanaryEnabled = (value) => store.toggleCanary(value)
   const onCanaryForm = (values) => store.setCanaryForm(values)
 
-  // --- DS picker + impact -------------------------------------------------------
-
-  // "Retry impact" (ImpactPanel) re-runs the blast-radius lookup that owns and
-  // repopulates `reverseLookupByDs` — the real data source now — and refreshes
-  // the deployments listing the picker rows read (req 7.4). The engine then
-  // re-derives off the repopulated ref with no engine change.
   const retryImpact = () => {
     impact.retry()
     composition.retryImpact()
   }
 
-  // Cap the picker list at the top 10 Deployment Settings (design §6.2 / req 3.8).
-  // The DS picker is presentational and unvirtualized; the cap bounds what it
-  // renders without changing the underlying selection or totals.
   const DS_DISPLAY_CAP = 10
 
   const dsQuery = ref('')
@@ -1195,10 +1124,6 @@
       name: ds.name,
       binding_policy: ds.binding_policy,
       policyLabel: ds.policyLabel ?? mapPolicyToLabel(ds.deployment_policy),
-      // SEAM 3: spread the per-DS meta only when known. `dsMetaFor` already
-      // omits any field it cannot derive (returns `{}` for an unresolved DS),
-      // so the picker renders `environmentNames` / `workloadsCount` ONLY when
-      // present — never fabricated (req 3.6, 7.3, 9.2).
       ...impact.dsMetaFor(ds.id)
     }))
   })
@@ -1290,8 +1215,6 @@
     if (groupKey === 'needsFirstRelease') onComposeFirstRelease(dsId)
   }
 
-  // --- Multi-DS gate (req 5.5): fold deployCtx over ALL selected DS, strictest --
-
   // The strictest blocking DS, carrying WHY (`reason`) so the footer explains it:
   //   'degraded' → its active release couldn't be read (offer Retry)
   //   'no_app'   → it has no Application to publish
@@ -1339,8 +1262,6 @@
       !versionsStillLoading.value &&
       !resourcesMissingReadyVersion.value.length
   )
-
-  // --- Confirm + Build & activate (spec §G) ------------------------------------
 
   const confirmVisible = ref(false)
 
@@ -1477,7 +1398,7 @@
 
     <template #content>
       <div
-        class="release-composer__grid grid gap-[var(--spacing-5)]"
+        class="grid grid-cols-[minmax(0,1fr)_minmax(var(--container-xs),var(--container-md))] gap-[var(--spacing-5)] max-[880px]:grid-cols-1"
         data-testid="release-composition__grid"
       >
         <div class="flex min-w-0 flex-col gap-[var(--spacing-5)]">
@@ -1646,7 +1567,7 @@
         </div>
 
         <section
-          class="release-composer__impact flex flex-col self-start overflow-hidden rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)]"
+          class="sticky top-[var(--spacing-4)] flex flex-col self-start overflow-hidden rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] max-[880px]:static"
           data-testid="release-composition__impact-card"
         >
           <div
@@ -1688,9 +1609,6 @@
         Build &amp; activate creates, builds and activates in one action.
       </span>
       <div class="flex items-center justify-end gap-[var(--spacing-3)]">
-        <!-- A degraded DS (active-release read failed) is recoverable in the
-             from-deployment flow too, where the picker isn't shown — so the footer
-             carries the Retry itself so the user is never stuck. -->
         <span
           v-if="blockingDs && blockingDs.reason === 'degraded'"
           class="flex items-center gap-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
@@ -1809,24 +1727,3 @@
     @close="onDeployProgressClose"
   />
 </template>
-
-<style scoped>
-  .release-composer__grid {
-    grid-template-columns: minmax(0, 1fr) minmax(var(--container-xs), var(--container-md));
-  }
-
-  .release-composer__impact {
-    position: sticky;
-    top: var(--spacing-4);
-  }
-
-  @media (max-width: 880px) {
-    .release-composer__grid {
-      grid-template-columns: 1fr;
-    }
-
-    .release-composer__impact {
-      position: static;
-    }
-  }
-</style>

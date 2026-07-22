@@ -343,7 +343,7 @@
         <div class="min-w-0 flex items-center gap-2">
           <button
             type="button"
-            class="version-name-button m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-medium leading-6 text-[var(--text-color)] hover:text-[var(--primary-color)] hover:underline focus-visible:text-[var(--primary-color)] focus-visible:outline-none"
+            class="version-name-button m-0 min-w-0 cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap border-0 bg-transparent p-0 text-left text-sm font-medium leading-6 text-[var(--text-color)] hover:text-[var(--primary-color)] hover:underline focus-visible:text-[var(--primary-color)] focus-visible:outline-none"
             :data-testid="`version-row__name-${version.id}`"
             @click="goToDetails(version)"
           >
@@ -428,14 +428,6 @@
 </template>
 
 <style scoped>
-  .version-name-button {
-    background: transparent;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-    font: inherit;
-  }
-
   :deep(.dataview-control.p-calendar) {
     display: inline-flex;
     align-items: center;

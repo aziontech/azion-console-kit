@@ -103,14 +103,11 @@
       class="flex flex-col gap-[var(--spacing-4)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] px-[var(--spacing-4)] py-[var(--spacing-5)]"
       :data-testid="`release-composition__card-${resource.type}`"
     >
-      <!-- header: icon + label + (Required | Read-only | toggle). The icon is
-           flush-left (no chip box) so it lines up exactly with the "Resource"
-           label and the field column below it (all at the card's left edge). -->
       <div class="flex items-center gap-[var(--spacing-2)]">
         <i
           :class="[
             resource.icon,
-            'release-composition__card-icon shrink-0 text-body-md text-[var(--text-color-secondary)]'
+            '-ml-[2px] shrink-0 text-body-md text-[var(--text-color-secondary)]'
           ]"
         />
         <span class="flex-1 text-body-sm font-semibold text-[var(--text-color)]">
@@ -141,9 +138,6 @@
         />
       </div>
 
-      <!-- body: the SAME Resource + Version selectors for every resource
-           (disabled when the deploy case locks it); a lock hint sits below.
-           Optional resources toggled off collapse to a short note. -->
       <div
         v-if="resource.enabled"
         class="flex flex-col gap-[var(--spacing-2)]"
@@ -191,9 +185,6 @@
         Not included in this release.
       </p>
 
-      <!-- dependencies (when the parent owns collections and is enabled).
-           The `border-t` divider mirrors the mock's `.deps { border-top }`,
-           separating the resource fields from the nested collections. -->
       <ReleaseDependenciesSection
         v-if="resource.hasOwned"
         class="border-t border-[var(--surface-border)] pt-[var(--spacing-4)]"
@@ -210,12 +201,3 @@
     </div>
   </div>
 </template>
-
-<style scoped>
-  /* The `ai ai-*` (azionicons) glyphs carry a small intrinsic left-bearing, so
-     the drawn icon sits a couple px right of its box. Pull it back so the icon
-     lines up flush with the "Resource" label and the field column below it. */
-  .release-composition__card-icon {
-    margin-left: -2px;
-  }
-</style>

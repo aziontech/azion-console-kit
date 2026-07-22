@@ -97,7 +97,7 @@
         class="flex items-center gap-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
         data-testid="release-composition__deps-loading"
       >
-        <i class="pi pi-spinner deps-loading-spinner" />
+        <i class="pi pi-spinner animate-spin motion-reduce:animate-none" />
         <span>{{ loadingMessage }}</span>
       </div>
     </Transition>
@@ -144,11 +144,12 @@
         </div>
 
         <div
-          class="collapsible-panel"
-          :class="{ 'is-expanded': collection.open }"
+          class="[display:grid] transition-[grid-template-rows,opacity] duration-200 ease-in-out motion-reduce:transition-none"
+          :class="collection.open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'"
           :aria-hidden="!collection.open"
+          :data-testid="`release-composition__deps-panel-${collection.type}`"
         >
-          <div class="collapsible-panel__inner">
+          <div class="min-h-0 overflow-hidden">
             <div
               class="flex flex-col gap-[var(--spacing-2)] border-t border-[var(--surface-border)] p-[var(--spacing-3)]"
               :data-testid="`release-composition__deps-body-${collection.type}`"
@@ -168,12 +169,7 @@
                   class="flex flex-col gap-[var(--spacing-2)]"
                   :data-testid="`release-composition__deps-row-${collection.type}-${instance.id}`"
                 >
-                  <div
-                    :class="[
-                      'release-composition__deps-row flex w-full items-end gap-[var(--spacing-3)]',
-                      instance.locked && 'release-composition__deps-row--locked'
-                    ]"
-                  >
+                  <div class="flex w-full items-end gap-[var(--spacing-3)]">
                     <div
                       v-if="instance.locked"
                       class="flex w-full min-w-0 flex-col gap-[var(--spacing-2)]"
@@ -235,10 +231,12 @@
 
                   <div
                     v-if="instance.sharedWith && instance.sharedWith.length"
-                    :class="[
-                      'release-composition__deps-row grid gap-[var(--spacing-3)]',
-                      instance.locked && 'release-composition__deps-row--locked'
-                    ]"
+                    class="grid gap-[var(--spacing-3)]"
+                    :class="
+                      instance.locked
+                        ? 'grid-cols-[1fr_1fr]'
+                        : 'grid-cols-[1fr_1fr_var(--spacing-8)] max-[600px]:grid-cols-[1fr_1fr_auto]'
+                    "
                   >
                     <span aria-hidden="true" />
                     <div
@@ -255,10 +253,12 @@
 
                   <div
                     v-if="instance.required && !instance.versionOptions.length"
-                    :class="[
-                      'release-composition__deps-row grid gap-[var(--spacing-3)]',
-                      instance.locked && 'release-composition__deps-row--locked'
-                    ]"
+                    class="grid gap-[var(--spacing-3)]"
+                    :class="
+                      instance.locked
+                        ? 'grid-cols-[1fr_1fr]'
+                        : 'grid-cols-[1fr_1fr_var(--spacing-8)] max-[600px]:grid-cols-[1fr_1fr_auto]'
+                    "
                   >
                     <span aria-hidden="true" />
                     <div
@@ -304,19 +304,6 @@
 </template>
 
 <style scoped>
-  .deps-loading-spinner {
-    animation: deps-loading-spin 1s linear infinite;
-  }
-
-  @keyframes deps-loading-spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
   .deps-loading-fade-enter-active,
   .deps-loading-fade-leave-active {
     transition:
@@ -330,53 +317,9 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .deps-loading-spinner {
-      animation: none;
-    }
     .deps-loading-fade-enter-active,
     .deps-loading-fade-leave-active {
       transition: none;
-    }
-  }
-
-  .collapsible-panel {
-    display: grid;
-    grid-template-rows: 0fr;
-    opacity: 0;
-    transition:
-      grid-template-rows 0.2s ease,
-      opacity 0.2s ease;
-  }
-  .collapsible-panel.is-expanded {
-    grid-template-rows: 1fr;
-    opacity: 1;
-  }
-  .collapsible-panel__inner {
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .collapsible-panel {
-      transition: none;
-    }
-  }
-
-  .release-composition__deps-row {
-    grid-template-columns: 1fr 1fr var(--spacing-8);
-  }
-
-  .release-composition__deps-row--locked {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @media (max-width: 600px) {
-    .release-composition__deps-row {
-      grid-template-columns: 1fr 1fr auto;
-    }
-
-    .release-composition__deps-row--locked {
-      grid-template-columns: 1fr 1fr;
     }
   }
 </style>

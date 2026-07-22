@@ -57,54 +57,61 @@
       content: { class: '!p-0 !h-auto' }
     }"
   >
-    <div class="action-sheet">
+    <div class="flex flex-col px-[1.125rem] pb-5 pt-2.5 text-[var(--text-color)]">
       <div
-        class="action-sheet__handle"
+        class="mx-auto mb-4 mt-1 h-1 w-[2.375rem] rounded-full bg-[var(--surface-500)]"
         aria-hidden="true"
       />
 
       <div
         v-if="title"
-        class="action-sheet__header"
+        class="flex min-w-0 flex-wrap items-center gap-2"
       >
-        <span class="action-sheet__title">{{ title }}</span>
+        <span class="max-w-full truncate text-[1.0625rem] font-semibold text-[var(--text-color)]">{{
+          title
+        }}</span>
         <VersionStateBadge
           v-if="state"
           :state="state"
         />
       </div>
 
-      <div class="action-sheet__divider" />
+      <div class="my-4 h-px bg-[var(--surface-border)]" />
 
-      <div class="action-sheet__actions">
+      <div class="flex flex-col gap-2.5">
         <template
           v-for="(item, index) in items"
           :key="index"
         >
           <div
             v-if="item.separator"
-            class="action-sheet__sep"
+            class="my-1 h-px bg-[var(--surface-border)]"
           />
           <button
             v-else
             type="button"
-            class="action-sheet__button"
-            :class="{ 'action-sheet__button--danger': item.class === 'danger' }"
+            class="flex min-h-11 w-full cursor-pointer flex-col items-stretch gap-0.5 rounded-md border border-[var(--surface-border)] px-3.5 py-2 text-sm font-medium leading-6 transition-colors duration-200 enabled:hover:bg-[var(--surface-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+            :class="
+              item.class === 'danger'
+                ? 'bg-transparent text-[var(--red-500)]'
+                : 'bg-[var(--surface-ground)] text-[var(--text-color)]'
+            "
             :disabled="item.disabled"
+            data-testid="version-action-sheet__item"
             @click="runItem(item)"
           >
-            <span class="action-sheet__button-main">
+            <span class="flex min-w-0 items-center justify-center gap-2">
               <i
                 v-if="item.icon"
                 :class="item.icon"
-                class="action-sheet__button-icon"
+                class="text-sm text-inherit"
                 aria-hidden="true"
               />
-              <span class="action-sheet__button-label">{{ item.label }}</span>
+              <span class="min-w-0 truncate">{{ item.label }}</span>
             </span>
             <span
               v-if="item.disabled && item.tooltip"
-              class="action-sheet__button-hint"
+              class="text-xs font-normal text-[var(--text-color-secondary)]"
             >
               {{ item.tooltip }}
             </span>
@@ -114,119 +121,3 @@
     </div>
   </Sidebar>
 </template>
-
-<style scoped>
-  .action-sheet {
-    display: flex;
-    flex-direction: column;
-    padding: 0.625rem 1.125rem 1.25rem;
-    color: var(--text-color);
-  }
-
-  .action-sheet__handle {
-    width: 2.375rem;
-    height: 0.25rem;
-    border-radius: 9999px;
-    background: var(--surface-500);
-    margin: 0.25rem auto 1rem;
-  }
-
-  .action-sheet__header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    min-width: 0;
-  }
-
-  .action-sheet__title {
-    font-size: 1.0625rem;
-    font-weight: 600;
-    color: var(--text-color);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
-  }
-
-  .action-sheet__divider {
-    height: 1px;
-    background: var(--surface-border);
-    margin: 1rem 0;
-  }
-
-  .action-sheet__actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.625rem;
-  }
-
-  .action-sheet__sep {
-    height: 1px;
-    background: var(--surface-border);
-    margin: 0.25rem 0;
-  }
-
-  .action-sheet__button {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.125rem;
-    width: 100%;
-    min-height: 2.75rem;
-    padding: 0.5rem 0.875rem;
-    border: 1px solid var(--surface-border);
-    border-radius: 0.375rem;
-    background: var(--surface-ground);
-    color: var(--text-color);
-    font-size: 0.875rem;
-    font-weight: 500;
-    line-height: 1.5rem;
-    cursor: pointer;
-    transition: background-color 200ms ease-in-out;
-  }
-
-  .action-sheet__button:hover {
-    background: var(--surface-hover);
-  }
-
-  .action-sheet__button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .action-sheet__button:disabled:hover {
-    background: var(--surface-ground);
-  }
-
-  .action-sheet__button--danger {
-    background: transparent;
-    color: var(--red-500);
-  }
-
-  .action-sheet__button-main {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    min-width: 0;
-  }
-
-  .action-sheet__button-icon {
-    font-size: 0.875rem;
-    color: inherit;
-  }
-
-  .action-sheet__button-label {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .action-sheet__button-hint {
-    font-size: 0.75rem;
-    font-weight: 400;
-    color: var(--text-color-secondary);
-  }
-</style>

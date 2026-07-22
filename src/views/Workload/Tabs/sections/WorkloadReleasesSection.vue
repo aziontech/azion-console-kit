@@ -195,7 +195,7 @@
       <div class="flex flex-col gap-0.5 min-w-0">
         <button
           type="button"
-          class="release-name-button m-0 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-left text-sm font-medium leading-6 text-[var(--text-color)] hover:text-[var(--primary-color)] hover:underline focus-visible:text-[var(--primary-color)] focus-visible:outline-none"
+          class="release-name-button m-0 min-w-0 cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap border-0 bg-transparent p-0 text-left text-sm font-medium leading-6 text-[var(--text-color)] hover:text-[var(--primary-color)] hover:underline focus-visible:text-[var(--primary-color)] focus-visible:outline-none"
           :data-testid="`workload-releases__row__id-${item.id}`"
           @click="goToDetails(item)"
         >
@@ -247,14 +247,6 @@
 </template>
 
 <style scoped>
-  .release-name-button {
-    background: transparent;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-    font: inherit;
-  }
-
   :deep(.dataview-control.p-calendar) {
     display: inline-flex;
     align-items: center;
