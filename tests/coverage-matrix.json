@@ -11,42 +11,73 @@
       "id": "J1",
       "title": "Create draft",
       "requirement": "7.1",
-      "commands": ["createDraft (empty)", "createDraft (clone: source_version + comment)"],
-      "surfaces": ["versions tab / landing 'New version'", "version editor (opens the new draft)"]
+      "commands": [
+        "createDraft (empty)",
+        "createDraft (clone: source_version + comment)"
+      ],
+      "surfaces": [
+        "versions tab / landing 'New version'",
+        "version editor (opens the new draft)"
+      ]
     },
     {
       "id": "J2",
       "title": "Edit and save (SAVE)",
       "requirement": "7.2",
-      "commands": ["SAVE"],
-      "surfaces": ["version editor form", "VersionActionBar footer"]
+      "commands": [
+        "SAVE"
+      ],
+      "surfaces": [
+        "version editor form",
+        "VersionActionBar footer"
+      ]
     },
     {
       "id": "J3",
       "title": "Save and build (SAVE_AND_BUILD)",
       "requirement": "7.3",
-      "commands": ["SAVE_AND_BUILD", "BUILD (kebab, persisted version)"],
-      "surfaces": ["VersionActionBar footer", "row kebab", "listing (state badge building/queued)"]
+      "commands": [
+        "SAVE_AND_BUILD",
+        "BUILD (kebab, persisted version)"
+      ],
+      "surfaces": [
+        "VersionActionBar footer",
+        "row kebab",
+        "listing (state badge building/queued)"
+      ]
     },
     {
       "id": "J4",
       "title": "Cancel build (CANCEL_BUILD)",
       "requirement": "7.4",
-      "commands": ["CANCEL_BUILD"],
-      "surfaces": ["ProcessingOverlay", "version editor"]
+      "commands": [
+        "CANCEL_BUILD"
+      ],
+      "surfaces": [
+        "ProcessingOverlay",
+        "version editor"
+      ]
     },
     {
       "id": "J5",
       "title": "New version from (NEW_DRAFT_FROM)",
       "requirement": "7.5",
-      "commands": ["NEW_DRAFT_FROM"],
-      "surfaces": ["VersionActionBar footer", "row kebab", "version editor remount (:key)"]
+      "commands": [
+        "NEW_DRAFT_FROM"
+      ],
+      "surfaces": [
+        "VersionActionBar footer",
+        "row kebab",
+        "version editor remount (:key)"
+      ]
     },
     {
       "id": "J6",
       "title": "Archive (ARCHIVE)",
       "requirement": "7.6",
-      "commands": ["ARCHIVE (comment required)"],
+      "commands": [
+        "ARCHIVE (comment required)"
+      ],
       "surfaces": [
         "row kebab",
         "VersionActionDialog",
@@ -58,7 +89,9 @@
       "id": "J7",
       "title": "Delete (DELETE)",
       "requirement": "7.7",
-      "commands": ["DELETE (destructive confirm)"],
+      "commands": [
+        "DELETE (destructive confirm)"
+      ],
       "surfaces": [
         "row kebab",
         "VersionActionDialog",
@@ -70,7 +103,10 @@
       "id": "J8",
       "title": "Deploy / Promote (deployable only)",
       "requirement": "7.8",
-      "commands": ["DEPLOY", "PROMOTE"],
+      "commands": [
+        "DEPLOY",
+        "PROMOTE"
+      ],
       "surfaces": [
         "VersionHeadingActions",
         "VersionActionBar footer",
@@ -92,8 +128,14 @@
       "id": "J10",
       "title": "Command error (backend failure)",
       "requirement": "7.10",
-      "commands": ["any command failing with 4xx/5xx"],
-      "surfaces": ["error toast", "no success navigation", "screen stays consistent"]
+      "commands": [
+        "any command failing with 4xx/5xx"
+      ],
+      "surfaces": [
+        "error toast",
+        "no success navigation",
+        "screen stays consistent"
+      ]
     }
   ],
   "resources": [
@@ -167,10 +209,10 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
+          "src/tests/services/v2/edge-app/edge-app-version-adapter.test.js",
           "src/tests/services/v2/edge-app/edge-app-version-service.test.js",
-          "src/tests/services/v2/edge-app/edge-app-version-adapter.test.js"
+          "src/tests/services/versioning/invalidation.test.js",
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "createDraft mutation + invalidation (shared service contract) and now dedicated edge-app tests: createDraft POST with the mapped payload, clone maps sourceVersionId/comment, bare clone omits resource fields (empty-vs-clone closed in Wave 1). Gap: \"new draft opens in the editor\" navigation (functional/e2e)."
       },
@@ -178,14 +220,14 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/services/v2/versioning/version-adapter.test.js",
-          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
-          "src/tests/services/v2/edge-app/edge-app-version-service.test.js",
           "src/tests/services/v2/edge-app/edge-app-version-adapter.test.js",
-          "src/tests/services/v2/versioning/version-adapter.pbt.test.js"
+          "src/tests/services/v2/edge-app/edge-app-version-service.test.js",
+          "src/tests/services/v2/versioning/version-adapter.pbt.test.js",
+          "src/tests/services/v2/versioning/version-adapter.test.js",
+          "src/tests/services/versioning/invalidation.test.js",
+          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "Application SAVE updates the draft (explicit case); dedicated edge-app tests assert updateDraft PATCH with the root-modules payload and the adapter form→payload mapping; updateDraft/patchDraft invalidation. Wave 1 closed the shared gaps: invalid SAVE rejects and never touches the service (req 2.5, form-adapter lifecycle) and a disabled Save renders disabled and dispatches nothing (req 3.1, functional action bar). PBT hardens transformDraftPayload (stripUndefined at every depth)."
       },
@@ -193,12 +235,12 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/composables/versioning/use-version-menu-actions.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js",
+          "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/services/v2/edge-app/edge-app-version-service.test.js",
+          "src/tests/services/versioning/invalidation.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
-          "src/tests/services/v2/edge-app/edge-app-version-service.test.js"
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "SAVE_AND_BUILD order save→build asserted (explicit Application case) + dedicated edge-app build endpoint test; kebab BUILD hits /build directly. Wave 1 added the generic save→build ordering (form-adapter lifecycle) and post-command navigation (edit screen returns to the versions list with a success toast). Remaining gap: rendered building/queued state badge in the listing."
       },
@@ -206,10 +248,10 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
           "src/tests/functional/version-dialogs.browser.test.js",
-          "src/tests/services/v2/edge-app/edge-app-version-service.test.js"
+          "src/tests/services/v2/edge-app/edge-app-version-service.test.js",
+          "src/tests/services/versioning/invalidation.test.js",
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "CANCEL_BUILD routed to service + cancelBuild invalidation + dedicated edge-app cancelBuild endpoint test. Wave 1: ProcessingOverlay rendered while building, hidden when ready, Cancel emits cancel (functional dialogs suite)."
       },
@@ -217,9 +259,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/version-capability.enumeration.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "NEW_DRAFT_FROM handler routes to service; kebab menu row present per state. Wave 1 closed navigate-to-new-draft (edit screen routes to the newly created version). Remaining gap: editor remount via :key."
       },
@@ -227,11 +269,11 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/composables/versioning/use-version-row-actions.test.js",
           "src/tests/composables/versioning/use-version-menu-actions-in-use.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/functional/version-dialogs.browser.test.js",
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "Comment contract, archive invalidation + base guard (empty comment rejects), 'in use' backend rejection surfaces a toast with no success/reload — all asserted at component level (shared shell path). Wave 1: rendered dialog (confirm disabled until a comment is typed) in the functional dialogs suite."
       },
@@ -239,10 +281,10 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/composables/versioning/use-version-row-actions.test.js",
           "src/tests/composables/versioning/use-version-menu-actions-in-use.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/functional/version-dialogs.browser.test.js",
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "Destructive confirm dialog (deletes only after confirmation), deleteVersion invalidation, rejection keeps list intact (no success/reload) — component level. Wave 1: destructive confirm rendered (DELETE confirms without a comment) in the functional dialogs suite."
       },
@@ -250,13 +292,13 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
-          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js",
-          "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/composables/versioning/use-deploy-resource-context.test.js",
           "src/tests/composables/versioning/use-resource-version-landing-versioned-only.test.js",
-          "src/tests/functional/version-heading-actions.browser.test.js",
+          "src/tests/composables/versioning/use-version-menu-actions.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
-          "src/tests/composables/versioning/use-deploy-resource-context.test.js"
+          "src/tests/functional/version-heading-actions.browser.test.js",
+          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
+          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js"
         ],
         "note": "DEPLOY registered by capability, heading/footer buttons rendered, kebab DEPLOY routes to the composer scoped to the version, PROMOTE opens the drawer pinned to the version. Tests are resource-generic over the shared (no-fork) shell. Wave 1 functional: heading Deploy renders and routes to the composer (explicit + resource-scoped route); action bar Deploy/Redeploy per state; deploy-resource-context builds the drawer context and version options."
       },
@@ -264,8 +306,8 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/composables/versioning/version-readonly-governance.test.js",
           "src/tests/composables/versioning/version-machine.test.js",
+          "src/tests/composables/versioning/version-readonly-governance.test.js",
           "src/tests/functional/version-readonly-context.browser.test.js"
         ],
         "note": "Structural governance (every versioned form consumes the central readOnly) + state machine gating + Wave 1 rendered proof: a control consuming the version context renders disabled and a real click cannot toggle it (functional readonly-context). Per-form rendered pass for the application form stays e2e-deferred (ADR 7.4)."
@@ -274,11 +316,11 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-shell-events.test.js",
-          "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/use-version-menu-actions-in-use.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/templates/version-shell-block/version-shell-events.test.js"
         ],
         "note": "command-error emitted (never rejects), backend rejection → error toast, failed build does not call onSuccess, no success signal on rejection. Wave 1: edit-screen command-error routing asserted (showErrors delegate, generic error toast, SAVE success reloads in place). Remaining gaps: rendered error toast per command surface; explicit no-navigation-on-failure."
       }
@@ -288,8 +330,8 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/services/v2/workload/workload-version-adapter-real.test.js"
+          "src/tests/services/v2/workload/workload-version-adapter-real.test.js",
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "createDraft invalidation + transformCreateDraftPayload (clone carries source_version + comment; empty body → empty payload). Gap: 'new draft opens in the editor' navigation."
       },
@@ -297,11 +339,11 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
+          "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/services/v2/workload/workload-version-adapter-real.test.js",
           "src/tests/services/versioning/invalidation.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
-          "src/tests/functional/version-action-bar.browser.test.js"
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "Workload SAVE PUTs the draft (explicit case); draft payload mapping + stripUndefined asserted. Wave 1 closed the shared gaps: invalid-SAVE gate (rejects, never touches the service) and rendered disabled Save (functional action bar)."
       },
@@ -309,9 +351,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "Workload saveStrategy (req 6.5) explicitly asserted: SAVE and SAVE_AND_BUILD both PUT with NO separate build; kebab Build navigates with ?intent=build (AUTO_BUILD_ON_SAVE). Wave 1 added post-command navigation generically (edit screen). Remaining gap: rendered state transition in the listing."
       },
@@ -319,8 +361,8 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/functional/version-dialogs.browser.test.js",
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "cancelBuild invalidation via the shared base contract. Wave 1: overlay rendered behavior (shows while building, hides when ready, Cancel emits) closed generically (functional dialogs suite)."
       },
@@ -328,9 +370,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/services/v2/workload/workload-version-adapter-real.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "Shared NEW_DRAFT_FROM handler + clone payload (source_version + comment, with/without overrides). Wave 1 closed navigate-to-new-draft (edit screen routes to the newly created version). Remaining gap: editor remount via :key."
       },
@@ -339,9 +381,9 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/workload/workload-version-adapter-real.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "Shared archive contract (comment guard, invalidation, in-use rejection) + workload archive payload (comment only). Wave 1: rendered dialog (confirm disabled until a comment is typed) in the functional dialogs suite."
       },
@@ -350,8 +392,8 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/functional/version-dialogs.browser.test.js",
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "Shared delete confirm + deleteVersion invalidation. Wave 1: destructive confirm rendered (DELETE confirms without a comment) in the functional dialogs suite."
       },
@@ -359,13 +401,13 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
-          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js",
+          "src/tests/composables/versioning/use-deploy-resource-context.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
-          "src/tests/composables/versioning/use-deploy-resource-context.test.js"
+          "src/tests/functional/version-heading-actions.browser.test.js",
+          "src/tests/services/versioning/invalidation.test.js",
+          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
+          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js"
         ],
         "note": "Deployable affordances (shared shell) + PROMOTE drawer receives workloadId; regression: workload rollback still invalidates the version cache despite bypassing the hook. Wave 1 functional: heading Deploy renders and routes to the composer (explicit + resource-scoped route); action bar Deploy/Redeploy per state; deploy-resource-context builds the drawer context and version options."
       },
@@ -382,10 +424,10 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-shell-events.test.js",
-          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/use-version-menu-actions-in-use.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/templates/version-shell-block/version-shell-events.test.js"
         ],
         "note": "Shared error path only. Wave 1: edit-screen command-error routing asserted (showErrors delegate, generic error toast, SAVE success reloads in place). Remaining gaps: rendered error toast per command surface; explicit no-navigation-on-failure."
       }
@@ -404,10 +446,10 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
+          "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/services/v2/custom-page/custom-page-version.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
-          "src/tests/functional/version-action-bar.browser.test.js"
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "saveStrategy (req 6.5) explicitly asserted: SAVE hits the BASE endpoint, NOT version updateDraft. Wave 1 closed the shared gaps: invalid-SAVE gate and rendered disabled Save (form-adapter lifecycle + functional action bar)."
       },
@@ -415,9 +457,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/services/v2/custom-page/custom-page-version.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "build endpoint + invalidation covered at service level; post-command navigation now generic via the edit screen. Gaps: no explicit custom_page base-save→build sequence test; rendered state transition in the listing."
       },
@@ -425,9 +467,9 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/custom-page/custom-page-version.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "cancelBuild service contract. Wave 1: overlay rendered behavior (shows while building, hides when ready, Cancel emits) closed generically (functional dialogs suite)."
       },
@@ -435,9 +477,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/services/v2/custom-page/custom-page-version.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "Shared handler + clone payload. Wave 1 closed navigate-to-new-draft (edit screen routes to the newly created version). Remaining gap: editor remount via :key."
       },
@@ -446,9 +488,9 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/custom-page/custom-page-version.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "Shared archive contract + custom-page archive service test. Wave 1: rendered dialog (confirm disabled until a comment is typed) in the functional dialogs suite."
       },
@@ -457,9 +499,9 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/custom-page/custom-page-version.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "Shared delete confirm + custom-page deleteVersion service test. Wave 1: destructive confirm rendered (DELETE confirms without a comment) in the functional dialogs suite."
       },
@@ -467,12 +509,12 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
-          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js",
+          "src/tests/composables/versioning/use-deploy-resource-context.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
-          "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
-          "src/tests/composables/versioning/use-deploy-resource-context.test.js"
+          "src/tests/functional/version-heading-actions.browser.test.js",
+          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
+          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js"
         ],
         "note": "Deployable affordances via the shared (no-fork) shell — resource-generic tests. Wave 1 functional: heading Deploy renders and routes to the composer (explicit + resource-scoped route); action bar Deploy/Redeploy per state; deploy-resource-context builds the drawer context and version options."
       },
@@ -489,10 +531,10 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-shell-events.test.js",
-          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/use-version-menu-actions-in-use.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/templates/version-shell-block/version-shell-events.test.js"
         ],
         "note": "Shared error path only. Wave 1: edit-screen command-error routing asserted (showErrors delegate, generic error toast, SAVE success reloads in place). Remaining gaps: rendered error toast per command surface; explicit no-navigation-on-failure."
       }
@@ -511,11 +553,11 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
+          "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
           "src/tests/services/v2/edge-firewall/versioned-subresources.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
-          "src/tests/functional/version-action-bar.browser.test.js"
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "Save via shared handler + adapter mapping; composite sub-resource CRUD scoped by (resourceId, versionId) tested (req 6.4). Wave 1 closed the shared gaps: invalid SAVE rejects and never touches the service, valid SAVE persists the merged draft (lifecycle) and rendered disabled Save (functional action bar)."
       },
@@ -523,10 +565,10 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
-          "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js",
-          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
+          "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
+          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "Explicit Firewall SAVE_AND_BUILD (updates then builds, default strategy) + build service test. Wave 1 added the generic save→build ordering (form-adapter lifecycle) and post-command navigation (edit screen returns to the versions list with a success toast). Remaining gap: rendered building/queued state badge in the listing."
       },
@@ -534,9 +576,9 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "cancelBuild service contract. Wave 1: overlay rendered behavior (shows while building, hides when ready, Cancel emits) closed generically (functional dialogs suite)."
       },
@@ -544,9 +586,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/templates/version-shell-block/use-version-form-adapter.test.js"
         ],
         "note": "Shared handler + clone payload. Wave 1 closed navigate-to-new-draft (edit screen routes to the newly created version). Remaining gap: editor remount via :key."
       },
@@ -555,9 +597,9 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "Shared archive contract + firewall archive service test. Wave 1: rendered dialog (confirm disabled until a comment is typed) in the functional dialogs suite."
       },
@@ -566,9 +608,9 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/edge-firewall/edge-firewall-version.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "Shared delete confirm + firewall deleteVersion service test. Wave 1: destructive confirm rendered (DELETE confirms without a comment) in the functional dialogs suite."
       },
@@ -576,12 +618,12 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
-          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js",
+          "src/tests/composables/versioning/use-deploy-resource-context.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
-          "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
-          "src/tests/composables/versioning/use-deploy-resource-context.test.js"
+          "src/tests/functional/version-heading-actions.browser.test.js",
+          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
+          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js"
         ],
         "note": "Deployable affordances via the shared (no-fork) shell — resource-generic tests. Wave 1 functional: heading Deploy renders and routes to the composer (explicit + resource-scoped route); action bar Deploy/Redeploy per state; deploy-resource-context builds the drawer context and version options."
       },
@@ -590,8 +632,8 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/version-readonly-governance.test.js",
-          "src/tests/views/EdgeFirewall/v6/firewall-version-editor-tabs.test.js",
-          "src/tests/functional/version-readonly-context.browser.test.js"
+          "src/tests/functional/version-readonly-context.browser.test.js",
+          "src/tests/views/EdgeFirewall/v6/firewall-version-editor-tabs.test.js"
         ],
         "note": "Structural governance + version editor tabs + Wave 1 rendered proof that consuming the version context disables the control (functional readonly-context). Per-form rendered pass for the firewall form stays e2e-deferred (ADR 7.4)."
       },
@@ -599,10 +641,10 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-shell-events.test.js",
-          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/use-version-menu-actions-in-use.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/templates/version-shell-block/version-shell-events.test.js"
         ],
         "note": "Shared error path only. Wave 1: edit-screen command-error routing asserted (showErrors delegate, generic error toast, SAVE success reloads in place). Remaining gaps: rendered error toast per command surface; explicit no-navigation-on-failure."
       }
@@ -611,16 +653,18 @@
       "J1": {
         "level": "component",
         "status": "partial",
-        "coveredBy": ["src/tests/services/v2/edge-connectors/edge-connector-version.test.js"],
+        "coveredBy": [
+          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js"
+        ],
         "note": "createDraft mutation + invalidation + adapter payload (connector is NOT in the shared invalidation suite; its own service test carries the contract). Gap: open-in-editor navigation."
       },
       "J2": {
         "level": "component",
         "status": "covered",
         "coveredBy": [
+          "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
-          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
-          "src/tests/functional/version-action-bar.browser.test.js"
+          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
         ],
         "note": "updateDraft/patchDraft + adapter mapping at service level. Wave 1 proved the shared shell SAVE flow generically (valid SAVE persists, invalid SAVE rejects — form-adapter lifecycle) and the rendered disabled Save (functional action bar)."
       },
@@ -628,9 +672,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
-          "src/tests/composables/versioning/use-version-menu-actions.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js",
+          "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
         ],
         "note": "build POSTs /versions/{vid}/build and invalidates; kebab BUILD runs the endpoint directly. Wave 1 added the generic save→build ordering (form-adapter lifecycle) and post-command navigation (edit screen returns to the versions list with a success toast). Remaining gap: rendered building/queued state badge in the listing."
@@ -639,8 +683,8 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/functional/version-dialogs.browser.test.js",
+          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js"
         ],
         "note": "cancelBuild POSTs /versions/{vid}/cancel and invalidates. Wave 1: overlay rendered behavior closed generically (functional dialogs suite)."
       },
@@ -648,9 +692,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/views/EdgeConnectors/v6/edge-connector-v6.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/views/EdgeConnectors/v6/edge-connector-v6.test.js"
         ],
         "note": "NEW_DRAFT_FROM exercised in the connector v6 view test + clone payload in the adapter. Wave 1 closed navigate-to-new-draft (edit screen routes to the newly created version). Remaining gap: editor remount via :key."
       },
@@ -659,8 +703,8 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/functional/version-dialogs.browser.test.js",
+          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js"
         ],
         "note": "Shared archive contract + connector archive (non-empty comment required) service test. Wave 1: rendered dialog (confirm disabled until a comment is typed) in the functional dialogs suite."
       },
@@ -669,8 +713,8 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/functional/version-dialogs.browser.test.js",
+          "src/tests/services/v2/edge-connectors/edge-connector-version.test.js"
         ],
         "note": "Shared delete confirm + connector deleteVersion service test. Wave 1: destructive confirm rendered (DELETE confirms without a comment) in the functional dialogs suite."
       },
@@ -678,12 +722,12 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
-          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js",
+          "src/tests/composables/versioning/use-deploy-resource-context.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
-          "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
-          "src/tests/composables/versioning/use-deploy-resource-context.test.js"
+          "src/tests/functional/version-heading-actions.browser.test.js",
+          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
+          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js"
         ],
         "note": "Deployable affordances via the shared (no-fork) shell — resource-generic tests. Wave 1 functional: heading Deploy renders and routes to the composer (explicit + resource-scoped route); action bar Deploy/Redeploy per state; deploy-resource-context builds the drawer context and version options."
       },
@@ -691,8 +735,8 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/views/EdgeConnectors/v6/edge-connector-v6.test.js",
-          "src/tests/composables/versioning/version-readonly-governance.test.js"
+          "src/tests/composables/versioning/version-readonly-governance.test.js",
+          "src/tests/views/EdgeConnectors/v6/edge-connector-v6.test.js"
         ],
         "note": "Rendered read-only asserted: mounts with VERSION_CONTEXT readOnly true/false and reacts to the toggle."
       },
@@ -700,10 +744,10 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-shell-events.test.js",
-          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/use-version-menu-actions-in-use.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/templates/version-shell-block/version-shell-events.test.js"
         ],
         "note": "Shared error path only. Wave 1: edit-screen command-error routing asserted (showErrors delegate, generic error toast, SAVE success reloads in place). Remaining gaps: rendered error toast per command surface; explicit no-navigation-on-failure."
       }
@@ -714,8 +758,8 @@
         "status": "partial",
         "coveredBy": [
           "src/tests/services/v2/edge-function/edge-function-version.test.js",
-          "src/tests/views/EdgeFunctions/v6/edge-function-version-adapter.test.js",
-          "src/tests/shared/versioning/version-service.contract.js"
+          "src/tests/shared/versioning/version-service.contract.js",
+          "src/tests/views/EdgeFunctions/v6/edge-function-version-adapter.test.js"
         ],
         "note": "createDraft (clone maps resource fields to root snake_case) + invalidation + view-level adapter usage. Gap: open-in-editor navigation."
       },
@@ -723,9 +767,9 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
+          "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/services/v2/edge-function/edge-function-version.test.js",
-          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
-          "src/tests/functional/version-action-bar.browser.test.js"
+          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
         ],
         "note": "updateDraft PATCH + adapter mapping at service level. Wave 1 proved the shared shell SAVE flow generically (valid SAVE persists, invalid SAVE rejects — form-adapter lifecycle) and the rendered disabled Save (functional action bar)."
       },
@@ -733,9 +777,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/edge-function/edge-function-version.test.js",
-          "src/tests/composables/versioning/use-version-menu-actions.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js",
+          "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/services/v2/edge-function/edge-function-version.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
         ],
         "note": "build endpoint + invalidation; kebab BUILD direct. Wave 1 added the generic save→build ordering (form-adapter lifecycle) and post-command navigation (edit screen returns to the versions list with a success toast). Remaining gap: rendered building/queued state badge in the listing."
@@ -744,9 +788,9 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/edge-function/edge-function-version.test.js",
-          "src/tests/views/EdgeFunctions/v6/edge-function-version-adapter.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/views/EdgeFunctions/v6/edge-function-version-adapter.test.js"
         ],
         "note": "cancelBuild endpoint + invalidation; CANCEL_BUILD referenced at view level. Wave 1: overlay rendered behavior closed generically (functional dialogs suite)."
       },
@@ -754,9 +798,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/views/EdgeFunctions/v6/edge-function-version-adapter.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/version-menu-versioned-only.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/views/EdgeFunctions/v6/edge-function-version-adapter.test.js"
         ],
         "note": "NEW_DRAFT_FROM exercised at view level; versioned-only kebab keeps the action. Wave 1 closed navigate-to-new-draft (edit screen routes to the newly created version). Remaining gap: editor remount via :key."
       },
@@ -765,8 +809,8 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/edge-function/edge-function-version.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/functional/version-dialogs.browser.test.js",
+          "src/tests/services/v2/edge-function/edge-function-version.test.js"
         ],
         "note": "Shared archive contract + function archive (comment required, POST with comment) service tests. Wave 1: rendered dialog (confirm disabled until a comment is typed) in the functional dialogs suite."
       },
@@ -775,8 +819,8 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/services/v2/edge-function/edge-function-version.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/functional/version-dialogs.browser.test.js",
+          "src/tests/services/v2/edge-function/edge-function-version.test.js"
         ],
         "note": "Shared delete confirm + function deleteVersion service test. Wave 1: destructive confirm rendered (DELETE confirms without a comment) in the functional dialogs suite."
       },
@@ -784,15 +828,15 @@
         "level": "n/a",
         "status": "covered",
         "coveredBy": [
-          "src/tests/composables/versioning/version-capability.enumeration.test.js",
-          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js",
-          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
-          "src/tests/composables/versioning/version-menu-versioned-only.test.js",
-          "src/tests/composables/versioning/use-resource-version-landing-versioned-only.test.js",
-          "src/tests/functional/version-heading-actions.browser.test.js",
-          "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/composables/versioning/use-deploy-resource-context.test.js",
-          "src/tests/composables/versioning/version-machine.pbt.test.js"
+          "src/tests/composables/versioning/use-resource-version-landing-versioned-only.test.js",
+          "src/tests/composables/versioning/version-capability.enumeration.test.js",
+          "src/tests/composables/versioning/version-machine.pbt.test.js",
+          "src/tests/composables/versioning/version-menu-versioned-only.test.js",
+          "src/tests/functional/version-action-bar.browser.test.js",
+          "src/tests/functional/version-heading-actions.browser.test.js",
+          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
+          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js"
         ],
         "note": "versioned-only: journey does not apply. The NEGATIVE affordance is what must hold (req 6.3) and is covered: no DEPLOY/PROMOTE/ROLLBACK in any state, heading/footer/kebab hide Deploy, dispatch('DEPLOY') fail-closes, landing omits the promote seam. Wave 1: heading omits Deploy (rendered), action bar drops the Deploy button AND the deploy copy, deploy-resource-context yields null, and the PBT proves no DEPLOY/PROMOTE/ROLLBACK in any state."
       },
@@ -800,8 +844,8 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/views/EdgeFunctions/v6/code-editor-readonly.test.js",
-          "src/tests/composables/versioning/version-readonly-governance.test.js"
+          "src/tests/composables/versioning/version-readonly-governance.test.js",
+          "src/tests/views/EdgeFunctions/v6/code-editor-readonly.test.js"
         ],
         "note": "Rendered read-only asserted: code editor becomes read-only when the version context is immutable and reacts to the toggle."
       },
@@ -809,10 +853,10 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-shell-events.test.js",
-          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/use-version-menu-actions-in-use.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/templates/version-shell-block/version-shell-events.test.js"
         ],
         "note": "Shared error path only. Wave 1: edit-screen command-error routing asserted (showErrors delegate, generic error toast, SAVE success reloads in place). Remaining gaps: rendered error toast per command surface; explicit no-navigation-on-failure."
       }
@@ -823,8 +867,8 @@
         "status": "partial",
         "coveredBy": [
           "src/tests/services/v2/network-lists/network-list-version.test.js",
-          "src/tests/views/NetworkLists/v6/network-list-version-adapter.test.js",
-          "src/tests/shared/versioning/version-service.contract.js"
+          "src/tests/shared/versioning/version-service.contract.js",
+          "src/tests/views/NetworkLists/v6/network-list-version-adapter.test.js"
         ],
         "note": "createDraft + invalidation + view-level adapter usage. Gap: open-in-editor navigation."
       },
@@ -832,9 +876,9 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
+          "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/services/v2/network-lists/network-list-version.test.js",
-          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
-          "src/tests/functional/version-action-bar.browser.test.js"
+          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
         ],
         "note": "updateDraft + adapter mapping at service level. Wave 1 proved the shared shell SAVE flow generically (valid SAVE persists, invalid SAVE rejects — form-adapter lifecycle) and the rendered disabled Save (functional action bar)."
       },
@@ -842,9 +886,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/network-lists/network-list-version.test.js",
-          "src/tests/composables/versioning/use-version-menu-actions.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js",
+          "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/services/v2/network-lists/network-list-version.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
         ],
         "note": "build endpoint + invalidation; kebab BUILD direct. Wave 1 added the generic save→build ordering (form-adapter lifecycle) and post-command navigation (edit screen returns to the versions list with a success toast). Remaining gap: rendered building/queued state badge in the listing."
@@ -853,9 +897,9 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/network-lists/network-list-version.test.js",
-          "src/tests/views/NetworkLists/v6/network-list-version-adapter.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/views/NetworkLists/v6/network-list-version-adapter.test.js"
         ],
         "note": "cancelBuild endpoint + invalidation. Wave 1: overlay rendered behavior closed generically (functional dialogs suite)."
       },
@@ -863,9 +907,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/views/NetworkLists/v6/network-list-version-adapter.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/version-menu-versioned-only.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/views/NetworkLists/v6/network-list-version-adapter.test.js"
         ],
         "note": "NEW_DRAFT_FROM exercised at view level; versioned-only kebab keeps the action. Wave 1 closed navigate-to-new-draft (edit screen routes to the newly created version). Remaining gap: editor remount via :key."
       },
@@ -874,9 +918,9 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/network-lists/network-list-version.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "Shared archive contract + network-list archive service test (in the shared invalidation suite too). Wave 1: rendered dialog (confirm disabled until a comment is typed) in the functional dialogs suite."
       },
@@ -885,9 +929,9 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/network-lists/network-list-version.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "Shared delete confirm + network-list deleteVersion service test. Wave 1: destructive confirm rendered (DELETE confirms without a comment) in the functional dialogs suite."
       },
@@ -895,15 +939,15 @@
         "level": "n/a",
         "status": "covered",
         "coveredBy": [
-          "src/tests/composables/versioning/version-capability.enumeration.test.js",
-          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js",
-          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
-          "src/tests/composables/versioning/version-menu-versioned-only.test.js",
-          "src/tests/composables/versioning/use-resource-version-landing-versioned-only.test.js",
-          "src/tests/functional/version-heading-actions.browser.test.js",
-          "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/composables/versioning/use-deploy-resource-context.test.js",
-          "src/tests/composables/versioning/version-machine.pbt.test.js"
+          "src/tests/composables/versioning/use-resource-version-landing-versioned-only.test.js",
+          "src/tests/composables/versioning/version-capability.enumeration.test.js",
+          "src/tests/composables/versioning/version-machine.pbt.test.js",
+          "src/tests/composables/versioning/version-menu-versioned-only.test.js",
+          "src/tests/functional/version-action-bar.browser.test.js",
+          "src/tests/functional/version-heading-actions.browser.test.js",
+          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
+          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js"
         ],
         "note": "versioned-only: n/a; negative affordance (req 6.3) covered — no Deploy/Promote/Rollback in any state or surface. Wave 1: heading omits Deploy (rendered), action bar drops the Deploy button AND the deploy copy, deploy-resource-context yields null, and the PBT proves no DEPLOY/PROMOTE/ROLLBACK in any state."
       },
@@ -911,8 +955,8 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/views/NetworkLists/v6/network-list-v6-readonly.test.js",
-          "src/tests/composables/versioning/version-readonly-governance.test.js"
+          "src/tests/composables/versioning/version-readonly-governance.test.js",
+          "src/tests/views/NetworkLists/v6/network-list-v6-readonly.test.js"
         ],
         "note": "Rendered read-only asserted per field (asn, ip/cidr list, countries) including reactive toggle to immutable."
       },
@@ -920,10 +964,10 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-shell-events.test.js",
-          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/use-version-menu-actions-in-use.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/templates/version-shell-block/version-shell-events.test.js"
         ],
         "note": "Shared error path only. Wave 1: edit-screen command-error routing asserted (showErrors delegate, generic error toast, SAVE success reloads in place). Remaining gaps: rendered error toast per command surface; explicit no-navigation-on-failure."
       }
@@ -933,8 +977,8 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/waf/waf-version-service.test.js",
           "src/tests/services/v2/waf/waf-version-adapter.test.js",
+          "src/tests/services/v2/waf/waf-version-service.test.js",
           "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "createDraft + invalidation + adapter payload. Gap: open-in-editor navigation."
@@ -943,11 +987,11 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/services/v2/waf/waf-version-service.test.js",
-          "src/tests/services/v2/waf/waf-version-adapter.test.js",
+          "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/services/v2/waf/versioned-subresources.test.js",
-          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
-          "src/tests/functional/version-action-bar.browser.test.js"
+          "src/tests/services/v2/waf/waf-version-adapter.test.js",
+          "src/tests/services/v2/waf/waf-version-service.test.js",
+          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
         ],
         "note": "updateDraft + adapter mapping; composite versioned exceptions CRUD scoped by (resourceId, versionId) tested and invalidating the version cache (req 6.4). Wave 1 proved the shared shell SAVE flow generically (invalid-SAVE gate) and the rendered disabled Save (functional action bar)."
       },
@@ -955,9 +999,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/waf/waf-version-service.test.js",
-          "src/tests/composables/versioning/use-version-menu-actions.test.js",
           "src/tests/composables/versioning/use-version-edit-screen.test.js",
+          "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/services/v2/waf/waf-version-service.test.js",
           "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
         ],
         "note": "build endpoint + invalidation; kebab BUILD direct. Wave 1 added the generic save→build ordering (form-adapter lifecycle) and post-command navigation (edit screen returns to the versions list with a success toast). Remaining gap: rendered building/queued state badge in the listing."
@@ -966,9 +1010,9 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/waf/waf-version-service.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "cancelBuild endpoint + invalidation. Wave 1: overlay rendered behavior closed generically (functional dialogs suite)."
       },
@@ -976,9 +1020,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/services/v2/waf/waf-version-adapter.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/version-menu-versioned-only.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/services/v2/waf/waf-version-adapter.test.js"
         ],
         "note": "Clone payload + versioned-only kebab keeps NEW_DRAFT_FROM. Wave 1 closed navigate-to-new-draft (edit screen routes to the newly created version). Remaining gap: editor remount via :key."
       },
@@ -987,9 +1031,9 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/waf/waf-version-service.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "Shared archive contract + WAF archive service test. Wave 1: rendered dialog (confirm disabled until a comment is typed) in the functional dialogs suite."
       },
@@ -998,9 +1042,9 @@
         "status": "covered",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/functional/version-dialogs.browser.test.js",
           "src/tests/services/v2/waf/waf-version-service.test.js",
-          "src/tests/services/versioning/invalidation.test.js",
-          "src/tests/functional/version-dialogs.browser.test.js"
+          "src/tests/services/versioning/invalidation.test.js"
         ],
         "note": "Shared delete confirm + WAF deleteVersion service test. Wave 1: destructive confirm rendered (DELETE confirms without a comment) in the functional dialogs suite."
       },
@@ -1008,15 +1052,15 @@
         "level": "n/a",
         "status": "covered",
         "coveredBy": [
-          "src/tests/composables/versioning/version-capability.enumeration.test.js",
-          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js",
-          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
-          "src/tests/composables/versioning/version-menu-versioned-only.test.js",
-          "src/tests/composables/versioning/use-resource-version-landing-versioned-only.test.js",
-          "src/tests/functional/version-heading-actions.browser.test.js",
-          "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/composables/versioning/use-deploy-resource-context.test.js",
-          "src/tests/composables/versioning/version-machine.pbt.test.js"
+          "src/tests/composables/versioning/use-resource-version-landing-versioned-only.test.js",
+          "src/tests/composables/versioning/version-capability.enumeration.test.js",
+          "src/tests/composables/versioning/version-machine.pbt.test.js",
+          "src/tests/composables/versioning/version-menu-versioned-only.test.js",
+          "src/tests/functional/version-action-bar.browser.test.js",
+          "src/tests/functional/version-heading-actions.browser.test.js",
+          "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
+          "src/tests/templates/version-shell-block/versioned-only-deploy-affordances.test.js"
         ],
         "note": "versioned-only: n/a; negative affordance (req 6.3) covered — no Deploy/Promote/Rollback in any state or surface. Wave 1: heading omits Deploy (rendered), action bar drops the Deploy button AND the deploy copy, deploy-resource-context yields null, and the PBT proves no DEPLOY/PROMOTE/ROLLBACK in any state."
       },
@@ -1024,9 +1068,9 @@
         "level": "component",
         "status": "covered",
         "coveredBy": [
+          "src/tests/composables/versioning/version-readonly-governance.test.js",
           "src/tests/views/WafRules/v6/waf-allowed-rules-readonly.test.js",
-          "src/tests/views/WafRules/v6/waf-version-editor-tabs.test.js",
-          "src/tests/composables/versioning/version-readonly-governance.test.js"
+          "src/tests/views/WafRules/v6/waf-version-editor-tabs.test.js"
         ],
         "note": "Rendered read-only asserted: write actions removed in an immutable version, create drawer does not open when read-only."
       },
@@ -1034,10 +1078,10 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-shell-events.test.js",
-          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/use-version-menu-actions-in-use.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/composables/versioning/use-version-row-actions.test.js",
+          "src/tests/templates/version-shell-block/version-shell-events.test.js"
         ],
         "note": "Shared error path only. Wave 1: edit-screen command-error routing asserted (showErrors delegate, generic error toast, SAVE success reloads in place). Remaining gaps: rendered error toast per command surface; explicit no-navigation-on-failure."
       }
@@ -1046,16 +1090,18 @@
       "J1": {
         "level": "component",
         "status": "partial",
-        "coveredBy": ["src/tests/services/v2/deployment/deployment-version.test.js"],
+        "coveredBy": [
+          "src/tests/services/v2/deployment/deployment-version.test.js"
+        ],
         "note": "createVersionService POSTs /versions and invalidates BOTH the version cache and deployments.detail (special hook tested); Wave 1 closed the clone payload gap (transformCreateDraftPayload keeps only resource {id, resource_type} + strategy/origin). Gap: open-in-editor navigation."
       },
       "J2": {
         "level": "component",
         "status": "covered",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
-          "src/tests/services/v2/deployment/deployment-version.test.js"
+          "src/tests/services/v2/deployment/deployment-version.test.js",
+          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
         ],
         "note": "Closed in Wave 1: updateDraft PATCHes /versions/{vid} under deployment-api and invalidates both the version cache and deployments.detail (deployment-version-service); draft payload mapping asserted (deployment-version-adapter); shared invalid-SAVE gate + rendered disabled Save proven generically."
       },
@@ -1064,8 +1110,8 @@
         "status": "partial",
         "coveredBy": [
           "src/tests/composables/versioning/use-version-edit-screen.test.js",
-          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js",
-          "src/tests/services/v2/deployment/deployment-version.test.js"
+          "src/tests/services/v2/deployment/deployment-version.test.js",
+          "src/tests/templates/version-shell-block/use-version-form-adapter-lifecycle.test.js"
         ],
         "note": "Closed the service gap in Wave 1: build POSTs /versions/{vid}/build under deployment-api and invalidates both caches (deployment-version-service). Generic save→build ordering and post-command navigation also proven. Remaining gap: rendered building/queued badge in the listing; the release-composer build&activate path is the composer contract (J8), not this journey."
       },
@@ -1082,9 +1128,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/services/v2/deployment/deployment-version.test.js",
-          "src/tests/views/Deployments/deployment-version-readonly.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/views/Deployments/deployment-version-readonly.test.js"
         ],
         "note": "Deployment's analogue is revert: POST /versions/{vid}/revert generates a NEW version and invalidates both caches; the Version History tab wires the revert action. Wave 1 closed the generic NEW_DRAFT_FROM navigation (edit screen). Remaining gaps: kebab NEW_DRAFT_FROM path for deployment specifically; editor remount via :key."
       },
@@ -1112,13 +1158,13 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/views/Deployments/v6/ReleaseComposerView.test.js",
-          "src/tests/services/v2/deployment/deployment-release-service.test.js",
+          "src/tests/composables/versioning/use-deploy-resource-context.test.js",
           "src/tests/composables/versioning/use-deployment-release-drawer.test.js",
-          "src/tests/services/v2/deployment/deployment-adapter.test.js",
-          "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
-          "src/tests/composables/versioning/use-deploy-resource-context.test.js"
+          "src/tests/functional/version-heading-actions.browser.test.js",
+          "src/tests/services/v2/deployment/deployment-adapter.test.js",
+          "src/tests/services/v2/deployment/deployment-release-service.test.js",
+          "src/tests/views/Deployments/v6/ReleaseComposerView.test.js"
         ],
         "note": "Special case: deployment IS the deploy target — the release composer surface and build&activate payload are tested. Gap: the version-shell Deploy hand-off (heading/kebab → composer) is only covered by the resource-generic shared tests, not a deployment-specific case. Wave 1 adds the generic rendered heading/action-bar deploy affordances and the deploy-resource-context contract."
       },
@@ -1135,9 +1181,9 @@
         "level": "component",
         "status": "partial",
         "coveredBy": [
-          "src/tests/templates/version-shell-block/version-shell-events.test.js",
+          "src/tests/composables/versioning/use-version-edit-screen.test.js",
           "src/tests/composables/versioning/use-version-row-actions.test.js",
-          "src/tests/composables/versioning/use-version-edit-screen.test.js"
+          "src/tests/templates/version-shell-block/version-shell-events.test.js"
         ],
         "note": "Shared error path only. Wave 1: edit-screen command-error routing asserted (showErrors delegate, generic error toast, SAVE success reloads in place). Remaining gaps: rendered error toast per command surface; explicit no-navigation-on-failure. Deployment-api specific failure handling still untested."
       }

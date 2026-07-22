@@ -1,3 +1,12 @@
+/**
+ * Coverage-matrix claims (spec versioning-test-coverage / TEST-ARCHITECTURE §3.4).
+ * The matrix (tests/coverage-matrix.json) is DERIVED from these markers —
+ * run `node scripts/check-coverage-matrix.mjs --write` after changing them.
+ * @covers application,connector,function,network_list,waf,workload:J3 component partial
+ * @covers application:J6 component
+ * @covers application,connector,custom_page,firewall,workload:J8 component
+ * @covers application:J10 component partial
+ */
 import { describe, it, expect, vi } from 'vitest'
 import { flushPromises } from '@vue/test-utils'
 

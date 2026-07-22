@@ -1,3 +1,15 @@
+/**
+ * Coverage-matrix claims (spec versioning-test-coverage / TEST-ARCHITECTURE §3.4).
+ * The matrix (tests/coverage-matrix.json) is DERIVED from these markers —
+ * run `node scripts/check-coverage-matrix.mjs --write` after changing them.
+ * @covers custom_page:J1 component partial
+ * @covers custom_page:J2 component
+ * @covers custom_page:J3 component partial
+ * @covers custom_page:J4 component
+ * @covers custom_page:J5 component partial
+ * @covers custom_page:J6 component
+ * @covers custom_page:J7 component
+ */
 import { describe, expect, it } from 'vitest'
 import { RESOURCE_TEST_REGISTRY } from '@/tests/support/versioning/registry'
 import { describeVersionServiceContract } from '@/tests/shared/versioning/version-service.contract'

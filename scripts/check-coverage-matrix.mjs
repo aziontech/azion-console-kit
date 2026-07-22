@@ -86,6 +86,94 @@ function readFileOrDie(file, label) {
   }
 }
 
+
+/**
+ * DERIVATION ENGINE (TEST-ARCHITECTURE §3.4 — "a matriz se escreve sozinha").
+ * Source of truth = `@covers` markers inside test files:
+ *   `* @covers <resources|*>:<J#> <level> [partial]`
+ * The committed tests/coverage-matrix.json is a GENERATED artifact:
+ *   --write  regenerates it from the markers (+ notes file);
+ *   default  derives in-memory and FAILS if the committed file differs
+ *            (zero manual editing — edit markers, then --write).
+ */
+const NOTES_FILE = 'tests/coverage-matrix.notes.json'
+// eslint-disable-next-line security/detect-unsafe-regex -- CI gate script: scans repo-committed test files line-anchored; input is bounded source code, not user input
+const COVERS_RE = /@covers\s+([\w,*]+):(J\d+)\s+([\w/-]+)(\s+partial)?/g
+
+function scanCoverageClaims(plugged) {
+  const claims = new Map() // "res:J" -> { level, partialOnly, coveredBy:Set }
+  const roots = ['src/tests', 'tests']
+  const stack = [...roots]
+  while (stack.length) {
+    const dir = stack.pop()
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- CI gate script: walks the repo test trees only
+    for (const entry of fs.readdirSync(dir)) {
+      const full = `${dir}/${entry}`
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- CI gate script: repo tree walk
+      if (fs.statSync(full).isDirectory()) {
+        stack.push(full)
+        continue
+      }
+      if (!/\.(test|browser\.test|contract|contract\.spec)\.js$/.test(entry) && !/\.pbt\.js$/.test(entry)) continue
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- CI gate script: repo tree walk
+      const source = fs.readFileSync(full, 'utf8')
+      let match
+      while ((match = COVERS_RE.exec(source)) !== null) {
+        const [, resSpec, journey, level, partialFlag] = match
+        const resources = resSpec === '*' ? plugged : resSpec.split(',')
+        for (const resource of resources) {
+          const key = `${resource}:${journey}`
+          const cell = claims.get(key) ?? { level, partialOnly: true, coveredBy: new Set() }
+          cell.coveredBy.add(full)
+          if (!partialFlag) cell.partialOnly = false
+          if (level !== 'component') cell.level = level
+          claims.set(key, cell)
+        }
+      }
+    }
+  }
+  return claims
+}
+
+function deriveMatrix(committed, plugged, journeyIds) {
+  const claims = scanCoverageClaims(plugged)
+  let notes = {}
+  try {
+    notes = JSON.parse(fs.readFileSync(NOTES_FILE, 'utf8')).notes ?? {}
+  } catch {
+    /* notes are optional prose */
+  }
+  const matrix = {}
+  const rows = committed.matrix ? Object.keys(committed.matrix) : plugged
+  for (const resource of rows) {
+    matrix[resource] = {}
+    for (const journey of journeyIds) {
+      const claim = claims.get(`${resource}:${journey}`)
+      const note = notes[`${resource}:${journey}`]
+      if (!claim) {
+        matrix[resource][journey] = {
+          level: 'component',
+          status: 'missing',
+          coveredBy: [],
+          ...(note ? { note } : {})
+        }
+        continue
+      }
+      matrix[resource][journey] = {
+        level: claim.level,
+        status: claim.partialOnly ? 'partial' : 'covered',
+        coveredBy: [...claim.coveredBy].sort(),
+        ...(note ? { note } : {})
+      }
+    }
+  }
+  return { ...committed, matrix }
+}
+
+function canonical(value) {
+  return JSON.stringify(value, null, 2) + '\n'
+}
+
 function loadMatrix() {
   try {
     return JSON.parse(readFileOrDie(MATRIX_FILE, 'coverage matrix'))
@@ -353,6 +441,23 @@ function main() {
 
   const errors = []
   const warnings = []
+
+  // CHECK 0 — the matrix is a generated artifact: derive from @covers markers
+  // and require the committed file to match byte-for-byte (or regenerate with --write).
+  const derived = deriveMatrix(matrix, plugged, journeyIds)
+  derived.summary = { ...matrix.summary, ...computeSummary(derived, journeyIds) }
+  if (process.argv.includes('--write')) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- CI gate script: writes the repo-committed matrix artifact
+    fs.writeFileSync(MATRIX_FILE, canonical(derived))
+    console.log(`coverage-matrix.json regenerated from @covers markers.`)
+    process.exit(0)
+  }
+  if (canonical(derived) !== readFileOrDie(MATRIX_FILE, 'coverage matrix')) {
+    errors.push(
+      'coverage-matrix.json is OUT OF SYNC with the @covers markers in the test files. ' +
+        'Never edit it by hand — run: node scripts/check-coverage-matrix.mjs --write'
+    )
+  }
 
   checkPluggedResources(matrix, plugged, errors, warnings)
   checkJourneyCompleteness(matrix, journeyIds, errors, warnings)

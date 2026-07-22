@@ -1,3 +1,11 @@
+/**
+ * Coverage-matrix claims (spec versioning-test-coverage / TEST-ARCHITECTURE §3.4).
+ * The matrix (tests/coverage-matrix.json) is DERIVED from these markers —
+ * run `node scripts/check-coverage-matrix.mjs --write` after changing them.
+ * @covers application:J6 component
+ * @covers application:J7 component
+ * @covers application,connector,custom_page,firewall,function,network_list,waf,workload:J10 component partial
+ */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const toastAdd = vi.fn()

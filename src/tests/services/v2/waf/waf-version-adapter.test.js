@@ -1,3 +1,11 @@
+/**
+ * Coverage-matrix claims (spec versioning-test-coverage / TEST-ARCHITECTURE §3.4).
+ * The matrix (tests/coverage-matrix.json) is DERIVED from these markers —
+ * run `node scripts/check-coverage-matrix.mjs --write` after changing them.
+ * @covers waf:J1 component partial
+ * @covers waf:J2 component
+ * @covers waf:J5 component partial
+ */
 import { describe, it, expect } from 'vitest'
 import { WafVersionAdapter } from '@/services/v2/waf/waf-version-adapter'
 

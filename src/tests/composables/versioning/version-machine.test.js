@@ -1,3 +1,9 @@
+/**
+ * Coverage-matrix claims (spec versioning-test-coverage / TEST-ARCHITECTURE §3.4).
+ * The matrix (tests/coverage-matrix.json) is DERIVED from these markers —
+ * run `node scripts/check-coverage-matrix.mjs --write` after changing them.
+ * @covers application:J9 component
+ */
 import { describe, it, expect } from 'vitest'
 import { getAvailableActions, VERSION_ACTIONS } from '@/composables/versioning/version-machine'
 
