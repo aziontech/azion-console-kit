@@ -1,5 +1,13 @@
 import { defineStore } from 'pinia'
 
+const PRESERVED_EXTRA_KEYS = [
+  'credit',
+  'formatCredit',
+  'days',
+  'yourServicePlan',
+  'isDeveloperSupportPlan'
+]
+
 export const useAccountStore = defineStore({
   id: 'account',
   persist: {
@@ -162,6 +170,15 @@ export const useAccountStore = defineStore({
     }
   },
   actions: {
+    setIdentity(account) {
+      const preservedExtras = {}
+      for (const key of PRESERVED_EXTRA_KEYS) {
+        if (this.account?.[key] !== undefined) {
+          preservedExtras[key] = this.account[key]
+        }
+      }
+      this.account = { ...account, ...preservedExtras }
+    },
     setAccountData(account) {
       this.account = { ...this.account, ...account }
     },

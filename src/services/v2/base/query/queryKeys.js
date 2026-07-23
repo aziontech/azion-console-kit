@@ -41,7 +41,8 @@ export const queryKeys = {
   },
   accountSettings: {
     all: ['account-settings'],
-    info: () => [...queryKeys.accountSettings.all, 'info']
+    info: () => [...queryKeys.accountSettings.all, 'info'],
+    jobRole: () => [...queryKeys.accountSettings.all, 'job-role']
   },
   solutions: {
     all: ['solutions'],

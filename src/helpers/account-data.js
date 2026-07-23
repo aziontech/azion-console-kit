@@ -1,10 +1,4 @@
-import {
-  accountService,
-  userService,
-  accountSettingsService,
-  contractService
-} from '@/services/v2/account'
-import { DEFAULT_JOB_ROLE } from '@/services/v2/account/job-role-validator'
+import { accountService, contractService } from '@/services/v2/account'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { useAccountStore } from '@/stores/account'
@@ -31,36 +25,9 @@ const clearBillingDerivedFields = (accountStore) => {
   })
 }
 
-const pickUserSnapshot = (userInfo) => {
-  const results = userInfo.results || userInfo
-  return {
-    is_account_owner: results.is_account_owner,
-    client_id: results.client_id,
-    timezone: results.timezone,
-    utc_offset: results.utc_offset,
-    first_name: results.first_name,
-    last_name: results.last_name,
-    permissions: results.permissions,
-    email: results.email,
-    user_id: results.id
-  }
-}
-
-const pickAddressSnapshot = (settings) => {
-  if (!settings) return {}
-  return {
-    postalCode: settings.postalCode,
-    country: settings.country,
-    region: settings.region,
-    city: settings.city,
-    address: settings.address,
-    complement: settings.complement
-  }
-}
-
 /**
- * Refresh the account + user + settings caches. Pass `force: true` to drop the Vue Query entries first so the
- * next fetch hits the network (used after plan changes / downgrades).
+ * Refresh the account identity (account + user + job role) as a single source of truth. Pass `force: true`
+ * to drop the Vue Query entries first so the next fetch hits the network (used after plan changes / downgrades).
  *
  * @param {Object} [options]
  * @param {boolean} [options.force=false]
@@ -74,18 +41,10 @@ export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
     clearBillingDerivedFields(accountStore)
   }
 
-  const [accountInfo, userInfo, accountSettingsInfo] = await Promise.all([
-    accountService.getAccountInfo(),
-    userService.getUserInfo(),
-    accountSettingsService.getAccountSettingsInfo().catch(() => null)
-  ])
+  const identity = await accountService.getAccountIdentity()
 
-  Object.assign(accountInfo, pickUserSnapshot(userInfo), pickAddressSnapshot(accountSettingsInfo), {
-    jobRole: accountSettingsInfo?.jobRole ?? DEFAULT_JOB_ROLE
-  })
-
-  accountStore.setAccountData(accountInfo)
-  setFeatureFlags(accountInfo.client_flags)
+  accountStore.setIdentity(identity)
+  setFeatureFlags(identity.client_flags)
 }
 
 export const loadContractData = async ({ force = false } = {}) => {
@@ -105,7 +64,7 @@ export const loadContractData = async ({ force = false } = {}) => {
 }
 
 /**
- * Full post-login account hydration. Loads user/account/settings
+ * Full post-login account hydration. Loads the account identity
  * needed by redirects, feature flags, and the plan gate.
  *
  * The accountGuard awaits this BEFORE making redirect decisions so the
