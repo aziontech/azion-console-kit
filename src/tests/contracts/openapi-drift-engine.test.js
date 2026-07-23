@@ -10,6 +10,7 @@ import {
   getRequestBodySchema,
   unwrapToItemSchema,
   applyKnownDrift,
+  findStaleKnownDrift,
   compareResponseFields,
   compareRequestFields
 } from '../../../tests/contracts/openapi-drift-engine'
@@ -227,13 +228,38 @@ describe('applyKnownDrift (known-drift allowlist)', () => {
     expect(failures).toEqual([issues[1], issues[2]])
   })
 
-  it('supports the * wildcard on resources and on fields', () => {
-    const allowlist = {
+  it('supports the * wildcard on resources but NEVER on fields (wildcard fields are inert)', () => {
+    // A fields:["*"] entry once neutralized the entire request-side drift
+    // check — the engine now only matches EXPLICIT field names.
+    const wildcardFields = {
       entries: [{ resources: ['*'], kind: 'missing-strict', fields: ['*'], reason: 'r2' }]
     }
-    const { failures, accepted } = applyKnownDrift(issues, allowlist, 'network_list')
+    const wildcardResult = applyKnownDrift(issues, wildcardFields, 'network_list')
+    expect(wildcardResult.accepted).toEqual([])
+    expect(wildcardResult.failures).toHaveLength(3)
+
+    const explicitFields = {
+      entries: [
+        { resources: ['*'], kind: 'missing-strict', fields: [issues[2].field], reason: 'r2' }
+      ]
+    }
+    const { failures, accepted, used } = applyKnownDrift(issues, explicitFields, 'network_list')
     expect(accepted).toEqual([{ ...issues[2], reason: 'r2' }])
     expect(failures).toHaveLength(2)
+    expect(used).toEqual([{ entryIndex: 0, field: issues[2].field, resource: 'network_list' }])
+  })
+
+  it('findStaleKnownDrift reports (entry, field) pairs that accepted nothing', () => {
+    const allowlist = {
+      entries: [
+        { resources: ['waf'], kind: 'missing', fields: ['state', 'ghost_field'], reason: 'r1' }
+      ]
+    }
+    const stale = findStaleKnownDrift(allowlist, [
+      { entryIndex: 0, field: 'state', resource: 'waf' }
+    ])
+    expect(stale).toEqual([{ entryIndex: 0, field: 'ghost_field', reason: 'r1' }])
+    expect(findStaleKnownDrift(allowlist, [])).toHaveLength(2)
   })
 
   it('does not accept when kind differs and passes everything through with no allowlist', () => {

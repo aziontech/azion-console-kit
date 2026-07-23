@@ -281,21 +281,55 @@ export const compareRequestFields = (ourFields, requestSchema, spec) => {
  * Splits drift issues into hard failures vs. ACCEPTED known drift
  * (tests/contracts/known-drift.json). An issue is accepted when some allowlist
  * entry matches its resource ('*' wildcard or explicit), its kind AND its
- * field — anything else keeps failing. Pure: allowlist is passed in.
+ * EXPLICIT field — anything else keeps failing. Pure: allowlist is passed in.
+ *
+ * Field wildcards are deliberately NOT supported: a `fields:["*"]` entry once
+ * neutralized the entire request-side check (every possible failure was
+ * pre-accepted). Precision is the contract: each tolerated field is named, so
+ * a NEW field drifting always fails, and a FIXED field goes stale (below).
+ *
+ * `used` reports every (entryIndex, field) pair that accepted an issue —
+ * the drift spec aggregates these across resources and fails on allowlist
+ * pairs that no longer match anything (stale entries: the API got fixed and
+ * the tolerance should be retired).
  */
 export const applyKnownDrift = (issues, allowlist, resource) => {
   const entries = Array.isArray(allowlist?.entries) ? allowlist.entries : []
   const failures = []
   const accepted = []
+  const used = []
   for (const issue of issues) {
-    const match = entries.find(
+    const matchIndex = entries.findIndex(
       (entry) =>
         (entry.resources?.includes('*') || entry.resources?.includes(resource)) &&
         entry.kind === issue.kind &&
-        (entry.fields?.includes('*') || entry.fields?.includes(issue.field))
+        entry.fields?.includes(issue.field)
     )
-    if (match) accepted.push({ ...issue, reason: match.reason })
-    else failures.push(issue)
+    if (matchIndex !== -1) {
+      accepted.push({ ...issue, reason: entries[matchIndex].reason })
+      used.push({ entryIndex: matchIndex, field: issue.field, resource })
+    } else {
+      failures.push(issue)
+    }
   }
-  return { failures, accepted }
+  return { failures, accepted, used }
+}
+
+/**
+ * Given every `used` match collected across ALL resources of a drift run,
+ * returns the allowlist (entryIndex, field) pairs that accepted NOTHING —
+ * i.e. tolerances for drift the published spec no longer has. Pure.
+ */
+export const findStaleKnownDrift = (allowlist, allUsed) => {
+  const entries = Array.isArray(allowlist?.entries) ? allowlist.entries : []
+  const usedKeys = new Set(allUsed.map((match) => `${match.entryIndex}:${match.field}`))
+  const stale = []
+  entries.forEach((entry, entryIndex) => {
+    for (const field of entry.fields ?? []) {
+      if (!usedKeys.has(`${entryIndex}:${field}`)) {
+        stale.push({ entryIndex, field, reason: entry.reason })
+      }
+    }
+  })
+  return stale
 }

@@ -61,7 +61,13 @@ jobs:
         env:
           # Manual override wins; else the repo var; else the public default.
           # Unreachable/non-JSON -> spec skips all tests and exits 0 (see guard).
-          OPENAPI_SCHEMA_URL: ${{ inputs.schema_url || vars.OPENAPI_SCHEMA_URL || 'https://api.azion.com/v4/openapi/openapi.yaml' }}
+          # STAGE fallback on purpose: the version endpoints exist on stage but
+          # NOT on production yet — the prod URL fails all 8 resources today
+          # (verified 2026-07-23). Override via the repo var / dispatch input.
+          OPENAPI_SCHEMA_URL: ${{ inputs.schema_url || vars.OPENAPI_SCHEMA_URL || 'https://stage-api.azion.com/v4/openapi/openapi.yaml' }}
+          # Scheduled run is STRICT: an unreachable/unparseable spec FAILS the
+          # job (and notifies) instead of skipping every test silently green.
+          DRIFT_STRICT: '1'
 
       # spec ci-maturity (req 2.1): scheduled failures are never silent.
       - name: Notify failure

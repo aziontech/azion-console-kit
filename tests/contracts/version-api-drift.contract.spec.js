@@ -54,13 +54,19 @@ import {
   unwrapToItemSchema,
   compareResponseFields,
   compareRequestFields,
-  applyKnownDrift
+  applyKnownDrift,
+  findStaleKnownDrift
 } from './openapi-drift-engine'
 
 // JSON import attributes vary across Node versions — plain fs read is portable.
 const knownDrift = JSON.parse(
   readFileSync(resolvePath(dirname(fileURLToPath(import.meta.url)), 'known-drift.json'), 'utf8')
 )
+
+// Every (entry, field) pair of the allowlist must still match REAL drift in
+// the published spec — the per-resource tests push their accepted matches here
+// and the staleness test (end of file) fails on pairs that matched nothing.
+const allUsedKnownDrift = []
 
 const SCHEMA_URL = process.env.OPENAPI_SCHEMA_URL
 const REQUEST_TIMEOUT_MS = 30000
@@ -92,8 +98,12 @@ const annotate = (testInfo, entry) => {
 /**
  * Fetches the published spec once. Tries the drf-spectacular OpenAPI JSON media
  * type first, then plain JSON. Returns `{ spec }` on success, or `{ skip }` with
- * a human reason on any non-200 / empty / non-JSON response — so the caller
- * skips cleanly instead of failing on a network/edge condition.
+ * a human reason on any non-200 / empty / non-JSON response.
+ *
+ * IMPORTANT: `{ skip }` only skips when the run is BEST-EFFORT (pre-deploy
+ * hooks). On the scheduled drift job (DRIFT_STRICT=1) an unreachable spec is a
+ * FAILURE — a scheduled check that silently verifies nothing for weeks is
+ * indistinguishable from a healthy one, which defeats its purpose.
  */
 const fetchSpec = async (request) => {
   const accepts = ['application/vnd.oai.openapi+json', 'application/json']
@@ -131,10 +141,19 @@ const fetchSpec = async (request) => {
 let publishedSpec = null
 let skipReason = null
 
+// DRIFT_STRICT=1 (the scheduled job): fetch problems FAIL instead of skipping.
+const STRICT = process.env.DRIFT_STRICT === '1'
+
 test.beforeAll(async ({ request }) => {
   const result = await fetchSpec(request)
   publishedSpec = result.spec ?? null
   skipReason = result.skip ?? null
+  if (STRICT && skipReason) {
+    throw new Error(
+      `contract-drift (strict): could not verify anything — ${skipReason}. ` +
+        'The scheduled drift job must never be silently green; fix OPENAPI_SCHEMA_URL or the published spec.'
+    )
+  }
 })
 
 for (const { resource, segment, schemas } of RESOURCES) {
@@ -173,7 +192,8 @@ for (const { resource, segment, schemas } of RESOURCES) {
       const responseIssues = compareResponseFields(responseFields, itemSchema, publishedSpec)
       // Known, documented divergences (tests/contracts/known-drift.json) become
       // warnings; anything NEW keeps failing (spec §3.4 — no alarm fatigue).
-      const { failures, accepted } = applyKnownDrift(responseIssues, knownDrift, resource)
+      const { failures, accepted, used } = applyKnownDrift(responseIssues, knownDrift, resource)
+      allUsedKnownDrift.push(...used)
       annotate(testInfo, {
         resource,
         section: 'response',
@@ -238,6 +258,7 @@ for (const { resource, segment, schemas } of RESOURCES) {
       // Same known-drift downgrade as the response side: documented divergences
       // become annotations; only NEW request drift fails.
       const requestVerdict = applyKnownDrift(requestIssues, knownDrift, resource)
+      allUsedKnownDrift.push(...requestVerdict.used)
       if (requestVerdict.accepted.length > 0) {
         annotate(testInfo, { resource, section: 'request', knownDrift: requestVerdict.accepted })
       }
@@ -260,3 +281,18 @@ function findActionPath(spec, segment, action) {
   const re = new RegExp(`/workspace/${seg}/\\{[^/}]+\\}/versions/\\{[^/}]+\\}/${action}/?$`)
   return paths.find((path) => re.test(path)) ?? null
 }
+
+// ── Allowlist hygiene ───────────────────────────────────────────────────────
+// A known-drift tolerance is a DEBT with the API team, not a permanent mute.
+// When the published spec gets fixed, the pair stops matching and this test
+// fails, forcing the entry to be retired (the exact failure mode that let
+// version_id/last_modified/last_editor linger for days in 2026-07).
+test('known-drift allowlist has no stale entries', () => {
+  test.skip(skipReason !== null, skipReason ?? 'no published spec')
+
+  const stale = findStaleKnownDrift(knownDrift, allUsedKnownDrift)
+  expect(
+    stale,
+    'these known-drift (entry, field) pairs no longer match any real drift — the API was fixed; retire them from known-drift.json'
+  ).toEqual([])
+})

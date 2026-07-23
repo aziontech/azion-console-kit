@@ -16,7 +16,11 @@ import { defineConfig } from '@playwright/test'
  */
 export default defineConfig({
   testDir: 'tests',
-  fullyParallel: true,
+  // Serial on purpose: the whole drift suite takes ~3s, and the known-drift
+  // staleness test aggregates the matches of EVERY resource test in module
+  // state — parallel workers would each see only their own slice.
+  fullyParallel: false,
+  workers: 1,
   forbidOnly: !!process.env.CI, // anti-placebo P1 also at the runner level
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : [['list']],

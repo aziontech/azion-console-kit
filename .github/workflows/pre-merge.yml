@@ -276,6 +276,16 @@ jobs:
               - 'vitest.functional.config.js'
               - 'playwright.config.ts'
               - '.github/workflows/pre-merge.yml'
+              # Review 2026-07-23: the filter missed paths whose regressions the
+              # functional suite exists to catch — it even tested a view file
+              # (statusEdgeApp.vue) that could change without triggering it.
+              - 'src/views/**'
+              - 'src/router/**'
+              # Dependency/build changes swap the very runtime the browser
+              # suite runs on (Vue, PrimeVue, Playwright image parity).
+              - 'package.json'
+              - 'yarn.lock'
+              - 'vite.config.js'
 
   # Consumer contract tests for the versioning services (schema sanity checks).
   # Runs in the same node:22-alpine container as run-tests for parity.
