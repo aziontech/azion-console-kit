@@ -16,13 +16,19 @@ import baseConfig from './vitest.config'
 // Consequence for the score: this is a FLOOR. A mutant that only a broader,
 // non-versioning suite would kill is reported as survived here. Widen this
 // include if that undercount matters once the gate is calibrated.
-export default mergeConfig(
+const merged = mergeConfig(
   baseConfig,
   defineConfig({
     test: {
       include: [
         'src/tests/composables/versioning/**/*.{test,spec}.js',
-        'src/tests/services/v2/versioning/**/*.{test,spec}.js'
+        'src/tests/services/v2/versioning/**/*.{test,spec}.js',
+        // Killers of the wave-3 mutate targets (spec test-effectiveness, req 4):
+        'src/tests/router/guards/**/*.{test,spec}.js',
+        'src/tests/services/v2/base/cache-sync/**/*.{test,spec}.js',
+        'src/tests/services/v2/base/sse/**/*.{test,spec}.js',
+        'src/tests/services/v2/base/http/**/*.{test,spec}.js',
+        'src/tests/services/v2/utils/**/*.{test,spec}.js'
       ],
       // Coverage collection is redundant under mutation testing (Stryker
       // disables it in its own vitest bootstrap); keep it off to save time.
@@ -30,3 +36,13 @@ export default mergeConfig(
     }
   })
 )
+
+// The unit config now splits into projects (unit-node/unit-dom, spec
+// test-effectiveness wave 1). Stryker drives ONE flat vitest run with the
+// include above — the environment comes from each file's needs (all killer
+// suites are node-safe; browser-coupled files carry their own docblock), so
+// drop the inherited projects and pin a single node environment.
+delete merged.test.projects
+merged.test.environment = 'node'
+
+export default merged

@@ -55,3 +55,8 @@ jobs:
           name: mutation-report
           path: reports/mutation
           retention-days: 14
+      # Per-module floors (spec test-effectiveness, req 4.2): Stryker's break
+      # only guards the aggregate — this fails the job when ANY module rots.
+      - name: Check mutation floors
+        run: node scripts/check-mutation-floors.mjs reports/mutation/mutation-report.json
+

@@ -1,0 +1,20 @@
+{
+  "$comment": "Per-module mutation-score floors (spec test-effectiveness, req 4.2). Frozen from the 2-run baseline of 2026-07-23 minus a 2pp jitter margin. Floors only move UP (same ratchet contract as coverage): raising requires a better score in the report; lowering requires a reviewed diff with a written reason.",
+  "floors": {
+    "composables/versioning/version-capability.js": 98,
+    "composables/versioning/version-actions.js": 96,
+    "composables/versioning/version-machine.js": 93,
+    "composables/versioning/to-version-options.js": 92,
+    "services/v2/versioning/version-adapter.js": 89,
+    "router/hooks/guards/redirectGuard.js": 98,
+    "router/hooks/guards/logoutGuard.js": 92,
+    "router/hooks/guards/billingGuard.js": 85,
+    "router/hooks/guards/cliGuard.js": 84,
+    "router/hooks/guards/realTimeEventsVersionGuard.js": 84,
+    "services/v2/base/sse/sse-client.js": 73,
+    "services/v2/utils/errorHandler.js": 67,
+    "services/v2/base/http/abortManager.js": 60,
+    "services/v2/base/cache-sync/cache-invalidator.js": 58,
+    "services/v2/base/cache-sync/invalidation-map.js": 37
+  }
+}
