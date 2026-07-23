@@ -86,6 +86,11 @@ module.exports = {
         // flag-v6 coverage suites (spec flag-v6-coverage, req 8.2) — born under
         // the hard bar from the first commit.
         'src/tests/**/flag-v6/**',
+        // test-maturity fase 2 (critical areas) — ratchet: new tests under the bar.
+        'src/tests/services/v2/base/**',
+        'src/tests/services/v2/mfa/**',
+        'src/tests/services/v2/payment/**',
+        'src/tests/services/v2/billing/**',
         'tests/**'
       ],
       plugins: ['vitest'],
