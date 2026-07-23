@@ -29,12 +29,25 @@ const THROTTLE = 2100
 // mocked idb-keyval and stores its CryptoKey through the same `set`.
 const cacheWrites = () => set.mock.calls.filter((call) => call[0] === CONFIG.cacheKey)
 
-// Real WebCrypto resolves outside the fake clock, so flush = fire the
-// throttle timer, then yield real ticks until the async write chain lands.
+// Real WebCrypto resolves outside the fake clock (threadpool, not
+// microtasks), so tick-counting is a race on slow CI runners. Flush = fire the
+// throttle timer, then yield real event-loop turns against a REAL-time
+// deadline (Date is not faked) until the async write chain lands.
+const drainRealTicks = async (ms) => {
+  const deadline = Date.now() + ms
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setImmediate(resolve))
+  }
+}
+
 const flushPersist = async (expectWrite = true) => {
   await vi.advanceTimersByTimeAsync(THROTTLE)
-  for (let tick = 0; tick < 50; tick++) {
-    if (expectWrite && cacheWrites().length > 0) return
+  if (!expectWrite) {
+    await drainRealTicks(150)
+    return
+  }
+  const deadline = Date.now() + 5000
+  while (Date.now() < deadline && cacheWrites().length === 0) {
     await new Promise((resolve) => setImmediate(resolve))
   }
 }
@@ -52,7 +65,11 @@ beforeEach(() => {
   vi.clearAllMocks()
 })
 
-afterEach(() => {
+afterEach(async () => {
+  // Land any in-flight throttled write NOW so it cannot leak into the next
+  // test's call counts (the exact cross-test race seen on CI).
+  await vi.runOnlyPendingTimersAsync()
+  await drainRealTicks(50)
   vi.useRealTimers()
 })
 
