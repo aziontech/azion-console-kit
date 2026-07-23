@@ -43,8 +43,18 @@ const SERVICE_EXCEPTIONS = [
   // Pure-utility files colocated with a service (no HTTP, no side effects).
   // Match the file-name suffix so e.g. `service-orders-constants` is treated
   // as a utility rather than a service entry point.
+  // `-normalize`/`-operators` cover pure data-transform helpers (e.g.
+  // `ts-normalize`, `aggregation-operators`) that live under a service dir but
+  // perform no server calls.
   // eslint-disable-next-line security/detect-unsafe-regex -- alternation of fixed literals followed by an optional fixed-suffix group; bounded, no nested quantifiers
-  /-(constants|errors|strategy|helpers|types|contracts|adapter)(\.[jt]sx?)?$/
+  /-(constants|errors|strategy|helpers|types|contracts|adapter|normalize|operators)(\.[jt]sx?)?$/,
+  // `chart-api-router`: pure routing/decision logic (picks the Events vs Metrics
+  // API by time-range duration) — returns strings/durations, performs no HTTP.
+  // eslint-disable-next-line security/detect-unsafe-regex -- fixed literal followed by an optional fixed-suffix group; bounded, no nested quantifiers
+  /\/chart-api-router(\.[jt]sx?)?$/,
+  // `panels-service`: client-side panel/session state persisted to local
+  // storage — not a server service, so the Vue Query model does not apply.
+  /\/panels-service(\/|$)/
 ]
 
 /**
