@@ -85,6 +85,18 @@ describe('persist → restore roundtrip with real encryption', () => {
     expect(restored.queries[0].state.data).toEqual({ round: 2 })
   })
 
+  it('cancelPendingPersist drops a scheduled write (ENG-46685 switch-account teardown)', async () => {
+    // Merged from PR #3658: the account-switch teardown must be able to cancel
+    // an in-flight throttled persist so the OLD account cache never lands.
+    const persister = createIDBPersister(CONFIG)
+
+    persister.persistClient({ queries: [query()] })
+    persister.cancelPendingPersist()
+    await flushPersist(false)
+
+    expect(cacheWrites()).toHaveLength(0)
+  })
+
   it('queries without data pass through unencrypted', async () => {
     const persister = createIDBPersister(CONFIG)
 
