@@ -119,7 +119,14 @@ module.exports = {
         // 17 module mocks); all were fixed (real HTTP-boundary mocks + observable
         // assertions), so the bar is now hard. New violations break the build.
         'azion-architecture/no-internal-state-assert': 'error',
-        'azion-architecture/no-versioning-module-mock': 'error'
+        'azion-architecture/no-versioning-module-mock': 'error',
+        // The "webkit razor" (spec test-effectiveness, req 3): never FAKE an
+        // environment capability (ResizeObserver/matchMedia/Intersection-
+        // Observer/getBoundingClientRect/focus) — the capability only truly
+        // exists in browser mode. The global setup-tests.js stubs are the
+        // single NAMED exemption (outside these globs; debt dies with the
+        // jsdom bucket, GUIA-DE-TESTES §11).
+        'azion-architecture/no-environment-capability-mock': 'error'
       }
     },
     {

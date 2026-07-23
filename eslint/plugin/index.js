@@ -13,6 +13,7 @@ const noIoInComponents = require('./lib/rules/no-io-in-components')
 const noUnawaitedClipboard = require('./lib/rules/no-unawaited-clipboard')
 const noVersioningModuleMock = require('./lib/rules/no-versioning-module-mock')
 const noInternalStateAssert = require('./lib/rules/no-internal-state-assert')
+const noEnvironmentCapabilityMock = require('./lib/rules/no-environment-capability-mock')
 const recommended = require('./lib/configs/recommended')
 
 module.exports = {
@@ -31,7 +32,8 @@ module.exports = {
     'no-io-in-components': noIoInComponents,
     'no-unawaited-clipboard': noUnawaitedClipboard,
     'no-versioning-module-mock': noVersioningModuleMock,
-    'no-internal-state-assert': noInternalStateAssert
+    'no-internal-state-assert': noInternalStateAssert,
+    'no-environment-capability-mock': noEnvironmentCapabilityMock
   },
   configs: {
     recommended

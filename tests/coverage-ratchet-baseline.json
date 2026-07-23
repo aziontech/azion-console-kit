@@ -1,0 +1,35 @@
+{
+  "src/services": {
+    "lines": 56.1
+  },
+  "src/views": {
+    "lines": 18.37
+  },
+  "src/helpers": {
+    "lines": 64.43
+  },
+  "src/plugins": {
+    "lines": 70.43
+  },
+  "src/modules": {
+    "lines": 30.89
+  },
+  "src/composables": {
+    "lines": 56.92
+  },
+  "src/stores": {
+    "lines": 78.47
+  },
+  "src/templates": {
+    "lines": 27.83
+  },
+  "src/router": {
+    "lines": 51.04
+  },
+  "src/components": {
+    "lines": 17.7
+  },
+  "src/utils": {
+    "lines": 40.72
+  }
+}

@@ -219,6 +219,11 @@ jobs:
       - name: Run tests
         run: yarn test:unit:coverage
 
+      # Coverage RATCHET (spec test-effectiveness, req 8): per-area floors
+      # that only move up — a change arriving without tests fails here.
+      - name: Check coverage ratchet
+        run: node scripts/check-coverage-ratchet.mjs coverage/unit/coverage-summary.json
+
       - name: Upload coverage reports
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

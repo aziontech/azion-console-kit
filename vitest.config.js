@@ -120,7 +120,10 @@ export default mergeConfig(
         ],
         // 'json' emits coverage-final.json (Istanbul), consumed by the merge script
         // to build the unified Sonar lcov (scripts/merge-coverage.mjs, spec task 14.1).
-        reporter: ['text', 'lcov', 'html', 'json'],
+        // 'json-summary' feeds the coverage RATCHET (spec test-effectiveness,
+        // req 8): per-area floors that only move up. Additive — lcov/sonar
+        // consumers are untouched.
+        reporter: ['text', 'lcov', 'html', 'json', 'json-summary'],
         reportsDirectory: './coverage/unit'
       },
       // 'json' feeds the pre-merge gate summary (scripts/ci/suite-summary.mjs):
