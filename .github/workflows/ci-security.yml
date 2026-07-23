@@ -67,7 +67,7 @@ jobs:
         run: pipx install semgrep
 
       # BLOCKING (only SAST for the JS/TS stack → promoted per policy).
-      # p/ci = curated low-noise ruleset; \`auto\` refuses to run with metrics
+      # p/ci = curated low-noise ruleset; 'auto' refuses to run with metrics
       # off, and telemetry stays off by policy. --disable-nosem: inline
       # suppressions do not silence CI (guide §10).
       - name: Semgrep scan
