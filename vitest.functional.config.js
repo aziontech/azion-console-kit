@@ -33,7 +33,12 @@ export default mergeConfig(
         'primevue/inputswitch',
         'primevue/dialog',
         'primevue/config',
-        'primevue/tooltip'
+        'primevue/tooltip',
+        // Pre-bundle the webkit plugin chain used by the composer smoke —
+        // discovering it mid-run triggers a vite re-optimization reload that
+        // can fail the FIRST cold run of unrelated files.
+        '@aziontech/webkit/plugin',
+        '@tanstack/vue-query'
       ]
     },
     test: {

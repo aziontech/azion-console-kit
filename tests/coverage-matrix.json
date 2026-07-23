@@ -295,6 +295,7 @@
           "src/tests/composables/versioning/use-deploy-resource-context.test.js",
           "src/tests/composables/versioning/use-resource-version-landing-versioned-only.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/functional/release-composer.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
@@ -403,6 +404,7 @@
         "coveredBy": [
           "src/tests/composables/versioning/use-deploy-resource-context.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/functional/release-composer.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/services/versioning/invalidation.test.js",
@@ -511,6 +513,7 @@
         "coveredBy": [
           "src/tests/composables/versioning/use-deploy-resource-context.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/functional/release-composer.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
@@ -620,6 +623,7 @@
         "coveredBy": [
           "src/tests/composables/versioning/use-deploy-resource-context.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/functional/release-composer.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
@@ -724,6 +728,7 @@
         "coveredBy": [
           "src/tests/composables/versioning/use-deploy-resource-context.test.js",
           "src/tests/composables/versioning/use-version-menu-actions.test.js",
+          "src/tests/functional/release-composer.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
@@ -833,6 +838,7 @@
           "src/tests/composables/versioning/version-capability.enumeration.test.js",
           "src/tests/composables/versioning/version-machine.pbt.test.js",
           "src/tests/composables/versioning/version-menu-versioned-only.test.js",
+          "src/tests/functional/release-composer.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
@@ -944,6 +950,7 @@
           "src/tests/composables/versioning/version-capability.enumeration.test.js",
           "src/tests/composables/versioning/version-machine.pbt.test.js",
           "src/tests/composables/versioning/version-menu-versioned-only.test.js",
+          "src/tests/functional/release-composer.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
@@ -1057,6 +1064,7 @@
           "src/tests/composables/versioning/version-capability.enumeration.test.js",
           "src/tests/composables/versioning/version-machine.pbt.test.js",
           "src/tests/composables/versioning/version-menu-versioned-only.test.js",
+          "src/tests/functional/release-composer.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/templates/version-shell-block/version-form-adapter-deploy-capability.test.js",
@@ -1160,6 +1168,7 @@
         "coveredBy": [
           "src/tests/composables/versioning/use-deploy-resource-context.test.js",
           "src/tests/composables/versioning/use-deployment-release-drawer.test.js",
+          "src/tests/functional/release-composer.browser.test.js",
           "src/tests/functional/version-action-bar.browser.test.js",
           "src/tests/functional/version-heading-actions.browser.test.js",
           "src/tests/services/v2/deployment/deployment-adapter.test.js",
