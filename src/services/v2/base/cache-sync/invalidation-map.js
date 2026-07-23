@@ -154,7 +154,8 @@ const PARENT_TYPE_TO_QUERY_KEY = {
   'custom page': 'customPages',
   'edge service': 'edgeService',
   'edge function': 'edgeFunction',
-  'network List': 'networkLists',
+  // lowercase key: CacheInvalidator lowercases parent.type before the lookup
+  'network list': 'networkLists',
   waf: 'waf',
 
   // User Menu

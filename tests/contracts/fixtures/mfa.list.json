@@ -1,0 +1,7 @@
+{
+  "count": 2,
+  "results": [
+    { "id": 7, "name": "Dev One", "email": "dev1@azion.com", "confirmed": true },
+    { "id": 8, "name": "Dev Two", "email": "dev2@azion.com", "confirmed": false }
+  ]
+}

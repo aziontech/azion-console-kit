@@ -95,6 +95,7 @@ module.exports = {
         'src/tests/services/v2/account/**',
         'src/tests/router/guards/**',
         'src/tests/stores/**',
+        'src/tests/contracts/**',
         'tests/**'
       ],
       plugins: ['vitest'],
