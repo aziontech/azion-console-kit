@@ -132,7 +132,11 @@ describe('accountGuard onboarding prefetch', () => {
     ensurePlansList.mockClear()
 
     const result = await accountGuard({
-      to: { meta: { isPublic: false }, name: 'additional-data', fullPath: '/signup/additional-data' },
+      to: {
+        meta: { isPublic: false },
+        name: 'additional-data',
+        fullPath: '/signup/additional-data'
+      },
       accountStore: {
         hasActiveUserId: false,
         hasSession: true,
