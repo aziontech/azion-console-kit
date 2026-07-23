@@ -130,7 +130,7 @@ function createThrottledPersist(fn) {
   let timer = null
   let pendingClient = null
 
-  return (client) => {
+  const throttled = (client) => {
     pendingClient = client
     if (timer) return
 
@@ -141,6 +141,16 @@ function createThrottledPersist(fn) {
       await fn(snapshot)
     }, PERSIST_THROTTLE_MS)
   }
+
+  throttled.cancel = () => {
+    if (timer) {
+      clearTimeout(timer)
+      timer = null
+    }
+    pendingClient = null
+  }
+
+  return throttled
 }
 
 export function createIDBPersister(config, onRestoreComplete = null) {
@@ -155,7 +165,8 @@ export function createIDBPersister(config, onRestoreComplete = null) {
       }
       return undefined
     },
-    removeClient: async () => {}
+    removeClient: async () => {},
+    cancelPendingPersist: () => {}
   }
 
   try {
@@ -226,6 +237,9 @@ export function createIDBPersister(config, onRestoreComplete = null) {
       } catch {
         // DB already deleted or unavailable
       }
+    },
+    cancelPendingPersist: () => {
+      throttledPersist.cancel()
     }
   }
 }

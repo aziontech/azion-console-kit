@@ -45,6 +45,12 @@ const GOVERNED_DIRS = [
 
 const RULE_PREFIX = 'azion-architecture/'
 
+// Test files are exercised by, not authored to, the architecture model: they
+// import services directly to mock/drive them and are never composables. The
+// TanStack rules (require-vue-query, no-direct-http-in-components) don't apply
+// to them, so exclude them from governance to avoid false positives.
+const TEST_FILE_PATTERN = /(^|\/)__tests__\/|\.(test|spec)\.[jt]sx?$/
+
 function parseArgs(argv) {
   const options = { base: 'origin/dev' }
   for (let i = 0; i < argv.length; i++) {
@@ -83,6 +89,7 @@ function getChangedFiles(base) {
 function isGovernedFile(relativePath) {
   const ext = path.extname(relativePath)
   if (!LINT_EXTENSIONS.includes(ext)) return false
+  if (TEST_FILE_PATTERN.test(relativePath)) return false
   return GOVERNED_DIRS.some((dir) => relativePath.startsWith(dir))
 }
 

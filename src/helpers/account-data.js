@@ -1,35 +1,14 @@
-import {
-  accountService,
-  userService,
-  accountSettingsService,
-  contractService
-} from '@/services/v2/account'
+import { accountService, contractService } from '@/services/v2/account'
 import { billingGqlService } from '@/services/v2/billing/billing-gql-service'
 import { useAccountStore } from '@/stores/account'
 import { setFeatureFlags } from '@/composables/user-flag'
 
 export const loadUserAndAccountInfo = async () => {
   const accountStore = useAccountStore()
-  const [accountInfo, userInfo, accountJobRole] = await Promise.all([
-    accountService.getAccountInfo(),
-    userService.getUserInfo(),
-    accountSettingsService.getAccountJobRole()
-  ])
-  accountInfo.jobRole = accountJobRole.jobRole
-  const userResults = userInfo.results || userInfo
-  accountInfo.is_account_owner = userResults.is_account_owner
-  accountInfo.client_id = userResults.client_id
-  accountInfo.timezone = userResults.timezone
-  accountInfo.utc_offset = userResults.utc_offset
-  accountInfo.first_name = userResults.first_name
-  accountInfo.last_name = userResults.last_name
-  accountInfo.permissions = userResults.permissions
-  accountInfo.email = userResults.email
-  accountInfo.user_id = userResults.id
-  accountInfo.isDeveloperSupportPlan = true
+  const identity = await accountService.getAccountIdentity()
 
-  accountStore.setAccountData(accountInfo)
-  setFeatureFlags(accountInfo.client_flags)
+  accountStore.setIdentity(identity)
+  setFeatureFlags(identity.client_flags)
 }
 
 export const loadBillingData = async () => {
