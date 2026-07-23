@@ -12,10 +12,3 @@ rules:
     ignore:
       - cla.yml
 
-  # First-party Azion composite actions are pinned to the v0 MAJOR by design
-  # (MCP security/compliance guides): central rollout of scanner updates.
-  # Everything third-party/official is pinned to commit SHA.
-  unpinned-uses:
-    ignore:
-      - ci-security.yml
-      - ci-compliance.yml

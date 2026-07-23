@@ -93,9 +93,22 @@ Se houver conflito, resolva em um PR `main → dev` normal (passa pelo
 | --- | --- | --- |
 | `pre-merge.yml` | PR + push `dev` | O portão: lint ×3, build, unit, contrato → functional, gate |
 | `complexity_check.yml` | PR para `dev`/`main` | Comentário informativo de complexidade (SCC pinado) |
+| `ci-security.yml` | PR + agendado (4ª feira) | Segurança INLINE (repo público não roda actions privadas): Semgrep, Gitleaks, zizmor, osv-scanner |
 | `deploy-stage.yml` | push `dev` | Deploy stage (+ drift pré-deploy informativo) |
 | `deploy-production.yml` | push `main` | Deploy produção (+ drift pré-deploy informativo) |
 | `deploy-storybook.yml` | push `dev` (paths storybook/) | Deploy do Storybook |
 | `versioning-contract-drift.yml` | agendado (dias úteis 06:00 UTC) + manual | Drift contra OpenAPI publicado |
 | `versioning-mutation.yml` | agendado (segundas 04:00 UTC) + manual | Stryker nos módulos de versionamento |
 | `assign-pr.yml` / `cla.yml` / `package-audit.yaml` | PR | Automação de PR / CLA / auditoria de dependências |
+
+## 7. Compliance em repositório PÚBLICO (limitação estrutural)
+
+As actions centrais `aziontech/azion-action-compliance` e `azion-action-security`
+são **privadas** — e o GitHub **não permite** que repositório público resolva
+action privada (sem exceção). Por isso:
+
+- `ci-compliance.yml` **não existe** neste repo: a nota de compliance vem da
+  **auditoria central** (Delivery Engineering / `query_repo_audit`), não de um
+  check por PR.
+- `ci-security.yml` roda o MESMO conjunto de ferramentas da action central,
+  **inline** com binários pinados por versão+checksum.

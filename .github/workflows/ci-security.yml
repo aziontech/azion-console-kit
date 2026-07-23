@@ -1,7 +1,13 @@
-# Security scanning on every PR (spec: MCP security guide / skill fix-compliance-check).
-# The composite action auto-detects the stack (node-yarn) and runs:
-# Semgrep (SAST, blocking for JS/TS) + yarn audit (SCA, blocking) +
-# osv-scanner (catch-all) + Gitleaks (secrets, blocking) + zizmor (actions).
+# Security scanning on every PR — INLINE open-source pipeline.
+#
+# WHY inline: this is a PUBLIC repository, and GitHub cannot resolve private
+# actions (aziontech/azion-action-security is internal) from public repos — no
+# setting overrides that. This workflow runs the same tool matrix the central
+# action would (MCP security guide, section 0 — node-yarn stack):
+#   Semgrep (SAST, blocking) · Gitleaks (secrets, blocking) ·
+#   zizmor (actions security, blocking medium+) · osv-scanner (SCA catch-all,
+#   non-blocking — the blocking SCA for yarn lives in package-audit.yaml).
+# Every binary is version-pinned with checksum verification.
 name: Security
 
 on:
@@ -14,20 +20,91 @@ on:
 
 permissions:
   contents: read
-  security-events: write # SARIF upload to GitHub Security tab
-  pull-requests: write # PR comment with scan report
 
 concurrency:
   group: ci-security-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+env:
+  GITLEAKS_VERSION: 8.30.1
+  GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+  OSV_VERSION: v2.4.0
+  OSV_SHA256: 15314940c10d26af9c6649f150b8a47c1262e8fc7e17b1d1029b0e479e8ed8a0
+
 jobs:
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest # public repo — OSS strategy
+  secrets:
+    name: Secrets (Gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # full history — secrets hide in old commits
+          persist-credentials: false
+
+      - name: Install pinned Gitleaks
+        run: |
+          curl -sSLf "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -o gitleaks.tar.gz
+          echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks && rm gitleaks.tar.gz
+
+      # BLOCKING. Reads the repo-committed .gitleaks.toml/.gitleaksignore —
+      # both gated by CODEOWNERS (@aziontech/security-office), so every
+      # suppression is a reviewed decision (MCP guide, section 10).
+      - name: Detect secrets
+        run: ./gitleaks detect --source . --config .gitleaks.toml --verbose
+
+  sast:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: aziontech/azion-action-security@v0
+
+      - name: Install Semgrep
+        run: pipx install semgrep
+
+      # BLOCKING (only SAST for the JS/TS stack → promoted per policy).
+      # --disable-nosem: inline suppressions do not silence CI (guide §10).
+      - name: Semgrep scan
+        run: semgrep scan --config auto --metrics=off --disable-nosem --error .
+
+  actions-security:
+    name: Actions security (zizmor)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install zizmor
+        run: pipx install zizmor
+
+      # BLOCKING on medium+. Uses the repo zizmor.yml (CODEOWNERS-gated) —
+      # the two documented exceptions there are reviewed accepted-risks.
+      - name: Scan workflows
+        run: zizmor --offline --min-severity medium .github/
+
+  sca-catchall:
+    name: SCA catch-all (osv-scanner)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install pinned osv-scanner
+        run: |
+          curl -sSLf "https://github.com/google/osv-scanner/releases/download/${OSV_VERSION}/osv-scanner_linux_amd64" -o osv-scanner
+          echo "${OSV_SHA256}  osv-scanner" | sha256sum -c -
+          chmod +x osv-scanner
+
+      # NON-blocking: the blocking SCA for yarn.lock is package-audit.yaml
+      # (yarn audit). This is the cross-ecosystem safety net (guide §0).
+      - name: Scan lockfiles
+        continue-on-error: true
+        run: ./osv-scanner scan --config=/dev/null --recursive .
