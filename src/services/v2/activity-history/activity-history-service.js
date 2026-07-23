@@ -3,6 +3,13 @@ import { BaseService } from '@/services/v2/base/query/baseService'
 
 export const SYNC_INTERVAL_MINUTES = 2
 
+// Serialise a value as a GraphQL literal. JSON.stringify produces a valid
+// GraphQL string literal (escaping ", \\ and control characters), which the
+// server coerces to whichever scalar type each *Ilike field expects. Inlining
+// avoids GraphQL's strict variable-type check, which can't reconcile the mixed
+// String / GenericScalar types the *Ilike fields carry in the schema.
+const toGqlLiteral = (value) => JSON.stringify(String(value))
+
 const buildDynamicFilters = (filter = {}) => {
   const normalizeFilterArray = (input) => {
     if (!input) return []
@@ -23,25 +30,29 @@ const buildDynamicFilters = (filter = {}) => {
     return []
   }
 
+  // Ilike fields are inlined as GraphQL literals (see toGqlLiteral) because the
+  // *Ilike scalar types are mixed (String / GenericScalar) in the schema, so a
+  // typed variable can't satisfy all of them. `type` below only matters for the
+  // scalar Eq/Int operators, which still bind through variables.
   const allowed = {
-    title: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
-    comment: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
+    title: { operator: 'Ilike', format: (value) => `%${value}%` },
+    comment: { operator: 'Ilike', format: (value) => `%${value}%` },
     type: { operator: 'Eq', type: 'String' },
-    authorName: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
-    authorEmail: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
+    authorName: { operator: 'Ilike', format: (value) => `%${value}%` },
+    authorEmail: { operator: 'Ilike', format: (value) => `%${value}%` },
     accountId: { operator: 'Eq', type: 'String' },
     resourceId: { operator: 'Eq', type: 'String' },
-    resourceType: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
+    resourceType: { operator: 'Ilike', format: (value) => `%${value}%` },
     remoteType: { operator: 'Eq', type: 'String' },
     remotePort: { operator: 'Eq', type: 'Int' },
     userId: { operator: 'Eq', type: 'String' },
     userIp: { operator: 'Eq', type: 'String' },
-    userAgent: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
+    userAgent: { operator: 'Ilike', format: (value) => `%${value}%` },
     uuid: { operator: 'Eq', type: 'String' },
-    resourceName: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
-    parentResourceType: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` },
+    resourceName: { operator: 'Ilike', format: (value) => `%${value}%` },
+    parentResourceType: { operator: 'Ilike', format: (value) => `%${value}%` },
     parentResourceId: { operator: 'Eq', type: 'String' },
-    parentResourceName: { operator: 'Ilike', type: 'String', format: (value) => `%${value}%` }
+    parentResourceName: { operator: 'Ilike', format: (value) => `%${value}%` }
   }
 
   const normalized = normalizeFilterArray(filter)
@@ -65,10 +76,20 @@ const buildDynamicFilters = (filter = {}) => {
 
     counterByField[field] = (counterByField[field] || 0) + 1
     const shouldBeOrEntry = occurrenceByField[field] > 1
-    const varName = shouldBeOrEntry ? `${field}_${counterByField[field]}` : field
-
-    variableDefs.push(`, $${varName}: ${rule.type}`)
     const formattedValue = rule.format ? rule.format(value) : value
+
+    if (rule.operator === 'Ilike') {
+      const literal = toGqlLiteral(formattedValue)
+      if (shouldBeOrEntry) {
+        orEntries.push(`{ ${field}${rule.operator}: ${literal} }`)
+      } else {
+        filterLines.push(`${field}${rule.operator}: ${literal}`)
+      }
+      continue
+    }
+
+    const varName = shouldBeOrEntry ? `${field}_${counterByField[field]}` : field
+    variableDefs.push(`, $${varName}: ${rule.type}`)
     variables[varName] = rule.type === 'Int' ? Number(formattedValue) : formattedValue
 
     if (shouldBeOrEntry) {
@@ -171,16 +192,17 @@ export class ActivityHistoryService extends BaseService {
       : this.#getOffsetDate({ intervalDays: dateRange })
 
     const dynamic = buildDynamicFilters(filter)
+    const searchLiteral = search ? toGqlLiteral(`%${search}%`) : ''
     const combinedOrEntries = [
       ...(search
         ? [
-            '{ titleIlike: $search }',
-            '{ authorNameIlike: $search }',
-            '{ authorEmailIlike: $search }',
-            '{ resourceTypeIlike: $search }',
-            '{ resourceNameIlike: $search }',
-            '{ parentResourceNameIlike: $search }',
-            '{ parentResourceTypeIlike: $search }'
+            `{ titleIlike: ${searchLiteral} }`,
+            `{ authorNameIlike: ${searchLiteral} }`,
+            `{ authorEmailIlike: ${searchLiteral} }`,
+            `{ resourceTypeIlike: ${searchLiteral} }`,
+            `{ resourceNameIlike: ${searchLiteral} }`,
+            `{ parentResourceNameIlike: ${searchLiteral} }`,
+            `{ parentResourceTypeIlike: ${searchLiteral} }`
           ]
         : []),
       ...dynamic.orEntries
@@ -188,11 +210,10 @@ export class ActivityHistoryService extends BaseService {
     const orClause = combinedOrEntries.length ? `or: [${combinedOrEntries.join(', ')}],` : ''
     const baseQuery = `
       query ActivityHistory(
-        $offset: Int, 
-        $limit: Int, 
-        $begin: DateTime!, 
+        $offset: Int,
+        $limit: Int,
+        $begin: DateTime!,
         $end: DateTime!
-        ${search ? ', $search: String' : ''}
         ${dynamic.variableDefs}
       ) {
         activityHistoryEvents(
@@ -235,7 +256,6 @@ export class ActivityHistoryService extends BaseService {
         limit,
         begin: offSetStart.toISOString(),
         end: offSetEnd.toISOString(),
-        ...(search ? { search: `%${search}%` } : {}),
         ...dynamic.variables
       }
     }
@@ -300,13 +320,14 @@ export class ActivityHistoryService extends BaseService {
       : this.#getOffsetDate({ intervalDays: dateRange })
 
     const dynamic = buildDynamicFilters(filter)
+    const searchLiteral = search ? toGqlLiteral(`%${search}%`) : ''
     const combinedOrEntries = [
       ...(search
         ? [
-            '{ titleIlike: $search }',
-            '{ authorNameIlike: $search }',
-            '{ authorEmailIlike: $search }',
-            '{ resourceTypeIlike: $search }'
+            `{ titleIlike: ${searchLiteral} }`,
+            `{ authorNameIlike: ${searchLiteral} }`,
+            `{ authorEmailIlike: ${searchLiteral} }`,
+            `{ resourceTypeIlike: ${searchLiteral} }`
           ]
         : []),
       ...dynamic.orEntries
@@ -315,9 +336,8 @@ export class ActivityHistoryService extends BaseService {
 
     const query = `
       query ActivityHistory(
-        $begin: DateTime!, 
+        $begin: DateTime!,
         $end: DateTime!
-        ${search ? ', $search: String' : ''}
         ${dynamic.variableDefs}
       ) {
         activityHistoryEvents(
@@ -338,7 +358,6 @@ export class ActivityHistoryService extends BaseService {
       variables: {
         begin: offSetStart.toISOString(),
         end: offSetEnd.toISOString(),
-        ...(search ? { search: `%${search}%` } : {}),
         ...dynamic.variables
       }
     }

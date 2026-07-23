@@ -34,6 +34,7 @@ const DEFAULT_PAGE_SIZE = 10
 
 const clearAllData = async () => {
   await pauseQueryPersistence()
+  persister.cancelPendingPersist?.()
   const accountStore = useAccountStore()
   accountStore.resetAccount()
   await clearAllCache()
