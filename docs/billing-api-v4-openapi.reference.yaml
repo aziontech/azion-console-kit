@@ -1,0 +1,83 @@
+# billing-api v4 (DRAFT skeleton, ENG-46458) — reference copy for contract gap analysis
+# Source: billing-api-openapi.yaml provided by user. Phase-1 self-service prepaid.
+# This is a REFERENCE ARTIFACT ONLY (not wired into the app). See gap-analysis doc.
+#
+# ── Endpoint surface (operationId — METHOD path) ─────────────────────────────
+# Billing Accounts (payer): [Phase 2, stays at /v4/billing_accounts]
+#   list_billing_accounts        GET   /v4/billing_accounts
+#   create_billing_account       POST  /v4/billing_accounts
+#   get_current_billing_account  GET   /v4/billing_accounts/current      (ADR-13: 409 if ambiguous)
+#   get_billing_account          GET   /v4/billing_accounts/{account_id}
+#   update_billing_account       PATCH /v4/billing_accounts/{account_id}
+# Service Orders (commercial agreement, 1 SO -> N Subscriptions):
+#   list_service_orders          GET   /v4/account/service_orders
+#   create_service_order         POST  /v4/account/service_orders        (admin/sales path)
+#   get_current_service_order    GET   /v4/account/service_orders/current
+#   get_service_order            GET   /v4/account/service_orders/{service_order_id}
+#   update_service_order         PATCH /v4/account/service_orders/{service_order_id}  (only order_number)
+#   list_service_order_actions   GET   /v4/account/service_orders/{id}/actions
+#   create_service_order_action  POST  /v4/account/service_orders/{id}/actions  (Idempotency-Key)
+#   list_service_order_subscriptions GET /v4/account/service_orders/{id}/subscriptions
+#   cancel_service_order         POST  /v4/account/service_orders/{id}/cancel
+# Subscriptions (operational entitlement — local source of truth):
+#   list_subscriptions           GET   /v4/account/subscriptions
+#   create_subscription          POST  /v4/account/subscriptions   (implicit SO 1:1; Idempotency-Key)
+#   get_current_subscription     GET   /v4/account/subscriptions/current
+#   get_subscription             GET   /v4/account/subscriptions/{subscription_id}
+#   list_subscription_versions   GET   /v4/account/subscriptions/{id}/versions
+#   change_subscription          POST  /v4/account/subscriptions/{id}/change   (Idempotency-Key)
+#   preview_subscription_change  POST  /v4/account/subscriptions/{id}/change/preview
+#   cancel_subscription          POST  /v4/account/subscriptions/{id}/cancel   (when: now|period_end)
+#   list_subscription_scheduled_changes  GET   /v4/account/subscriptions/{id}/scheduled_changes
+#   get_subscription_scheduled_change    GET   /v4/account/subscriptions/{id}/scheduled_changes/{scid}
+#   delete_subscription_scheduled_change DELETE /v4/account/subscriptions/{id}/scheduled_changes/{scid}
+# Payment Methods:
+#   list_payment_methods         GET   /v4/account/payments/payment_methods
+#   create_payment_setup_session POST  /v4/account/payments/payment_setup_sessions
+#   get_payment_method           GET   /v4/account/payments/payment_methods/{payment_method_id}
+#   delete_payment_method        DELETE /v4/account/payments/payment_methods/{payment_method_id}
+#   set_default_payment_method   POST  /v4/account/payments/payment_methods/{payment_method_id}/default
+# Invoices:
+#   list_invoices                GET   /v4/account/billing/invoices
+#   get_invoice                  GET   /v4/account/billing/invoices/{invoice_id}
+#   list_invoice_lines           GET   /v4/account/billing/invoices/{invoice_id}/lines
+#   get_invoice_pdf              GET   /v4/account/billing/invoices/{invoice_id}/pdf
+#   list_invoice_settlements     GET   /v4/account/billing/invoices/{invoice_id}/settlements
+#   pay_invoice                  POST  /v4/account/billing/invoices/{invoice_id}/pay  (Idempotency-Key)
+# Payments (charge ledger):
+#   list_payments                GET   /v4/account/payments
+#   get_payment                  GET   /v4/account/payments/{payment_id}
+#   list_payment_refunds         GET   /v4/account/payments/{payment_id}/refunds
+#   create_payment_refund        POST  /v4/account/payments/{payment_id}/refunds  (admin, Idempotency-Key)
+# Credits:
+#   get_credit_balance           GET   /v4/account/billing/balance
+#   list_credits                 GET   /v4/account/billing/credits
+#   add_credit                   POST  /v4/account/billing/credits  (admin, Idempotency-Key)
+# Budget Alerts (inform only):
+#   list_budget_alerts           GET   /v4/account/billing/budget_alerts
+#   create_budget_alert          POST  /v4/account/billing/budget_alerts
+#   update_budget_alert          PATCH /v4/account/billing/budget_alerts/{id}
+#   delete_budget_alert          DELETE /v4/account/billing/budget_alerts/{id}
+# Spend Limits (enforced):
+#   list/create/update/delete    /v4/account/billing/spend_limits[/{id}]
+# Webhooks:
+#   ingest_webhook               POST  /webhooks/{provider}   (HMAC, provider=stripe)
+#   list/create/get/delete       /v4/webhook_endpoints[/{id}]   [Phase 2]
+# Internal (x-internal-secret):
+#   intake_charge                POST  /internal/v1/charges          -> ChargeResponse
+#   intake_overage_notice        POST  /internal/v1/overage_notices  -> OverageNoticeAck
+# Commitments / Credit Limits / cost_breakdown / members: [Future / Phase 2]
+#
+# ── Conventions ──────────────────────────────────────────────────────────────
+# - Envelope: single-resource responses wrapped as { state: "executed", data: <Resource> }.
+#   list responses are paginated { count, total_pages, page, page_size, next, previous, results }.
+#   EXCEPTIONS (bare arrays, NO envelope): list_payment_methods, list_invoice_lines,
+#     list_invoice_settlements, list_payment_refunds, list_budget_alerts, list_spend_limits,
+#     list_credit_limits, list_billing_account_members. Internal endpoints return the bare schema.
+# - Errors: application/vnd.api+json JSON:API { errors:[{status,code,title,detail,source,meta}] }.
+# - Money: integer minor units (cents). currency: ISO-4217 (3). country: ISO 3166 (2).
+# - IDs: int64. Pagination: page (1..10000), page_size (1..100, default 20), fields (reserved).
+# - Idempotency: header `idempotency-key` on charge/change/pay/refund/action/create.
+# - Self-service singletons via /current (ADR-13: 409 when context resolves to >1).
+#
+# Full schemas live in the original spec; key field lists captured in the gap-analysis doc.

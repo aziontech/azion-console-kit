@@ -317,6 +317,14 @@ export const queryKeys = {
     detail: (id) => [...queryKeys.serviceOrders.all, 'detail', id],
     billingPaymentMethods: () => [...queryKeys.serviceOrders.all, 'billing', 'payment-methods']
   },
+  subscriptions: {
+    all: ['subscriptions'],
+    list: (params) => [...queryKeys.subscriptions.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.subscriptions.all, 'detail', id],
+    current: () => [...queryKeys.subscriptions.all, 'current'],
+    versions: (id) => [...queryKeys.subscriptions.detail(id), 'versions'],
+    scheduledChanges: (id) => [...queryKeys.subscriptions.detail(id), 'scheduled-changes']
+  },
   edgeService: {
     all: ['edge-services'],
     list: (params) => [...queryKeys.edgeService.all, 'list', normalizeParams(params)],
