@@ -1,3 +1,8 @@
+/* eslint-disable azion-architecture/require-vue-query --
+ * This composable owns a bespoke metrics-chart loading pipeline (API routing by
+ * time-range and several load strategies) that the TanStack query-cache model
+ * does not fit; the metrics-chart-service calls are made directly by design
+ * rather than through useQuery/fetchQuery. */
 import { ref, computed, onScopeDispose } from 'vue'
 import { loadAggregableFields } from '@/modules/filter-loaders/dataset-fields-loader'
 import { resolveChartApi } from '@/services/real-time-events-service-v2/chart-api-router'

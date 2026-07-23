@@ -1,3 +1,8 @@
+/* eslint-disable azion-architecture/require-vue-query --
+ * This composable owns a bespoke event-loading pipeline (geometric time
+ * windows, ts-cursor pagination and rollup counts) that the TanStack
+ * query-cache model does not fit; the load-events-* services are called
+ * directly by design rather than through useQuery/fetchQuery. */
 import { ref, computed, shallowRef } from 'vue'
 import { useGraphQLStore } from '@/stores/graphql-query'
 import {
