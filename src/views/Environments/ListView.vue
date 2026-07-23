@@ -77,10 +77,10 @@
         filterPath: 'last_editor'
       },
       {
-        field: 'updated_at',
+        field: 'last_modified',
         header: 'Last Modified',
-        sortField: 'updated_at',
-        filterPath: 'updated_at'
+        sortField: 'last_modified',
+        filterPath: 'last_modified'
       }
     ]
   })

@@ -84,9 +84,9 @@ const normalizeEnvironment = (environment) => {
     state_detail: source.state_detail ?? null,
     client_id: source.client_id ?? null,
     created_at: source.created_at ?? null,
-    updated_at: source.updated_at ?? null,
+    last_modified: source.last_modified ?? source.updated_at ?? null,
     created_by: normalizeAuditActor(source.created_by),
-    last_modified_by: normalizeAuditActor(source.last_modified_by)
+    last_editor: source.last_editor ?? null
   }
 }
 
@@ -105,13 +105,12 @@ export const EnvironmentAdapter = {
     if (!Array.isArray(data)) return []
     return data.map((item) => {
       const normalized = normalizeEnvironment(item)
-      const lastEditor =
-        normalized.last_modified_by?.email || normalized.last_modified_by?.user_id || '-'
+      const lastEditor = normalized.last_editor || '-'
       return {
         ...normalized,
         last_editor: lastEditor,
-        updated_at: normalized.updated_at
-          ? formatDateToDayMonthYearHour(normalized.updated_at)
+        last_modified: normalized.last_modified
+          ? formatDateToDayMonthYearHour(normalized.last_modified)
           : '-'
       }
     })

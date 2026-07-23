@@ -30,6 +30,8 @@ const parseItemResponse = (data) => {
   return data
 }
 
+const SELECTION_PAGE_SIZE = 100
+
 const buildApiListParams = (params = {}) => {
   const hasPagination = params.page != null || params.pageSize != null || params.page_size != null
 
@@ -40,6 +42,8 @@ const buildApiListParams = (params = {}) => {
     const rawPageSize = params.pageSize ?? params.page_size
     const pageSize = Number(rawPageSize) > 0 ? Math.min(Number(rawPageSize), 100) : 10
     requestParams.page_size = pageSize
+  } else {
+    requestParams.page_size = SELECTION_PAGE_SIZE
   }
 
   const nameFilter =
@@ -77,7 +81,8 @@ export class EnvironmentService extends BaseService {
   #fetchDropdown = async () => {
     const { data } = await this.http.request({
       method: 'GET',
-      url: this.#baseURL
+      url: this.#baseURL,
+      params: { page_size: SELECTION_PAGE_SIZE }
     })
 
     const { results, count } = parseListResponse(data)

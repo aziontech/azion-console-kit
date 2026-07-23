@@ -69,7 +69,7 @@
         :columns="getColumns"
         :actions="actions"
         editPagePath="/variables/edit"
-        defaultOrderingFieldName="-updated_at"
+        defaultOrderingFieldName="-last_modified"
         exportFileName="Variables"
         emptyListMessage="No variables found."
         :empty-block="{

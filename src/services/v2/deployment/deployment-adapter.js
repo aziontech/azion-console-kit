@@ -126,9 +126,9 @@ const normalizeDeployment = (deployment) => {
     state_detail: source.state_detail ?? null,
     client_id: source.client_id ?? null,
     created_at: formatDateToDayMonthYearHour(source.created_at) ?? null,
-    updated_at: formatDateToDayMonthYearHour(source.updated_at) ?? null,
+    updated_at: formatDateToDayMonthYearHour(source.last_modified ?? source.updated_at) ?? null,
     created_by: normalizeAuditEmail(source.created_by),
-    last_modified_by: normalizeAuditEmail(source.last_modified_by)
+    last_editor: normalizeAuditEmail(source.last_editor)
   }
 }
 
@@ -137,7 +137,7 @@ export const DeploymentAdapter = {
     if (!Array.isArray(data)) return []
     return data.map((item) => {
       const normalized = normalizeDeployment(item)
-      const lastEditor = normalized.last_modified_by || normalized.created_by || ''
+      const lastEditor = normalized.last_editor || normalized.created_by || ''
       return {
         ...normalized,
         status: mapStateToStatus(normalized.state),

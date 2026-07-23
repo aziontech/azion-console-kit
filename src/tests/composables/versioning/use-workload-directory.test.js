@@ -59,14 +59,14 @@ describe('useWorkloadDirectory', () => {
           id: 'ADEP0001',
           updated_at: '2026-06-10T14:32:11Z',
           created_at: '2026-06-01T09:00:00Z',
-          last_modified_by: 'ops@example.com',
+          last_editor: 'ops@example.com',
           created_by: 'admin@example.com'
         },
         {
           id: 'ADEP0002',
           updated_at: null,
           created_at: '2026-05-05T10:00:00Z',
-          last_modified_by: null,
+          last_editor: null,
           created_by: 'admin@example.com'
         }
       ],

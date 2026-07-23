@@ -75,6 +75,44 @@ describe('deployment — bespoke reads: listVersionsService returns { body, coun
     expect(result.body).toHaveLength(2)
   })
 
+  it('reads version_id and last_editor from a flat version payload', async () => {
+    stubEnsure()
+    vi.spyOn(httpService, 'request').mockResolvedValueOnce({
+      data: {
+        results: [
+          {
+            version_id: VID,
+            name: 'v1',
+            version_state: 'ready',
+            last_editor: 'editor@azion.com',
+            ready_at: '2026-07-08T12:00:00Z',
+            resources: []
+          }
+        ],
+        count: 1
+      }
+    })
+
+    const { body } = await service.listVersionsService(DID)
+
+    expect(body[0]).toMatchObject({ id: VID, state: 'ready', lastEditor: 'editor@azion.com' })
+  })
+
+  it('maps pageSize to page_size when listing versions', async () => {
+    stubEnsure()
+    const requestSpy = vi
+      .spyOn(httpService, 'request')
+      .mockResolvedValueOnce({ data: { results: [], count: 0 } })
+
+    await service.listVersionsService(DID, { page: 2, pageSize: 20, skipCache: true })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'GET',
+      url: BASE,
+      params: { page: 2, page_size: 20 }
+    })
+  })
+
   it('defaults to { body: [], count: 0 } when the cache yields nothing', async () => {
     vi.spyOn(service, 'useEnsureQueryData').mockResolvedValueOnce(undefined)
 
@@ -215,7 +253,7 @@ describe('deployment — bespoke adapter: resources[] snapshot, status, no confi
     description: 'ship it',
     updated_at: '2026-06-18T10:05:00Z',
     created_at: '2026-06-18T10:00:00Z',
-    last_modified_by: { email: 'editor@azion.com' },
+    last_editor: 'editor@azion.com',
     created_by: 'creator@azion.com',
     resources: [
       {
@@ -234,7 +272,7 @@ describe('deployment — bespoke adapter: resources[] snapshot, status, no confi
     ...overrides
   })
 
-  it('normalizes meta, derives status from state and prefers last_modified_by', () => {
+  it('normalizes meta, derives status from state and prefers last_editor', () => {
     const result = adapter.transformLoadVersion(deploymentVersion())
 
     expect(result.id).toBe('AVDEP0001')

@@ -84,15 +84,6 @@ const normalizeAudit = (audit) => {
   }
 }
 
-const normalizeAuditActor = (actor) => {
-  if (!isObject(actor)) return null
-  return {
-    user_id: actor.user_id ?? null,
-    trigger: actor.trigger ?? null,
-    email: actor.email ?? null
-  }
-}
-
 const normalizeReleaseResources = (resources) => {
   if (!Array.isArray(resources)) return []
   return resources
@@ -134,7 +125,7 @@ const normalizeRelease = (release) => {
     state: source.state ?? null,
     state_detail: source.state_detail ?? null,
     client_id: source.client_id ?? null,
-    last_modified_by: normalizeAuditActor(source.last_modified_by),
+    last_editor: source.last_editor ?? null,
     created_at: source.created_at ?? null,
     trace_id: source.trace_id ?? source.kivo?.trace_id ?? source.audit?.trace_id ?? null
   }
@@ -172,9 +163,8 @@ const deriveDisplayFields = (normalized) => {
     duration: formatDurationFromAudit(normalized.audit?.requested_at, normalized.audit?.ready_at),
     lastEditor:
       normalized.audit?.requested_by_email ||
-      normalized.last_modified_by?.email ||
+      (typeof normalized.last_editor === 'string' ? normalized.last_editor : '') ||
       normalized.audit?.requested_by_user_id ||
-      normalized.last_modified_by?.user_id ||
       '',
     lastModified: normalized.created_at ? formatDateToDayMonthYearHour(normalized.created_at) : '-'
   }

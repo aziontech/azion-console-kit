@@ -342,7 +342,7 @@ export class DeploymentReleaseService extends BaseService {
         const { data } = await this.http.request({
           method: 'GET',
           url: `${this.#baseURL}/${deploymentShortId}/releases`,
-          params: { ordering: DEFAULT_RELEASES_ORDERING }
+          params: { ordering: DEFAULT_RELEASES_ORDERING, page_size: 100 }
         })
 
         const releases = parseReleaseList(data)

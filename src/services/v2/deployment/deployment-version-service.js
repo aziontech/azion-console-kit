@@ -19,6 +19,22 @@ const parseListResponse = (data) => {
 const unwrapItem = (data) =>
   data && typeof data === 'object' && !Array.isArray(data) && data.data ? data.data : data
 
+const buildVersionListParams = (params = {}) => {
+  const { pageSize, page_size, page, ...rest } = params
+  const requestParams = { ...rest }
+
+  if (page != null) {
+    requestParams.page = Number(page) > 0 ? Number(page) : 1
+  }
+
+  const rawPageSize = pageSize ?? page_size
+  if (rawPageSize != null) {
+    requestParams.page_size = Number(rawPageSize) > 0 ? Math.min(Number(rawPageSize), 100) : 10
+  }
+
+  return requestParams
+}
+
 export class DeploymentVersionService extends VersionServiceBase {
   constructor() {
     super()
@@ -78,7 +94,7 @@ export class DeploymentVersionService extends VersionServiceBase {
         const { data } = await this.http.request({
           method: 'GET',
           url: this.getUrl(id),
-          params
+          params: buildVersionListParams(params)
         })
         const { results, count } = parseListResponse(data)
         return { body: this.adapter.transformListVersions(results), count }

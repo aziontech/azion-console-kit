@@ -76,7 +76,7 @@
       :columns="columns"
       :actions="actions"
       :editInDrawer="openEdit"
-      defaultOrderingFieldName="-updated_at"
+      defaultOrderingFieldName="-last_modified"
       exportFileName="Variables"
       emptyListMessage="No variables found."
       :emptyBlock="{

@@ -30,6 +30,33 @@ const activeRelease = {
   ]
 }
 
+describe('DeploymentAdapter.transformList — last editor', () => {
+  it('reads last_editor (string) as the list lastEditor', () => {
+    const [row] = DeploymentAdapter.transformList([
+      {
+        id: 'dep-1',
+        state: 'active',
+        last_editor: 'editor@azion.com',
+        created_by: 'creator@azion.com'
+      }
+    ])
+
+    expect(row.lastEditor).toBe('editor@azion.com')
+  })
+
+  it('falls back to created_by when last_editor is absent', () => {
+    const [row] = DeploymentAdapter.transformList([
+      {
+        id: 'dep-2',
+        state: 'active',
+        created_by: 'creator@azion.com'
+      }
+    ])
+
+    expect(row.lastEditor).toBe('creator@azion.com')
+  })
+})
+
 describe('DeploymentAdapter.transformReleaseComposition', () => {
   it('extracts applicationFromRelease with resourceName when an application resource is present', () => {
     const result = DeploymentAdapter.transformReleaseComposition(activeRelease, {

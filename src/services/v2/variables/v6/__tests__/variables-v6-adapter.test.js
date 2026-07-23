@@ -6,6 +6,7 @@ vi.mock('@/helpers/convert-date', () => ({
 }))
 
 import { VariablesV6Adapter } from '@/services/v2/variables/v6/variables-v6-adapter'
+import { formatDateToDayMonthYearHour, convertToRelativeTime } from '@/helpers/convert-date'
 
 const MASK = '••••••••'
 
@@ -16,7 +17,7 @@ const makeApiItem = (overrides = {}) => ({
   secret: false,
   scope: 'global',
   last_editor: 'user@azion.com',
-  updated_at: '2026-07-08T12:00:00Z',
+  last_modified: '2026-07-08T12:00:00Z',
   ...overrides
 })
 
@@ -144,6 +145,28 @@ describe('VariablesV6Adapter — P2 secret masking', () => {
     it('returns null when there is no item', () => {
       expect(VariablesV6Adapter.transformFormItem(null)).toBeNull()
     })
+  })
+})
+
+describe('VariablesV6Adapter — last_modified mapping', () => {
+  it('reads last_modified for the modified date fields', () => {
+    formatDateToDayMonthYearHour.mockClear()
+    convertToRelativeTime.mockClear()
+
+    VariablesV6Adapter.transformList([makeApiItem({ last_modified: '2026-07-09T09:00:00Z' })])
+
+    expect(formatDateToDayMonthYearHour).toHaveBeenCalledWith('2026-07-09T09:00:00Z')
+    expect(convertToRelativeTime).toHaveBeenCalledWith('2026-07-09T09:00:00Z')
+  })
+
+  it('falls back to updated_at when last_modified is absent', () => {
+    formatDateToDayMonthYearHour.mockClear()
+
+    VariablesV6Adapter.transformList([
+      makeApiItem({ last_modified: undefined, updated_at: '2026-07-01T00:00:00Z' })
+    ])
+
+    expect(formatDateToDayMonthYearHour).toHaveBeenCalledWith('2026-07-01T00:00:00Z')
   })
 })
 

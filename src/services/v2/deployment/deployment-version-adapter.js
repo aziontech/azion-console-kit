@@ -58,10 +58,16 @@ const normalizeVersion = (version) => {
   const state = meta.version_state ?? meta.state ?? source.version_state ?? source.state ?? null
 
   const lastActivityAt =
-    source.updated_at ?? meta.updated_at ?? source.created_at ?? meta.created_at ?? null
+    source.updated_at ??
+    meta.updated_at ??
+    source.ready_at ??
+    meta.ready_at ??
+    source.created_at ??
+    meta.created_at ??
+    null
 
   return {
-    id: source.id ?? null,
+    id: source.version_id ?? source.id ?? null,
     deployment_id: source.deployment_id ?? null,
     name: source.name ?? '',
     resources: normalizeVersionResources(source.resources),
@@ -71,7 +77,7 @@ const normalizeVersion = (version) => {
     comment: source.description ?? meta.description ?? '',
     createdAt: lastActivityAt,
     lastModified: lastActivityAt ? formatDateToDayMonthYearHour(lastActivityAt) : null,
-    lastEditor: resolveActorEmail(source.last_modified_by) ?? resolveActorEmail(source.created_by)
+    lastEditor: resolveActorEmail(source.last_editor) ?? resolveActorEmail(source.created_by)
   }
 }
 

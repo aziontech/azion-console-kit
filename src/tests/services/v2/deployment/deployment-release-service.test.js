@@ -54,7 +54,7 @@ describe('DeploymentReleaseService - getActiveReleaseComposition', () => {
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'GET',
       url: `/deployment-api/v4/deployments/${DEPLOYMENT_ID}/releases`,
-      params: { ordering: '-created_at,-id' }
+      params: { ordering: '-created_at,-id', page_size: 100 }
     })
   })
 

@@ -60,7 +60,7 @@ export const getVariablesV6Columns = () => {
   const lastModifiedColumn = {
     field: 'lastModified',
     header: 'Last Modified',
-    sortField: 'updated_at',
+    sortField: 'last_modified',
     filterPath: 'lastModified'
   }
 

@@ -86,7 +86,7 @@ export function useWorkloadDirectory({ enabled } = {}) {
       if (deployment?.id == null) continue
       metaDir.set(String(deployment.id), {
         updatedAt: deployment.updated_at ?? deployment.created_at ?? null,
-        lastModifiedBy: deployment.last_modified_by ?? deployment.created_by ?? null
+        lastModifiedBy: deployment.last_editor ?? deployment.created_by ?? null
       })
     }
 

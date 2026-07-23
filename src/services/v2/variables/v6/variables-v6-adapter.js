@@ -15,8 +15,8 @@ const mapItem = (item) => ({
   value: buildValue(item),
   scope: item.scope,
   lastEditor: item.last_editor,
-  lastModified: formatDateToDayMonthYearHour(item.updated_at),
-  lastModify: convertToRelativeTime(item.updated_at)
+  lastModified: formatDateToDayMonthYearHour(item.last_modified ?? item.updated_at),
+  lastModify: convertToRelativeTime(item.last_modified ?? item.updated_at)
 })
 
 const transformScopePayload = (scope) => {
