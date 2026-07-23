@@ -1,3 +1,6 @@
+// @vitest-environment jsdom -- browser-coupled: window.localStorage (saved
+// searches persistence). Node's own Storage global is version-dependent
+// (present in local Node 26, absent in CI node:22) — jsdom keeps it deterministic.
 /**
  * Regression test suite for the Real-Time Events module.
  *
