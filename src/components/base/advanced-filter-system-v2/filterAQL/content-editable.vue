@@ -1,11 +1,4 @@
 <template>
-  <!--
-    whitespace-pre é FUNCIONAL (não cosmético): mantém a query em uma linha e
-    preserva o espaço final que o usuário digita após um valor (ex.: `status = 200 `).
-    Sem ele o innerText descarta esse espaço e o AQL nunca avança para o logicOperator,
-    então as sugestões de AND/OR não aparecem. overflow-x-hidden recorta texto longo
-    que senão pintaria por cima do divisor/ações à direita.
-  -->
   <div
     id="editableDiv"
     ref="editable"
