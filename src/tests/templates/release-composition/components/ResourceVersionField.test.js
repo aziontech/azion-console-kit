@@ -35,7 +35,9 @@ describe('ResourceVersionField', () => {
 
   it('builds grouped options with the Track latest sentinel on top and a pinned group', () => {
     const wrapper = makeWrapper()
-    const groups = wrapper.vm.dropdownOptions
+    // the component's observable contract: the option groups it HANDS to the
+    // Dropdown (child prop), not its internal computed
+    const groups = wrapper.findComponent({ name: 'Dropdown' }).props('options')
 
     expect(groups[0].items[0].value).toBe(LATEST_READY)
     expect(groups[0].items[0].isLatest).toBe(true)
@@ -43,9 +45,12 @@ describe('ResourceVersionField', () => {
     expect(groups[1].items).toEqual(versions)
   })
 
-  it('flags the latest sentinel as selected when modelValue is LATEST', () => {
+  it('renders the latest-Ready selected value when modelValue is LATEST', () => {
     const wrapper = makeWrapper({ modelValue: LATEST_READY })
-    expect(wrapper.vm.isLatest).toBe(true)
+
+    expect(wrapper.find('[data-testid="release-composition__version-select"]').text()).toContain(
+      'latest Ready'
+    )
   })
 
   it('emits update:modelValue on version change', () => {

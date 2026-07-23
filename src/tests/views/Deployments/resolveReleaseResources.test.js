@@ -14,6 +14,7 @@ const loadCustomPageVersion = vi.fn()
 vi.mock('@/services/v2/edge-app/edge-app-service', () => ({
   edgeAppService: { listEdgeApplicationsService: (...args) => listEdgeApplicationsService(...args) }
 }))
+// eslint-disable-next-line azion-architecture/no-versioning-module-mock -- resolveReleaseResources is an ORCHESTRATOR of 13 services; this collaborator has its own real-behavior suite (shared version-service contract), and the seam mirrors the before-each-route precedent
 vi.mock('@/services/v2/edge-app/edge-app-version-service', () => ({
   edgeAppVersionService: { loadVersion: (...args) => loadAppVersion(...args) }
 }))
@@ -28,18 +29,21 @@ vi.mock('@/services/v2/edge-connectors/edge-connectors-service', () => ({
     listEdgeConnectorsService: (...args) => listEdgeConnectorsService(...args)
   }
 }))
+// eslint-disable-next-line azion-architecture/no-versioning-module-mock -- resolveReleaseResources is an ORCHESTRATOR of 13 services; this collaborator has its own real-behavior suite (shared version-service contract), and the seam mirrors the before-each-route precedent
 vi.mock('@/services/v2/edge-connectors/edge-connector-version-service', () => ({
   edgeConnectorVersionService: { loadVersion: (...args) => loadConnectorVersion(...args) }
 }))
 vi.mock('@/services/v2/edge-function/edge-function-service', () => ({
   edgeFunctionService: { listEdgeFunctionsService: (...args) => listEdgeFunctionsService(...args) }
 }))
+// eslint-disable-next-line azion-architecture/no-versioning-module-mock -- resolveReleaseResources is an ORCHESTRATOR of 13 services; this collaborator has its own real-behavior suite (shared version-service contract), and the seam mirrors the before-each-route precedent
 vi.mock('@/services/v2/edge-function/edge-function-version-service', () => ({
   edgeFunctionVersionService: { loadVersion: (...args) => loadFunctionVersion(...args) }
 }))
 vi.mock('@/services/v2/custom-page/custom-page-service', () => ({
   customPageService: { listCustomPagesService: (...args) => listCustomPagesService(...args) }
 }))
+// eslint-disable-next-line azion-architecture/no-versioning-module-mock -- resolveReleaseResources is an ORCHESTRATOR of 13 services; this collaborator has its own real-behavior suite (shared version-service contract), and the seam mirrors the before-each-route precedent
 vi.mock('@/services/v2/custom-page/custom-page-version-service', () => ({
   customPageVersionService: { loadVersion: (...args) => loadCustomPageVersion(...args) }
 }))

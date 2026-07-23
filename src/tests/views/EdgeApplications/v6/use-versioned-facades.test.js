@@ -1,3 +1,9 @@
+/* eslint-disable azion-architecture/no-versioning-module-mock --
+ * JUSTIFIED EXCEPTION (delegation-contract test): a facade's entire observable
+ * behavior IS "delegates to the versioned service with correctly scoped args".
+ * The spied services have their own real-behavior suites (shared
+ * version-service contracts drive them through the HTTP seam), so replacing
+ * them here asserts the facade's wiring, not a placebo. Review 2026-07-23. */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { versionedCacheSettingsService } from '@/services/v2/edge-app/versioned/versioned-cache-settings-service'

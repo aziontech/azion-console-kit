@@ -1,3 +1,9 @@
+/* eslint-disable azion-architecture/no-versioning-module-mock --
+ * JUSTIFIED EXCEPTION (view test, reactive-query seam): the EditorTabs view is
+ * isolated at the TanStack query hooks (useLoadVersionQuery/useListVersionsQuery)
+ * — a reactive cache boundary. The hooks' real behavior is covered by the
+ * shared version-service contract suites through the HTTP seam. Review
+ * 2026-07-23. */
 import { defineComponent, ref, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'

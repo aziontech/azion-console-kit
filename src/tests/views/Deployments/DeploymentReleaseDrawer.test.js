@@ -31,6 +31,7 @@ vi.mock('@/views/Deployments/components/DeploymentReleaseDetails.vue', () => ({
 const onSecondaryAction = vi.fn()
 const secondaryButtonLabel = ref('Rollback')
 let capturedEmit
+// eslint-disable-next-line azion-architecture/no-versioning-module-mock -- view-contract test: the drawer's brain (use-deployment-release-drawer) has its own 11-test real-behavior suite; here the seam isolates the TEMPLATE contract (slots, buttons, emits)
 vi.mock('@/composables/versioning/use-deployment-release-drawer', () => ({
   useDeploymentReleaseDrawer: ({ emit }) => {
     capturedEmit = emit

@@ -58,12 +58,15 @@ describe('cross-tab session events', () => {
   it('does NOT react to its own broadcast (self-filter)', async () => {
     const { sendLogoutBroadcast, onLogout } =
       await import('@/services/v2/base/auth/session-broadcast')
+    const otherTab = await makePeerTab() // fence: proves the broadcast WAS delivered
+    const witnessed = vi.fn()
+    otherTab.on('LOGOUT', witnessed)
     const callback = vi.fn()
     onLogout(callback)
 
     sendLogoutBroadcast()
-    await new Promise((resolve) => setTimeout(resolve, 25))
 
+    await vi.waitFor(() => expect(witnessed).toHaveBeenCalled())
     expect(callback).not.toHaveBeenCalled()
   })
 })

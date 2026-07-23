@@ -69,13 +69,16 @@ describe('lifecycle safety', () => {
   it('close() detaches the channel and drops listeners', async () => {
     const tabA = makeTab()
     const tabB = makeTab()
+    const witness = makeTab() // deterministic fence: proves the send WAS delivered
     const received = vi.fn()
+    const witnessed = vi.fn()
     tabB.on('LOGOUT', received)
+    witness.on('LOGOUT', witnessed)
 
     tabB.close()
     tabA.send('LOGOUT')
-    await new Promise((resolve) => setTimeout(resolve, 25))
 
+    await vi.waitFor(() => expect(witnessed).toHaveBeenCalled())
     expect(received).not.toHaveBeenCalled()
   })
 

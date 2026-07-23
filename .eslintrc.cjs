@@ -80,8 +80,14 @@ module.exports = {
       // Source of truth: .claude/rules/testing-versioning.md
       files: [
         'src/tests/**/*version*',
+        // Case-sensitive globs let `Version*` files escape the ratchet (found
+        // in the 2026-07-23 deep review carrying wrapper.vm asserts).
+        'src/tests/**/*Version*',
         'src/tests/**/versioning/**',
         'src/tests/**/v6/**',
+        // new-release feature trees — recent code, no reason to grandfather.
+        'src/tests/templates/release-composition/**',
+        'src/tests/views/Deployments/**',
         'src/tests/functional/**',
         // flag-v6 coverage suites (spec flag-v6-coverage, req 8.2) — born under
         // the hard bar from the first commit.

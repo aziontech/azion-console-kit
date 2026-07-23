@@ -114,7 +114,7 @@ describe('ReleaseDependenciesSection', () => {
 
     const panel = wrapper.find('[data-testid="release-composition__deps-panel-connector"]')
     expect(panel.exists()).toBe(true)
-    expect(panel.classes()).toContain('grid-rows-[0fr]')
+    // collapse is proven by the accessibility contract, not the CSS class
     expect(panel.attributes('aria-hidden')).toBe('true')
   })
 
