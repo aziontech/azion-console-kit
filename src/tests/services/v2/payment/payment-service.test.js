@@ -131,3 +131,19 @@ describe('credits and history', () => {
     expect(rows).toEqual([{ invoice: 'INV-1' }])
   })
 })
+
+describe('error paths — HTTP failure must never look like success', () => {
+  it.each([
+    { method: 'listCreditCards', call: (sut) => sut.listCreditCards() },
+    { method: 'createCreditCard', call: (sut) => sut.createCreditCard({ cardNumber: '4242' }) },
+    { method: 'editCreditCard', call: (sut) => sut.editCreditCard(9, { isDefault: true }) },
+    { method: 'deleteCreditCard', call: (sut) => sut.deleteCreditCard(9) },
+    { method: 'addCredit', call: (sut) => sut.addCredit({ amount: 10 }) },
+    { method: 'listPaymentsHistory', call: (sut) => sut.listPaymentsHistory() }
+  ])('$method propagates the boundary rejection', async ({ call }) => {
+    const http = spyHttpRequest()
+    http.rejectNext(new Error('payment API down'))
+
+    await expect(call(service())).rejects.toThrow('payment API down')
+  })
+})

@@ -71,3 +71,15 @@ describe('deleteMfaService', () => {
     expect(feedback).toBe('MFA successfully deleted')
   })
 })
+
+describe('error paths — HTTP failure must never look like success', () => {
+  it.each([
+    { method: 'listMfaService', call: (sut) => sut.listMfaService() },
+    { method: 'deleteMfaService', call: (sut) => sut.deleteMfaService(77) }
+  ])('$method propagates the boundary rejection', async ({ call }) => {
+    const http = spyHttpRequest()
+    http.rejectNext(new Error('mfa API down'))
+
+    await expect(call(new MFAService())).rejects.toThrow('mfa API down')
+  })
+})
