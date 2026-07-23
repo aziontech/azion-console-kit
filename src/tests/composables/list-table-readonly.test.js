@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: document — lifecycle composable driven through a host-component mount
 import { defineComponent, h, ref } from 'vue'
 import { mount, flushPromises } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'

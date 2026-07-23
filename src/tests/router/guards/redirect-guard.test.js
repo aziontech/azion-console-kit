@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: window.location — the guard hard-redirects to the CLI callback URL
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { redirectGuard } from '@/router/hooks/guards/redirectGuard'

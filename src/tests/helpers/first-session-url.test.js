@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: window.location.href — first-session-url captures the real page URL
 import { describe, expect, it, beforeEach, vi } from 'vitest'
 import {
   captureFirstSessionUrl,

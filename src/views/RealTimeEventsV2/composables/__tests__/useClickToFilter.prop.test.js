@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: window — composable reads window state on click-to-filter
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import fc from 'fast-check'
 import { useClickToFilter } from '../useClickToFilter.js'

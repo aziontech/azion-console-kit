@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: window.location/clipboard — share composable builds and copies the page URL
 /* eslint-disable no-console */
 /**
  * Task 4.3* — PBT Clipboard Promise Handling (Wave 5)

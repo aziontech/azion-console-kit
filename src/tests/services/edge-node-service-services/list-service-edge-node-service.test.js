@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const localeMock = (locale = 'en') => {
   const DateTimeFormat = Intl.DateTimeFormat
-  vi.spyOn(window.global.Intl, 'DateTimeFormat')
+  vi.spyOn(Intl, 'DateTimeFormat')
     .mockImplementationOnce(function (__, options) {
       return DateTimeFormat(locale, { ...options })
     })

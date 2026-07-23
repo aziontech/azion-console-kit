@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: document — the guard applies the theme to document via themeApply
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 

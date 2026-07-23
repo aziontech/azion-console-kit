@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: window — chart builder reads viewport for decimation thresholds
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { defineComponent, h } from 'vue'
 import { mount } from '@vue/test-utils'

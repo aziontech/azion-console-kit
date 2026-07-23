@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: document — lifecycle composable driven through a host-component mount
 /**
  * Coverage-matrix claims (spec versioning-test-coverage / TEST-ARCHITECTURE §3.4).
  * The matrix (tests/coverage-matrix.json) is DERIVED from these markers —

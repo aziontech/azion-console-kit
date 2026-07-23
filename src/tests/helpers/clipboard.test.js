@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: navigator.clipboard — the clipboard helper writes through the browser API
 import { clipboardWrite } from '@/helpers'
 import { afterAll, describe, expect, it, vi } from 'vitest'
 

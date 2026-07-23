@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: window.open — the helper opens the playground in a new tab
 import { describe, it, expect, vi } from 'vitest'
 import { openGraphQlPlayground } from '@/helpers/open-graphql-playground'
 

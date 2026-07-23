@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: document.cookie/window.location — the util reads cookies and the page URL
 import {
   getHubSpotUtk,
   getHubSpotContext,
