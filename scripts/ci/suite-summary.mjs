@@ -41,11 +41,14 @@ const buildSummary = () => {
     }
   }
 
+  const repoRoot = process.cwd() + '/'
   const failures = (report.testResults ?? []).flatMap((file) =>
     (file.assertionResults ?? [])
       .filter((test) => test.status === 'failed')
       .map((test) => ({
         name: test.fullName || test.title,
+        // repo-relative path so the gate can annotate the exact file
+        file: String(file.name ?? '').replace(repoRoot, ''),
         message: (test.failureMessages ?? []).join('\n').slice(0, MESSAGE_LIMIT)
       }))
   )

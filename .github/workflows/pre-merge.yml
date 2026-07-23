@@ -432,6 +432,15 @@ jobs:
         run: |
           fail=0
 
+          # The digest puts WHAT/WHERE failed inside THIS step's log — the
+          # first place people click on a red gate (clarity follow-up of
+          # req 6.3.1; the full report stays in the run Summary tab).
+          if [ -f .gate-summaries/digest.txt ]; then
+            echo "═══ Resultado por suíte ═══"
+            cat .gate-summaries/digest.txt
+            echo "═══════════════════════════"
+          fi
+
           check_required() {
             if [ "$2" != "success" ]; then
               echo "::error::pre-merge-gate: required job '$1' did not succeed (result: $2)"
@@ -455,7 +464,7 @@ jobs:
           check_skippable "functional"        '${{ needs.functional.result }}'
 
           if [ "$fail" -ne 0 ]; then
-            echo "::error::pre-merge-gate failed — see the consolidated report in the run summary"
+            echo "::error::pre-merge-gate failed — failing tests listed above (Resultado por suíte) and in the Annotations/Summary tabs"
             exit 1
           fi
           echo "pre-merge-gate passed"
