@@ -5,7 +5,7 @@
  */
 import * as yup from 'yup'
 
-const mfaEntry = yup.object({
+export const mfaEntry = yup.object({
   id: yup.number().required(),
   name: yup.string().nullable(),
   email: yup.string().required(),

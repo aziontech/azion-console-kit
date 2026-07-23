@@ -9,7 +9,7 @@
  */
 import * as yup from 'yup'
 
-const creditCard = yup.object({
+export const creditCard = yup.object({
   id: yup.number().required(),
   card_holder: yup.string().required(),
   card_brand: yup.string().required(),
