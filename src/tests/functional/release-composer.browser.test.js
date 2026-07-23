@@ -18,8 +18,7 @@ import { createPinia } from 'pinia'
 import { WebkitPlugin } from '@aziontech/webkit/plugin'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import { queryClient } from '@/services/v2/base/query/queryClient'
-import { httpService } from '@/services/v2/base/http/httpService'
-import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import { routeHttpByUrl } from '../support/versioning/boundaries'
 import ReleaseComposerView from '@/views/Deployments/v6/ReleaseComposerView.vue'
 
 const trackerStub = () => {
@@ -33,24 +32,8 @@ const trackerStub = () => {
   )
 }
 
-// Routes BOTH HTTP boundaries by URL fragment; unmatched requests get an
-// empty-but-shaped answer so ancillary calls never crash the smoke.
-const stubHttpBoundaries = (fixtureRoutes = {}) => {
-  const calls = []
-  const answer = (url) => {
-    const hit = Object.entries(fixtureRoutes).find(([fragment]) => url.includes(fragment))
-    return hit ? hit[1] : { results: [], count: 0 }
-  }
-  vi.spyOn(httpService, 'request').mockImplementation(async (config) => {
-    calls.push(config)
-    return { data: answer(config.url), status: 200 }
-  })
-  vi.spyOn(AxiosHttpClientAdapter, 'request').mockImplementation(async (config) => {
-    calls.push(config)
-    return { statusCode: 200, body: answer(config.url) }
-  })
-  return calls
-}
+// Canonical kit seam (spec test-effectiveness req 9.2).
+const stubHttpBoundaries = (fixtureRoutes = {}) => routeHttpByUrl(fixtureRoutes)
 
 const makeRouter = () =>
   createRouter({

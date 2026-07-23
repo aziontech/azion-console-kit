@@ -23,9 +23,8 @@ import ToastService from 'primevue/toastservice'
 import DialogService from 'primevue/dialogservice'
 import Tooltip from 'primevue/tooltip'
 import { queryClient } from '@/services/v2/base/query/queryClient'
-import { httpService } from '@/services/v2/base/http/httpService'
-import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { flagOff, installFlagReset } from '../../support/flag-v6'
+import { routeHttpByUrl } from '../../support/versioning/boundaries'
 import { findRoute, resolveRouteProps } from '../../support/flag-v6/route-tools'
 
 const RESOURCE_ID = '123'
@@ -55,24 +54,9 @@ const stubQueryCache = () => {
 
 // Routes BOTH HTTP boundaries by URL fragment; unmatched requests get an
 // empty-but-shaped answer so ancillary calls never crash the smoke.
-const stubHttpBoundaries = (fixtureRoutes) => {
-  const calls = []
-  const answer = (url) => {
-    const match = fixtureRoutes.find(([fragment]) => url.includes(fragment))
-    return match ? match[1] : undefined
-  }
-
-  vi.spyOn(httpService, 'request').mockImplementation(async (request) => {
-    calls.push(request)
-    return answer(request.url) ?? { data: { results: [], count: 0 } }
-  })
-  vi.spyOn(AxiosHttpClientAdapter, 'request').mockImplementation(async (request) => {
-    calls.push(request)
-    return answer(request.url) ?? { statusCode: 200, body: { results: [], count: 0 } }
-  })
-
-  return calls
-}
+// Canonical kit seam (spec test-effectiveness req 9.2) — raw: entries carry
+// the full seam response verbatim.
+const stubHttpBoundaries = (fixtureRoutes) => routeHttpByUrl(fixtureRoutes, { raw: true })
 
 export const describeLegacySmoke = ({
   resource,
