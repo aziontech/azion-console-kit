@@ -170,6 +170,13 @@ const DETERMINISTIC_PARSE_CASES = [
 const DETERMINISTIC_VALIDATOR_CASES = [
   // Valid queries — no errors today.
   { query: 'status = 200', expected: [] },
+  // Reserved words: a bare and/or in value position is a dangling logical
+  // operator (incomplete query), NOT a value — quoting makes it a value.
+  {
+    query: 'host = or',
+    expected: ['complete the expression after the logical operator (AND/OR), or remove it.']
+  },
+  { query: 'host = "or"', expected: [] },
   { query: 'host like example', expected: [] },
   // Multi-clause valid query — no errors today.
   { query: 'status = 200 and host like x', expected: [] },
@@ -254,7 +261,10 @@ const arbAlphaValue = fc
     maxLength: 8
   })
   .map((chars) => chars.join(''))
-  .filter((value) => !value.includes('and'))
+  // 'and'/'or' are reserved words of the language: a bare `host = or` is a
+  // dangling logical operator by design (quote the value to use it literally).
+  // The original filter excluded only 'and' — CI seed 976433793 caught 'or'.
+  .filter((value) => !value.includes('and') && !value.includes('or'))
 
 const arbIntValue = fc.integer({ min: 1, max: 999 })
 
