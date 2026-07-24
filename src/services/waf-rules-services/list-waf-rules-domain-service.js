@@ -1,37 +1,49 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeWafRulesBaseUrl } from './make-waf-rules-base-url'
 
-export const listWafRulesDomainsService = async ({ wafId }) => {
-  let httpResponse = await AxiosHttpClientAdapter.request({
-    url: `${makeWafRulesBaseUrl()}/${wafId}/domains?page_size=100`,
-    method: 'GET'
-  })
+const PAGE_SIZE = 100
 
-  httpResponse = adapt(httpResponse)
+export const listWafRulesDomainsService = async ({ wafId }) => {
+  const firstPageResponse = await fetchDomainsPage({ wafId, page: 1 })
+
+  const domains = extractDomains(firstPageResponse)
+  const count = Number(firstPageResponse.body?.count) || 0
+  const totalPages = Math.ceil(count / PAGE_SIZE)
+
+  if (totalPages > 1) {
+    const pagePromises = []
+    for (let page = 2; page <= totalPages; page++) {
+      pagePromises.push(fetchDomainsPage({ wafId, page }))
+    }
+
+    const pagesResponses = await Promise.all(pagePromises)
+    pagesResponses.forEach((pageResponse) => domains.push(...extractDomains(pageResponse)))
+  }
+
+  const httpResponse = adapt(domains, firstPageResponse.statusCode)
 
   return parseHttpResponse(httpResponse)
 }
 
-const adapt = (httpResponse) => {
-  /**
-   * Necessary until the API gets the common pattern
-   * of returning the array of data inside results property
-   * like other andpoints.
-   */
+const fetchDomainsPage = async ({ wafId, page }) => {
+  return AxiosHttpClientAdapter.request({
+    url: `${makeWafRulesBaseUrl()}/${wafId}/domains?page=${page}&page_size=${PAGE_SIZE}`,
+    method: 'GET'
+  })
+}
 
-  // eslint-disable-next-line no-console
-  const isArray = Array.isArray(httpResponse.body.results)
+const extractDomains = (httpResponse) =>
+  Array.isArray(httpResponse.body?.results) ? [...httpResponse.body.results] : []
 
-  const parsedWafRulesDomain = isArray
-    ? httpResponse.body.results.map((domain) => ({
-        domain: domain.domain,
-        id: domain.id,
-        name: domain.name
-      }))
-    : []
+const adapt = (domains, statusCode) => {
+  const parsedWafRulesDomain = domains.map((domain) => ({
+    domain: domain.domain,
+    id: domain.id,
+    name: domain.name
+  }))
 
   return {
     body: parsedWafRulesDomain,
-    statusCode: httpResponse.statusCode
+    statusCode
   }
 }
