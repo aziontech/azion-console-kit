@@ -1,4 +1,3 @@
-// @vitest-environment jsdom -- browser-coupled: window.localStorage — saved searches persist through the browser storage
 /* global globalThis */
 /* eslint-disable no-console */
 /**

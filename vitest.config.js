@@ -35,10 +35,11 @@ export default mergeConfig(
               // wave-1 census; the 2 mounting files carry a jsdom docblock):
               'src/services/**/__tests__/**/*.{test,spec}.js',
               'src/components/base/advanced-filter-system-v2/filterAQL/__tests__/**/*.{test,spec}.js',
-              'src/views/RealTimeEventsV2/__tests__/**/*.{test,spec}.js',
-              'src/views/RealTimeEventsV2/composables/__tests__/**/*.{test,spec}.js',
-              // flag-v6 stays in unit-dom: its per-resource files look pure,
-              // but the SHARED legacy-smoke contract mounts real views.
+              // RTE view-composable suites stay in unit-dom (jsdom): a census
+              // on 2026-07-24 found >50% of them touch the DOM (matchMedia,
+              // overflow measure, keydown, keep-alive) — a view-composable dir
+              // is not pure logic. Promoting it needed per-file pragmas on
+              // every RTE PR; reverting is the "err on the safe side" call.
               'src/tests/composables/**/*.{test,spec}.js'
             ]
           }
@@ -68,8 +69,6 @@ export default mergeConfig(
               'src/tests/functional/**',
               'src/services/**/__tests__/**',
               'src/components/base/advanced-filter-system-v2/filterAQL/__tests__/**',
-              'src/views/RealTimeEventsV2/__tests__/**',
-              'src/views/RealTimeEventsV2/composables/__tests__/**',
               'src/tests/composables/**'
             ]
           }

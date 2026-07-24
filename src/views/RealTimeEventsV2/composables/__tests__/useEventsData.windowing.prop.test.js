@@ -9,12 +9,15 @@ import { useEventsData } from '../useEventsData.js'
  * Validates: Requirements 9.1
  *
  * For any time range where (tsRangeEnd - tsRangeBegin) > 2 hours, the
- * useEventsData loader splits the range into sequential windows of at most
- * 2 hours each, fetching from newest to oldest. For ranges ≤ 2 hours, no
- * windowing is applied.
+ * useEventsData loader walks the range newest→oldest in contiguous BOUNDED
+ * windows: the first is 2h and each window that exhausts without filling the
+ * page grows ×4 (geometric ladder — every scan stays bounded, and empty or
+ * sparse stretches cost O(log range) requests instead of one full-range
+ * query). For ranges ≤ 2 hours, no windowing is applied.
  */
 
 const TWO_HOURS_MS = 2 * 60 * 60 * 1000
+const GROWTH_FACTOR = 4
 
 // ── Generators ──
 
@@ -62,11 +65,9 @@ const arbPageSize = fc.integer({ min: 25, max: 50 })
 
 /**
  * Create a useEventsData instance with a tracking listService that records
- * the tsRange of every call made to it. Each call returns a single row so
- * that the windowed loop advances to the next window (the source treats a
- * fully-empty window as "no older data exists" and stops). One row per call
- * is fewer than `remaining` for any pageSize >= 2, which both forces
- * window advancement and never exhausts the page in a single window.
+ * the tsRange of every call. Each call returns a single row (< remaining for
+ * any pageSize ≥ 2), so every window exhausts, the walk advances to the next
+ * (×4-grown) window, and the full ladder sequence is observable.
  */
 function createTrackedEventsData(range, pageSize) {
   const calls = []
@@ -108,7 +109,7 @@ function createTrackedEventsData(range, pageSize) {
 // ── Tests ──
 
 describe('Feature: real-time-events-refactor, Property 6: Temporal windowing correctness', () => {
-  it('ranges > 2h are split into sequential ≤2h windows from newest to oldest', async () => {
+  it('ranges > 2h are split into sequential bounded windows from newest to oldest', async () => {
     await fc.assert(
       fc.asyncProperty(arbLongRange, arbPageSize, async (range, pageSize) => {
         const { instance, calls } = createTrackedEventsData(range, pageSize)
@@ -118,13 +119,17 @@ describe('Feature: real-time-events-refactor, Property 6: Temporal windowing cor
         // For long ranges, windowing must be applied — at least 2 calls
         expect(calls.length).toBeGreaterThanOrEqual(2)
 
-        // Verify each window is ≤ 2 hours
+        // Geometric ladder bound: the first window is ≤ 2h and each subsequent
+        // window is at most ×4 the previous one (smaller when clamped to the
+        // range begin). No window ever covers the whole remaining range "for free".
+        let maxAllowed = TWO_HOURS_MS
         for (const call of calls) {
           const wBegin = new Date(call.tsRangeBegin).getTime()
           const wEnd = new Date(call.tsRangeEnd).getTime()
           const windowDuration = wEnd - wBegin
-          expect(windowDuration).toBeLessThanOrEqual(TWO_HOURS_MS)
+          expect(windowDuration).toBeLessThanOrEqual(maxAllowed)
           expect(windowDuration).toBeGreaterThan(0)
+          maxAllowed *= GROWTH_FACTOR
         }
 
         // Verify windows are sequential from newest to oldest:
@@ -194,21 +199,24 @@ describe('Feature: real-time-events-refactor, Property 6: Temporal windowing cor
     )
   })
 
-  it('number of windows equals ceil(durationMs / 2h) for long ranges', async () => {
+  it('number of windows follows the geometric ladder (2h, then ×4 per exhausted window)', async () => {
     await fc.assert(
       fc.asyncProperty(arbLongRange, arbPageSize, async (range, pageSize) => {
         const { instance, calls } = createTrackedEventsData(range, pageSize)
 
         await instance.load()
 
-        const expectedWindows = Math.ceil(range.durationMs / TWO_HOURS_MS)
-        // Windowing fetches sequentially newest→oldest and stops when
-        // the last window covers the original begin; depending on
-        // whether the final fragment is sub-2h or exactly equals the
-        // boundary, the implementation may produce expectedWindows
-        // or expectedWindows-1 calls. Both are correct.
-        expect(calls.length).toBeGreaterThanOrEqual(Math.max(1, expectedWindows - 1))
-        expect(calls.length).toBeLessThanOrEqual(expectedWindows)
+        // The mock returns 1 row per call (< remaining), so every window
+        // exhausts and grows ×4. The exact call count is the ladder length.
+        let width = TWO_HOURS_MS
+        let remaining = range.durationMs
+        let expectedCalls = 0
+        while (remaining > 0) {
+          expectedCalls += 1
+          remaining -= Math.min(width, remaining)
+          width *= GROWTH_FACTOR
+        }
+        expect(calls.length).toBe(expectedCalls)
       }),
       { numRuns: 100 }
     )

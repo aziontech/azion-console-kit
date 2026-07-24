@@ -9,7 +9,7 @@
   import CopyBlock from '@aziontech/webkit/button-copy'
 
   import PrimeButton from '@aziontech/webkit/button'
-  import { useFieldArray, useField } from 'vee-validate'
+  import { useFieldArray, useField, useIsFieldDirty } from 'vee-validate'
   import { ref, watch, computed } from 'vue'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
 
@@ -106,7 +106,10 @@
       tls.value.certificate = 1
     }
   }
+  const isDomainsDirty = useIsFieldDirty('domains')
+
   const handleLetEncrypt = () => {
+    if (!isDomainsDirty.value) return
     if (!domains.value?.length) return
 
     const [first, ...rest] = domains.value

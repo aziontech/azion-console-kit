@@ -1,6 +1,13 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { loadDomainService } from '@/services/domains-services'
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
+import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
+
+vi.mock('@/services/v2/digital-certificates/digital-certificates-service', () => ({
+  digitalCertificatesService: {
+    loadDigitalCertificate: vi.fn()
+  }
+}))
 
 const fixtures = {
   domainMock: {
@@ -27,6 +34,12 @@ const fixtures = {
     digital_certificate_id: null,
     edge_application_id: 'ea1234',
     environment: 'preview'
+  },
+  certificateMock: {
+    id: '862026',
+    name: 'Certificate X',
+    authority: 'lets_encrypt',
+    subjectName: ['*.example.com']
   }
 }
 
@@ -38,6 +51,11 @@ const makeSut = () => {
 }
 
 describe('DomainServices', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    digitalCertificatesService.loadDigitalCertificate.mockResolvedValue(fixtures.certificateMock)
+  })
+
   it('should call api with correct params', async () => {
     const requestSpy = vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
       statusCode: 200,
@@ -68,6 +86,9 @@ describe('DomainServices', () => {
       id: fixtures.domainMock.id
     })
 
+    expect(digitalCertificatesService.loadDigitalCertificate).toHaveBeenCalledWith({
+      id: fixtures.domainMock.digital_certificate_id
+    })
     expect(result).toEqual({
       id: fixtures.domainMock.id,
       name: fixtures.domainMock.name,
@@ -82,7 +103,9 @@ describe('DomainServices', () => {
       mtlsVerification: fixtures.domainMock.mtls_verification,
       mtlsTrustedCertificate: fixtures.domainMock.mtls_trusted_ca_certificate_id,
       environment: fixtures.domainMock.environment,
-      oldDomains: ['CName 1', 'CName 2']
+      oldDomains: ['CName 1', 'CName 2'],
+      authorityCertificate: fixtures.certificateMock.authority,
+      subjectNameCertificate: fixtures.certificateMock.subjectName
     })
   })
 
@@ -97,6 +120,7 @@ describe('DomainServices', () => {
       id: fixtures.domainMock.id
     })
 
+    expect(digitalCertificatesService.loadDigitalCertificate).not.toHaveBeenCalled()
     expect(result).toEqual({
       id: fixtures.domainWithoutCertificateMock.id,
       name: fixtures.domainWithoutCertificateMock.name,
@@ -110,8 +134,26 @@ describe('DomainServices', () => {
       active: fixtures.domainWithoutCertificateMock.is_active,
       mtlsVerification: fixtures.domainWithoutCertificateMock.mtls_verification,
       environment: fixtures.domainMock.environment,
-      oldDomains: ['CName 1', 'CName 2']
+      oldDomains: ['CName 1', 'CName 2'],
+      authorityCertificate: null,
+      subjectNameCertificate: null
     })
+  })
+
+  it('should fallback certificate metadata to null when the certificate request fails', async () => {
+    vi.spyOn(AxiosHttpClientAdapter, 'request').mockResolvedValueOnce({
+      statusCode: 200,
+      body: { results: fixtures.domainMock }
+    })
+    digitalCertificatesService.loadDigitalCertificate.mockRejectedValueOnce(new Error('not found'))
+    const { sut } = makeSut()
+
+    const result = await sut({
+      id: fixtures.domainMock.id
+    })
+
+    expect(result.authorityCertificate).toBeNull()
+    expect(result.subjectNameCertificate).toBeNull()
   })
 
   it('should return an error when the request fails with status 400', async () => {

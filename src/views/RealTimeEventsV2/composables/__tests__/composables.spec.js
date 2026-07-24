@@ -1,4 +1,3 @@
-// @vitest-environment jsdom -- browser-coupled: matchMedia/document — useReactiveMediaQuery/useBreakpoint wrap real media queries (host component mount)
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { defineComponent, h, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'

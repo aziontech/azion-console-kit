@@ -117,7 +117,7 @@ describe('VersionHistoryTab — polling lifecycle (P6)', () => {
       expect.objectContaining({
         method: 'GET',
         url: VERSIONS_URL,
-        params: expect.objectContaining({ page: 1, pageSize: 20 })
+        params: expect.objectContaining({ page: 1, page_size: 20 })
       })
     )
     expect(requestSpy.mock.calls[0][0].params).not.toHaveProperty('skipCache')
@@ -128,14 +128,21 @@ describe('VersionHistoryTab — polling lifecycle (P6)', () => {
 
     await vi.advanceTimersByTimeAsync(1)
     await flush()
+    // The refetch is observable by the SECOND HTTP call happening with the
+    // same list params. skipCache is a client-side cache directive
+    // (persist:!skipCache) — it forces the bypass one layer down and must
+    // NOT leak into the API query string (same contract as
+    // deployment-version.test.js). Asserting skipCache in the request params
+    // was a false proxy for "this is a poll".
     expect(requestSpy).toHaveBeenCalledTimes(2)
     expect(requestSpy).toHaveBeenLastCalledWith(
       expect.objectContaining({
         method: 'GET',
         url: VERSIONS_URL,
-        params: expect.objectContaining({ skipCache: true })
+        params: expect.objectContaining({ page: 1, page_size: 20 })
       })
     )
+    expect(requestSpy.mock.calls.at(-1)[0].params).not.toHaveProperty('skipCache')
   })
 
   it('keeps re-fetching every interval while a transient version remains', async () => {

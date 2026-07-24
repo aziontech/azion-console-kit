@@ -12,6 +12,7 @@
 import { AxiosHttpClientAdapter } from '@/services/axios/AxiosHttpClientAdapter'
 import { makeBeholderBaseUrl } from '@/services/real-time-metrics-services/make-beholder-base-url'
 import { makeRealTimeEventsBaseUrl } from '@/services/real-time-events-service-v2/make-real-time-events-service'
+import { pivotTimeseries } from '@/services/real-time-events-service-v2/_shared/graphql/pivot-timeseries'
 
 /**
  * Serialize a filter value as a GraphQL scalar literal. Mirrors the quoting
@@ -26,6 +27,68 @@ export const toGraphQLScalar = (value) => {
   if (typeof value === 'number' && !Number.isNaN(value)) return String(value)
   const str = String(value).replace(/"/g, '\\"')
   return `"${str}"`
+}
+
+/**
+ * Render a built `{ and, in, or }` filter (the shape produced by
+ * `_shared/filter/adapters.buildForTarget`) into inline GraphQL filter
+ * fragments, using the same scalar-inlining convention as the static
+ * per-config filters above.
+ *
+ * Only the `and`/`in`/`or` groups are read; each `in` key is normalized to the
+ * `<field>In` GraphQL key. The caller is responsible for having already dropped
+ * any field the target Metrics dataset does not accept (via `buildForTarget`),
+ * so this function never introduces an unsupported key on its own — it merely
+ * serializes what it is handed.
+ *
+ * @param {{ and?: object, in?: object, or?: Array<object> }} builtFilter
+ * @returns {string[]} filter fragment strings (e.g. `status: 200`)
+ */
+export function buildInlineFilterFragments(builtFilter) {
+  if (!builtFilter || typeof builtFilter !== 'object') return []
+
+  const renderGroup = (group) => {
+    const parts = []
+    Object.entries(group?.and || {}).forEach(([key, value]) => {
+      parts.push(`${key}: ${toGraphQLScalar(value)}`)
+    })
+    Object.entries(group?.in || {}).forEach(([key, value]) => {
+      const gqlKey = key.endsWith('In') ? key : `${key}In`
+      const values = Array.isArray(value) ? value : [value]
+      parts.push(`${gqlKey}: ${toGraphQLScalar(values)}`)
+    })
+    return parts
+  }
+
+  if (Array.isArray(builtFilter.or) && builtFilter.or.length) {
+    const groupFragments = builtFilter.or.map((group) => `{ ${renderGroup(group).join(', ')} }`)
+    return [`or: [ ${groupFragments.join(', ')} ]`]
+  }
+
+  return renderGroup(builtFilter)
+}
+
+/**
+ * Merge static per-config filter entries with the dynamic (user-driven,
+ * already dataset-filtered) subset into one list of inline GraphQL fragments.
+ *
+ * Static filters are declared on the chart config (e.g. `wafBlock: '1'`);
+ * dynamic filters come from `buildForTarget` and are guaranteed to contain only
+ * fields the target dataset supports. The result is spliced into a
+ * `filter: { tsRange..., <fragments> }` block. Static filters win nothing/lose
+ * nothing here — both are simply concatenated, matching the additive AND
+ * semantics of a single GraphQL filter object.
+ *
+ * @param {object} staticFilters - plain `{ key: value }` map from the config.
+ * @param {{ and?: object, in?: object, or?: Array<object> }} [dynamicFilter]
+ * @returns {string[]}
+ */
+export function mergeFilterFragments(staticFilters, dynamicFilter) {
+  const fragments = Object.entries(staticFilters || {}).map(
+    ([key, value]) => `${key}: ${toGraphQLScalar(value)}`
+  )
+  fragments.push(...buildInlineFilterFragments(dynamicFilter))
+  return fragments
 }
 
 /**
@@ -95,12 +158,18 @@ async function graphqlRequest(url, query) {
  * @param {Object} config - Chart config with `metricsApiFallback` property
  * @param {string} begin - ISO 8601 begin timestamp
  * @param {string} end - ISO 8601 end timestamp
+ * @param {{ dynamicFilter?: object }} [options] - `dynamicFilter` is the
+ *   supported filter subset (built by `buildForTarget`) merged into every
+ *   query's filter block; it never carries an unsupported field.
  * @returns {Promise<Array>} Chart data rows
  * @throws {Object} { reason, detail } on API error
  */
-export async function loadMetricsFallback(config, begin, end) {
+export async function loadMetricsFallback(config, begin, end, { dynamicFilter } = {}) {
   const fallback = config.metricsApiFallback
   const { metricsDataset, fields } = fallback
+  const dynamicFragments = buildInlineFilterFragments(dynamicFilter)
+  const buildFilterBlock = () =>
+    ['tsRange: { begin: $tsRange_begin, end: $tsRange_end }', ...dynamicFragments].join(', ')
 
   // ── Aggregation path (e.g. avg: requestTime) ──────────────────────────
   // Used when the fallback specifies `aggregation` + optional `aggregationType`.
@@ -116,7 +185,7 @@ export async function loadMetricsFallback(config, begin, end) {
     aggregate: { ${aggType}: ${aggField} }
     groupBy: [ts]
     orderBy: [ts_ASC]
-    filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end } }
+    filter: { ${buildFilterBlock()} }
   ) {
     ts
     ${aggType}
@@ -153,7 +222,7 @@ export async function loadMetricsFallback(config, begin, end) {
     limit: 10000
     groupBy: [ts]
     orderBy: [ts_ASC]
-    filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end } }
+    filter: { ${buildFilterBlock()} }
   ) {
     ts
     ${field}
@@ -174,7 +243,7 @@ export async function loadMetricsFallback(config, begin, end) {
     limit: 10000
     groupBy: [ts]
     orderBy: [ts_ASC]
-    filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end } }
+    filter: { ${buildFilterBlock()} }
   ) {
     ${returnFields}
   }
@@ -194,18 +263,15 @@ export async function loadMetricsFallback(config, begin, end) {
 
   if (fallback.directFields) {
     const dataByAlias = response.body?.data || {}
-    const perTs = new Map()
-    for (const field of fields) {
-      const rows = Array.isArray(dataByAlias[field]) ? dataByAlias[field] : []
-      rows.forEach((row) => {
-        if (!row?.ts) return
-        if (!perTs.has(row.ts)) perTs.set(row.ts, { ts: row.ts })
-        const val = row[field]
-        perTs.get(row.ts)[field] = typeof val === 'number' ? val : 0
-      })
-    }
-    let data = Array.from(perTs.values()).sort(
-      (rowA, rowB) => new Date(rowA.ts) - new Date(rowB.ts)
+    let data = pivotTimeseries(
+      fields.map((field) => ({
+        key: field,
+        rows: Array.isArray(dataByAlias[field]) ? dataByAlias[field] : []
+      })),
+      {
+        pickValue: (row, field) => (typeof row[field] === 'number' ? row[field] : 0),
+        sort: true
+      }
     )
     if (typeof fallback.postProcess === 'function') {
       data = fallback.postProcess(data)
@@ -238,18 +304,25 @@ export async function loadMetricsFallback(config, begin, end) {
  * @param {Object} config - Chart config with `metricsApiSeries` property
  * @param {string} begin - ISO 8601 begin timestamp
  * @param {string} end - ISO 8601 end timestamp
+ * @param {{ dynamicFilter?: object }} [options] - supported filter subset merged
+ *   into every series/pivot filter block.
  * @returns {Promise<Array>} Chart data rows
  * @throws {Object} { reason, detail } on API error
  */
-export async function loadMetricsSeries(config, begin, end) {
+export async function loadMetricsSeries(config, begin, end, { dynamicFilter } = {}) {
   const { metricsDataset, series, groupByPivot } = config.metricsApiSeries
   if (!metricsDataset) return []
+  const dynamicFragments = buildInlineFilterFragments(dynamicFilter)
 
   if (groupByPivot?.field) {
     // ── groupByPivot path ──
     const agg = groupByPivot.aggregate || 'sum: requests'
     const aggReturnField = agg.split(':')[0].trim()
     const field = groupByPivot.field
+    const filterBlock = [
+      'tsRange: { begin: $tsRange_begin, end: $tsRange_end }',
+      ...dynamicFragments
+    ].join(', ')
 
     const query = {
       query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!) {
@@ -258,7 +331,7 @@ export async function loadMetricsSeries(config, begin, end) {
     aggregate: { ${agg} }
     groupBy: [ts, ${field}]
     orderBy: [ts_ASC]
-    filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end } }
+    filter: { ${filterBlock} }
   ) { ts ${field} ${aggReturnField} }
 }`,
       variables: { tsRange_begin: begin, tsRange_end: end }
@@ -298,10 +371,10 @@ export async function loadMetricsSeries(config, begin, end) {
     const safeAlias = `s${index}`
     aliasToName.set(safeAlias, displayName)
     safeAliases.push(safeAlias)
-    const filterPairs = ['tsRange: { begin: $tsRange_begin, end: $tsRange_end }']
-    Object.entries(entry.filters || {}).forEach(([key, value]) => {
-      filterPairs.push(`${key}: ${toGraphQLScalar(value)}`)
-    })
+    const filterPairs = [
+      'tsRange: { begin: $tsRange_begin, end: $tsRange_end }',
+      ...mergeFilterFragments(entry.filters, dynamicFilter)
+    ]
     const agg = entry.aggregate || 'sum: requests'
     const aggReturnField = agg.split(':')[0].trim()
     return `  ${safeAlias}: ${metricsDataset}(
@@ -328,26 +401,18 @@ export async function loadMetricsSeries(config, begin, end) {
   }
 
   const dataByAlias = response.body?.data || {}
-  const perTs = new Map()
-  const displayNames = []
-  for (const safeAlias of safeAliases) {
-    const displayName = aliasToName.get(safeAlias)
-    displayNames.push(displayName)
-    const rows = Array.isArray(dataByAlias[safeAlias]) ? dataByAlias[safeAlias] : []
-    rows.forEach((row) => {
-      if (!row?.ts) return
-      if (!perTs.has(row.ts)) perTs.set(row.ts, { ts: row.ts })
-      const val = row.sum ?? row.count ?? row.avg ?? 0
-      perTs.get(row.ts)[displayName] = val
-    })
-  }
   // Backfill missing series with 0 so chart builder sees a consistent set.
-  for (const row of perTs.values()) {
-    for (const displayName of displayNames) {
-      if (!(displayName in row)) row[displayName] = 0
+  return pivotTimeseries(
+    safeAliases.map((safeAlias) => ({
+      key: aliasToName.get(safeAlias),
+      rows: Array.isArray(dataByAlias[safeAlias]) ? dataByAlias[safeAlias] : []
+    })),
+    {
+      pickValue: (row) => row.sum ?? row.count ?? row.avg ?? 0,
+      backfill: true,
+      sort: true
     }
-  }
-  return Array.from(perTs.values()).sort((left, right) => new Date(left.ts) - new Date(right.ts))
+  )
 }
 
 /**
@@ -362,10 +427,12 @@ export async function loadMetricsSeries(config, begin, end) {
  * @param {Object} config - Chart config with `eventsApi` property
  * @param {string} begin - ISO 8601 begin timestamp
  * @param {string} end - ISO 8601 end timestamp
+ * @param {{ dynamicFilter?: object }} [options] - supported filter subset merged
+ *   into every series/pivot filter block.
  * @returns {Promise<Array>} Chart data rows
  * @throws {Object} { reason, detail } on API error
  */
-export async function loadFromEventsApi(config, begin, end) {
+export async function loadFromEventsApi(config, begin, end, { dynamicFilter } = {}) {
   const { dataset, series, groupByPivot } = config.eventsApi
 
   let body
@@ -375,10 +442,10 @@ export async function loadFromEventsApi(config, begin, end) {
     const aliases = series.map((entry, index) => {
       const alias = entry.name || `series_${index}`
       seriesNames.push(alias)
-      const filterPairs = ['tsRange: { begin: $tsRange_begin, end: $tsRange_end }']
-      Object.entries(entry.filters || {}).forEach(([key, value]) => {
-        filterPairs.push(`${key}: ${toGraphQLScalar(value)}`)
-      })
+      const filterPairs = [
+        'tsRange: { begin: $tsRange_begin, end: $tsRange_end }',
+        ...mergeFilterFragments(entry.filters, dynamicFilter)
+      ]
       const agg = entry.aggregate || 'count: rows'
       const aggReturnField = agg.startsWith('count') ? 'count' : agg.split(':')[0].trim()
       return `  ${alias}: ${dataset}(
@@ -390,27 +457,23 @@ export async function loadFromEventsApi(config, begin, end) {
   ) { ts ${aggReturnField} }`
     })
     body = aliases.join('\n')
-    postProcess = (dataByAlias) => {
-      const perTs = new Map()
-      for (const name of seriesNames) {
-        const rows = Array.isArray(dataByAlias[name]) ? dataByAlias[name] : []
-        rows.forEach((row) => {
-          if (!row?.ts) return
-          if (!perTs.has(row.ts)) perTs.set(row.ts, { ts: row.ts })
-          const val = row.count ?? row.avg ?? row.sum ?? 0
-          perTs.get(row.ts)[name] = val
-        })
-      }
-      return Array.from(perTs.values()).sort(
-        (left, right) => new Date(left.ts) - new Date(right.ts)
+    postProcess = (dataByAlias) =>
+      pivotTimeseries(
+        seriesNames.map((name) => ({
+          key: name,
+          rows: Array.isArray(dataByAlias[name]) ? dataByAlias[name] : []
+        })),
+        {
+          pickValue: (row) => row.count ?? row.avg ?? row.sum ?? 0,
+          sort: true
+        }
       )
-    }
   } else if (groupByPivot?.field) {
     const field = groupByPivot.field
-    const filterPairs = ['tsRange: { begin: $tsRange_begin, end: $tsRange_end }']
-    Object.entries(groupByPivot.filters || {}).forEach(([key, value]) => {
-      filterPairs.push(`${key}: ${toGraphQLScalar(value)}`)
-    })
+    const filterPairs = [
+      'tsRange: { begin: $tsRange_begin, end: $tsRange_end }',
+      ...mergeFilterFragments(groupByPivot.filters, dynamicFilter)
+    ]
     body = `  ${dataset}(
     limit: 10000
     aggregate: { count: rows }
@@ -461,10 +524,18 @@ export async function loadFromEventsApi(config, begin, end) {
  * @param {string} end - ISO 8601 end timestamp
  * @param {Object} options
  * @param {Function} options.loadAggregableFields - Async function to load aggregable fields for schema guard
+ * @param {object} [options.dynamicFilter] - supported filter subset (from
+ *   `buildForTarget`) merged into the filter block; never carries an
+ *   unsupported field.
  * @returns {Promise<Array>} Chart data rows
  * @throws {Object} { reason, detail } on API error or schema mismatch
  */
-export async function loadMetricsAggregation(config, begin, end, { loadAggregableFields }) {
+export async function loadMetricsAggregation(
+  config,
+  begin,
+  end,
+  { loadAggregableFields, dynamicFilter } = {}
+) {
   // Schema guard: drop any field not present in the live backend enum.
   const aggregableFields = await loadAggregableFields(config.metricsDataset)
   if (aggregableFields.size) {
@@ -486,10 +557,7 @@ export async function loadMetricsAggregation(config, begin, end, { loadAggregabl
     }
   }
 
-  const filterEntries = config.filters || {}
-  const extraFilterFragments = Object.entries(filterEntries).map(
-    ([key, val]) => `${key}: ${toGraphQLScalar(val)}`
-  )
+  const extraFilterFragments = mergeFilterFragments(config.filters, dynamicFilter)
   const filterBlock =
     'filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end }' +
     (extraFilterFragments.length ? `, ${extraFilterFragments.join(', ')}` : '') +
@@ -601,29 +669,28 @@ export async function loadMetricsAggregation(config, begin, end, { loadAggregabl
 
   if (responseShape === 'direct') {
     const dataByAlias = response.body?.data || {}
-    const perTs = new Map()
-    for (const field of config.fields) {
-      const rows = Array.isArray(dataByAlias[field]) ? dataByAlias[field] : []
-      rows.forEach((row) => {
-        if (!row?.ts) return
-        if (!perTs.has(row.ts)) perTs.set(row.ts, { ts: row.ts })
-        const val = row[field]
-        perTs.get(row.ts)[field] = typeof val === 'number' ? val : 0
-      })
-    }
-    return Array.from(perTs.values()).sort((rowA, rowB) => new Date(rowA.ts) - new Date(rowB.ts))
+    return pivotTimeseries(
+      config.fields.map((field) => ({
+        key: field,
+        rows: Array.isArray(dataByAlias[field]) ? dataByAlias[field] : []
+      })),
+      {
+        pickValue: (row, field) => (typeof row[field] === 'number' ? row[field] : 0),
+        sort: true
+      }
+    )
   }
 
   // responseShape === 'aliases'
   const dataByAlias = response.body?.data || {}
-  const perTs = new Map()
-  for (const field of config.fields) {
-    const rows = Array.isArray(dataByAlias[field]) ? dataByAlias[field] : []
-    rows.forEach((row) => {
-      if (!row?.ts) return
-      if (!perTs.has(row.ts)) perTs.set(row.ts, { ts: row.ts })
-      perTs.get(row.ts)[field] = row.sum ?? 0
-    })
-  }
-  return Array.from(perTs.values()).sort((left, right) => new Date(left.ts) - new Date(right.ts))
+  return pivotTimeseries(
+    config.fields.map((field) => ({
+      key: field,
+      rows: Array.isArray(dataByAlias[field]) ? dataByAlias[field] : []
+    })),
+    {
+      pickValue: (row) => row.sum ?? 0,
+      sort: true
+    }
+  )
 }

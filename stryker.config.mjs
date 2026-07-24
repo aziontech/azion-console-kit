@@ -56,7 +56,8 @@ const config = {
     'src/services/v2/base/cache-sync/cache-invalidator.js',
     'src/services/v2/utils/errorHandler.js',
     'src/services/v2/base/sse/sse-client.js',
-    'src/services/v2/base/http/abortManager.js'
+    'src/services/v2/base/http/abortManager.js',
+    'src/services/v2/deployment/deployment-version-service.js'
   ],
 
   // 'perTest' is the vitest-runner default: for each mutant Stryker runs ONLY
@@ -86,6 +87,10 @@ const config = {
   //   sse-client 75.2 · errorHandler 69.6 · abortManager 62.9
   //   cache-invalidator 60.5 · invalidation-map 39.9 (mapping tables carry
   //   many unexercised entries — raising this floor is Onda-4+ backlog)
+  //   deployment-version-service 58.3 (added 2026-07-24: the skipCache
+  //   decision is fully covered; the remaining survivors are parse/unwrap
+  //   paths owned by the in-progress v6 deployment work — raising is that
+  //   work's backlog, not this merge's)
   thresholds: {
     high: 90,
     low: 80,

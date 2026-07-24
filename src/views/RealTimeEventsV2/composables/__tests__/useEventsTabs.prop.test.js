@@ -1,5 +1,3 @@
-// @vitest-environment jsdom -- browser-coupled: window.localStorage/sessionStorage
-// (Node's Storage global is version-dependent: local Node 26 has it, CI node:22
 // does not — jsdom keeps the storage boundary deterministic across runtimes).
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { ref } from 'vue'

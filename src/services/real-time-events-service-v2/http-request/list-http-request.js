@@ -3,7 +3,7 @@ import { AxiosHttpClientSignalDecorator } from '@/services/axios/AxiosHttpClient
 import { makeRealTimeEventsBaseUrl } from '../make-real-time-events-service'
 import { generateCurrentTimestamp } from '@/helpers/generate-timestamp'
 import { buildSummary } from '@/helpers'
-import * as Errors from '@/services/axios/errors'
+import { parseGraphQLResponse } from '@/services/real-time-events-service-v2/_shared/service/parse-graphql-response'
 import { getCurrentTimezone } from '@/helpers'
 
 const shouldShowTsColumn = false
@@ -139,8 +139,8 @@ export const listHttpRequest = async (filter, { onQuery } = {}) => {
   ])
 
   // Both must succeed
-  if (responseA.statusCode !== 200) return parseHttpResponse(responseA)
-  if (responseB.statusCode !== 200) return parseHttpResponse(responseB)
+  if (responseA.statusCode !== 200) return parseGraphQLResponse(responseA, adaptResponse)
+  if (responseB.statusCode !== 200) return parseGraphQLResponse(responseB, adaptResponse)
 
   const rowsA = responseA.body.data?.[DATASET] || []
   const rowsB = responseB.body.data?.[DATASET] || []
@@ -204,27 +204,4 @@ const adaptResponse = (httpResponse) => {
   }))
 
   return { data }
-}
-
-const parseHttpResponse = (response) => {
-  const { body, statusCode } = response
-
-  switch (statusCode) {
-    case 200:
-      return adaptResponse(body)
-    case 400:
-      const apiError = body.detail
-      throw new Error(apiError).message
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
-    case 403:
-      const forbiddenError = body.detail
-      throw new Error(forbiddenError).message
-    case 404:
-      throw new Errors.NotFoundError().message
-    case 500:
-      throw new Errors.InternalServerError().message
-    default:
-      throw new Errors.UnexpectedError().message
-  }
 }

@@ -1,5 +1,3 @@
-// @vitest-environment jsdom -- browser-coupled: window.localStorage/sessionStorage
-// (Node's Storage global is version-dependent: local Node 26 has it, CI node:22
 // does not — jsdom keeps the storage boundary deterministic across runtimes).
 /* global globalThis */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
@@ -11,8 +9,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
  * 1. When canOpenNewTab is injected and returns false, openTab shows the warn
  *    toast with the MAX_TOTAL_TABS message and does NOT open the tab.
  * 2. When canOpenNewTab is injected and returns true, openTab opens the tab normally.
- * 3. When canOpenNewTab is NOT injected (null), openTab falls back to the old
- *    MAX_OPEN_TABS = 5 limit.
+ * 3. When canOpenNewTab is NOT injected (null), openTab falls back to counting
+ *    against the SAME unified ceiling (MAX_TOTAL_TABS): 5 non-pinned tabs are
+ *    allowed, the 6th is blocked, and the toast reports the single ceiling.
  * 4. removeEventsTabFromActive sets activeTabId to null when the closed tab was active.
  * 5. removeEventsTabFromActive does nothing when the closed tab was not active.
  */
@@ -50,7 +49,7 @@ vi.mock('@/modules/real-time-metrics/constants/reports', () => ({
 // Import composable and constants (after mocks are registered)
 // ---------------------------------------------------------------------------
 
-import { useSessionManager, MAX_OPEN_TABS } from '../useSessionManager.js'
+import { useSessionManager } from '../useSessionManager.js'
 import { MAX_TOTAL_TABS } from '../useTabLimit.js'
 import { loadPanelsWithMeta } from '@/services/panels-service'
 
@@ -172,44 +171,46 @@ describe('useSessionManager — tab-limit path', () => {
     })
   })
 
-  // ── Test 3: canOpenNewTab NOT injected — falls back to MAX_OPEN_TABS = 5 ──
+  // ── Test 3: canOpenNewTab NOT injected — unified MAX_TOTAL_TABS ceiling ──
 
   describe('when canOpenNewTab is NOT injected (null)', () => {
-    it('falls back to the old MAX_OPEN_TABS = 5 limit', () => {
-      // Create 6 panels so we can try to open more than 5
+    it('falls back to the SAME unified ceiling (MAX_TOTAL_TABS) — pinned + 5 non-pinned, 6th blocked', () => {
+      // Create MAX_TOTAL_TABS panels so we can try to exceed the ceiling.
       // eslint-disable-next-line id-length
-      const panels = Array.from({ length: 6 }, (_, i) => makePanel(`panel-${i}`))
+      const panels = Array.from({ length: MAX_TOTAL_TABS }, (_, i) => makePanel(`panel-${i}`))
 
-      // No canOpenNewTab injected — uses legacy path
+      // No canOpenNewTab injected — uses the fallback, which counts non-pinned
+      // tabs against MAX_TOTAL_TABS (pinned Events tab always occupies 1 slot).
       const { manager, toast } = createManager(panels)
       const { openTab, openTabs } = manager
 
-      // Open 5 tabs (the old limit)
+      // Open MAX_TOTAL_TABS - 1 non-pinned tabs (fills the ceiling alongside the
+      // always-present pinned Events tab).
       // eslint-disable-next-line id-length
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < MAX_TOTAL_TABS - 1; i++) {
         openTab(`panel-${i}`)
       }
 
-      // At this point we have 5 extra tabs + 1 pinned = 6 total
+      // pinned + (MAX_TOTAL_TABS - 1) non-pinned = MAX_TOTAL_TABS total.
       // eslint-disable-next-line id-length
       const extraCount = openTabs.value.filter((t) => t.id !== null).length
-      expect(extraCount).toBe(5)
+      expect(extraCount).toBe(MAX_TOTAL_TABS - 1)
 
-      // Attempting to open a 6th extra tab should be blocked by MAX_OPEN_TABS
+      // Attempting to open one more non-pinned tab must be blocked by the SAME
+      // unified ceiling (no divergent MAX_OPEN_TABS anymore).
       toast.add.mockClear()
-      openTab('panel-5')
+      openTab(`panel-${MAX_TOTAL_TABS - 1}`)
 
-      // Tab should NOT have been added
+      // Tab should NOT have been added.
       // eslint-disable-next-line id-length
       const extraCountAfter = openTabs.value.filter((t) => t.id !== null).length
-      expect(extraCountAfter).toBe(5)
+      expect(extraCountAfter).toBe(MAX_TOTAL_TABS - 1)
 
-      // Toast should use the old MAX_OPEN_TABS message
+      // Toast must report the single unified ceiling value.
       expect(toast.add).toHaveBeenCalledOnce()
       const toastCall = toast.add.mock.calls[0][0]
       expect(toastCall.severity).toBe('warn')
-      expect(toastCall.summary).toBe(`Tab limit reached (${MAX_OPEN_TABS})`)
-      expect(MAX_OPEN_TABS).toBe(5)
+      expect(toastCall.summary).toBe(`Tab limit reached (${MAX_TOTAL_TABS})`)
     })
   })
 

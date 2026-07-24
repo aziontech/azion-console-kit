@@ -142,30 +142,14 @@
     white-space: nowrap;
   }
   .qh-field {
-    font-family: var(
-      --rte-font-mono,
-      ui-monospace,
-      SFMono-Regular,
-      'SF Mono',
-      Menlo,
-      Consolas,
-      monospace
-    );
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.75rem;
     color: var(--text-color);
     flex-shrink: 0;
     white-space: nowrap;
   }
   .qh-value {
-    font-family: var(
-      --rte-font-mono,
-      ui-monospace,
-      SFMono-Regular,
-      'SF Mono',
-      Menlo,
-      Consolas,
-      monospace
-    );
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.75rem;
     color: var(--text-color);
     overflow: hidden;

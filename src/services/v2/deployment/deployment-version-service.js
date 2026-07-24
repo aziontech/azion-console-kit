@@ -19,9 +19,17 @@ const parseListResponse = (data) => {
 const unwrapItem = (data) =>
   data && typeof data === 'object' && !Array.isArray(data) && data.data ? data.data : data
 
+// Client-side cache directives — never part of the API query string.
+const CACHE_CONTROL_KEYS = ['skipCache', 'hasFilter']
+
 const buildVersionListParams = (params = {}) => {
+  // Drop the page-size aliases (normalized below) and the cache-control flags
+  // (two suites assert they never leak into the request); search/state stay
+  // as real server-side filters.
   const { pageSize, page_size, page, ...rest } = params
-  const requestParams = { ...rest }
+  const requestParams = Object.fromEntries(
+    Object.entries(rest).filter(([key]) => !CACHE_CONTROL_KEYS.includes(key))
+  )
 
   if (page != null) {
     requestParams.page = Number(page) > 0 ? Number(page) : 1

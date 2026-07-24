@@ -28,7 +28,8 @@ const merged = mergeConfig(
         'src/tests/services/v2/base/cache-sync/**/*.{test,spec}.js',
         'src/tests/services/v2/base/sse/**/*.{test,spec}.js',
         'src/tests/services/v2/base/http/**/*.{test,spec}.js',
-        'src/tests/services/v2/utils/**/*.{test,spec}.js'
+        'src/tests/services/v2/utils/**/*.{test,spec}.js',
+        'src/tests/services/v2/deployment/**/*.{test,spec}.js'
       ],
       // Coverage collection is redundant under mutation testing (Stryker
       // disables it in its own vitest bootstrap); keep it off to save time.

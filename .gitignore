@@ -75,3 +75,9 @@ storybook/yarn.lock
 playwright-report
 test-results
 src/tests/functional/__screenshots__
+
+# RTE spec drafts — mantidos localmente pelo time de Real-Time Events; não
+# versionar neste branch (removidos aqui, editados na dev — evita re-conflito
+# de modify/delete a cada merge). Ver PR #3660.
+specs/real-time-events-responsividade/
+specs/real-time-events-v2-improvements/

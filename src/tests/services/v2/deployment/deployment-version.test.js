@@ -132,6 +132,42 @@ describe('deployment — bespoke reads: listVersionsService returns { body, coun
       expect.objectContaining({ persist: false, skipCache: true })
     )
   })
+
+  // The skip-cache decision is `skipCache || hasFilter || search`. Each trigger
+  // must independently force the bypass, and the absence of all three must
+  // KEEP the cache — asserting the full truth table so no single condition can
+  // rot silently (mutation-proven).
+  it.each([
+    { params: { skipCache: true }, label: 'explicit skipCache' },
+    { params: { hasFilter: true }, label: 'hasFilter flag' },
+    { params: { search: 'x' }, label: 'search term' }
+  ])('skips cache when $label is present', async ({ params }) => {
+    const ensureSpy = vi
+      .spyOn(service, 'useEnsureQueryData')
+      .mockResolvedValueOnce({ body: [], count: 0 })
+
+    await service.listVersionsService(DID, params)
+
+    expect(ensureSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.any(Function),
+      expect.objectContaining({ persist: false, skipCache: true })
+    )
+  })
+
+  it('KEEPS the cache when no filter/search/skipCache is present', async () => {
+    const ensureSpy = vi
+      .spyOn(service, 'useEnsureQueryData')
+      .mockResolvedValueOnce({ body: [], count: 0 })
+
+    await service.listVersionsService(DID, { page: 1 })
+
+    expect(ensureSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.any(Function),
+      expect.objectContaining({ persist: true, skipCache: false })
+    )
+  })
 })
 
 describe('deployment — bespoke: dual cache invalidation (version + deployment detail)', () => {

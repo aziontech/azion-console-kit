@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, unref } from 'vue'
 import { MAX_TOTAL_TABS } from './useTabLimit.js'
 
 /**
@@ -54,7 +54,9 @@ function computeDefaultLabel(currentTabs) {
  *
  * @param {Object} options
  * @param {Object} options.toast                                    – PrimeVue toast service
- * @param {() => number} options.totalTabCount                      – injected from useTabLimit
+ * @param {() => number} options.totalTabCount                      – injected from useTabLimit (total across all tab kinds)
+ * @param {import('vue').ComputedRef<boolean>|(() => boolean)|null} [options.canOpenNewTab=null] – shared admission predicate from useTabLimit (single ceiling-aware source of truth). When omitted, falls back to `totalTabCount() < MAX_TOTAL_TABS` for backward compatibility.
+ * @param {(reservedCount?: number) => number} [options.capForRestore=null] – ceiling-aware restore cap from useTabLimit. When omitted, restore falls back to MAX_TOTAL_TABS - 1.
  * @param {import('vue').Ref<string|null>} options.activeTabId      – shared with useSessionManager
  * @returns {{
  *   eventsTabs: import('vue').Ref<Array<{id: string, label: string, dataset: string}>>,
@@ -67,7 +69,33 @@ function computeDefaultLabel(currentTabs) {
  *   isEventsTabId: (id: string|null) => boolean
  * }}
  */
-export function useEventsTabs({ toast, totalTabCount, activeTabId }) {
+export function useEventsTabs({
+  toast,
+  totalTabCount,
+  canOpenNewTab: injectedCanOpenNewTab = null,
+  capForRestore = null,
+  activeTabId
+}) {
+  /**
+   * Single ceiling-aware admission predicate.
+   *
+   * Prefers the shared `canOpenNewTab` from useTabLimit (one source of truth
+   * across every tab kind). Falls back to the total-count comparison only when
+   * not injected, preserving the previous MAX_TOTAL_TABS semantics.
+   *
+   * @returns {boolean}
+   */
+  const canOpenNewTab = () => {
+    if (injectedCanOpenNewTab != null) {
+      const value =
+        typeof injectedCanOpenNewTab === 'function'
+          ? injectedCanOpenNewTab()
+          : unref(injectedCanOpenNewTab)
+      return Boolean(value)
+    }
+    return totalTabCount() < MAX_TOTAL_TABS
+  }
+
   /**
    * Reactive list of additional Events tabs (excludes the pinned first tab).
    * Each entry: { id: 'events:<uuid>', label: string, dataset: string }
@@ -112,7 +140,9 @@ export function useEventsTabs({ toast, totalTabCount, activeTabId }) {
   /**
    * Read and restore additional Events tabs from localStorage.
    * Silently returns [] on any parse error or non-array value (Requirement 2.4).
-   * Limits restored tabs to MAX_TOTAL_TABS - 1 entries.
+   * Restore honors the SAME ceiling as admission via the shared capForRestore
+   * (req 2.1): reserving 1 slot for the pinned Events tab yields the same
+   * MAX_TOTAL_TABS - 1 cap, now sourced from the single tab-limit unit.
    */
   function restoreEventsTabs() {
     try {
@@ -120,7 +150,10 @@ export function useEventsTabs({ toast, totalTabCount, activeTabId }) {
       if (!raw) return
       const parsed = JSON.parse(raw)
       if (!Array.isArray(parsed)) return
-      const limited = parsed.slice(0, MAX_TOTAL_TABS - 1)
+      // Reserve 1 slot for the pinned Events tab. Falls back to the previous
+      // literal cap only when capForRestore is not injected.
+      const restoreCap = typeof capForRestore === 'function' ? capForRestore(1) : MAX_TOTAL_TABS - 1
+      const limited = parsed.slice(0, restoreCap)
       // Only restore entries that have the required shape
       const valid = limited.filter(
         (entry) =>
@@ -135,18 +168,6 @@ export function useEventsTabs({ toast, totalTabCount, activeTabId }) {
     } catch {
       // Malformed JSON or unavailable storage — silently fall back to []
     }
-  }
-
-  // ── canOpenNewTab ──────────────────────────────────────────────────────────
-
-  /**
-   * Returns true when the total number of open tabs (across all kinds) is
-   * below MAX_TOTAL_TABS.
-   *
-   * @returns {boolean}
-   */
-  function canOpenNewTab() {
-    return totalTabCount() < MAX_TOTAL_TABS
   }
 
   // ── Tab lifecycle ──────────────────────────────────────────────────────────

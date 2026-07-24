@@ -15,6 +15,7 @@
     "services/v2/utils/errorHandler.js": 67,
     "services/v2/base/http/abortManager.js": 60,
     "services/v2/base/cache-sync/cache-invalidator.js": 58,
-    "services/v2/base/cache-sync/invalidation-map.js": 37
+    "services/v2/base/cache-sync/invalidation-map.js": 37,
+    "services/v2/deployment/deployment-version-service.js": 56
   }
 }

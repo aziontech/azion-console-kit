@@ -1,6 +1,3 @@
-// @vitest-environment jsdom -- browser-coupled: window.localStorage (saved
-// searches persistence). Node's own Storage global is version-dependent
-// (present in local Node 26, absent in CI node:22) — jsdom keeps it deterministic.
 /**
  * Regression test suite for the Real-Time Events module.
  *
@@ -22,6 +19,7 @@ import { useFieldResolution } from '../composables/useFieldResolution'
 import { useFieldStats } from '../composables/useFieldStats'
 import { useLegendFilter } from '../composables/useLegendFilter'
 import { useViewSync } from '../composables/useViewSync'
+import { useEventsExplorer } from '../composables/useEventsExplorer'
 import { resolveChartKind, CHART_KINDS } from '../composables/chart-kinds'
 import { useEventsTabs } from '../composables/useEventsTabs'
 import { useEventsData } from '../composables/useEventsData'
@@ -246,12 +244,14 @@ describe('Requirement 13.2: Filter add/exclude/remove with URL hash persistence'
     expect(setFilterInHash).toHaveBeenCalled()
   })
 
-  it('handleRemoveFilter removes a filter by index and persists', async () => {
+  it('handleRemoveFilter removes the emitted filter by identity and persists', async () => {
     ctx.handleAddFilter('host', 'a.com')
     ctx.handleAddFilter('status', '200')
     expect(filterData.value.fields).toHaveLength(2)
 
-    ctx.handleRemoveFilter(0)
+    // FilterTagsDisplay emits the SOURCE raw filter object, not an index.
+    const hostFilter = filterData.value.fields[0]
+    ctx.handleRemoveFilter(hostFilter)
     expect(filterData.value.fields).toHaveLength(1)
     expect(filterData.value.fields[0].valueField).toBe('status')
   })
@@ -327,42 +327,57 @@ describe('Requirement 13.3: Time range selection and brush-select', () => {
   })
 
   it('useViewSync dispatches events:none by default', () => {
-    const selectedMetricsDashboard = ref(null)
-    const stackByField = ref('none')
-    const reloadListTableWithHash = vi.fn()
+    const onIntent = vi.fn()
 
-    const { selectedView, isMetricsView } = useViewSync({
-      selectedMetricsDashboard,
-      stackByField,
-      reloadListTableWithHash
-    })
+    const { selectedView, isMetricsView } = useViewSync({ onIntent })
 
     expect(selectedView.value).toBe('events:none')
     expect(isMetricsView.value).toBe(false)
+    // No view change yet → no intent emitted.
+    expect(onIntent).not.toHaveBeenCalled()
   })
 
-  it('useViewSync switches to metrics view and back', async () => {
-    const selectedMetricsDashboard = ref(null)
-    const stackByField = ref('none')
-    const reloadListTableWithHash = vi.fn()
+  it('useViewSync switches to metrics view and back (intent + applyViewIntent)', async () => {
+    // Post-7.3 / task 9.4: useViewSync EMITS the parsed intent AND owns the
+    // single writable View source `selectedView`. stackByField /
+    // selectedMetricsDashboard / isMetricsView are read-only computeds derived
+    // from selectedView (no independent writers — this flips the old
+    // dual-ownership where the seam wrote separate refs). applyViewIntent now
+    // writes `selectedView`; the derived controls follow.
+    const onIntent = vi.fn()
 
-    const { selectedView, isMetricsView } = useViewSync({
-      selectedMetricsDashboard,
-      stackByField,
-      reloadListTableWithHash
+    const { selectedView, isMetricsView, stackByField, selectedMetricsDashboard } = useViewSync({
+      onIntent
+    })
+    const { applyViewIntent } = useEventsExplorer({
+      reloadListTableWithHash: vi.fn(),
+      loadData: vi.fn(),
+      reloadActiveMetrics: vi.fn(),
+      selectedView,
+      selectedMetricsDashboard
     })
 
     selectedView.value = 'metrics:wafThreats'
     await nextTick()
     expect(isMetricsView.value).toBe(true)
+    expect(onIntent).toHaveBeenLastCalledWith({ scheme: 'metrics', key: 'wafThreats' })
+    // The seam re-applies the same View value (no-op write-back); the derived
+    // controls already reflect it.
+    applyViewIntent({ scheme: 'metrics', key: 'wafThreats' })
+    await nextTick()
     expect(selectedMetricsDashboard.value).toBe('wafThreats')
     expect(stackByField.value).toBe('none')
+    expect(selectedView.value).toBe('metrics:wafThreats')
 
     selectedView.value = 'events:status'
     await nextTick()
     expect(isMetricsView.value).toBe(false)
+    expect(onIntent).toHaveBeenLastCalledWith({ scheme: 'events', key: 'status' })
+    applyViewIntent({ scheme: 'events', key: 'status' })
+    await nextTick()
     expect(selectedMetricsDashboard.value).toBeNull()
     expect(stackByField.value).toBe('status')
+    expect(selectedView.value).toBe('events:status')
   })
 })
 
@@ -547,31 +562,37 @@ describe('Requirement 13.7: CSV and JSON export output consistency', () => {
     expect(csvItem.command).toBeTypeOf('function')
   })
 
-  it('useExportData exportFunctionMapper maps tsFormat field', () => {
-    const tableData = shallowRef([])
+  it('CSV export maps the tsFormat field to its cell value', async () => {
+    const rows = [
+      { id: 'a', tsFormat: '2024-01-01 00:00:00', summary: [{ key: 'host', value: 'a.com' }] }
+    ]
+    const tableData = shallowRef(rows)
     const tabSelected = computed(() => ({ dataset: 'workloadEvents' }))
-    const { exportFunctionMapper } = useExportData({ tableData, tabSelected })
+    const { buildCsv } = useExportData({ tableData, tabSelected, selectedFields: ref([]) })
 
-    // defaultColumnMapper maps { field, data } → { tsFormat: data, summary: data }
-    // exportFunctionMapper then returns mappedRow[field]
-    const result = exportFunctionMapper({ field: 'tsFormat', data: '2024-01-01 00:00:00' })
-    expect(result).toBe('2024-01-01 00:00:00')
+    // The tsFormat mapping is exercised through the CSV cell serialization.
+    const csv = await buildCsv(rows)
+    expect(csv).toContain('"2024-01-01 00:00:00"')
   })
 
-  it('useExportData exportFunctionMapper maps summary field to pipe-separated string', () => {
-    const tableData = shallowRef([])
-    const tabSelected = computed(() => ({ dataset: 'workloadEvents' }))
-    const { exportFunctionMapper } = useExportData({ tableData, tabSelected })
-
-    // When field is 'summary', data is the summary array
-    const summaryData = [
-      { key: 'host', value: 'a.com' },
-      { key: 'status', value: 200 }
+  it('CSV export maps the summary field to a pipe-separated cell', async () => {
+    const rows = [
+      {
+        id: 'a',
+        tsFormat: 'T1',
+        summary: [
+          { key: 'host', value: 'a.com' },
+          { key: 'status', value: 200 }
+        ]
+      }
     ]
-    const result = exportFunctionMapper({ field: 'summary', data: summaryData })
-    expect(result).toContain('host: a.com')
-    expect(result).toContain('status: 200')
-    expect(result).toContain(' | ')
+    const tableData = shallowRef(rows)
+    const tabSelected = computed(() => ({ dataset: 'workloadEvents' }))
+    const { buildCsv } = useExportData({ tableData, tabSelected, selectedFields: ref([]) })
+
+    // summary array → `key: value` joined by ` | `, quoted as a single cell.
+    const csv = await buildCsv(rows)
+    expect(csv).toContain('"host: a.com | status: 200"')
   })
 
   it('JSON export for same input data is deterministic', () => {
@@ -604,44 +625,47 @@ describe('Requirement 13.8: Keyboard navigation, detail view, search, field stat
       vi.restoreAllMocks()
     })
 
-    it('ArrowDown increments focusedRowIndex', () => {
+    // Task 3.10: focus is now IDENTITY-based (`focusedId`), not positional
+    // (`focusedRowIndex`). Observable behavior (which row becomes focused after
+    // an arrow key) is unchanged — the assertions target the focused row's id.
+    it('ArrowDown moves focus to the next row', () => {
       const rows = [makeRow(1, 'ts1'), makeRow(2, 'ts2'), makeRow(3, 'ts3')]
       const tableData = ref(rows)
       const dv = useDetailView(tableData)
 
-      dv.focusedRowIndex.value = 0
+      dv.focusedId.value = rows[0].id
       dv.handleKeyDown({ key: 'ArrowDown', preventDefault: vi.fn() })
-      expect(dv.focusedRowIndex.value).toBe(1)
+      expect(dv.focusedId.value).toBe(rows[1].id)
     })
 
-    it('ArrowUp decrements focusedRowIndex', () => {
+    it('ArrowUp moves focus to the previous row', () => {
       const rows = [makeRow(1, 'ts1'), makeRow(2, 'ts2')]
       const tableData = ref(rows)
       const dv = useDetailView(tableData)
 
-      dv.focusedRowIndex.value = 1
+      dv.focusedId.value = rows[1].id
       dv.handleKeyDown({ key: 'ArrowUp', preventDefault: vi.fn() })
-      expect(dv.focusedRowIndex.value).toBe(0)
+      expect(dv.focusedId.value).toBe(rows[0].id)
     })
 
-    it('ArrowDown does not exceed table length', () => {
+    it('ArrowDown does not move past the last row', () => {
       const rows = [makeRow(1, 'ts1'), makeRow(2, 'ts2')]
       const tableData = ref(rows)
       const dv = useDetailView(tableData)
 
-      dv.focusedRowIndex.value = 1
+      dv.focusedId.value = rows[1].id
       dv.handleKeyDown({ key: 'ArrowDown', preventDefault: vi.fn() })
-      expect(dv.focusedRowIndex.value).toBe(1)
+      expect(dv.focusedId.value).toBe(rows[1].id)
     })
 
-    it('ArrowUp does not go below 0', () => {
+    it('ArrowUp does not move past the first row', () => {
       const rows = [makeRow(1, 'ts1')]
       const tableData = ref(rows)
       const dv = useDetailView(tableData)
 
-      dv.focusedRowIndex.value = 0
+      dv.focusedId.value = rows[0].id
       dv.handleKeyDown({ key: 'ArrowUp', preventDefault: vi.fn() })
-      expect(dv.focusedRowIndex.value).toBe(0)
+      expect(dv.focusedId.value).toBe(rows[0].id)
     })
 
     it('Enter selects the focused row', () => {
@@ -649,7 +673,7 @@ describe('Requirement 13.8: Keyboard navigation, detail view, search, field stat
       const tableData = ref(rows)
       const dv = useDetailView(tableData)
 
-      dv.focusedRowIndex.value = 1
+      dv.focusedId.value = rows[1].id
       dv.handleKeyDown({ key: 'Enter', preventDefault: vi.fn() })
       expect(dv.activeRow.value).toEqual(rows[1])
     })
@@ -734,7 +758,7 @@ describe('Requirement 13.8: Keyboard navigation, detail view, search, field stat
       expect(dv.activeRow.value).toBeNull()
       expect(dv.sidebarVisible.value).toBe(false)
       expect(dv.expandedRows.value).toHaveLength(0)
-      expect(dv.focusedRowIndex.value).toBe(-1)
+      expect(dv.focusedId.value).toBeNull()
     })
   })
 
@@ -743,19 +767,19 @@ describe('Requirement 13.8: Keyboard navigation, detail view, search, field stat
     // component context. We test the highlight function via the returned API
     // by manually setting debouncedQuery.
     it('highlight wraps matching text in <mark> tags when debouncedQuery is set', () => {
-      const { highlight, debouncedQuery } = useDocumentSearch(shallowRef([]))
+      const { highlight, debouncedQuery } = useDocumentSearch({ rows: shallowRef([]) })
       debouncedQuery.value = 'test'
       const result = highlight('This is a test string')
       expect(result).toContain('<mark class="search-highlight">test</mark>')
     })
 
     it('highlight returns original text when no query', () => {
-      const { highlight } = useDocumentSearch(shallowRef([]))
+      const { highlight } = useDocumentSearch({ rows: shallowRef([]) })
       expect(highlight('hello world')).toBe('hello world')
     })
 
     it('highlight is case-insensitive', () => {
-      const { highlight, debouncedQuery } = useDocumentSearch(shallowRef([]))
+      const { highlight, debouncedQuery } = useDocumentSearch({ rows: shallowRef([]) })
       debouncedQuery.value = 'TEST'
       const result = highlight('This is a test string')
       expect(result).toContain('<mark class="search-highlight">test</mark>')
@@ -870,15 +894,9 @@ describe('Requirement 13.9: KeepAlive state preservation', () => {
   })
 
   it('useViewSync preserves selectedView state', () => {
-    const selectedMetricsDashboard = ref(null)
-    const stackByField = ref('none')
-    const reloadListTableWithHash = vi.fn()
+    const onIntent = vi.fn()
 
-    const { selectedView } = useViewSync({
-      selectedMetricsDashboard,
-      stackByField,
-      reloadListTableWithHash
-    })
+    const { selectedView } = useViewSync({ onIntent })
 
     selectedView.value = 'events:status'
     // State is preserved in the ref — KeepAlive would keep this alive
@@ -1028,14 +1046,17 @@ describe('Multi-tab coexistence regression', () => {
       expect(labels).toContain('Export as CSV')
     })
 
-    it('exportFunctionMapper maps tsFormat correctly for an httpRequests tab', () => {
-      const tableData = shallowRef([])
+    it('CSV export maps tsFormat correctly for an httpRequests tab', async () => {
+      const rows = [
+        { id: 'a', tsFormat: '2024-06-15 12:34:56', summary: [{ key: 'host', value: 'a.com' }] }
+      ]
+      const tableData = shallowRef(rows)
       const tabSelected = computed(() => ({ dataset: 'httpRequests' }))
 
-      const { exportFunctionMapper } = useExportData({ tableData, tabSelected })
+      const { buildCsv } = useExportData({ tableData, tabSelected, selectedFields: ref([]) })
 
-      const result = exportFunctionMapper({ field: 'tsFormat', data: '2024-06-15 12:34:56' })
-      expect(result).toBe('2024-06-15 12:34:56')
+      const csv = await buildCsv(rows)
+      expect(csv).toContain('"2024-06-15 12:34:56"')
     })
   })
 
