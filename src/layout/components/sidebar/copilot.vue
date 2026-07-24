@@ -1,52 +1,22 @@
 <script setup>
   import PrimeButton from '@aziontech/webkit/button'
+  import PrimeTag from '@aziontech/webkit/prime-tag'
+  import Toolbar from '@aziontech/webkit/toolbar'
   import { useLayout } from '@/composables/use-layout'
-  import AzionAIChatBlock from '@/modules/azion-ai-chat/layout'
+  import CopilotFrame from '@/modules/azion-ai-chat/layout/copilot-frame.vue'
   import { useRouter } from 'vue-router'
-  import { ref, watch, watchEffect, onMounted } from 'vue'
-  import { useAccountStore } from '@/stores/account'
-  import { loadPromptSuggestion } from '@/modules/azion-ai-chat/services/load-prompt-suggestions'
-  import { openContactSupport } from '@/helpers'
-  import { loadContractData } from '@/helpers/account-data'
+  import { watch } from 'vue'
 
   defineOptions({
     name: 'copilot-sidebar'
   })
 
-  const { closeSidebar, activeComponent } = useLayout()
+  const { closeSidebar } = useLayout()
   const router = useRouter()
 
   const openChatInNewTab = () => {
     router.push({ name: 'copilot' })
   }
-
-  const user = ref({})
-  const suggestionsOptions = ref([])
-  const hasSupport = ref(false)
-
-  const loadPromptSuggestionWithRoleDecorator = (role) => {
-    suggestionsOptions.value = loadPromptSuggestion(role)
-  }
-
-  onMounted(() => {
-    loadContractData()
-  })
-
-  watchEffect(async () => {
-    const { account } = useAccountStore()
-
-    user.value = {
-      name: account.name,
-      client_id: account.client_id,
-      email: account.email,
-      first_name: account.first_name,
-      last_name: account.last_name,
-      id: account.id
-    }
-
-    loadPromptSuggestionWithRoleDecorator(account.jobRole)
-    hasSupport.value = !account?.isDeveloperSupportPlan
-  })
 
   watch(
     () => router.currentRoute.value.name,
@@ -60,20 +30,29 @@
 
 <template>
   <div class="flex flex-col h-[calc(100vh-3.5rem)]">
-    <AzionAIChatBlock
-      :user="user"
-      :suggestionsOptions="suggestionsOptions"
-      :invokeClearChat="activeComponent.props?.clearChat"
+    <Toolbar
+      class="border-noround surface-section border-x-none w-full pl-6 pr-8 py-3 z-10 border-top-none"
     >
-      <template #chatControls="{ clearChat }">
+      <template #start>
+        <h3 class="text-color text-lg font-medium flex gap-3">
+          Azion Copilot
+          <PrimeTag
+            v-tooltip.bottom="
+              'Copilot is in preview mode and can make mistakes. Consider verifying important information.'
+            "
+            value="Preview"
+          />
+        </h3>
+      </template>
+      <template #end>
         <div class="flex gap-2">
+          <!-- TODO: wire up once the postMessage bridge to the Copilot app exists -->
           <PrimeButton
             icon="pi pi-eraser"
             outlined
             class="surface-border h-8 w-8"
             aria-label="New chat"
             v-tooltip.bottom="'New chat'"
-            @click="clearChat"
           />
           <PrimeButton
             icon="pi pi-arrow-up-right-and-arrow-down-left-from-center"
@@ -93,19 +72,7 @@
           />
         </div>
       </template>
-      <template
-        #chatSuggestions
-        v-if="hasSupport"
-      >
-        <PrimeButton
-          label="Open a support ticket"
-          @click="openContactSupport"
-          iconPos="right"
-          size="small"
-          link
-          icon="pi pi-external-link"
-        />
-      </template>
-    </AzionAIChatBlock>
+    </Toolbar>
+    <CopilotFrame class="flex-1" />
   </div>
 </template>

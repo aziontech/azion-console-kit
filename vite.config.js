@@ -43,7 +43,13 @@ const getConfig = () => {
       __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false
     },
     plugins: [
-      vue(),
+      vue({
+        template: {
+          compilerOptions: {
+            isCustomElement: (tag) => tag === 'azion-chat-widget'
+          }
+        }
+      }),
       vueJsx(),
       ...(IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length
         ? [
@@ -136,6 +142,10 @@ const getConfig = () => {
             ? 'https://jkjuyhi0gza.map.azionedge.net'
             : 'https://urvlgkvpxla.map.azionedge.net',
           rewrite: (path) => path.replace(/^\/edge_api/, '')
+        }),
+        '/copilot-api': createProxyConfig({
+          target: 'http://localhost:3000',
+          rewrite: (path) => path.replace(/^\/copilot-api/, '')
         })
       }
     }
