@@ -208,6 +208,17 @@ describe('panels-service', () => {
       const stored = JSON.parse(storageMock._store['rte-custom-panels'])
       expect(stored).toHaveLength(2)
     })
+
+    it('should cap stored panels at 50, dropping the oldest', () => {
+      for (let index = 0; index < 55; index += 1) {
+        savePanel(makeValidPanel({ id: `panel-${index}` }))
+      }
+
+      const stored = JSON.parse(storageMock._store['rte-custom-panels'])
+      expect(stored).toHaveLength(50)
+      expect(stored[0].id).toBe('panel-5')
+      expect(stored[49].id).toBe('panel-54')
+    })
   })
 
   describe('updatePanel', () => {

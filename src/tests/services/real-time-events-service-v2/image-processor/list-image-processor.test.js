@@ -97,10 +97,10 @@ describe('ImageProcessorServices', () => {
           summary: [
             { key: 'configurationId', value: fixtures.imageProcessor.configurationId },
             { key: 'host', value: fixtures.imageProcessor.host },
-            { key: 'httpReferer', value: fixtures.imageProcessor.httpReferer },
-            { key: 'httpUserAgent', value: fixtures.imageProcessor.httpUserAgent },
             { key: 'requestUri', value: fixtures.imageProcessor.requestUri },
             { key: 'status', value: fixtures.imageProcessor.status },
+            { key: 'httpReferer', value: fixtures.imageProcessor.httpReferer },
+            { key: 'httpUserAgent', value: fixtures.imageProcessor.httpUserAgent },
             { key: 'bytesSent', value: fixtures.imageProcessor.bytesSent }
           ],
           ts: fixtures.imageProcessor.ts,

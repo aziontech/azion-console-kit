@@ -49,14 +49,30 @@ const fieldsByRequest = [
 ]
 
 const mergeHttpEvents = (responses) => {
-  return responses
+  // O(n) collect+unwrap (fix C9): the previous reduce did `[].concat(acc[key], value)`
+  // per repeated key, which is O(n²) when a key recurs across events. Gather all
+  // values per key into buckets first (preserving first-seen key order), then unwrap
+  // to a scalar when a key occurred once and to an ordered array when it repeated —
+  // byte-equivalent to the old concat behavior for the happy path (disjoint chunks).
+  const buckets = {}
+  responses
     .flatMap((res) => res.body?.data?.workloadEvents || [])
-    .reduce((acc, event) => {
+    .forEach((event) => {
       Object.entries(event).forEach(([key, value]) => {
-        acc[key] = acc[key] ? [].concat(acc[key], value) : value
+        if (buckets[key]) {
+          buckets[key].push(value)
+        } else {
+          buckets[key] = [value]
+        }
       })
-      return acc
-    }, {})
+    })
+
+  const merged = {}
+  Object.keys(buckets).forEach((key) => {
+    const bucket = buckets[key]
+    merged[key] = bucket.length === 1 ? bucket[0] : [].concat(...bucket)
+  })
+  return merged
 }
 
 const createPayload = (filter, fields) => {

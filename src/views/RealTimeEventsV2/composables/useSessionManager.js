@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, unref } from 'vue'
 import {
   loadPanels,
   loadPanelsWithMeta,
@@ -11,37 +11,16 @@ import {
 } from '@/services/panels-service'
 import REPORTS from '@/modules/real-time-metrics/constants/reports'
 import { MAX_TOTAL_TABS } from './useTabLimit.js'
+import { resolveTabNeighbor } from './utils/resolveTabNeighbor.js'
+import { createSessionUrlSync } from './utils/sessionUrlSync.js'
+import { useSessionPersistence, migrateLegacyDataset } from './useSessionPersistence.js'
 
-// Kept for backward compatibility — when canOpenNewTab is not injected,
-// fall back to the old per-type limit.
-export const MAX_OPEN_TABS = 5
-
-const TABS_STORAGE_KEY = 'rte:open-tabs'
-const ACTIVE_TAB_STORAGE_KEY = 'rte:active-tab'
-
-// Legacy dataset name aliases. Sessions persisted with the old GraphQL dataset
-// identifiers are transparently migrated at load time so the UI keeps working
-// without forcing users to re-save every session. Rewrites happen in-memory
-// only; the next explicit save materializes the new identifier on disk.
-const LEGACY_DATASET_ALIASES = Object.freeze({
-  httpEvents: 'workloadEvents',
-  edgeFunctionsEvents: 'functionEvents',
-  cellsConsoleEvents: 'functionConsoleEvents',
-  imageProcessedEvents: 'imagesProcessedEvents',
-  l2CacheEvents: 'tieredCacheEvents',
-  idnsQueriesEvents: 'edgeDnsQueriesEvents'
-})
-
-const migrateLegacyDataset = (panel) => {
-  const dataset = panel?.eventsConfig?.dataset
-  if (!dataset) return panel
-  const renamed = LEGACY_DATASET_ALIASES[dataset]
-  if (!renamed) return panel
-  return {
-    ...panel,
-    eventsConfig: { ...panel.eventsConfig, dataset: renamed }
-  }
-}
+// Single ceiling expressed in terms of NON-PINNED tabs. The pinned Events tab
+// (id === null) is always present and never counted here, so the effective
+// total ceiling stays MAX_TOTAL_TABS. Used only on the (rare) un-injected
+// fallback path — the injected canOpenNewTab predicate is authoritative
+// otherwise. There is exactly ONE ceiling value everywhere (req 2.1).
+const MAX_NON_PINNED_TABS = MAX_TOTAL_TABS - 1
 
 // Fixed first tab representing the raw events explorer.
 export const EVENTS_TAB = Object.freeze({
@@ -61,16 +40,30 @@ export const EVENTS_TAB = Object.freeze({
  * @param {import('vue-router').RouteLocationNormalized} options.route         – current route
  * @param {import('vue-router').Router}                  options.router        – router instance
  * @param {Object}                                        options.toast         – PrimeVue toast service
- * @param {(() => boolean)|null}                          [options.canOpenNewTab=null] – injected from useTabLimit; when provided, replaces the per-type MAX_OPEN_TABS check
+ * @param {import('vue').ComputedRef<boolean>|(() => boolean)|null} [options.canOpenNewTab=null] – injected from useTabLimit (single ceiling-aware source of truth); when provided, it is authoritative for admission. When absent, the fallback counts against the SAME unified ceiling (MAX_TOTAL_TABS). Accepts a computed ref or a getter.
+ * @param {((reservedCount?: number) => number)|null}      [options.capForRestore=null] – ceiling-aware restore cap from useTabLimit. When provided, restoration honors the unified ceiling. When absent, the fallback slices against the same MAX_TOTAL_TABS ceiling.
+ * @param {(() => number)|null}                            [options.reservedTabCount=null] – getter for tab slots already consumed by OTHER tab kinds (e.g. additional Events tabs) at Dashboard-restore time. Used to keep the unified ceiling correct regardless of restore order. Defaults to 0.
  * @param {import('vue').Ref|null}                         [options.fallbackCopyDialogRef=null] – ref to a `<FallbackCopyDialog>` instance. When clipboard write fails or the Clipboard API is unavailable, the dialog is opened with the share URL so the user can copy it manually. Optional: when omitted (or unwired), a plain error toast is shown instead.
+ * @param {(() => Array<{id: (string|null)}>)|null}        [options.combinedTabOrder=null] – getter for the full visual tab order (pinned Events + additional Events + Dashboard). Used by internal close paths (deleteSession) to resolve the correct neighbor across ALL tab kinds, matching the caller-provided nextActiveId path. When absent, close falls back to the openTabs-local left neighbor.
  */
 export function useSessionManager({
   route,
   router,
   toast,
   canOpenNewTab = null,
-  fallbackCopyDialogRef = null
+  capForRestore = null,
+  reservedTabCount = null,
+  fallbackCopyDialogRef = null,
+  combinedTabOrder = null
 }) {
+  const readCombinedTabOrder = () =>
+    typeof combinedTabOrder === 'function' ? combinedTabOrder() : null
+  // Normalize the injected admission predicate: useTabLimit now exposes a
+  // stable computed, but a plain getter is still accepted for compatibility.
+  const readCanOpenNewTab = () => {
+    if (canOpenNewTab == null) return null
+    return typeof canOpenNewTab === 'function' ? canOpenNewTab() : unref(canOpenNewTab)
+  }
   const openTabs = ref([EVENTS_TAB])
   const activeTabId = ref(null)
   const panels = ref([])
@@ -115,62 +108,51 @@ export function useSessionManager({
   // Backwards-compat alias (kept for existing consumers).
   const activePanel = activeTabId
 
-  // ── localStorage persistence ──
-  const persistTabs = () => {
-    try {
-      const persistable = openTabs.value
-        .filter((tab) => tab.id !== null && tab.type !== 'shared')
-        .map((tab) => tab.id)
-      localStorage.setItem(TABS_STORAGE_KEY, JSON.stringify(persistable))
-      localStorage.setItem(ACTIVE_TAB_STORAGE_KEY, activeTabId.value ?? '')
-    } catch {
-      // ignore (localStorage unavailable)
-    }
-  }
+  // ── localStorage persistence (extracted) ──
+  const { persistTabs, restoreTabs } = useSessionPersistence({
+    openTabs,
+    activeTabId,
+    panels,
+    eventsTab: EVENTS_TAB,
+    maxTotalTabs: MAX_TOTAL_TABS,
+    capForRestore,
+    reservedTabCount
+  })
 
-  const restoreTabs = () => {
-    try {
-      const raw = localStorage.getItem(TABS_STORAGE_KEY)
-      if (!raw) return
-      const ids = JSON.parse(raw)
-      if (!Array.isArray(ids)) return
-      const validIds = ids.filter((id) => panels.value.some((panel) => panel.id === id))
-      const restored = validIds.slice(0, MAX_OPEN_TABS).map((id) => {
-        const panel = panels.value.find((item) => item.id === id)
-        return { id: panel.id, label: panel.label, icon: panel.icon, closable: true }
-      })
-      openTabs.value = [EVENTS_TAB, ...restored]
-      const savedActive = localStorage.getItem(ACTIVE_TAB_STORAGE_KEY)
-      if (savedActive && openTabs.value.some((tab) => String(tab.id) === savedActive)) {
-        activeTabId.value = savedActive === '' ? null : savedActive
-      }
-    } catch {
-      // ignore
-    }
-  }
-
-  // ── URL sync helpers ──
-  const syncUrlWithPanel = () => {
-    const { name, params, query } = route
-    const newQuery = { ...query }
-
-    if (activeTabId.value) {
-      newQuery.panel = activeTabId.value
-    } else {
-      delete newQuery.panel
-    }
-
-    router.replace({ name, params, query: newQuery })
-  }
-
-  const removeQueryParam = (paramName) => {
-    const { name, params, query } = route
-    const newQuery = { ...query }
-    delete newQuery[paramName]
-    router.replace({ name, params, query: newQuery })
-  }
+  // ── URL sync helpers (extracted) ──
+  const { syncUrlWithPanel, removeQueryParam } = createSessionUrlSync({
+    route,
+    router,
+    activeTabId
+  })
 
   // ── Tab management ──
+  /**
+   * Single admission gate shared by every "open a new tab" path (openTab and
+   * handleShareImport). When the injected canOpenNewTab predicate is present it
+   * is authoritative; otherwise we count non-pinned tabs against the SAME
+   * unified ceiling (MAX_TOTAL_TABS). Either way the toast reports the one
+   * ceiling value, so no divergent number can leak to the user (req 2.1, 2.5).
+   *
+   * @returns {boolean} true when a new tab may be opened.
+   */
+  const canAdmitNewTab = () => {
+    const admission = readCanOpenNewTab()
+    if (admission !== null) return admission
+    const nonPinnedCount = openTabs.value.filter((tab) => tab.id !== null).length
+    return nonPinnedCount < MAX_NON_PINNED_TABS
+  }
+
+  const notifyTabLimitReached = () => {
+    toast.add({
+      closable: true,
+      severity: 'warn',
+      summary: `Tab limit reached (${MAX_TOTAL_TABS})`,
+      detail: 'Close a tab before opening another one.',
+      life: 4000
+    })
+  }
+
   const openTab = (panelId) => {
     if (panelId === null || panelId === undefined) {
       activeTabId.value = null
@@ -180,18 +162,8 @@ export function useSessionManager({
     }
     const alreadyOpen = openTabs.value.some((tab) => tab.id === panelId)
     if (!alreadyOpen) {
-      const extraCount = openTabs.value.filter((tab) => tab.id !== null).length
-      const limitReached = canOpenNewTab ? !canOpenNewTab() : extraCount >= MAX_OPEN_TABS
-      if (limitReached) {
-        toast.add({
-          closable: true,
-          severity: 'warn',
-          summary: canOpenNewTab
-            ? `Tab limit reached (${MAX_TOTAL_TABS})`
-            : `Tab limit reached (${MAX_OPEN_TABS})`,
-          detail: 'Close a tab before opening another one.',
-          life: 4000
-        })
+      if (!canAdmitNewTab()) {
+        notifyTabLimitReached()
         return
       }
       const panel = panels.value.find((item) => item.id === panelId)
@@ -206,16 +178,40 @@ export function useSessionManager({
     persistTabs()
   }
 
-  const closeTab = (panelId) => {
+  /**
+   * Close a Dashboard/panel tab and, when it was active, activate a neighbor.
+   *
+   * Neighbor resolution (req 2.2 / C4): the visual tab bar interleaves the
+   * pinned Events tab, additional Events tabs, and Dashboard tabs, but
+   * `openTabs` only holds the pinned + Dashboard tabs. Picking a neighbor by an
+   * index into that PARTIAL array can activate the wrong tab. The caller (the
+   * view) therefore resolves the neighbor from the COMBINED visual order and
+   * passes it as `nextActiveId` — an id that may be an `events:*` tab, a
+   * Dashboard id, or `null` (the pinned Events tab). When `nextActiveId` is not
+   * provided (e.g. internal `deleteSession` calls), we fall back to the
+   * openTabs-local left neighbor for backward compatibility.
+   *
+   * @param {string|null} panelId – id of the tab to close
+   * @param {string|null} [nextActiveId] – id to activate when the closed tab was
+   *   active; resolved from the combined tab order by the caller. `undefined`
+   *   means "not provided" and triggers the local fallback; explicit `null`
+   *   means "activate the pinned Events tab".
+   */
+  const closeTab = (panelId, nextActiveId) => {
     if (panelId === null) return // Events tab is non-closable
     const idx = openTabs.value.findIndex((tab) => tab.id === panelId)
     if (idx <= 0) return
     const wasActive = activeTabId.value === panelId
     openTabs.value = openTabs.value.filter((tab) => tab.id !== panelId)
     if (wasActive) {
-      // Activate previous tab (or Events if only Events left)
-      const next = openTabs.value[Math.max(0, idx - 1)]
-      activeTabId.value = next ? next.id : null
+      if (nextActiveId !== undefined) {
+        // Neighbor resolved from the combined visual order by the caller.
+        activeTabId.value = nextActiveId
+      } else {
+        // Fallback: openTabs-local left neighbor (Events if only Events left).
+        const next = openTabs.value[Math.max(0, idx - 1)]
+        activeTabId.value = next ? next.id : null
+      }
       syncUrlWithPanel()
     }
     if (sharedTabState.value && sharedTabState.value.id === panelId) {
@@ -294,9 +290,16 @@ export function useSessionManager({
     try {
       deletePanel(panelId)
       panels.value = loadPanels()
-      // Close the tab if open
+      // Close the tab if open. Resolve the neighbor from the COMBINED visual
+      // order (same seam TabsView uses for user-driven close) so deleting an
+      // active Dashboard tab that sits after additional Events tabs activates
+      // the correct neighbor instead of an openTabs-local positional guess
+      // (req 2.2 / C4). Falls back to closeTab's local resolution when the
+      // combined order is not injected.
       if (openTabs.value.some((tab) => tab.id === panelId)) {
-        closeTab(panelId)
+        const order = readCombinedTabOrder()
+        const nextActiveId = Array.isArray(order) ? resolveTabNeighbor(order, panelId) : undefined
+        closeTab(panelId, nextActiveId)
       }
       toast.add({
         closable: true,
@@ -473,24 +476,46 @@ export function useSessionManager({
 
     // If the share contains a custom panel that isn't already local, create an
     // ephemeral shared tab (not persisted; users can "Save" via existing flows).
+    // Admission honors the SAME unified ceiling as openTab (req 2.5 / bug C7):
+    // a shared tab must not bypass the limit. When the ceiling is reached we do
+    // NOT append a new tab — the shared view still round-trips via
+    // pendingShareViewState applied to the pinned Events tab below (and a toast
+    // tells the user why no tab was opened), mirroring openTab's behavior.
+    //
+    // `sharedTabRefused` is set ONLY when a genuinely new shared tab was blocked
+    // by the ceiling; the "panel already exists locally" and "no panelConfig"
+    // cases keep their original activation semantics untouched.
+    let sharedTabRefused = false
     if (decoded.panelConfig) {
       const cfg = decoded.panelConfig
       const exists = panels.value.some((panel) => panel.id === cfg.id)
       if (!exists) {
-        sharedTabState.value = {
-          id: cfg.id,
-          panelConfig: { ...cfg, type: 'shared' }
+        if (canAdmitNewTab()) {
+          sharedTabState.value = {
+            id: cfg.id,
+            panelConfig: { ...cfg, type: 'shared' }
+          }
+          openTabs.value = [
+            ...openTabs.value,
+            { id: cfg.id, label: cfg.label, icon: cfg.icon, closable: true, shared: true }
+          ]
+        } else {
+          notifyTabLimitReached()
+          sharedTabRefused = true
         }
-        openTabs.value = [
-          ...openTabs.value,
-          { id: cfg.id, label: cfg.label, icon: cfg.icon, closable: true, shared: true }
-        ]
       }
     }
 
     if (decoded.tab !== undefined) {
       const tabId = decoded.tab
-      if (tabId === null || openTabs.value.some((tab) => tab.id === tabId)) {
+      // When the shared panel tab was refused by the ceiling, do NOT activate a
+      // phantom id — fall back to the pinned Events tab so the buffered
+      // viewState still lands somewhere visible (consistent with openTab).
+      const sharedTabWasRefused =
+        sharedTabRefused && decoded.panelConfig && decoded.panelConfig.id === tabId
+      if (sharedTabWasRefused) {
+        activeTabId.value = null
+      } else if (tabId === null || openTabs.value.some((tab) => tab.id === tabId)) {
         activeTabId.value = tabId
       }
     }

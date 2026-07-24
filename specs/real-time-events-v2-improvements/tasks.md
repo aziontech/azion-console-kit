@@ -10,15 +10,15 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
 
 ### Mapeamento Properties → Verificação
 
-| Property | Verificação | Onde está | Fase |
-|---|---|---|---|
-| **P1** — Share URL é base64-encoded e URL-safe | Lint custom: check `encodeShareState` output matches `[A-Za-z0-9+/=]*`; PBT: encode/decode roundtrip | `src/services/panels-service/` | Fase 0 |
-| **P2** — Clipboard write é async-awaited; toast sucesso após resolve | Integration test: mock clipboard, assert toast fires **after** write promise resolves, not before | `src/views/RealTimeEventsV2/composables/useSessionManager.js` | Fase 1 |
-| **P3** — Queries GraphQL em 5 datasets nunca passam unsupported groupBy | Lint custom AST: scan `loadEventsChartFromEventsApi` calls, assert `groupByField` in `DATASET_SUPPORTS_GROUPBY[dataset]` or is null | `src/services/real-time-events-service-v2/load-events-aggregation.js` | Fase 3 |
-| **P4** — Saved searches validadas ao carregar; entradas corrompidas puladas | PBT: corrupt entries in localStorage, assert load skips them + logs, valid ones loaded | `src/views/RealTimeEventsV2/composables/useSavedSearches.js` | Fase 2 |
-| **P5** — Modal width estável across field/operator changes | Playwright visual: measure modal width on field change, assert no resize; Mermaid diagram in design confirms constraint | `src/components/base/advanced-filter-system-v2/filterFields/` | Fase 4 |
-| **P6** — Share state import valida schema version | PBT: decode malformed payloads (missing `ver`, wrong `ver`), assert returns null or error | `src/views/RealTimeEventsV2/composables/useSessionManager.js` | Fase 1 |
-| **P7** — localStorage unavailable gracefully degraded com warning toast | Integration test: mock localStorage.setItem to throw QuotaExceededError, assert `localStorageAvailable=false` + toast shown | `src/views/RealTimeEventsV2/composables/useSavedSearches.js` | Fase 2 |
+| Property                                                                    | Verificação                                                                                                                         | Onde está                                                             | Fase   |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------ |
+| **P1** — Share URL é base64-encoded e URL-safe                              | Lint custom: check `encodeShareState` output matches `[A-Za-z0-9+/=]*`; PBT: encode/decode roundtrip                                | `src/services/panels-service/`                                        | Fase 0 |
+| **P2** — Clipboard write é async-awaited; toast sucesso após resolve        | Integration test: mock clipboard, assert toast fires **after** write promise resolves, not before                                   | `src/views/RealTimeEventsV2/composables/useSessionManager.js`         | Fase 1 |
+| **P3** — Queries GraphQL em 5 datasets nunca passam unsupported groupBy     | Lint custom AST: scan `loadEventsChartFromEventsApi` calls, assert `groupByField` in `DATASET_SUPPORTS_GROUPBY[dataset]` or is null | `src/services/real-time-events-service-v2/load-events-aggregation.js` | Fase 3 |
+| **P4** — Saved searches validadas ao carregar; entradas corrompidas puladas | PBT: corrupt entries in localStorage, assert load skips them + logs, valid ones loaded                                              | `src/views/RealTimeEventsV2/composables/useSavedSearches.js`          | Fase 2 |
+| **P5** — Modal width estável across field/operator changes                  | Playwright visual: measure modal width on field change, assert no resize; Mermaid diagram in design confirms constraint             | `src/components/base/advanced-filter-system-v2/filterFields/`         | Fase 4 |
+| **P6** — Share state import valida schema version                           | PBT: decode malformed payloads (missing `ver`, wrong `ver`), assert returns null or error                                           | `src/views/RealTimeEventsV2/composables/useSessionManager.js`         | Fase 1 |
+| **P7** — localStorage unavailable gracefully degraded com warning toast     | Integration test: mock localStorage.setItem to throw QuotaExceededError, assert `localStorageAvailable=false` + toast shown         | `src/views/RealTimeEventsV2/composables/useSavedSearches.js`          | Fase 2 |
 
 > Tarefas marcadas com `*` são opcionais (testes, stories, a11y checks). Tarefas sem `*` são obrigatórias para a feature ser completa.
 
@@ -41,7 +41,7 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     - Rule falha se encontra `navigator.clipboard.writeText()` sem `await` (pré-fix para P2)
     - _Requirements: 1.1, 1.2, N.7_
 
-  - [ ]* 1.3 Setup Property tests para encoding/decoding
+  - [ ]\* 1.3 Setup Property tests para encoding/decoding
     - Criar `src/services/panels-service/__tests__/encode-decode.pbt.js`
     - PBT: generate random ShareState objects, roundtrip via encode → decode, assert idempotent
     - Min 100 iterações com fast-check
@@ -55,7 +55,7 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     - Exportar ref para `TabsView.vue` usar via `fallbackCopyDialogRef.value.show(url)`
     - _Requirements: 1.4, N.8_
 
-  - [ ]* 2.2 Story: Testar fallback em ambiente sem Clipboard API
+  - [ ]\* 2.2 Story: Testar fallback em ambiente sem Clipboard API
     - Manual: disable `navigator.clipboard` no browser (Chrome DevTools), clicar Share, verificar dialog aparece
     - Verificar que URL pode ser copiada via button
     - _Requirements: 1.4, N.8_
@@ -89,7 +89,7 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     - Ensure `fallbackCopyDialogRef` is available (create via `ref(null)`, pass to `FallbackCopyDialog.vue`)
     - _Requirements: 1.1, 1.3, 1.4_
 
-  - [ ]* 4.3 Property Test: Clipboard Promise Handling
+  - [ ]\* 4.3 Property Test: Clipboard Promise Handling
     - Mock `navigator.clipboard.writeText` to return a deferred promise
     - Assert that success toast fires **after** promise resolves, not immediately
     - Assert error toast fires on reject
@@ -112,14 +112,14 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     - Integration with `useViewSync` composable (already wired)
     - _Requirements: 1.5, N.2_
 
-  - [ ]* 5.3 Property Test: Share State Validation
+  - [ ]\* 5.3 Property Test: Share State Validation
     - **Property P6: Share state import valida schema version**
     - **Validates: Requirements 1.7, N.2**
     - PBT: generate malformed payloads (missing `ver`, `ver=999`, bad JSON), assert `decodeShareState` returns null
     - PBT: generate valid ShareState objects, encode → decode → verify equality
     - _Requirements: 1.5, 1.7, N.2_
 
-  - [ ]* 5.4 E2E Story: Share URL Round-Trip
+  - [ ]\* 5.4 E2E Story: Share URL Round-Trip
     - Start on Real-Time Events V2 with filters applied
     - Click Share button → copy URL
     - Open URL in new tab → verify same filters/dataset/pageSize appear
@@ -157,7 +157,7 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     - Use `localStorageAvailable` flag to gate toast
     - _Requirements: 3.5, N.6_
 
-  - [ ]* 7.3 Property Test: Saved Search Persistence & Validation
+  - [ ]\* 7.3 Property Test: Saved Search Persistence & Validation
     - **Property P4: Saved searches validadas ao carregar; entradas corrompidas puladas**
     - **Validates: Requirements 3.1, 3.2, 3.6, N.3**
     - PBT: generate valid SavedSearch objects, save to mock localStorage, load, assert equality
@@ -165,7 +165,7 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     - PBT: 50+ entries, assert load < 200ms
     - _Requirements: 3.1, 3.2, 3.6, N.3_
 
-  - [ ]* 7.4 Property Test: localStorage Unavailable Graceful Degradation
+  - [ ]\* 7.4 Property Test: localStorage Unavailable Graceful Degradation
     - **Property P7: localStorage unavailable gracefully degraded com warning toast**
     - **Validates: Requirements 3.5, N.6**
     - Mock localStorage.setItem to throw QuotaExceededError
@@ -213,9 +213,9 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
         functionConsoleEvents: new Set([]),
         dataStreamedEvents: new Set([]),
         edgeDnsQueriesEvents: new Set([]),
-        activityHistoryEvents: new Set([]),
+        activityHistoryEvents: new Set([])
         // ... others
-      };
+      }
       ```
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
 
@@ -229,7 +229,7 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     - If `groupByField` dropped, log: `{ event: 'unsupported_groupby', dataset, field, fallback_to_ts }`
     - _Requirements: 2.1-2.7, N.9_
 
-  - [ ]* 10.4 Integration Test: GraphQL Query Validation
+  - [ ]\* 10.4 Integration Test: GraphQL Query Validation
     - **Property P3: Queries GraphQL em 5 datasets nunca passam unsupported groupBy**
     - **Validates: Requirements 2.1-2.7, N.9**
     - For each of 5 problematic datasets (functionEvents, functionConsoleEvents, dataStreamedEvents, edgeDnsQueriesEvents, activityHistoryEvents):
@@ -240,7 +240,7 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     - Test that workloadEvents still supports `groupBy: ['ts', 'status']` (positive control)
     - _Requirements: 2.1-2.7, N.9_
 
-  - [ ]* 10.5 Story: Verify Tabs Load Without Errors
+  - [ ]\* 10.5 Story: Verify Tabs Load Without Errors
     - Manual: open Real-Time Events V2
     - Click each tab: Function Events, Function Console Events, Data Stream Events, Edge DNS Queries, Activity History
     - Verify no GraphQL error toast; data loads (or empty state if no data, but no error)
@@ -253,7 +253,7 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     - Log raw error to console: `console.error({ ...error, dataset, groupByField })`
     - _Requirements: 2.7, N.9_
 
-  - [ ]* 11.2 Story: Manual Test GraphQL Error Handling
+  - [ ]\* 11.2 Story: Manual Test GraphQL Error Handling
     - Manual: block GraphQL endpoint in DevTools → click on problematic tab → verify error toast appears with friendly text
     - Open console → verify raw error logged for debugging
     - _Requirements: 2.7, N.9_
@@ -294,7 +294,7 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     - Spot-check 2–3 key components
     - _Requirements: 4.2, 4.3, 4.4_
 
-  - [ ]* 13.4 Playwright Visual Test: Modal Width Stability
+  - [ ]\* 13.4 Playwright Visual Test: Modal Width Stability
     - **Property P5: Modal width estável across field/operator changes**
     - **Validates: Requirements 4.1-4.6**
     - Playwright: open Add Filter modal on desktop/tablet/mobile
@@ -304,7 +304,7 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     - Test on 3 breakpoints (desktop 1024px, tablet 800px, mobile 375px)
     - _Requirements: 4.1-4.6_
 
-  - [ ]* 13.5 Story: Manual Mobile Testing
+  - [ ]\* 13.5 Story: Manual Mobile Testing
     - Manual: test on iPhone/iPad (or Chrome mobile emulation)
     - Open Add Filter modal → select different fields/operators
     - Verify no jank, no resize animation
@@ -336,19 +336,19 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     - Playwright: click each tab (Function, Function Console, Data Stream, DNS, Activity History) → verify data loads (or empty state) without error
     - _Requirements: 2.1-2.7, 2.6_
 
-  - [ ]* 15.4 Story: Cross-Browser Testing
+  - [ ]\* 15.4 Story: Cross-Browser Testing
     - Manual: test Share URL on Chrome, Firefox, Safari (if possible)
     - Verify Clipboard API works or fallback dialog appears
     - _Requirements: 1.3, 1.4, N.8_
 
-  - [ ]* 15.5 Story: Accessibility Review
+  - [ ]\* 15.5 Story: Accessibility Review
     - Manual: test with screen reader (NVDA / JAWS / macOS VoiceOver)
     - Share toast is announced
     - Saved searches dropdown is navigable via keyboard
     - Error toasts are readable
     - _Requirements: N.4, N.5, N.6_
 
-  - [ ]* 15.6 Story: Mobile Responsiveness (All 4 Features)
+  - [ ]\* 15.6 Story: Mobile Responsiveness (All 4 Features)
     - Manual: test on mobile viewport
     - Share button accessible and clickable
     - Fallback copy dialog appears on small screen
@@ -429,7 +429,21 @@ Stack: Vue 3 (Composition API), GraphQL (REST POST), PrimeVue, @aziontech/webkit
     {
       "id": 5,
       "label": "Optional Tests & Stories (Waves 0–4)",
-      "tasks": ["1.3", "2.2", "4.3", "5.3", "5.4", "7.3", "7.4", "8.1", "10.4", "10.5", "11.2", "13.4", "13.5"]
+      "tasks": [
+        "1.3",
+        "2.2",
+        "4.3",
+        "5.3",
+        "5.4",
+        "7.3",
+        "7.4",
+        "8.1",
+        "10.4",
+        "10.5",
+        "11.2",
+        "13.4",
+        "13.5"
+      ]
     },
     {
       "id": 6,
@@ -563,4 +577,3 @@ Todas as 31 requirements cobertas:
 - ✅ N.8 — Task 4.1, 2.1
 - ✅ N.9 — Task 4.1, 10.3, 11.1
 - ✅ N.10 — Task 7.1
-

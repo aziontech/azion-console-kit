@@ -1,32 +1,18 @@
 import { computed, ref, watch } from 'vue'
 import { useMetricsChart, METRICS_CHART_CONFIGS } from './useMetricsChart'
+import { parseView, encodeView } from './view-protocol'
+import { normalizeTsBounds } from '@/services/real-time-events-service-v2/_shared/ts-normalize'
 import {
   loadAggregableFields,
   getAggregableFields
 } from '@/modules/filter-loaders/dataset-fields-loader'
 
 /**
- * Parse a unified `View` selection value. The View dropdown mixes two
- * families of options using a scheme-prefixed encoding so the caller can
- * route loading to the correct service:
- *
- *   events:<stackBy>      – 'events:none' | 'events:status' | 'events:requestMethod'
- *   metrics:<metricsKey>  – 'metrics:wafThreats' | 'metrics:botTraffic' | ...
- *
- * @param {string} viewValue
- * @returns {{ scheme: 'events'|'metrics', key: string }}
+ * @deprecated Backward-compat alias for {@link parseView} from `view-protocol`.
+ * The `scheme:key` codec now lives in a single module (task 11.4); this re-export
+ * keeps existing importers (`useViewSync`, `useEventsExplorer`, tests) stable.
  */
-export function parseViewValue(viewValue) {
-  if (typeof viewValue !== 'string' || !viewValue.includes(':')) {
-    return { scheme: 'events', key: 'none' }
-  }
-  const [scheme, ...rest] = viewValue.split(':')
-  const key = rest.join(':')
-  if (scheme !== 'events' && scheme !== 'metrics') {
-    return { scheme: 'events', key: 'none' }
-  }
-  return { scheme, key: key || 'none' }
-}
+export const parseViewValue = parseView
 
 /**
  * Composable for chart configuration resolution, metrics dashboard watcher,
@@ -45,6 +31,7 @@ export function parseViewValue(viewValue) {
  * @param {import('vue').ComputedRef<Array>}  [options.eventsStackOptions]    – tab-level stack options (defaults to Default/Status/Request Method)
  * @param {import('vue').ComputedRef<boolean>}[options.supportsStacking]      – whether the active tab supports stack-by (false for Functions/DNS/etc)
  * @param {import('vue').ComputedRef<string>} [options.accountTimezone]       – IANA timezone of the user account (e.g. 'America/Sao_Paulo')
+ * @param {import('vue').ComputedRef<string|null>} [options.selectedMetricsDashboard] – active metrics selection, INJECTED as a read-only computed derived from the single writable View source (`selectedView`, task 9.4 / design §3.6). useChartConfig no longer owns it; it wires it into useMetricsChart and reacts to it.
  */
 export function useChartConfig({
   filterData,
@@ -54,17 +41,22 @@ export function useChartConfig({
   eventsStackOptions = computed(() => []),
   supportsStacking = computed(() => true),
   onMetricsError = null,
-  accountTimezone = computed(() => 'UTC')
+  accountTimezone = computed(() => 'UTC'),
+  selectedMetricsDashboard = computed(() => null)
 }) {
   // ── Metrics chart (WAF / dashboard overlay) ──
+  // The active selection is DERIVED from the View SoT and injected; neither this
+  // composable nor useMetricsChart owns it (task 9.4). We pass it down so the
+  // metrics loader routes off the same derived value.
   const {
     data: metricsChartData,
     isLoading: isLoadingMetricsChart,
     configKey: metricsChartConfigKey,
-    selectedDashboard: selectedMetricsDashboard,
+    partial: metricsChartPartial,
     load: loadMetricsChart
   } = useMetricsChart(filterData, {
-    onError: onMetricsError
+    onError: onMetricsError,
+    selectedDashboard: selectedMetricsDashboard
   })
 
   // Live snapshot of each Metrics dataset's aggregable-fields enum. Starts as
@@ -91,10 +83,10 @@ export function useChartConfig({
     const dashboards = metricsDashboards.value || []
     if (!dashboards.length) return []
 
-    // Touch the ref so the computed re-runs when new enums land.
-    // eslint-disable-next-line no-unused-expressions
-    aggregableFieldsByDataset.value
-
+    // `aggregableFieldsByDataset.value` is read below via `canUseConfig`, which
+    // is a GENUINE reactive dependency — the ref is reassigned (`.value = next`)
+    // whenever new enums land, so the computed re-runs without a manual
+    // version-counter / no-op touch (task 9.8, req 4.8).
     const entries = Object.entries(METRICS_CHART_CONFIGS)
     return dashboards
       .map((dashboard) => {
@@ -103,7 +95,7 @@ export function useChartConfig({
           .filter(([, cfg]) => canUseConfig(cfg))
           .map(([metricsKey, cfg]) => ({
             label: cfg.label,
-            value: `metrics:${metricsKey}`,
+            value: encodeView({ scheme: 'metrics', key: metricsKey }),
             metricsKey
           }))
         return {
@@ -165,11 +157,13 @@ export function useChartConfig({
     const options = Array.isArray(eventsStackOptions.value) ? eventsStackOptions.value : []
     const hasDashboards = (metricsDashboards.value || []).length > 0
     if (hasDashboards || !supportsStacking.value || options.length === 0) {
-      return [{ label: 'Default', value: 'events:none', stackBy: 'none' }]
+      return [
+        { label: 'Default', value: encodeView({ scheme: 'events', key: 'none' }), stackBy: 'none' }
+      ]
     }
     return options.map((opt) => ({
       label: opt.label,
-      value: `events:${opt.value}`,
+      value: encodeView({ scheme: 'events', key: opt.value }),
       stackBy: opt.value
     }))
   })
@@ -208,6 +202,33 @@ export function useChartConfig({
     loadMetricsChart(config)
   })
 
+  /**
+   * Reload whichever metrics chart is currently active. Zero-arg: resolves the
+   * active dashboard selection into its `METRICS_CHART_CONFIGS` entry and
+   * triggers `loadMetricsChart`. No-op when no metrics view is active or the
+   * selection has no matching config. Consumed by the filter watcher below and
+   * by the tab-panel `onActivated`/dataset-reset paths.
+   */
+  const reloadActiveMetrics = () => {
+    const configId = selectedMetricsDashboard.value
+    if (!configId) return
+    const config = METRICS_CHART_CONFIGS[configId]
+    if (!config) return
+    loadMetricsChart(config)
+  }
+
+  // Reload the active metrics chart when the shared filter's time range or AQL
+  // fields change. Guarded by an active metrics selection; no `immediate` since
+  // the `selectedMetricsDashboard` watch covers the initial load. No `deep`:
+  // `tsRange`/`fields` are replaced by identity, so their refs are enough.
+  watch(
+    () => [filterData.value?.tsRange, filterData.value?.fields],
+    () => {
+      if (!selectedMetricsDashboard.value) return
+      reloadActiveMetrics()
+    }
+  )
+
   // ── Brush select (zoom into time range) ──
   /**
    * Convert a UTC Date to a "fake local" Date whose getHours/getMinutes/…
@@ -245,8 +266,7 @@ export function useChartConfig({
 
   const handleBrushSelect = ({ begin, end }) => {
     if (!filterData.value) return
-    const tsBegin = begin instanceof Date ? begin.toISOString() : String(begin)
-    const tsEnd = end instanceof Date ? end.toISOString() : String(end)
+    const { tsRangeBegin: tsBegin, tsRangeEnd: tsEnd } = normalizeTsBounds(begin, end)
     filterData.value = {
       ...filterData.value,
       tsRange: { tsRangeBegin: tsBegin, tsRangeEnd: tsEnd, label: '', labelStart: '', labelEnd: '' }
@@ -257,11 +277,8 @@ export function useChartConfig({
     const localBegin = toUserTzDate(begin, tz)
     const localEnd = toUserTzDate(end, tz)
     filterSystemRef.value?.syncDateRangeFromExternal?.(localBegin, localEnd, '')
-    // Reload metrics chart if active
-    if (selectedMetricsDashboard.value) {
-      const config = METRICS_CHART_CONFIGS[selectedMetricsDashboard.value]
-      if (config) loadMetricsChart(config)
-    }
+    // Metrics reload is handled by the filterData watcher (tsRange change),
+    // so we don't call loadMetricsChart here to avoid a double-fire.
     reloadListTableWithHash()
   }
 
@@ -270,10 +287,13 @@ export function useChartConfig({
     isLoadingMetricsChart,
     metricsChartConfigKey,
     selectedMetricsDashboard,
+    metricsChartPartial,
     hasMetricsDashboards,
     viewOptions,
     hasMultipleViewOptions,
     loadMetricsChart,
+    reloadActiveMetrics,
+    metricsViewItemsFlat,
     handleBrushSelect
   }
 }

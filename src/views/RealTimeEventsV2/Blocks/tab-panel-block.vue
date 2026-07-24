@@ -1,15 +1,5 @@
 <script setup>
-  import {
-    computed,
-    nextTick,
-    onBeforeMount,
-    onBeforeUnmount,
-    onMounted,
-    onActivated,
-    onDeactivated,
-    ref,
-    watch
-  } from 'vue'
+  import { computed, nextTick, onBeforeMount, onMounted, onActivated, ref, watch } from 'vue'
   import { useRouteFilterManager } from '@/helpers'
   import { useToast } from '@aziontech/webkit/use-toast'
   import DetailSidebarPanel from './components/detail-sidebar-panel.vue'
@@ -18,7 +8,7 @@
   import EventsSummaryBar from './components/events-summary-bar.vue'
   import ResizableSplitter from '@/components/Splitter/ResizableSplitter.vue'
   import DiscoverToolbar from './components/discover-toolbar.vue'
-  import DiscoverDataTable from './components/discover-data-table.vue'
+  import VirtualEventTable from './components/VirtualEventTable.vue'
   import QueryHistoryOverlay from './components/query-history-overlay.vue'
   import SavedSearchesOverlay from './components/saved-searches-overlay.vue'
   import LoadMoreFooter from './components/load-more-footer.vue'
@@ -26,7 +16,6 @@
   import { getChartConfig } from './constants/chart-configs'
   import TABS_EVENTS from './constants/tabs-events'
   import { useAccountStore } from '@stores/account'
-  import { resetSeriesOrderCache } from '../composables/useChartBuilder'
   import safeStructuredClone from '@/helpers/structured-clone'
 
   // Composables
@@ -36,6 +25,7 @@
   import { useDetailView } from '../composables/useDetailView'
   import { usePageSize, PAGE_SIZE_OPTIONS } from '../composables/usePageSize'
   import { useEventsData } from '../composables/useEventsData'
+  import { useEventDataset } from '../composables/useEventDataset'
   import { useFilterActions } from '../composables/useFilterActions'
   import { useChartConfig } from '../composables/useChartConfig'
   import { useExportData } from '../composables/useExportData'
@@ -43,6 +33,10 @@
   import { useDatasetFields } from '../composables/useDatasetFields'
   import { useFieldResolution } from '../composables/useFieldResolution'
   import { useViewSync } from '../composables/useViewSync'
+  import { useEventsExplorer } from '../composables/useEventsExplorer'
+  import { useChartCollapse } from '../composables/useChartCollapse'
+  import { useShareState } from '../composables/useShareState'
+  import { useKeepAliveResource } from '@/composables/useKeepAliveResource'
 
   defineOptions({ name: 'TabPanelBlock' })
   const emit = defineEmits(['dataset-change'])
@@ -89,7 +83,11 @@
   const selectedFields = ref([])
   const sidebarVisible = ref(typeof window !== 'undefined' ? window.innerWidth > 768 : true)
   const filterBarRef = ref(null)
-  const stackByField = ref('none')
+  // Reactive gate for the events chart-aggregation co-fire (design §3.8). Mirrors
+  // `isMetricsView`: under a metrics view the events chart isn't shown, so co-
+  // firing it per list load is wasted; kept in sync by a watcher. Page-size
+  // reloads additionally skip the chart via load({skipChart:true}).
+  const suppressChartAgg = ref(false)
 
   const allDatasets = Object.values(TABS_EVENTS)
   const accountTimezone = computed(() => {
@@ -120,21 +118,45 @@
   const chartStackByOptions = computed(() => props.tabSelected?.stackByOptions ?? [])
   const tabSupportsStacking = computed(() => props.tabSelected?.showStackBy ?? false)
 
+  // Forwarding seam for the single reload entry (useEventsExplorer), which is
+  // instantiated AFTER useChartConfig but needs to be callable by useViewSync's
+  // intent callback + the watchers below. The holder is assigned once the explorer
+  // exists; every call site funnels through it.
+  const reload = (reason, payload) => reloadImpl(reason, payload)
+  // Single-assignment seam (C6): reloadImpl is wired exactly once (after the
+  // explorer exists). A second assignment throws to surface accidental re-wiring.
+  let reloadImpl = () => {}
+  let reloadImplWired = false
+  const setReloadImpl = (fn) => {
+    if (reloadImplWired) throw new Error('reloadImpl already assigned')
+    reloadImpl = fn
+    reloadImplWired = true
+  }
+
+  /* ── View sync — single writable View source of truth (design §3.6, task 9.4) ── */
+  // `selectedView` is the ONLY writable view state; `stackByField`,
+  // `selectedMetricsDashboard`, `isMetricsView` are read-only computeds from it.
+  // A View change emits the parsed intent to the single reload seam (one list load
+  // + one chart agg), killing the historical dual ownership that could desync.
+  const { selectedView, isMetricsView, stackByField, selectedMetricsDashboard } = useViewSync({
+    onIntent: (intent) => reload('view', { intent })
+  })
+
   /* ── Events data ── */
   const {
     tableData,
     chartData,
     kpis: summaryKpis,
     recordsFound,
+    aggregateDivergence,
     isLoading,
     isChartLoading,
+    chartHasError,
     hasMoreData,
     isLoadingMore,
     initialLoadDone,
     load: loadData,
-    loadChart,
-    loadMore: loadMoreData,
-    setRecordsFound
+    loadMore: loadMoreData
   } = useEventsData({
     filterData,
     listService: computed(() => props.listService),
@@ -143,19 +165,40 @@
     pageSize,
     hasChartConfig,
     onError: (error) => toast.add(error),
-    stackByField
+    stackByField,
+    suppressChartAgg
   })
 
-  watch(stackByField, () => {
-    if (hasChartConfig.value) loadChart()
+  // NOTE: the former `watch(stackByField) -> loadChart()` is intentionally removed
+  // (design §3.8, task 7.3). A stack-by change now rides the single `reload('view')`
+  // path: the View intent sets `stackByField`, then one list load() co-fires the
+  // chart agg once — eliminating the classic events-view double chart-agg.
+
+  /* ── Dataset contract (design §2.1(2)(3)(4), §3.4) ── */
+  // THE table data seam between the producer (`useEventsData`) and every rows
+  // consumer: re-exposes the same `tableData` ref + id-keyed indexes + a single
+  // `resetToken`. Eviction ENABLED (task 9.2, cap max(10×pageSize,5000)); id-keyed
+  // search/stats keep the trim desync-free (design §2.1(3)/§7.4, P5).
+  const dataset = useEventDataset({
+    rows: tableData,
+    hasMore: hasMoreData,
+    pageSize: pageSize.value,
+    evictionEnabled: true
   })
+
+  // Release/rehydrate the dataset's reclaimable derived memory across keep-alive
+  // (task 9.9, req 4.6). The tab panel is the SINGLE owner: release (deactivate/
+  // unmount) drops the id-keyed indexes (the `rows` buffer survives); rehydrate
+  // (activate/mount) reindexes before the onActivated reload guard runs.
+  useKeepAliveResource(dataset.rehydrate, dataset.releaseReclaimable)
 
   /* ── Field resolution ── */
   const { availableFieldOptions } = useFieldResolution({
     filterFields: computed(() => props.filterFields),
     liveDatasetFields,
     selectedFields,
-    tableData
+    tableData: dataset.rows,
+    resetToken: dataset.resetToken
   })
 
   /* ── Document search ── */
@@ -164,7 +207,7 @@
     debouncedQuery: debouncedSearchQuery,
     filteredData: filteredTableData,
     highlight: highlightText
-  } = useDocumentSearch(tableData)
+  } = useDocumentSearch({ rows: dataset.rows, resetToken: dataset.resetToken })
 
   /* ── Detail view ── */
   const {
@@ -183,7 +226,7 @@
     getRowClass,
     handleKeyDown,
     resetSelection
-  } = useDetailView(tableData)
+  } = useDetailView(dataset.rows)
 
   /* ── Active-tab guard ── */
   // When tabId is null (pinned tab), it is active when activeTabId is also null/undefined.
@@ -227,35 +270,62 @@
     loadData()
   }
 
-  // When the dataset changes, its filter-field catalogue (props.filterFields)
-  // is reloaded. Drop any active filter that the new dataset doesn't support
-  // (e.g. `status` when moving to Functions) and re-sync the encoded `filters=`
-  // URL param + reload — otherwise the stale filter leaks into the request and
-  // the API errors. Reference change of props.filterFields is the trigger.
+  // When the dataset changes, its filter-field catalogue reloads. Drop any active
+  // filter the new dataset doesn't support (e.g. `status` on Functions) and re-sync
+  // the encoded `filters=` param + reload, else the stale filter leaks and the API
+  // errors. Reference change of props.filterFields is the trigger.
   watch(
     () => props.filterFields,
     () => {
       if (pruneIncompatibleFilters()) {
-        reloadListTableWithHash()
+        reload('prune')
+      }
+    }
+  )
+
+  // When the dataset changes, its metrics dashboards (View dropdown entries) change
+  // too. If the selected metrics view no longer exists for the new dataset, fall
+  // back to plain events, else the selector points at an orphaned option and the
+  // chart shows stale metrics. Events views are never orphaned.
+  watch(
+    () => props.tabSelected?.panel,
+    async () => {
+      if (!isMetricsView.value) return
+      await nextTick()
+      const stillAvailable = metricsViewItemsFlat.value.some(
+        (item) => item.value === selectedView.value
+      )
+      if (!stillAvailable) {
+        selectedView.value = 'events:none'
       }
     }
   )
 
   /* ── Chart config ── */
+  // `selectedMetricsDashboard` is INJECTED here as the read-only computed
+  // derived from `selectedView` (owned by useViewSync, task 9.4). useChartConfig
+  // and useMetricsChart consume it; neither owns the selection anymore.
   const {
     metricsChartData,
     isLoadingMetricsChart,
     metricsChartConfigKey,
-    selectedMetricsDashboard,
+    metricsChartPartial,
     hasMetricsDashboards,
     viewOptions,
     hasMultipleViewOptions,
-    handleBrushSelect
+    handleBrushSelect,
+    reloadActiveMetrics,
+    metricsViewItemsFlat
   } = useChartConfig({
     filterData,
     metricsDashboards: computed(() => props.metricsDashboards),
     filterSystemRef: computed(() => filterBarRef.value?.filterSystemRef || null),
-    reloadListTableWithHash,
+    selectedMetricsDashboard,
+    // handleBrushSelect (in useChartConfig) is the only consumer; route it through
+    // the single reload seam as reason 'brush' so the events chart-agg is
+    // suppressed under a metrics view. Metrics still reloads via the filterData
+    // watch (tsRange mutation) — one metrics fetch, unchanged.
+    reloadListTableWithHash: () => reload('brush'),
     eventsStackOptions: chartStackByOptions,
     supportsStacking: tabSupportsStacking,
     accountTimezone,
@@ -272,16 +342,38 @@
         detail: detailMap[err?.reason] || err?.message || 'Showing events instead.',
         life: 4500
       })
+      // Single writable source: switching back to events is a `selectedView`
+      // write; the derived controls follow automatically.
       selectedView.value = 'events:none'
     }
   })
 
-  /* ── View sync ── */
-  const { selectedView, isMetricsView } = useViewSync({
+  // Keep the events chart-agg suppression gate mirroring the active view kind.
+  // `immediate` seeds it before the first load(); no reload is triggered here.
+  watch(
+    isMetricsView,
+    (metrics) => {
+      suppressChartAgg.value = metrics
+    },
+    { immediate: true }
+  )
+
+  /* ── Single reload seam (design §3.8/§7.5, task 7.3) ── */
+  // `applyViewIntent` inside the seam writes the single writable `selectedView`
+  // (task 9.4); the derived controls follow. `selectedMetricsDashboard` is
+  // passed read-only only to decide the activate-time metrics nudge.
+  const { reload: explorerReload } = useEventsExplorer({
+    reloadListTableWithHash,
+    loadData,
+    reloadActiveMetrics,
+    selectedView,
     selectedMetricsDashboard,
-    stackByField,
-    reloadListTableWithHash
+    // Fetch-only snapshot for the `activate` no-reload guard (task 9.6, req 4.14):
+    // getCurrentShareState minus the CLIENT-ONLY documentQuery/selectedFields, so
+    // a doc-search or field toggle no longer spuriously refetches on re-activation.
+    getInputsSnapshot: () => getFetchInputsSnapshot()
   })
+  setReloadImpl(explorerReload)
 
   /* ── Overlay refs ── */
   const queryHistoryOverlayRef = ref(null)
@@ -311,7 +403,7 @@
   const handleLoadQueryHistory = (entry) => {
     if (entry.filterFields?.length && filterData.value)
       filterData.value = { ...filterData.value, fields: safeStructuredClone(entry.filterFields) }
-    reloadListTableWithHash()
+    reload('query-history')
     queryHistoryOverlayRef.value?.hide()
   }
 
@@ -338,14 +430,14 @@
       pageSize.value = entry.pageSize
       setPageSize(entry.pageSize)
     }
-    reloadListTableWithHash()
+    reload('saved-search')
     savedSearchOverlayRef.value?.hide()
   }
 
   const handlePageSizeChange = (val) => {
     pageSize.value = val
     setPageSize(val)
-    loadData()
+    reload('page-size')
   }
 
   const onRowClick = ({ originalEvent, data: rowData }) => {
@@ -360,6 +452,17 @@
 
   const getFieldValue = (rowData, fieldName) => {
     const key = fieldName.replace('field_', '')
+    // O(1) cell access via the dataset's id-keyed summary map (§3.4) when the row
+    // is indexed. `.has` distinguishes "field absent" ('-') from a legitimately
+    // falsy stored value, matching the previous array-scan semantics (found →
+    // String(value); not found → '-').
+    const id = rowData?.id
+    if (id != null && dataset.hasId(id)) {
+      const summaryMap = dataset.summaryMapOf(id)
+      return summaryMap.has(key) ? String(summaryMap.get(key)) : '-'
+    }
+    // Fallback: row not (yet) indexed — scan its own summary array (unchanged
+    // behavior, no regression for detached/transient rows).
     if (!Array.isArray(rowData.summary)) return '-'
     const entry = rowData.summary.find((item) => item.key === key)
     return entry ? String(entry.value) : '-'
@@ -367,26 +470,9 @@
 
   const { handleLegendFilter } = useLegendFilter({ handleAddFilter, handleAddRangeFilter })
 
-  // ── Chart collapse (fullscreen mode) ─────────────────────────────────
-  // In fullscreen the chart is collapsed by default to maximise table space.
-  // The user can expand it again via the toggle button in the chart header.
-  const CHART_COLLAPSE_KEY = 'rte:chart-collapsed'
-  const isChartCollapsed = ref(false)
-  try {
-    if (localStorage.getItem(CHART_COLLAPSE_KEY) === '1') isChartCollapsed.value = true
-  } catch {
-    /* ignore */
-  }
-  watch(isChartCollapsed, (val) => {
-    try {
-      localStorage.setItem(CHART_COLLAPSE_KEY, val ? '1' : '0')
-    } catch {
-      /* ignore */
-    }
-  })
-  watch(isFullscreen, (val) => {
-    isChartCollapsed.value = val
-  })
+  // ── Chart collapse (fullscreen mode) ──
+  const { isChartCollapsed, toggleCollapse } = useChartCollapse({ isFullscreen })
+
   const handleDatasetChange = (dataset) => emit('dataset-change', dataset)
   const datasetDropdownOptions = computed(() =>
     allDatasets.map((ds) => ({ label: ds.title, value: ds.panel }))
@@ -396,20 +482,29 @@
     if (selectedDataset) emit('dataset-change', selectedDataset)
   }
 
-  const { dataTableRef, exportMenuItems, exportFunctionMapper } = useExportData({
-    tableData,
-    tabSelected: computed(() => props.tabSelected)
+  const { exportMenuItems, exportCsv } = useExportData({
+    // JSON export + CSV fallback source (the retained rows), read through the
+    // dataset seam.
+    tableData: dataset.rows,
+    tabSelected: computed(() => props.tabSelected),
+    // ── ≤10k LOGICAL export wiring (design §2.1(9)/§3.7) ──
+    // With these params the CSV export re-fetches the CURRENT range/filter up to
+    // EXPORT_MAX_ROWS (newest→oldest) instead of reading the mounted virtual
+    // window, so the export covers the logical result, not just what is on
+    // screen / retained.
+    listService: computed(() => props.listService),
+    filterData: () => filterData.value,
+    pageSize: () => pageSize.value,
+    selectedFields: () => selectedFields.value,
+    onWarn: ({ rows, cap }) =>
+      toast.add({
+        severity: 'warn',
+        summary: 'Export truncated',
+        detail: `The result has ${rows} rows; only the most recent ${cap} were exported.`,
+        life: 5000
+      })
   })
-  const discoverDataTableRef = ref(null)
   const eventChartRef = ref(null)
-  // Sync the dataTableRef from useExportData to the inner DataTable via the sub-component
-  watch(
-    () => discoverDataTableRef.value?.dataTableRef,
-    (inner) => {
-      dataTableRef.value = inner ?? null
-    },
-    { flush: 'post' }
-  )
 
   // When the detail sidebar opens or closes, the chart container width changes.
   // Trigger a resize after the DOM has settled so C3 fills the new width.
@@ -418,6 +513,16 @@
       setTimeout(() => {
         eventChartRef.value?.resize()
       }, 120)
+    })
+  })
+
+  // Toggling the field sidebar reflows the splitter (panel-a is hidden via the
+  // `splitter--sidebar-collapsed` class instead of being remounted). The chart
+  // container width therefore changes without a mount, so nudge C3 to refit
+  // after the DOM settles — a width safeguard, NOT a chart rebuild.
+  watch(sidebarVisible, () => {
+    nextTick(() => {
+      eventChartRef.value?.resize()
     })
   })
 
@@ -431,28 +536,10 @@
   }
 
   /**
-   * Hydrate this tab from a Share_State payload on mount.
-   *
-   * Two entry points feed this:
-   *   1. **Additional Events tabs** — `useEventsTabs.getPendingViewState`
-   *      returns the full decoded view state (filters + meta) for the
-   *      tab being opened from `?shareState=...`. Passed via the
-   *      `pendingViewState` prop.
-   *   2. **Pinned Events tab** — `useSessionManager` exposes the decoded
-   *      filters/pageSize/selectedFields directly via `initialFilterState`,
-   *      `initialPageSize`, `initialSelectedFields` (split because the
-   *      pinned tab can also receive these from non-share flows).
-   *
-   * Called from `onBeforeMount` *before* `refreshFilterData()` so the
-   * shared filters land in `filterData.value` first and the initial load
-   * uses them — otherwise the request would fire with stale defaults
-   * and we'd flash the wrong dataset.
-   *
-   * Also exposed via `defineExpose` so the parent can re-apply share
-   * state when a Share_State arrives after this component already
-   * mounted (TabsView watches `pendingEventsTabState` and calls this as
-   * a fallback when the tab-limit is reached, see TabsView.vue:325-342).
-   *
+   * Hydrate this tab from a Share_State payload on mount, from either
+   * `pendingViewState` (new Events tab) or `initialFilterState`/`initialPageSize`/
+   * `initialSelectedFields` (pinned tab). Called from `onBeforeMount` before
+   * `refreshFilterData()`; also exposed for late Share_State (see TabsView).
    * @requires Requirements 1.5, N.2
    */
   const applyInitialShareState = () => {
@@ -477,45 +564,63 @@
     }
   }
 
-  const getCurrentShareState = () => ({
-    filters: filterData.value ? safeStructuredClone(filterData.value) : null,
-    dataset: props.tabSelected?.panel || null,
-    pageSize: pageSize.value,
-    selectedFields: [...selectedFields.value],
-    documentQuery: documentSearchQuery.value || '',
-    selectedView: selectedView.value || 'events:none'
+  // Share_State projections: whole (share links) + fetch-only subset (activate
+  // guard). See useShareState.
+  const { getCurrentShareState, getFetchInputsSnapshot } = useShareState({
+    filterData,
+    pageSize,
+    selectedFields,
+    documentSearchQuery,
+    selectedView,
+    dataset: () => props.tabSelected?.panel || null
   })
 
   /* ── Lifecycle ── */
+  // Keydown listener — SINGLE owner via useKeepAliveResource (task 7.6). One
+  // acquire/release pair per live period across the mount + keep-alive paths,
+  // guaranteed symmetric (no duplicate on re-activation, no leak on deactivate).
+  // Replaces the four hand-rolled add/remove calls.
+  useKeepAliveResource(
+    () => {
+      document.addEventListener('keydown', onKeyDown)
+    },
+    () => {
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  )
+  // NOTE: the `resetSeriesOrderCache()` lifecycle calls are removed — the series
+  // order cache is now per-instance (`createSeriesOrderCache()` in
+  // useChartBuilder, task 7.8), so there is no module singleton to reset and the
+  // reset calls were dead (design §2.1(7)).
+
   onBeforeMount(() => {
     applyInitialShareState()
     refreshFilterData()
   })
   onMounted(async () => {
-    document.addEventListener('keydown', onKeyDown)
     await nextTick()
     filterBarRef.value?.filterSystemRef?.applyFilters()
-    loadData()
-  })
-  onBeforeUnmount(() => {
-    document.removeEventListener('keydown', onKeyDown)
-    resetSeriesOrderCache()
-  })
-  onDeactivated(() => {
-    document.removeEventListener('keydown', onKeyDown)
-    resetSeriesOrderCache()
+    reload('mount')
   })
   onActivated(async () => {
-    document.addEventListener('keydown', onKeyDown)
     await nextTick()
-    filterBarRef.value?.filterSystemRef?.applyFilters()
+    // SILENT tsRange re-resolve (no `updatedFilter` emit). The previous
+    // unconditional applyFilters() routed EVERY reactivation through
+    // reload('filter'), which skips the inputs-equality check and poisoned the
+    // 'activate' guard below — every tab switch paid a fetch + aggregation.
+    filterBarRef.value?.filterSystemRef?.refreshAppliedTimeRange?.()
     await nextTick()
-    loadData()
+    // Keep-alive re-activation funnels through the single reload seam (reason
+    // 'activate'): in-memory reload + metrics nudge, but ONLY when reload-affecting
+    // inputs changed (task 9.6, req 4.14; guard inside useEventsExplorer.reload).
+    // A relative range re-resolves → snapshot differs → one reload; else zero fetches.
+    reload('activate')
   })
   watch(isLoading, (loading, was) => {
     if (was && !loading) {
       resetSelection()
-      if (tableData.value.length > 0) filterBarRef.value?.filterSystemRef?.commitQueryToHistory?.()
+      if (dataset.rows.value.length > 0)
+        filterBarRef.value?.filterSystemRef?.commitQueryToHistory?.()
     }
   })
 
@@ -540,7 +645,7 @@
       :tabSelected="props.tabSelected"
       :hideDatasetSelector="hideDatasetSelector"
       :datasetOptions="datasetDropdownOptions"
-      @filter-updated="reloadListTableWithHash"
+      @filter-updated="() => reload('filter')"
       @remove-filter="handleRemoveFilter"
       @dataset-change="onDatasetDropdownChange"
       @open-saved-searches="(e) => savedSearchOverlayRef.toggle(e)"
@@ -578,7 +683,6 @@
           :minSize="[15, 50]"
           :maxSize="[30, 90]"
           :class="{ 'splitter--sidebar-collapsed': !sidebarVisible }"
-          :key="String(sidebarVisible)"
         >
           <template #panel-a>
             <FieldSidebar
@@ -586,6 +690,7 @@
               v-model:selectedFields="selectedFields"
               v-model:visible="sidebarVisible"
               :data="tableData"
+              :resetToken="dataset.resetToken.value"
               :datasets="allDatasets"
               :selectedDataset="props.tabSelected"
               @add-filter="handleAddFilter"
@@ -605,6 +710,8 @@
                   :tsRangeBegin="tsRangeBegin"
                   :tsRangeEnd="tsRangeEnd"
                   :isLoading="isMetricsView ? isLoadingMetricsChart : isChartLoading"
+                  :hasError="!isMetricsView && chartHasError"
+                  :chartDiverges="isMetricsView && metricsChartPartial"
                   :userTimezone="accountTimezone"
                   :stackBy="stackByField"
                   :view="selectedView"
@@ -615,8 +722,7 @@
                   @update:view="selectedView = $event"
                   @brush-select="handleBrushSelect"
                   @legend-filter="handleLegendFilter"
-                  @total-computed="setRecordsFound"
-                  @toggle-collapse="isChartCollapsed = !isChartCollapsed"
+                  @toggle-collapse="toggleCollapse"
                 />
                 <EventsSummaryBar
                   v-if="showChartSummary && !isChartCollapsed"
@@ -626,6 +732,7 @@
               <DiscoverToolbar
                 :sidebarVisible="sidebarVisible"
                 :recordsFound="recordsFound"
+                :aggregateDivergence="aggregateDivergence"
                 :documentSearchQuery="documentSearchQuery"
                 :detailViewMode="detailViewMode"
                 :isFullscreen="isFullscreen"
@@ -643,8 +750,7 @@
                 class="flex flex-col flex-1 min-w-0 min-h-0 overflow-hidden outline-none"
                 tabindex="0"
               >
-                <DiscoverDataTable
-                  ref="discoverDataTableRef"
+                <VirtualEventTable
                   :data="filteredTableData"
                   :selectedFields="selectedFields"
                   :expandedRows="expandedRows"
@@ -652,8 +758,8 @@
                   :detailViewMode="detailViewMode"
                   :isLoading="isLoading"
                   :isDetailLoading="isDetailLoading"
-                  :exportFilename="`${props.tabSelected.tabRouter}-logs`"
-                  :exportFunction="exportFunctionMapper"
+                  :exportCsv="exportCsv"
+                  :resetToken="dataset.resetToken.value"
                   :rowClass="getRowClass"
                   :debouncedSearchQuery="debouncedSearchQuery"
                   :dataset="props.tabSelected.dataset"
@@ -684,8 +790,8 @@
         :visible="detailSidebarVisible"
         :data="activeRowData"
         :isLoading="isDetailLoading"
-        :onAddFilter="handleAddFilter"
-        :onExcludeFilter="handleExcludeFilter"
+        @add-filter="handleAddFilter"
+        @exclude-filter="handleExcludeFilter"
         @close="closeDetailSidebar"
         @navigate="navigateRow"
       />
@@ -760,6 +866,23 @@
     }
     .discover-layout {
       min-height: 200px;
+    }
+    /* Fields as an overlay drawer: side-by-side split on a phone squeezes the
+       chart/table into ~40% width (overlapping ticks, cramped header). The
+       drawer leaves the main area full-width; the X button still closes it.
+       !important beats the splitter's inline pixel width. */
+    .discover-layout__main {
+      position: relative;
+    }
+    :deep(.resizable-splitter > .panel-a) {
+      position: absolute;
+      inset-block: 0;
+      left: 0;
+      z-index: 20;
+      width: min(85vw, 320px) !important;
+      background: var(--surface-ground);
+      border-right: 1px solid var(--surface-border);
+      box-shadow: var(--shadow-xl);
     }
   }
 
