@@ -25,8 +25,8 @@ export const toGraphQLScalar = (value) => {
   if (value === null || value === undefined) return 'null'
   if (typeof value === 'boolean') return value ? 'true' : 'false'
   if (typeof value === 'number' && !Number.isNaN(value)) return String(value)
-
-  return JSON.stringify(String(value))
+  const str = String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+  return `"${str}"`
 }
 
 /**
