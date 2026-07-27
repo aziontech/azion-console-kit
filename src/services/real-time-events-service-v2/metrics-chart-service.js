@@ -25,8 +25,11 @@ export const toGraphQLScalar = (value) => {
   if (value === null || value === undefined) return 'null'
   if (typeof value === 'boolean') return value ? 'true' : 'false'
   if (typeof value === 'number' && !Number.isNaN(value)) return String(value)
-  const str = String(value).replace(/"/g, '\\"')
-  return `"${str}"`
+  // Escape via JSON so BOTH `"` and `\` (plus control chars) are handled. A lone
+  // trailing backslash (e.g. `a\`) would otherwise escape the closing quote and
+  // break out of the GraphQL string literal — a structure-injection vector on
+  // the inline metrics filter path.
+  return JSON.stringify(String(value))
 }
 
 /**

@@ -13,6 +13,38 @@
  */
 
 /**
+ * Operators accepted by the events filter builder. Mirrors the keys of
+ * `OPERATOR_MAPPING` (advanced-filter-system-v2) — kept as a local literal so
+ * this pure module stays framework-agnostic (no Vue-component import).
+ *
+ * Security: a clause's operator is concatenated onto its field to form the
+ * GraphQL query key downstream (`build-filter-parts` / `buildInlineFilterFragments`).
+ * The filter UI can only ever emit one of these operators; an operator outside
+ * this set can only come from a hand-crafted / tampered `?filters=` hash, so we
+ * drop the clause rather than splice attacker-controlled text into the query.
+ */
+export const VALID_OPERATORS = new Set([
+  'In',
+  'Eq',
+  'Ne',
+  'Like',
+  'Ilike',
+  'Range',
+  'Lt',
+  'Lte',
+  'Gt',
+  'Gte'
+])
+
+/**
+ * Shape of a GraphQL field name: a letter/underscore start followed by word
+ * characters. `valueField` is concatenated with the operator into the query key,
+ * so anything outside this shape (spaces, braces, colons, parentheses) could
+ * break out of the `filter: { ... }` block — reject it at the source.
+ */
+export const SAFE_FIELD_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/
+
+/**
  * Coerces a raw filter value to the type declared by the clause.
  * Arrays are coerced element-wise, unwrapping `{ value }` option objects.
  * Non-coercible / non-finite values pass through unchanged.
@@ -52,13 +84,20 @@ export const coerceFilterValue = (rawValue, type) => {
  * us a clause without a resolved operator.
  * See spec: realtime-events-filter-operator-bug — Requirement 2.3, 2.4.
  *
+ * Security guard: the resolved `valueField`/`operator` become the GraphQL query
+ * key (`valueField + operator`) that is spliced verbatim into the query string
+ * downstream. Only whitelisted operators and identifier-shaped field names are
+ * allowed through, so a tampered `?filters=` hash cannot inject GraphQL
+ * structure (extra selections, fragment breakout) via a crafted field/operator.
+ *
  * @param {Array<object>} clauses
  * @returns {object}
  */
 export const buildFilterGroup = (clauses) => {
   const group = {}
   clauses.forEach((ff) => {
-    if (typeof ff.operator !== 'string' || ff.operator.length === 0) return
+    if (typeof ff.operator !== 'string' || !VALID_OPERATORS.has(ff.operator)) return
+    if (typeof ff.valueField !== 'string' || !SAFE_FIELD_NAME.test(ff.valueField)) return
     const value = coerceFilterValue(ff.value, ff.type)
     if (ff.operator === 'In') {
       group.in = group.in || {}
