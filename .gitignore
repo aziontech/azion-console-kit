@@ -40,18 +40,14 @@ package-lock.json
 reports/mutation
 .stryker-tmp
 
-#azion vulcan folder
-#azion
-.edge
-!azion/production
-!azion/stage
-
+# Azion CLI state (generated per-deploy, account-specific — owned by the
+# infrastructure repo; use .azion/ for local ephemeral state)
 azion/
-
-src/views/Playground/PlaygroundView.vue
-#Paths added by Azion CLI
+.azion/
 .edge/
 .vulcan
+
+src/views/Playground/PlaygroundView.vue
 
 
 storybook/yarn.lock
