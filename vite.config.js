@@ -49,11 +49,11 @@ const getConfig = () => {
     plugins: [
       vue(),
       vueJsx(),
-      ...(IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length
+      ...(IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length && env.VITE_SENTRY_ORG?.length
         ? [
             sentryVitePlugin({
-              org: 'azion-technologies',
-              project: IS_PROD ? 'console' : 'console-stage',
+              org: env.VITE_SENTRY_ORG,
+              project: env.VITE_SENTRY_PROJECT,
               authToken: env.VITE_SENTRY_AUTH_TOKEN,
               sourcemaps: { assets: './dist/assets/**' }
             })
@@ -134,12 +134,6 @@ const getConfig = () => {
           '/sse': createProxyConfig({
             target: BEHOLDER_URL
           })
-        }),
-        '/edge_api': createProxyConfig({
-          target: IS_PROD
-            ? 'https://jkjuyhi0gza.map.azionedge.net'
-            : 'https://urvlgkvpxla.map.azionedge.net',
-          rewrite: (path) => path.replace(/^\/edge_api/, '')
         }),
         '/deployment-api': createProxyConfig({
           target: deploymentApiUrl,

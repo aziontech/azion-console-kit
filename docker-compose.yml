@@ -8,7 +8,7 @@ services:
       - .:/app
       - /app/node_modules
     environment:
-      - NODE_ENV=stage
-      - VITE_ENVIRONMENT=stage
+      - NODE_ENV=${NODE_ENV:-development}
+      - VITE_ENVIRONMENT=${VITE_ENVIRONMENT:-stage}
     stdin_open: true
     tty: true
