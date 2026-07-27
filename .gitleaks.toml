@@ -1,6 +1,6 @@
 # Gitleaks configuration — documented false-positive allowlist.
 # Triage evidence: 2026-07-22 full-history scan (187 findings, ALL false
-# positives — see docs/RUNBOOK.md §6). Gated by CODEOWNERS
+# positives — reviewed case by case). Gated by CODEOWNERS
 # (@aziontech/security-office): every addition here requires security review.
 
 [extend]

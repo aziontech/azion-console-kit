@@ -77,3 +77,4 @@ src/tests/functional/__screenshots__
 # de modify/delete a cada merge). Ver PR #3660.
 specs/real-time-events-responsividade/
 specs/real-time-events-v2-improvements/
+plans/
