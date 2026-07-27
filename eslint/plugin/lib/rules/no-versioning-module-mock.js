@@ -12,7 +12,9 @@ const VERSIONING_MODULE_PATTERN =
 // placebo through a different door (found evading this rule in the 2026-07-23
 // deep review). Heuristic: the spied identifier is a versioning service
 // singleton (contains "version"/"versioned" AND ends in Service).
-const VERSIONING_IDENTIFIER_PATTERN = /(version|Version).*Service$|^versioned/
+const isVersioningServiceIdentifier = (name) =>
+  (name.endsWith('Service') && (name.includes('version') || name.includes('Version'))) ||
+  name.startsWith('versioned')
 const MOCKING_CHAIN =
   /^mock(Implementation|ImplementationOnce|ResolvedValue|ResolvedValueOnce|RejectedValue|RejectedValueOnce|ReturnValue|ReturnValueOnce)$/
 
@@ -61,7 +63,7 @@ module.exports = {
           if (
             isBehaviorReplacement &&
             target?.type === 'Identifier' &&
-            VERSIONING_IDENTIFIER_PATTERN.test(target.name)
+            isVersioningServiceIdentifier(target.name)
           ) {
             context.report({
               node: target,
