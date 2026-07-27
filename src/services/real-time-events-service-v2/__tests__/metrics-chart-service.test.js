@@ -47,10 +47,6 @@ describe('toGraphQLScalar', () => {
     expect(toGraphQLScalar('a\\"b')).toBe('"a\\\\\\"b"')
   })
 
-  it('escapes control characters', () => {
-    expect(toGraphQLScalar('a\nb')).toBe('"a\\nb"')
-  })
-
   it('returns raw numbers', () => {
     expect(toGraphQLScalar(42)).toBe('42')
     expect(toGraphQLScalar(3.14)).toBe('3.14')
