@@ -1,0 +1,56 @@
+# OSSF Scorecard — PUBLIC repositories only.
+# Runs the PUBLIC ossf/scorecard-action on GitHub-hosted runners (free for public).
+# Results are NOT published (publish_results: false -> no OpenSSF API, no badge).
+# The job gates the PR on the aggregate score. Ramp with THRESHOLD + MODE before
+# flipping MODE=enforce org-wide (today 0/52 public repos are >= 8).
+name: OSSF Scorecard
+
+on:
+  pull_request:
+    branches: ['main', 'master', 'dev', 'develop', 'stage']
+  schedule:
+    - cron: '0 6 * * 1' # weekly measurement on the default branch
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  scorecard:
+    name: OSSF Scorecard # <- this string is the required_status_checks context
+    runs-on: ubuntu-latest # GitHub-hosted, free for public — never azion-runners
+    permissions:
+      contents: read
+    env:
+      THRESHOLD: '8' # target aggregate; start lower during the ramp
+      MODE: 'warn' # warn = never blocks; enforce = fail PR below THRESHOLD
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run Scorecard (results not published)
+        uses: ossf/scorecard-action@4eaacf0543bb3f2c246792bd56e8cdeffafb205a # v2.4.3
+        with:
+          results_file: results.json
+          results_format: json
+          publish_results: false # NOT published: no OpenSSF API, no badge
+
+      - name: Gate on aggregate score
+        run: |
+          SCORE=$(jq -r '.score' results.json)
+          echo "OSSF aggregate = ${SCORE}  (threshold ${THRESHOLD}, mode ${MODE})"
+          # -1 == inconclusive: don't block on it
+          if [ "$SCORE" = "-1" ] || [ "$SCORE" = "null" ]; then
+            echo "::warning::Scorecard returned inconclusive score — not gating"; exit 0
+          fi
+          below=$(awk -v s="$SCORE" -v t="$THRESHOLD" 'BEGIN{print (s<t)?1:0}')
+          if [ "$below" = "1" ]; then
+            if [ "$MODE" = "enforce" ]; then
+              echo "::error::OSSF ${SCORE} < ${THRESHOLD} — blocking merge"; exit 1
+            else
+              echo "::warning::OSSF ${SCORE} < ${THRESHOLD} — warn mode, not blocking"
+            fi
+          fi
+          # NOTE: results.json (full findings) is never printed — only the aggregate.
+          # To also keep findings in the private Security tab, run a second step with
+          # results_format: sarif + github/codeql-action/upload-sarif (needs security-events: write).
