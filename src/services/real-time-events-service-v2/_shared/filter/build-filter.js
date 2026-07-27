@@ -12,17 +12,6 @@
  *     OR, so `a AND b OR c` ⇒ `(a AND b) OR c`).
  */
 
-/**
- * Operators accepted by the events filter builder. Mirrors the keys of
- * `OPERATOR_MAPPING` (advanced-filter-system-v2) — kept as a local literal so
- * this pure module stays framework-agnostic (no Vue-component import).
- *
- * Security: a clause's operator is concatenated onto its field to form the
- * GraphQL query key downstream (`build-filter-parts` / `buildInlineFilterFragments`).
- * The filter UI can only ever emit one of these operators; an operator outside
- * this set can only come from a hand-crafted / tampered `?filters=` hash, so we
- * drop the clause rather than splice attacker-controlled text into the query.
- */
 export const VALID_OPERATORS = new Set([
   'In',
   'Eq',
@@ -36,12 +25,6 @@ export const VALID_OPERATORS = new Set([
   'Gte'
 ])
 
-/**
- * Shape of a GraphQL field name: a letter/underscore start followed by word
- * characters. `valueField` is concatenated with the operator into the query key,
- * so anything outside this shape (spaces, braces, colons, parentheses) could
- * break out of the `filter: { ... }` block — reject it at the source.
- */
 export const SAFE_FIELD_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/
 
 /**

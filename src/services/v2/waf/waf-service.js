@@ -295,10 +295,6 @@ export class WafService extends BaseService {
         pageNumbers.push(page)
       }
 
-      // Fetch the remaining pages resiliently: a single failing page (network /
-      // 5xx / timeout) must not wipe the whole listing. Keep every page that
-      // resolved and drop only the ones that rejected, surfacing which are
-      // missing so the partial result is not silent.
       const settled = await Promise.allSettled(
         pageNumbers.map((page) => this.#fetchWafDomainsPage(wafId, page))
       )
