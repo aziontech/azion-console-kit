@@ -55,6 +55,7 @@
   import { getInstance, load } from 'recaptcha-v3'
   import { useField, useForm } from 'vee-validate'
   import { useAccountStore } from '@/stores/account'
+  import { getRuntimeConfig } from '@/helpers/runtime-config'
 
   import { inject, onMounted, onUnmounted, ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
@@ -72,7 +73,9 @@
   let recaptcha
 
   onMounted(async () => {
-    recaptcha = await load(import.meta.env.VITE_RECAPTCHA_SITE_KEY)
+    const recaptchaSiteKey =
+      getRuntimeConfig().recaptchaSiteKey || import.meta.env.VITE_RECAPTCHA_SITE_KEY
+    recaptcha = await load(recaptchaSiteKey)
     getInstance().showBadge()
   })
 

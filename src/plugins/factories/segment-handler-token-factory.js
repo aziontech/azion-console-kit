@@ -1,5 +1,7 @@
+import { getRuntimeConfig } from '@/helpers/runtime-config'
+
 function makeSegmentToken() {
-  const segmentToken = import.meta.env['VITE_SEGMENT_TOKEN']
+  const segmentToken = getRuntimeConfig().segmentToken || import.meta.env['VITE_SEGMENT_TOKEN']
 
   if (!segmentToken) {
     // eslint-disable-next-line no-console

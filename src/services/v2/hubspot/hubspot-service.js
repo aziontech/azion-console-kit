@@ -1,12 +1,18 @@
 import { HubspotAdapter } from './hubspot-adapter'
 import { BaseService } from '@/services/v2/base/query/baseService'
+import { getRuntimeConfig } from '@/helpers/runtime-config'
 
 export class HubspotService extends BaseService {
-  #baseUrl = import.meta.env.VITE_HUBSPOT_API_URL || 'https://www.azion.com/api'
   #basePath = '/hubspot/events'
 
+  // Resolved at call time: the exported singleton is constructed during the
+  // static import graph, before loadRuntimeConfig() resolves.
   #buildUrl() {
-    return { url: `${this.#baseUrl}${this.#basePath}`, config: {} }
+    const baseUrl =
+      getRuntimeConfig().hubspotApiUrl ||
+      import.meta.env.VITE_HUBSPOT_API_URL ||
+      'https://www.azion.com/api'
+    return { url: `${baseUrl}${this.#basePath}`, config: {} }
   }
 
   submitForm = async (payload) => {

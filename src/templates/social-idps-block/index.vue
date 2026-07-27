@@ -38,7 +38,7 @@
   import Skeleton from '@aziontech/webkit/skeleton'
   import { useToast } from '@aziontech/webkit/use-toast'
   import { computed, onMounted, ref, inject, onUnmounted } from 'vue'
-  import socialIdpsData from '@/helpers/social-idps'
+  import { getSocialIdps } from '@/helpers/social-idps'
 
   defineOptions({ name: 'social-idps-block' })
 
@@ -66,7 +66,7 @@
   const showIdps = defineModel('showSocialIdps')
 
   const loadSocialIdps = () => {
-    idps.value = socialIdpsData
+    idps.value = getSocialIdps()
     showIdps.value = idps.value.length > 0
   }
 

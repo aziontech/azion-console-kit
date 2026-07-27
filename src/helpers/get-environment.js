@@ -1,10 +1,10 @@
+import { getRuntimeConfig } from './runtime-config'
+
 /**
  * @returns {'development'|'stage'|'production'}
  */
 export const getEnvironment = () => {
-  const environment = import.meta.env
-
-  return environment.VITE_ENVIRONMENT || environment.MODE
+  return getRuntimeConfig().environment || import.meta.env.VITE_ENVIRONMENT || import.meta.env.MODE
 }
 
 /**
