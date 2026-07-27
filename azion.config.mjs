@@ -1,13 +1,19 @@
 import { defineConfig } from 'azion'
 import process from 'node:process'
 
-const { CROSS_EDGE_SECRET, VITE_ENVIRONMENT } = process.env
+/**
+ * Reference edge configuration for the Azion Console Kit SPA.
+ *
+ * This file lets anyone deploy the app to their own Azion account
+ * (`azion deploy`) and documents the routing the app expects. It is NOT the
+ * source of truth for Azion's own environments — the deploy pipeline lives
+ * in a separate infrastructure repository, which injects its own
+ * environment-specific configuration at build/deploy time.
+ */
+const { VITE_ENVIRONMENT } = process.env
 
 const environment = VITE_ENVIRONMENT || 'production'
 const domainSuffix = environment === 'production' ? 'net' : 'com'
-
-const edgeApiHost =
-  environment === 'production' ? 'jkjuyhi0gza.map.azionedge.net' : 'urvlgkvpxla.map.azionedge.net'
 
 const deploymentApiHost =
   environment === 'production' ? 'deployment-api.azion.app' : 'deployment-api-stage.azion.app'
@@ -197,12 +203,6 @@ const config = {
       type: 'single_origin',
       hostHeader: 'storage.googleapis.com',
       addresses: ['storage.googleapis.com']
-    },
-    {
-      name: 'origin-edge-api',
-      type: 'single_origin',
-      hostHeader: edgeApiHost,
-      addresses: [edgeApiHost]
     }
   ],
   cache: [
@@ -269,11 +269,7 @@ const config = {
           'Applies common settings for all requests, including standard headers and HTTP to HTTPS redirection.',
         match: '^\\/',
         behavior: {
-          setHeaders: [
-            'Accept: application/json; version=3;',
-            'X-Cross-Edge-Secret: ' + CROSS_EDGE_SECRET || 'secret',
-            'X-User-Real-IP: ${remote_addr}'
-          ],
+          setHeaders: ['Accept: application/json; version=3;', 'X-User-Real-IP: ${remote_addr}'],
           bypassCache: true,
           forwardCookies: true,
           httpToHttps: true
