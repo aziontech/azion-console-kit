@@ -143,7 +143,17 @@ export class DigitalCertificatesService extends BaseService {
   }
 
   loadDigitalCertificate = async ({ id }) => {
-    const fields = ['id', 'name', 'type', 'authority', 'csr', 'managed', 'certificate', 'status']
+    const fields = [
+      'id',
+      'name',
+      'type',
+      'authority',
+      'csr',
+      'managed',
+      'certificate',
+      'status',
+      'subject_name'
+    ]
 
     const { data } = await this.http.request({
       method: 'GET',

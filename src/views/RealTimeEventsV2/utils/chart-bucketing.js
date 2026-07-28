@@ -1,69 +1,20 @@
 /**
  * Chart bucketing logic for event histograms.
  *
- * Lookup table mapping time ranges to bucket intervals.
- * Each entry: [maxRange, bucketInterval].
- * The first entry whose maxRange >= durationMs wins.
- *
- * Examples:
- *   1 min  → 1s     5 min  → 5s     15 min → 10s    30 min → 30s
- *   1 h    → 1m     3 h    → 5m     6 h    → 10m    12 h   → 30m
- *   24 h   → 30m    2 d    → 1h     7 d    → 3h     14 d   → 12h
- *   30 d   → 12h
+ * The range→interval lookup and `getBucketInterval` now live in the SINGLE
+ * shared rule (`_shared/buckets.js`, task 11.6) so the chart path and the
+ * events/pivot path can never drift again. Re-exported here for the existing
+ * chart-builder consumers.
  */
 
-const SEC = 1000
-const MIN = 60 * SEC
-const HOUR = 60 * MIN
-const DAY = 24 * HOUR
+import {
+  getBucketInterval,
+  MIN,
+  HOUR,
+  DAY
+} from '@/services/real-time-events-service-v2/_shared/buckets'
 
-const BUCKET_TABLE = [
-  [1 * MIN, 1 * SEC], // 1 min  → 1s   (60 buckets)
-  [5 * MIN, 5 * SEC], // 5 min  → 5s   (60 buckets)
-  [15 * MIN, 10 * SEC], // 15 min → 10s  (90 buckets)
-  [30 * MIN, 30 * SEC], // 30 min → 30s  (60 buckets)
-  [1 * HOUR, 1 * MIN], // 1 h    → 1m   (60 buckets)
-  [3 * HOUR, 5 * MIN], // 3 h    → 5m   (36 buckets)
-  [6 * HOUR, 10 * MIN], // 6 h    → 10m  (36 buckets)
-  [12 * HOUR, 30 * MIN], // 12 h   → 30m  (24 buckets)
-  [1 * DAY, 30 * MIN], // 24 h   → 30m  (48 buckets)
-  [2 * DAY, 1 * HOUR], // 2 d    → 1h   (48 buckets)
-  [7 * DAY, 3 * HOUR], // 7 d    → 3h   (56 buckets)
-  [14 * DAY, 12 * HOUR], // 14 d   → 12h  (28 buckets)
-  [30 * DAY, 12 * HOUR], // 30 d   → 12h  (60 buckets)
-  [90 * DAY, 1 * DAY], // 90 d   → 1d   (90 buckets)
-  [365 * DAY, 7 * DAY], // 365 d  → 7d   (52 buckets)
-  [Infinity, 30 * DAY]
-]
-
-/**
- * Pick the smallest bucket interval that (a) covers the duration and
- * (b) produces no more than `targetMaxBuckets` slots. Without the cap,
- * narrow viewports (~490px) end up with 60+ bars at ~7px each — too dense
- * to be readable. The cap is a soft target: if no interval in the table
- * satisfies both conditions, the coarsest matching interval is returned
- * (i.e. we prefer fewer-but-wider bars over time-coverage drift).
- *
- * @param {number} durationMs - Range duration in ms.
- * @param {number} [targetMaxBuckets=Infinity] - Soft cap on output bucket count.
- * @returns {number} Bucket interval in ms.
- */
-export function getBucketInterval(durationMs, targetMaxBuckets = Infinity) {
-  const minInterval =
-    Number.isFinite(targetMaxBuckets) && targetMaxBuckets > 0 ? durationMs / targetMaxBuckets : 0
-
-  // Walk the table in ascending-interval order; first row that fits the
-  // duration AND yields ≤ targetMaxBuckets wins.
-  for (const [maxRange, interval] of BUCKET_TABLE) {
-    if (durationMs <= maxRange && interval >= minInterval) return interval
-  }
-  // No row satisfied both — fall back to the coarsest interval that still
-  // covers the duration so we don't over-decimate badly.
-  for (const [maxRange, interval] of BUCKET_TABLE) {
-    if (durationMs <= maxRange) return interval
-  }
-  return 30 * DAY
-}
+export { getBucketInterval }
 
 /**
  * Detect the native bucket interval from server data by inspecting

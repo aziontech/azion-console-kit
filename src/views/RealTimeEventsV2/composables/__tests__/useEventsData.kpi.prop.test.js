@@ -372,5 +372,38 @@ describe('useEventsData KPI fallback — abort and error-swallow paths', () => {
     expect(onError).toHaveBeenCalledWith(
       expect.objectContaining({ severity: 'error', summary: 'Error loading events' })
     )
+
+    // Task 5.4 (req 2.4) — the events chart path now raises a deterministic
+    // error flag so EventChart can mount a visible error state instead of a
+    // blank chart. (STATE-1: previously only the toast signalled failure.)
+    expect(instance.chartHasError.value).toBe(true)
+  })
+
+  it('chartHasError: cleared on a fresh load and stays false on success (req 2.4)', async () => {
+    // A failing run raises the flag; a subsequent successful run must clear it
+    // so a retry that works leaves the error state behind (loading → success).
+    let shouldFail = true
+    const { instance } = createEventsDataForKpi({
+      dataset: 'workloadEvents',
+      showSummary: false,
+      tsRange: {
+        tsRangeBegin: '2024-01-01T00:00:00.000Z',
+        tsRangeEnd: '2024-01-02T00:00:00.000Z'
+      },
+      chartAggregationImpl: async () => {
+        if (shouldFail) throw new Error('Chart aggregation failed')
+        return { chartData: [{ ts: '2024-01-01T00:00:00.000Z', count: 5 }], kpis: null }
+      },
+      onError: vi.fn()
+    })
+
+    expect(instance.chartHasError.value).toBe(false)
+
+    await instance.loadChart()
+    expect(instance.chartHasError.value).toBe(true)
+
+    shouldFail = false
+    await instance.loadChart()
+    expect(instance.chartHasError.value).toBe(false)
   })
 })

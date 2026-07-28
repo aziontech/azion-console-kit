@@ -37,14 +37,17 @@
 
         return {
           ...item,
-          field: label
+          field: label,
+          __source: item
         }
       })
       .filter(Boolean)
   })
 
-  const removeFilter = (index) => {
-    emit('removeFilter', index)
+  // Emits the SOURCE raw filter (by identity), not the rendered index, so the
+  // consumer removes exactly the clicked chip regardless of any hidden filters.
+  const removeFilter = (filter) => {
+    emit('removeFilter', filter.__source)
   }
 
   const handleClickFilter = (filter) => {
@@ -116,7 +119,7 @@
         class="filter-tag__remove pl-1 cursor-pointer text-sm flex-shrink-0"
         :aria-label="filterAriaLabel(filter)"
         data-testid="rte-chip-remove-button"
-        @click.stop="removeFilter(index)"
+        @click.stop="removeFilter(filter)"
         @focus.stop="onChipFocus"
       >
         <i

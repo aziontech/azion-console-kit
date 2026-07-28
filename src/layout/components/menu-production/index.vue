@@ -43,8 +43,12 @@
       @focus="scrollToFocusedItem"
     >
       <template #item="{ item, label, props }">
-        <router-link
-          :to="item.to"
+        <component
+          :is="item.external ? 'a' : 'router-link'"
+          :to="item.external ? undefined : item.to"
+          :href="item.external ? item.to : undefined"
+          :target="item.external ? '_blank' : undefined"
+          :rel="item.external ? 'noopener noreferrer' : undefined"
           @click.prevent="redirectToRoute(item)"
           @click.middle="windowOpen(item.to)"
           :data-testid="`sidebar-block__menu-item__${item.id}`"
@@ -60,7 +64,7 @@
             :value="item.tag"
             class="ml-2"
           />
-        </router-link>
+        </component>
       </template>
     </PrimeMenu>
   </Sidebar>

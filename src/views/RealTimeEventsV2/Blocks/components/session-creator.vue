@@ -312,7 +312,7 @@
         />
         <small
           v-if="nameError"
-          class="text-red-500 text-xs"
+          class="text-[var(--danger-contrast)] text-xs"
           data-testid="session-creator-name-error"
         >
           {{ nameError }}
@@ -461,7 +461,7 @@
         </div>
         <small
           v-if="chartsError"
-          class="text-red-500 text-xs"
+          class="text-[var(--danger-contrast)] text-xs"
           data-testid="session-creator-charts-error"
         >
           {{ chartsError }}

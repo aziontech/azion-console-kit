@@ -96,6 +96,10 @@ export const realTimeEventsV2Routes = {
   },
   meta: {
     title: 'Real-Time Events (New)',
+    // The v2 explorer owns its vertical scroll: the app shell pins <main> to the
+    // viewport height so the virtualized events table scrolls internally instead
+    // of growing the document (see layout/index.vue `fillViewport`).
+    fillViewport: true,
     breadCrumbs: [
       {
         label: 'Real-Time Events',

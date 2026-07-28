@@ -1,7 +1,7 @@
 import { convertGQLTotalRecords } from '@/helpers/convert-gql'
 import { AxiosHttpClientSignalDecorator } from '../axios/AxiosHttpClientSignalDecorator'
 import { makeRealTimeEventsBaseUrl } from './make-real-time-events-service'
-import * as Errors from '@/services/axios/errors'
+import { parseGraphQLResponse } from '@/services/real-time-events-service-v2/_shared/service/parse-graphql-response'
 
 // ── DEV MOCK ────────────────────────────────────────────────────────────
 // Use VITE_ENVIRONMENT (not MODE) so that production-targeted local dev
@@ -26,7 +26,7 @@ export const getTotalRecords = async ({ filter, dataset }) => {
     body: payload
   })
 
-  return parseHttpResponse(httpResponse, dataset)
+  return parseGraphQLResponse(httpResponse, (body) => adaptResponse(body, dataset))
 }
 
 const adapt = (filter, dataset) => {
@@ -43,35 +43,4 @@ const adaptResponse = (body, dataset) => {
   const formattedBR = new Intl.NumberFormat('pt-BR').format(totalRecords)
 
   return formattedBR
-}
-
-/**
- * Parses the HTTP response and returns the data or throws an error based on the status code.
- *
- * @param {Object} httpResponse - The HTTP response object.
- * @return {any} The data from the response body if the status code is 200.
- * @throws {Error} An InternalServerError if the status code is 500.
- * @throws {Error} An UnexpectedError for any other status code.
- */
-const parseHttpResponse = (response, dataset) => {
-  const { body, statusCode } = response
-
-  switch (statusCode) {
-    case 200:
-      return adaptResponse(body, dataset)
-    case 400:
-      const apiError = body.detail
-      throw new Error(apiError).message
-    case 401:
-      throw new Errors.InvalidApiTokenError().message
-    case 403:
-      const forbiddenError = body.detail
-      throw new Error(forbiddenError).message
-    case 404:
-      throw new Errors.NotFoundError().message
-    case 500:
-      throw new Errors.InternalServerError().message
-    default:
-      throw new Errors.UnexpectedError().message
-  }
 }

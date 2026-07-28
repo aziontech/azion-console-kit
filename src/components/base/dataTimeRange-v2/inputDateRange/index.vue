@@ -11,7 +11,6 @@
     createRelativeRange,
     createStartOfDay,
     createEndOfDay,
-    MONTHS,
     RELATIVE_UNITS,
     RELATIVE_DIRECTIONS,
     TIME_SLOTS,
@@ -58,16 +57,10 @@
   const hasChanges = ref(false)
   const tempInputValue = ref('')
   const hasInitializedAbsoluteRange = ref(false)
-  const selectedMonth = ref(new Date().getMonth())
-  const selectedYear = ref(new Date().getFullYear())
-
   const relativeValue = ref(5)
   const relativeUnit = ref('minutes')
   const relativeDirection = ref('last')
   const relativePreset = ref(getCurrentMonthLabel().toLowerCase())
-
-  const currentYear = new Date().getFullYear()
-  const years = Array.from({ length: 20 }, (unused, index) => currentYear - 10 + index)
 
   const maxDate = computed(() => {
     if (!props.maxDays || props.maxDays <= 0) return null
@@ -219,71 +212,6 @@
     selectedDate.value = date
     updateSelectedDateTime()
     hasChanges.value = false
-    emitSelectIfValid()
-  }
-
-  const onMonthChange = () => {
-    model.value.label = ''
-    if (props.editingField === 'start') {
-      model.value.labelStart = ''
-    } else {
-      model.value.labelEnd = ''
-    }
-    const newDate = clampToBounds(new Date(selectedYear.value, selectedMonth.value, 1))
-    selectedDate.value = newDate
-    selectedMonth.value = newDate.getMonth()
-    selectedYear.value = newDate.getFullYear()
-    updateSelectedDateTime()
-    hasChanges.value = false
-    emitSelectIfValid()
-  }
-
-  const onYearChange = () => {
-    model.value.label = ''
-    if (props.editingField === 'start') {
-      model.value.labelStart = ''
-    } else {
-      model.value.labelEnd = ''
-    }
-    const newDate = new Date(selectedYear.value, selectedMonth.value, 1)
-    selectedDate.value = newDate
-    updateSelectedDateTime()
-    hasChanges.value = false
-    emitSelectIfValid()
-  }
-
-  const previousMonth = () => {
-    model.value.label = ''
-    if (props.editingField === 'start') {
-      model.value.labelStart = ''
-    } else {
-      model.value.labelEnd = ''
-    }
-    if (selectedMonth.value === 0) {
-      selectedMonth.value = 11
-      selectedYear.value--
-    } else {
-      selectedMonth.value--
-    }
-    onMonthChange()
-    hasChanges.value = false
-    emitSelectIfValid()
-  }
-
-  const nextMonth = () => {
-    model.value.label = ''
-    if (props.editingField === 'start') {
-      model.value.labelStart = ''
-    } else {
-      model.value.labelEnd = ''
-    }
-    if (selectedMonth.value === 11) {
-      selectedMonth.value = 0
-      selectedYear.value++
-    } else {
-      selectedMonth.value++
-    }
-    onMonthChange()
     emitSelectIfValid()
   }
 
@@ -457,7 +385,7 @@
       class="cursor-pointer border border-transparent hover:border-[var(--surface-border)] focus:border-[var(--surface-border)] focus:outline-none"
       :class="[
         isInvalidRange ? 'p-invalid text-[var(--error-color)]' : '',
-        isOverlayOpen ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+        isOverlayOpen ? 'ring-1 ring-[var(--border-selected)] border-[var(--border-selected)]' : ''
       ]"
       @click="openStart"
       readonly
@@ -473,7 +401,9 @@
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
             : 'border-none',
-          isOverlayOpen && editingField === 'start' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+          isOverlayOpen && editingField === 'start'
+            ? 'ring-1 ring-[var(--border-selected)] border-[var(--border-selected)]'
+            : ''
         ]"
         :style="{
           width: `${sizeInput(startDisplayInput)}ch`
@@ -495,7 +425,9 @@
           isInvalidRange
             ? 'p-invalid text-[var(--error-color)] border border-[var(--error-color)]'
             : 'border-none',
-          isOverlayOpen && editingField === 'end' ? 'ring-1 ring-[#F3652B] border-[#F3652B]' : ''
+          isOverlayOpen && editingField === 'end'
+            ? 'ring-1 ring-[var(--border-selected)] border-[var(--border-selected)]'
+            : ''
         ]"
         :style="{
           width: `${sizeInput(endDisplayInput)}ch`
@@ -509,40 +441,7 @@
 
   <template v-else>
     <template v-if="mode === 'absolute'">
-      <div class="flex justify-center">
-        <div class="flex items-center gap-3">
-          <PrimeButton
-            icon="pi pi-chevron-left"
-            size="small"
-            outlined
-            @click="previousMonth"
-          />
-          <div class="flex items-center gap-2">
-            <Dropdown
-              v-model="selectedMonth"
-              :options="MONTHS"
-              optionLabel="label"
-              optionValue="value"
-              class="min-w-[120px]"
-              @change="onMonthChange"
-            />
-            <Dropdown
-              v-model="selectedYear"
-              :options="years"
-              class="min-w-[100px]"
-              @change="onYearChange"
-            />
-          </div>
-          <PrimeButton
-            icon="pi pi-chevron-right"
-            size="small"
-            outlined
-            @click="nextMonth"
-          />
-        </div>
-      </div>
-
-      <div class="flex items-start gap-2 mt-2">
+      <div class="flex items-start gap-2">
         <Calendar
           v-model="selectedDate"
           :inline="true"
@@ -555,7 +454,6 @@
           class="flex-1 min-w-0"
           @date-select="onDateSelect"
           :pt="{
-            header: { class: 'hidden' },
             weekDay: {
               style:
                 'width: 28px !important; height: 28px !important; margin: 2px !important; font-size: 0.75rem !important; font-weight: 500 !important;'

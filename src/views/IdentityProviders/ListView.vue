@@ -12,6 +12,7 @@
   import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import { onBeforeRouteLeave } from 'vue-router'
   import { useDeleteDialog } from '@/composables/useDeleteDialog'
+  import { resolveRollbackTarget } from './utils'
 
   defineOptions({ name: 'identity-providers-view' })
 
@@ -68,22 +69,27 @@
   const setActiveIdentityProvider = async (item) => {
     if (item.isActive) return
     loadingStore.startLoading()
+
+    const isRollbackToAzionSSO = item.id === 'azion-default-sso'
     let idpId = item.id
     let protocol = item.protocol
-    if (item.id === 'azion-default-sso') {
-      const currentData = listTableRef.value?.dataTableRef?.data || []
-      currentData.forEach((element) => {
-        if (element.isActive) {
-          idpId = element.id
-          protocol = element.protocol
-        }
-      })
+
+    if (isRollbackToAzionSSO) {
+      const target = resolveRollbackTarget(listTableRef.value?.data || [])
+      if (!target) {
+        toastBuilder('info', 'There is no active federated identity provider to roll back.')
+        loadingStore.finishLoading()
+        return
+      }
+      idpId = target.id
+      protocol = target.protocol
     }
+
     try {
       const response = await props.setIdentityProviderStatusService({
         id: idpId,
         protocol,
-        isActive: item.id !== 'azion-default-sso'
+        isActive: !isRollbackToAzionSSO
       })
       toastBuilder('success', response)
     } catch (error) {

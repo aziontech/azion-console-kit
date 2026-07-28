@@ -2,10 +2,13 @@ import { describe, it, expect, vi } from 'vitest'
 import { ref, nextTick, shallowRef } from 'vue'
 
 // Mock Vue lifecycle hooks since we're testing outside a component
+// (useDocumentSearch releases/rehydrates via useKeepAliveResource, task 9.9).
 vi.mock('vue', async () => {
   const actual = await vi.importActual('vue')
   return {
     ...actual,
+    onMounted: vi.fn((cb) => cb),
+    onActivated: vi.fn((cb) => cb),
     onBeforeUnmount: vi.fn((cb) => cb),
     onDeactivated: vi.fn((cb) => cb)
   }
@@ -26,14 +29,14 @@ const makeRow = (fields) => {
 describe('useDocumentSearch', () => {
   it('returns all rows when query is empty', () => {
     const tableData = ref([makeRow({ name: 'Alice' }), makeRow({ name: 'Bob' })])
-    const { filteredData } = useDocumentSearch(tableData)
+    const { filteredData } = useDocumentSearch({ rows: tableData })
     expect(filteredData.value).toHaveLength(2)
   })
 
   it('filters rows based on debounced query', async () => {
     vi.useFakeTimers()
     const tableData = ref([makeRow({ name: 'Alice' }), makeRow({ name: 'Bob' })])
-    const { query, filteredData } = useDocumentSearch(tableData)
+    const { query, filteredData } = useDocumentSearch({ rows: tableData })
 
     query.value = 'alice'
     await nextTick() // trigger the watcher on query
@@ -49,7 +52,7 @@ describe('useDocumentSearch', () => {
   it('builds search index incrementally on loadMore (append)', async () => {
     vi.useFakeTimers()
     const tableData = ref([makeRow({ name: 'Alice' })])
-    const { query, filteredData } = useDocumentSearch(tableData)
+    const { query, filteredData } = useDocumentSearch({ rows: tableData })
     await nextTick()
 
     // Simulate loadMore by appending
@@ -69,7 +72,7 @@ describe('useDocumentSearch', () => {
 
   it('fully rebuilds index when tableData shrinks (new query)', async () => {
     const tableData = ref([makeRow({ name: 'Alice' }), makeRow({ name: 'Bob' })])
-    const { filteredData, query } = useDocumentSearch(tableData)
+    const { filteredData, query } = useDocumentSearch({ rows: tableData })
     await nextTick()
 
     // Simulate new query — data shrinks
@@ -92,7 +95,7 @@ describe('useDocumentSearch', () => {
       makeRow({ tags: ['important', 'urgent'] }),
       makeRow({ tags: ['normal'] })
     ])
-    const { query, filteredData } = useDocumentSearch(tableData)
+    const { query, filteredData } = useDocumentSearch({ rows: tableData })
 
     query.value = 'urgent'
     await nextTick()
@@ -110,7 +113,7 @@ describe('useDocumentSearch', () => {
       makeRow({ summary: [{ key: 'host', value: 'example.com' }] }),
       makeRow({ summary: [{ key: 'host', value: 'other.com' }] })
     ])
-    const { query, filteredData } = useDocumentSearch(tableData)
+    const { query, filteredData } = useDocumentSearch({ rows: tableData })
 
     query.value = 'example.com'
     await nextTick()
@@ -125,7 +128,7 @@ describe('useDocumentSearch', () => {
   it('highlight wraps first occurrence in mark tag', () => {
     vi.useFakeTimers()
     const tableData = ref([makeRow({ name: 'Alice' })])
-    const { highlight, debouncedQuery } = useDocumentSearch(tableData)
+    const { highlight, debouncedQuery } = useDocumentSearch({ rows: tableData })
 
     // Directly set debouncedQuery for synchronous highlight testing
     debouncedQuery.value = 'ali'
@@ -137,7 +140,7 @@ describe('useDocumentSearch', () => {
 
   it('highlight returns original text when no match', () => {
     const tableData = ref([])
-    const { highlight, debouncedQuery } = useDocumentSearch(tableData)
+    const { highlight, debouncedQuery } = useDocumentSearch({ rows: tableData })
     debouncedQuery.value = 'xyz'
 
     expect(highlight('Hello World')).toBe('Hello World')
@@ -145,14 +148,14 @@ describe('useDocumentSearch', () => {
 
   it('highlight returns original text when query is empty', () => {
     const tableData = ref([])
-    const { highlight } = useDocumentSearch(tableData)
+    const { highlight } = useDocumentSearch({ rows: tableData })
 
     expect(highlight('Hello World')).toBe('Hello World')
   })
 
   it('registers onDeactivated hook to clear debounce timer', () => {
     const tableData = ref([])
-    useDocumentSearch(tableData)
+    useDocumentSearch({ rows: tableData })
 
     // onDeactivated should have been called with a callback
     expect(onDeactivated).toHaveBeenCalled()
@@ -161,7 +164,7 @@ describe('useDocumentSearch', () => {
   it('handles null values in rows gracefully', async () => {
     vi.useFakeTimers()
     const tableData = ref([makeRow({ name: null, status: 'ok' })])
-    const { query, filteredData } = useDocumentSearch(tableData)
+    const { query, filteredData } = useDocumentSearch({ rows: tableData })
 
     query.value = 'ok'
     vi.advanceTimersByTime(400)
@@ -174,7 +177,7 @@ describe('useDocumentSearch', () => {
   it('works with shallowRef tableData', async () => {
     vi.useFakeTimers()
     const tableData = shallowRef([makeRow({ name: 'Alice' })])
-    const { query, filteredData } = useDocumentSearch(tableData)
+    const { query, filteredData } = useDocumentSearch({ rows: tableData })
 
     query.value = 'alice'
     vi.advanceTimersByTime(400)

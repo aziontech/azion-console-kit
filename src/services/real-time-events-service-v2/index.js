@@ -8,6 +8,7 @@ import { listEdgeDNS, loadEdgeDNS } from './edge-dns'
 import { listTieredCache, loadTieredCache } from './tiered-cache'
 import { loadFieldsEventsData } from './load-fields-real-time-events-data'
 import { getTotalRecords } from './get-total-records'
+import { loadEventsCount } from './load-events-count'
 export {
   listActivityHistory,
   loadActivityHistory,
@@ -26,5 +27,6 @@ export {
   listTieredCache,
   loadTieredCache,
   loadFieldsEventsData,
-  getTotalRecords
+  getTotalRecords,
+  loadEventsCount
 }

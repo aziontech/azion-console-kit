@@ -30,25 +30,29 @@ const read = (relPath) => readFileSync(path.resolve(repoRoot, relPath), 'utf-8')
 
 describe('Property P5 — data-testid preservation', () => {
   const cases = [
-    // event-chart.vue — E2E suite + new bottom-sheet (req 5.1)
+    // event-chart.vue — E2E suite (root wrapper)
     {
       file: 'src/views/RealTimeEventsV2/Blocks/components/event-chart.vue',
       testid: 'event-chart'
     },
+    // view-selector.vue — View dropdown + bottom-sheet (req 5.1), extracted
+    // from event-chart.vue in task 7.4. The View UI now lives in its own
+    // component but renders inline inside the chart header, so the E2E DOM
+    // contract (these test-ids in the rendered chart) is unchanged.
     {
-      file: 'src/views/RealTimeEventsV2/Blocks/components/event-chart.vue',
+      file: 'src/views/RealTimeEventsV2/Blocks/components/view-selector.vue',
       testid: 'event-chart-view'
     },
     {
-      file: 'src/views/RealTimeEventsV2/Blocks/components/event-chart.vue',
+      file: 'src/views/RealTimeEventsV2/Blocks/components/view-selector.vue',
       testid: 'rte-chart-bottom-sheet'
     },
     {
-      file: 'src/views/RealTimeEventsV2/Blocks/components/event-chart.vue',
+      file: 'src/views/RealTimeEventsV2/Blocks/components/view-selector.vue',
       testid: 'rte-chart-bottom-sheet-close'
     },
     {
-      file: 'src/views/RealTimeEventsV2/Blocks/components/event-chart.vue',
+      file: 'src/views/RealTimeEventsV2/Blocks/components/view-selector.vue',
       testid: 'rte-chart-bottom-sheet-backdrop'
     },
 

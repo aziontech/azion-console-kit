@@ -1,6 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { accountGuard } from '@/router/hooks/guards/accountGuard'
 
+// Hermetic: a dev's .env.local with VITE_DEBUG_LOGIN=true flips the guard into
+// its debug branch and breaks these assertions. Tests must not depend on it.
+vi.stubEnv('VITE_DEBUG_LOGIN', 'false')
+
 vi.mock('@/helpers/account-data', () => ({
   loadAccountHydration: vi.fn()
 }))

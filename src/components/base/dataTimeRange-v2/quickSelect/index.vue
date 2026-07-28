@@ -327,6 +327,19 @@
 
   const applyQuickSelect = () => {
     const now = new Date()
+    if (props.maxDays > 0) {
+      const requested = createRelativeRange(
+        quickSelectValue.value,
+        quickSelectUnit.value,
+        quickSelectDirection.value,
+        now
+      )
+      const spanMs = Math.abs(requested.endDate.getTime() - requested.startDate.getTime())
+      if (spanMs > props.maxDays * 864e5) {
+        quickSelectValue.value = props.maxDays
+        quickSelectUnit.value = 'days'
+      }
+    }
     const { startDate: newStartDate, endDate: newEndDate } = createRelativeRange(
       quickSelectValue.value,
       quickSelectUnit.value,
