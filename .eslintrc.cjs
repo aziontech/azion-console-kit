@@ -31,6 +31,54 @@ module.exports = {
         'no-console': 'off',
         'id-length': 'off'
       }
+    },
+    // Billing boundary: the plans experience (billing-api v4) and the managed
+    // experience (legacy billing, kept for internal/custom accounts) must stay
+    // independent. Mixing them is how the legacy path silently breaks.
+    {
+      files: [
+        'src/services/v2/billing-api/**',
+        'src/composables/billing/**',
+        'src/composables/useSubscription*.js',
+        'src/composables/useCurrentSubscription.js',
+        'src/composables/useCheckoutSessionPreparer.js',
+        'src/composables/useLatestInvoice.js'
+      ],
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          {
+            patterns: [
+              {
+                group: ['**/services/v2/billing-legacy/**', '**/composables/billing-legacy/**'],
+                message:
+                  'The plans experience must not import legacy billing. Use services/v2/billing-api instead — see src/services/v2/billing-api/README.md.'
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      files: [
+        'src/services/v2/billing-legacy/**',
+        'src/composables/billing-legacy/**',
+        'src/views/Billing/legacy/**'
+      ],
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          {
+            patterns: [
+              {
+                group: ['**/services/v2/billing-api/**', '**/composables/billing/**'],
+                message:
+                  'Legacy billing is frozen for managed accounts and must not depend on billing-api v4 — see src/services/v2/billing-legacy/README.md.'
+              }
+            ]
+          }
+        ]
+      }
     }
   ],
   parserOptions: {

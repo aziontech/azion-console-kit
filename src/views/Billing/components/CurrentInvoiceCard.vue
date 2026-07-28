@@ -95,7 +95,7 @@
   import Currency from '@aziontech/webkit/content/currency'
   import SubscriptionPlanRow from './SubscriptionPlanRow.vue'
   import SkeletonBlock from '@/templates/skeleton-block'
-  import { invoicesService } from '@/services/v2/billing/invoices-service'
+  import { billingInvoicesService } from '@/services/v2/billing-api/invoices/invoices-service'
 
   defineOptions({ name: 'current-invoice-card' })
 
@@ -108,16 +108,15 @@
   const isLoadingInvoice = ref(true)
 
   const extractTotal = (invoice) => {
-    if (!invoice) return null
-    const cents = typeof invoice.amount_paid === 'number' ? invoice.amount_paid : invoice.total
+    const cents = invoice?.amount
     if (typeof cents !== 'number' || !Number.isFinite(cents)) return null
     return cents / 100
   }
 
   onMounted(async () => {
     try {
-      const result = await invoicesService.listAccountInvoices({ limit: 1 })
-      latestInvoiceTotal.value = extractTotal(result?.invoices?.[0])
+      const result = await billingInvoicesService.listInvoices({ page: 1, pageSize: 1 })
+      latestInvoiceTotal.value = extractTotal(result?.results?.[0])
     } catch {
       latestInvoiceTotal.value = null
     } finally {

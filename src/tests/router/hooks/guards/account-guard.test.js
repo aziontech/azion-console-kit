@@ -20,10 +20,6 @@ vi.mock('@/composables/usePlansService', () => ({
   ensurePlansList: vi.fn().mockResolvedValue([])
 }))
 
-vi.mock('@/composables/useServiceOrdersList', () => ({
-  ensureServiceOrdersList: vi.fn(async () => ({ data: [] }))
-}))
-
 describe('accountGuard hasSession check', () => {
   it('should redirect to login without calling API when hasSession=false', async () => {
     const { loadAccountHydration } = await import('@/helpers/account-data')
@@ -195,16 +191,12 @@ describe('accountGuard onboarding prefetch', () => {
 describe('accountGuard hasActivePlan derivation', () => {
   beforeEach(async () => {
     const { loadAccountHydration } = await import('@/helpers/account-data')
-    const { ensureServiceOrdersList } = await import('@/composables/useServiceOrdersList')
     loadAccountHydration.mockReset()
     loadAccountHydration.mockResolvedValue(undefined)
-    ensureServiceOrdersList.mockReset()
   })
 
-  const runGuard = async () => {
-    const { ensureServiceOrdersList } = await import('@/composables/useServiceOrdersList')
-
-    await accountGuard({
+  const runGuard = async () =>
+    accountGuard({
       to: { meta: { isPublic: false }, name: 'home', fullPath: '/' },
       accountStore: {
         hasActiveUserId: false,
@@ -215,12 +207,14 @@ describe('accountGuard hasActivePlan derivation', () => {
       tracker: { reset: vi.fn() }
     })
 
-    return { ensureServiceOrdersList }
-  }
+  it('resolves the plan gate from the account payload, without a billing request', async () => {
+    const { subscriptionsService } =
+      await import('@/services/v2/billing-api/subscriptions/subscriptions-service')
+    const spy = vi.spyOn(subscriptionsService, 'getCurrentSubscription')
 
-  it('does not load service orders during session restore', async () => {
-    const { ensureServiceOrdersList } = await runGuard()
+    await runGuard()
 
-    expect(ensureServiceOrdersList).not.toHaveBeenCalled()
+    expect(spy).not.toHaveBeenCalled()
+    spy.mockRestore()
   })
 })

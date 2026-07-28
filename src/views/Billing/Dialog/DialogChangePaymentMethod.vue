@@ -57,8 +57,7 @@
   import Dialog from '@aziontech/webkit/dialog'
   import ActionButton from '@aziontech/webkit/actions/button'
   import PaymentMethodSetupBlock from '@/templates/checkout-block/payment-method-setup-block.vue'
-  import { useUpdateDefaultPaymentMethod } from '@/composables/useUpdateDefaultPaymentMethod'
-  import { queryKeys } from '@/services/v2/base/query/queryKeys'
+  import { useWalletMutations, walletQueryKey } from '@/composables/billing/useWallet'
   import { useToast } from '@aziontech/webkit/use-toast'
 
   defineOptions({ name: 'dialog-change-payment-method' })
@@ -72,13 +71,13 @@
 
   const toast = useToast()
   const queryClient = useQueryClient()
-  const { createSetupIntent, setDefault: setDefaultPaymentMethod } = useUpdateDefaultPaymentMethod()
+  const { createSetupIntent, setDefault: setDefaultPaymentMethod } = useWalletMutations()
 
   const awaitDefaultPaymentMethod = async (
     paymentMethodId,
     { maxAttempts = 6, delayMs = 500 } = {}
   ) => {
-    const key = queryKeys.serviceOrders.billingPaymentMethods()
+    const key = walletQueryKey()
     for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
       await queryClient.refetchQueries({ queryKey: key })
       const data = queryClient.getQueryData(key)

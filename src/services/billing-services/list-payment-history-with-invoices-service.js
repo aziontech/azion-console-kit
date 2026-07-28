@@ -1,5 +1,5 @@
 import { listPaymentHistoryService } from './list-payment-history-service'
-import { invoicesService } from '@/services/v2/billing/invoices-service'
+import { legacyInvoicesService } from '@/services/v2/billing-legacy/invoices/legacy-invoices-service'
 
 const toLegacyRows = (value) => {
   if (Array.isArray(value)) return value
@@ -18,7 +18,7 @@ const fetchLegacyRows = async (params) => {
 
 const fetchInvoicesRows = async () => {
   try {
-    const { rows } = await invoicesService.listAccountInvoicesAsRows()
+    const { rows } = await legacyInvoicesService.listAccountInvoicesAsRows()
     return Array.isArray(rows) ? rows : []
   } catch {
     return []

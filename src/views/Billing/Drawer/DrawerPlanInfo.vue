@@ -99,8 +99,7 @@
   import TermsAcceptanceBlock from '@/templates/checkout-block/terms-acceptance-block.vue'
   import CheckoutSubmissionFooter from '@/views/Billing/Drawer/CheckoutSubmissionFooter.vue'
   import { usePlans } from '@/composables/usePlans'
-  import { useBillingPaymentMethods } from '@/composables/useBillingPaymentMethods'
-  import { useUpdateDefaultPaymentMethod } from '@/composables/useUpdateDefaultPaymentMethod'
+  import { useWallet, useWalletMutations } from '@/composables/billing/useWallet'
   import { useToast } from '@aziontech/webkit/use-toast'
 
   defineOptions({ name: 'drawer-plan-info' })
@@ -156,8 +155,8 @@
   const useDefaultPaymentMethod = ref(true)
   const isTermsAccepted = ref(false)
 
-  const { defaultPaymentMethod: defaultPaymentCard } = useBillingPaymentMethods()
-  const { createSetupIntent, setDefault: setDefaultPaymentMethod } = useUpdateDefaultPaymentMethod()
+  const { defaultPaymentMethod: defaultPaymentCard } = useWallet()
+  const { createSetupIntent, setDefault: setDefaultPaymentMethod } = useWalletMutations()
 
   const isChangeCycleMode = computed(() => props.mode === 'change-cycle')
 

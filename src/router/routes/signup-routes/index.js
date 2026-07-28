@@ -25,7 +25,12 @@ export const signupRoutes = {
     {
       path: 'additional-data',
       name: 'additional-data',
-      component: () => import('@views/Signup/AdditionalDataView.vue'),
+      component: () => import('@views/Signup/OnboardingScreen.vue'),
+      props: {
+        postAdditionalDataService: SignupService.postAdditionalDataService,
+        patchFullnameService: SignupService.patchFullnameService,
+        updateAccountInfoService: SignupService.updateAccountInfoService
+      },
       meta: {
         hideNavigation: true
       },

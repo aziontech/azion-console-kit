@@ -2,10 +2,20 @@
   <LegacyBillingScreen
     v-if="experience === 'custom' || experience === 'internal'"
     ref="childRef"
-    v-bind="serviceProps"
-  />
+    v-bind="props"
+    @loadCard="emit('loadCard')"
+    @openDrawerAddCredit="emit('openDrawerAddCredit')"
+    @openDrawerAddPaymentMethod="emit('openDrawerAddPaymentMethod')"
+  >
+    <template #notification="slotProp">
+      <slot
+        name="notification"
+        v-bind="slotProp"
+      />
+    </template>
+  </LegacyBillingScreen>
   <TabsView
-    v-else-if="experience !== 'null'"
+    v-else
     ref="childRef"
     v-bind="props"
     @loadCard="emit('loadCard')"
@@ -21,9 +31,8 @@
 </template>
 
 <script setup>
-  import { computed, ref, onMounted } from 'vue'
+  import { ref } from 'vue'
   import { storeToRefs } from 'pinia'
-  import { useRouter } from 'vue-router'
   import { useAccountStore } from '@/stores/account'
   import TabsView from '@/views/Billing/TabsView.vue'
   import LegacyBillingScreen from '@/views/Billing/legacy/LegacyBillingScreen.vue'
@@ -46,28 +55,12 @@
     cardDefault: { type: Object, required: true }
   })
 
-  const emit = defineEmits(['loadCard', 'openDrawerAddCredit'])
+  const emit = defineEmits(['loadCard', 'openDrawerAddCredit', 'openDrawerAddPaymentMethod'])
 
   const accountStore = useAccountStore()
   const { billingExperience: experience } = storeToRefs(accountStore)
-  const router = useRouter()
 
   const childRef = ref(null)
-
-  const serviceProps = computed(() => ({
-    loadPaymentMethodDefaultService: props.loadPaymentMethodDefaultService,
-    getStripeClientService: props.getStripeClientService,
-    loadCurrentInvoiceService: props.loadCurrentInvoiceService,
-    loadInvoiceDataService: props.loadInvoiceDataService,
-    listServiceAndProductsChangesService: props.listServiceAndProductsChangesService,
-    documentPaymentMethodService: props.documentPaymentMethodService,
-    listPaymentHistoryService: props.listPaymentHistoryService,
-    documentPaymentHistoryService: props.documentPaymentHistoryService,
-    loadYourServicePlanService: props.loadYourServicePlanService,
-    openPlans: props.openPlans,
-    loadContractServicePlan: props.loadContractServicePlan,
-    loadInvoiceLastUpdatedService: props.loadInvoiceLastUpdatedService
-  }))
 
   const callBackDrawer = async () => {
     await childRef.value?.callBackDrawer?.()
@@ -75,11 +68,5 @@
 
   defineExpose({
     callBackDrawer
-  })
-
-  onMounted(() => {
-    if (experience.value === 'null') {
-      router.replace({ name: 'additional-data' })
-    }
   })
 </script>

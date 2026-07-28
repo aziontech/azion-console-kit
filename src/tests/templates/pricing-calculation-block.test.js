@@ -39,10 +39,9 @@ vi.mock('@/composables/useCheckoutSessionPreparer', () => ({
   })
 }))
 
-vi.mock('@/services/v2/service-orders/service-orders-service', () => ({
-  serviceOrdersService: {
-    useListPlansQuery: () => ({ data: mocks.plans })
-  }
+vi.mock('@/composables/usePlansService', () => ({
+  usePlansList: () => ({ data: mocks.plans }),
+  getPlanPricing: () => ({ monthly: 10, yearly: 100 })
 }))
 
 const flushPromises = () => Promise.resolve().then(() => Promise.resolve())

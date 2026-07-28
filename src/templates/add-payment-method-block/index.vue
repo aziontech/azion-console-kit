@@ -12,7 +12,7 @@
   import InputText from '@aziontech/webkit/inputtext'
   import { useField } from 'vee-validate'
   import * as yup from 'yup'
-  import { paymentService } from '@/services/v2/payment/payment-service'
+  import { legacyPaymentsService } from '@/services/v2/billing-legacy/payments/legacy-payments-service'
   import AddAddressBlock from './add-address.vue'
   import { capitalizeFirstLetter } from '@/helpers'
 
@@ -198,7 +198,7 @@
         card_expiration_month: token.card.exp_month,
         card_expiration_year: token.card.exp_year
       }
-      const response = await paymentService.createCreditCard(payload)
+      const response = await legacyPaymentsService.createCreditCard(payload)
       emit('onSuccess', response)
       showToast('success', response.feedback)
       toggleDrawerVisibility(false)

@@ -1,23 +1,22 @@
 import { useQuery } from '@tanstack/vue-query'
-import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
+import { productsPlansService } from '@/services/v2/products/plans-service'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 
 const PLANS_QUERY = {
   queryKey: queryKeys.plans.list(),
-  queryFn: () => serviceOrdersService.listPlansService(),
+  queryFn: () => productsPlansService.listPlans(),
   staleTime: 0,
   gcTime: 0,
   meta: { persist: false }
 }
 
 /**
- * Composable for fetching the plan catalogue from the server.
- * Cached across the session (staleTime 1h, gcTime 24h, no refetch on
- * mount/focus). Shares `queryKeys.plans.list()` with `ensurePlansList`
- * and `ServiceOrdersService.useListPlansQuery`, so all consumers reuse
- * the same cache entry.
+ * Composable for fetching the plan catalogue from products-api.
+ * Always revalidates on mount and is not persisted (`staleTime: 0`,
+ * `gcTime: 0`). Shares `queryKeys.plans.list()` with `ensurePlansList`, so
+ * both consumers reuse the same in-flight request and cache entry.
  *
  * @param {Object} [options] - Query options
  * @param {boolean} [options.enabled=true] - Controls automatic query execution
@@ -51,6 +50,11 @@ export async function ensurePlansList() {
   return queryClient.ensureQueryData(PLANS_QUERY)
 }
 
+const findPlanBySku = (plans, planName) => {
+  const target = String(planName).toLowerCase()
+  return plans.find((item) => item?.sku?.toLowerCase() === target) ?? null
+}
+
 /**
  * Helper to get plan pricing by plan name/sku
  * @param {Array} plans - List of plans from API
@@ -62,7 +66,7 @@ export function getPlanPricing(plans, planName) {
     return { monthly: 0, yearly: 0 }
   }
 
-  const plan = plans.find((item) => item.sku.toLowerCase() === planName.toLowerCase())
+  const plan = findPlanBySku(plans, planName)
   if (!plan?.pricings) {
     return { monthly: 0, yearly: 0 }
   }
@@ -86,7 +90,7 @@ export function getPlanPricingId(plans, planName, billingCycle) {
     return null
   }
 
-  const plan = plans.find((item) => item.sku.toLowerCase() === planName.toLowerCase())
+  const plan = findPlanBySku(plans, planName)
   if (!plan?.pricings) return null
 
   const pricing = plan.pricings.find((pricingItem) => pricingItem.periodicity === billingCycle)

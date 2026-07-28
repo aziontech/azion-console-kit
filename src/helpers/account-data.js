@@ -1,4 +1,5 @@
 import { accountService, contractService } from '@/services/v2/account'
+import { billingGqlService } from '@/services/v2/billing-legacy/accounting/billing-gql-service'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { useAccountStore } from '@/stores/account'
@@ -45,6 +46,20 @@ export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
 
   accountStore.setIdentity(identity)
   setFeatureFlags(identity.client_flags)
+}
+
+export const loadBillingData = async () => {
+  const accountStore = useAccountStore()
+  const { account, accountIsNotRegular } = accountStore
+
+  if (!accountIsNotRegular) return
+  if (account.formatCredit) return
+
+  const billingData = await billingGqlService.getCreditAndExpirationDate()
+  if (!billingData) return
+
+  const { credit, formatCredit, days } = billingData
+  accountStore.setAccountData({ credit, formatCredit, days })
 }
 
 export const loadContractData = async ({ force = false } = {}) => {

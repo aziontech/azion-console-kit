@@ -194,7 +194,13 @@ export const queryKeys = {
   billing: {
     all: ['billing'],
     lastBill: () => [...queryKeys.billing.all, 'last-bill'],
-    invoicesList: () => [...queryKeys.billing.all, 'invoices', 'list']
+    invoicesList: (params) => [
+      ...queryKeys.billing.all,
+      'invoices',
+      'list',
+      normalizeParams(params)
+    ],
+    invoiceDetail: (id) => [...queryKeys.billing.all, 'invoices', 'detail', id]
   },
   variables: {
     all: ['variables'],
@@ -312,19 +318,41 @@ export const queryKeys = {
     all: ['plans'],
     list: () => [...queryKeys.plans.all, 'list']
   },
-  serviceOrders: {
-    all: ['service-orders'],
-    list: (params) => [...queryKeys.serviceOrders.all, 'list', normalizeParams(params)],
-    detail: (id) => [...queryKeys.serviceOrders.all, 'detail', id],
-    billingPaymentMethods: () => [...queryKeys.serviceOrders.all, 'billing', 'payment-methods']
+  billingLegacy: {
+    all: ['billing-legacy'],
+    paymentMethods: () => [...queryKeys.billingLegacy.all, 'payment-methods'],
+    invoices: () => [...queryKeys.billingLegacy.all, 'invoices'],
+    paymentHistory: () => [...queryKeys.billingLegacy.all, 'payment-history']
   },
   subscriptions: {
     all: ['subscriptions'],
     list: (params) => [...queryKeys.subscriptions.all, 'list', normalizeParams(params)],
-    detail: (id) => [...queryKeys.subscriptions.all, 'detail', id],
     current: () => [...queryKeys.subscriptions.all, 'current'],
+    detail: (id) => [...queryKeys.subscriptions.all, 'detail', id],
     versions: (id) => [...queryKeys.subscriptions.detail(id), 'versions'],
     scheduledChanges: (id) => [...queryKeys.subscriptions.detail(id), 'scheduled-changes']
+  },
+  paymentMethods: {
+    all: ['payment-methods'],
+    list: () => [...queryKeys.paymentMethods.all, 'list'],
+    detail: (id) => [...queryKeys.paymentMethods.all, 'detail', id]
+  },
+  payments: {
+    all: ['payments'],
+    list: (params) => [...queryKeys.payments.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.payments.all, 'detail', id]
+  },
+  credits: {
+    all: ['credits'],
+    balance: () => [...queryKeys.credits.all, 'balance'],
+    list: (params) => [...queryKeys.credits.all, 'list', normalizeParams(params)]
+  },
+  billingAccounts: {
+    all: ['billing-accounts'],
+    list: (params) => [...queryKeys.billingAccounts.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.billingAccounts.all, 'detail', id],
+    current: () => [...queryKeys.billingAccounts.all, 'current'],
+    costBreakdown: (id) => [...queryKeys.billingAccounts.detail(id), 'cost-breakdown']
   },
   edgeService: {
     all: ['edge-services'],

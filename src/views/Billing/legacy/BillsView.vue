@@ -254,8 +254,8 @@
   import PrimeButton from '@aziontech/webkit/button'
   import Tag from '@aziontech/webkit/prime-tag'
   import cardFlagBlock from '@templates/card-flag-block'
-  import DialogChangePaymentMethod from '@/views/Billing/Dialog/DialogChangePaymentMethod.vue'
-  import { useBillingPaymentMethods } from '@/composables/useBillingPaymentMethods'
+  import DialogChangePaymentMethod from '@/views/Billing/legacy/DialogChangePaymentMethod.vue'
+  import { useLegacyWallet } from '@/composables/billing-legacy/useLegacyWallet'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
 
@@ -338,7 +338,7 @@
     defaultPaymentMethod,
     isLoading: isPaymentMethodLoading,
     refetch: refetchPaymentMethod
-  } = useBillingPaymentMethods()
+  } = useLegacyWallet()
 
   const paymentMethodBrand = computed(() => {
     const raw = (defaultPaymentMethod.value?.brand || '').toLowerCase()

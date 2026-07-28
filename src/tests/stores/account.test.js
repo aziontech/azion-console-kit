@@ -27,19 +27,20 @@ describe('account store session state', () => {
     expect(store.hasSession).toBe(false)
   })
 
-  it('should require onboarding for a first-login client with billing_type=null', () => {
+  it('should require onboarding for a first-login client with no contracted plan', () => {
     const store = useAccountStore()
 
     store.setAccountData({
       kind: 'client',
       first_login: true,
-      billing_type: null
+      billing_type: null,
+      hasServiceOrderPlan: false
     })
 
     expect(store.needsOnboarding).toBe(true)
   })
 
-  it('should require onboarding for a client with billing_type=null when first_login is absent', () => {
+  it('should require onboarding for a first-login client when the plan flag is absent', () => {
     const store = useAccountStore()
 
     store.setAccountData({
@@ -50,25 +51,66 @@ describe('account store session state', () => {
     expect(store.needsOnboarding).toBe(true)
   })
 
-  it('should not require onboarding for a returning (first_login=false) client with billing_type=null', () => {
+  it('should not require onboarding for a returning (first_login=false) client', () => {
     const store = useAccountStore()
 
     store.setAccountData({
       kind: 'client',
       first_login: false,
-      billing_type: null
+      billing_type: null,
+      hasServiceOrderPlan: false
     })
 
     expect(store.needsOnboarding).toBe(false)
   })
 
-  it('should not require onboarding for a client that already has a billing_type', () => {
+  it('should not require onboarding for a first-login client that already has a plan', () => {
     const store = useAccountStore()
 
     store.setAccountData({
       kind: 'client',
       first_login: true,
-      billing_type: 'plan'
+      billing_type: 'plan',
+      hasServiceOrderPlan: true
+    })
+
+    expect(store.needsOnboarding).toBe(false)
+  })
+
+  it('should require onboarding for a first-login internal account regardless of plan', () => {
+    const store = useAccountStore()
+
+    store.setAccountData({
+      kind: 'client',
+      first_login: true,
+      billing_type: 'internal',
+      hasServiceOrderPlan: true
+    })
+
+    expect(store.isManagedBillingAccount).toBe(true)
+    expect(store.needsOnboarding).toBe(true)
+  })
+
+  it('should require onboarding for a first-login custom account regardless of plan', () => {
+    const store = useAccountStore()
+
+    store.setAccountData({
+      kind: 'client',
+      first_login: true,
+      billing_type: 'custom',
+      hasServiceOrderPlan: true
+    })
+
+    expect(store.needsOnboarding).toBe(true)
+  })
+
+  it('should not require onboarding for a returning internal account', () => {
+    const store = useAccountStore()
+
+    store.setAccountData({
+      kind: 'client',
+      first_login: false,
+      billing_type: 'internal'
     })
 
     expect(store.needsOnboarding).toBe(false)
@@ -97,17 +139,27 @@ describe('account store billing experience', () => {
     expect(store.billingExperience).toBe('plan')
   })
 
-  it('should map billing_type=null to the null experience', () => {
+  it('should map billing_type=null to the plan experience', () => {
     const store = useAccountStore()
     store.setAccountData({ billing_type: null })
-    expect(store.billingExperience).toBe('null')
+    expect(store.billingExperience).toBe('plan')
   })
 
-  it('should map a missing billing_type to the null experience', () => {
+  it('should map a missing billing_type to the plan experience', () => {
     const store = useAccountStore()
     store.setAccountData({ id: 1 })
     expect(store.billingType).toBe(null)
-    expect(store.billingExperience).toBe('null')
+    expect(store.billingExperience).toBe('plan')
+  })
+
+  it('should flag internal and custom as managed billing accounts', () => {
+    const store = useAccountStore()
+    store.setAccountData({ billing_type: 'internal' })
+    expect(store.isManagedBillingAccount).toBe(true)
+    store.setAccountData({ billing_type: 'custom' })
+    expect(store.isManagedBillingAccount).toBe(true)
+    store.setAccountData({ billing_type: 'plan' })
+    expect(store.isManagedBillingAccount).toBe(false)
   })
 
   it('should map billing_type=custom to the custom experience', () => {

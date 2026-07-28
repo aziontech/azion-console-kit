@@ -1,29 +1,31 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAccountStore } from '@/stores/account'
-import { useServiceOrdersList } from '@/composables/useServiceOrdersList'
+import { useSubscriptionState } from '@/composables/useSubscriptionState'
+import { useScheduledChanges } from '@/composables/useSubscriptionPlanChange'
 import { usePlansList } from '@/composables/usePlansService'
+import { toBillingPeriod, toCataloguePeriodicity } from '@/services/v2/utils/billing-period'
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
 import {
   findPlanById,
-  findPricingById,
   formatPlanStartDate,
   resolvePlanSku,
   toFiniteNumber
 } from '@/composables/subscription-helpers'
 import { formatBillingPeriod, formatLastUpdate, formatNextChargeDate } from '@/utils/billing-date'
-import { queryClient } from '@/services/v2/base/query/queryClient'
-import { queryKeys } from '@/services/v2/base/query/queryKeys'
 
-const isActivePopulated = (so) => Boolean(so?.priceId && so?.currentPeriodEnd)
+const findPricing = (plan, period) => {
+  const pricings = plan?.pricings ?? []
+  const target = toBillingPeriod(period)
+  if (!target) return null
+  return pricings.find((pricing) => toBillingPeriod(pricing.periodicity) === target) ?? null
+}
 
 /**
- * Subscription state derived from the cached service-orders list. All data
- * flows through Vue Query — there is no manual polling loop or singleton
- * tracking state. Server-side changes invalidate the cache via the SSE
- * prefetch pipeline (see `prefetch-registrations.js`), and any mutation
- * `onSuccess` invalidates `queryKeys.serviceOrders.all` to refresh derived
- * computeds automatically.
+ * Subscription state for the plans experience, read straight from billing-api
+ * v4: `subscriptions/current` for the lifecycle, `versions` for the plan and
+ * fee behind it, `scheduled_changes` for a pending downgrade, and the
+ * products-api catalogue for names and prices.
  */
 export function useCurrentSubscription() {
   const accountStore = useAccountStore()
@@ -32,40 +34,36 @@ export function useCurrentSubscription() {
   const accountId = computed(() => accountData.value?.id ?? null)
 
   const {
-    activeServiceOrder,
-    currentServiceOrder,
-    isLoading: isLoadingServiceOrder,
-    refetch: refetchServiceOrders
-  } = useServiceOrdersList(accountId)
+    subscription,
+    serviceOrderId,
+    currentVersion,
+    hasSubscription,
+    isUnavailable,
+    isLoading: isLoadingSubscription,
+    refetch: refetchSubscription
+  } = useSubscriptionState({ enabled: computed(() => Boolean(accountId.value)) })
 
-  const hasFinishedOnboarding = computed(
-    () => accountData.value?.first_login !== true || Boolean(activeServiceOrder.value)
-  )
-  const hasContractedPlan = hasFinishedOnboarding
+  const hasContractedPlan = hasSubscription
 
-  // Plans are only needed to enrich the active SO with pricing/sku metadata.
-  // Gating with `enabled` keeps the catalogue request off the wire while the
-  // account is still hydrating or has no active SO yet.
-  const plansQueryEnabled = computed(
-    () => Boolean(accountId.value) && hasContractedPlan.value && Boolean(activeServiceOrder.value)
-  )
+  const plansQueryEnabled = computed(() => Boolean(accountId.value) && hasSubscription.value)
   const { data: plansData, isLoading: isLoadingPlans } = usePlansList({
     enabled: plansQueryEnabled
   })
 
+  const planId = computed(() => currentVersion.value?.planId ?? null)
+  const period = computed(() => currentVersion.value?.period ?? null)
+
+  const activePlan = computed(() => findPlanById(plansData.value, planId.value))
+
   const planSku = computed(() => {
-    if (isLoadingServiceOrder.value) return null
-    const so = activeServiceOrder.value
-    if (!so) return 'hobby'
-    const plan = findPlanById(plansData.value, so.planId)
-    return resolvePlanSku(plan)
+    if (isLoadingSubscription.value || isUnavailable.value) return null
+    if (!hasSubscription.value) return 'hobby'
+    return resolvePlanSku(activePlan.value)
   })
 
-  const activePricing = computed(() =>
-    findPricingById(plansData.value, activeServiceOrder.value?.priceId)
-  )
+  const activePricing = computed(() => findPricing(activePlan.value, period.value))
 
-  const billingCycle = computed(() => activePricing.value?.periodicity ?? null)
+  const billingCycle = computed(() => toCataloguePeriodicity(period.value))
 
   const planChargeValue = computed(() => {
     if (!hasContractedPlan.value) return 0
@@ -75,31 +73,46 @@ export function useCurrentSubscription() {
   const isPro = computed(() => planSku.value === 'pro')
   const isHobby = computed(() => planSku.value === 'hobby')
 
-  const planTitle = computed(() => (isPro.value ? 'Pro Plan' : 'Hobby'))
+  const planTitle = computed(() => {
+    if (isPro.value) return 'Pro Plan'
+    if (isHobby.value) return 'Hobby'
+    return activePlan.value?.name ?? null
+  })
   const planTag = computed(() => (hasContractedPlan.value ? 'Current Plan' : null))
 
-  const planStartDate = computed(() =>
-    formatPlanStartDate(activeServiceOrder.value?.currentPeriodStart)
-  )
+  const planStartDate = computed(() => formatPlanStartDate(subscription.value?.currentPeriodStart))
   const billingPeriod = computed(() =>
     formatBillingPeriod(
-      activeServiceOrder.value?.currentPeriodStart,
-      activeServiceOrder.value?.currentPeriodEnd
+      subscription.value?.currentPeriodStart,
+      subscription.value?.currentPeriodEnd
     )
   )
-  const nextChargeDate = computed(() =>
-    formatNextChargeDate(activeServiceOrder.value?.currentPeriodEnd)
-  )
-  const lastUpdate = computed(() =>
-    formatLastUpdate(currentServiceOrder.value?.updatedAt ?? activeServiceOrder.value?.updatedAt)
-  )
+  const nextChargeDate = computed(() => formatNextChargeDate(subscription.value?.currentPeriodEnd))
+  const lastUpdate = computed(() => formatLastUpdate(subscription.value?.audit?.lastModified))
 
-  const scheduledDowngrade = computed(() => activeServiceOrder.value?.downgradePending ?? null)
+  const {
+    pendingChange,
+    refetch: refetchScheduledChanges,
+    isLoading: isLoadingScheduledChanges
+  } = useScheduledChanges(serviceOrderId, {
+    enabled: computed(() => Boolean(serviceOrderId.value))
+  })
+
+  const scheduledDowngrade = computed(() => {
+    const pending = pendingChange.value
+    if (!pending) return null
+    return {
+      id: pending.id,
+      effectiveAt: pending.effectiveAt,
+      toPlanId: pending.change?.planId ?? null,
+      toPeriod: pending.change?.period ?? null
+    }
+  })
 
   const scheduledDowngradePricing = computed(() => {
-    const toPriceId = scheduledDowngrade.value?.toPriceId
-    if (!toPriceId) return null
-    return findPricingById(plansData.value, toPriceId)
+    const scheduled = scheduledDowngrade.value
+    if (!scheduled?.toPlanId) return null
+    return findPricing(findPlanById(plansData.value, scheduled.toPlanId), scheduled.toPeriod)
   })
 
   const nextChargeValue = computed(() => {
@@ -108,38 +121,39 @@ export function useCurrentSubscription() {
     return toFiniteNumber(pricing?.priceValue, 0)
   })
 
-  const currentInvoiceAmountCharged = computed(() =>
-    toFiniteNumber(activeServiceOrder.value?.invoiceAmountCharged, null)
-  )
-
-  const isDowngradePending = computed(() => Boolean(scheduledDowngrade.value?.effectiveAt))
+  const isDowngradePending = computed(() => Boolean(scheduledDowngrade.value))
 
   const isLoading = computed(() => {
     if (!accountId.value) return true
-    if (!hasContractedPlan.value) return false
-    return isLoadingServiceOrder.value || (plansQueryEnabled.value && isLoadingPlans.value)
+    return isLoadingSubscription.value || (plansQueryEnabled.value && isLoadingPlans.value)
   })
 
   const refetch = async () => {
     await loadUserAndAccountInfo({ force: true })
-    if (!accountId.value || !hasContractedPlan.value) return
-    queryClient.invalidateQueries({ queryKey: queryKeys.serviceOrders.all })
-    await refetchServiceOrders()
+    if (!accountId.value) return
+    await refetchSubscription()
+    if (serviceOrderId.value) await refetchScheduledChanges()
   }
 
   const refetchUntil = async (predicate, { maxAttempts = 5, delayMs = 500 } = {}) => {
     await refetch()
     if (!predicate) return true
     let attempt = 1
-    while (attempt < maxAttempts && !predicate(activeServiceOrder.value)) {
+    while (attempt < maxAttempts && !predicate(currentVersion.value, subscription.value)) {
       await new Promise((resolve) => setTimeout(resolve, delayMs))
       await refetch()
       attempt += 1
     }
-    return Boolean(predicate(activeServiceOrder.value))
+    return Boolean(predicate(currentVersion.value, subscription.value))
   }
 
   return {
+    subscription,
+    subscriptionId: computed(() => subscription.value?.id ?? null),
+    serviceOrderId,
+    currentVersion,
+    planId,
+    period,
     planSku,
     billingCycle,
     planChargeValue,
@@ -154,10 +168,16 @@ export function useCurrentSubscription() {
     isHobby,
     isPro,
     isLoading,
+    isLoadingScheduledChanges,
     isDowngradePending,
+    isUnavailable,
     scheduledDowngrade,
-    currentInvoiceAmountCharged,
-    isActivePopulated: computed(() => isActivePopulated(activeServiceOrder.value)),
+    refetchScheduledChanges,
+    status: computed(() => subscription.value?.status ?? null),
+    cancelAtPeriodEnd: computed(() => Boolean(subscription.value?.cancelAtPeriodEnd)),
+    isActivePopulated: computed(() =>
+      Boolean(planId.value && subscription.value?.currentPeriodEnd)
+    ),
     refetch,
     refetchUntil
   }

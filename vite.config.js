@@ -14,6 +14,9 @@ const getConfig = () => {
   const URLStartPrefix = IS_PROD ? 'https://' : 'https://stage-'
   const DomainSuffix = IS_PROD ? 'net' : 'com'
   const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && !IS_PROD
+  const BillingApiURL = IS_PROD
+    ? 'https://billing-api.azion.app'
+    : 'https://billing-api-stage.azion.app'
   const BEHOLDER_URL = env.VITE_BEHOLDER_URL
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
@@ -111,6 +114,9 @@ const getConfig = () => {
           target: `${URLStartPrefix}api.azion.com`,
           rewrite: (path) => path.replace(/^\/api/, '')
         }),
+        '^/v4/(account/(billing|payments|subscriptions)|billing_accounts)': createProxyConfig({
+          target: BillingApiURL
+        }),
         '/v4': createProxyConfig({
           target: `${URLStartPrefix}api.azion.com`
         }),
@@ -132,9 +138,7 @@ const getConfig = () => {
           })
         }),
         '/edge_api': createProxyConfig({
-          target: IS_PROD
-            ? 'https://jkjuyhi0gza.map.azionedge.net'
-            : 'https://urvlgkvpxla.map.azionedge.net',
+          target: BillingApiURL,
           rewrite: (path) => path.replace(/^\/edge_api/, '')
         })
       }

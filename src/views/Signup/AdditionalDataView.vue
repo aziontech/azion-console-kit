@@ -105,10 +105,10 @@
   import { usePlans } from '@/composables/usePlans'
   import { usePlansList, ensurePlansList } from '@/composables/usePlansService'
   import { useAccountStore } from '@/stores/account'
-  import { useServiceOrders } from '@/composables/useServiceOrders'
+  import { useSubscriptionPlanChange } from '@/composables/useSubscriptionPlanChange'
   import {
     preparePaidSignupCheckout,
-    submitSignupPlanFromDraftOrCreate
+    submitSignupPlan
   } from '@/composables/signup-checkout-preparation'
   import { useAdditionalDataFormState } from '@/composables/useAdditionalDataFormState'
   import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
@@ -155,7 +155,7 @@
   // checkout; the explicit `ensurePlansList()` below guarantees the catalogue
   // is loaded before the SO call needs it.
   const { data: plansData } = usePlansList()
-  const { prepareSignupCheckout, isLoading: isLoadingServiceOrder } = useServiceOrders()
+  const { createSubscription, isCreating: isLoadingServiceOrder } = useSubscriptionPlanChange()
 
   const additionalDataRef = ref(null)
   const isFormValid = ref(false)
@@ -196,7 +196,7 @@
   const submitButtonLabel = computed(() => 'Continue')
 
   const invalidateBillingCaches = () => {
-    queryClient.removeQueries({ queryKey: queryKeys.serviceOrders.all })
+    queryClient.removeQueries({ queryKey: queryKeys.subscriptions.all })
     queryClient.removeQueries({ queryKey: queryKeys.billing.all })
     queryClient.removeQueries({ queryKey: queryKeys.plans.all })
   }
@@ -227,11 +227,10 @@
   }
 
   const rememberDraftServiceOrder = ({ accountId, result }) => {
-    const serviceOrder = result?.serviceOrder ?? null
-    const serviceOrderId = result?.draftServiceOrderId || serviceOrder?.serviceOrderId || null
-    if (!serviceOrderId || accountId !== accountStore.accountData?.id) return
+    const subscriptionId = result?.subscription?.id ?? null
+    if (!subscriptionId || accountId !== accountStore.accountData?.id) return
 
-    draftServiceOrderId.value = serviceOrderId
+    draftServiceOrderId.value = subscriptionId
   }
 
   const resolveCheckoutReadyWaiters = () => {
@@ -290,11 +289,10 @@
     try {
       const plans = await ensureCheckoutPlans()
       const result = await preparePaidSignupCheckout({
-        accountId,
         plan,
         billingCycle,
         plans,
-        prepareSignupCheckout
+        createSubscription
       })
 
       rememberDraftServiceOrder({ accountId, result })
@@ -331,8 +329,7 @@
     ) {
       return Promise.resolve({
         clientSecret: checkoutSessionClientSecret.value,
-        draftServiceOrderId: draftServiceOrderId.value,
-        serviceOrder: null
+        subscription: null
       })
     }
 
@@ -426,14 +423,13 @@
       try {
         await persistOnboardingData({ plan })
         const plans = await ensureCheckoutPlans()
-        const result = await submitSignupPlanFromDraftOrCreate({
-          accountId,
+        const result = await submitSignupPlan({
           plan,
           billingCycle,
           plans,
-          prepareSignupCheckout
+          createSubscription
         })
-        if (result?.draftServiceOrderId) {
+        if (result?.subscription) {
           draftServiceOrderId.value = null
         }
 
@@ -453,8 +449,8 @@
     try {
       isAwaitingCheckoutReveal.value = true
       const result = await prepareProCheckout({ billingCycle, force: false })
-      if (result?.draftServiceOrderId) {
-        draftServiceOrderId.value = result.draftServiceOrderId
+      if (result?.subscription?.id) {
+        draftServiceOrderId.value = result.subscription.id
       }
       if (!checkoutSessionClientSecret.value) {
         throw new Error('Unable to initialize payment. Please try again.')

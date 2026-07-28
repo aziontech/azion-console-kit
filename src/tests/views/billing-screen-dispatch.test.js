@@ -53,10 +53,10 @@ describe('BillingScreen dispatch by billing_type', () => {
     expect(replaceMock).not.toHaveBeenCalled()
   })
 
-  it('redirects to onboarding and renders no billing screen for billing_type=null', () => {
+  it('renders the new screen for billing_type=null without redirecting', () => {
     const wrapper = mountWith(null)
-    expect(replaceMock).toHaveBeenCalledWith({ name: 'additional-data' })
-    expect(wrapper.findComponent(TabsView).exists()).toBe(false)
+    expect(replaceMock).not.toHaveBeenCalled()
+    expect(wrapper.findComponent(TabsView).exists()).toBe(true)
     expect(wrapper.findComponent(LegacyBillingScreen).exists()).toBe(false)
   })
 

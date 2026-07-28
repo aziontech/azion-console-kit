@@ -326,21 +326,22 @@ export function registerPrefetchQueryFns() {
   })
 
   // =========================================================================
-  // Service Orders - Structure: ['service-orders', 'list', params] or ['service-orders', 'detail', id]
+  // Subscriptions - Structure: ['subscriptions', 'current'] or
+  // ['subscriptions', 'detail', id, 'versions' | 'scheduled-changes']
   // SSE billing/payment events invalidate these keys; without this handler,
-  // the UI would stay stale after webhook-driven SO state changes.
+  // the UI would stay stale after webhook-driven subscription changes.
   // =========================================================================
 
-  prefetchRegistry.register(['service-orders', 'list'], async (queryKey) => {
-    const { serviceOrdersService } = await import('../../service-orders/service-orders-service')
-    const params = queryKey[2] ?? {}
-    return serviceOrdersService.listServiceOrders(params)
+  prefetchRegistry.register(['subscriptions', 'current'], async () => {
+    const { subscriptionsService } =
+      await import('../../billing-api/subscriptions/subscriptions-service')
+    return subscriptionsService.getCurrentSubscription()
   })
 
-  prefetchRegistry.register(['service-orders', 'detail'], async (queryKey) => {
-    const { serviceOrdersService } = await import('../../service-orders/service-orders-service')
-    const id = queryKey[2]
-    return serviceOrdersService.getServiceOrder(id)
+  prefetchRegistry.register(['subscriptions', 'list'], async (queryKey) => {
+    const { subscriptionsService } =
+      await import('../../billing-api/subscriptions/subscriptions-service')
+    return subscriptionsService.listSubscriptions(queryKey[2] ?? {})
   })
 
   // =========================================================================
@@ -349,8 +350,8 @@ export function registerPrefetchQueryFns() {
   // =========================================================================
 
   prefetchRegistry.register(['plans', 'list'], async () => {
-    const { serviceOrdersService } = await import('../../service-orders/service-orders-service')
-    return serviceOrdersService.listPlansService()
+    const { productsPlansService } = await import('../../products/plans-service')
+    return productsPlansService.listPlans()
   })
 
   // =========================================================================

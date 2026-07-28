@@ -4,7 +4,7 @@ import { useAccountStore } from '@/stores/account'
 import { getLastDayMonth } from '@/helpers/payment-history'
 import { getLinkDownloadInvoice } from '@/helpers/invoice'
 import { formatDateToMonthYear, formatDateToDayMonthYearHour } from '@/helpers/convert-date'
-import { paymentService } from '@/services/v2/payment/payment-service'
+import { legacyPaymentsService } from '@/services/v2/billing-legacy/payments/legacy-payments-service'
 
 const PAGE_SIZE = 100
 const ACCOUNTING_LIST_LIMIT = 12
@@ -90,7 +90,7 @@ const removeCurrentPayment = (payments) => {
 }
 
 const listPaymentHistoryForNotRegularAccounts = async () => {
-  const body = await paymentService.listPaymentsHistory({
+  const body = await legacyPaymentsService.listPaymentsHistory({
     pageSize: PAGE_SIZE
   })
 

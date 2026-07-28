@@ -94,12 +94,20 @@ export const useAccountStore = defineStore({
     isFirstLogin(state) {
       return state.account?.first_login
     },
+    isFirstLoginPending(state) {
+      return state.account?.first_login !== false
+    },
+    isManagedBillingAccount() {
+      return this.billingType === 'internal' || this.billingType === 'custom'
+    },
+    hasContractedPlan(state) {
+      return state.account?.hasServiceOrderPlan === true
+    },
     needsOnboarding(state) {
-      return (
-        state.account?.kind === 'client' &&
-        state.account?.billing_type === null &&
-        state.account?.first_login !== false // TODO: temporary — skip onboarding when first_login === false
-      )
+      if (state.account?.kind !== 'client') return false
+      if (!this.isFirstLoginPending) return false
+      if (this.isManagedBillingAccount) return true
+      return !this.hasContractedPlan
     },
     accountUtcOffset(state) {
       return state.account?.utc_offset || '+0000'
@@ -148,8 +156,6 @@ export const useAccountStore = defineStore({
           return 'custom'
         case 'internal':
           return 'internal'
-        case null:
-          return 'null'
         case 'plan':
         default:
           return 'plan'

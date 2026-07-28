@@ -1,11 +1,7 @@
-import { getPlanPricingId } from '@/composables/usePlansService'
+import { toBillingPeriod } from '@/services/v2/utils/billing-period'
 
 export const extractCheckoutClientSecret = (response) =>
-  response?.payment?.clientSecret ||
-  response?.data?.clientSecret ||
-  response?.data?.payment?.clientSecret ||
-  response?.serviceOrder?.clientSecret ||
-  ''
+  response?.payment?.clientSecret || response?.data?.payment?.client_secret || ''
 
 const findPlanBySku = (plans, plan) => {
   if (!Array.isArray(plans) || !plan) return null
@@ -14,69 +10,52 @@ const findPlanBySku = (plans, plan) => {
 
 export const getPlanIdFromSku = (plans, plan) => findPlanBySku(plans, plan)?.id ?? null
 
-const getResponseServiceOrder = (response) =>
-  response?.data || response?.serviceOrder || response?.service_order || null
-
-const getDraftServiceOrderId = (draft) => draft?.serviceOrderId || draft?.id || null
-
 const resolvePlanPayload = ({ plans, plan, billingCycle }) => {
   const planId = getPlanIdFromSku(plans, plan)
   if (!planId) {
     throw new Error(`Plan not found for ${plan}.`)
   }
 
-  if (plan === 'hobby') {
-    return { planId }
-  }
-
-  const planPricingId = getPlanPricingId(plans, plan, billingCycle)
-  if (!planPricingId) {
+  const period = toBillingPeriod(billingCycle) ?? toBillingPeriod('monthly')
+  if (!period) {
     throw new Error(`Plan pricing not found for ${plan} (${billingCycle}).`)
   }
 
-  return { planId, planPricingId }
+  return { planId, period }
 }
 
+/**
+ * Creates the subscription for a paid signup and hands back the client secret
+ * of the first payment. `POST /v4/account/subscriptions` returns the
+ * subscription as `incomplete` plus `payment.client_secret`; the gateway only
+ * collects — activation happens server-side once the payment settles.
+ */
 export const preparePaidSignupCheckout = async ({
   plan,
   billingCycle,
   plans,
-  prepareSignupCheckout
+  createSubscription
 }) => {
   if (plan !== 'pro') {
-    return { clientSecret: '', draftServiceOrderId: null, serviceOrder: null }
+    return { clientSecret: '', subscription: null }
   }
 
-  const payload = resolvePlanPayload({ plans, plan, billingCycle })
-  const response = await prepareSignupCheckout(payload)
-
+  const response = await createSubscription(resolvePlanPayload({ plans, plan, billingCycle }))
   const clientSecret = extractCheckoutClientSecret(response)
+
   if (!clientSecret) {
     throw new Error('Payment session client secret missing in response.')
   }
 
-  const serviceOrder = getResponseServiceOrder(response)
-  return {
-    clientSecret,
-    draftServiceOrderId: getDraftServiceOrderId(serviceOrder),
-    serviceOrder
-  }
+  return { clientSecret, subscription: response?.subscription ?? null }
 }
 
-export const submitSignupPlanFromDraftOrCreate = async ({
-  plan,
-  billingCycle,
-  plans,
-  prepareSignupCheckout
-}) => {
-  const payload = resolvePlanPayload({ plans, plan, billingCycle })
-  const response = await prepareSignupCheckout(payload)
-  const serviceOrder = getResponseServiceOrder(response)
+export const submitSignupPlan = async ({ plan, billingCycle, plans, createSubscription }) => {
+  const response = await createSubscription(resolvePlanPayload({ plans, plan, billingCycle }))
 
   return {
     response,
     payment: plan === 'pro' ? { clientSecret: extractCheckoutClientSecret(response) } : null,
-    serviceOrder,
-    draftServiceOrderId: getDraftServiceOrderId(serviceOrder)
+    subscription: response?.subscription ?? null
   }
 }

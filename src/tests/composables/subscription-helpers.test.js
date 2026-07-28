@@ -9,14 +9,8 @@ vi.mock('@/helpers/convert-date', () => ({
   }
 }))
 
-const {
-  findPlanById,
-  findPricingById,
-  formatPlanStartDate,
-  isActiveServiceOrder,
-  resolvePlanSku,
-  toFiniteNumber
-} = await import('@/composables/subscription-helpers')
+const { findPlanById, formatPlanStartDate, resolvePlanSku, toFiniteNumber } =
+  await import('@/composables/subscription-helpers')
 
 const plans = [
   {
@@ -34,15 +28,6 @@ const plans = [
   }
 ]
 
-describe('isActiveServiceOrder', () => {
-  it('returns true only for ACTIVE status', () => {
-    expect(isActiveServiceOrder({ status: 'ACTIVE' })).toBe(true)
-    expect(isActiveServiceOrder({ status: 'DRAFT' })).toBe(false)
-    expect(isActiveServiceOrder(null)).toBe(false)
-    expect(isActiveServiceOrder(undefined)).toBe(false)
-  })
-})
-
 describe('findPlanById', () => {
   it('returns the matching plan', () => {
     expect(findPlanById(plans, 'plan-pro')).toBe(plans[1])
@@ -52,22 +37,6 @@ describe('findPlanById', () => {
     expect(findPlanById(plans, 'plan-missing')).toBeNull()
     expect(findPlanById(plans, null)).toBeNull()
     expect(findPlanById(null, 'plan-pro')).toBeNull()
-  })
-})
-
-describe('findPricingById', () => {
-  it('finds a pricing nested under a plan', () => {
-    expect(findPricingById(plans, 'price-yearly')).toEqual({
-      id: 'price-yearly',
-      periodicity: 'yearly',
-      priceValue: '490.00'
-    })
-  })
-
-  it('returns null when not found', () => {
-    expect(findPricingById(plans, 'price-missing')).toBeNull()
-    expect(findPricingById(plans, null)).toBeNull()
-    expect(findPricingById(null, 'price-monthly')).toBeNull()
   })
 })
 

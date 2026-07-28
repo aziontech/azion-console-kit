@@ -1,15 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   preparePaidSignupCheckout,
-  submitSignupPlanFromDraftOrCreate
+  submitSignupPlan
 } from '@/composables/signup-checkout-preparation'
 
 const plans = [
-  {
-    id: 'plan_hobby',
-    sku: 'hobby',
-    pricings: []
-  },
+  { id: 'plan_hobby', sku: 'hobby', pricings: [] },
   {
     id: 'plan_pro',
     sku: 'pro',
@@ -20,75 +16,104 @@ const plans = [
   }
 ]
 
-describe('signup-checkout-preparation', () => {
-  it('prepares a paid signup checkout through the dedicated endpoint', async () => {
-    const prepareSignupCheckout = vi.fn().mockResolvedValue({
-      data: { serviceOrderId: 'so_draft' },
-      payment: { clientSecret: 'cs_test_secret' }
-    })
+const createResponse = (overrides = {}) => ({
+  subscription: { id: 10, status: 'incomplete', serviceOrderId: 1 },
+  payment: { clientSecret: 'seti_test_secret', gateway: 'stripe' },
+  ...overrides
+})
+
+describe('preparePaidSignupCheckout', () => {
+  it('creates the subscription and returns the first-payment client secret', async () => {
+    const createSubscription = vi.fn().mockResolvedValue(createResponse())
 
     const result = await preparePaidSignupCheckout({
-      accountId: 123,
       plan: 'pro',
       billingCycle: 'monthly',
       plans,
-      prepareSignupCheckout
+      createSubscription
     })
 
-    expect(prepareSignupCheckout).toHaveBeenCalledWith({
-      planId: 'plan_pro',
-      planPricingId: 'price_pro_monthly'
-    })
-    expect(result).toEqual({
-      clientSecret: 'cs_test_secret',
-      draftServiceOrderId: 'so_draft',
-      serviceOrder: { serviceOrderId: 'so_draft' }
-    })
+    expect(createSubscription).toHaveBeenCalledWith({ planId: 'plan_pro', period: 'monthly' })
+    expect(result.clientSecret).toBe('seti_test_secret')
+    expect(result.subscription).toEqual({ id: 10, status: 'incomplete', serviceOrderId: 1 })
   })
 
-  it('lets the API reuse an existing DRAFT when preparing another paid cycle', async () => {
-    const prepareSignupCheckout = vi.fn().mockResolvedValue({
-      data: { serviceOrderId: 'so_existing' },
-      payment: { clientSecret: 'cs_next_secret' }
-    })
+  it('translates the catalogue periodicity to the billing-api period', async () => {
+    const createSubscription = vi.fn().mockResolvedValue(createResponse())
 
-    const result = await preparePaidSignupCheckout({
-      accountId: 123,
+    await preparePaidSignupCheckout({
       plan: 'pro',
       billingCycle: 'yearly',
       plans,
-      prepareSignupCheckout
+      createSubscription
     })
 
-    expect(prepareSignupCheckout).toHaveBeenCalledWith({
-      planId: 'plan_pro',
-      planPricingId: 'price_pro_yearly'
-    })
-    expect(result.clientSecret).toBe('cs_next_secret')
-    expect(result.draftServiceOrderId).toBe('so_existing')
+    expect(createSubscription).toHaveBeenCalledWith({ planId: 'plan_pro', period: 'annual' })
   })
 
-  it('activates Hobby through the signup prepare endpoint only when Hobby is submitted', async () => {
-    const prepareSignupCheckout = vi.fn().mockResolvedValue({
-      data: { serviceOrderId: 'so_existing', status: 'ACTIVE', planId: 'plan_hobby' }
-    })
+  it('does nothing for a free plan', async () => {
+    const createSubscription = vi.fn()
 
-    const result = await submitSignupPlanFromDraftOrCreate({
-      accountId: 123,
+    const result = await preparePaidSignupCheckout({
       plan: 'hobby',
       billingCycle: 'monthly',
       plans,
-      prepareSignupCheckout
+      createSubscription
     })
 
-    expect(prepareSignupCheckout).toHaveBeenCalledWith({
-      planId: 'plan_hobby'
+    expect(createSubscription).not.toHaveBeenCalled()
+    expect(result).toEqual({ clientSecret: '', subscription: null })
+  })
+
+  it('throws when the response carries no client secret', async () => {
+    const createSubscription = vi.fn().mockResolvedValue(createResponse({ payment: null }))
+
+    await expect(
+      preparePaidSignupCheckout({ plan: 'pro', billingCycle: 'monthly', plans, createSubscription })
+    ).rejects.toThrow('Payment session client secret missing in response.')
+  })
+
+  it('throws when the paid plan is not in the catalogue', async () => {
+    await expect(
+      preparePaidSignupCheckout({
+        plan: 'pro',
+        billingCycle: 'monthly',
+        plans: [{ id: 'plan_hobby', sku: 'hobby', pricings: [] }],
+        createSubscription: vi.fn()
+      })
+    ).rejects.toThrow('Plan not found for pro.')
+  })
+})
+
+describe('submitSignupPlan', () => {
+  it('creates a free subscription without a payment leg', async () => {
+    const createSubscription = vi
+      .fn()
+      .mockResolvedValue({ subscription: { id: 11, status: 'active' }, payment: null })
+
+    const result = await submitSignupPlan({
+      plan: 'hobby',
+      billingCycle: 'monthly',
+      plans,
+      createSubscription
     })
+
+    expect(createSubscription).toHaveBeenCalledWith({ planId: 'plan_hobby', period: 'monthly' })
     expect(result.payment).toBeNull()
-    expect(result.serviceOrder).toEqual({
-      serviceOrderId: 'so_existing',
-      status: 'ACTIVE',
-      planId: 'plan_hobby'
+    expect(result.subscription).toEqual({ id: 11, status: 'active' })
+  })
+
+  it('carries the client secret for a paid plan', async () => {
+    const createSubscription = vi.fn().mockResolvedValue(createResponse())
+
+    const result = await submitSignupPlan({
+      plan: 'pro',
+      billingCycle: 'yearly',
+      plans,
+      createSubscription
     })
+
+    expect(createSubscription).toHaveBeenCalledWith({ planId: 'plan_pro', period: 'annual' })
+    expect(result.payment).toEqual({ clientSecret: 'seti_test_secret' })
   })
 })

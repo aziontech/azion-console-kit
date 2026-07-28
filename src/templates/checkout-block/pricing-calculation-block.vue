@@ -24,8 +24,7 @@
   import { useToast } from '@aziontech/webkit/use-toast'
   import { usePlans } from '@/composables/usePlans'
   import { useCheckoutSessionPreparer } from '@/composables/useCheckoutSessionPreparer'
-  import { serviceOrdersService } from '@/services/v2/service-orders/service-orders-service'
-  import { getPlanPricing } from '@/composables/usePlansService'
+  import { getPlanPricing, usePlansList } from '@/composables/usePlansService'
   import PlanCardHeader from '@/templates/checkout-block/plan-card-header.vue'
   import BillingCycleToggle from '@/templates/checkout-block/billing-cycle-toggle.vue'
   import PricingSummary from '@/templates/checkout-block/pricing-summary.vue'
@@ -69,7 +68,7 @@
 
   const toast = useToast()
   const { initialize, billingCycle: sharedBillingCycle, setParam } = usePlans()
-  const { data: plans } = serviceOrdersService.useListPlansQuery()
+  const { data: plans } = usePlansList()
   const { prepare: prepareCheckoutSession, isPreparing } = useCheckoutSessionPreparer()
 
   const DEFAULT_BILLING_CYCLE = 'monthly'

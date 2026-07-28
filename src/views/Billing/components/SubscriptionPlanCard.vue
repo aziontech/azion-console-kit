@@ -21,7 +21,7 @@
           class="flex items-center gap-3 h-5"
         >
           <span class="text-sm font-semibold leading-5 text-color">{{
-            subscription.planTitle
+            subscription.planTitle || '--'
           }}</span>
           <Tag
             v-if="subscription.planTag"

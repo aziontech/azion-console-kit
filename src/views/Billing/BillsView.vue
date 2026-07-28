@@ -45,7 +45,7 @@
   >
     <ListTable
       ref="listTableRef"
-      :listService="props.listPaymentHistoryService"
+      :listService="listPaymentHistory"
       :columns="loaderPaymentHistoryColumns"
       :actions="actionsRow"
       :enableEditClick="false"
@@ -141,9 +141,16 @@
   import { usePlans } from '@/composables/usePlans'
   import { usePlansList } from '@/composables/usePlansService'
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
-  import { useBillingPaymentMethods } from '@/composables/useBillingPaymentMethods'
-  import { useServiceOrders } from '@/composables/useServiceOrders'
+  import { useWallet } from '@/composables/billing/useWallet'
+  import { paymentsService } from '@/services/v2/billing-api/payments/payments-service'
+  import { PaymentsAdapter } from '@/services/v2/billing-api/payments/payments-adapter'
+  import { paymentMethodsService } from '@/services/v2/billing-api/payment-methods/payment-methods-service'
+  import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
   import { useCheckoutSessionPreparer } from '@/composables/useCheckoutSessionPreparer'
+  import { useSubscriptionPlanChange } from '@/composables/useSubscriptionPlanChange'
+  import { ensureCurrentSubscription } from '@/composables/useSubscriptionState'
+  import { toBillingPeriod } from '@/services/v2/utils/billing-period'
+  import { CHANGE_TIMING } from '@/services/v2/billing-api/subscriptions/subscriptions-constants'
   import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
   import { useAccountStore } from '@/stores/account'
   import { useWarmStripe } from '@/composables/useWarmStripe'
@@ -178,10 +185,6 @@
   const { showExportBilling, accountIsNotRegular } = storeToRefs(accountStore)
 
   const props = defineProps({
-    listPaymentHistoryService: {
-      type: Function,
-      required: true
-    },
     documentPaymentHistoryService: {
       type: Function,
       required: true
@@ -308,14 +311,7 @@
   initializePlans()
 
   const subscription = useCurrentSubscription()
-  const {
-    downgrade: downgradeServiceOrderPlan,
-    upgrade: upgradeServiceOrderPlan,
-    cancelDowngrade: cancelDowngradeServiceOrderPlan,
-    loadAccountServiceOrders,
-    serviceOrder,
-    activeServiceOrder
-  } = useServiceOrders()
+  const { applyChange, cancelScheduledChange } = useSubscriptionPlanChange()
   const { prepare: prepareCheckoutSession, recoverFromStaleSession } = useCheckoutSessionPreparer()
   const { warmStripe } = useWarmStripe()
 
@@ -385,7 +381,7 @@
     prepareCheckoutAhead({ plan: 'pro', preferredCycle: cycle }).catch(Sentry.captureException)
   }
 
-  const { defaultPaymentMethod } = useBillingPaymentMethods()
+  const { defaultPaymentMethod } = useWallet()
 
   const formatBrandName = (brand) => {
     if (!brand) return ''
@@ -411,8 +407,7 @@
     planChargeValue: computed(() => subscription.planChargeValue.value),
     isHobby: computed(() => subscription.isHobby.value),
     isPro: computed(() => subscription.isPro.value),
-    isLoading: computed(() => subscription.isLoading.value),
-    currentInvoiceAmountCharged: computed(() => subscription.currentInvoiceAmountCharged.value)
+    isLoading: computed(() => subscription.isLoading.value)
   })
 
   const currentInvoice = ref({})
@@ -453,13 +448,6 @@
     // pre-downloading the client here keeps those drawers from stalling on a
     // cold js.stripe.com load.
     warmStripe()
-    // Post-checkout entry refreshes once so the cards reflect the just-paid
-    // SO without depending on stale persisted cache.
-    try {
-      await subscription.refetch()
-    } catch (err) {
-      Sentry.captureException(err)
-    }
   })
 
   const isPostPaymentReloading = ref(false)
@@ -472,25 +460,34 @@
 
   const currentActiveCycle = computed(() => subscription.billingCycle.value || 'monthly')
 
-  const ensureActiveServiceOrder = async () => {
-    if (activeServiceOrder.value) return activeServiceOrder.value
-    const accountId = accountStore.accountData?.id
-    if (!accountId) return null
+  const ensureSubscription = async () => {
+    if (subscription.subscription.value) return subscription.subscription.value
+    if (!accountStore.accountData?.id) return null
     try {
-      const { active } = await loadAccountServiceOrders(accountId)
-      return active
+      const current = await ensureCurrentSubscription()
+      return current?.data ?? null
     } catch {
       return null
     }
   }
 
+  const listPaymentHistory = async ({ page = 1, pageSize = 20, status } = {}) => {
+    const [payments, paymentMethods] = await Promise.all([
+      paymentsService.listPayments({ page, pageSize, ...(status && { status }) }),
+      paymentMethodsService.listPaymentMethods().catch(() => [])
+    ])
+
+    return {
+      count: payments.count,
+      body: PaymentsAdapter.toHistoryRows(payments.results, {
+        paymentMethods,
+        formatDate: formatDateToDayMonthYearHour
+      })
+    }
+  }
+
   const findPlanIdBySku = (sku) =>
     plansData.value?.find((plan) => plan.sku?.toLowerCase() === sku.toLowerCase())?.id ?? null
-
-  const findPriceId = (sku, cycle) => {
-    const plan = plansData.value?.find((item) => item.sku?.toLowerCase() === sku.toLowerCase())
-    return plan?.pricings?.find((pricing) => pricing.periodicity === cycle)?.id ?? null
-  }
 
   const showOtherPlans = async () => {
     const initialCycle = subscription.isPro.value ? 'yearly' : 'monthly'
@@ -606,7 +603,7 @@
       fromCycle,
       toCycle
     }
-    const active = await ensureActiveServiceOrder()
+    const active = await ensureSubscription()
     downgradeEffectiveAt.value = active?.currentPeriodEnd ?? null
     showDowngradeDialog.value = true
   }
@@ -619,7 +616,7 @@
       fromCycle: null,
       toCycle: null
     }
-    const active = await ensureActiveServiceOrder()
+    const active = await ensureSubscription()
     downgradeEffectiveAt.value = active?.currentPeriodEnd ?? null
     showDowngradeDialog.value = true
   }
@@ -670,55 +667,41 @@
   }
 
   const resolveCycleChangePayload = async ({ plan, billingCycle }) => {
-    const active = await ensureActiveServiceOrder()
+    const active = await ensureSubscription()
     if (!active?.serviceOrderId) {
-      throw new Error('Missing active service order.')
+      throw new Error('No active subscription to change.')
     }
 
-    const accountId = accountStore.accountData?.id
     const planId = findPlanIdBySku(plan)
-    const planPricingId = findPriceId(plan, billingCycle)
+    const period = toBillingPeriod(billingCycle)
 
-    if (!accountId || !planId || !planPricingId) {
+    if (!planId || !period) {
       throw new Error('Missing data required to change cycle.')
     }
 
-    return { serviceOrderId: active.serviceOrderId, accountId, planId, planPricingId }
+    return { serviceOrderId: active.serviceOrderId, planId, period }
   }
 
-  const upgradeServiceOrderCycle = async ({ plan, billingCycle }) => {
-    const { serviceOrderId, accountId, planId, planPricingId } = await resolveCycleChangePayload({
+  const changeSubscriptionCycle = async ({ plan, billingCycle, when }) => {
+    const { serviceOrderId, planId, period } = await resolveCycleChangePayload({
       plan,
       billingCycle
     })
 
-    await upgradeServiceOrderPlan({
-      id: serviceOrderId,
-      accountId,
-      newPlanId: planId,
-      priceId: planPricingId
-    })
+    await applyChange({ serviceOrderId, planId, period, when })
   }
 
-  const downgradeServiceOrderCycle = async ({ plan, billingCycle }) => {
-    const { serviceOrderId, accountId, planId, planPricingId } = await resolveCycleChangePayload({
-      plan,
-      billingCycle
-    })
+  const upgradeServiceOrderCycle = ({ plan, billingCycle }) =>
+    changeSubscriptionCycle({ plan, billingCycle, when: CHANGE_TIMING.NOW })
 
-    await downgradeServiceOrderPlan({
-      id: serviceOrderId,
-      accountId,
-      newPlanId: planId,
-      priceId: planPricingId
-    })
-  }
+  const downgradeServiceOrderCycle = ({ plan, billingCycle }) =>
+    changeSubscriptionCycle({ plan, billingCycle, when: CHANGE_TIMING.PERIOD_END })
 
   const handleCycleUpgradeSubmit = async ({ plan, billingCycle, done, fail }) => {
     const fromCycle = subscription.billingCycle.value
     try {
       await upgradeServiceOrderCycle({ plan, billingCycle })
-      const targetPriceId = findPriceId(plan, billingCycle)
+      const targetPeriod = toBillingPeriod(billingCycle)
       done?.()
       showPlanInfoDrawer.value = false
       showChangePlanDrawer.value = false
@@ -726,8 +709,8 @@
       lockedCycle.value = null
       isPostPaymentReloading.value = true
       try {
-        if (targetPriceId) {
-          await subscription.refetchUntil((so) => so?.priceId === targetPriceId)
+        if (targetPeriod) {
+          await subscription.refetchUntil((version) => version?.period === targetPeriod)
         } else {
           await subscription.refetch()
         }
@@ -796,16 +779,18 @@
         return
       }
 
-      const serviceOrderId = serviceOrder.value?.serviceOrderId
+      const serviceOrderId = subscription.serviceOrderId.value
       const targetPlanId = findPlanIdBySku(toPlan)
 
       if (!serviceOrderId || !targetPlanId) {
         throw new Error('Missing data required to change plan.')
       }
 
-      await downgradeServiceOrderPlan({
-        id: serviceOrderId,
-        newPlanId: targetPlanId
+      await applyChange({
+        serviceOrderId,
+        planId: targetPlanId,
+        period: toBillingPeriod(toCycle || fromCycle),
+        when: CHANGE_TIMING.PERIOD_END
       })
 
       trackBilling('downgradeScheduled', {
@@ -825,7 +810,7 @@
       showChangePlanDrawer.value = false
       isPostPaymentReloading.value = true
       try {
-        await subscription.refetchUntil((so) => so?.downgradePending != null)
+        await subscription.refetchScheduledChanges()
       } finally {
         isPostPaymentReloading.value = false
       }
@@ -845,16 +830,19 @@
   const handleCancelDowngradeConfirm = async ({ fail, done } = {}) => {
     const fromPlan = subscription.planSku.value
     try {
-      const serviceOrderId = serviceOrder.value?.serviceOrderId
+      const serviceOrderId = subscription.serviceOrderId.value
       if (!serviceOrderId) {
         throw new Error('Missing service order to cancel.')
       }
 
-      await cancelDowngradeServiceOrderPlan({ id: serviceOrderId })
+      await cancelScheduledChange({
+        serviceOrderId,
+        scheduledChangeId: subscription.scheduledDowngrade.value?.id
+      })
 
       isPostPaymentReloading.value = true
       try {
-        await subscription.refetchUntil((so) => so?.downgradePending == null)
+        await subscription.refetchScheduledChanges()
       } finally {
         isPostPaymentReloading.value = false
       }
@@ -902,6 +890,31 @@
       methodType: 'card'
     })
 
+    const activeSubscriptionId = subscription.serviceOrderId.value ?? null
+
+    if (activeSubscriptionId && targetPlanId) {
+      try {
+        await applyChange({
+          serviceOrderId: activeSubscriptionId,
+          planId: targetPlanId,
+          period: toBillingPeriod(submittedCycle),
+          when: CHANGE_TIMING.NOW
+        })
+      } catch (err) {
+        const detail =
+          (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
+          'Unable to change the plan after the payment method was saved.'
+        trackBilling('planChangeFailed', {
+          plan: targetPlan,
+          billingCycle: submittedCycle,
+          errorType: 'plan-change',
+          errorMessage: detail
+        })
+        toast.add({ severity: 'error', summary: 'Error', detail, closable: true })
+        return
+      }
+    }
+
     markAwaitingActiveServiceOrder()
 
     showPlanInfoDrawer.value = false
@@ -924,7 +937,7 @@
     isPostPaymentReloading.value = true
     try {
       if (targetPlanId) {
-        await subscription.refetchUntil((so) => so?.planId === targetPlanId)
+        await subscription.refetchUntil((version) => version?.planId === targetPlanId)
       } else {
         await subscription.refetch()
       }

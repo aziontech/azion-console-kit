@@ -5,8 +5,8 @@ import AdditionalDataView from '@/views/Signup/AdditionalDataView.vue'
 
 const mocks = vi.hoisted(() => ({
   preparePaidSignupCheckout: vi.fn(),
-  submitSignupPlanFromDraftOrCreate: vi.fn(),
-  prepareSignupCheckout: vi.fn(),
+  submitSignupPlan: vi.fn(),
+  createSubscription: vi.fn(),
   ensurePlansList: vi.fn(),
   warmStripe: vi.fn(),
   clearAdditionalDataFormState: vi.fn(),
@@ -33,7 +33,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/composables/signup-checkout-preparation', () => ({
   preparePaidSignupCheckout: mocks.preparePaidSignupCheckout,
-  submitSignupPlanFromDraftOrCreate: mocks.submitSignupPlanFromDraftOrCreate
+  submitSignupPlan: mocks.submitSignupPlan
 }))
 
 vi.mock('@/composables/usePlansService', () => ({
@@ -45,10 +45,10 @@ vi.mock('@/stores/account', () => ({
   useAccountStore: () => mocks.accountStore
 }))
 
-vi.mock('@/composables/useServiceOrders', () => ({
-  useServiceOrders: () => ({
-    prepareSignupCheckout: mocks.prepareSignupCheckout,
-    isLoading: { value: false }
+vi.mock('@/composables/useSubscriptionPlanChange', () => ({
+  useSubscriptionPlanChange: () => ({
+    createSubscription: mocks.createSubscription,
+    isCreating: { value: false }
   })
 }))
 
@@ -202,8 +202,8 @@ const mountAdditionalDataView = () =>
 describe('Signup AdditionalDataView checkout preparation', () => {
   beforeEach(() => {
     mocks.preparePaidSignupCheckout.mockReset()
-    mocks.submitSignupPlanFromDraftOrCreate.mockReset()
-    mocks.prepareSignupCheckout.mockReset()
+    mocks.submitSignupPlan.mockReset()
+    mocks.createSubscription.mockReset()
     mocks.ensurePlansList.mockReset()
     mocks.warmStripe.mockReset()
     mocks.clearAdditionalDataFormState.mockReset()
@@ -242,11 +242,10 @@ describe('Signup AdditionalDataView checkout preparation', () => {
 
     expect(mocks.preparePaidSignupCheckout).toHaveBeenCalledWith(
       expect.objectContaining({
-        accountId: 123,
         plan: 'pro',
         billingCycle: 'yearly',
         plans: mocks.plansData.value,
-        prepareSignupCheckout: mocks.prepareSignupCheckout
+        createSubscription: mocks.createSubscription
       })
     )
     expect(vi.getTimerCount()).toBe(0)
@@ -255,9 +254,8 @@ describe('Signup AdditionalDataView checkout preparation', () => {
   it('submits Hobby without waiting for an obsolete Pro checkout preparation', async () => {
     const preparation = createDeferred()
     mocks.preparePaidSignupCheckout.mockReturnValueOnce(preparation.promise)
-    mocks.submitSignupPlanFromDraftOrCreate.mockResolvedValue({
-      draftServiceOrderId: 'so_hobby',
-      serviceOrder: { serviceOrderId: 'so_hobby' }
+    mocks.submitSignupPlan.mockResolvedValue({
+      subscription: { id: 'sub_hobby', status: 'active' }
     })
     const wrapper = mountAdditionalDataView()
 
@@ -267,17 +265,16 @@ describe('Signup AdditionalDataView checkout preparation', () => {
     await wrapper.get('[data-testid="actions-button"]').trigger('click')
     await flushPromises()
 
-    expect(mocks.submitSignupPlanFromDraftOrCreate).toHaveBeenCalledWith(
+    expect(mocks.submitSignupPlan).toHaveBeenCalledWith(
       expect.objectContaining({
         plan: 'hobby',
-        prepareSignupCheckout: mocks.prepareSignupCheckout
+        createSubscription: mocks.createSubscription
       })
     )
 
     preparation.resolve({
       clientSecret: 'cs_stale',
-      draftServiceOrderId: 'so_stale',
-      serviceOrder: { serviceOrderId: 'so_stale', status: 'DRAFT' }
+      subscription: { id: 'sub_stale', status: 'incomplete' }
     })
     await flushPromises()
   })
