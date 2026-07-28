@@ -1,17 +1,3 @@
-/**
- * Security: `?filters=` GraphQL structure-injection guard.
- *
- * The filter clauses that seed a query are rehydrated from a base64 URL hash
- * (`getFiltersFromHash` → `JSON.parse(atob(...))`) with no schema validation, so
- * a tampered link can hand `buildFilter` arbitrary `{ valueField, operator }`
- * pairs. Downstream, `buildFilterGroup` forms the GraphQL query key as
- * `valueField + operator` and `buildFilterParts` splices that key verbatim into
- * the query string (`${key}: $var`). Without a guard, a crafted field/operator
- * could break out of the `filter: { ... }` block and inject structure.
- *
- * These tests pin the guard: only whitelisted operators and identifier-shaped
- * field names survive; everything else is dropped before it can reach the query.
- */
 import { describe, it, expect } from 'vitest'
 import { buildFilter, buildFilterGroup, VALID_OPERATORS, SAFE_FIELD_NAME } from '../build-filter'
 import { buildFilterParts } from '../../build-filter-parts'

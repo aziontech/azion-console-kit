@@ -38,8 +38,6 @@ describe('toGraphQLScalar', () => {
   })
 
   it('escapes a trailing backslash so it cannot break out of the string literal', () => {
-    // Without escaping `\`, `a\` renders as `"a\"` — the backslash escapes the
-    // closing quote and the GraphQL string literal is left unterminated.
     expect(toGraphQLScalar('a\\')).toBe('"a\\\\"')
   })
 
