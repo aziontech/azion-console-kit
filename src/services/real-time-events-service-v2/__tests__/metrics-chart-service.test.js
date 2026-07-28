@@ -37,6 +37,14 @@ describe('toGraphQLScalar', () => {
     expect(toGraphQLScalar('say "hi"')).toBe('"say \\"hi\\""')
   })
 
+  it('escapes a trailing backslash so it cannot break out of the string literal', () => {
+    expect(toGraphQLScalar('a\\')).toBe('"a\\\\"')
+  })
+
+  it('escapes backslash before an embedded quote (no injection)', () => {
+    expect(toGraphQLScalar('a\\"b')).toBe('"a\\\\\\"b"')
+  })
+
   it('returns raw numbers', () => {
     expect(toGraphQLScalar(42)).toBe('42')
     expect(toGraphQLScalar(3.14)).toBe('3.14')

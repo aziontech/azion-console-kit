@@ -290,13 +290,29 @@ export class WafService extends BaseService {
     const totalPages = Math.ceil(count / WAF_DOMAINS_PAGE_SIZE)
 
     if (totalPages > 1) {
-      const pagePromises = []
+      const pageNumbers = []
       for (let page = 2; page <= totalPages; page++) {
-        pagePromises.push(this.#fetchWafDomainsPage(wafId, page))
+        pageNumbers.push(page)
       }
 
-      const pagesResponses = await Promise.all(pagePromises)
-      pagesResponses.forEach((pageResponse) => allDomains.push(...pageResponse.results))
+      const settled = await Promise.allSettled(
+        pageNumbers.map((page) => this.#fetchWafDomainsPage(wafId, page))
+      )
+
+      const failedPages = []
+      settled.forEach((outcome, index) => {
+        if (outcome.status === 'fulfilled') {
+          allDomains.push(...outcome.value.results)
+        } else {
+          failedPages.push(pageNumbers[index])
+        }
+      })
+
+      if (failedPages.length) {
+        console.error(
+          `[WafService] listWafDomains(${wafId}): ${failedPages.length} of ${pageNumbers.length} domain pages failed and were skipped (pages ${failedPages.join(', ')}).`
+        )
+      }
     }
 
     return allDomains.map((domain) => ({
