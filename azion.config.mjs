@@ -303,6 +303,20 @@ const config = {
         }
       },
       {
+        name: 'Bypass Cache for Runtime Config',
+        description:
+          'config.json changes independently of the immutable bundle (environment promotion, token rotation) and must never be cached at the edge.',
+        match: '^/config.json$',
+        behavior: {
+          setOrigin: {
+            name: 'origin-storage-default',
+            type: 'object_storage'
+          },
+          bypassCache: true,
+          deliver: true
+        }
+      },
+      {
         name: 'Set Cache for Static Assets',
         description: 'Sets the cache for all requests using the default object storage.',
         match:

@@ -24,7 +24,7 @@ describe('runtime-config', () => {
 
     const config = await loadRuntimeConfig()
 
-    expect(fetchMock).toHaveBeenCalledWith('/config.json')
+    expect(fetchMock).toHaveBeenCalledWith('/config.json', { cache: 'no-store' })
     expect(config).toEqual({ environment: 'stage', segmentToken: 'seg-token' })
     expect(getRuntimeConfig()).toEqual({ environment: 'stage', segmentToken: 'seg-token' })
   })

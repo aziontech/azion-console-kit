@@ -49,7 +49,10 @@ const getConfig = () => {
     plugins: [
       vue(),
       vueJsx(),
-      ...(IS_SENTRY_UPLOAD && env.VITE_SENTRY_AUTH_TOKEN?.length && env.VITE_SENTRY_ORG?.length
+      ...(IS_SENTRY_UPLOAD &&
+      env.VITE_SENTRY_AUTH_TOKEN?.length &&
+      env.VITE_SENTRY_ORG?.length &&
+      env.VITE_SENTRY_PROJECT?.length
         ? [
             sentryVitePlugin({
               org: env.VITE_SENTRY_ORG,
