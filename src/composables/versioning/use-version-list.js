@@ -1,7 +1,7 @@
 import { ref, computed, toValue } from 'vue'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 
-const STATE_LABELS = {
+const VERSION_STATE_LABELS = {
   [VERSION_STATES.DRAFT]: 'Draft',
   [VERSION_STATES.QUEUED]: 'Queued',
   [VERSION_STATES.BUILDING]: 'Building',
@@ -10,6 +10,54 @@ const STATE_LABELS = {
   [VERSION_STATES.ARCHIVED]: 'Archived',
   [VERSION_STATES.CANCELED]: 'Canceled',
   [VERSION_STATES.ERROR]: 'Error'
+}
+
+const VERSION_SORT_OPTIONS = [
+  { label: 'Last modified', value: 'lastModified-desc' },
+  { label: 'First created', value: 'createdAt-asc' },
+  { label: 'Status', value: 'state-asc' }
+]
+
+const buildVersionStatusOptions = () => [
+  { label: 'All Status', value: null },
+  ...Object.values(VERSION_STATES).map((value) => ({
+    label: VERSION_STATE_LABELS[value],
+    value
+  }))
+]
+
+const TRAFFIC_OPTIONS = [
+  { label: 'All Traffic', value: null },
+  { label: 'Receiving traffic', value: 'active' }
+]
+
+export const buildVersionListOptions = ({ activeVersions } = {}) => {
+  const statusOptions = buildVersionStatusOptions()
+
+  const filters = computed(() => {
+    const base = [
+      {
+        key: 'state',
+        options: statusOptions,
+        placeholder: 'All Status',
+        defaultValue: null
+      }
+    ]
+
+    const active = toValue(activeVersions)
+    if (active instanceof Map && active.size > 0) {
+      base.push({
+        key: 'traffic',
+        options: TRAFFIC_OPTIONS,
+        placeholder: 'All Traffic',
+        defaultValue: null
+      })
+    }
+
+    return base
+  })
+
+  return { filters, sortOptions: VERSION_SORT_OPTIONS }
 }
 
 const COMPARATORS = {
@@ -38,44 +86,7 @@ export function useVersionList(rawVersions, options = {}) {
   const filterValues = ref({ state: null, traffic: null })
   const sort = ref(defaultSort)
 
-  const statusOptions = [
-    { label: 'All Status', value: null },
-    ...Object.values(VERSION_STATES).map((value) => ({ label: STATE_LABELS[value], value }))
-  ]
-
-  const trafficOptions = [
-    { label: 'All Traffic', value: null },
-    { label: 'Receiving traffic', value: 'active' }
-  ]
-
-  const sortOptions = [
-    { label: 'Last modified', value: 'lastModified-desc' },
-    { label: 'First created', value: 'createdAt-asc' },
-    { label: 'Status', value: 'state-asc' }
-  ]
-
-  const filters = computed(() => {
-    const base = [
-      {
-        key: 'state',
-        options: statusOptions,
-        placeholder: 'All Status',
-        defaultValue: null
-      }
-    ]
-
-    const active = toValue(activeVersions)
-    if (active instanceof Map && active.size > 0) {
-      base.push({
-        key: 'traffic',
-        options: trafficOptions,
-        placeholder: 'All Traffic',
-        defaultValue: null
-      })
-    }
-
-    return base
-  })
+  const { filters, sortOptions } = buildVersionListOptions({ activeVersions })
 
   const items = computed(() => {
     const source = toValue(rawVersions) ?? []
@@ -117,7 +128,6 @@ export function useVersionList(rawVersions, options = {}) {
     filterValues,
     sort,
     filters,
-    sortOptions,
-    statusOptions
+    sortOptions
   }
 }

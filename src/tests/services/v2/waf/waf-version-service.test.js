@@ -71,11 +71,15 @@ describe('WafVersionService - reads', () => {
     const result = await queryFn()
 
     expect(useQuerySpy).toHaveBeenCalledWith(
-      queryKeys.waf.version.list(RID),
+      queryKeys.waf.version.list(RID, { page: 1, page_size: 20 }),
       expect.any(Function),
       expect.any(Object)
     )
-    expect(requestSpy).toHaveBeenCalledWith({ method: 'GET', url: BASE })
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'GET',
+      url: BASE,
+      params: { page: 1, page_size: 20 }
+    })
     expect(result.count).toBe(1)
     expect(result.body[0]).toMatchObject({ id: VID, state: 'draft', version: 2 })
     expect(result.body[0].config).toMatchObject({ id: 902, name: 'waf-main', active: true })

@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { VERSION_POLL_INTERVAL_MS } from '@/services/v2/versioning/version-cache-policy'
 import { httpService } from '@/services/v2/base/http/httpService'
 import { queryClient } from '@/services/v2/base/query/queryClient'
+import { useTableDefinitionsStore } from '@/stores/table-definitions'
 
 vi.mock('@aziontech/webkit/use-toast', () => ({
   useToast: () => ({ add: vi.fn() })
@@ -79,6 +80,7 @@ const listResponse = (versions) => ({
 let requestSpy
 
 const setupBoundary = () => {
+  useTableDefinitionsStore().setNumberOfLinesPerPage(20)
   vi.spyOn(queryClient, 'ensureQueryData').mockImplementation(({ queryFn }) => queryFn())
   vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
   vi.spyOn(queryClient, 'invalidateQueries').mockImplementation(() => {})

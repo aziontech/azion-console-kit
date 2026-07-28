@@ -7,6 +7,8 @@ import { getVersionCapability } from './version-capability'
  * @param {{ resourceType: string, injectionKey: string, versionService: object,
  * currentVersionId?: import('vue').Ref<string>|(() => string)|string }} config
  */
+export const VERSION_SELECTION_PAGE_SIZE = 100
+
 export function useDeployResourceContext({
   resourceType,
   injectionKey,
@@ -22,7 +24,9 @@ export function useDeployResourceContext({
   const resourceName = computed(() => resource.value?.name ?? '')
   const currentId = computed(() => toValue(currentVersionId) ?? null)
 
-  const versionsQuery = versionService.useListVersionsQuery(resourceId.value)
+  const versionsQuery = versionService.useListVersionsQuery(resourceId.value, {
+    pageSize: VERSION_SELECTION_PAGE_SIZE
+  })
   const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
 
   const readyVersionOptions = computed(() =>

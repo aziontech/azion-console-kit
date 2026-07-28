@@ -5,6 +5,7 @@ import { VERSION_ACTIONS } from '@/composables/versioning/version-machine'
 import { toDeployableVersionOptions } from '@/composables/versioning/to-version-options'
 import { getVersionCapability } from '@/composables/versioning/version-capability'
 import { useActiveVersions } from '@/composables/versioning/use-active-versions'
+import { VERSION_SELECTION_PAGE_SIZE } from '@/composables/versioning/use-deploy-resource-context'
 import { releaseComposerRouteFromResource } from '@/templates/release-composition/release-composer-route'
 
 export const LANDING_TAB_KEYS = ['overview', 'versions', 'settings', 'variables']
@@ -94,7 +95,9 @@ export function useResourceVersionLanding({
 
   watch(resourceId, loadResource, { immediate: true })
 
-  const versionsQuery = versionService.useListVersionsQuery(resourceId.value)
+  const versionsQuery = versionService.useListVersionsQuery(resourceId.value, {
+    pageSize: VERSION_SELECTION_PAGE_SIZE
+  })
   const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
 
   const activeVersionsResourceRef = computed(() => ({ resourceType, resourceId: resourceId.value }))

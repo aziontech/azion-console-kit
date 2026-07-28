@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const listEdgeApplicationsService = vi.fn()
 const loadAppVersion = vi.fn()
 const listEdgeFirewallService = vi.fn()
-const listFirewallVersions = vi.fn()
+const loadFirewallVersion = vi.fn()
 const listEdgeConnectorsService = vi.fn()
 const loadConnectorVersion = vi.fn()
 const listEdgeFunctionsService = vi.fn()
@@ -20,9 +20,12 @@ vi.mock('@/services/v2/edge-app/edge-app-version-service', () => ({
 }))
 vi.mock('@/services/v2/edge-firewall/edge-firewall-service', () => ({
   edgeFirewallService: {
-    listEdgeFirewallService: (...args) => listEdgeFirewallService(...args),
-    listFirewallVersions: (...args) => listFirewallVersions(...args)
+    listEdgeFirewallService: (...args) => listEdgeFirewallService(...args)
   }
+}))
+// eslint-disable-next-line azion-architecture/no-versioning-module-mock -- resolveReleaseResources is an ORCHESTRATOR of 13 services; this collaborator has its own real-behavior suite (shared version-service contract), and the seam mirrors the before-each-route precedent
+vi.mock('@/services/v2/edge-firewall/edge-firewall-version-service', () => ({
+  edgeFirewallVersionService: { loadVersion: (...args) => loadFirewallVersion(...args) }
 }))
 vi.mock('@/services/v2/edge-connectors/edge-connectors-service', () => ({
   edgeConnectorsService: {
@@ -61,6 +64,29 @@ describe('resolveReleaseResources — name resolution for the new resource types
     const passthrough = [{ type: 'unknown', id: 'x' }, { type: 'connector' }]
     expect(await resolveReleaseResources(passthrough)).toEqual(passthrough)
     expect(listEdgeConnectorsService).not.toHaveBeenCalled()
+  })
+
+  it('resolves firewall name and version name from its version service', async () => {
+    listEdgeFirewallService.mockResolvedValue({ body: [{ id: 'fw1', name: 'My Firewall' }] })
+    loadFirewallVersion.mockResolvedValue({ comment: 'hardening pass', id: 'FV2' })
+
+    const [resolved] = await resolveReleaseResources([
+      { type: 'firewall', id: 'fw1', versionId: 'FV2' }
+    ])
+
+    expect(loadFirewallVersion).toHaveBeenCalledWith('fw1', 'FV2')
+    expect(resolved).toMatchObject({ name: 'My Firewall', versionName: 'hardening pass' })
+  })
+
+  it('falls back to the version id when the firewall version has no comment', async () => {
+    listEdgeFirewallService.mockResolvedValue({ body: [{ id: 'fw1', name: 'My Firewall' }] })
+    loadFirewallVersion.mockResolvedValue({ comment: '', id: 'FV3' })
+
+    const [resolved] = await resolveReleaseResources([
+      { type: 'firewall', id: 'fw1', versionId: 'FV3' }
+    ])
+
+    expect(resolved.versionName).toBe('FV3')
   })
 
   it('resolves connector name (by id) and version name from its version service', async () => {

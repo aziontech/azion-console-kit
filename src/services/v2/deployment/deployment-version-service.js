@@ -1,5 +1,8 @@
 import { toValue } from 'vue'
-import { VersionServiceBase } from '@/services/v2/versioning/version-service-base'
+import {
+  VersionServiceBase,
+  buildVersionListParams
+} from '@/services/v2/versioning/version-service-base'
 import { versionListCachePolicy } from '@/services/v2/versioning/version-cache-policy'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { DeploymentVersionAdapter } from '@/services/v2/deployment/deployment-version-adapter'
@@ -19,30 +22,6 @@ const parseListResponse = (data) => {
 const unwrapItem = (data) =>
   data && typeof data === 'object' && !Array.isArray(data) && data.data ? data.data : data
 
-// Client-side cache directives — never part of the API query string.
-const CACHE_CONTROL_KEYS = ['skipCache', 'hasFilter']
-
-const buildVersionListParams = (params = {}) => {
-  // Drop the page-size aliases (normalized below) and the cache-control flags
-  // (two suites assert they never leak into the request); search/state stay
-  // as real server-side filters.
-  const { pageSize, page_size, page, ...rest } = params
-  const requestParams = Object.fromEntries(
-    Object.entries(rest).filter(([key]) => !CACHE_CONTROL_KEYS.includes(key))
-  )
-
-  if (page != null) {
-    requestParams.page = Number(page) > 0 ? Number(page) : 1
-  }
-
-  const rawPageSize = pageSize ?? page_size
-  if (rawPageSize != null) {
-    requestParams.page_size = Number(rawPageSize) > 0 ? Math.min(Number(rawPageSize), 100) : 10
-  }
-
-  return requestParams
-}
-
 export class DeploymentVersionService extends VersionServiceBase {
   constructor() {
     super()
@@ -58,15 +37,16 @@ export class DeploymentVersionService extends VersionServiceBase {
 
   useListVersionsQuery = (deploymentId, params) => {
     const { skipCache, ...rest } = params ?? {}
-    const hasParams = Object.keys(rest).length > 0
-    const listParams = hasParams ? rest : undefined
+    const listParams = buildVersionListParams(rest)
 
     return this.useQuery(
       this.versionKeys.list(toValue(deploymentId), listParams),
       async () => {
-        const request = { method: 'GET', url: this.getUrl(toValue(deploymentId)) }
-        if (listParams) request.params = listParams
-        const { data } = await this.http.request(request)
+        const { data } = await this.http.request({
+          method: 'GET',
+          url: this.getUrl(toValue(deploymentId)),
+          params: listParams
+        })
         const { results, count } = parseListResponse(data)
         return { body: this.adapter.transformListVersions(results), count }
       },

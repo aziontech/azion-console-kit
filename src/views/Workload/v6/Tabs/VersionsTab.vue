@@ -7,13 +7,16 @@
   import VersionListDataView from '@/components/VersionListDataView'
   import VersionActionDialog from '@/templates/version-shell-block/components/VersionActionDialog.vue'
   import { workloadVersionService } from '@/services/v2/workload/workload-version-service'
-  import { useVersionList } from '@/composables/versioning/use-version-list'
+  import { usePagedVersionList } from '@/composables/versioning/use-paged-version-list'
   import { useWorkloadVersionEnvironments } from '@/composables/versioning/use-workload-version-environments'
   import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
   import { mapVersionMenuItemsToMenu } from '@/composables/versioning/version-actions'
   import '@/assets/styles/version-row-menu.css'
 
   defineOptions({ name: 'workload-v6-versions-tab' })
+
+  const CONTROLS_DISABLED_TOOLTIP =
+    'Search, filters and sorting are not available yet for version listings.'
 
   const props = defineProps({
     workloadId: {
@@ -25,17 +28,31 @@
   const router = useRouter()
   const workloadId = computed(() => String(props.workloadId))
 
-  const versionsQuery = workloadVersionService.useListVersionsQuery(workloadId)
-  const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
+  const {
+    items,
+    totalRecords,
+    paginatorFirst,
+    pageSize,
+    isLoading,
+    isError,
+    hasAnyVersions,
+    filters,
+    sortOptions,
+    onPage,
+    reload
+  } = usePagedVersionList({
+    versionService: workloadVersionService,
+    resourceId: workloadId
+  })
 
-  const { items, searchTerm, filterValues, sort, filters, sortOptions } = useVersionList(
-    rawVersions,
-    { searchableFields: ['id', 'state', 'comment'] }
-  )
-
-  const { environments } = useWorkloadVersionEnvironments(workloadId, rawVersions, {
+  const { environments, resolve: reloadEnvironments } = useWorkloadVersionEnvironments(workloadId, {
     service: workloadVersionService
   })
+
+  const refreshAll = () => {
+    reload()
+    reloadEnvironments()
+  }
 
   const columns = [
     { key: 'version', label: 'Version', size: 'minmax(220px, 1.4fr)' },
@@ -56,7 +73,7 @@
     versionService: workloadVersionService,
     router,
     workloadId,
-    onSuccess: () => versionsQuery.refetch?.()
+    onSuccess: () => refreshAll()
   })
 
   const bandMenuRef = ref(null)
@@ -138,17 +155,19 @@
     <VersionListDataView
       :items="items"
       :columns="columns"
-      :loading="versionsQuery.isLoading.value"
-      :is-error="versionsQuery.isError?.value ?? false"
-      :has-versions="rawVersions.length > 0"
-      :search-term="searchTerm"
+      :loading="isLoading"
+      :is-error="isError"
+      :has-versions="hasAnyVersions"
+      lazy
+      :total-records="totalRecords"
+      :paginator-first="paginatorFirst"
       :filters="filters"
-      :filter-values="filterValues"
-      :sort="sort"
       :sort-options="sortOptions"
+      controls-disabled
+      :controls-disabled-tooltip="CONTROLS_DISABLED_TOOLTIP"
       :show-row-actions="true"
       resource-type="workload"
-      :paginator-rows="20"
+      :paginator-rows="pageSize"
       search-placeholder="Search versions"
       :empty-state="{
         title: 'This workload has no versions yet',
@@ -159,15 +178,13 @@
         title: 'Failed to load versions',
         description: 'Something went wrong loading this Workload’s versions. Try again.',
         buttonLabel: 'Retry',
-        buttonAction: () => versionsQuery.refetch?.()
+        buttonAction: () => refreshAll()
       }"
       filtered-empty-title="No versions match your filters"
       filtered-empty-description="Try a different search term or status filter."
       data-testid="workload-v6-versions__table"
-      @update:search-term="searchTerm = $event"
-      @update:filter-values="filterValues = $event"
-      @update:sort="sort = $event"
-      @refresh="versionsQuery.refetch?.()"
+      @page="onPage"
+      @refresh="refreshAll()"
       @row-action="handleRowAction"
     />
 

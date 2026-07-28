@@ -11,6 +11,7 @@
   import DataTable from '@aziontech/webkit/list-data-table'
   import EmptyResultsBlock from '@aziontech/webkit/empty-results-block'
   import Illustration from '@/assets/svg/illustration-layers.vue'
+  import { useTablePageSize, TABLE_PAGE_SIZE_OPTIONS } from '@/composables/useTablePageSize'
 
   defineOptions({ name: 'generic-data-view' })
 
@@ -47,7 +48,11 @@
     },
     paginatorRows: {
       type: Number,
-      default: 10
+      default: null
+    },
+    rowsPerPageOptions: {
+      type: Array,
+      default: () => TABLE_PAGE_SIZE_OPTIONS
     },
     columns: {
       type: Array,
@@ -155,6 +160,15 @@
     'edit-filter',
     'row-primary-click'
   ])
+
+  const { pageSize: storedPageSize, setPageSize } = useTablePageSize(props.rowsPerPageOptions)
+
+  const effectivePaginatorRows = computed(() => props.paginatorRows ?? storedPageSize.value)
+
+  const handlePage = (event) => {
+    setPageSize(event?.rows)
+    emit('page', event)
+  }
 
   const searchValue = computed({
     get: () => props.searchTerm,
@@ -527,12 +541,12 @@
             :paginator="true"
             :lazy="lazy"
             :totalRecords="lazy ? totalRecords : undefined"
-            :rows="paginatorRows"
+            :rows="effectivePaginatorRows"
             :first="paginatorFirst"
-            :rowsPerPageOptions="[10, 20, 50]"
+            :rowsPerPageOptions="rowsPerPageOptions"
             paginator-template="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown JumpToPageInput"
             current-page-report-template="Showing {first} to {last} of {totalRecords} entries"
-            @page="emit('page', $event)"
+            @page="handlePage"
           >
             <template #list="{ data: deployment }">
               <div

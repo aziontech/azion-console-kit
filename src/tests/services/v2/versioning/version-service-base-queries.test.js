@@ -1,12 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { httpService } from '@/services/v2/base/http/httpService'
 import { queryClient } from '@/services/v2/base/query/queryClient'
-import { VersionServiceBase } from '@/services/v2/versioning/version-service-base'
+import {
+  VersionServiceBase,
+  buildVersionListParams,
+  VERSION_LIST_DEFAULT_PAGE_SIZE,
+  VERSION_LIST_MAX_PAGE_SIZE
+} from '@/services/v2/versioning/version-service-base'
 
 const RID = 'res-9'
 const VID = 'AVTEST01'
 const BASE = 'v4/workspace/tests'
 const VERSIONS_URL = `${BASE}/${RID}/versions`
+const DEFAULT_PARAMS = { page: 1, page_size: VERSION_LIST_DEFAULT_PAGE_SIZE }
 
 const versionKeys = {
   all: (rid) => ['test-version', rid, 'versions'],
@@ -74,6 +80,38 @@ describe('VersionServiceBase.loadVersion', () => {
   })
 })
 
+describe('buildVersionListParams', () => {
+  it('always emits page and page_size, defaulting to page 1', () => {
+    expect(buildVersionListParams()).toEqual({
+      page: 1,
+      page_size: VERSION_LIST_DEFAULT_PAGE_SIZE
+    })
+  })
+
+  it('accepts pageSize and page_size aliases and clamps to the ceiling', () => {
+    expect(buildVersionListParams({ pageSize: 500 }).page_size).toBe(VERSION_LIST_MAX_PAGE_SIZE)
+    expect(buildVersionListParams({ page_size: 50 }).page_size).toBe(50)
+  })
+
+  it('falls back to page 1 and the default size for non-positive input', () => {
+    expect(buildVersionListParams({ page: 0, pageSize: -5 })).toEqual({
+      page: 1,
+      page_size: VERSION_LIST_DEFAULT_PAGE_SIZE
+    })
+  })
+
+  it('drops client-side cache directives', () => {
+    expect(buildVersionListParams({ skipCache: true, hasFilter: true })).toEqual({
+      page: 1,
+      page_size: VERSION_LIST_DEFAULT_PAGE_SIZE
+    })
+  })
+
+  it('passes unknown params through untouched', () => {
+    expect(buildVersionListParams({ fields: 'version_id' }).fields).toBe('version_id')
+  })
+})
+
 describe('VersionServiceBase.listVersions', () => {
   it('returns the adapted list body when the result carries one', async () => {
     stubEnsure()
@@ -96,6 +134,56 @@ describe('VersionServiceBase.listVersions', () => {
   })
 })
 
+describe('VersionServiceBase.listVersionsPage', () => {
+  it('returns both the adapted body and the server count', async () => {
+    stubEnsure()
+    vi.spyOn(httpService, 'request').mockResolvedValueOnce({
+      data: { count: 42, body: [{ id: VID, state: 'ready' }] }
+    })
+
+    const result = await service.listVersionsPage(RID)
+
+    expect(result).toEqual({ count: 42, body: [{ id: VID, state: 'ready' }] })
+  })
+
+  it('sends an explicit page and page_size when called with no params', async () => {
+    stubEnsure()
+    const requestSpy = vi
+      .spyOn(httpService, 'request')
+      .mockResolvedValueOnce({ data: { count: 0, body: [] } })
+
+    await service.listVersionsPage(RID)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'GET',
+      url: VERSIONS_URL,
+      params: DEFAULT_PARAMS
+    })
+  })
+
+  it('clamps the requested page size to the ceiling', async () => {
+    stubEnsure()
+    const requestSpy = vi
+      .spyOn(httpService, 'request')
+      .mockResolvedValueOnce({ data: { count: 0, body: [] } })
+
+    await service.listVersionsPage(RID, { page: 3, pageSize: 500 })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'GET',
+      url: VERSIONS_URL,
+      params: { page: 3, page_size: VERSION_LIST_MAX_PAGE_SIZE }
+    })
+  })
+
+  it('falls back to an empty body and a zero count when the result is empty', async () => {
+    stubEnsure()
+    vi.spyOn(httpService, 'request').mockResolvedValueOnce({ data: {} })
+
+    expect(await service.listVersionsPage(RID)).toEqual({ body: [], count: 0 })
+  })
+})
+
 describe('VersionServiceBase.useListVersionsQuery — skipCache / params split', () => {
   const spyUseQuery = () =>
     vi
@@ -111,9 +199,13 @@ describe('VersionServiceBase.useListVersionsQuery — skipCache / params split',
     const { queryKey, queryFn, options } = service.useListVersionsQuery(RID, { skipCache: true })
     await queryFn()
 
-    expect(queryKey).toEqual(versionKeys.list(RID))
+    expect(queryKey).toEqual(versionKeys.list(RID, DEFAULT_PARAMS))
     expect(options).toMatchObject({ persist: false, skipCache: true })
-    expect(requestSpy).toHaveBeenCalledWith({ method: 'GET', url: VERSIONS_URL })
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'GET',
+      url: VERSIONS_URL,
+      params: DEFAULT_PARAMS
+    })
     expect(useQuerySpy).toHaveBeenCalledTimes(1)
   })
 
@@ -129,12 +221,17 @@ describe('VersionServiceBase.useListVersionsQuery — skipCache / params split',
     })
     await queryFn()
 
-    expect(queryKey).toEqual(versionKeys.list(RID, { page: 2, ordering: 'name' }))
+    const expectedParams = {
+      page: 2,
+      ordering: 'name',
+      page_size: VERSION_LIST_DEFAULT_PAGE_SIZE
+    }
+    expect(queryKey).toEqual(versionKeys.list(RID, expectedParams))
     expect(options).toMatchObject({ persist: true })
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'GET',
       url: VERSIONS_URL,
-      params: { page: 2, ordering: 'name' }
+      params: expectedParams
     })
   })
 
@@ -150,24 +247,27 @@ describe('VersionServiceBase.useListVersionsQuery — skipCache / params split',
     })
     await queryFn()
 
-    expect(queryKey).toEqual(versionKeys.list(RID, { page: 3 }))
+    const expectedParams = { page: 3, page_size: VERSION_LIST_DEFAULT_PAGE_SIZE }
+    expect(queryKey).toEqual(versionKeys.list(RID, expectedParams))
     expect(options).toMatchObject({ persist: false, skipCache: true })
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'GET',
       url: VERSIONS_URL,
-      params: { page: 3 }
+      params: expectedParams
     })
   })
 
-  it('omits the params segment from the queryKey entirely when no params are passed', () => {
+  it('always carries a normalized params segment in the queryKey', () => {
     spyUseQuery()
 
     const withoutParams = service.useListVersionsQuery(RID).queryKey
     const withParams = service.useListVersionsQuery(RID, { page: 2 }).queryKey
 
-    expect(withoutParams).toEqual(versionKeys.list(RID))
-    expect(withParams).toEqual(versionKeys.list(RID, { page: 2 }))
-    expect(withParams.length).toBe(withoutParams.length + 1)
+    expect(withoutParams).toEqual(versionKeys.list(RID, DEFAULT_PARAMS))
+    expect(withParams).toEqual(
+      versionKeys.list(RID, { page: 2, page_size: VERSION_LIST_DEFAULT_PAGE_SIZE })
+    )
+    expect(withParams.length).toBe(withoutParams.length)
     expect(withoutParams).not.toEqual(withParams)
   })
 

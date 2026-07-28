@@ -148,9 +148,11 @@ describe('Property 7 — default hook contract on the base', () => {
   })
 })
 
-describe('Regression — load/list keep their previous queryKeys/shape', () => {
+const DEFAULT_LIST_PARAMS = { page: 1, page_size: 20 }
+
+describe('Regression — load/list keep their queryKeys/shape', () => {
   it.each(SERVICES)(
-    '$name reads default to the unparameterized version keys',
+    '$name reads default to the normalized first-page version keys',
     ({ Service, keys }) => {
       const service = new Service()
       const useQuerySpy = vi
@@ -160,14 +162,14 @@ describe('Regression — load/list keep their previous queryKeys/shape', () => {
       const { queryKey: listKey } = service.useListVersionsQuery(RID)
       const { queryKey: detailKey } = service.useLoadVersionQuery(RID, VID)
 
-      expect(listKey).toEqual(keys.list(RID))
+      expect(listKey).toEqual(keys.list(RID, DEFAULT_LIST_PARAMS))
       expect(detailKey).toEqual(keys.detail(RID, VID))
       expect(useQuerySpy).toHaveBeenCalledTimes(2)
     }
   )
 
   it.each(SERVICES)(
-    '$name list GETs /{base}/{id}/versions with no params',
+    '$name list GETs /{base}/{id}/versions with an explicit first page',
     async ({ Service, baseURL }) => {
       const service = new Service()
       const requestSpy = vi
@@ -178,7 +180,11 @@ describe('Regression — load/list keep their previous queryKeys/shape', () => {
       const { queryFn } = service.useListVersionsQuery(RID)
       await queryFn()
 
-      expect(requestSpy).toHaveBeenCalledWith({ method: 'GET', url: `${baseURL}/${RID}/versions` })
+      expect(requestSpy).toHaveBeenCalledWith({
+        method: 'GET',
+        url: `${baseURL}/${RID}/versions`,
+        params: DEFAULT_LIST_PARAMS
+      })
     }
   )
 
@@ -195,15 +201,16 @@ describe('Regression — load/list keep their previous queryKeys/shape', () => {
     const { queryFn } = service.useListVersionsQuery(RID, { page: 2 })
     await queryFn()
 
+    const expectedParams = { page: 2, page_size: 20 }
     expect(useQuerySpy).toHaveBeenCalledWith(
-      queryKeys.application.version.list(RID, { page: 2 }),
+      queryKeys.application.version.list(RID, expectedParams),
       expect.any(Function),
       expect.objectContaining({ persist: true })
     )
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'GET',
       url: `v4/workspace/applications/${RID}/versions`,
-      params: { page: 2 }
+      params: expectedParams
     })
   })
 
@@ -221,13 +228,14 @@ describe('Regression — load/list keep their previous queryKeys/shape', () => {
     await queryFn()
 
     expect(useQuerySpy).toHaveBeenCalledWith(
-      queryKeys.application.version.list(RID),
+      queryKeys.application.version.list(RID, DEFAULT_LIST_PARAMS),
       expect.any(Function),
       expect.objectContaining({ persist: false, skipCache: true })
     )
     expect(requestSpy).toHaveBeenCalledWith({
       method: 'GET',
-      url: `v4/workspace/applications/${RID}/versions`
+      url: `v4/workspace/applications/${RID}/versions`,
+      params: DEFAULT_LIST_PARAMS
     })
   })
 

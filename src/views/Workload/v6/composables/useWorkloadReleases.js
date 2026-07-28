@@ -6,12 +6,15 @@ import { workloadService } from '@/services/v2/workload/workload-service'
 import { aggregateReleasesByBindings } from '@/views/Workload/v6/utils/aggregateReleasesByBindings'
 import { resolveDeploymentIds } from '@/views/Workload/v6/utils/resolveDeploymentIds'
 
+export const RELEASES_PAGE_SIZE = 100
+
 export function useWorkloadReleases({ workloadId, getWorkload } = {}) {
   const toast = useToast()
 
   const releases = ref([])
   const loading = ref(false)
   const error = ref(null)
+  const truncated = ref(false)
 
   const notifyError = (detail) => {
     toast.add({ closable: true, severity: 'error', summary: 'Error', detail })
@@ -47,6 +50,7 @@ export function useWorkloadReleases({ workloadId, getWorkload } = {}) {
   const reload = async () => {
     loading.value = true
     error.value = null
+    truncated.value = false
 
     try {
       const bindings = await resolveBindings()
@@ -60,7 +64,10 @@ export function useWorkloadReleases({ workloadId, getWorkload } = {}) {
       const [settled, deploymentNameById] = await Promise.all([
         Promise.allSettled(
           deploymentIds.map((deploymentId) =>
-            deploymentReleaseService.listReleasesService(deploymentId)
+            deploymentReleaseService.listReleasesService(deploymentId, {
+              page: 1,
+              pageSize: RELEASES_PAGE_SIZE
+            })
           )
         ),
         resolveDeploymentNames()
@@ -72,10 +79,9 @@ export function useWorkloadReleases({ workloadId, getWorkload } = {}) {
       settled.forEach((result, index) => {
         const deploymentId = deploymentIds[index]
         if (result.status === 'fulfilled') {
-          releasesByDeployment.set(
-            deploymentId,
-            Array.isArray(result.value?.body) ? result.value.body : []
-          )
+          const body = Array.isArray(result.value?.body) ? result.value.body : []
+          if (Number(result.value?.count) > body.length) truncated.value = true
+          releasesByDeployment.set(deploymentId, body)
         } else {
           failures += 1
           releasesByDeployment.set(deploymentId, [])
@@ -96,5 +102,5 @@ export function useWorkloadReleases({ workloadId, getWorkload } = {}) {
     }
   }
 
-  return { releases, loading, error, reload }
+  return { releases, loading, error, truncated, reload }
 }

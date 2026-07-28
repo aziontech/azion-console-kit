@@ -6,8 +6,12 @@
   import CurrentBadge from '@/components/CurrentBadge'
   import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
-  import { useWorkloadReleases } from '@/views/Workload/v6/composables/useWorkloadReleases'
+  import {
+    useWorkloadReleases,
+    RELEASES_PAGE_SIZE
+  } from '@/views/Workload/v6/composables/useWorkloadReleases'
   import { useReleaseDrawerController } from '@/composables/versioning/use-deployment-release-drawer'
+  import { useTablePageSize } from '@/composables/useTablePageSize'
 
   defineOptions({ name: 'workload-releases-section' })
 
@@ -16,7 +20,7 @@
     workload: { type: Object, default: () => null }
   })
 
-  const { releases, loading, reload } = useWorkloadReleases({
+  const { releases, loading, truncated, reload } = useWorkloadReleases({
     workloadId: props.workloadId,
     getWorkload: () => props.workload
   })
@@ -25,7 +29,7 @@
   const filterValues = ref({ status: 'all' })
   const dateRange = ref(null)
   const paginatorFirst = ref(0)
-  const paginatorRows = ref(10)
+  const { pageSize: paginatorRows, setPageSize } = useTablePageSize()
 
   const {
     visible: drawerVisible,
@@ -129,7 +133,7 @@
 
   const onPage = (event) => {
     paginatorFirst.value = event.first
-    paginatorRows.value = event.rows
+    setPageSize(event.rows)
   }
 
   watch(
@@ -147,6 +151,14 @@
 </script>
 
 <template>
+  <p
+    v-if="truncated"
+    class="text-sm text-[var(--text-color-secondary)] mb-2"
+    data-testid="workload-releases__truncated-notice"
+  >
+    Showing the most recent {{ RELEASES_PAGE_SIZE }} releases per deployment.
+  </p>
+
   <GenericDataView
     :items="filteredReleases"
     :hasDeployments="Boolean(releases.length)"

@@ -54,7 +54,11 @@ describe('deployment — bespoke reads: listVersionsService returns { body, coun
 
     const result = await service.listVersionsService(DID)
 
-    expect(requestSpy).toHaveBeenCalledWith({ method: 'GET', url: BASE, params: {} })
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'GET',
+      url: BASE,
+      params: { page: 1, page_size: 20 }
+    })
     expect(result.count).toBe(1)
     expect(Array.isArray(result.body)).toBe(true)
     expect(result.body[0]).toMatchObject({ id: VID, name: 'v1', state: 'draft' })
@@ -167,6 +171,57 @@ describe('deployment — bespoke reads: listVersionsService returns { body, coun
       expect.any(Function),
       expect.objectContaining({ persist: true, skipCache: false })
     )
+  })
+})
+
+describe('deployment — version list params come from the shared builder', () => {
+  const stubEnsure = () =>
+    vi.spyOn(queryClient, 'ensureQueryData').mockImplementation(({ queryFn }) => queryFn())
+
+  it('sends page and page_size even when called with no params', async () => {
+    stubEnsure()
+    const requestSpy = vi
+      .spyOn(httpService, 'request')
+      .mockResolvedValueOnce({ data: { results: [], count: 0 } })
+
+    await service.listVersionsService(DID)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'GET',
+      url: BASE,
+      params: { page: 1, page_size: 20 }
+    })
+  })
+
+  it('clamps page_size to the ceiling', async () => {
+    stubEnsure()
+    const requestSpy = vi
+      .spyOn(httpService, 'request')
+      .mockResolvedValueOnce({ data: { results: [], count: 0 } })
+
+    await service.listVersionsService(DID, { pageSize: 500 })
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'GET',
+      url: BASE,
+      params: { page: 1, page_size: 100 }
+    })
+  })
+
+  it('sends page and page_size from the reactive query path too', async () => {
+    const requestSpy = vi
+      .spyOn(httpService, 'request')
+      .mockResolvedValueOnce({ data: { results: [], count: 0 } })
+    vi.spyOn(service, 'useQuery').mockImplementation((_key, queryFn) => ({ queryFn }))
+
+    const { queryFn } = service.useListVersionsQuery(DID)
+    await queryFn()
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'GET',
+      url: BASE,
+      params: { page: 1, page_size: 20 }
+    })
   })
 })
 

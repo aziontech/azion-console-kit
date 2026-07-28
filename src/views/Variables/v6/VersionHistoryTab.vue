@@ -7,6 +7,7 @@
   import { clipboardWrite } from '@/helpers/clipboard'
   import { variablesV6Service } from '@/services/v2/variables/v6/variables-v6-service'
   import { VERSION_POLL_INTERVAL_MS } from '@/services/v2/versioning/version-cache-policy'
+  import { useTablePageSize } from '@/composables/useTablePageSize'
   import { isProcessing } from '@/composables/versioning/version-machine'
   import { buildVersionRowActions } from '@/views/Variables/v6/version-row-actions'
   import RevertDialog from '@/views/Variables/v6/components/RevertDialog.vue'
@@ -41,7 +42,7 @@
   const isError = ref(false)
   const hasAnyVersions = ref(false)
   const page = ref(1)
-  const pageSize = ref(20)
+  const { pageSize, setPageSize } = useTablePageSize()
   const searchTerm = ref('')
 
   let pollTimer = null
@@ -107,7 +108,7 @@
 
   const onPage = (event) => {
     page.value = (event?.page ?? 0) + 1
-    pageSize.value = event?.rows ?? pageSize.value
+    setPageSize(event?.rows ?? pageSize.value)
     fetchVersions()
   }
 

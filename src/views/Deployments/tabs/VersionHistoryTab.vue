@@ -11,6 +11,7 @@
     hasTransientVersions
   } from '@/services/v2/versioning/version-cache-policy'
   import { isProcessing } from '@/composables/versioning/version-machine'
+  import { useTablePageSize } from '@/composables/useTablePageSize'
   import { buildVersionRowActions } from './version-history-row-actions'
   import RevertDialog from './components/RevertDialog.vue'
   import VersionListDataView from '@/components/VersionListDataView'
@@ -62,7 +63,7 @@
   const isError = ref(false)
   const hasAnyVersions = ref(false)
   const page = ref(1)
-  const pageSize = ref(20)
+  const { pageSize, setPageSize } = useTablePageSize()
   const searchTerm = ref('')
   const stateFilter = ref('')
 
@@ -135,7 +136,7 @@
 
   const onPage = (event) => {
     page.value = (event?.page ?? 0) + 1
-    pageSize.value = event?.rows ?? pageSize.value
+    setPageSize(event?.rows ?? pageSize.value)
     fetchVersions()
   }
 

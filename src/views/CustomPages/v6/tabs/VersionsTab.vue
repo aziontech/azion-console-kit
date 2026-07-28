@@ -8,12 +8,15 @@
   import VersionActionDialog from '@/templates/version-shell-block/components/VersionActionDialog.vue'
 
   import { customPageVersionService } from '@/services/v2/custom-page/custom-page-version-service'
-  import { useVersionList } from '@/composables/versioning/use-version-list'
+  import { usePagedVersionList } from '@/composables/versioning/use-paged-version-list'
   import { useActiveVersions } from '@/composables/versioning/use-active-versions'
   import { getVersionListColumns } from '@/composables/versioning/version-list-columns'
   import { useVersionMenuActions } from '@/composables/versioning/use-version-menu-actions'
 
   defineOptions({ name: 'custom-pages-v6-versions-tab' })
+
+  const CONTROLS_DISABLED_TOOLTIP =
+    'Search, filters and sorting are not available yet for version listings.'
 
   const props = defineProps({
     customPageId: {
@@ -28,19 +31,29 @@
   const customPageId = computed(() => String(props.customPageId))
   const isCreatingDraft = ref(false)
 
-  const versionsQuery = customPageVersionService.useListVersionsQuery(customPageId.value)
-  const rawVersions = computed(() => versionsQuery.data.value?.body ?? [])
-
   const resourceRef = computed(() => ({
     resourceType: 'custom_page',
     resourceId: customPageId.value
   }))
   const { activeVersions, refresh: refreshActiveVersions } = useActiveVersions(resourceRef)
 
-  const { items, searchTerm, filterValues, sort, filters, sortOptions } = useVersionList(
-    rawVersions,
-    { activeVersions }
-  )
+  const {
+    items,
+    totalRecords,
+    paginatorFirst,
+    pageSize,
+    isLoading,
+    isError,
+    hasAnyVersions,
+    filters,
+    sortOptions,
+    onPage,
+    reload
+  } = usePagedVersionList({
+    versionService: customPageVersionService,
+    resourceId: customPageId,
+    activeVersions
+  })
 
   const columns = getVersionListColumns({ includeTraffic: false })
 
@@ -66,7 +79,7 @@
     router,
     openPromoteDrawer: menuHost.openPromoteDrawer,
     onSuccess: () => {
-      versionsQuery.refetch?.()
+      reload()
       refreshActiveVersions()
     }
   })
@@ -99,17 +112,19 @@
     <VersionListDataView
       :items="items"
       :columns="columns"
-      :loading="versionsQuery.isLoading.value"
-      :is-error="versionsQuery.isError?.value ?? false"
-      :has-versions="rawVersions.length > 0"
-      :search-term="searchTerm"
+      :loading="isLoading"
+      :is-error="isError"
+      :has-versions="hasAnyVersions"
+      lazy
+      :total-records="totalRecords"
+      :paginator-first="paginatorFirst"
       :filters="filters"
-      :filter-values="filterValues"
-      :sort="sort"
       :sort-options="sortOptions"
+      controls-disabled
+      :controls-disabled-tooltip="CONTROLS_DISABLED_TOOLTIP"
       :show-row-actions="true"
       resource-type="custom_page"
-      :paginator-rows="20"
+      :paginator-rows="pageSize"
       search-placeholder="Search versions"
       :empty-state="{
         title: 'This custom page has no versions yet',
@@ -122,20 +137,18 @@
         title: 'Failed to load versions',
         description: 'Something went wrong loading this custom page versions. Try again.',
         buttonLabel: 'Retry',
-        buttonAction: () => versionsQuery.refetch?.()
+        buttonAction: () => reload()
       }"
       filtered-empty-title="No versions match your filters"
       filtered-empty-description="Try a different search term or status filter."
       data-testid="custom-pages-v6-versions__table"
-      @update:search-term="searchTerm = $event"
-      @update:filter-values="filterValues = $event"
-      @update:sort="sort = $event"
-      @refresh="versionsQuery.refetch?.()"
+      @page="onPage"
+      @refresh="reload()"
       @row-action="handleRowAction"
     >
       <template #toolbar-actions>
         <PrimeButton
-          v-if="rawVersions.length > 0"
+          v-if="hasAnyVersions"
           label="New Version"
           icon="pi pi-plus"
           size="small"

@@ -10,7 +10,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { ref } from 'vue'
-import { useDeployResourceContext } from '@/composables/versioning/use-deploy-resource-context'
+import {
+  useDeployResourceContext,
+  VERSION_SELECTION_PAGE_SIZE
+} from '@/composables/versioning/use-deploy-resource-context'
 
 const { route } = vi.hoisted(() => ({ route: { params: {} } }))
 vi.mock('vue-router', () => ({ useRoute: () => route }))
@@ -113,7 +116,9 @@ describe('useDeployResourceContext — resource id resolution', () => {
       resource: { id: 77, name: 'App' },
       currentVersionId: 'v1'
     })
-    expect(versionService.useListVersionsQuery).toHaveBeenCalledWith(77)
+    expect(versionService.useListVersionsQuery).toHaveBeenCalledWith(77, {
+      pageSize: VERSION_SELECTION_PAGE_SIZE
+    })
   })
 
   it('falls back to the route param id when the injected resource has none', () => {

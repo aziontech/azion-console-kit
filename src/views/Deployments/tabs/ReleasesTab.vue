@@ -17,6 +17,7 @@
   import VersionStateBadge from '@/templates/version-shell-block/components/VersionStateBadge.vue'
   import DeploymentReleaseDrawer from '@/views/Deployments/components/DeploymentReleaseDrawer.vue'
   import { useReleaseDrawerController } from '@/composables/versioning/use-deployment-release-drawer'
+  import { useTablePageSize } from '@/composables/useTablePageSize'
 
   defineOptions({ name: 'deployment-releases-tab' })
 
@@ -34,7 +35,7 @@
   const loading = ref(false)
 
   const paginatorFirst = ref(0)
-  const paginatorRows = ref(10)
+  const { pageSize: paginatorRows, setPageSize } = useTablePageSize()
   const searchTerm = ref('')
   const filterValues = ref({ status: 'all' })
   const dateRange = ref(null)
@@ -262,7 +263,7 @@
 
   const onPage = (event) => {
     paginatorFirst.value = event.first
-    paginatorRows.value = event.rows
+    setPageSize(event.rows)
   }
 
   watch(

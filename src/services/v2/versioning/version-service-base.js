@@ -2,6 +2,31 @@ import { toValue } from 'vue'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { versionListCachePolicy } from './version-cache-policy'
 
+export const VERSION_LIST_MAX_PAGE_SIZE = 100
+export const VERSION_LIST_DEFAULT_PAGE_SIZE = 20
+
+const CACHE_CONTROL_KEYS = ['skipCache', 'hasFilter']
+
+export const buildVersionListParams = (params = {}) => {
+  const { page, pageSize, page_size, ...rest } = params ?? {}
+
+  const passthrough = Object.fromEntries(
+    Object.entries(rest).filter(([key]) => !CACHE_CONTROL_KEYS.includes(key))
+  )
+
+  const requestedPage = Number(page)
+  const requestedPageSize = Number(pageSize ?? page_size)
+
+  return {
+    ...passthrough,
+    page: requestedPage > 0 ? requestedPage : 1,
+    page_size:
+      requestedPageSize > 0
+        ? Math.min(requestedPageSize, VERSION_LIST_MAX_PAGE_SIZE)
+        : VERSION_LIST_DEFAULT_PAGE_SIZE
+  }
+}
+
 export class VersionServiceBase extends BaseService {
   getUrl(resourceId, versionId, suffix = '') {
     const base = `${this.baseURL}/${resourceId}/versions`
@@ -15,14 +40,15 @@ export class VersionServiceBase extends BaseService {
 
   #splitListParams = (params) => {
     const { skipCache, ...rest } = params ?? {}
-    const hasParams = Object.keys(rest).length > 0
-    return { skipCache: Boolean(skipCache), listParams: hasParams ? rest : undefined }
+    return { skipCache: Boolean(skipCache), listParams: buildVersionListParams(rest) }
   }
 
   #fetchList = async (resourceId, listParams) => {
-    const request = { method: 'GET', url: this.getUrl(resourceId) }
-    if (listParams) request.params = listParams
-    const { data } = await this.http.request(request)
+    const { data } = await this.http.request({
+      method: 'GET',
+      url: this.getUrl(resourceId),
+      params: listParams
+    })
     return this.adapter?.transformListVersions?.(data) ?? data
   }
 
@@ -50,7 +76,7 @@ export class VersionServiceBase extends BaseService {
     )
   }
 
-  async listVersions(resourceId, params) {
+  listVersionsPage = async (resourceId, params) => {
     const id = toValue(resourceId)
     const { skipCache, listParams } = this.#splitListParams(params)
     const result = await this.useEnsureQueryData(
@@ -58,7 +84,12 @@ export class VersionServiceBase extends BaseService {
       () => this.#fetchList(id, listParams),
       { persist: !skipCache, skipCache }
     )
-    return result?.body ?? []
+    return { body: result?.body ?? [], count: result?.count ?? 0 }
+  }
+
+  async listVersions(resourceId, params) {
+    const { body } = await this.listVersionsPage(resourceId, params)
+    return body
   }
 
   useLoadVersionQuery = (resourceId, versionId) =>

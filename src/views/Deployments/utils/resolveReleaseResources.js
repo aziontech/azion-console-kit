@@ -1,6 +1,7 @@
 import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
 import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
 import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+import { edgeFirewallVersionService } from '@/services/v2/edge-firewall/edge-firewall-version-service'
 import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
 import { edgeConnectorVersionService } from '@/services/v2/edge-connectors/edge-connector-version-service'
 import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
@@ -23,11 +24,8 @@ const RESOURCE_RESOLVERS = {
   firewall: {
     listNames: () => edgeFirewallService.listEdgeFirewallService({ page: 1, pageSize: 100 }),
     resolveVersionName: async (id, versionId) => {
-      const versions = await edgeFirewallService.listFirewallVersions(id)
-      const match = (Array.isArray(versions) ? versions : []).find(
-        (version) => String(version.id) === String(versionId)
-      )
-      return match?.comment || match?.id
+      const version = await edgeFirewallVersionService.loadVersion(id, versionId)
+      return version?.comment || version?.id
     }
   },
   connector: {

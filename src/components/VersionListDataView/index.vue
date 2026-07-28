@@ -19,6 +19,7 @@
     mapVersionMenuItemsToMenu
   } from '@/composables/versioning/version-actions'
   import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
+  import { useTablePageSize, TABLE_PAGE_SIZE_OPTIONS } from '@/composables/useTablePageSize'
   import '@/assets/styles/version-row-menu.css'
 
   defineOptions({ name: 'version-list-data-view' })
@@ -100,7 +101,23 @@
     },
     paginatorRows: {
       type: Number,
-      default: 20
+      default: null
+    },
+    rowsPerPageOptions: {
+      type: Array,
+      default: () => TABLE_PAGE_SIZE_OPTIONS
+    },
+    paginatorFirst: {
+      type: Number,
+      default: 0
+    },
+    controlsDisabled: {
+      type: Boolean,
+      default: false
+    },
+    controlsDisabledTooltip: {
+      type: String,
+      default: ''
     },
     showPaginator: {
       type: Boolean,
@@ -147,6 +164,15 @@
   ])
 
   const slots = useSlots()
+
+  const { pageSize: storedPageSize, setPageSize } = useTablePageSize(props.rowsPerPageOptions)
+
+  const effectivePaginatorRows = computed(() => props.paginatorRows ?? storedPageSize.value)
+
+  const handlePage = (event) => {
+    setPageSize(event?.rows)
+    emit('page', event)
+  }
 
   const searchValue = computed({
     get: () => props.searchTerm,
@@ -369,6 +395,8 @@
           type="button"
           class="filter-toggle"
           :aria-label="sortAriaLabel"
+          :disabled="controlsDisabled"
+          :title="controlsDisabledTooltip"
           data-testid="version-list-data-view__filters-toggle"
           @click="toggleFiltersOverlay"
         >
@@ -388,6 +416,8 @@
             v-model="searchValue"
             :placeholder="searchPlaceholder"
             :aria-label="searchPlaceholder"
+            :disabled="controlsDisabled"
+            :title="controlsDisabledTooltip"
             class="dataview-control w-full"
             data-testid="version-list-data-view__search"
           />
@@ -403,6 +433,8 @@
             :optionLabel="filter.optionLabel || 'label'"
             :optionValue="filter.optionValue || 'value'"
             :aria-label="filter.placeholder"
+            :disabled="controlsDisabled"
+            :title="controlsDisabledTooltip"
             class="dataview-control dataview-dropdown dataview-dropdown-min min-w-0 w-full sm:w-auto"
             :placeholder="filter.placeholder"
             :data-testid="`version-list-data-view__filter-${filter.key}`"
@@ -416,6 +448,8 @@
             optionLabel="label"
             optionValue="value"
             :aria-label="sortAriaLabel"
+            :disabled="controlsDisabled"
+            :title="controlsDisabledTooltip"
             class="dataview-control dataview-dropdown dataview-dropdown-min min-w-0 w-full sm:w-auto"
             :placeholder="sortAriaLabel"
             data-testid="version-list-data-view__sort"
@@ -435,6 +469,8 @@
                 :optionLabel="filter.optionLabel || 'label'"
                 :optionValue="filter.optionValue || 'value'"
                 :aria-label="filter.placeholder"
+                :disabled="controlsDisabled"
+                :title="controlsDisabledTooltip"
                 class="dataview-control dataview-dropdown min-w-0 w-full"
                 :placeholder="filter.placeholder"
                 @update:modelValue="updateFilterValue(filter.key, $event)"
@@ -447,6 +483,8 @@
                 optionLabel="label"
                 optionValue="value"
                 :aria-label="sortAriaLabel"
+                :disabled="controlsDisabled"
+                :title="controlsDisabledTooltip"
                 class="dataview-control dataview-dropdown min-w-0 w-full"
                 :placeholder="sortAriaLabel"
               />
@@ -572,12 +610,13 @@
             dataKey="id"
             :paginator="showPaginator"
             :lazy="lazy"
+            :first="paginatorFirst"
             :totalRecords="lazy ? totalRecords : undefined"
-            :rows="paginatorRows"
-            :rowsPerPageOptions="[10, 20, 50]"
+            :rows="effectivePaginatorRows"
+            :rowsPerPageOptions="rowsPerPageOptions"
             paginator-template="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown JumpToPageInput"
             current-page-report-template="Showing {first} to {last} of {totalRecords} entries"
-            @page="emit('page', $event)"
+            @page="handlePage"
           >
             <template #list="{ data: version }">
               <div

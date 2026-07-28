@@ -1,26 +1,34 @@
 import { ref, watch, toValue } from 'vue'
 import { VERSION_STATES } from '@/composables/versioning/version-machine'
 
-export function useWorkloadVersionEnvironments(workloadId, versions, { service }) {
+export const ENVIRONMENT_SOURCE_PAGE_SIZE = 100
+
+export function useWorkloadVersionEnvironments(workloadId, { service }) {
   const environments = ref([])
   const isResolving = ref(false)
 
   const resolve = async () => {
     const id = String(toValue(workloadId) ?? '')
-    const list = toValue(versions) ?? []
-    if (!id || !list.length) {
-      environments.value = []
-      return
-    }
-
-    const candidates = list.filter((version) => version.state === VERSION_STATES.READY)
-    if (!candidates.length) {
+    if (!id) {
       environments.value = []
       return
     }
 
     isResolving.value = true
     try {
+      const { body } = await service.listVersionsPage(id, {
+        pageSize: ENVIRONMENT_SOURCE_PAGE_SIZE,
+        skipCache: true
+      })
+
+      const candidates = (Array.isArray(body) ? body : []).filter(
+        (version) => version.state === VERSION_STATES.READY
+      )
+      if (!candidates.length) {
+        environments.value = []
+        return
+      }
+
       const details = await Promise.all(
         candidates.map((version) => service.loadVersion(id, version.id).catch(() => null))
       )
@@ -41,12 +49,14 @@ export function useWorkloadVersionEnvironments(workloadId, versions, { service }
         deploymentId: version.deploymentId ?? null,
         version
       }))
+    } catch {
+      environments.value = []
     } finally {
       isResolving.value = false
     }
   }
 
-  watch([() => toValue(workloadId), () => toValue(versions)], resolve, { immediate: true })
+  watch(() => toValue(workloadId), resolve, { immediate: true })
 
   return { environments, isResolving, resolve }
 }

@@ -44,6 +44,7 @@ const COMPOSABLES_ALLOWLIST = [
   'use-deploy-resource-context.js',
   'use-deployment-release-drawer.js',
   'use-live-deployments.js',
+  'use-paged-version-list.js',
   'use-resource-version-landing.js',
   'use-version-command-bus.js',
   'use-version-command.js',

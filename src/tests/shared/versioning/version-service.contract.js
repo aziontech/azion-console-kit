@@ -57,11 +57,15 @@ export const describeVersionServiceContract = (descriptor) => {
           const result = await queryFn()
 
           expect(useQuery).toHaveBeenCalledWith(
-            descriptor.versionKeys.list(RID),
+            descriptor.versionKeys.list(RID, { page: 1, page_size: 20 }),
             expect.any(Function),
             expect.any(Object)
           )
-          expect(http.spy).toHaveBeenCalledWith({ method: 'GET', url: BASE })
+          expect(http.spy).toHaveBeenCalledWith({
+            method: 'GET',
+            url: BASE,
+            params: { page: 1, page_size: 20 }
+          })
           expect(result.count).toBe(1)
           expect(result.body[0].id).toBe(raw.version_id)
           expect(result.body[0].config).toMatchObject(descriptor.configMarkers)
