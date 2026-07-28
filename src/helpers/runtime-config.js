@@ -14,7 +14,9 @@ export async function loadRuntimeConfig() {
   if (_config) return _config
 
   try {
-    const response = await fetch('/config.json')
+    // no-store: config.json changes independently of the immutable bundle
+    // (environment promotion, token rotation) — it must never be cached.
+    const response = await fetch('/config.json', { cache: 'no-store' })
     _config = response.ok ? await response.json() : {}
   } catch {
     _config = {}

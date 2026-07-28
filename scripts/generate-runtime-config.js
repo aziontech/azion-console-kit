@@ -26,10 +26,17 @@ import { fileURLToPath } from 'node:url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const distDir = join(__dirname, '..', 'dist')
 
+const environment = process.env.VITE_ENVIRONMENT
+
+// Legacy per-environment DSN fallback must follow the TARGET environment —
+// a blind PROD||STAGE chain would write the production DSN into a stage
+// config.json whenever both secrets are exported.
+const legacySentryDsn =
+  environment === 'production' ? process.env.VITE_PROD_SENTRY : process.env.VITE_STAGE_SENTRY
+
 const config = {
-  environment: process.env.VITE_ENVIRONMENT,
-  sentryDsn:
-    process.env.VITE_SENTRY_DSN || process.env.VITE_PROD_SENTRY || process.env.VITE_STAGE_SENTRY,
+  environment,
+  sentryDsn: process.env.VITE_SENTRY_DSN || legacySentryDsn,
   stripeToken: process.env.VITE_STRIPE_TOKEN,
   recaptchaSiteKey: process.env.VITE_RECAPTCHA_SITE_KEY,
   segmentToken: process.env.VITE_SEGMENT_TOKEN,

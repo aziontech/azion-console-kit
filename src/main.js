@@ -62,4 +62,10 @@ async function bootstrap() {
   app.mount('#app')
 }
 
-bootstrap()
+bootstrap().catch((error) => {
+  // Surface bootstrap failures: without this they become silent unhandled
+  // rejections (blank page, nothing in window.onerror-based monitoring).
+  // eslint-disable-next-line no-console
+  console.error('[bootstrap] failed to start the application', error)
+  throw error
+})
