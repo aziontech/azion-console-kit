@@ -5,25 +5,25 @@ const SSO_PROVIDERS = [
   {
     name: 'GitHub',
     slug: 'github',
-    configKey: 'ssoGithub',
+    configId: 'ssoGithub',
     envVar: 'VITE_SSO_GITHUB'
   },
   {
     name: 'Google',
     slug: 'google',
-    configKey: 'ssoGoogle',
+    configId: 'ssoGoogle',
     envVar: 'VITE_SSO_GOOGLE'
   },
   {
     name: 'Microsoft Azure',
     slug: 'azure',
-    configKey: 'ssoAzure',
+    configId: 'ssoAzure',
     envVar: 'VITE_SSO_AZURE'
   },
   {
     name: 'IDP SCIM e2e',
     slug: '',
-    configKey: 'ssoIdpScimE2e',
+    configId: 'ssoIdpScimE2e',
     envVar: 'VITE_SSO_IDP_SCIM_E2E'
   }
 ]
@@ -43,7 +43,7 @@ export const getSocialIdps = () => {
   const runtimeConfig = getRuntimeConfig()
 
   return SSO_PROVIDERS.map((provider) => {
-    const uuid = runtimeConfig[provider.configKey] || import.meta.env[provider.envVar]
+    const uuid = runtimeConfig[provider.configId] || import.meta.env[provider.envVar]
 
     if (!uuid) {
       return null
