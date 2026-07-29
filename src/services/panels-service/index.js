@@ -10,6 +10,7 @@ import {
 } from './storage-utils'
 
 const STORAGE_KEY = 'rte-custom-panels'
+const MAX_CUSTOM_PANELS = 50
 
 /**
  * Validates a PanelConfig object.
@@ -141,7 +142,9 @@ export const savePanel = (config) => {
   }
 
   existing.push(config)
-  setItem(STORAGE_KEY, JSON.stringify(existing))
+  // Cap growth to avoid QuotaExceededError; keeps newest, drops oldest past the cap.
+  const capped = existing.slice(-MAX_CUSTOM_PANELS)
+  setItem(STORAGE_KEY, JSON.stringify(capped))
 }
 
 /**

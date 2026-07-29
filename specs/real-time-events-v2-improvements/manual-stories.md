@@ -10,7 +10,7 @@ tests cannot exercise (real clipboard, real layout, real mobile).
 
 ---
 
-## Story 5.4* — Share URL Round-Trip (Manual)
+## Story 5.4\* — Share URL Round-Trip (Manual)
 
 **Validates: Requirements 1.1, 1.2, 1.3, 1.5**
 
@@ -34,7 +34,7 @@ tests cannot exercise (real clipboard, real layout, real mobile).
 
 ---
 
-## Story 10.5* — Verify Tabs Load Without Errors
+## Story 10.5\* — Verify Tabs Load Without Errors
 
 **Validates: Requirements 2.1–2.6**
 
@@ -59,7 +59,7 @@ correct whitelist for that dataset.
 
 ---
 
-## Story 11.2* — GraphQL Error Handling
+## Story 11.2\* — GraphQL Error Handling
 
 **Validates: Requirements 2.7, N.9**
 
@@ -78,11 +78,12 @@ correct whitelist for that dataset.
 
 ---
 
-## Story 13.5* — Mobile Modal Width Stability
+## Story 13.5\* — Mobile Modal Width Stability
 
 **Validates: Requirements 4.1–4.6, N.5**
 
 Run on either:
+
 - A real iPhone / iPad with the staging build, OR
 - Chrome DevTools "Toggle device toolbar" set to iPhone 12 (390×844)
   and iPad Mini (768×1024).
@@ -103,22 +104,25 @@ Run on either:
 7. Repeat at desktop ≥ 1024px — width should be 35rem (560px) exactly.
 
 **Touch targets** (WCAG AA, N.5):
+
 - Each filter operator chip and the close button must be at least 44×44 px.
 - Verify via DevTools "Inspect" → check the bounding box.
 
 ---
 
-## Story 15.4* — Cross-Browser Share URL
+## Story 15.4\* — Cross-Browser Share URL
 
 **Validates: Requirements 1.3, 1.4, N.8**
 
-Run the Story 5.4* steps on:
+Run the Story 5.4\* steps on:
+
 1. Chrome (latest) — clipboard.writeText() expected to succeed.
 2. Firefox (latest) — clipboard.writeText() expected to succeed.
 3. Safari (latest, macOS) — verify either success OR the
    `FallbackCopyDialog` appears with a manually-copyable URL.
 
 For each browser, confirm:
+
 - Success path: green toast + URL in clipboard.
 - Fallback path (if clipboard blocked): info toast + dialog with the
   URL visible in a read-only input + a "Copy" button that selects all
@@ -126,7 +130,7 @@ For each browser, confirm:
 
 ---
 
-## Story 15.5* — Accessibility Review
+## Story 15.5\* — Accessibility Review
 
 **Validates: Requirements N.4, N.5, N.6**
 
@@ -146,17 +150,18 @@ Tested with macOS VoiceOver (Cmd+F5) or NVDA on Windows.
 
 ---
 
-## Story 15.6* — Mobile Responsiveness Across All 4 Features
+## Story 15.6\* — Mobile Responsiveness Across All 4 Features
 
 **Validates: Requirements 4.1–4.6, N.4**
 
 On mobile viewport (iPhone 12, 390×844):
+
 1. **Share button** is visible and tappable (44×44 minimum).
 2. **Fallback copy dialog** (if clipboard fails) fits the screen with
    no horizontal scroll.
 3. **Saved Searches overlay** is scrollable when more than ~6 entries
    exist; no clipping at viewport edges.
-4. **Add Filter modal** width is stable per Story 13.5*.
+4. **Add Filter modal** width is stable per Story 13.5\*.
 
 ---
 

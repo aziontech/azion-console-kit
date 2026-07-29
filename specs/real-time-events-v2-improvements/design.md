@@ -6,6 +6,7 @@
 ## 1. Goals & Non-Goals
 
 **Goals**
+
 - Enable query sharing via shareable links that encode filters, dataset, page size, and field selection (requirements 1.1–1.7).
 - Fix GraphQL errors in Function, Function Console, Data Stream, Edge DNS, and Activity History tabs caused by invalid `groupBy` clauses (requirements 2.1–2.7).
 - Restore saved search persistence to localStorage with validation and graceful degradation (requirements 3.1–3.7).
@@ -13,6 +14,7 @@
 - Meet non-functional requirements: clipboard handling (<100ms), share decoding (<50ms), saved search load (<200ms for 50+ items), accessibility (focus trap, ARIA labels, screen-reader announcements), security (URL-safe encoding, no PII exposure, explicit user action only).
 
 **Non-Goals**
+
 - Implement a backend API for cross-device persistent saved searches (localStorage-only).
 - Add collaborative/real-time multi-user editing of shared queries.
 - Redesign the Add Filter modal component itself (only stabilize width).
@@ -129,34 +131,40 @@
 - **Touches requirements**: 1.1, 1.2, 1.3, 1.4, 1.6, N.1, N.7, N.8, N.9.
 
 **Pseudo-code (fix)**:
+
 ```javascript
 const shareCurrentView = async ({ viewState = {}, eventsTab = null } = {}) => {
   try {
-    const state = { tab: activeTabId.value, viewState };
-    if (eventsTab !== null) state.eventsTab = eventsTab;
+    const state = { tab: activeTabId.value, viewState }
+    if (eventsTab !== null) state.eventsTab = eventsTab
     // ... panelConfig logic
-    const encoded = encodeShareState(state);
-    const url = new URL(window.location.href);
-    url.searchParams.delete('panel');
-    url.searchParams.set('shareState', encoded);
-    
+    const encoded = encodeShareState(state)
+    const url = new URL(window.location.href)
+    url.searchParams.delete('panel')
+    url.searchParams.set('shareState', encoded)
+
     // FIX: await clipboard write and guard feature availability
     if (!navigator.clipboard || !window.isSecureContext) {
-      throw new Error('Clipboard API unavailable');
+      throw new Error('Clipboard API unavailable')
     }
-    await navigator.clipboard.writeText(url.toString());
-    
-    toast.add({ severity: 'success', summary: 'Share URL copied', life: 3000 });
+    await navigator.clipboard.writeText(url.toString())
+
+    toast.add({ severity: 'success', summary: 'Share URL copied', life: 3000 })
   } catch (err) {
     // If clipboard fails, try fallback: show dialog with copyable URL
     try {
-      fallbackCopyDialog.showURL(url.toString());
-      toast.add({ severity: 'info', summary: 'URL opened for manual copy', life: 4000 });
+      fallbackCopyDialog.showURL(url.toString())
+      toast.add({ severity: 'info', summary: 'URL opened for manual copy', life: 4000 })
     } catch {
-      toast.add({ severity: 'error', summary: 'Error generating share URL', detail: String(err).slice(0, 100), life: 5000 });
+      toast.add({
+        severity: 'error',
+        summary: 'Error generating share URL',
+        detail: String(err).slice(0, 100),
+        life: 5000
+      })
     }
   }
-};
+}
 ```
 
 ### 3.3 `handleShareImport()` Share State Decoder
@@ -261,6 +269,7 @@ const shareCurrentView = async ({ viewState = {}, eventsTab = null } = {}) => {
 - **Touches requirements**: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, N.9.
 
 **Pseudo-code (fix)**:
+
 ```javascript
 const DATASET_SUPPORTS_GROUPBY = {
   workloadEvents: new Set(['status', 'requestMethod', 'upstreamCacheStatus']),
@@ -279,7 +288,7 @@ const loadEventsChartFromEventsApi = ({ dataset, groupByField, ... }) => {
     console.warn(`Dataset ${dataset} does not support groupBy:${groupByField}; dropping`);
     groupByField = null; // Fallback to time-series only
   }
-  
+
   const query = buildQuery({ dataset, groupByField, ... });
   // ... rest of logic
 };
@@ -295,15 +304,15 @@ const loadEventsChartFromEventsApi = ({ dataset, groupByField, ... }) => {
 // Storage key: "rte:saved-searches:{tenant_id}:{user_id}"
 
 interface SavedSearch {
-  id: string;                    // "saved-{timestamp}-{random}"
-  name: string;                  // User-given name, 50 chars max
-  dataset: string;               // "workloadEvents" | "functionEvents" | ...
-  filters: FilterConfig[];       // [{ field, operator, value, ... }]
-  pageSize: number;              // Rows per page, e.g., 50
-  selectedFields: string[];      // Visible columns, e.g., ['timestamp', 'status', ...]
-  description?: string;          // Optional, 120 chars max
-  createdAt: ISO8601;            // Timestamp
-  updatedAt: ISO8601;            // Timestamp
+  id: string // "saved-{timestamp}-{random}"
+  name: string // User-given name, 50 chars max
+  dataset: string // "workloadEvents" | "functionEvents" | ...
+  filters: FilterConfig[] // [{ field, operator, value, ... }]
+  pageSize: number // Rows per page, e.g., 50
+  selectedFields: string[] // Visible columns, e.g., ['timestamp', 'status', ...]
+  description?: string // Optional, 120 chars max
+  createdAt: ISO8601 // Timestamp
+  updatedAt: ISO8601 // Timestamp
 }
 
 // Full localStorage value: SavedSearch[]
@@ -368,12 +377,13 @@ interface SavedSearch {
 - **Aggregation fields**: Vary per dataset; source of truth is [dataset-fields.js:22-220](src/services/real-time-events-service-v2/_shared/dataset-fields.js).
 - **Error contract**: GraphQL errors returned in `response.errors` array; client-side guard checks field support before query submission (See Component 3.7).
 - **Example fix**:
+
   ```graphql
   # BEFORE (fails for functionEvents — no 'status' field):
   query {
     functionEvents(dataset: functionEvents, groupBy: ["ts", "status"]) { ... }
   }
-  
+
   # AFTER (valid for functionEvents):
   query {
     functionEvents(dataset: functionEvents, groupBy: ["ts"]) { ... }
@@ -523,7 +533,7 @@ interface SavedSearch {
 - **Options considered**:
   - **A. Cap encoded URL at 2000 chars**: Warn user if approaching limit; omit `panelConfig` if necessary.
   - **B. Always omit `panelConfig` for new shares**: Users must have already saved the panel. Reduces feature scope.
-  - **C. Compress `panelConfig`: Use LZ-string or similar. Adds complexity.
+  - \*\*C. Compress `panelConfig`: Use LZ-string or similar. Adds complexity.
   - **D. No limit**: Accept risk of truncation. UX: silent failure if URL truncated.
 - **Decision**: **A** (Cap at 2000 chars with warning)
   - In `shareCurrentView`, after encoding, check `if (url.toString().length > 2000)`. If so, and `panelConfig` is present, drop it and re-encode. Warn user: "Shared query is complex; recipient will need to open it and select the panel manually."
@@ -553,18 +563,18 @@ interface SavedSearch {
 
 ## 8. Risks & Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|---|---|---|---|
-| **R1**: Clipboard API unavailable in old browsers or non-HTTPS contexts | Medium | Medium | Feature-detect `navigator.clipboard`; fallback to dialog + manual copy (Decision 7.1). |
-| **R2**: Toast fires before clipboard write completes (async race) | Medium | High | Use `async/await`; emit toast **after** await resolves. Add regression test. |
-| **R3**: Modal width fix in shared component affects other views | Medium | High | Grep for consumers of `advanced-filter-system-v2`; test all usages. The fixed width applies only to filter panel inner div, should not affect other modal contexts. |
-| **R4**: Saved searches loading blocks on large localStorage (50+ items) | Low | Low | Validation is O(n) JSON parse; with 50 items ≈ 100 bytes each, < 200ms (requirement N.3 met). Monitor with perf logs. |
-| **R5**: Share URL truncated in email clients (> 2000 chars) | Low | Medium | Cap encoded URL at 2000 chars; warn user and omit `panelConfig` if needed (Decision 7.6). |
-| **R6**: accountStore.account is null on first paint; saved searches appear "gone" | Low | Low | Render empty-state placeholder "Loading…" until `accountStore.isReady`. Confirm `accountStore.account` hydration timing. |
-| **R7**: GraphQL error message leaks technical jargon to users | Low | Low | Map error codes to friendly messages in UI; log raw errors to console. (Decision 7.5). |
-| **R8**: Dialog (new Add Filter modal) is centered; users expect trigger-anchored overlay | Medium | Medium | Conduct QA with actual users. If feedback negative, revert to OverlayPanel + manual focus trap (more complex but preserves UX). |
-| **R9**: Clipboard permission denied in iframe context (embedded Real-Time Events) | Low | Medium | Feature-detect + fallback covers this; no special handling needed. |
-| **R10**: localStorage scoped by tenant+user; user logout wipes searches (expected but risky) | Low | Low | This is by design (per Open Q1, per-browser scoping). Document in settings/help. |
+| Risk                                                                                         | Likelihood | Impact | Mitigation                                                                                                                                                          |
+| -------------------------------------------------------------------------------------------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **R1**: Clipboard API unavailable in old browsers or non-HTTPS contexts                      | Medium     | Medium | Feature-detect `navigator.clipboard`; fallback to dialog + manual copy (Decision 7.1).                                                                              |
+| **R2**: Toast fires before clipboard write completes (async race)                            | Medium     | High   | Use `async/await`; emit toast **after** await resolves. Add regression test.                                                                                        |
+| **R3**: Modal width fix in shared component affects other views                              | Medium     | High   | Grep for consumers of `advanced-filter-system-v2`; test all usages. The fixed width applies only to filter panel inner div, should not affect other modal contexts. |
+| **R4**: Saved searches loading blocks on large localStorage (50+ items)                      | Low        | Low    | Validation is O(n) JSON parse; with 50 items ≈ 100 bytes each, < 200ms (requirement N.3 met). Monitor with perf logs.                                               |
+| **R5**: Share URL truncated in email clients (> 2000 chars)                                  | Low        | Medium | Cap encoded URL at 2000 chars; warn user and omit `panelConfig` if needed (Decision 7.6).                                                                           |
+| **R6**: accountStore.account is null on first paint; saved searches appear "gone"            | Low        | Low    | Render empty-state placeholder "Loading…" until `accountStore.isReady`. Confirm `accountStore.account` hydration timing.                                            |
+| **R7**: GraphQL error message leaks technical jargon to users                                | Low        | Low    | Map error codes to friendly messages in UI; log raw errors to console. (Decision 7.5).                                                                              |
+| **R8**: Dialog (new Add Filter modal) is centered; users expect trigger-anchored overlay     | Medium     | Medium | Conduct QA with actual users. If feedback negative, revert to OverlayPanel + manual focus trap (more complex but preserves UX).                                     |
+| **R9**: Clipboard permission denied in iframe context (embedded Real-Time Events)            | Low        | Medium | Feature-detect + fallback covers this; no special handling needed.                                                                                                  |
+| **R10**: localStorage scoped by tenant+user; user logout wipes searches (expected but risky) | Low        | Low    | This is by design (per Open Q1, per-browser scoping). Document in settings/help.                                                                                    |
 
 ---
 
@@ -587,45 +597,45 @@ interface SavedSearch {
 
 Every requirement from `specs/real-time-events-v2-improvements/requirements.md` is mapped below:
 
-| Requirement | Covered by |
-|---|---|
-| 1.1 | §3.2 `shareCurrentView()` + §3.1 Share Button |
-| 1.2 | §3.2 `shareCurrentView()` state object |
-| 1.3 | §3.2 `shareCurrentView()` success toast |
-| 1.4 | §7.1 Clipboard Fallback Strategy; §3.2 error handling |
-| 1.5 | §3.3 `handleShareImport()` decoder |
-| 1.6 | §3.3 ephemeral shared tab creation |
-| 1.7 | §3.3 `handleShareImport()` validation |
-| 2.1 | §3.7 GraphQL guard (Function Events) |
-| 2.2 | §3.7 GraphQL guard (Function Console Events) |
-| 2.3 | §3.7 GraphQL guard (Data Stream Events) |
-| 2.4 | §3.7 GraphQL guard (Edge DNS Queries) |
-| 2.5 | §3.7 GraphQL guard (Activity History) |
-| 2.6 | §3.7 GraphQL guard + error handling |
-| 2.7 | §3.7 error toast; §7.5 friendly error messages |
-| 3.1 | §3.4 `useSavedSearches` create logic |
-| 3.2 | §3.4 `useSavedSearches` load + restore |
-| 3.3 | §3.4 `useSavedSearches` apply logic |
-| 3.4 | §3.4 `useSavedSearches` delete logic |
-| 3.5 | §3.4 graceful degradation + §7.4 localStorage unavailable warning |
-| 3.6 | §3.4 per-entry validation; §7.7 validation strategy |
-| 3.7 | §3.4 dataset-keyed storage; §7.4 flat list with badge |
-| 4.1 | §3.5 Add Filter Modal responsive width |
-| 4.2 | §3.5 width stability across field changes |
-| 4.3 | §3.5 width stability across operator changes |
-| 4.4 | §3.5 width stability across input value changes |
-| 4.5 | §3.5 no resize during lifecycle |
-| 4.6 | §3.5 responsive to viewport resize |
-| N.1 | §3.2 `shareCurrentView()` <100ms |
-| N.2 | §3.3 `handleShareImport()` <50ms |
-| N.3 | §3.4 `useSavedSearches.load()` <200ms for 50+ items |
-| N.4 | §3.1 Share Button aria-label + tooltip |
-| N.5 | §3.6 Add Filter Modal focus trap (via Dialog); §7.3 Dialog decision |
-| N.6 | §3.1 toast persist 3s+ and announce to screen readers; PrimeVue Toast a11y |
-| N.7 | §5 Share State Encoding (base64 URL-safe); §7.6 URL length cap |
-| N.8 | §3.2 clipboard write on explicit user action only |
-| N.9 | §6.3 Observability logging for share, GraphQL, saved searches |
-| N.10 | §6.3 Observability logging for saved search CRUD |
+| Requirement | Covered by                                                                 |
+| ----------- | -------------------------------------------------------------------------- |
+| 1.1         | §3.2 `shareCurrentView()` + §3.1 Share Button                              |
+| 1.2         | §3.2 `shareCurrentView()` state object                                     |
+| 1.3         | §3.2 `shareCurrentView()` success toast                                    |
+| 1.4         | §7.1 Clipboard Fallback Strategy; §3.2 error handling                      |
+| 1.5         | §3.3 `handleShareImport()` decoder                                         |
+| 1.6         | §3.3 ephemeral shared tab creation                                         |
+| 1.7         | §3.3 `handleShareImport()` validation                                      |
+| 2.1         | §3.7 GraphQL guard (Function Events)                                       |
+| 2.2         | §3.7 GraphQL guard (Function Console Events)                               |
+| 2.3         | §3.7 GraphQL guard (Data Stream Events)                                    |
+| 2.4         | §3.7 GraphQL guard (Edge DNS Queries)                                      |
+| 2.5         | §3.7 GraphQL guard (Activity History)                                      |
+| 2.6         | §3.7 GraphQL guard + error handling                                        |
+| 2.7         | §3.7 error toast; §7.5 friendly error messages                             |
+| 3.1         | §3.4 `useSavedSearches` create logic                                       |
+| 3.2         | §3.4 `useSavedSearches` load + restore                                     |
+| 3.3         | §3.4 `useSavedSearches` apply logic                                        |
+| 3.4         | §3.4 `useSavedSearches` delete logic                                       |
+| 3.5         | §3.4 graceful degradation + §7.4 localStorage unavailable warning          |
+| 3.6         | §3.4 per-entry validation; §7.7 validation strategy                        |
+| 3.7         | §3.4 dataset-keyed storage; §7.4 flat list with badge                      |
+| 4.1         | §3.5 Add Filter Modal responsive width                                     |
+| 4.2         | §3.5 width stability across field changes                                  |
+| 4.3         | §3.5 width stability across operator changes                               |
+| 4.4         | §3.5 width stability across input value changes                            |
+| 4.5         | §3.5 no resize during lifecycle                                            |
+| 4.6         | §3.5 responsive to viewport resize                                         |
+| N.1         | §3.2 `shareCurrentView()` <100ms                                           |
+| N.2         | §3.3 `handleShareImport()` <50ms                                           |
+| N.3         | §3.4 `useSavedSearches.load()` <200ms for 50+ items                        |
+| N.4         | §3.1 Share Button aria-label + tooltip                                     |
+| N.5         | §3.6 Add Filter Modal focus trap (via Dialog); §7.3 Dialog decision        |
+| N.6         | §3.1 toast persist 3s+ and announce to screen readers; PrimeVue Toast a11y |
+| N.7         | §5 Share State Encoding (base64 URL-safe); §7.6 URL length cap             |
+| N.8         | §3.2 clipboard write on explicit user action only                          |
+| N.9         | §6.3 Observability logging for share, GraphQL, saved searches              |
+| N.10        | §6.3 Observability logging for saved search CRUD                           |
 
 ---
 
@@ -641,4 +651,3 @@ Every requirement from `specs/real-time-events-v2-improvements/requirements.md` 
 - [x] **Validation strategy**: ✅ Approved — Decision 7.7 (per-entry validation, silent skip).
 - [x] **User logout behavior**: ✅ Confirmed — saved searches cleared on logout (current behavior, acceptable).
 - [x] **Toast announcement to screen readers**: ✅ PrimeVue Toast applies `aria-live="polite"` by default.
-

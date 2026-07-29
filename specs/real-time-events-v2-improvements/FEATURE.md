@@ -10,12 +10,12 @@ in this folder.
 
 Four user-visible improvements over Real-Time Events V1:
 
-| # | Feature | One-liner |
-|---|---|---|
-| 1 | **Query sharing** | A Share button serializes `filters + dataset + pageSize + selectedFields` into `?shareState=…` and copies the resulting URL to the clipboard. Pasting that URL into another tab restores the exact view. |
-| 2 | **Saved searches** | A Save button persists a named search (filters, columns, dataset, page size) to `localStorage` scoped per account+tenant. Re-applies on click; survives reload. |
-| 3 | **GraphQL `groupBy` whitelist** | Five datasets (Function, Function Console, Data Stream, Edge DNS, Activity History) only support `groupBy: [ts]`. A `DATASET_SUPPORTS_GROUPBY` map in `load-events-aggregation.js` prevents the V1 crash on those tabs. |
-| 4 | **Add Filter modal width stability** | Modal width is locked via responsive CSS (`min(35rem, 90vw)` desktop, `calc(100vw - 1rem)` mobile). Switching the filter field or operator no longer causes the modal to jump. |
+| #   | Feature                              | One-liner                                                                                                                                                                                                               |
+| --- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Query sharing**                    | A Share button serializes `filters + dataset + pageSize + selectedFields` into `?shareState=…` and copies the resulting URL to the clipboard. Pasting that URL into another tab restores the exact view.                |
+| 2   | **Saved searches**                   | A Save button persists a named search (filters, columns, dataset, page size) to `localStorage` scoped per account+tenant. Re-applies on click; survives reload.                                                         |
+| 3   | **GraphQL `groupBy` whitelist**      | Five datasets (Function, Function Console, Data Stream, Edge DNS, Activity History) only support `groupBy: [ts]`. A `DATASET_SUPPORTS_GROUPBY` map in `load-events-aggregation.js` prevents the V1 crash on those tabs. |
+| 4   | **Add Filter modal width stability** | Modal width is locked via responsive CSS (`min(35rem, 90vw)` desktop, `calc(100vw - 1rem)` mobile). Switching the filter field or operator no longer causes the modal to jump.                                          |
 
 All four are covered end-to-end by automated tests under
 `src/views/RealTimeEventsV2/**/__tests__/` and Cypress specs under
@@ -42,10 +42,12 @@ src/views/RealTimeEventsV2/
 ```
 
 Persistence keys (account-scoped, see `useSavedSearches.js`):
+
 - `azion.rte.v2.savedSearches.<accountId>.<tenantId>`
 - Legacy unscoped key is dropped on first load (one-time migration).
 
 URL shape:
+
 - `?shareState=<base64url-encoded JSON>`
 - JSON schema: `{ v: 1, dataset, filterData, pageSize, selectedFields }`
 - Versioned for forward-compat — bump `v` and add a migrator if shape changes.
@@ -62,6 +64,7 @@ comment. Do **not** strip them — downstream sinks (browser-console
 forwarder, Sentry breadcrumbs) depend on them.
 
 Event names you can grep for:
+
 - `share_url_copied` — Share button success (includes URL length, no PII)
 - `useSavedSearches: save | delete | apply` — CRUD audit
 - `[real-time-events] GraphQL query failed` — error path
@@ -70,11 +73,11 @@ Event names you can grep for:
 
 ## Guardrails enforced by tooling
 
-| Mechanism | What it stops |
-|---|---|
-| ESLint rule `azion-architecture/no-unawaited-clipboard` (`error`) | `navigator.clipboard.writeText(...)` without `await` or explicit `.then/.catch`. Regression-proofs the bug fixed in this spec. |
-| `DATASET_SUPPORTS_GROUPBY` in `load-events-aggregation.js` | Sending unsupported `groupBy` fields to the five datasets that only accept `groupBy: [ts]`. Falls back to time-only aggregation. |
-| Unit + Cypress tests under `__tests__/` and `cypress/e2e/real-time-events/` | URL round-trip, quota-exceeded fallback, modal width stability, touch-target sizes, focus management. |
+| Mechanism                                                                   | What it stops                                                                                                                    |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| ESLint rule `azion-architecture/no-unawaited-clipboard` (`error`)           | `navigator.clipboard.writeText(...)` without `await` or explicit `.then/.catch`. Regression-proofs the bug fixed in this spec.   |
+| `DATASET_SUPPORTS_GROUPBY` in `load-events-aggregation.js`                  | Sending unsupported `groupBy` fields to the five datasets that only accept `groupBy: [ts]`. Falls back to time-only aggregation. |
+| Unit + Cypress tests under `__tests__/` and `cypress/e2e/real-time-events/` | URL round-trip, quota-exceeded fallback, modal width stability, touch-target sizes, focus management.                            |
 
 The ESLint rule lives at
 `eslint/plugin/lib/rules/no-unawaited-clipboard.js` with tests at
@@ -109,13 +112,13 @@ pattern rather than introducing per-feature booleans.
 
 ## Where to look when something breaks
 
-| Symptom | First file to read |
-|---|---|
-| Share button silently fails | `composables/useSessionManager.js` (clipboard path + fallback) |
-| Saved search disappears after reload | `composables/useSavedSearches.js` `load()` + check `storageKey` formation |
-| One tab errors on GraphQL | `composables/utils/load-events-aggregation.js` — verify dataset in whitelist |
-| Modal width jumps | `Blocks/tab-panel-block.vue` — search for `add-filter` modal class + tokens |
-| Shared URL doesn't restore filters | `composables/useViewSync.js` — `parseShareState` + `applyShareState` |
+| Symptom                              | First file to read                                                           |
+| ------------------------------------ | ---------------------------------------------------------------------------- |
+| Share button silently fails          | `composables/useSessionManager.js` (clipboard path + fallback)               |
+| Saved search disappears after reload | `composables/useSavedSearches.js` `load()` + check `storageKey` formation    |
+| One tab errors on GraphQL            | `composables/utils/load-events-aggregation.js` — verify dataset in whitelist |
+| Modal width jumps                    | `Blocks/tab-panel-block.vue` — search for `add-filter` modal class + tokens  |
+| Shared URL doesn't restore filters   | `composables/useViewSync.js` — `parseShareState` + `applyShareState`         |
 
 ---
 

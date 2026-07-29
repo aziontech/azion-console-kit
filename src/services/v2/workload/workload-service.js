@@ -49,10 +49,28 @@ export class WorkloadService extends BaseService {
 
     const zones = (zonesResponse?.body || []).map((zone) => zone.domain?.content ?? zone.domain)
 
-    return (
+    const workload =
       this.adapter?.transformLoadWorkload?.(workloadResponse.data, workloadDeployment[0], zones) ??
       workloadResponse.data
-    )
+
+    const certificateMetadata = await this.#loadCertificateMetadata(workload.tls?.certificate)
+
+    return { ...workload, ...certificateMetadata }
+  }
+
+  #loadCertificateMetadata = async (certificateId) => {
+    if (!certificateId) {
+      return { authorityCertificate: null, subjectNameCertificate: null }
+    }
+
+    const certificate = await this.digitalCertificate
+      .loadDigitalCertificate({ id: certificateId })
+      .catch(() => null)
+
+    return {
+      authorityCertificate: certificate?.authority ?? null,
+      subjectNameCertificate: certificate?.subjectName ?? null
+    }
   }
 
   prefetchList = (pageSize = 10) => {
@@ -275,7 +293,7 @@ export class WorkloadService extends BaseService {
       const hostnames = [payload.letEncrypt.commonName, ...payload.letEncrypt.alternativeNames]
       const skipRecreation = this.#shouldSkipLetsEncryptRecreation({
         changed,
-        subjctName: payload.subjctName,
+        subjctName: payload.subjectNameCertificate,
         hostnames
       })
 

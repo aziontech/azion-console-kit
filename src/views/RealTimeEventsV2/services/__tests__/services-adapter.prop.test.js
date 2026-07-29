@@ -22,7 +22,6 @@ vi.mock('@/services/real-time-events-service-v2', () => ({
   listEdgeDNS: vi.fn(),
   listImageProcessor: vi.fn(),
   listTieredCache: vi.fn(),
-  loadEventsChartAggregation: vi.fn(),
   loadActivityHistory: vi.fn(),
   loadEdgeFunctions: vi.fn(),
   loadEdgeFunctionsConsole: vi.fn(),

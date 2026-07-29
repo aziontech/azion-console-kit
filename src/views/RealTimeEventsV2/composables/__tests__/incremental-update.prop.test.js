@@ -114,7 +114,7 @@ describe('Feature: real-time-events-refactor, Property 7: Incremental computed u
 
           // Incremental path: start with initial, then append
           const incrementalData = ref([...initial])
-          const { filteredData: incrementalFiltered } = useDocumentSearch(incrementalData)
+          const { filteredData: incrementalFiltered } = useDocumentSearch({ rows: incrementalData })
           await nextTick()
 
           // Simulate loadMore append
@@ -123,7 +123,7 @@ describe('Feature: real-time-events-refactor, Property 7: Incremental computed u
 
           // Full recomputation path: create fresh with all rows
           const fullData = ref(allRows)
-          const { filteredData: fullFiltered } = useDocumentSearch(fullData)
+          const { filteredData: fullFiltered } = useDocumentSearch({ rows: fullData })
           await nextTick()
 
           // With empty query, both should return all rows
@@ -146,8 +146,9 @@ describe('Feature: real-time-events-refactor, Property 7: Incremental computed u
 
             // Incremental path
             const incrementalData = ref([...initial])
-            const { query: incQuery, filteredData: incFiltered } =
-              useDocumentSearch(incrementalData)
+            const { query: incQuery, filteredData: incFiltered } = useDocumentSearch({
+              rows: incrementalData
+            })
             await nextTick()
 
             incrementalData.value = [...incrementalData.value, ...appended]
@@ -161,7 +162,9 @@ describe('Feature: real-time-events-refactor, Property 7: Incremental computed u
 
             // Full recomputation path
             const fullData = ref(allRows)
-            const { query: fullQuery, filteredData: fullFiltered } = useDocumentSearch(fullData)
+            const { query: fullQuery, filteredData: fullFiltered } = useDocumentSearch({
+              rows: fullData
+            })
             await nextTick()
 
             fullQuery.value = searchTerm

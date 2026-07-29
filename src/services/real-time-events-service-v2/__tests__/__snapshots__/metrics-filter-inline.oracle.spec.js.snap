@@ -1,0 +1,103 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`metrics-filter-inline oracle · byte-equivalent request bodies > cache-status chart path (no status skip, drops or) 1`] = `
+{
+  "query": "query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!, $filter_host: String, $filter_statusGte: Int, $in_scheme: [String]) {
+      httpMetrics ( limit: 10000, aggregate: { sum: requests }, groupBy: [ts, upstreamCacheStatus], orderBy: [ts_ASC]
+        filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end }, host: $filter_host, statusGte: $filter_statusGte, schemeIn: $in_scheme }
+      ) { ts, upstreamCacheStatus, sum } }",
+  "variables": {
+    "filter_host": "example.com",
+    "filter_statusGte": 400,
+    "in_scheme": [
+      "https",
+      "http",
+    ],
+    "tsRange_begin": "2024-01-01T00:00:00Z",
+    "tsRange_end": "2024-01-01T06:00:00Z",
+  },
+}
+`;
+
+exports[`metrics-filter-inline oracle · byte-equivalent request bodies > default count path (skips status*, drops or) 1`] = `
+{
+  "query": "query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!, $filter_host: String, $in_scheme: [String]) {
+      httpMetrics ( limit: 10000, aggregate: { sum: requests }, groupBy: [ts], orderBy: [ts_ASC]
+        filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end }, host: $filter_host, schemeIn: $in_scheme }
+      ) { ts, sum } }",
+  "variables": {
+    "filter_host": "example.com",
+    "in_scheme": [
+      "https",
+      "http",
+    ],
+    "tsRange_begin": "2024-01-01T00:00:00Z",
+    "tsRange_end": "2024-01-01T06:00:00Z",
+  },
+}
+`;
+
+exports[`metrics-filter-inline oracle · byte-equivalent request bodies > request-method chart path (no status skip, drops or) 1`] = `
+{
+  "query": "query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!, $filter_host: String, $filter_statusGte: Int, $in_scheme: [String]) {
+      httpMetrics ( limit: 10000, aggregate: { sum: requests }, groupBy: [ts, requestMethod], orderBy: [ts_ASC]
+        filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end }, host: $filter_host, statusGte: $filter_statusGte, schemeIn: $in_scheme }
+      ) { ts, requestMethod, sum } }",
+  "variables": {
+    "filter_host": "example.com",
+    "filter_statusGte": 400,
+    "in_scheme": [
+      "https",
+      "http",
+    ],
+    "tsRange_begin": "2024-01-01T00:00:00Z",
+    "tsRange_end": "2024-01-01T06:00:00Z",
+  },
+}
+`;
+
+exports[`metrics-filter-inline oracle · byte-equivalent request bodies > status chart path (skips status*, keeps host/scheme, drops or) 1`] = `
+{
+  "query": "query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!, $filter_host: String, $in_scheme: [String]) {
+      status4xx: httpMetrics(
+        limit: 10000, aggregate: { sum: requests }, groupBy: [ts], orderBy: [ts_ASC]
+        filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end }, statusRange: { begin: 400, end: 499 }, host: $filter_host, schemeIn: $in_scheme }
+      ) { ts, sum }
+      status5xx: httpMetrics(
+        limit: 10000, aggregate: { sum: requests }, groupBy: [ts], orderBy: [ts_ASC]
+        filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end }, statusRange: { begin: 500, end: 599 }, host: $filter_host, schemeIn: $in_scheme }
+      ) { ts, sum } }",
+  "variables": {
+    "filter_host": "example.com",
+    "in_scheme": [
+      "https",
+      "http",
+    ],
+    "tsRange_begin": "2024-01-01T00:00:00Z",
+    "tsRange_end": "2024-01-01T06:00:00Z",
+  },
+}
+`;
+
+exports[`metrics-filter-inline oracle · byte-equivalent request bodies > summary-kpis-from-metrics path (skips status*, drops or) 1`] = `
+{
+  "query": "query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!, $filter_host: String, $in_scheme: [String]) {
+      status4xx: httpMetrics(
+        limit: 1, aggregate: { sum: requests },
+        filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end }, statusRange: { begin: 400, end: 499 }, host: $filter_host, schemeIn: $in_scheme }
+      ) { sum }
+      status5xx: httpMetrics(
+        limit: 1, aggregate: { sum: requests },
+        filter: { tsRange: { begin: $tsRange_begin, end: $tsRange_end }, statusRange: { begin: 500, end: 599 }, host: $filter_host, schemeIn: $in_scheme }
+      ) { sum } }",
+  "variables": {
+    "filter_host": "example.com",
+    "in_scheme": [
+      "https",
+      "http",
+    ],
+    "tsRange_begin": "2024-01-01T00:00:00Z",
+    "tsRange_end": "2024-01-01T06:00:00Z",
+  },
+}
+`;

@@ -10,14 +10,14 @@ Toda implementação respeita os princípios em `CLAUDE.md` e nas skills `solid-
 
 ### Mapeamento Properties → tipo de verificação
 
-| Property | Verificação | Onde está | Fase |
-|---|---|---|---|
-| **P1** — Zero listener leaks: todo `addEventListener`/`setTimeout`/`setInterval`/`ResizeObserver`/`requestAnimationFrame` em arquivos tocados tem cleanup simétrico com handler nomeado idêntico | Mount/unmount loop ≥ 10x com Vitest + assert `window.__listenerCount__` estável (instrumentado em test setup) | `src/views/RealTimeEventsV2/__tests__/leak.pbt.spec.js` | Fase 6 |
-| **P2** — Touch targets WCAG: todo `button`/`[role="button"]`/`[tabindex]` em event-chart.vue, filter-bar.vue, filterTagsDisplay tem `min-width`/`min-height` ≥ 24×24 (desktop/xl) e ≥ 44×44 (mobile/mobile-s/tablet) | Test parametrizado: monta cada componente em 5 viewports, queryAll seletores interativos, assert `getBoundingClientRect()` ≥ alvo | `src/views/RealTimeEventsV2/__tests__/touch-target.spec.js` | Fase 6 |
-| **P3** — Aria-label completeness: 6 botões declarados em §11.5 dos requirements têm `aria-label` não-vazio | Snapshot test: queryAll seletores, assert `getAttribute('aria-label')` truthy + length > 0 | `src/views/RealTimeEventsV2/__tests__/aria-label.spec.js` | Fase 6 |
-| **P4** — Zero `ResizeObserver` loops: 30s de stress (resize sequencial simulado) sem o erro `ResizeObserver loop completed with undelivered notifications` no console | Integration test com `vi.useFakeTimers()` + `console.error` spy + assert `spy.mock.calls` não contém o erro | `src/views/RealTimeEventsV2/__tests__/ro-loop.spec.js` | Fase 6 |
-| **P5** — data-testid preservation: lista declarada (`event-chart`, `event-chart-view`, `dataset-selector-top`, `session-toolbar`, `field-sidebar`, `rte-tab-{id}`) está presente em runtime | Test snapshot: monta TabsView + tab-panel-block, queryAll por test-id, assert presence | `src/views/RealTimeEventsV2/__tests__/testid-preservation.spec.js` | Fase 6 |
-| **P6** — Auto-refresh pausa em `visibilityState === 'hidden'` e faz catch-up no retorno se idade > intervalo | Integration test com `vi.useFakeTimers()` + mock service + dispatch `visibilitychange`; assert sequence de fetch antes/durante/depois do hidden | `src/components/base/advanced-filter-system-v2/__tests__/auto-refresh-pause.spec.js` | Fase 6 |
+| Property                                                                                                                                                                                                             | Verificação                                                                                                                                     | Onde está                                                                            | Fase   |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------ |
+| **P1** — Zero listener leaks: todo `addEventListener`/`setTimeout`/`setInterval`/`ResizeObserver`/`requestAnimationFrame` em arquivos tocados tem cleanup simétrico com handler nomeado idêntico                     | Mount/unmount loop ≥ 10x com Vitest + assert `window.__listenerCount__` estável (instrumentado em test setup)                                   | `src/views/RealTimeEventsV2/__tests__/leak.pbt.spec.js`                              | Fase 6 |
+| **P2** — Touch targets WCAG: todo `button`/`[role="button"]`/`[tabindex]` em event-chart.vue, filter-bar.vue, filterTagsDisplay tem `min-width`/`min-height` ≥ 24×24 (desktop/xl) e ≥ 44×44 (mobile/mobile-s/tablet) | Test parametrizado: monta cada componente em 5 viewports, queryAll seletores interativos, assert `getBoundingClientRect()` ≥ alvo               | `src/views/RealTimeEventsV2/__tests__/touch-target.spec.js`                          | Fase 6 |
+| **P3** — Aria-label completeness: 6 botões declarados em §11.5 dos requirements têm `aria-label` não-vazio                                                                                                           | Snapshot test: queryAll seletores, assert `getAttribute('aria-label')` truthy + length > 0                                                      | `src/views/RealTimeEventsV2/__tests__/aria-label.spec.js`                            | Fase 6 |
+| **P4** — Zero `ResizeObserver` loops: 30s de stress (resize sequencial simulado) sem o erro `ResizeObserver loop completed with undelivered notifications` no console                                                | Integration test com `vi.useFakeTimers()` + `console.error` spy + assert `spy.mock.calls` não contém o erro                                     | `src/views/RealTimeEventsV2/__tests__/ro-loop.spec.js`                               | Fase 6 |
+| **P5** — data-testid preservation: lista declarada (`event-chart`, `event-chart-view`, `dataset-selector-top`, `session-toolbar`, `field-sidebar`, `rte-tab-{id}`) está presente em runtime                          | Test snapshot: monta TabsView + tab-panel-block, queryAll por test-id, assert presence                                                          | `src/views/RealTimeEventsV2/__tests__/testid-preservation.spec.js`                   | Fase 6 |
+| **P6** — Auto-refresh pausa em `visibilityState === 'hidden'` e faz catch-up no retorno se idade > intervalo                                                                                                         | Integration test com `vi.useFakeTimers()` + mock service + dispatch `visibilitychange`; assert sequence de fetch antes/durante/depois do hidden | `src/components/base/advanced-filter-system-v2/__tests__/auto-refresh-pause.spec.js` | Fase 6 |
 
 > Tarefas marcadas com `*` são opcionais (testes / E2E). Tarefas sem `*` são obrigatórias para a feature ser dada como concluída. Cada Property deve ser coberta por pelo menos uma task obrigatória.
 
@@ -28,7 +28,6 @@ Toda implementação respeita os princípios em `CLAUDE.md` e nas skills `solid-
 ### Fase 0 — Fundação (composables responsivos)
 
 - [ ] 1. Criar composables locais a `RealTimeEventsV2/`
-
   - [x] 1.1 Criar `useReactiveMediaQuery(query: string): Ref<boolean>` como primitiva reutilizável
     - Arquivo novo: `src/views/RealTimeEventsV2/composables/useReactiveMediaQuery.js`.
     - Handler nomeado `onChange(e)` registrado via `mql.addEventListener('change', onChange)`.
@@ -68,7 +67,7 @@ Toda implementação respeita os princípios em `CLAUDE.md` e nas skills `solid-
     - Pure function, zero side effects.
     - _Requirements: 1.5_
 
-  - [x]* 1.6 Unit tests para composables + util
+  - [x]\* 1.6 Unit tests para composables + util
     - Arquivo novo: `src/views/RealTimeEventsV2/composables/__tests__/composables.spec.js`.
     - Cobre: setup/teardown symmetric de cada composable (montar 10x, assert listener count estável), token derivation, `pickEvenlyDistributed` casos básicos + edge.
     - Usa Vitest + `@vue/test-utils`.
@@ -84,7 +83,6 @@ Toda implementação respeita os princípios em `CLAUDE.md` e nas skills `solid-
 ### Fase 1 — Chart engine (interação + visual + decimação)
 
 - [ ] 3. Refactor de `event-chart.vue` e `useChartBuilder.js`
-
   - [x] 3.1 `event-chart.vue` — interaction layer + visual layer (sem bottom-sheet)
     - **Interação**:
       - Substituir `@mousedown/move/up/leave` por `@pointerdown/move/up/cancel/leave` no `.chart-container`. Handlers renomeados `handlePointerDown/Move/Up/Cancel`.
@@ -120,7 +118,7 @@ Toda implementação respeita os princípios em `CLAUDE.md` e nas skills `solid-
     - Rota-de-fuga se `tick.values` causar regressão em algum `chartKind`: usar `axis.x.tick.culling: { max: maxTicks }` (não garante gap mas evita perda).
     - _Requirements: 1.4, 1.5, 1.6, 1.7, 1.8_
 
-  - [x]* 3.3 Unit tests para `useChartBuilder` decimação + cache
+  - [x]\* 3.3 Unit tests para `useChartBuilder` decimação + cache
     - Arquivo novo: `src/views/RealTimeEventsV2/composables/__tests__/useChartBuilder.spec.js`.
     - Cobre: decimação preserva primeiro/último; cache hit retorna sem nova medição; format/rotate por breakpoint.
     - Mock `getBoundingClientRect` via `Element.prototype.getBoundingClientRect` stub.
@@ -136,7 +134,6 @@ Toda implementação respeita os princípios em `CLAUDE.md` e nas skills `solid-
 ### Fase 2 — Bottom-sheet do View dropdown em mobile
 
 - [ ] 5. Variante bottom-sheet do `View` dropdown no `event-chart.vue`
-
   - [x] 5.1 `event-chart.vue` — variante bottom-sheet do View dropdown
     - Dentro do mesmo `<Teleport to="body">` existente: `v-if="bp.is('mobile-s') || bp.is('mobile')"` alternando entre dois templates.
     - **Anatomia**:
@@ -165,7 +162,6 @@ Toda implementação respeita os princípios em `CLAUDE.md` e nas skills `solid-
 ### Fase 3 — Filter bar + chips
 
 - [ ] 7. Layout adaptativo de `filter-bar.vue` e refactor de `filterTagsDisplay`
-
   - [x] 7.1 `filter-bar.vue` — layout adaptativo + a11y + touch targets
     - Importar `useBreakpoint`.
     - Classes condicionais no container raiz: `is-single-row` (desktop/xl), `is-two-row` (tablet), `is-stack` (mobile/mobile-s).
@@ -215,7 +211,6 @@ Toda implementação respeita os princípios em `CLAUDE.md` e nas skills `solid-
 ### Fase 4 — Filter system + overlays
 
 - [ ] 9. `advanced-filter-system-v2/index.vue` + overlays teleportados
-
   - [x] 9.1 `advanced-filter-system-v2/index.vue` — visibility pause + focus guard + time range mobile
     - Importar `useVisibility` + `useBreakpoint`.
     - **Auto-refresh pause (§8.6, 8.7)**:
@@ -254,7 +249,6 @@ Toda implementação respeita os princípios em `CLAUDE.md` e nas skills `solid-
 ### Fase 5 — Container + splitter + iOS safe-area
 
 - [ ] 11. `tab-panel-block.vue` + `ResizableSplitter.vue`
-
   - [x] 11.1 `tab-panel-block.vue` — alinhar breakpoint do field-sidebar + safe-area + 100dvh
     - Alterar `@media (max-width: 768px)` em [tab-panel-block.vue:663-673](src/views/RealTimeEventsV2/Blocks/tab-panel-block.vue#L663-L673) para `@media (max-width: 639px)` (alinhar ao token `tablet`).
     - Fullscreen mode ([tab-panel-block.vue:454](src/views/RealTimeEventsV2/Blocks/tab-panel-block.vue#L454)): adicionar `padding-top: env(safe-area-inset-top)`, `padding-bottom: env(safe-area-inset-bottom)`, `padding-left: env(safe-area-inset-left)`, `padding-right: env(safe-area-inset-right)`.
@@ -279,7 +273,6 @@ Toda implementação respeita os princípios em `CLAUDE.md` e nas skills `solid-
 ### Fase 6 — Property tests + validação
 
 - [ ] 13. Cobertura automatizada das Properties P1–P6
-
   - [x] 13.1 Property P1 — Leak test (mount/unmount loop)
     - Arquivo novo: `src/views/RealTimeEventsV2/__tests__/leak.pbt.spec.js`.
     - Test setup: instrumentar `window.addEventListener`/`removeEventListener` para contar via `window.__listenerCount__` (test util em `setupFiles`).
@@ -345,7 +338,7 @@ Toda implementação respeita os princípios em `CLAUDE.md` e nas skills `solid-
     - **Validates: Requirements 8.6, 8.7**.
     - _Requirements: 8.6, 8.7_
 
-  - [~]* 13.7 E2E smoke per breakpoint (Cypress, opcional) — **REMOVIDO POR DECISÃO DO USUÁRIO**: sample `@xfail` que não executa no ambiente atual ("não quero sample"). Coverage de §12.1 e §13.3 fica a cargo de QA manual no Checkpoint 14.
+  - [~]\* 13.7 E2E smoke per breakpoint (Cypress, opcional) — **REMOVIDO POR DECISÃO DO USUÁRIO**: sample `@xfail` que não executa no ambiente atual ("não quero sample"). Coverage de §12.1 e §13.3 fica a cargo de QA manual no Checkpoint 14.
     - _Requirements: 12.1, 13.3_
 
 - [ ] 14. Checkpoint Fase 6 (final)

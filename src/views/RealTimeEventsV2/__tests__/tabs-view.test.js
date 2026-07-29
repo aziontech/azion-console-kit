@@ -27,6 +27,25 @@ function createTabsSetup() {
   const openTabs = ref([{ id: null }]) // pinned tab only initially
   const toast = { add: vi.fn() }
 
+  // Mirror the real TabsView wiring: a single ceiling-aware source of truth
+  // (useTabLimit) whose canOpenNewTab/capForRestore are injected into
+  // useEventsTabs. `eventsTabs` is forward-referenced lazily by the computed.
+  // eslint-disable-next-line prefer-const
+  let eventsTabsRef
+  const {
+    MAX_TOTAL_TABS: maxTabs,
+    canOpenNewTab,
+    totalTabCount,
+    capForRestore
+  } = useTabLimit({
+    openTabs: computed(() => [
+      { id: null },
+      ...eventsTabsRef.value,
+      // eslint-disable-next-line id-length
+      ...openTabs.value.filter((t) => t.id !== null)
+    ])
+  })
+
   const {
     eventsTabs,
     openEventsTab,
@@ -37,21 +56,12 @@ function createTabsSetup() {
     isEventsTabId: isEventsId
   } = useEventsTabs({
     toast,
-    totalTabCount: () => {
-      // eslint-disable-next-line id-length
-      return 1 + eventsTabs.value.length + openTabs.value.filter((t) => t.id !== null).length
-    },
+    totalTabCount,
+    canOpenNewTab,
+    capForRestore,
     activeTabId
   })
-
-  const { MAX_TOTAL_TABS: maxTabs, canOpenNewTab } = useTabLimit({
-    openTabs: computed(() => [
-      { id: null },
-      ...eventsTabs.value,
-      // eslint-disable-next-line id-length
-      ...openTabs.value.filter((t) => t.id !== null)
-    ])
-  })
+  eventsTabsRef = eventsTabs
 
   // Simulate openNewEventsTab from TabsView
   const openNewEventsTab = () => {
@@ -450,13 +460,15 @@ describe('Share_State import with tab limit reached', () => {
       openNewEventsTab()
     }
 
-    expect(canOpenNewTab()).toBe(false)
+    // canOpenNewTab is now a STABLE computed (single ceiling-aware source of
+    // truth) — read `.value` instead of calling it.
+    expect(canOpenNewTab.value).toBe(false)
     expect(eventsTabs.value).toHaveLength(MAX_TOTAL_TABS - 1)
 
     // Simulate what TabsView does when pendingEventsTabState arrives but limit is reached
 
     // canOpenNewTab is false, so we should show the toast
-    if (!canOpenNewTab()) {
+    if (!canOpenNewTab.value) {
       toast.add({
         closable: true,
         severity: 'warn',
@@ -481,13 +493,13 @@ describe('Share_State import with tab limit reached', () => {
       openNewEventsTab()
     }
 
-    expect(canOpenNewTab()).toBe(false)
+    expect(canOpenNewTab.value).toBe(false)
   })
 
   it('canOpenNewTab returns true when fewer than MAX_TOTAL_TABS tabs are open', () => {
     const { canOpenNewTab } = createTabsSetup()
 
-    expect(canOpenNewTab()).toBe(true)
+    expect(canOpenNewTab.value).toBe(true)
   })
 })
 
