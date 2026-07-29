@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref, useSlots } from 'vue'
+  import { computed, ref, useSlots, watch } from 'vue'
   import { useMediaQuery } from '@vueuse/core'
   import DataView from 'primevue/dataview'
   import PrimeButton from '@aziontech/webkit/button'
@@ -23,8 +23,6 @@
   import '@/assets/styles/version-row-menu.css'
 
   defineOptions({ name: 'version-list-data-view' })
-
-  const ACTIONS_TRACK_WIDTH = 44
 
   const props = defineProps({
     items: {
@@ -163,16 +161,35 @@
     'row-action'
   ])
 
+  const ACTIONS_TRACK_WIDTH = 44
+
+  const dropdownPt = {
+    panel: { class: 'dataview-dropdown-panel' },
+    item: { class: 'dataview-dropdown-item' }
+  }
+
   const slots = useSlots()
 
   const { pageSize: storedPageSize, setPageSize } = useTablePageSize(props.rowsPerPageOptions)
 
-  const effectivePaginatorRows = computed(() => props.paginatorRows ?? storedPageSize.value)
+  const isMobileSheet = useMediaQuery('(max-width: 767.98px)')
 
-  const handlePage = (event) => {
-    setPageSize(event?.rows)
-    emit('page', event)
-  }
+  const isCompactViewport = useMediaQuery('(max-width: 1023.98px)')
+
+  const paginatorFirstModel = ref(props.paginatorFirst)
+
+  const trafficOverlayRef = ref(null)
+  const trafficPopupVersion = ref(null)
+
+  const overflowMenuRef = ref(null)
+  const rowMenuModel = ref([])
+
+  const actionSheetVisible = ref(false)
+  const actionSheetVersion = ref(null)
+
+  const filtersOverlayRef = ref(null)
+
+  const effectivePaginatorRows = computed(() => props.paginatorRows ?? storedPageSize.value)
 
   const searchValue = computed({
     get: () => props.searchTerm,
@@ -184,71 +201,15 @@
     set: (value) => emit('update:sort', value)
   })
 
-  const resolveFilterValue = (filter) => props.filterValues?.[filter?.key] ?? filter?.defaultValue
-
-  const updateFilterValue = (key, value) => {
-    emit('update:filterValues', {
-      ...props.filterValues,
-      [key]: value
-    })
-  }
-
-  const dropdownPt = {
-    panel: { class: 'dataview-dropdown-panel' },
-    item: { class: 'dataview-dropdown-item' }
-  }
-
-  const columnHasData = (column) => {
-    const path = column?.field || column?.key
-    return props.items.some((item) => {
-      const value = item?.[path]
-      return value != null && value !== ''
-    })
-  }
-
-  const isColumnVisible = (column) => {
-    if (!column?.optional) return true
-    if (slots[`cell-${column.key}`]) return true
-    return columnHasData(column)
-  }
-
   const visibleColumns = computed(() => props.columns.filter(isColumnVisible))
 
-  const resolveDisplayValue = (item, column) => {
-    const value = item?.[column?.field || column?.key]
-    if (value == null || value === '') return '--'
-    return value
-  }
-
-  const trafficOverlayRef = ref(null)
-  const trafficPopupVersion = ref(null)
   const trafficPopupDeployments = computed(
     () => trafficPopupVersion.value?.activeTraffic?.deployments ?? []
   )
 
-  const showTrafficPopup = (event, version) => {
-    if (!version?.activeTraffic) return
-    trafficPopupVersion.value = version
-    trafficOverlayRef.value?.show?.(event)
-  }
-
-  const hideTrafficPopup = () => trafficOverlayRef.value?.hide?.()
-
   const hasTrafficColumn = computed(() =>
     visibleColumns.value.some((col) => col?.key === 'traffic')
   )
-
-  const resolveSize = (column) => column?.size || 'minmax(0, 1fr)'
-
-  const extractMinPx = (size) => {
-    if (!size) return 0
-    const str = String(size)
-    const minmaxMatch = str.match(/minmax\(\s*(\d+)px/)
-    if (minmaxMatch) return parseInt(minmaxMatch[1], 10)
-    const pxMatch = str.match(/^\s*(\d+)px\s*$/)
-    if (pxMatch) return parseInt(pxMatch[1], 10)
-    return 0
-  }
 
   const gridTemplateColumns = computed(() => {
     const tracks = visibleColumns.value.map(resolveSize)
@@ -271,13 +232,6 @@
   const rowStyle = computed(() => ({
     gridTemplateColumns: gridTemplateColumns.value
   }))
-
-  const alignClass = (column) => {
-    const align = column?.align
-    if (align === 'end') return 'align-end'
-    if (align === 'center') return 'align-center'
-    return 'align-start'
-  }
 
   const cardPrimaryColumn = computed(() => {
     const explicit = visibleColumns.value.find((col) => col?.mobileSlot === 'primary')
@@ -305,13 +259,6 @@
 
   const hasMobileCardLayout = computed(() => visibleColumns.value.length > 0)
 
-  const isPrimaryColumn = (column) => column?.key === 'version'
-
-  const triggerRowClick = (item) => {
-    emit('row-action', { action: 'OPEN_CONFIGURATION', item })
-    emit('row-click', item)
-  }
-
   const isForbiddenError = computed(() => props.errorKind === 'forbidden')
   const isNotFoundError = computed(() => props.errorKind === 'notFound')
 
@@ -326,6 +273,94 @@
     () => !!(props.emptyState?.buttonLabel && props.emptyState?.buttonAction)
   )
 
+  const hasCollapsibleFilters = computed(
+    () => props.filters.length > 0 || props.sortOptions.length > 0 || !!slots['toolbar-extras']
+  )
+
+  const activeFilterCount = computed(() =>
+    props.filters.reduce((count, filter) => {
+      const value = resolveFilterValue(filter)
+      const isActive = value != null && value !== '' && value !== filter?.defaultValue
+      return count + (isActive ? 1 : 0)
+    }, 0)
+  )
+
+  watch(
+    () => props.paginatorFirst,
+    (value) => {
+      paginatorFirstModel.value = value ?? 0
+    }
+  )
+
+  const handlePage = (event) => {
+    paginatorFirstModel.value = event?.first ?? 0
+    setPageSize(event?.rows)
+    emit('page', event)
+  }
+
+  const resolveFilterValue = (filter) => props.filterValues?.[filter?.key] ?? filter?.defaultValue
+
+  const updateFilterValue = (key, value) => {
+    emit('update:filterValues', {
+      ...props.filterValues,
+      [key]: value
+    })
+  }
+
+  const columnHasData = (column) => {
+    const path = column?.field || column?.key
+    return props.items.some((item) => {
+      const value = item?.[path]
+      return value != null && value !== ''
+    })
+  }
+
+  const isColumnVisible = (column) => {
+    if (!column?.optional) return true
+    if (slots[`cell-${column.key}`]) return true
+    return columnHasData(column)
+  }
+
+  const resolveDisplayValue = (item, column) => {
+    const value = item?.[column?.field || column?.key]
+    if (value == null || value === '') return '--'
+    return value
+  }
+
+  const showTrafficPopup = (event, version) => {
+    if (!version?.activeTraffic) return
+    trafficPopupVersion.value = version
+    trafficOverlayRef.value?.show?.(event)
+  }
+
+  const hideTrafficPopup = () => trafficOverlayRef.value?.hide?.()
+
+  const resolveSize = (column) => column?.size || 'minmax(0, 1fr)'
+
+  const extractMinPx = (size) => {
+    if (!size) return 0
+    const str = String(size)
+    const minmaxMatch = str.match(/minmax\(\s*(\d+)px/)
+    if (minmaxMatch) return parseInt(minmaxMatch[1], 10)
+    const pxMatch = str.match(/^\s*(\d+)px\s*$/)
+    if (pxMatch) return parseInt(pxMatch[1], 10)
+    return 0
+  }
+
+  const alignClass = (column) => {
+    const align = column?.align
+    if (align === 'end') return 'align-end'
+    if (align === 'center') return 'align-center'
+    return 'align-start'
+  }
+
+  const isPrimaryColumn = (column) => column?.key === 'version'
+
+  const triggerRowClick = (item) => {
+    emit('row-action', { action: 'OPEN_CONFIGURATION', item })
+    emit('row-click', item)
+  }
+
   const runErrorAction = () => props.errorState?.buttonAction?.()
   const runEmptyAction = () => props.emptyState?.buttonAction?.()
 
@@ -336,13 +371,6 @@
 
   const hasRowActions = (version) =>
     buildVersionMenuItems(version?.state, { resourceType: props.resourceType }).length > 0
-
-  const overflowMenuRef = ref(null)
-  const rowMenuModel = ref([])
-
-  const isMobileSheet = useMediaQuery('(max-width: 767.98px)')
-  const actionSheetVisible = ref(false)
-  const actionSheetVersion = ref(null)
 
   const openRowMenu = (event, version) => {
     event?.stopPropagation?.()
@@ -360,21 +388,6 @@
     overflowMenuRef.value?.toggle?.(event)
   }
 
-  const isCompactViewport = useMediaQuery('(max-width: 1023.98px)')
-
-  const hasCollapsibleFilters = computed(
-    () => props.filters.length > 0 || props.sortOptions.length > 0 || !!slots['toolbar-extras']
-  )
-
-  const activeFilterCount = computed(() =>
-    props.filters.reduce((count, filter) => {
-      const value = resolveFilterValue(filter)
-      const isActive = value != null && value !== '' && value !== filter?.defaultValue
-      return count + (isActive ? 1 : 0)
-    }, 0)
-  )
-
-  const filtersOverlayRef = ref(null)
   const toggleFiltersOverlay = (event) => {
     filtersOverlayRef.value?.toggle?.(event)
   }
@@ -610,7 +623,7 @@
             dataKey="id"
             :paginator="showPaginator"
             :lazy="lazy"
-            :first="paginatorFirst"
+            :first="paginatorFirstModel"
             :totalRecords="lazy ? totalRecords : undefined"
             :rows="effectivePaginatorRows"
             :rowsPerPageOptions="rowsPerPageOptions"

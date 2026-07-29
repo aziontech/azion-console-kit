@@ -73,6 +73,27 @@ describe('VersionListDataView pagination', () => {
     expect(wrapper.findComponent(DataViewStub).props('first')).toBe(0)
   })
 
+  it('keeps the paginator on the emitted page when the parent does not control paginatorFirst', async () => {
+    const wrapper = mountView({ lazy: true, totalRecords: 40 })
+
+    wrapper.findComponent(DataViewStub).vm.$emit('page', { first: 20, rows: 20 })
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.findComponent(DataViewStub).props('first')).toBe(20)
+  })
+
+  it('preserves the current page across a loading remount', async () => {
+    const wrapper = mountView({ lazy: true, totalRecords: 40 })
+
+    wrapper.findComponent(DataViewStub).vm.$emit('page', { first: 20, rows: 20 })
+    await wrapper.vm.$nextTick()
+
+    await wrapper.setProps({ loading: true })
+    await wrapper.setProps({ loading: false })
+
+    expect(wrapper.findComponent(DataViewStub).props('first')).toBe(20)
+  })
+
   it('passes the server total through only in lazy mode', () => {
     const lazyWrapper = mountView({ lazy: true, totalRecords: 40 })
     expect(lazyWrapper.findComponent(DataViewStub).props('totalRecords')).toBe(40)
