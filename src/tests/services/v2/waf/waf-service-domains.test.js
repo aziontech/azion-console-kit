@@ -83,4 +83,36 @@ describe('WafService.listWafDomains', () => {
 
     expect(result).toEqual([])
   })
+
+  it('should degrade to a partial list when one of the extra pages fails', async () => {
+    const warnSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.spyOn(httpService, 'request').mockImplementation(({ params }) => {
+      if (params.page === 2) {
+        return Promise.reject(new Error('network error'))
+      }
+      const pages = {
+        1: makeDomains(1, 100),
+        3: makeDomains(201, 50)
+      }
+      return Promise.resolve({ data: { count: 250, results: pages[params.page] } })
+    })
+
+    const result = await wafService.listWafDomains(14209)
+
+    // Page 1 (100) + page 3 (50) survive; the failed page 2 is skipped, not fatal.
+    expect(result).toHaveLength(150)
+    expect(result[0]).toEqual({ id: 1, name: 'domain-1', domain: 'domain-1.map.azionedge.net' })
+    expect(result[149]).toEqual({
+      id: 250,
+      name: 'domain-250',
+      domain: 'domain-250.map.azionedge.net'
+    })
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('pages 2'))
+  })
+
+  it('should reject when the first page fails (cannot paginate without the count)', async () => {
+    vi.spyOn(httpService, 'request').mockRejectedValueOnce(new Error('boom'))
+
+    await expect(wafService.listWafDomains(14209)).rejects.toThrow('boom')
+  })
 })
