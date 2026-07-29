@@ -23,9 +23,9 @@ const findPricing = (plan, period) => {
 
 /**
  * Subscription state for the plans experience, read straight from billing-api
- * v4: `subscriptions/current` for the lifecycle, `versions` for the plan and
- * fee behind it, `scheduled_changes` for a pending downgrade, and the
- * products-api catalogue for names and prices.
+ * v4: `subscriptions/current` carries the lifecycle AND the plan identity
+ * (`plan_id`, `plan_pricing_id`, `renew`, `pending_transition`); the
+ * products-api catalogue resolves names and prices from those ids.
  */
 export function useCurrentSubscription() {
   const accountStore = useAccountStore()
@@ -35,8 +35,10 @@ export function useCurrentSubscription() {
 
   const {
     subscription,
-    serviceOrderId,
-    currentVersion,
+    subscriptionId,
+    planId,
+    planPricingId,
+    pendingTransition,
     hasSubscription,
     isUnavailable,
     isLoading: isLoadingSubscription,
@@ -50,10 +52,15 @@ export function useCurrentSubscription() {
     enabled: plansQueryEnabled
   })
 
-  const planId = computed(() => currentVersion.value?.planId ?? null)
-  const period = computed(() => currentVersion.value?.period ?? null)
-
   const activePlan = computed(() => findPlanById(plansData.value, planId.value))
+
+  const activePricingById = computed(
+    () => activePlan.value?.pricings?.find((pricing) => pricing.id === planPricingId.value) ?? null
+  )
+
+  const period = computed(
+    () => toBillingPeriod(activePricingById.value?.periodicity ?? subscription.value?.renew) ?? null
+  )
 
   const planSku = computed(() => {
     if (isLoadingSubscription.value || isUnavailable.value) return null
@@ -61,7 +68,9 @@ export function useCurrentSubscription() {
     return resolvePlanSku(activePlan.value)
   })
 
-  const activePricing = computed(() => findPricing(activePlan.value, period.value))
+  const activePricing = computed(
+    () => activePricingById.value ?? findPricing(activePlan.value, period.value)
+  )
 
   const billingCycle = computed(() => toCataloguePeriodicity(period.value))
 
@@ -94,17 +103,32 @@ export function useCurrentSubscription() {
     pendingChange,
     refetch: refetchScheduledChanges,
     isLoading: isLoadingScheduledChanges
-  } = useScheduledChanges(serviceOrderId, {
-    enabled: computed(() => Boolean(serviceOrderId.value))
+  } = useScheduledChanges(subscriptionId, {
+    enabled: computed(() => Boolean(subscriptionId.value))
   })
 
   const scheduledDowngrade = computed(() => {
+    const transition = pendingTransition.value
+    if (transition?.toPlanId) {
+      const toPlan = findPlanById(plansData.value, transition.toPlanId)
+      const toPricing =
+        toPlan?.pricings?.find((pricing) => pricing.id === transition.toPlanPricingId) ?? null
+      return {
+        id: pendingChange.value?.id ?? null,
+        effectiveAt: transition.effectiveDate,
+        toPlanId: transition.toPlanId,
+        toPlanPricingId: transition.toPlanPricingId ?? null,
+        toPeriod: toBillingPeriod(toPricing?.periodicity) ?? null
+      }
+    }
+
     const pending = pendingChange.value
     if (!pending) return null
     return {
       id: pending.id,
       effectiveAt: pending.effectiveAt,
       toPlanId: pending.change?.planId ?? null,
+      toPlanPricingId: null,
       toPeriod: pending.change?.period ?? null
     }
   })
@@ -132,26 +156,26 @@ export function useCurrentSubscription() {
     await loadUserAndAccountInfo({ force: true })
     if (!accountId.value) return
     await refetchSubscription()
-    if (serviceOrderId.value) await refetchScheduledChanges()
+    if (subscriptionId.value) await refetchScheduledChanges()
   }
 
   const refetchUntil = async (predicate, { maxAttempts = 5, delayMs = 500 } = {}) => {
     await refetch()
     if (!predicate) return true
     let attempt = 1
-    while (attempt < maxAttempts && !predicate(currentVersion.value, subscription.value)) {
+    while (attempt < maxAttempts && !predicate(subscription.value, subscription.value)) {
       await new Promise((resolve) => setTimeout(resolve, delayMs))
       await refetch()
       attempt += 1
     }
-    return Boolean(predicate(currentVersion.value, subscription.value))
+    return Boolean(predicate(subscription.value, subscription.value))
   }
 
   return {
     subscription,
-    subscriptionId: computed(() => subscription.value?.id ?? null),
-    serviceOrderId,
-    currentVersion,
+    subscriptionId,
+    planPricingId,
+    pendingTransition,
     planId,
     period,
     planSku,
@@ -174,7 +198,7 @@ export function useCurrentSubscription() {
     scheduledDowngrade,
     refetchScheduledChanges,
     status: computed(() => subscription.value?.status ?? null),
-    cancelAtPeriodEnd: computed(() => Boolean(subscription.value?.cancelAtPeriodEnd)),
+    cancelAtPeriodEnd: computed(() => subscription.value?.autoRenew === false),
     isActivePopulated: computed(() =>
       Boolean(planId.value && subscription.value?.currentPeriodEnd)
     ),

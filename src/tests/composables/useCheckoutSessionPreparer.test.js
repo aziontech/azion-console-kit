@@ -34,7 +34,10 @@ describe('prepareCheckoutSessionForSubscription', () => {
       createCardSetupSession
     })
 
-    expect(createSubscription).toHaveBeenCalledWith({ planId: 'plan_pro', period: 'monthly' })
+    expect(createSubscription).toHaveBeenCalledWith({
+      planId: 'plan_pro',
+      planPricingId: 'price_pro_monthly'
+    })
     expect(createCardSetupSession).not.toHaveBeenCalled()
     expect(secret).toBe('seti_first_payment')
   })
@@ -70,7 +73,7 @@ describe('prepareCheckoutSessionForSubscription', () => {
     expect(secret).toBe('seti_env')
   })
 
-  it('creates a new subscription after a cancelled one', async () => {
+  it('creates a new subscription after a CANCELED one', async () => {
     const createSubscription = vi.fn().mockResolvedValue({
       subscription: { id: 11, status: 'incomplete' },
       payment: { clientSecret: 'seti_resubscribe' }
@@ -80,7 +83,7 @@ describe('prepareCheckoutSessionForSubscription', () => {
       plan: 'pro',
       cycle: 'monthly',
       plans,
-      ensureSubscription: () => Promise.resolve({ data: { id: 10, status: 'cancelled' } }),
+      ensureSubscription: () => Promise.resolve({ data: { id: 10, status: 'CANCELED' } }),
       createSubscription,
       createCardSetupSession: vi.fn()
     })
@@ -89,7 +92,7 @@ describe('prepareCheckoutSessionForSubscription', () => {
     expect(secret).toBe('seti_resubscribe')
   })
 
-  it('translates the catalogue periodicity before sending it', async () => {
+  it('sends the pricing id that matches the chosen cycle', async () => {
     const createSubscription = vi.fn().mockResolvedValue({
       subscription: { id: 12 },
       payment: { clientSecret: 'seti_annual' }
@@ -104,7 +107,10 @@ describe('prepareCheckoutSessionForSubscription', () => {
       createCardSetupSession: vi.fn()
     })
 
-    expect(createSubscription).toHaveBeenCalledWith({ planId: 'plan_pro', period: 'annual' })
+    expect(createSubscription).toHaveBeenCalledWith({
+      planId: 'plan_pro',
+      planPricingId: 'price_pro_yearly'
+    })
   })
 
   it('throws when the plan cannot be resolved in the catalogue', async () => {

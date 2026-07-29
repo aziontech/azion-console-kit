@@ -123,7 +123,7 @@ describe('PaymentsAdapter.transformDetailResponse', () => {
 })
 
 describe('PaymentsAdapter builders', () => {
-  it('builds snake_case list params', () => {
+  it('builds snake_case list params and drops billing_account (not in the contract)', () => {
     expect(
       PaymentsAdapter.toListParams({
         page: 2,
@@ -137,7 +137,6 @@ describe('PaymentsAdapter builders', () => {
       page: 2,
       page_size: 50,
       fields: 'id,status',
-      billing_account: 1,
       invoice: 88,
       status: 'succeeded'
     })

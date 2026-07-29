@@ -47,7 +47,6 @@ const toListParams = (params = {}) => ({
   ...(params.page !== undefined && { page: params.page }),
   ...(params.pageSize !== undefined && { page_size: params.pageSize }),
   ...(params.fields !== undefined && { fields: params.fields }),
-  ...(params.billingAccount !== undefined && { billing_account: params.billingAccount }),
   ...(params.invoice !== undefined && { invoice: params.invoice }),
   ...(params.status !== undefined && { status: params.status })
 })

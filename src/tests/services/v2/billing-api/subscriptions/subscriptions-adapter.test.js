@@ -2,50 +2,87 @@ import { describe, expect, it } from 'vitest'
 import { SubscriptionsAdapter } from '@/services/v2/billing-api/subscriptions/subscriptions-adapter'
 
 describe('SubscriptionsAdapter.transformSubscription', () => {
-  it('maps snake_case wire fields to camelCase, including the required service_order_id', () => {
+  it('maps the v1.0.0 wire fields, including plan_pricing_id and pending_transition', () => {
     const result = SubscriptionsAdapter.transformSubscription({
-      id: 101,
-      service_order_id: 55,
-      current_version_id: 7,
-      status: 'active',
+      id: '019c9fa2-aaaa-4bbb-8ccc-000000000001',
+      type: 'plan_subscription',
+      status: 'ACTIVE',
+      plan_id: '019c9fa2-ee78-7a7a-a266-796f750d8261',
+      plan_pricing_id: '019c9fa2-ee75-743c-8b0b-a1de319b9bfb',
+      start_date: '2026-07-01T00:00:00Z',
+      end_date: null,
       current_period_start: '2026-07-01T00:00:00Z',
       current_period_end: '2026-08-01T00:00:00Z',
-      anniversary_day: 1,
-      cancel_at_period_end: false,
+      auto_renew: true,
+      renew: 'monthly',
+      product_version: '1.0',
+      on_demand_enabled: false,
+      pending_transition: {
+        type: 'downgrade',
+        to_plan_id: '019c9fa2-ee79-7ebf-b10a-c4dd48cbc067',
+        to_plan_pricing_id: '019c9fa2-ee77-7667-aeee-0c58cc09041f',
+        effective_date: '2026-08-01T00:00:00Z'
+      },
       created_at: '2026-07-01T00:00:00Z',
       last_modified: '2026-07-10T00:00:00Z',
       last_editor: 'user@azion.com'
     })
 
     expect(result).toEqual({
-      id: 101,
-      serviceOrderId: 55,
-      currentVersionId: 7,
-      status: 'active',
+      id: '019c9fa2-aaaa-4bbb-8ccc-000000000001',
+      type: 'plan_subscription',
+      status: 'ACTIVE',
+      planId: '019c9fa2-ee78-7a7a-a266-796f750d8261',
+      planPricingId: '019c9fa2-ee75-743c-8b0b-a1de319b9bfb',
+      accountMode: null,
+      billingMode: null,
+      startDate: '2026-07-01T00:00:00Z',
+      endDate: null,
       currentPeriodStart: '2026-07-01T00:00:00Z',
       currentPeriodEnd: '2026-08-01T00:00:00Z',
-      anniversaryDay: 1,
-      cancelAtPeriodEnd: false,
+      autoRenew: true,
+      renew: 'monthly',
+      productVersion: '1.0',
+      onDemandEnabled: false,
+      pendingTransition: {
+        type: 'downgrade',
+        toPlanId: '019c9fa2-ee79-7ebf-b10a-c4dd48cbc067',
+        toPlanPricingId: '019c9fa2-ee77-7667-aeee-0c58cc09041f',
+        effectiveDate: '2026-08-01T00:00:00Z'
+      },
       audit: {
         createdAt: '2026-07-01T00:00:00Z',
         lastModified: '2026-07-10T00:00:00Z',
         lastEditor: 'user@azion.com'
       }
     })
-    expect(result.serviceOrderId).toBe(55)
   })
 
   it('defaults nullable fields when absent', () => {
     const result = SubscriptionsAdapter.transformSubscription({
-      id: 1,
-      status: 'incomplete',
-      cancel_at_period_end: false
+      id: 'sub-uuid',
+      status: 'DRAFT',
+      plan_id: 'plan-uuid'
     })
 
-    expect(result.currentVersionId).toBeNull()
+    expect(result.planPricingId).toBeNull()
     expect(result.currentPeriodStart).toBeNull()
-    expect(result.anniversaryDay).toBeNull()
+    expect(result.pendingTransition).toBeNull()
+    expect(result.renew).toBeNull()
     expect(result.audit.lastEditor).toBeNull()
+  })
+
+  it('maps account_mode and billing_mode when the payload carries them', () => {
+    const result = SubscriptionsAdapter.transformSubscription({
+      id: 'sub-uuid',
+      status: 'ACTIVE',
+      plan_id: 'plan-uuid',
+      account_mode: 'custom',
+      billing_mode: 'postpaid'
+    })
+
+    expect(result.accountMode).toBe('custom')
+    expect(result.billingMode).toBe('postpaid')
   })
 })
 
@@ -83,31 +120,21 @@ describe('SubscriptionsAdapter.transformScheduledChange (UUID string ids)', () =
   })
 })
 
-describe('SubscriptionsAdapter.transformChangeResponse (202)', () => {
-  it('exposes the subscription, proration and pending_transition', () => {
-    const result = SubscriptionsAdapter.transformChangeResponse({
+describe('SubscriptionsAdapter change response (202)', () => {
+  it('reads the 202 body as the subscription detail envelope', () => {
+    const result = SubscriptionsAdapter.transformSubscriptionDetailResponse({
       state: 'executed',
-      data: {
-        subscription: { id: 42, status: 'active', cancel_at_period_end: false },
-        proration: { immediate_total: 1250 },
-        pending_transition: { plan_id: 'plan-uuid', effective_at: '2026-08-01T00:00:00Z' }
-      }
+      data: { id: 42, status: 'active', cancel_at_period_end: false }
     })
 
     expect(result.state).toBe('executed')
-    expect(result.subscription.id).toBe(42)
-    expect(result.proration).toEqual({ immediate_total: 1250 })
-    expect(result.pendingTransition).toEqual({
-      plan_id: 'plan-uuid',
-      effective_at: '2026-08-01T00:00:00Z'
-    })
+    expect(result.data.id).toBe(42)
+    expect(result.data.status).toBe('active')
   })
 
-  it('defaults subscription/proration/pendingTransition when absent', () => {
-    const result = SubscriptionsAdapter.transformChangeResponse({ state: 'executed', data: {} })
-    expect(result.subscription).toBeNull()
-    expect(result.proration).toBeNull()
-    expect(result.pendingTransition).toBeNull()
+  it('defaults the subscription to null when the envelope carries no data', () => {
+    const result = SubscriptionsAdapter.transformSubscriptionDetailResponse({ state: 'executed' })
+    expect(result.data).toBeNull()
   })
 })
 
@@ -187,21 +214,64 @@ describe('SubscriptionsAdapter.toChangePayload', () => {
   it('builds a full change payload with proration behavior and period', () => {
     expect(
       SubscriptionsAdapter.toChangePayload({
-        planId: 'plan-uuid',
+        planId: 9,
         period: 'annual',
-        prorationBehavior: 'create_prorations',
-        when: 'now'
+        prorationBehavior: 'create_prorations'
       })
     ).toEqual({
-      plan_id: 'plan-uuid',
+      plan_id: 9,
       period: 'annual',
-      proration_behavior: 'create_prorations',
-      when: 'now'
+      proration_behavior: 'create_prorations'
     })
+  })
+
+  it('drops when and plan_pricing_id — neither exists in the change schema', () => {
+    expect(
+      SubscriptionsAdapter.toChangePayload({
+        planId: 9,
+        planPricingId: 'pricing-uuid',
+        when: 'now'
+      })
+    ).toEqual({ plan_id: 9 })
   })
 
   it('drops undefined and unknown fields (additionalProperties:false)', () => {
     expect(SubscriptionsAdapter.toChangePayload({ planId: 9, bogus: 'x' })).toEqual({ plan_id: 9 })
     expect(SubscriptionsAdapter.toChangePayload()).toEqual({})
+  })
+})
+
+describe('SubscriptionsAdapter.toCreatePayload', () => {
+  it('carries only plan_id and plan_pricing_id — the pricing already encodes the period', () => {
+    expect(
+      SubscriptionsAdapter.toCreatePayload({
+        planId: '019c9fa2-ee78-7a7a-a266-796f750d8261',
+        planPricingId: '019c9fa2-ee75-743c-8b0b-a1de319b9bfb',
+        period: 'annual'
+      })
+    ).toEqual({
+      plan_id: '019c9fa2-ee78-7a7a-a266-796f750d8261',
+      plan_pricing_id: '019c9fa2-ee75-743c-8b0b-a1de319b9bfb'
+    })
+  })
+
+  it('drops fields that belong to create_service_order, not to create_subscription', () => {
+    expect(
+      SubscriptionsAdapter.toCreatePayload({
+        planId: 'plan-uuid',
+        accountId: 9999,
+        paymentMethodId: 44,
+        tosVersion: '2026-07-01',
+        bogus: 'x'
+      })
+    ).toEqual({
+      plan_id: 'plan-uuid'
+    })
+  })
+
+  it('keeps the body minimal when only the plan is known', () => {
+    expect(SubscriptionsAdapter.toCreatePayload({ planId: 'plan-uuid' })).toEqual({
+      plan_id: 'plan-uuid'
+    })
   })
 })

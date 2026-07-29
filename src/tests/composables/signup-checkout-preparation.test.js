@@ -33,12 +33,15 @@ describe('preparePaidSignupCheckout', () => {
       createSubscription
     })
 
-    expect(createSubscription).toHaveBeenCalledWith({ planId: 'plan_pro', period: 'monthly' })
+    expect(createSubscription).toHaveBeenCalledWith({
+      planId: 'plan_pro',
+      planPricingId: 'price_pro_monthly'
+    })
     expect(result.clientSecret).toBe('seti_test_secret')
     expect(result.subscription).toEqual({ id: 10, status: 'incomplete', serviceOrderId: 1 })
   })
 
-  it('translates the catalogue periodicity to the billing-api period', async () => {
+  it('picks the pricing that matches the catalogue periodicity', async () => {
     const createSubscription = vi.fn().mockResolvedValue(createResponse())
 
     await preparePaidSignupCheckout({
@@ -48,7 +51,10 @@ describe('preparePaidSignupCheckout', () => {
       createSubscription
     })
 
-    expect(createSubscription).toHaveBeenCalledWith({ planId: 'plan_pro', period: 'annual' })
+    expect(createSubscription).toHaveBeenCalledWith({
+      planId: 'plan_pro',
+      planPricingId: 'price_pro_yearly'
+    })
   })
 
   it('does nothing for a free plan', async () => {
@@ -98,7 +104,10 @@ describe('submitSignupPlan', () => {
       createSubscription
     })
 
-    expect(createSubscription).toHaveBeenCalledWith({ planId: 'plan_hobby', period: 'monthly' })
+    expect(createSubscription).toHaveBeenCalledWith({
+      planId: 'plan_hobby',
+      planPricingId: null
+    })
     expect(result.payment).toBeNull()
     expect(result.subscription).toEqual({ id: 11, status: 'active' })
   })
@@ -113,7 +122,10 @@ describe('submitSignupPlan', () => {
       createSubscription
     })
 
-    expect(createSubscription).toHaveBeenCalledWith({ planId: 'plan_pro', period: 'annual' })
+    expect(createSubscription).toHaveBeenCalledWith({
+      planId: 'plan_pro',
+      planPricingId: 'price_pro_yearly'
+    })
     expect(result.payment).toEqual({ clientSecret: 'seti_test_secret' })
   })
 })

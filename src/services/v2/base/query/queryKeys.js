@@ -332,6 +332,18 @@ export const queryKeys = {
     versions: (id) => [...queryKeys.subscriptions.detail(id), 'versions'],
     scheduledChanges: (id) => [...queryKeys.subscriptions.detail(id), 'scheduled-changes']
   },
+  serviceOrders: {
+    all: ['service-orders'],
+    list: (params) => [...queryKeys.serviceOrders.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.serviceOrders.all, 'detail', id],
+    actions: (id) => [...queryKeys.serviceOrders.detail(id), 'actions'],
+    terms: (id) => [...queryKeys.serviceOrders.detail(id), 'terms'],
+    bySubscription: (subscriptionId) => [
+      ...queryKeys.serviceOrders.all,
+      'by-subscription',
+      subscriptionId
+    ]
+  },
   paymentMethods: {
     all: ['payment-methods'],
     list: () => [...queryKeys.paymentMethods.all, 'list'],

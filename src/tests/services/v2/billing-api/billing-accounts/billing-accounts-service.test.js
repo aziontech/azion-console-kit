@@ -44,11 +44,11 @@ describe('BillingAccountsService', () => {
     expect(httpMock).toHaveBeenCalledWith({
       method: 'GET',
       url: '/v4/billing_accounts',
-      params: { page_size: 50, account: 900, status: 'active' }
+      params: { page_size: 50 }
     })
   })
 
-  it('creates a billing account without owner_account_id or an idempotency header', async () => {
+  it('creates a billing account without owner_account_id and no idempotency header', async () => {
     const result = await service.createBillingAccount({
       ownerAccountId: 900,
       currency: 'USD',
@@ -60,7 +60,6 @@ describe('BillingAccountsService', () => {
       url: '/v4/billing_accounts',
       body: { currency: 'USD', country: 'US' }
     })
-    expect(httpMock.mock.calls[0][0].body.owner_account_id).toBeUndefined()
     expect(httpMock.mock.calls[0][0].config).toBeUndefined()
     expect(result.data.id).toBe(501)
   })
@@ -85,7 +84,7 @@ describe('BillingAccountsService', () => {
     expect(result.data.defaultPaymentMethodId).toBe(44)
   })
 
-  it('updates a billing account with only tax_id and legal_entity_name', async () => {
+  it('updates a billing account with the PATCH-able profile fields', async () => {
     await service.updateBillingAccount({
       id: 501,
       payload: {

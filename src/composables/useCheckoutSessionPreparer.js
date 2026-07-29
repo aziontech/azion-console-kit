@@ -6,8 +6,7 @@ import { useWalletMutations } from '@/composables/billing/useWallet'
 import { ensureCurrentSubscription } from '@/composables/useSubscriptionState'
 import { ensurePlansList } from '@/composables/usePlansService'
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
-import { toBillingPeriod } from '@/services/v2/utils/billing-period'
-import { SUBSCRIPTION_STATUS } from '@/services/v2/billing-api/subscriptions/subscriptions-constants'
+import { SUBSCRIPTION_TERMINAL_STATUSES } from '@/services/v2/billing-api/subscriptions/subscriptions-constants'
 
 const resolvePlan = (plans, sku) =>
   plans?.find((item) => item.sku?.toLowerCase() === String(sku).toLowerCase()) ?? null
@@ -22,23 +21,24 @@ export const prepareCheckoutSessionForSubscription = async ({
 }) => {
   const catalogPlan = resolvePlan(plans, plan)
   const planId = catalogPlan?.id
-  const period = toBillingPeriod(cycle)
+  const planPricingId =
+    catalogPlan?.pricings?.find((pricing) => pricing.periodicity === cycle)?.id ?? null
 
-  if (!planId || !period) {
+  if (!planId || (catalogPlan?.pricings?.length && !planPricingId)) {
     throw new Error(`Plan pricing not found for ${plan} (${cycle}).`)
   }
 
   const current = await ensureSubscription()
   const subscription = current?.data ?? null
 
-  if (subscription && subscription.status !== SUBSCRIPTION_STATUS.CANCELLED) {
+  if (subscription && !SUBSCRIPTION_TERMINAL_STATUSES.includes(subscription.status)) {
     const session = await createCardSetupSession()
     const secret = session?.clientSecret ?? session?.data?.clientSecret ?? ''
     if (!secret) throw new Error('Unable to start the card capture session.')
     return secret
   }
 
-  const response = await createSubscription({ planId, period })
+  const response = await createSubscription({ planId, planPricingId })
   const secret = response?.payment?.clientSecret ?? ''
 
   if (!secret) {

@@ -12,23 +12,25 @@ import {
 } from '@/services/v2/billing-api/subscriptions/subscriptions-constants'
 
 describe('subscriptions constants mirror the v4 contract enums', () => {
-  it('uses the British spelling cancelled for the terminal status', () => {
-    expect(SUBSCRIPTION_STATUS.CANCELLED).toBe('cancelled')
-    expect(SUBSCRIPTION_TERMINAL_STATUSES).toEqual(['cancelled'])
+  it('uses the single-l CANCELED spelling and treats EXPIRED as terminal too', () => {
+    expect(SUBSCRIPTION_STATUS.CANCELED).toBe('CANCELED')
+    expect(SUBSCRIPTION_STATUS.CANCELLED).toBeUndefined()
+    expect(SUBSCRIPTION_TERMINAL_STATUSES).toEqual(['CANCELED', 'EXPIRED'])
   })
 
-  it('exposes the exact subscription status set', () => {
+  it('exposes the exact uppercase subscription status set', () => {
     expect(SUBSCRIPTION_STATUS).toEqual({
-      INCOMPLETE: 'incomplete',
-      ACTIVE: 'active',
-      PAST_DUE: 'past_due',
-      SUSPENDED: 'suspended',
-      CANCELLED: 'cancelled'
+      DRAFT: 'DRAFT',
+      ACTIVE: 'ACTIVE',
+      PAST_DUE: 'PAST_DUE',
+      BLOCKED: 'BLOCKED',
+      CANCELED: 'CANCELED',
+      EXPIRED: 'EXPIRED'
     })
   })
 
-  it('gates entitlement on active and past_due only', () => {
-    expect(SUBSCRIPTION_ENTITLED_STATUSES).toEqual(['active', 'past_due'])
+  it('gates entitlement on ACTIVE and PAST_DUE only', () => {
+    expect(SUBSCRIPTION_ENTITLED_STATUSES).toEqual(['ACTIVE', 'PAST_DUE'])
   })
 
   it('uses annual (not yearly) for the yearly period', () => {

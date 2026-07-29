@@ -1,9 +1,14 @@
+export const SUBSCRIPTION_TYPE = Object.freeze({
+  PLAN_SUBSCRIPTION: 'plan_subscription'
+})
+
 export const SUBSCRIPTION_STATUS = Object.freeze({
-  INCOMPLETE: 'incomplete',
-  ACTIVE: 'active',
-  PAST_DUE: 'past_due',
-  SUSPENDED: 'suspended',
-  CANCELLED: 'cancelled'
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+  PAST_DUE: 'PAST_DUE',
+  BLOCKED: 'BLOCKED',
+  CANCELED: 'CANCELED',
+  EXPIRED: 'EXPIRED'
 })
 
 export const SUBSCRIPTION_ENTITLED_STATUSES = Object.freeze([
@@ -11,7 +16,10 @@ export const SUBSCRIPTION_ENTITLED_STATUSES = Object.freeze([
   SUBSCRIPTION_STATUS.PAST_DUE
 ])
 
-export const SUBSCRIPTION_TERMINAL_STATUSES = Object.freeze([SUBSCRIPTION_STATUS.CANCELLED])
+export const SUBSCRIPTION_TERMINAL_STATUSES = Object.freeze([
+  SUBSCRIPTION_STATUS.CANCELED,
+  SUBSCRIPTION_STATUS.EXPIRED
+])
 
 export const BILLING_PERIOD = Object.freeze({
   MONTHLY: 'monthly',
@@ -21,6 +29,11 @@ export const BILLING_PERIOD = Object.freeze({
 export const BILLING_MODE = Object.freeze({
   PREPAID: 'prepaid',
   POSTPAID: 'postpaid'
+})
+
+export const ACCOUNT_MODE = Object.freeze({
+  PLAN: 'plan',
+  CUSTOM: 'custom'
 })
 
 export const PRORATION_BEHAVIOR = Object.freeze({

@@ -190,23 +190,19 @@ describe('BillingAccountsAdapter.transformCostBreakdownResponse', () => {
 })
 
 describe('BillingAccountsAdapter payload builders', () => {
-  it('builds a strict create payload without owner_account_id', () => {
+  it('builds a strict create payload with only currency and country required', () => {
     const result = BillingAccountsAdapter.toCreatePayload({
-      ownerAccountId: 900,
       currency: 'USD',
       country: 'US'
     })
 
     expect(result).toEqual({ currency: 'USD', country: 'US' })
-    expect(result.owner_account_id).toBeUndefined()
   })
 
-  it('builds a full create payload with optional fields but never owner_account_id', () => {
+  it('builds a full create payload with the optional fields', () => {
     const result = BillingAccountsAdapter.toCreatePayload({
-      ownerAccountId: 900,
       currency: 'USD',
       country: 'US',
-      accountType: 'invoiced',
       taxId: '12-3456789',
       legalEntityName: 'Acme Inc'
     })
@@ -214,40 +210,44 @@ describe('BillingAccountsAdapter payload builders', () => {
     expect(result).toEqual({
       currency: 'USD',
       country: 'US',
-      account_type: 'invoiced',
       tax_id: '12-3456789',
       legal_entity_name: 'Acme Inc'
     })
-    expect(result.owner_account_id).toBeUndefined()
   })
 
-  it('drops unknown create fields so the body honors additionalProperties:false', () => {
+  it('drops fields outside the create schema so the body honors additionalProperties:false', () => {
     expect(
       BillingAccountsAdapter.toCreatePayload({
-        ownerAccountId: 900,
         currency: 'USD',
         country: 'US',
+        ownerAccountId: 900,
+        accountType: 'invoiced',
         bogus: 'x'
       })
     ).toEqual({ currency: 'USD', country: 'US' })
   })
 
-  it('builds an update payload limited to tax_id and legal_entity_name', () => {
+  it('builds an update payload with every PATCH-able field', () => {
     expect(
       BillingAccountsAdapter.toUpdatePayload({
         taxId: '12-3456789',
-        legalEntityName: 'Acme Inc',
-        defaultPaymentMethodId: 44,
-        billingEmails: ['billing@acme.com'],
-        address: {
-          line1: '1 Main St',
-          postalCode: '62704'
-        }
+        legalEntityName: 'Acme Inc'
       })
     ).toEqual({
       tax_id: '12-3456789',
       legal_entity_name: 'Acme Inc'
     })
+  })
+
+  it('drops the deferred profile fields from the update payload', () => {
+    expect(
+      BillingAccountsAdapter.toUpdatePayload({
+        taxId: '999',
+        defaultPaymentMethodId: 44,
+        billingEmails: ['billing@acme.com'],
+        address: { line1: '1 Main St', postalCode: '62704' }
+      })
+    ).toEqual({ tax_id: '999' })
   })
 
   it('builds a partial update payload and drops unknown fields', () => {
@@ -257,7 +257,7 @@ describe('BillingAccountsAdapter payload builders', () => {
     expect(BillingAccountsAdapter.toUpdatePayload({})).toEqual({})
   })
 
-  it('builds snake_case list params', () => {
+  it('builds snake_case list params and drops filters outside the contract', () => {
     expect(
       BillingAccountsAdapter.toListParams({
         page: 2,
@@ -269,9 +269,7 @@ describe('BillingAccountsAdapter payload builders', () => {
     ).toEqual({
       page: 2,
       page_size: 50,
-      fields: 'id,status',
-      account: 900,
-      status: 'active'
+      fields: 'id,status'
     })
   })
 

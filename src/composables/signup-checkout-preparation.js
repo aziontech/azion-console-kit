@@ -1,4 +1,4 @@
-import { toBillingPeriod } from '@/services/v2/utils/billing-period'
+import { CATALOGUE_PERIODICITY } from '@/services/v2/utils/billing-period'
 
 export const extractCheckoutClientSecret = (response) =>
   response?.payment?.clientSecret || response?.data?.payment?.client_secret || ''
@@ -10,18 +10,24 @@ const findPlanBySku = (plans, plan) => {
 
 export const getPlanIdFromSku = (plans, plan) => findPlanBySku(plans, plan)?.id ?? null
 
+export const getPlanPricingIdFromSku = (plans, plan, periodicity) => {
+  const pricings = findPlanBySku(plans, plan)?.pricings ?? []
+  return pricings.find((pricing) => pricing.periodicity === periodicity)?.id ?? null
+}
+
 const resolvePlanPayload = ({ plans, plan, billingCycle }) => {
-  const planId = getPlanIdFromSku(plans, plan)
-  if (!planId) {
+  const catalogPlan = findPlanBySku(plans, plan)
+  if (!catalogPlan?.id) {
     throw new Error(`Plan not found for ${plan}.`)
   }
 
-  const period = toBillingPeriod(billingCycle) ?? toBillingPeriod('monthly')
-  if (!period) {
-    throw new Error(`Plan pricing not found for ${plan} (${billingCycle}).`)
+  const periodicity = billingCycle || CATALOGUE_PERIODICITY.MONTHLY
+  const planPricingId = getPlanPricingIdFromSku(plans, plan, periodicity)
+  if (catalogPlan.pricings?.length && !planPricingId) {
+    throw new Error(`Plan pricing not found for ${plan} (${periodicity}).`)
   }
 
-  return { planId, period }
+  return { planId: catalogPlan.id, planPricingId }
 }
 
 /**

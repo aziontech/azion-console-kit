@@ -57,7 +57,6 @@ const transformCostBreakdownResponse = (envelope = {}) => ({
 const toCreatePayload = (payload = {}) => ({
   currency: payload.currency,
   country: payload.country,
-  ...(payload.accountType !== undefined && { account_type: payload.accountType }),
   ...(payload.taxId !== undefined && { tax_id: payload.taxId }),
   ...(payload.legalEntityName !== undefined && { legal_entity_name: payload.legalEntityName })
 })
@@ -70,9 +69,7 @@ const toUpdatePayload = (payload = {}) => ({
 const toListParams = (params = {}) => ({
   ...(params.page !== undefined && { page: params.page }),
   ...(params.pageSize !== undefined && { page_size: params.pageSize }),
-  ...(params.fields !== undefined && { fields: params.fields }),
-  ...(params.account !== undefined && { account: params.account }),
-  ...(params.status !== undefined && { status: params.status })
+  ...(params.fields !== undefined && { fields: params.fields })
 })
 
 const toCostBreakdownParams = (params = {}) => ({

@@ -25,19 +25,14 @@ export const signupRoutes = {
     {
       path: 'additional-data',
       name: 'additional-data',
-      component: () => import('@views/Signup/OnboardingScreen.vue'),
-      props: {
-        postAdditionalDataService: SignupService.postAdditionalDataService,
-        patchFullnameService: SignupService.patchFullnameService,
-        updateAccountInfoService: SignupService.updateAccountInfoService
-      },
+      component: () => import('@views/Signup/AdditionalDataView.vue'),
       meta: {
         hideNavigation: true
       },
       beforeEnter: (to, from, next) => {
         const accountStore = useAccountStore()
 
-        if (accountStore.hasActiveUserId && accountStore.needsOnboarding) {
+        if (accountStore.isFirstLogin) {
           next()
         } else {
           next({ name: 'home' })

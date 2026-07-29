@@ -1,3 +1,5 @@
+import { PaymentsAdapter } from '@/services/v2/billing-api/payments/payments-adapter'
+
 const transformInvoiceLineItem = (item = {}) => ({
   invoiceId: item.invoice_id,
   consumingAccountId: item.consuming_account_id,
@@ -81,6 +83,11 @@ const toListParams = (params = {}) => ({
   ...(params.billingAccount !== undefined && { billing_account: params.billingAccount })
 })
 
+const transformPaymentResponse = (envelope = {}) => ({
+  state: envelope?.state ?? null,
+  data: envelope?.data ? PaymentsAdapter.transformPayment(envelope.data) : null
+})
+
 const toPayPayload = (payload = {}) => ({
   ...(payload.paymentMethodId !== undefined &&
     payload.paymentMethodId !== null && { payment_method_id: payload.paymentMethodId })
@@ -95,6 +102,7 @@ export const InvoicesAdapter = {
   transformLinesResponse,
   transformSettlementsResponse,
   transformPdfResponse,
+  transformPaymentResponse,
   toListParams,
   toPayPayload
 }

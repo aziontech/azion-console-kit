@@ -26,106 +26,6 @@ describe('account store session state', () => {
     store.resetAccount()
     expect(store.hasSession).toBe(false)
   })
-
-  it('should require onboarding for a first-login client with no contracted plan', () => {
-    const store = useAccountStore()
-
-    store.setAccountData({
-      kind: 'client',
-      first_login: true,
-      billing_type: null,
-      hasServiceOrderPlan: false
-    })
-
-    expect(store.needsOnboarding).toBe(true)
-  })
-
-  it('should require onboarding for a first-login client when the plan flag is absent', () => {
-    const store = useAccountStore()
-
-    store.setAccountData({
-      kind: 'client',
-      billing_type: null
-    })
-
-    expect(store.needsOnboarding).toBe(true)
-  })
-
-  it('should not require onboarding for a returning (first_login=false) client', () => {
-    const store = useAccountStore()
-
-    store.setAccountData({
-      kind: 'client',
-      first_login: false,
-      billing_type: null,
-      hasServiceOrderPlan: false
-    })
-
-    expect(store.needsOnboarding).toBe(false)
-  })
-
-  it('should not require onboarding for a first-login client that already has a plan', () => {
-    const store = useAccountStore()
-
-    store.setAccountData({
-      kind: 'client',
-      first_login: true,
-      billing_type: 'plan',
-      hasServiceOrderPlan: true
-    })
-
-    expect(store.needsOnboarding).toBe(false)
-  })
-
-  it('should require onboarding for a first-login internal account regardless of plan', () => {
-    const store = useAccountStore()
-
-    store.setAccountData({
-      kind: 'client',
-      first_login: true,
-      billing_type: 'internal',
-      hasServiceOrderPlan: true
-    })
-
-    expect(store.isManagedBillingAccount).toBe(true)
-    expect(store.needsOnboarding).toBe(true)
-  })
-
-  it('should require onboarding for a first-login custom account regardless of plan', () => {
-    const store = useAccountStore()
-
-    store.setAccountData({
-      kind: 'client',
-      first_login: true,
-      billing_type: 'custom',
-      hasServiceOrderPlan: true
-    })
-
-    expect(store.needsOnboarding).toBe(true)
-  })
-
-  it('should not require onboarding for a returning internal account', () => {
-    const store = useAccountStore()
-
-    store.setAccountData({
-      kind: 'client',
-      first_login: false,
-      billing_type: 'internal'
-    })
-
-    expect(store.needsOnboarding).toBe(false)
-  })
-
-  it('should never require onboarding for non-client accounts', () => {
-    const store = useAccountStore()
-
-    store.setAccountData({
-      kind: 'reseller',
-      billing_type: null
-    })
-
-    expect(store.needsOnboarding).toBe(false)
-  })
 })
 
 describe('account store billing experience', () => {
@@ -174,10 +74,84 @@ describe('account store billing experience', () => {
     expect(store.billingExperience).toBe('internal')
   })
 
-  it('should fall back to the plan experience for an unknown billing_type', () => {
+  it('should keep the plans experience only for plan and null', () => {
+    const store = useAccountStore()
+    store.setAccountData({ billing_type: 'plan' })
+    expect(store.isPlansBillingAccount).toBe(true)
+    store.setAccountData({ billing_type: null })
+    expect(store.isPlansBillingAccount).toBe(true)
+    store.setAccountData({ billing_type: 'internal' })
+    expect(store.isPlansBillingAccount).toBe(false)
+    store.setAccountData({ billing_type: 'custom' })
+    expect(store.isPlansBillingAccount).toBe(false)
+  })
+
+  it('should treat an unknown billing_type as a managed account', () => {
     const store = useAccountStore()
     store.setAccountData({ billing_type: 'something-new' })
+    expect(store.isPlansBillingAccount).toBe(false)
+    expect(store.isManagedBillingAccount).toBe(true)
+    expect(store.billingExperience).toBe('something-new')
+  })
+})
+
+describe('account store billing experience from the v4 subscription', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+  })
+
+  it('should start with no account_mode known', () => {
+    const store = useAccountStore()
+    expect(store.accountMode).toBe(null)
+  })
+
+  it('should send an account_mode=custom subscription to the managed experience', () => {
+    const store = useAccountStore()
+    store.setAccountData({ billing_type: 'plan' })
+    store.setSubscriptionAccountMode('custom')
+    expect(store.billingExperience).toBe('custom')
+    expect(store.isManagedBillingAccount).toBe(true)
+  })
+
+  it('should keep the plans experience for account_mode=plan without billing_type', () => {
+    const store = useAccountStore()
+    store.setAccountData({ billing_type: null })
+    store.setSubscriptionAccountMode('plan')
     expect(store.billingExperience).toBe('plan')
+    expect(store.isPlansBillingAccount).toBe(true)
+  })
+
+  it('should let the local billing_type override win over account_mode', () => {
+    const store = useAccountStore()
+    store.setAccountData({ billing_type: 'plan', billing_type_overridden: true })
+    store.setSubscriptionAccountMode('custom')
+    expect(store.billingExperience).toBe('plan')
+  })
+
+  it('should treat an account_mode=custom account as regular regardless of status', () => {
+    const store = useAccountStore()
+    store.setAccountData({ status: 'ONLINE', billing_type: 'plan' })
+    expect(store.accountIsNotRegular).toBe(true)
+    store.setSubscriptionAccountMode('custom')
+    expect(store.accountIsNotRegular).toBe(false)
+  })
+
+  it('should drop the account_mode when the identity switches to another account', () => {
+    const store = useAccountStore()
+    store.setIdentity({ id: 1, billing_type: 'plan' })
+    store.setSubscriptionAccountMode('custom')
+    store.setIdentity({ id: 1, billing_type: 'plan' })
+    expect(store.accountMode).toBe('custom')
+    store.setIdentity({ id: 2, billing_type: 'plan' })
+    expect(store.accountMode).toBe(null)
+    expect(store.billingExperience).toBe('plan')
+  })
+
+  it('should drop the account_mode on resetAccount', () => {
+    const store = useAccountStore()
+    store.setSubscriptionAccountMode('custom')
+    store.resetAccount()
+    expect(store.accountMode).toBe(null)
   })
 })
 

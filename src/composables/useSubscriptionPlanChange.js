@@ -28,10 +28,14 @@ export const PLAN_CHANGE_MESSAGES = Object.freeze({
   MISSING_SCHEDULED_CHANGE: 'No scheduled change to cancel.'
 })
 
+const assertPlanId = (planId) => {
+  if (!planId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_PLAN)
+}
+
 const intentKeys = new Map()
 
-const buildIntentId = ({ serviceOrderId, planId, period, when }) =>
-  `${serviceOrderId}:${planId}:${period ?? ''}:${when ?? ''}`
+const buildIntentId = ({ subscriptionId, planId, planPricingId, period, when }) =>
+  `${subscriptionId}:${planId}:${planPricingId ?? ''}:${period ?? ''}:${when ?? ''}`
 
 const takeIdempotencyKey = (intentId) => {
   if (!intentKeys.has(intentId)) intentKeys.set(intentId, generateIdempotencyKey())
@@ -40,18 +44,18 @@ const takeIdempotencyKey = (intentId) => {
 
 const releaseIdempotencyKey = (intentId) => intentKeys.delete(intentId)
 
-const fetchScheduledChanges = async (serviceOrderId) => {
+const fetchScheduledChanges = async (subscriptionId) => {
   try {
-    return await subscriptionsService.listScheduledChanges(serviceOrderId)
+    return await subscriptionsService.listScheduledChanges(subscriptionId)
   } catch (error) {
     if (isNotFound(error)) return EMPTY_SCHEDULED_CHANGES
     throw error
   }
 }
 
-const buildScheduledChangesQuery = (serviceOrderId) => ({
-  queryKey: queryKeys.subscriptions.scheduledChanges(serviceOrderId),
-  queryFn: () => fetchScheduledChanges(serviceOrderId),
+const buildScheduledChangesQuery = (subscriptionId) => ({
+  queryKey: queryKeys.subscriptions.scheduledChanges(subscriptionId),
+  queryFn: () => fetchScheduledChanges(subscriptionId),
   staleTime: 0,
   gcTime: 0,
   meta: NO_CACHE_META
@@ -79,14 +83,14 @@ export const pickPendingCancellation = (scheduledChanges) => {
   )
 }
 
-export function useScheduledChanges(serviceOrderIdRef, options = {}) {
+export function useScheduledChanges(subscriptionIdRef, options = {}) {
   const { enabled = true } = options
-  const serviceOrderId = computed(() => unref(serviceOrderIdRef) ?? null)
+  const subscriptionId = computed(() => unref(subscriptionIdRef) ?? null)
 
   const query = useQuery({
-    queryKey: computed(() => queryKeys.subscriptions.scheduledChanges(serviceOrderId.value)),
-    queryFn: () => fetchScheduledChanges(serviceOrderId.value),
-    enabled: computed(() => Boolean(serviceOrderId.value) && Boolean(unref(enabled))),
+    queryKey: computed(() => queryKeys.subscriptions.scheduledChanges(subscriptionId.value)),
+    queryFn: () => fetchScheduledChanges(subscriptionId.value),
+    enabled: computed(() => Boolean(subscriptionId.value) && Boolean(unref(enabled))),
     staleTime: 0,
     gcTime: 0,
     refetchOnMount: 'always',
@@ -111,40 +115,40 @@ export function useScheduledChanges(serviceOrderIdRef, options = {}) {
   }
 }
 
-export async function ensureScheduledChanges(serviceOrderId) {
-  if (!serviceOrderId) return EMPTY_SCHEDULED_CHANGES
+export async function ensureScheduledChanges(subscriptionId) {
+  if (!subscriptionId) return EMPTY_SCHEDULED_CHANGES
   await waitForPersistenceRestore()
-  return queryClient.fetchQuery(buildScheduledChangesQuery(serviceOrderId))
+  return queryClient.fetchQuery(buildScheduledChangesQuery(subscriptionId))
 }
 
-export async function ensurePendingChange(serviceOrderId) {
-  return pickPendingChange(await ensureScheduledChanges(serviceOrderId))
+export async function ensurePendingChange(subscriptionId) {
+  return pickPendingChange(await ensureScheduledChanges(subscriptionId))
 }
 
 /**
  * Plan lifecycle against billing-api v4.
  *
- * The change and scheduled_changes routes key on the subscription's
- * `service_order_id`, not on the subscription id — the id is read from
- * `subscriptions/current` and resolved here so callers never have to know.
+ * Every nested route — `change`, `change/preview`, `cancel` and
+ * `scheduled_changes` — keys on `{subscription_id}`. The id comes from
+ * `subscriptions/current` and is resolved here so callers never have to know.
  */
 export function useSubscriptionPlanChange() {
-  const invalidate = (serviceOrderId) => {
+  const invalidate = (subscriptionId) => {
     invalidateSubscriptionState()
-    if (serviceOrderId) {
+    if (subscriptionId) {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.subscriptions.scheduledChanges(serviceOrderId)
+        queryKey: queryKeys.subscriptions.scheduledChanges(subscriptionId)
       })
     }
     queryClient.invalidateQueries({ queryKey: queryKeys.billing.all })
   }
 
-  const resolveServiceOrderId = async (serviceOrderId) => {
-    if (serviceOrderId) return serviceOrderId
+  const resolveSubscriptionId = async (subscriptionId) => {
+    if (subscriptionId) return subscriptionId
     const cached = getCachedCurrentSubscription()
-    if (cached?.serviceOrderId) return cached.serviceOrderId
+    if (cached?.id) return cached.id
     const current = await ensureCurrentSubscription()
-    return current?.data?.serviceOrderId ?? null
+    return current?.data?.id ?? null
   }
 
   const createMutation = useMutation({
@@ -153,110 +157,130 @@ export function useSubscriptionPlanChange() {
   })
 
   const previewMutation = useMutation({
-    mutationFn: ({ serviceOrderId, payload }) =>
-      subscriptionsService.previewSubscriptionChange({ serviceOrderId, payload })
+    mutationFn: ({ subscriptionId, payload }) =>
+      subscriptionsService.previewSubscriptionChange({ subscriptionId, payload })
   })
 
   const changeMutation = useMutation({
-    mutationFn: ({ serviceOrderId, payload, idempotencyKey }) =>
-      subscriptionsService.changeSubscription({ serviceOrderId, payload, idempotencyKey })
+    mutationFn: ({ subscriptionId, payload, idempotencyKey }) =>
+      subscriptionsService.changeSubscription({ subscriptionId, payload, idempotencyKey })
   })
 
   const cancelSubscriptionMutation = useMutation({
-    mutationFn: ({ subscriptionId, payload, idempotencyKey }) =>
-      subscriptionsService.cancelSubscription({ subscriptionId, payload, idempotencyKey })
+    mutationFn: ({ subscriptionId, payload }) =>
+      subscriptionsService.cancelSubscription({ subscriptionId, payload })
   })
 
   const cancelScheduledChangeMutation = useMutation({
-    mutationFn: ({ serviceOrderId, scheduledChangeId }) =>
-      subscriptionsService.deleteScheduledChange({ serviceOrderId, scheduledChangeId })
+    mutationFn: ({ subscriptionId, scheduledChangeId }) =>
+      subscriptionsService.deleteScheduledChange({ subscriptionId, scheduledChangeId })
   })
 
-  const buildPayload = ({ planId, period, prorationBehavior, when }) => ({
+  const buildPayload = ({ planId, planPricingId, period, prorationBehavior, when }) => ({
     planId,
+    ...(planPricingId !== undefined && planPricingId !== null && { planPricingId }),
     ...(period !== undefined && period !== null && { period }),
     prorationBehavior: prorationBehavior ?? PRORATION_BEHAVIOR.CREATE_PRORATIONS,
     when: when ?? CHANGE_TIMING.NOW
   })
 
-  const createSubscription = async ({ planId, period, paymentMethodId, tosVersion }) => {
-    if (!planId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_PLAN)
+  const createSubscription = async ({
+    planId,
+    planPricingId,
+    accountId,
+    paymentMethodId,
+    tosVersion
+  }) => {
+    assertPlanId(planId)
 
+    const intentId = `create:${planId}:${planPricingId ?? ''}`
     const response = await createMutation.mutateAsync({
-      payload: { planId, period, paymentMethodId, tosVersion },
-      idempotencyKey: takeIdempotencyKey(`create:${planId}:${period ?? ''}`)
+      payload: { planId, planPricingId, accountId, paymentMethodId, tosVersion },
+      idempotencyKey: takeIdempotencyKey(intentId)
     })
 
-    releaseIdempotencyKey(`create:${planId}:${period ?? ''}`)
-    invalidate(response?.subscription?.serviceOrderId)
+    releaseIdempotencyKey(intentId)
+    invalidate(response?.subscription?.id)
     return response
   }
 
-  const previewChange = async ({ serviceOrderId, planId, period, prorationBehavior, when }) => {
-    const targetServiceOrderId = await resolveServiceOrderId(serviceOrderId)
-    if (!targetServiceOrderId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_SUBSCRIPTION)
-    if (!planId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_PLAN)
+  const previewChange = async ({
+    subscriptionId,
+    planId,
+    planPricingId,
+    period,
+    prorationBehavior,
+    when
+  }) => {
+    const targetSubscriptionId = await resolveSubscriptionId(subscriptionId)
+    if (!targetSubscriptionId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_SUBSCRIPTION)
+    assertPlanId(planId)
 
     return previewMutation.mutateAsync({
-      serviceOrderId: targetServiceOrderId,
-      payload: buildPayload({ planId, period, prorationBehavior, when })
+      subscriptionId: targetSubscriptionId,
+      payload: buildPayload({ planId, planPricingId, period, prorationBehavior, when })
     })
   }
 
-  const applyChange = async ({ serviceOrderId, planId, period, prorationBehavior, when }) => {
-    const targetServiceOrderId = await resolveServiceOrderId(serviceOrderId)
-    if (!targetServiceOrderId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_SUBSCRIPTION)
-    if (!planId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_PLAN)
+  const applyChange = async ({
+    subscriptionId,
+    planId,
+    planPricingId,
+    period,
+    prorationBehavior,
+    when
+  }) => {
+    const targetSubscriptionId = await resolveSubscriptionId(subscriptionId)
+    if (!targetSubscriptionId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_SUBSCRIPTION)
+    assertPlanId(planId)
 
-    const payload = buildPayload({ planId, period, prorationBehavior, when })
+    const payload = buildPayload({ planId, planPricingId, period, prorationBehavior, when })
     const intentId = buildIntentId({
-      serviceOrderId: targetServiceOrderId,
+      subscriptionId: targetSubscriptionId,
       planId,
+      planPricingId: payload.planPricingId,
       period: payload.period,
       when: payload.when
     })
 
     const response = await changeMutation.mutateAsync({
-      serviceOrderId: targetServiceOrderId,
+      subscriptionId: targetSubscriptionId,
       payload,
       idempotencyKey: takeIdempotencyKey(intentId)
     })
 
     releaseIdempotencyKey(intentId)
-    invalidate(targetServiceOrderId)
+    invalidate(targetSubscriptionId)
     return response
   }
 
   const cancelSubscription = async ({ subscriptionId, when, reason } = {}) => {
-    const targetId = subscriptionId ?? getCachedCurrentSubscription()?.id ?? null
+    const targetId = await resolveSubscriptionId(subscriptionId)
     if (!targetId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_SUBSCRIPTION)
 
-    const intentId = `cancel:${targetId}:${when ?? CHANGE_TIMING.PERIOD_END}`
     const response = await cancelSubscriptionMutation.mutateAsync({
       subscriptionId: targetId,
-      payload: { when: when ?? CHANGE_TIMING.PERIOD_END, reason },
-      idempotencyKey: takeIdempotencyKey(intentId)
+      payload: { when: when ?? CHANGE_TIMING.PERIOD_END, reason }
     })
 
-    releaseIdempotencyKey(intentId)
-    invalidate(response?.data?.serviceOrderId)
+    invalidate(targetId)
     return response
   }
 
-  const cancelScheduledChange = async ({ serviceOrderId, scheduledChangeId } = {}) => {
-    const targetServiceOrderId = await resolveServiceOrderId(serviceOrderId)
-    if (!targetServiceOrderId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_SUBSCRIPTION)
+  const cancelScheduledChange = async ({ subscriptionId, scheduledChangeId } = {}) => {
+    const targetSubscriptionId = await resolveSubscriptionId(subscriptionId)
+    if (!targetSubscriptionId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_SUBSCRIPTION)
 
     const targetChangeId =
-      scheduledChangeId ?? (await ensurePendingChange(targetServiceOrderId))?.id ?? null
+      scheduledChangeId ?? (await ensurePendingChange(targetSubscriptionId))?.id ?? null
     if (!targetChangeId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_SCHEDULED_CHANGE)
 
     const response = await cancelScheduledChangeMutation.mutateAsync({
-      serviceOrderId: targetServiceOrderId,
+      subscriptionId: targetSubscriptionId,
       scheduledChangeId: targetChangeId
     })
 
-    invalidate(targetServiceOrderId)
+    invalidate(targetSubscriptionId)
     return response
   }
 

@@ -53,7 +53,7 @@ export class InvoicesService extends BaseService {
       body: InvoicesAdapter.toPayPayload(payload),
       config: { headers: { 'idempotency-key': idempotencyKey ?? generateIdempotencyKey() } }
     })
-    return response.data
+    return InvoicesAdapter.transformPaymentResponse(response.data)
   }
 }
 

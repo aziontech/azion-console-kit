@@ -1,15 +1,33 @@
+const transformPendingTransition = (item) =>
+  item
+    ? {
+        type: item.type ?? null,
+        toPlanId: item.to_plan_id ?? null,
+        toPlanPricingId: item.to_plan_pricing_id ?? null,
+        effectiveDate: item.effective_date ?? null
+      }
+    : null
+
 const transformSubscription = (item = {}) => ({
   id: item.id,
-  serviceOrderId: item.service_order_id ?? null,
-  currentVersionId: item.current_version_id ?? null,
+  type: item.type ?? null,
   status: item.status,
+  planId: item.plan_id ?? null,
+  planPricingId: item.plan_pricing_id ?? null,
+  accountMode: item.account_mode ?? null,
+  billingMode: item.billing_mode ?? null,
+  startDate: item.start_date ?? null,
+  endDate: item.end_date ?? null,
   currentPeriodStart: item.current_period_start ?? null,
   currentPeriodEnd: item.current_period_end ?? null,
-  anniversaryDay: item.anniversary_day ?? null,
-  cancelAtPeriodEnd: item.cancel_at_period_end,
+  autoRenew: item.auto_renew ?? null,
+  renew: item.renew ?? null,
+  productVersion: item.product_version ?? null,
+  onDemandEnabled: item.on_demand_enabled ?? null,
+  pendingTransition: transformPendingTransition(item.pending_transition),
   audit: {
-    createdAt: item.created_at,
-    lastModified: item.last_modified,
+    createdAt: item.created_at ?? null,
+    lastModified: item.last_modified ?? null,
     lastEditor: item.last_editor ?? null
   }
 })
@@ -64,16 +82,6 @@ const transformPagination = (envelope = {}) => ({
   previous: envelope.previous ?? null
 })
 
-const transformChangeResponse = (envelope = {}) => {
-  const data = envelope?.data ?? {}
-  return {
-    state: envelope?.state ?? null,
-    subscription: data.subscription ? transformSubscription(data.subscription) : null,
-    proration: data.proration ?? null,
-    pendingTransition: data.pending_transition ?? null
-  }
-}
-
 const transformChangePreviewResponse = (envelope = {}) => {
   const data = envelope?.data ?? {}
   return {
@@ -102,6 +110,7 @@ const transformScheduledChangeDetailResponse = (envelope = {}) => ({
 const toListParams = (params = {}) => ({
   ...(params.page !== undefined && { page: params.page }),
   ...(params.pageSize !== undefined && { page_size: params.pageSize }),
+  ...(params.fields !== undefined && { fields: params.fields }),
   ...(params.status && { status: params.status }),
   ...(params.serviceOrder !== undefined && { service_order: params.serviceOrder }),
   ...(params.billingAccount !== undefined && { billing_account: params.billingAccount }),
@@ -109,10 +118,15 @@ const toListParams = (params = {}) => ({
   ...(params.product !== undefined && { product: params.product })
 })
 
-const transformSubscriptionDetailResponse = (envelope = {}) => ({
-  state: envelope?.state ?? null,
-  data: envelope?.data ? transformSubscription(envelope.data) : null
-})
+const unwrap = (envelope) => (envelope && envelope.data !== undefined ? envelope.data : envelope)
+
+const transformSubscriptionDetailResponse = (envelope = {}) => {
+  const data = unwrap(envelope)
+  return {
+    state: envelope?.state ?? null,
+    data: data?.id ? transformSubscription(data) : null
+  }
+}
 
 const transformSubscriptionsListResponse = (envelope = {}) => ({
   ...transformPagination(envelope),
@@ -125,10 +139,10 @@ const transformVersionsListResponse = (envelope = {}) => ({
 })
 
 const transformCreateResponse = (envelope = {}) => {
-  const data = envelope?.data ?? {}
+  const data = unwrap(envelope) ?? {}
   return {
     state: envelope?.state ?? null,
-    subscription: data.subscription ? transformSubscription(data.subscription) : null,
+    subscription: data.id ? transformSubscription(data) : null,
     payment: data.payment
       ? { clientSecret: data.payment.client_secret ?? null, gateway: data.payment.gateway ?? null }
       : null
@@ -136,22 +150,16 @@ const transformCreateResponse = (envelope = {}) => {
 }
 
 const toChangePayload = (payload = {}) => ({
-  ...(payload.planId !== undefined && { plan_id: payload.planId }),
+  ...(payload.planId != null && { plan_id: payload.planId }),
   ...(payload.period !== undefined && { period: payload.period }),
   ...(payload.prorationBehavior !== undefined && {
     proration_behavior: payload.prorationBehavior
-  }),
-  ...(payload.when !== undefined && { when: payload.when })
+  })
 })
 
 const toCreatePayload = (payload = {}) => ({
   plan_id: payload.planId,
-  ...(payload.period !== undefined && { period: payload.period }),
-  ...(payload.accountId !== undefined && { account_id: payload.accountId }),
-  ...(payload.paymentMethodId !== undefined &&
-    payload.paymentMethodId !== null && { payment_method_id: payload.paymentMethodId }),
-  ...(payload.tosVersion !== undefined &&
-    payload.tosVersion !== null && { tos_acceptance: { version: payload.tosVersion } })
+  ...(payload.planPricingId != null && { plan_pricing_id: payload.planPricingId })
 })
 
 const toCancelPayload = (payload = {}) => ({
@@ -175,7 +183,6 @@ export const SubscriptionsAdapter = {
   transformSubscription,
   transformSubscriptionVersion,
   transformScheduledChange,
-  transformChangeResponse,
   transformChangePreviewResponse,
   transformScheduledChangesListResponse,
   transformScheduledChangeDetailResponse,
@@ -187,5 +194,6 @@ export const SubscriptionsAdapter = {
   toCreatePayload,
   toCancelPayload,
   toListParams,
+  transformPendingTransition,
   pickCurrentVersion
 }

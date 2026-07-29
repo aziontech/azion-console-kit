@@ -52,55 +52,54 @@ export class SubscriptionsService extends BaseService {
     return SubscriptionsAdapter.transformCreateResponse(response.data)
   }
 
-  cancelSubscription = async ({ subscriptionId, payload, idempotencyKey } = {}) => {
+  cancelSubscription = async ({ subscriptionId, payload } = {}) => {
     const response = await this.http.request({
       method: 'POST',
       url: `${this.#baseURL}/${subscriptionId}/cancel`,
-      body: SubscriptionsAdapter.toCancelPayload(payload),
+      body: SubscriptionsAdapter.toCancelPayload(payload)
+    })
+    return SubscriptionsAdapter.transformSubscriptionDetailResponse(response.data)
+  }
+
+  changeSubscription = async ({ subscriptionId, payload, idempotencyKey }) => {
+    const response = await this.http.request({
+      method: 'POST',
+      url: `${this.#baseURL}/${subscriptionId}/change`,
+      body: SubscriptionsAdapter.toChangePayload(payload),
       config: this.#idempotencyConfig(idempotencyKey)
     })
     return SubscriptionsAdapter.transformSubscriptionDetailResponse(response.data)
   }
 
-  changeSubscription = async ({ serviceOrderId, payload, idempotencyKey }) => {
+  previewSubscriptionChange = async ({ subscriptionId, payload }) => {
     const response = await this.http.request({
       method: 'POST',
-      url: `${this.#baseURL}/${serviceOrderId}/change`,
-      body: SubscriptionsAdapter.toChangePayload(payload),
-      config: this.#idempotencyConfig(idempotencyKey)
-    })
-    return SubscriptionsAdapter.transformChangeResponse(response.data)
-  }
-
-  previewSubscriptionChange = async ({ serviceOrderId, payload }) => {
-    const response = await this.http.request({
-      method: 'POST',
-      url: `${this.#baseURL}/${serviceOrderId}/change/preview`,
+      url: `${this.#baseURL}/${subscriptionId}/change/preview`,
       body: SubscriptionsAdapter.toChangePayload(payload)
     })
     return SubscriptionsAdapter.transformChangePreviewResponse(response.data)
   }
 
-  listScheduledChanges = async (serviceOrderId) => {
+  listScheduledChanges = async (subscriptionId) => {
     const response = await this.http.request({
       method: 'GET',
-      url: `${this.#baseURL}/${serviceOrderId}/scheduled_changes`
+      url: `${this.#baseURL}/${subscriptionId}/scheduled_changes`
     })
     return SubscriptionsAdapter.transformScheduledChangesListResponse(response.data)
   }
 
-  getScheduledChange = async ({ serviceOrderId, scheduledChangeId }) => {
+  getScheduledChange = async ({ subscriptionId, scheduledChangeId }) => {
     const response = await this.http.request({
       method: 'GET',
-      url: `${this.#baseURL}/${serviceOrderId}/scheduled_changes/${scheduledChangeId}`
+      url: `${this.#baseURL}/${subscriptionId}/scheduled_changes/${scheduledChangeId}`
     })
     return SubscriptionsAdapter.transformScheduledChangeDetailResponse(response.data)
   }
 
-  deleteScheduledChange = async ({ serviceOrderId, scheduledChangeId }) => {
+  deleteScheduledChange = async ({ subscriptionId, scheduledChangeId }) => {
     await this.http.request({
       method: 'DELETE',
-      url: `${this.#baseURL}/${serviceOrderId}/scheduled_changes/${scheduledChangeId}`
+      url: `${this.#baseURL}/${subscriptionId}/scheduled_changes/${scheduledChangeId}`
     })
     return { id: scheduledChangeId }
   }

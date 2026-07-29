@@ -14,7 +14,7 @@ vi.mock('@/stores/account', () => ({
   useAccountStore: vi.fn()
 }))
 
-import { loadUserAndAccountInfo, loadAccountHydration } from '@/helpers/account-data'
+import { loadUserAndAccountInfo } from '@/helpers/account-data'
 import { accountService } from '@/services/v2/account'
 import { setFeatureFlags } from '@/composables/user-flag'
 import { useAccountStore } from '@/stores/account'
@@ -67,23 +67,6 @@ describe('loadUserAndAccountInfo', () => {
         isDeveloperSupportPlan: undefined
       })
     )
-    expect(setIdentity).toHaveBeenCalled()
-  })
-})
-
-describe('loadAccountHydration', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it('hydrates the account identity for the login guard path', async () => {
-    const setIdentity = vi.fn()
-    useAccountStore.mockReturnValue({ setIdentity, setAccountData: vi.fn() })
-    accountService.getAccountIdentity.mockResolvedValue({ client_flags: [] })
-
-    await loadAccountHydration()
-
-    expect(accountService.getAccountIdentity).toHaveBeenCalledTimes(1)
     expect(setIdentity).toHaveBeenCalled()
   })
 })

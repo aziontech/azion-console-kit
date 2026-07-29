@@ -77,14 +77,3 @@ export const loadContractData = async ({ force = false } = {}) => {
   const { isDeveloperSupportPlan, yourServicePlan } = contractData
   accountStore.setAccountData({ isDeveloperSupportPlan, yourServicePlan })
 }
-
-/**
- * Full post-login account hydration. Loads the account identity
- * needed by redirects, feature flags, and the plan gate.
- *
- * The accountGuard awaits this BEFORE making redirect decisions so the
- * `needsOnboarding` getter returns correct values the first time it is read.
- */
-export const loadAccountHydration = async ({ force = false } = {}) => {
-  await loadUserAndAccountInfo({ force })
-}

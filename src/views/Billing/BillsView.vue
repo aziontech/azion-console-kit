@@ -486,8 +486,13 @@
     }
   }
 
-  const findPlanIdBySku = (sku) =>
-    plansData.value?.find((plan) => plan.sku?.toLowerCase() === sku.toLowerCase())?.id ?? null
+  const findPlanBySku = (sku) =>
+    plansData.value?.find((plan) => plan.sku?.toLowerCase() === sku.toLowerCase()) ?? null
+
+  const findPlanIdBySku = (sku) => findPlanBySku(sku)?.id ?? null
+
+  const findPlanPricingIdBySku = (sku, periodicity) =>
+    findPlanBySku(sku)?.pricings?.find((pricing) => pricing.periodicity === periodicity)?.id ?? null
 
   const showOtherPlans = async () => {
     const initialCycle = subscription.isPro.value ? 'yearly' : 'monthly'
@@ -668,7 +673,7 @@
 
   const resolveCycleChangePayload = async ({ plan, billingCycle }) => {
     const active = await ensureSubscription()
-    if (!active?.serviceOrderId) {
+    if (!active?.id) {
       throw new Error('No active subscription to change.')
     }
 
@@ -679,16 +684,21 @@
       throw new Error('Missing data required to change cycle.')
     }
 
-    return { serviceOrderId: active.serviceOrderId, planId, period }
+    return {
+      subscriptionId: active.id,
+      planId,
+      planPricingId: findPlanPricingIdBySku(plan, billingCycle),
+      period
+    }
   }
 
   const changeSubscriptionCycle = async ({ plan, billingCycle, when }) => {
-    const { serviceOrderId, planId, period } = await resolveCycleChangePayload({
+    const { subscriptionId, planId, planPricingId, period } = await resolveCycleChangePayload({
       plan,
       billingCycle
     })
 
-    await applyChange({ serviceOrderId, planId, period, when })
+    await applyChange({ subscriptionId, planId, planPricingId, period, when })
   }
 
   const upgradeServiceOrderCycle = ({ plan, billingCycle }) =>
@@ -701,7 +711,7 @@
     const fromCycle = subscription.billingCycle.value
     try {
       await upgradeServiceOrderCycle({ plan, billingCycle })
-      const targetPeriod = toBillingPeriod(billingCycle)
+      const targetPricingId = findPlanPricingIdBySku(plan, billingCycle)
       done?.()
       showPlanInfoDrawer.value = false
       showChangePlanDrawer.value = false
@@ -709,8 +719,8 @@
       lockedCycle.value = null
       isPostPaymentReloading.value = true
       try {
-        if (targetPeriod) {
-          await subscription.refetchUntil((version) => version?.period === targetPeriod)
+        if (targetPricingId) {
+          await subscription.refetchUntil((current) => current?.planPricingId === targetPricingId)
         } else {
           await subscription.refetch()
         }
@@ -779,17 +789,19 @@
         return
       }
 
-      const serviceOrderId = subscription.serviceOrderId.value
+      const subscriptionId = subscription.subscriptionId.value
       const targetPlanId = findPlanIdBySku(toPlan)
+      const targetCycle = toCycle || fromCycle
 
-      if (!serviceOrderId || !targetPlanId) {
+      if (!subscriptionId || !targetPlanId) {
         throw new Error('Missing data required to change plan.')
       }
 
       await applyChange({
-        serviceOrderId,
+        subscriptionId,
         planId: targetPlanId,
-        period: toBillingPeriod(toCycle || fromCycle),
+        planPricingId: findPlanPricingIdBySku(toPlan, targetCycle),
+        period: toBillingPeriod(targetCycle),
         when: CHANGE_TIMING.PERIOD_END
       })
 
@@ -830,13 +842,13 @@
   const handleCancelDowngradeConfirm = async ({ fail, done } = {}) => {
     const fromPlan = subscription.planSku.value
     try {
-      const serviceOrderId = subscription.serviceOrderId.value
-      if (!serviceOrderId) {
-        throw new Error('Missing service order to cancel.')
+      const subscriptionId = subscription.subscriptionId.value
+      if (!subscriptionId) {
+        throw new Error('Missing subscription to cancel the scheduled change.')
       }
 
       await cancelScheduledChange({
-        serviceOrderId,
+        subscriptionId,
         scheduledChangeId: subscription.scheduledDowngrade.value?.id
       })
 
@@ -890,13 +902,14 @@
       methodType: 'card'
     })
 
-    const activeSubscriptionId = subscription.serviceOrderId.value ?? null
+    const activeSubscriptionId = subscription.subscriptionId.value ?? null
 
     if (activeSubscriptionId && targetPlanId) {
       try {
         await applyChange({
-          serviceOrderId: activeSubscriptionId,
+          subscriptionId: activeSubscriptionId,
           planId: targetPlanId,
+          planPricingId: findPlanPricingIdBySku(targetPlan, submittedCycle),
           period: toBillingPeriod(submittedCycle),
           when: CHANGE_TIMING.NOW
         })
@@ -937,7 +950,7 @@
     isPostPaymentReloading.value = true
     try {
       if (targetPlanId) {
-        await subscription.refetchUntil((version) => version?.planId === targetPlanId)
+        await subscription.refetchUntil((current) => current?.planId === targetPlanId)
       } else {
         await subscription.refetch()
       }
