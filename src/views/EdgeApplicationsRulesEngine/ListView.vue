@@ -590,14 +590,6 @@
                 data-pc-section="rowreordericon"
                 :class="hasContentDefault(rowData.phase?.content) ? 'no-before mr-8' : ''"
               />
-              <!--
-                step="-1" inverts the spinner buttons: the down arrow (increment) moves the rule up
-                and the up arrow (decrement) moves it down. min/max are intentionally omitted because
-                PrimeVue ties its automatic button disabling to the button role and ignores the step
-                sign, which produces inverted disabled states. Instead we disable each button
-                explicitly via pt: the up button (increment) on the first rule and the down button
-                (decrement) on the last rule.
-              -->
               <InputNumber
                 v-model="rowData.position.value"
                 showButtons
