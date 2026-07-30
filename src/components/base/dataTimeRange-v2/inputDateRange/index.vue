@@ -135,7 +135,7 @@
 
   const sizeInput = (value) => {
     if (!value) return 7
-    return value.length
+    return Math.max(value.length, 5)
   }
 
   const clampToBounds = (date) => {

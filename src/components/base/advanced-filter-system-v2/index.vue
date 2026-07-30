@@ -174,11 +174,22 @@
       filterDataRange.value.endDate = endDate
     }
 
-    const { tsRangeBegin, tsRangeEnd } = updatedTimeRange(
-      filterDataRange.value.startDate,
-      filterDataRange.value.endDate,
-      selectedUtcOffset
-    )
+    const startIsInstant =
+      isNowLabel(filterDataRange.value.labelStart) ||
+      Boolean(labelStartParsed) ||
+      Boolean(labelParsed)
+    const endIsInstant =
+      isNowLabel(filterDataRange.value.labelEnd) ||
+      isNowLabel(filterDataRange.value.label) ||
+      Boolean(labelEndParsed) ||
+      Boolean(labelParsed)
+
+    const tsRangeBegin = startIsInstant
+      ? toInstantIso(filterDataRange.value.startDate)
+      : toOffsetIso(filterDataRange.value.startDate, selectedUtcOffset)
+    const tsRangeEnd = endIsInstant
+      ? toInstantIso(filterDataRange.value.endDate)
+      : toOffsetIso(filterDataRange.value.endDate, selectedUtcOffset)
 
     let cappedBegin = tsRangeBegin
     if (props.filterDateRangeMaxDays > 0) {
@@ -302,44 +313,27 @@
     applyFilters()
   }
 
-  const updatedTimeRange = (begin, end, userUTC) => {
-    const beginDate = new Date(begin)
-    const endDate = new Date(end)
+  const isNowLabel = (label) => typeof label === 'string' && label.trim() === 'now'
 
-    const dateBegin = createUtcDateFromUserTimezoneParts(
+  const toInstantIso = (value) => new Date(value).toISOString().replace(/\.\d{3}/, '')
+
+  const toOffsetIso = (value, userUTC) => {
+    const date = new Date(value)
+
+    return createUtcDateFromUserTimezoneParts(
       {
-        year: beginDate.getFullYear(),
-        monthIndex: beginDate.getMonth(),
-        day: beginDate.getDate(),
-        hour: beginDate.getHours(),
-        minute: beginDate.getMinutes(),
-        second: beginDate.getSeconds(),
-        millisecond: beginDate.getMilliseconds()
+        year: date.getFullYear(),
+        monthIndex: date.getMonth(),
+        day: date.getDate(),
+        hour: date.getHours(),
+        minute: date.getMinutes(),
+        second: date.getSeconds(),
+        millisecond: date.getMilliseconds()
       },
       userUTC
     )
       .toISOString()
       .replace(/\.\d{3}/, '')
-
-    const dateEnd = createUtcDateFromUserTimezoneParts(
-      {
-        year: endDate.getFullYear(),
-        monthIndex: endDate.getMonth(),
-        day: endDate.getDate(),
-        hour: endDate.getHours(),
-        minute: endDate.getMinutes(),
-        second: endDate.getSeconds(),
-        millisecond: endDate.getMilliseconds()
-      },
-      userUTC
-    )
-      .toISOString()
-      .replace(/\.\d{3}/, '')
-
-    return {
-      tsRangeBegin: dateBegin,
-      tsRangeEnd: dateEnd
-    }
   }
 
   onMounted(() => {

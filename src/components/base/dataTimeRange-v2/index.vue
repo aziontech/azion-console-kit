@@ -344,13 +344,8 @@
     const now = new Date()
     model.value.label = ''
 
-    if (editingField.value === 'start') {
-      model.value.startDate = clampToBounds(now)
-      model.value.labelStart = 'now'
-    } else {
-      model.value.endDate = clampToBounds(now)
-      model.value.labelEnd = 'now'
-    }
+    model.value.endDate = clampToBounds(now)
+    model.value.labelEnd = 'now'
 
     handleSelect()
     closeOverlay()
