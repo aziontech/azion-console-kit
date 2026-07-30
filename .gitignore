@@ -1,7 +1,6 @@
 # Logs
 logs
 *.log
-.npmrc
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -18,10 +17,7 @@ coverage
 *.local
 package-lock.json
 
-/.nyc_output
 /.hypothesis
-/cypress/videos/
-/cypress/screenshots/
 
 # Editor directories and files
 .vscode/*
@@ -39,28 +35,30 @@ package-lock.json
 .env
 .env.*
 !.env.sample
-cypress.env.*
-!cypress.env.example.json
 
 #azion vulcan folder
 #azion
 .edge
 !azion/production
 !azion/stage
-azion/
-/cypress/downloads
 
+azion/
+
+src/views/Playground/PlaygroundView.vue
 #Paths added by Azion CLI
 .edge/
 .vulcan
-specs.json
+
 docs/ARCHITECTURE.md
-hooks/
+
+storybook/yarn.lock
+
+# Kiro specs
+.kiro/
 
 # AI
 CLAUDE.md
 .opencode/
 .claude/
 AGENTS.md
-storybook/yarn.lock
 .gitnexus

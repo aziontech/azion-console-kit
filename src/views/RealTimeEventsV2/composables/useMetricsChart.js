@@ -1,0 +1,510 @@
+/* eslint-disable azion-architecture/require-vue-query --
+ * This composable owns a bespoke metrics-chart loading pipeline (API routing by
+ * time-range and several load strategies) that the TanStack query-cache model
+ * does not fit; the metrics-chart-service calls are made directly by design
+ * rather than through useQuery/fetchQuery. */
+import { ref, computed, onScopeDispose } from 'vue'
+import { loadAggregableFields } from '@/modules/filter-loaders/dataset-fields-loader'
+import { resolveChartApi } from '@/services/real-time-events-service-v2/chart-api-router'
+import { buildForTarget } from '@/services/real-time-events-service-v2/_shared/filter/adapters'
+import { resolveCapabilityTarget } from '@/services/real-time-events-service-v2/_shared/filter/field-capability'
+import {
+  loadMetricsFallback,
+  loadMetricsSeries,
+  loadFromEventsApi,
+  loadMetricsAggregation,
+  pivotGroupedData
+} from '@/services/real-time-events-service-v2/metrics-chart-service'
+import { normalizeTsBounds } from '@/services/real-time-events-service-v2/_shared/ts-normalize'
+
+export { pivotGroupedData }
+
+export class MetricsChartError extends Error {
+  constructor(message, { reason, detail } = {}) {
+    super(message)
+    this.name = 'MetricsChartError'
+    this.reason = reason || 'unknown'
+    this.detail = detail || null
+  }
+}
+
+/**
+ * Composable for loading multi-series Metrics chart data.
+ * Uses the Metrics GraphQL API directly — no ResolveReport overhead.
+ *
+ * @param {import('vue').Ref<Object>} filterData
+ * @param {Object} [options]
+ * @param {(err: MetricsChartError, config: Object) => void} [options.onError]
+ *   Invoked when a load is rejected (invalid time range, schema mismatch,
+ *   network/API error). Callers typically pipe this to a toast.
+ * @param {import('vue').ComputedRef<string|null>} [options.selectedDashboard]
+ *   The active metrics selection, INJECTED as a read-only computed derived from
+ *   the single writable View source (`selectedView`, task 9.4 / design §3.6).
+ *   This composable no longer owns the selection; it consumes what the View SoT
+ *   derives. When omitted (isolated unit tests), a local read-only computed of
+ *   `null` is used so the shape stays stable and no write path exists.
+ */
+export function useMetricsChart(filterData, { onError, selectedDashboard } = {}) {
+  const data = ref([])
+  const isLoading = ref(false)
+  const configKey = ref(null)
+  // Selection is derived elsewhere and injected; never owned here (no writable
+  // ref). Fall back to a constant read-only computed when not injected.
+  const activeDashboard = selectedDashboard || computed(() => null)
+  // `true` iff at least one events-applicable filter field was dropped when
+  // building the metrics query for the active config (i.e. the chart does not
+  // reflect every active filter). Drives the divergence indicator (§3.13).
+  const partial = ref(false)
+
+  const emitError = (err, config) => {
+    if (typeof onError === 'function') {
+      try {
+        onError(err, config)
+      } catch {
+        /* noop */
+      }
+    }
+  }
+
+  // Monotonic supersession token: each runLoad captures the token it started
+  // with; a load that has been superseded by a newer one must never write to
+  // `data.value`/`isLoading.value`.
+  let loadToken = 0
+  let loadDebounceTimer = null
+
+  /**
+   * Load chart data for a given metrics config.
+   * @param {Object} config - { metricsDataset, fields, groupBy?, aggregation?, filters?, label?, eventsApi? }
+   */
+  const runLoad = async (config) => {
+    const myToken = ++loadToken
+
+    if (!config || !filterData.value?.tsRange) {
+      data.value = []
+      partial.value = false
+      return
+    }
+
+    // Include only the AQL filter fields expressible in the target Metrics
+    // dataset (supported-or-drop — never send a key the Metrics API would
+    // reject). Fields applicable to Events but not to this dataset are dropped
+    // and flip `partial`, so the UI can flag the chart/list divergence.
+    const { filter: metricsFilter, partial: isPartial } = buildForTarget(
+      filterData.value.fields,
+      resolveCapabilityTarget(config)
+    )
+    partial.value = isPartial
+    const activeConfig = { ...config, metricsFilter }
+
+    isLoading.value = true
+    try {
+      const tsRange = filterData.value.tsRange
+      const { tsRangeBegin: begin, tsRangeEnd: end } = normalizeTsBounds(tsRange)
+
+      // Metrics-only series: datasets that only exist in the Metrics API (e.g. botManagerMetrics).
+      // Always routed to the Metrics endpoint regardless of time range.
+      if (config.metricsApiSeries?.series?.length || config.metricsApiSeries?.groupByPivot?.field) {
+        const result = await loadMetricsSeries(activeConfig, begin, end, {
+          dynamicFilter: metricsFilter
+        })
+        if (myToken !== loadToken) return
+        data.value = result
+        return
+      }
+
+      // Route via the central chart-api-router: ≤ 30 min → Events API, > 30 min → Metrics API.
+      if (config.eventsApi?.series?.length || config.eventsApi?.groupByPivot?.field) {
+        const api = resolveChartApi(begin, end)
+        if (api === 'metrics' && config.metricsApiFallback) {
+          const result = await loadMetricsFallback(activeConfig, begin, end, {
+            dynamicFilter: metricsFilter
+          })
+          if (myToken !== loadToken) return
+          if (result.loaded) {
+            data.value = result.data ?? []
+          }
+          return
+        }
+        const result = await loadFromEventsApi(activeConfig, begin, end, {
+          dynamicFilter: metricsFilter
+        })
+        if (myToken !== loadToken) return
+        data.value = result
+        return
+      }
+
+      // Default aggregation path via Metrics API with schema guard.
+      const result = await loadMetricsAggregation(activeConfig, begin, end, {
+        loadAggregableFields,
+        dynamicFilter: metricsFilter
+      })
+      if (myToken !== loadToken) return
+      data.value = result
+    } catch (err) {
+      if (myToken !== loadToken) return
+      // eslint-disable-next-line no-console
+      console.warn('useMetricsChart: failed to load', err)
+      data.value = []
+      const typed =
+        err instanceof MetricsChartError
+          ? err
+          : new MetricsChartError(err?.message || err?.detail || 'Chart could not be loaded.', {
+              reason: err?.reason || 'unknown',
+              detail: err?.detail || err?.message || null
+            })
+      emitError(typed, config)
+    } finally {
+      // A superseded runLoad must not flip isLoading off for the newer one.
+      if (myToken === loadToken) {
+        isLoading.value = false
+      }
+    }
+  }
+
+  /**
+   * Debounced entry point: clears any pending run and schedules a trailing
+   * runLoad after 50ms so bursts of reactive changes coalesce into one load.
+   * @param {Object} config
+   */
+  const load = (config) => {
+    clearTimeout(loadDebounceTimer)
+    loadDebounceTimer = setTimeout(() => {
+      runLoad(config)
+    }, 50)
+  }
+
+  onScopeDispose(() => {
+    clearTimeout(loadDebounceTimer)
+  })
+
+  return { data, isLoading, configKey, selectedDashboard: activeDashboard, partial, load }
+}
+
+/**
+ * Predefined metrics chart configs for investigation panels.
+ * Each entry maps to a GraphQL query and a chart-configs.js visual config.
+ *
+ * - `fields`: explicit field names returned by the API (simple sum per ts).
+ * - `aggregation`: single aggregation variable name (used with groupBy queries).
+ * - `groupBy`: GraphQL groupBy clause (defaults to ['ts'] if omitted).
+ * - `filters`: extra GraphQL filter fields (e.g. wafBlock: "1").
+ */
+export const METRICS_CHART_CONFIGS = {
+  // ── WAF (dashboard 357548675837198933) ──
+  //
+  // All WAF charts aggregate per-second over raw `workloadEvents` rather than
+  // the Metrics API, because the live `HttpMetricsAggregatedFields` enum does
+  // not expose the calculated `wafRequests*` fields documented at
+  // https://www.azion.com/en/documentation/devtools/graphql-api/features/gql-real-time-metrics-fields/.
+  // Filter keys use the Events `*Eq` operator convention (see
+  // `src/helpers/real-time-filters-rules-v2.js`). Series names match the
+  // `seriesOrder`/`seriesLabels` in `chart-configs.js` so the chart builder
+  // renders them with the intended colors/labels.
+  wafThreats: {
+    chartConfigKey: 'wafThreats',
+    label: 'Threats vs Requests',
+    dashboardId: '357548675837198933',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [
+        // Allowed: request crossed the WAF without being blocked and outside
+        // learning mode (i.e. no threat would have been blocked either).
+        { name: 'wafRequestsAllowed', filters: { wafBlockEq: '0', wafLearningEq: '0' } },
+        // Threat: WAF identified a threat but was in learning mode so it
+        // didn't block (wafLearning=1 implies wafBlock=0 by definition).
+        { name: 'wafRequestsThreat', filters: { wafLearningEq: '1' } },
+        // Blocked: WAF actually blocked the request.
+        { name: 'wafRequestsBlocked', filters: { wafBlockEq: '1' } }
+      ]
+    },
+    // For ranges > 30 min, fall back to Metrics API (httpMetrics exposes these fields).
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['wafRequestsAllowed', 'wafRequestsThreat', 'wafRequestsBlocked']
+    }
+  },
+  wafXss: {
+    chartConfigKey: 'wafXss',
+    label: 'Cross-Site Scripting (XSS)',
+    dashboardId: '357548675837198933',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [{ name: 'wafRequestsXssAttacks', filters: { wafAttackFamilyEq: '$XSS' } }]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['wafRequestsXssAttacks']
+    }
+  },
+  wafRfi: {
+    chartConfigKey: 'wafRfi',
+    label: 'Remote File Inclusion (RFI)',
+    dashboardId: '357548675837198933',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [{ name: 'wafRequestsRfiAttacks', filters: { wafAttackFamilyEq: '$RFI' } }]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['wafRequestsRfiAttacks']
+    }
+  },
+  wafSql: {
+    chartConfigKey: 'wafSql',
+    label: 'SQL Injection',
+    dashboardId: '357548675837198933',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [{ name: 'wafRequestsSqlAttacks', filters: { wafAttackFamilyEq: '$SQL' } }]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['wafRequestsSqlAttacks']
+    }
+  },
+  wafOther: {
+    chartConfigKey: 'wafOther',
+    label: 'Other Threats',
+    dashboardId: '357548675837198933',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [{ name: 'wafRequestsOthersAttacks', filters: { wafAttackFamilyEq: '$OTHERS' } }]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['wafRequestsOthersAttacks']
+    }
+  },
+  // `wafThreatsByHost` keeps the Metrics API path because the `requests`
+  // field it aggregates is a basic member of the `<Dataset>AggregatedFields`
+  // enum (confirmed by mirroring RT Metrics' `reports.js` queries). Filter
+  // values are inlined per
+  // `src/modules/real-time-metrics/filters/filter-to-graphql-string.js`.
+  wafThreatsByHost: {
+    metricsDataset: 'httpMetrics',
+    aggregation: 'requests',
+    groupBy: ['ts', 'host'],
+    filters: { wafBlock: '1', wafLearning: '0' },
+    // Limit to the top-5 hosts by total threats — wide ranges can otherwise
+    // return dozens of hosts and overwhelm the legend.
+    topN: 5,
+    chartConfigKey: 'wafThreatsByHost',
+    label: 'Threats by Host',
+    dashboardId: '357548675837198933'
+  },
+  // ── Bot Manager (dashboard 371360344901061482) ──
+  // Bot Manager only has Metrics API (no Events dataset). One alias per
+  // category with its own filter — avoids groupBy + pivot senoidal artifact.
+  // Filter keys use the Metrics API operator convention (e.g. classifiedEq).
+  botTraffic: {
+    chartConfigKey: 'botTraffic',
+    label: 'Bot Traffic',
+    dashboardId: '371360344901061482',
+    metricsApiSeries: {
+      metricsDataset: 'botManagerMetrics',
+      series: [
+        { name: 'bad bot', aggregate: 'sum: requests', filters: { classifiedEq: 'bad bot' } },
+        { name: 'good bot', aggregate: 'sum: requests', filters: { classifiedEq: 'good bot' } },
+        {
+          name: 'legitimate',
+          aggregate: 'sum: requests',
+          filters: { classifiedEq: 'legitimate' }
+        },
+        {
+          name: 'under evaluation',
+          aggregate: 'sum: requests',
+          filters: { classifiedEq: 'under evaluation' }
+        }
+      ]
+    }
+  },
+  botCaptcha: {
+    chartConfigKey: 'botCaptcha',
+    label: 'Bot CAPTCHA',
+    dashboardId: '371360344901061482',
+    metricsApiSeries: {
+      metricsDataset: 'botManagerMetrics',
+      groupByPivot: {
+        field: 'challengeSolved',
+        aggregate: 'sum: requests',
+        labelMap: {
+          true: 'Resolved',
+          false: 'Unresolved',
+          1: 'Resolved',
+          0: 'Unresolved'
+        }
+      }
+    }
+  },
+
+  // ── Performance (dashboard IDs: Data Transferred, Requests, Bandwidth Saving, Tiered Cache) ──
+
+  // 2.1 Cache Behavior
+  cacheHitMiss: {
+    chartConfigKey: 'cacheHitMiss',
+    label: 'Cache Hit vs Miss',
+    dashboardId: '357548608166298191',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      groupByPivot: { field: 'upstreamCacheStatus' }
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['savedRequests', 'missedRequests']
+    }
+  },
+  tieredCacheHitMiss: {
+    chartConfigKey: 'tieredCacheHitMiss',
+    label: 'Tiered Cache Hit vs Miss',
+    dashboardId: '357549371218199219',
+    eventsApi: {
+      dataset: 'tieredCacheEvents',
+      groupByPivot: { field: 'upstreamCacheStatus' }
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      fields: ['savedRequests', 'missedRequests']
+    }
+  },
+  cacheHitRate: {
+    chartConfigKey: 'cacheHitRate',
+    label: 'Cache Hit Rate',
+    dashboardId: '357549179454620239',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [
+        {
+          name: '_savedCount',
+          filters: {
+            upstreamCacheStatusIn: ['HIT', 'STALE', 'EXPIRED', 'REVALIDATED']
+          }
+        },
+        {
+          name: '_totalCount',
+          filters: {}
+        }
+      ]
+    },
+    // Derive requestsOffloaded (percentage) from the two raw count series.
+    eventsApiPostProcess(rows) {
+      return rows.map((row) => {
+        const saved = row._savedCount || 0
+        const total = row._totalCount || 0
+        return {
+          ts: row.ts,
+          requestsOffloaded: total > 0 ? (saved / total) * 100 : 0
+        }
+      })
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      directFields: true,
+      fields: ['requestsOffloaded']
+    }
+  },
+
+  // 2.2 Latency
+  avgRequestTime: {
+    chartConfigKey: 'avgRequestTime',
+    label: 'Avg Request Time',
+    dashboardId: '357548623571976783',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [{ name: 'requestTime', aggregate: 'avg: requestTime', filters: {} }]
+    },
+    // For ranges > 30 min fall back to Metrics API using avg aggregation,
+    // mirroring how Real-Time Metrics loads this chart.
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      aggregation: 'requestTime',
+      aggregationType: 'avg'
+    }
+  },
+  avgUpstreamResponseTime: {
+    chartConfigKey: 'avgUpstreamResponseTime',
+    label: 'Avg Upstream Response Time',
+    dashboardId: '357548623571976783',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [
+        { name: 'upstreamResponseTime', aggregate: 'avg: upstreamResponseTime', filters: {} }
+      ]
+    },
+    // upstreamResponseTime exists in httpMetrics aggregated fields — use avg aggregation
+    // mirroring the same pattern as avgRequestTime.
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      aggregation: 'upstreamResponseTime',
+      aggregationType: 'avg'
+    }
+  },
+  avgConnectTime: {
+    chartConfigKey: 'avgConnectTime',
+    label: 'Avg Connect Time',
+    dashboardId: '357548623571976783',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [{ name: 'upstreamConnectTime', aggregate: 'avg: upstreamConnectTime', filters: {} }]
+    }
+    // No metricsApiFallback: upstreamConnectTime does not exist in httpMetrics aggregated fields.
+    // For ranges > 30 min the Events API is used directly (may return partial data).
+  },
+
+  // 2.3 Throughput
+  bandwidthSavedMissed: {
+    chartConfigKey: 'bandwidthSavedMissed',
+    label: 'Bandwidth Saved vs Missed',
+    dashboardId: '357549179454620239',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [
+        {
+          name: 'bandwidthSavedData',
+          aggregate: 'sum: bytesSent',
+          filters: {
+            upstreamCacheStatusIn: ['HIT', 'STALE', 'EXPIRED', 'REVALIDATED']
+          }
+        },
+        {
+          name: 'bandwidthMissedData',
+          aggregate: 'sum: bytesSent',
+          filters: {
+            upstreamCacheStatusIn: ['MISS', 'BYPASS', 'UPDATING', '-', '']
+          }
+        }
+      ]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      directFields: true,
+      fields: ['bandwidthSavedData', 'bandwidthMissedData']
+    }
+  },
+  requestsSavedMissed: {
+    chartConfigKey: 'requestsSavedMissed',
+    label: 'Requests Saved vs Missed',
+    dashboardId: '357548608166298191',
+    eventsApi: {
+      dataset: 'workloadEvents',
+      series: [
+        {
+          name: 'savedRequests',
+          filters: {
+            upstreamCacheStatusIn: ['HIT', 'STALE', 'EXPIRED', 'REVALIDATED']
+          }
+        },
+        {
+          name: 'missedRequests',
+          filters: {
+            upstreamCacheStatusIn: ['MISS', 'BYPASS', 'UPDATING', '-', '']
+          }
+        }
+      ]
+    },
+    metricsApiFallback: {
+      metricsDataset: 'httpMetrics',
+      directFields: true,
+      fields: ['savedRequests', 'missedRequests']
+    }
+  }
+}

@@ -141,7 +141,7 @@ export class SignUpTracker {
 
   /**
    * @param {Object} payload
-   * @param {'api'|'field'} payload.errorType
+   * @param {'api'|'field'|'client'} payload.errorType
    * @param {string} payload.fieldName
    * @param {string} payload.errorMessage
    *

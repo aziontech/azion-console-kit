@@ -2,13 +2,9 @@
   import CreateDrawerBlock from '@templates/create-drawer-block'
   import { refDebounced } from '@vueuse/core'
   import * as yup from 'yup'
-  import { ref, inject, defineExpose } from 'vue'
+  import { ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
-  import { createDomainService } from '@/services/domains-services/v4'
-  import {
-    listEdgeApplicationsService,
-    loadEdgeApplicationsService
-  } from '@/services/edge-application-services/v4'
+  import { useWorkloadDomainDrawerServices } from '@/composables/useWorkloadDomainDrawerServices'
   import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
   import FormFieldsCreateDomains from '../FormFields/FormFieldsCreateDomains.vue'
   import { useRoute } from 'vue-router'
@@ -22,6 +18,8 @@
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+  const { createDomainService, listEdgeApplicationsService, loadEdgeApplicationsService } =
+    useWorkloadDomainDrawerServices()
   const showCreateDomainDrawer = ref(false)
   const DEBOUNCE_TIME_IN_MS = 300
   const showCreateDrawer = refDebounced(showCreateDomainDrawer, DEBOUNCE_TIME_IN_MS)

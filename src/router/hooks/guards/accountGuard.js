@@ -1,7 +1,6 @@
-import { loadAccountHydration } from '@/helpers/account-data'
+import { loadUserAndAccountInfo } from '@/helpers/account-data'
 import { setRedirectRoute } from '@/helpers'
 import { sessionManager } from '@/services/v2/base/auth'
-import { ensurePlansList } from '@/composables/usePlansService'
 
 /** @type {import('vue-router').NavigationGuardWithThis} */
 export async function accountGuard({ to, accountStore, tracker }) {
@@ -10,26 +9,17 @@ export async function accountGuard({ to, accountStore, tracker }) {
 
   if (userNotIsLoggedIn && isPrivateRoute) {
     if (!accountStore.hasSession) {
-      setRedirectRoute(to)
-      return '/login'
+      if (import.meta.env.VITE_DEBUG_LOGIN === 'true') {
+        accountStore.setHasSession(true)
+      } else {
+        setRedirectRoute(to)
+        return '/login'
+      }
     }
 
     try {
-      // Await account identity hydration before deciding onboarding redirects.
-      // `has_service_order_plan` from account info drives the plan gate.
-      await loadAccountHydration()
-
-      const needsOnboarding = accountStore.needsOnboarding
-      const isAdditionalDataRoute = to.name === 'additional-data'
-
-      if (needsOnboarding && !isAdditionalDataRoute) {
-        ensurePlansList().catch(() => {})
-        return { name: 'additional-data' }
-      }
-
-      if (!needsOnboarding && isAdditionalDataRoute) {
-        return { name: 'home' }
-      }
+      await loadUserAndAccountInfo()
+      sessionManager.afterLogin()
 
       if (to.meta.isPublic) {
         return '/'

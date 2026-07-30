@@ -1,7 +1,7 @@
 export const formatBytes = (bytes, decimals = 2) => {
   if (bytes === 0) return '0 Bytes'
 
-  const kilobyte = 1024
+  const kilobyte = 1000
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 

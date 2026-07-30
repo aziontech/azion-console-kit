@@ -36,7 +36,8 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+  import { ref, computed, watch, nextTick } from 'vue'
+  import { useKeepAliveResource } from '@/composables/useKeepAliveResource'
   const props = defineProps({
     panelSizes: {
       type: Array,
@@ -74,7 +75,6 @@
   const isHorizontal = computed(() => props.direction === 'horizontal')
   const currentSizes = ref([props.panelSizes[0], props.panelSizes[1]])
   let hasAppliedInitial = false
-  let resizeObserver = null
   watch(
     () => props.panelSizes,
     (val) => {
@@ -216,20 +216,36 @@
     emit('resizeend', { sizes: [sizeA, sizeB] })
     hasAppliedInitial = true
   }
-  onMounted(() => {
+
+  const acquireResources = () => {
     applyInitialSizes()
     // Re-apply once when the element becomes visible and has dimensions (e.g., after tab switch)
     if ('ResizeObserver' in window && root.value) {
-      resizeObserver = new ResizeObserver((entries) => {
+      const ro = new ResizeObserver((entries) => {
         const entry = entries[0]
         const cr = entry?.contentRect
         if (!hasAppliedInitial && cr && (cr.width > 0 || cr.height > 0)) {
           applyInitialSizes()
         }
       })
-      resizeObserver.observe(root.value)
+      ro.observe(root.value)
+      return ro
     }
-  })
+    return null
+  }
+  const releaseResources = (ro) => {
+    onPointerUp()
+    if (ro) {
+      const el = root.value
+      if (typeof ro.unobserve === 'function' && el) {
+        ro.unobserve(el)
+      }
+      if (typeof ro.disconnect === 'function') {
+        ro.disconnect()
+      }
+    }
+  }
+  useKeepAliveResource(acquireResources, releaseResources)
   watch(
     () => props.direction,
     async () => {
@@ -244,20 +260,6 @@
       applyInitialSizes()
     }
   )
-  onBeforeUnmount(() => {
-    onPointerUp()
-    if (resizeObserver && root.value) {
-      // Safely cleanup ResizeObserver without empty catch blocks
-      const el = root.value
-      if (typeof resizeObserver.unobserve === 'function' && el) {
-        resizeObserver.unobserve(el)
-      }
-      if (typeof resizeObserver.disconnect === 'function') {
-        resizeObserver.disconnect()
-      }
-      resizeObserver = null
-    }
-  })
 </script>
 <style scoped>
   .resizable-splitter {
@@ -265,5 +267,18 @@
   }
   .handle {
     background: var(--handle-bg);
+  }
+  /* Tablet (640-1023px): enlarge the splitter handle's touchable area
+     for finger ergonomics. Visual bar inside (`barOuterClass`) stays narrow;
+     only the clickable/touchable wrapper grows. Mouse-driven desktop (>=1024px)
+     and mobile (<640px, where the handle is hidden by the parent) are
+     unaffected. */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .handle.cursor-row-resize {
+      height: 2rem;
+    }
+    .handle.cursor-col-resize {
+      width: 2rem;
+    }
   }
 </style>

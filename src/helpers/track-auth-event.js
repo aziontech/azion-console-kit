@@ -1,5 +1,44 @@
 import { useAccountStore } from '@/stores/account'
-import { loadUserAndAccountInfo } from '@/helpers/account-data'
+
+const splitFullName = (fullName) => {
+  const [firstname, ...lastNameParts] = (fullName || '').trim().split(/\s+/).filter(Boolean)
+
+  return {
+    firstname,
+    lastname: lastNameParts.join(' ') || undefined
+  }
+}
+
+const adaptIdentityFromToken = ({ id, props } = {}) => {
+  if (!props) return {}
+
+  const { firstname, lastname } = splitFullName(props.full_name)
+
+  return {
+    email: props.email,
+    userId: id,
+    accountId: props.account_id,
+    firstname,
+    lastname,
+    company: props.account_company_name,
+    accountKind: props.account_type
+  }
+}
+
+const adaptIdentityFromStore = (accountStore) => {
+  const { userId, accountData, isClientAccount } = accountStore
+  const { firstname, lastname } = splitFullName(accountData?.name)
+
+  return {
+    email: accountData?.email,
+    userId,
+    accountId: accountData?.id,
+    firstname: isClientAccount ? accountData?.first_name || firstname : undefined,
+    lastname: isClientAccount ? accountData?.last_name || lastname : undefined,
+    company: isClientAccount ? accountData?.company_name : undefined,
+    accountKind: accountData?.kind
+  }
+}
 
 /**
  * Safely tracks sign-in event without blocking the main flow.
@@ -7,38 +46,28 @@ import { loadUserAndAccountInfo } from '@/helpers/account-data'
  * @param {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} params.tracker
  * @param {'email'|'google'|'github'|'azure'} params.method
  * @param {string} [params.email] - Optional email override
+ * @param {Object} [params.userTrackingInfo] - Optional token verification tracking payload
  * @returns {Promise<void>}
  */
-export async function trackSignInSafely({ tracker, method, email, loadUserData = false }) {
+export async function trackSignInSafely({ tracker, method, email, userTrackingInfo }) {
   try {
     const accountStore = useAccountStore()
-
-    if (loadUserData) {
-      try {
-        await loadUserAndAccountInfo()
-      } catch (loadError) {
-        // Continue without user data - still track with available info
-      }
-    }
-
     const signupTypeFlags = accountStore.getSignupTypeFlags()
-    const { userId: consoleUserId, accountData, isClientAccount } = accountStore
-    const accountKind = accountData?.kind
+
+    const identity = userTrackingInfo
+      ? adaptIdentityFromToken(userTrackingInfo)
+      : adaptIdentityFromStore(accountStore)
 
     const payload = {
       method,
       signupTypeFlags,
-      email: accountData?.email || email,
-      userId: consoleUserId,
-      accountId: accountData?.id,
-      firstname: isClientAccount
-        ? accountData?.first_name || accountData?.name?.split(' ')[0]
-        : undefined,
-      lastname: isClientAccount
-        ? accountData?.last_name || accountData?.name?.split(' ').slice(1).join(' ')
-        : undefined,
-      company: isClientAccount ? accountData?.company_name : undefined,
-      accountKind
+      email: identity.email || email,
+      userId: identity.userId,
+      accountId: identity.accountId,
+      firstname: identity.firstname,
+      lastname: identity.lastname,
+      company: identity.company,
+      accountKind: identity.accountKind
     }
 
     tracker.signIn.userSignedIn(payload).track()

@@ -220,8 +220,7 @@
       const mfaToken = joinDigitsMfa()
       await props.validateMfaCodeService(mfaToken)
       const { user_tracking_info: userInfo } = await verifyUserData()
-      // Load user data and track before switchAccount (which cancels pending requests)
-      await trackSignInSafely({ tracker, method: 'email', loadUserData: true })
+      await trackSignInSafely({ tracker, method: 'email', userTrackingInfo: userInfo })
       const redirect = await props.accountHandler.switchAndReturnAccountPage(
         userInfo.props.account_id
       )

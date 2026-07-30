@@ -1,97 +1,53 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { loadAccountHydration } from '@/helpers/account-data'
-import {
-  accountService,
-  userService,
-  accountSettingsService,
-  contractService
-} from '@/services/v2/account'
-import { useAccountStore } from '@/stores/account'
-import { setFeatureFlags } from '@/composables/user-flag'
 
 vi.mock('@/services/v2/account', () => ({
-  accountService: {
-    getAccountInfo: vi.fn()
-  },
-  userService: {
-    getUserInfo: vi.fn()
-  },
-  accountSettingsService: {
-    getAccountSettingsInfo: vi.fn()
-  },
-  contractService: {
-    getContractServicePlan: vi.fn()
-  }
+  accountService: { getAccountIdentity: vi.fn() },
+  contractService: {}
 }))
-
+vi.mock('@/services/v2/billing/billing-gql-service', () => ({
+  billingGqlService: {}
+}))
+vi.mock('@/composables/user-flag', () => ({
+  setFeatureFlags: vi.fn()
+}))
 vi.mock('@/stores/account', () => ({
   useAccountStore: vi.fn()
 }))
 
-vi.mock('@/composables/user-flag', () => ({
-  setFeatureFlags: vi.fn()
-}))
+import { loadUserAndAccountInfo } from '@/helpers/account-data'
+import { accountService } from '@/services/v2/account'
+import { setFeatureFlags } from '@/composables/user-flag'
+import { useAccountStore } from '@/stores/account'
 
-describe('account data hydration', () => {
+describe('loadUserAndAccountInfo', () => {
+  let setIdentity
+
   beforeEach(() => {
     vi.clearAllMocks()
-    const accountStore = {
-      account: {},
-      setAccountData: vi.fn((accountData) => {
-        accountStore.account = { ...accountStore.account, ...accountData }
-      })
+    setIdentity = vi.fn()
+    useAccountStore.mockReturnValue({ setIdentity })
+  })
+
+  it('reads the single identity source and writes it into the store via setIdentity', async () => {
+    const identity = {
+      id: 42,
+      kind: 'client',
+      client_id: 'client-42',
+      client_flags: ['allow_console']
     }
-    useAccountStore.mockReturnValue(accountStore)
-    accountService.getAccountInfo.mockResolvedValue({
-      id: 1,
-      client_flags: [],
-      hasServiceOrderPlan: true
-    })
-    userService.getUserInfo.mockResolvedValue({ results: { id: 10, client_id: 20 } })
-    accountSettingsService.getAccountSettingsInfo.mockResolvedValue({ jobRole: 'developer' })
-    contractService.getContractServicePlan.mockResolvedValue({
-      isDeveloperSupportPlan: true,
-      yourServicePlan: 'Developer'
-    })
+    accountService.getAccountIdentity.mockResolvedValue(identity)
+
+    await loadUserAndAccountInfo()
+
+    expect(accountService.getAccountIdentity).toHaveBeenCalledTimes(1)
+    expect(setIdentity).toHaveBeenCalledWith(identity)
   })
 
-  it('hydrates account identity without loading contract data in the login guard path', async () => {
-    await loadAccountHydration()
+  it('feeds feature flags from the identity payload', async () => {
+    accountService.getAccountIdentity.mockResolvedValue({ client_flags: ['flag_a', 'flag_b'] })
 
-    expect(accountService.getAccountInfo).toHaveBeenCalledTimes(1)
-    expect(userService.getUserInfo).toHaveBeenCalledTimes(1)
-    expect(accountSettingsService.getAccountSettingsInfo).toHaveBeenCalledTimes(1)
-    expect(contractService.getContractServicePlan).not.toHaveBeenCalled()
-    expect(setFeatureFlags).toHaveBeenCalledWith([])
-  })
+    await loadUserAndAccountInfo()
 
-  it('stores service order plan state from account info during login hydration', async () => {
-    await loadAccountHydration()
-
-    expect(useAccountStore().account.hasServiceOrderPlan).toBe(true)
-  })
-
-  it('stores false when account info requires plan configuration', async () => {
-    accountService.getAccountInfo.mockResolvedValueOnce({
-      id: 1,
-      client_flags: [],
-      hasServiceOrderPlan: false
-    })
-
-    await loadAccountHydration()
-
-    expect(useAccountStore().account.hasServiceOrderPlan).toBe(false)
-  })
-
-  it('stores normalized false from account service for non-active plan state', async () => {
-    accountService.getAccountInfo.mockResolvedValueOnce({
-      id: 1,
-      client_flags: [],
-      hasServiceOrderPlan: false
-    })
-
-    await loadAccountHydration()
-
-    expect(useAccountStore().account.hasServiceOrderPlan).toBe(false)
+    expect(setFeatureFlags).toHaveBeenCalledWith(['flag_a', 'flag_b'])
   })
 })

@@ -7,6 +7,7 @@ const pureAdapters = require('./lib/rules/pure-adapters')
 const moduleIsolation = require('./lib/rules/module-isolation')
 const namingConvention = require('./lib/rules/naming-convention')
 const typeSeparation = require('./lib/rules/type-separation')
+const noUnawaitedClipboard = require('./lib/rules/no-unawaited-clipboard')
 const recommended = require('./lib/configs/recommended')
 
 module.exports = {
@@ -19,7 +20,8 @@ module.exports = {
     'pure-adapters': pureAdapters,
     'module-isolation': moduleIsolation,
     'naming-convention': namingConvention,
-    'type-separation': typeSeparation
+    'type-separation': typeSeparation,
+    'no-unawaited-clipboard': noUnawaitedClipboard
   },
   configs: {
     recommended

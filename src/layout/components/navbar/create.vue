@@ -1,5 +1,5 @@
 <template>
-  <Button
+  <PrimeButton
     @click="openCreateModalToggle"
     icon="pi pi-plus"
     :label="currentLabel"

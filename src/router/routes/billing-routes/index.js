@@ -15,7 +15,7 @@ export const billingRoutes = {
     listServiceAndProductsChangesService: BillingServices.listServiceAndProductsChangesService,
     getStripeClientService: BillingServices.getStripeClientService,
     documentPaymentMethodService: Helpers.documentationGuideProducts.paymentMethods,
-    listPaymentHistoryService: BillingServices.listPaymentHistoryWithInvoicesService,
+    listPaymentHistoryService: BillingServices.listPaymentHistoryService,
     documentPaymentHistoryService: Helpers.documentationGuideProducts.paymentHistory,
     loadYourServicePlanService: BillingServices.loadYourServicePlanService,
     openPlans: Helpers.openShowMorePlan,
@@ -23,10 +23,6 @@ export const billingRoutes = {
     loadInvoiceLastUpdatedService: BillingServices.loadInvoiceLastUpdatedService
   },
   children: [
-    {
-      path: 'payment',
-      redirect: { name: 'billing-tabs' }
-    },
     {
       path: ':tab?',
       name: 'billing-tabs',

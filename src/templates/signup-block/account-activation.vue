@@ -9,7 +9,7 @@
         folder and follow the instructions.
       </p>
     </section>
-    <section class="w-full flex flex-wrap gap-2 items-center">
+    <section class="w-full flex flex-wrap gap-2">
       <p class="text-start text-sm">Didn't receive the email?</p>
       <PrimeButton
         size="small"

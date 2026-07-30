@@ -29,9 +29,9 @@
   const { value: authorityCertificate } = useField('authorityCertificate')
   const { value: subjectNameCertificate } = useField('subjectNameCertificate')
 
-  useField('tls.certificate', { initialValue: 0 })
-  useField('tls.ciphers', { initialValue: 'Modern_v2025Q1' })
-  useField('tls.minimumVersion', { initialValue: 'tls_1_3' })
+  useField('tls.certificate', undefined, { initialValue: 0 })
+  useField('tls.ciphers', undefined, { initialValue: 'Modern_v2025Q1' })
+  useField('tls.minimumVersion', undefined, { initialValue: 'tls_1_3' })
 
   const { errorMessage: httpPortError, value: httpPortValue } = useField('protocols.http.httpPorts')
   const { errorMessage: httpsPortError, value: httpsPortValue } = useField(
@@ -109,8 +109,15 @@
 
   const selectCertificate = (option) => {
     statusDigitalCertificate.value = option.status
-    authorityCertificate.value = option.authority
-    subjectNameCertificate.value = option.subjectName
+    const normalizedAuthority = option.authority ?? null
+    const normalizedSubjectName = option.subjectName ?? null
+
+    if (authorityCertificate.value !== normalizedAuthority) {
+      authorityCertificate.value = normalizedAuthority
+    }
+    if (subjectNameCertificate.value !== normalizedSubjectName) {
+      subjectNameCertificate.value = normalizedSubjectName
+    }
   }
 
   const loadInitialTls = {

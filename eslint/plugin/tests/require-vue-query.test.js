@@ -173,6 +173,54 @@ ruleTester.run('require-vue-query', rule, {
         }
       `,
       filename: 'src/modules/orders/composables/use-order.js'
+    },
+
+    // Pure timestamp-transform utility in a service dir (normalize suffix) — allowed
+    {
+      code: `
+        import { normalizeTs } from '@/services/real-time-events-service-v2/_shared/ts-normalize'
+
+        export function useChartConfig() {
+          return normalizeTs('2020-01-01')
+        }
+      `,
+      filename: 'src/views/RealTimeEventsV2/composables/useChartConfig.js'
+    },
+
+    // Pure aggregation-operators utility (operators suffix) — allowed
+    {
+      code: `
+        import { OPERATORS } from '@/services/real-time-events-service-v2/_shared/aggregation-operators'
+
+        export function useFieldResolution() {
+          return OPERATORS
+        }
+      `,
+      filename: 'src/views/RealTimeEventsV2/composables/useFieldResolution.js'
+    },
+
+    // chart-api-router: pure routing/decision logic (no HTTP) — allowed
+    {
+      code: `
+        import { resolveChartApi } from '@/services/real-time-events-service-v2/chart-api-router'
+
+        export function useEventsData() {
+          return resolveChartApi('a', 'b')
+        }
+      `,
+      filename: 'src/views/RealTimeEventsV2/composables/useEventsData.js'
+    },
+
+    // panels-service: client-side session/panel state (no HTTP) — allowed
+    {
+      code: `
+        import { loadPanels } from '@/services/panels-service'
+
+        export function useSessionManager() {
+          return loadPanels()
+        }
+      `,
+      filename: 'src/views/RealTimeEventsV2/composables/useSessionManager.js'
     }
   ],
 
@@ -235,6 +283,29 @@ ruleTester.run('require-vue-query', rule, {
           data: {
             fileName: 'useAuth.js',
             source: '../services/auth-service'
+          }
+        }
+      ]
+    },
+
+    // A real data service colocated in the SAME _shared dir as exempted pure
+    // utilities is NOT exempted — must still use Vue Query (guards against the
+    // pure-utility exceptions over-reaching to HTTP-performing modules)
+    {
+      code: `
+        import { makeListService } from '@/services/real-time-events-service-v2/_shared/make-list-service'
+
+        export function useEventsList() {
+          return makeListService()
+        }
+      `,
+      filename: 'src/views/RealTimeEventsV2/composables/useEventsList.js',
+      errors: [
+        {
+          messageId: 'requireVueQuery',
+          data: {
+            fileName: 'useEventsList.js',
+            source: '@/services/real-time-events-service-v2/_shared/make-list-service'
           }
         }
       ]
