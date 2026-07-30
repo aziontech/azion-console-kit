@@ -66,6 +66,15 @@ export default {
         sora: ['Sora'],
         protomono: ['Proto Mono'],
         'proto-mono': ['Proto Mono'],
+        code: [
+          'ui-monospace',
+          'SFMono-Regular',
+          'SF Mono',
+          'Menlo',
+          'Consolas',
+          'Liberation Mono',
+          'monospace'
+        ],
         mono: [
           'Proto Mono',
           'ui-monospace',
