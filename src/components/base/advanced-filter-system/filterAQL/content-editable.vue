@@ -4,7 +4,7 @@
     ref="editable"
     contenteditable
     placeholder="Filter using Azion Query Language syntax..."
-    class="contenteditable p-inputtext font-normal text-sm w-full h-auto"
+    class="p-inputtext font-normal text-sm w-full h-auto font-code whitespace-pre-wrap empty:before:content-[attr(placeholder)] empty:before:text-[color:var(--input-placeholder-text-color)] empty:before:pointer-events-none"
     @input="handleInput"
     @keyup="updateCursorOffset"
     @mouseup="updateCursorOffset"
@@ -75,17 +75,3 @@
     getCursorOffset: () => cursorOffset.value
   })
 </script>
-
-<style>
-  .contenteditable {
-    white-space: pre-wrap;
-    font-family:
-      ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
-  }
-
-  .contenteditable:empty:before {
-    content: attr(placeholder);
-    color: var(--input-placeholder-text-color);
-    pointer-events: none;
-  }
-</style>
