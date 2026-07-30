@@ -17,6 +17,7 @@
 
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
+  import { moveItemToPosition } from '@/helpers/reorder-list-position'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -230,10 +231,8 @@
     )
     if (oldIndex === -1) return
 
-    const [movedItem] = data.value.splice(oldIndex, 1)
-    movedItem.position.altered = true
-    const targetIndex = Math.min(Math.max(newValue, 0), data.value.length)
-    data.value.splice(targetIndex, 0, movedItem)
+    data.value[oldIndex].position.altered = true
+    data.value = moveItemToPosition(data.value, oldIndex, newValue)
     updateRowPositions(data.value)
   }
 

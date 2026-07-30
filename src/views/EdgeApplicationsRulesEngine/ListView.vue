@@ -15,6 +15,7 @@
   import DataTable from '@aziontech/webkit/list-data-table'
   import { useDataTable } from '@/composables/useDataTable'
   import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
+  import { clampIndex, moveItemToPosition } from '@/helpers/reorder-list-position'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -259,29 +260,25 @@
     if (originalIndex === -1) return
 
     const maxAllowedPosition = rulesInCurrentPhase.length - 1
-    let newPosition = targetPosition
+    const newPosition = clampIndex(targetPosition, maxAllowedPosition)
 
-    if (newPosition > maxAllowedPosition) {
-      newPosition = maxAllowedPosition
+    if (targetPosition > maxAllowedPosition) {
       displayPositionExceededToast()
-    }
-
-    // Clamp inferior: sem min/max no InputNumber, evita índice negativo no splice
-    if (newPosition < 0) {
-      newPosition = 0
     }
 
     if (originalIndex === newPosition) return
 
-    const firstRule = rulesInCurrentPhase.splice(originalIndex, 1)[0]
-
+    const firstRule = rulesInCurrentPhase[originalIndex]
     firstRule.position.value = targetPosition
     firstRule.position.altered = newPosition !== firstRule.position.immutableValue
 
-    rulesInCurrentPhase.splice(newPosition, 0, firstRule)
+    const reorderedPhase = moveItemToPosition(rulesInCurrentPhase, originalIndex, targetPosition)
 
-    updateRowPositions(rulesInCurrentPhase)
-    data.value = [...request, ...response]
+    updateRowPositions(reorderedPhase)
+    data.value =
+      currentRulePhase === 'Response'
+        ? [...request, ...reorderedPhase]
+        : [...reorderedPhase, ...response]
   }
 
   const onPositionChange = (updatedRow, newValue) => {
