@@ -32,8 +32,10 @@ describe('Property P3 — Aria-label completeness', () => {
     expect(source).toMatch(/aria-label\s*=\s*["']Open saved searches["']/)
   })
 
-  it('event-chart view trigger has aria-label="Change chart view"', () => {
-    const source = read('views/RealTimeEventsV2/Blocks/components/event-chart.vue')
+  it('view-selector trigger has aria-label="Change chart view"', () => {
+    // View dropdown extracted from event-chart.vue in task 7.4; renders inline
+    // inside the chart header, so the a11y contract is unchanged.
+    const source = read('views/RealTimeEventsV2/Blocks/components/view-selector.vue')
     expect(source).toMatch(/aria-label\s*=\s*["']Change chart view["']/)
   })
 
@@ -60,8 +62,8 @@ describe('Property P3 — Aria-label completeness', () => {
     expect(source).toMatch(/aria-label\s*=\s*["']Clear query history["']/)
   })
 
-  it('event-chart bottom-sheet close has aria-label="Close view menu"', () => {
-    const source = read('views/RealTimeEventsV2/Blocks/components/event-chart.vue')
+  it('view-selector bottom-sheet close has aria-label="Close view menu"', () => {
+    const source = read('views/RealTimeEventsV2/Blocks/components/view-selector.vue')
     expect(source).toMatch(/aria-label\s*=\s*["']Close view menu["']/)
   })
 

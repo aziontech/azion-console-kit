@@ -3,7 +3,7 @@
   import PrimeButton from '@aziontech/webkit/button'
   import InputText from '@aziontech/webkit/inputtext'
   import Checkbox from '@aziontech/webkit/checkbox'
-  import ProgressBar from '@aziontech/webkit/progressbar'
+  import FieldRow from './field-row.vue'
   import { useFieldStats } from '../../composables/useFieldStats'
 
   defineOptions({ name: 'FieldSidebar' })
@@ -32,6 +32,10 @@
     selectedDataset: {
       type: Object,
       default: null
+    },
+    resetToken: {
+      type: Number,
+      default: undefined
     }
   })
 
@@ -51,7 +55,8 @@
       data: toRef(props, 'data'),
       availableFields: toRef(props, 'availableFields'),
       searchQuery,
-      selectedFields: toRef(props, 'selectedFields')
+      selectedFields: toRef(props, 'selectedFields'),
+      resetToken: toRef(props, 'resetToken')
     })
 
   const toggleField = (fieldValue) => {
@@ -71,11 +76,6 @@
 
   const handleAddFilter = (fieldName, value) => {
     emit('add-filter', fieldName, value)
-  }
-
-  const truncateFieldValue = (value, maxLen = 30) => {
-    if (!value) return '-'
-    return value.length > maxLen ? `${value.slice(0, maxLen)}…` : value
   }
 
   const expandedField = ref(null)
@@ -159,70 +159,18 @@
             <span class="field-sidebar__pin-label">PINNED</span>
           </div>
           <div class="flex flex-col">
-            <div
+            <FieldRow
               v-for="field in pinnedFields"
               :key="'pinned-' + field.value"
-              class="flex flex-col"
-            >
-              <div
-                class="field-sidebar__row"
-                @click="toggleFieldStats(field.value)"
-                data-testid="field-sidebar-pinned-item"
-              >
-                <Checkbox
-                  :modelValue="isFieldSelected(field.value)"
-                  :binary="true"
-                  class="!w-4 !h-4 flex-shrink-0"
-                  @click.stop="toggleField(field.value)"
-                />
-                <span
-                  class="field-sidebar__row-name"
-                  :class="{ 'field-sidebar__row-name--selected': isFieldSelected(field.value) }"
-                >
-                  {{ field.value }}
-                </span>
-                <span
-                  v-if="fieldStats[field.value]"
-                  class="field-sidebar__row-count"
-                  v-tooltip.top="{
-                    value: `${fieldStats[field.value].uniqueCount} unique values in loaded page`,
-                    showDelay: 300
-                  }"
-                >
-                  {{ fieldStats[field.value].uniqueCount }}
-                </span>
-              </div>
-
-              <div
-                v-if="expandedField === field.value && fieldStats[field.value]"
-                class="field-sidebar__stats"
-              >
-                <div class="field-sidebar__stats-title">
-                  Top {{ fieldStats[field.value].topValues.length }} of
-                  {{ fieldStats[field.value].uniqueCount }} values
-                </div>
-                <div
-                  v-for="(stat, statIdx) in fieldStats[field.value].topValues"
-                  :key="statIdx"
-                  class="field-sidebar__topvalue-row"
-                  :title="stat.value"
-                  @click="handleAddFilter(field.value, stat.value)"
-                >
-                  <div class="field-sidebar__topvalue-meta">
-                    <span class="field-sidebar__topvalue-label">{{
-                      truncateFieldValue(stat.value)
-                    }}</span>
-                    <span class="field-sidebar__topvalue-pct">{{ stat.percent }}%</span>
-                  </div>
-                  <ProgressBar
-                    :value="stat.percent"
-                    :showValue="false"
-                    class="!h-1"
-                  />
-                </div>
-                <div class="field-sidebar__topvalue-hint">Click a value to add as filter</div>
-              </div>
-            </div>
+              :field="field"
+              :selected="isFieldSelected(field.value)"
+              :expanded="expandedField === field.value"
+              :stats="fieldStats[field.value]"
+              testid="field-sidebar-pinned-item"
+              @toggle-select="toggleField(field.value)"
+              @toggle-stats="toggleFieldStats(field.value)"
+              @add-filter="handleAddFilter"
+            />
           </div>
           <div
             v-if="availableFieldsNonPinned.length"
@@ -237,67 +185,18 @@
           </span>
         </div>
         <div class="flex flex-col">
-          <div
+          <FieldRow
             v-for="field in availableFieldsNonPinned"
             :key="field.value"
-            class="flex flex-col"
-          >
-            <div
-              class="field-sidebar__row"
-              @click="toggleFieldStats(field.value)"
-              data-testid="field-sidebar-available-item"
-            >
-              <Checkbox
-                :modelValue="isFieldSelected(field.value)"
-                :binary="true"
-                class="!w-4 !h-4 flex-shrink-0"
-                @click.stop="toggleField(field.value)"
-              />
-              <span
-                class="field-sidebar__row-name"
-                :class="{ 'field-sidebar__row-name--selected': isFieldSelected(field.value) }"
-              >
-                {{ field.value }}
-              </span>
-              <span
-                v-if="fieldStats[field.value]"
-                class="field-sidebar__row-count"
-              >
-                {{ fieldStats[field.value].uniqueCount }}
-              </span>
-            </div>
-
-            <!-- Field statistics -->
-            <div
-              v-if="expandedField === field.value && fieldStats[field.value]"
-              class="field-sidebar__stats"
-            >
-              <div class="field-sidebar__stats-title">
-                Top {{ fieldStats[field.value].topValues.length }} of
-                {{ fieldStats[field.value].uniqueCount }} values
-              </div>
-              <div
-                v-for="(stat, statIdx) in fieldStats[field.value].topValues"
-                :key="statIdx"
-                class="field-sidebar__topvalue-row"
-                :title="stat.value"
-                @click="handleAddFilter(field.value, stat.value)"
-              >
-                <div class="field-sidebar__topvalue-meta">
-                  <span class="field-sidebar__topvalue-label">{{
-                    truncateFieldValue(stat.value)
-                  }}</span>
-                  <span class="field-sidebar__topvalue-pct">{{ stat.percent }}%</span>
-                </div>
-                <ProgressBar
-                  :value="stat.percent"
-                  :showValue="false"
-                  class="!h-1"
-                />
-              </div>
-              <div class="field-sidebar__topvalue-hint">Click a value to add as filter</div>
-            </div>
-          </div>
+            :field="field"
+            :selected="isFieldSelected(field.value)"
+            :expanded="expandedField === field.value"
+            :stats="fieldStats[field.value]"
+            testid="field-sidebar-available-item"
+            @toggle-select="toggleField(field.value)"
+            @toggle-stats="toggleFieldStats(field.value)"
+            @add-filter="handleAddFilter"
+          />
 
           <div
             v-if="!filteredFields.length"
@@ -380,76 +279,6 @@
     font-weight: 600;
   }
 
-  .field-sidebar__row-count {
-    font-size: 0.6875rem;
-    color: var(--text-color-secondary);
-    flex-shrink: 0;
-    min-width: 1.5rem;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* ── Stats panel ─────────────────────────────────────────────────── */
-  .field-sidebar__stats {
-    margin: 0 0.75rem 0.375rem 1.75rem;
-    padding: 0.5rem 0.625rem;
-    border-radius: var(--border-radius);
-    background: var(--surface-hover);
-  }
-
-  .field-sidebar__stats-title {
-    font-size: 0.6875rem;
-    color: var(--text-color-secondary);
-    margin-bottom: 0.375rem;
-  }
-
-  .field-sidebar__topvalue-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1875rem;
-    padding: 0.25rem 0.375rem;
-    border-radius: calc(var(--border-radius) - 2px);
-    cursor: pointer;
-    transition: background-color 0.1s;
-  }
-
-  .field-sidebar__topvalue-row:hover {
-    background: var(--surface-card);
-  }
-
-  .field-sidebar__topvalue-meta {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.25rem;
-  }
-
-  .field-sidebar__topvalue-label {
-    font-size: 0.75rem;
-    color: var(--text-color);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .field-sidebar__topvalue-pct {
-    font-size: 0.6875rem;
-    color: var(--text-color-secondary);
-    flex-shrink: 0;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .field-sidebar__topvalue-hint {
-    font-size: 0.625rem;
-    color: var(--text-color-secondary);
-    font-style: italic;
-    margin-top: 0.375rem;
-    padding: 0 0.375rem;
-    opacity: 0.75;
-  }
-
   /* ── Divider ─────────────────────────────────────────────────────── */
   .field-sidebar__divider {
     height: 1px;
@@ -494,10 +323,6 @@
     .field-sidebar-search {
       padding: 0.375rem 0.625rem;
     }
-
-    .field-sidebar__stats {
-      margin: 0 0.625rem 0.25rem 1.5rem;
-    }
   }
 
   /* Generous on large screens */
@@ -513,10 +338,6 @@
 
     .field-sidebar-search {
       padding: 0.625rem 1rem;
-    }
-
-    .field-sidebar__stats {
-      margin: 0 1rem 0.5rem 2rem;
     }
 
     .field-sidebar__section-label {

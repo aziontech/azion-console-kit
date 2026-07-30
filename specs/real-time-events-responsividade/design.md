@@ -6,6 +6,7 @@
 ## 1. Goals & Non-Goals
 
 **Goals**
+
 - Tornar a página `/real-time-events/v2/:tab?` operável e legível de 320px a ≥1440px com foco em **gráfico** e **filter bar**.
 - Suportar interação **touch** no gráfico (brush-to-zoom e tooltip), hoje quebrada.
 - Adaptar overlays teleportados (View dropdown, time range, saved searches, query history) para não estourar viewport em mobile.
@@ -14,6 +15,7 @@
 - Padronizar 5 breakpoints (mobile-s / mobile / tablet / desktop / xl) via tokens reutilizáveis.
 
 **Non-Goals**
+
 - Refatorar `discover-data-table`, `detail-sidebar-panel`, `events-summary-bar`, `field-sidebar`, `discover-toolbar`, `SessionTabHeader` (já têm suas próprias responsividades).
 - Adicionar dependências runtime novas (sem `@vueuse/core`, sem libs de bottom-sheet).
 - Migrar de C3 para outra lib de gráfico.
@@ -383,20 +385,20 @@ Não aplicável. Sem mudanças em endpoints, queries GraphQL ou eventos.
 
 ## 8. Risks & Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|---|---|---|---|
-| Pointer Events em Safari/iOS antigo causar quebra | Baixa (target ≥ iOS 16) | Alto (zoom quebrado) | Manter feature detection `'PointerEvent' in window`; fallback nominal a `mouse*`. Validar em iOS Safari 16.0 real e BrowserStack. |
-| C3 ignorar `tick.values` em modo `categories` ou regenerar perdendo zoom do usuário | Média | Médio (decimação não aparece) | Validar com `chartKind` atual antes de aplicar; rota-de-fuga: `axis.x.tick.culling.max: maxTicks`. |
-| Bottom-sheet z-index vs C3 tooltip teleportado (99999) | Alta | Baixo (visual) | Sheet `100000`, backdrop `99998`. Fechar tooltip ao abrir sheet (`chartInstance.tooltip.hide()`). |
-| `matchMedia` reativo gerar reflows extras em rotation | Baixa | Baixo | `change` event só dispara em transição de breakpoint, não continuamente. Sem debounce necessário. |
-| `ResizeObserver` loop reaparecer com C3 interno re-resize | Média | Alto (warning) | `requestAnimationFrame` wrap **fora** do `chartInstance.resize()`. Validar 30s de uso intensivo. |
-| Pointer capture + scroll-jacking iOS | Média | Médio (zoom intermitente) | `setPointerCapture` + `touch-action: pan-y` no container chart. |
-| Decimação medindo label width antes de C3 renderizar fontes | Baixa | Médio | Usar elemento off-screen com mesma `font-family/size`; medir antes de `c3.generate`. |
-| Memory leak por handler não-nomeado | Média (sem disciplina) | Alto (degradação por sessão) | Convenção do `useReactiveMediaQuery`: setup ↔ cleanup com handler nomeado idêntico. Code review obrigatório. Teste mount/unmount em loop (≥10). |
-| Bottom-sheet quebra trap de foco em tab switching | Média | Médio (a11y) | Salvar `activeElement` antes do open, devolver no close. Testar com NVDA + VoiceOver. |
-| Telemetria/E2E quebrar por mudança em estrutura DOM | Média | Médio | Preservar `data-testid` existentes (lista em §6.3). Novos test-ids documentados. |
-| Empty/loading/error states ficarem muito apertados em mobile-s | Média | Baixo | Faixa de altura 180-220px com `padding` mínimo. Ícone reduzido + copy mais curto se necessário. |
-| Auto-refresh catch-up disparar fetch em momento ruim (ex: usuário no meio de scroll) | Baixa | Baixo | Catch-up só se `lastTickAt > refreshInterval`; UI mostra spinner discreto, não bloqueia. |
+| Risk                                                                                 | Likelihood              | Impact                        | Mitigation                                                                                                                                      |
+| ------------------------------------------------------------------------------------ | ----------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pointer Events em Safari/iOS antigo causar quebra                                    | Baixa (target ≥ iOS 16) | Alto (zoom quebrado)          | Manter feature detection `'PointerEvent' in window`; fallback nominal a `mouse*`. Validar em iOS Safari 16.0 real e BrowserStack.               |
+| C3 ignorar `tick.values` em modo `categories` ou regenerar perdendo zoom do usuário  | Média                   | Médio (decimação não aparece) | Validar com `chartKind` atual antes de aplicar; rota-de-fuga: `axis.x.tick.culling.max: maxTicks`.                                              |
+| Bottom-sheet z-index vs C3 tooltip teleportado (99999)                               | Alta                    | Baixo (visual)                | Sheet `100000`, backdrop `99998`. Fechar tooltip ao abrir sheet (`chartInstance.tooltip.hide()`).                                               |
+| `matchMedia` reativo gerar reflows extras em rotation                                | Baixa                   | Baixo                         | `change` event só dispara em transição de breakpoint, não continuamente. Sem debounce necessário.                                               |
+| `ResizeObserver` loop reaparecer com C3 interno re-resize                            | Média                   | Alto (warning)                | `requestAnimationFrame` wrap **fora** do `chartInstance.resize()`. Validar 30s de uso intensivo.                                                |
+| Pointer capture + scroll-jacking iOS                                                 | Média                   | Médio (zoom intermitente)     | `setPointerCapture` + `touch-action: pan-y` no container chart.                                                                                 |
+| Decimação medindo label width antes de C3 renderizar fontes                          | Baixa                   | Médio                         | Usar elemento off-screen com mesma `font-family/size`; medir antes de `c3.generate`.                                                            |
+| Memory leak por handler não-nomeado                                                  | Média (sem disciplina)  | Alto (degradação por sessão)  | Convenção do `useReactiveMediaQuery`: setup ↔ cleanup com handler nomeado idêntico. Code review obrigatório. Teste mount/unmount em loop (≥10). |
+| Bottom-sheet quebra trap de foco em tab switching                                    | Média                   | Médio (a11y)                  | Salvar `activeElement` antes do open, devolver no close. Testar com NVDA + VoiceOver.                                                           |
+| Telemetria/E2E quebrar por mudança em estrutura DOM                                  | Média                   | Médio                         | Preservar `data-testid` existentes (lista em §6.3). Novos test-ids documentados.                                                                |
+| Empty/loading/error states ficarem muito apertados em mobile-s                       | Média                   | Baixo                         | Faixa de altura 180-220px com `padding` mínimo. Ícone reduzido + copy mais curto se necessário.                                                 |
+| Auto-refresh catch-up disparar fetch em momento ruim (ex: usuário no meio de scroll) | Baixa                   | Baixo                         | Catch-up só se `lastTickAt > refreshInterval`; UI mostra spinner discreto, não bloqueia.                                                        |
 
 ---
 
@@ -418,102 +420,102 @@ Esta entrega é puramente client-side e não requer feature flag, migração de 
 
 ## 10. Requirements Coverage
 
-| Requirement | Covered by |
-|---|---|
-| 1.1 | §3.5 event-chart (`.chart-container` height), §3.2 `useBreakpoint` |
-| 1.2 | §3.5, §3.2 |
-| 1.3 | §3.5 (`@media` desktop/xl) |
-| 1.4 | §3.6 `useChartBuilder` tick decimation, §7.4 |
-| 1.5 | §3.6, §3.7 `pickEvenlyDistributed` |
-| 1.6 | §3.6 (rotate logic), §7.4 |
-| 1.7 | §3.6 (format branch) |
-| 1.8 | §3.6 |
-| 1.9 | §3.5 (`ResizeObserver` debounce ≤100ms), §6.1 |
-| 1.10 | §3.5, §3.2 (graceful at <320px) |
-| 1.11 | §3.5 (preserve current CSS), §6.4 a11y contrast |
-| 1.12 | §3.5 (empty/loading/error heights aligned) |
-| 2.1 | §3.8 filter-bar (`is-single-row` class) |
-| 2.2 | §3.8 (`is-two-row` + flex-end) |
-| 2.3 | §3.8 (`is-stack`) |
-| 2.4 | §3.8 (mobile-s Dataset 100%) |
-| 2.5 | §3.8 (44px touch target) |
-| 2.6 | §3.8 (no horizontal overflow) |
-| 2.7 | §3.5/§3.8 (state preservation on rotation) |
-| 2.8 | §3.11 (visualViewport handling no AQL focus) |
-| 2.9 | §3.8 (height 2rem desktop, 2.75rem tablet+) |
-| 3.1 | §3.9 filterTagsDisplay (scroll-x universal) |
-| 3.2 | §3.9, §7.3 (CSS mask fade) |
-| 3.3 | §3.9 (max-width by breakpoint) |
-| 3.4 | §3.9 (24×24 touch target) |
-| 3.5 | §3.9, §6.2 a11y aria-label |
-| 3.6 | §3.9 (`overscroll-behavior-x: contain`), §3.5 (`touch-action`) |
-| 3.7 | §3.9 (scrollIntoView no focus) |
-| 3.8 | §3.9 (substitui overflow:hidden por scroll-x) |
-| 3.9 | §3.9 (v-if existente preservado) |
-| 4.1 | §3.5 (`@media` ocultar `.chart-header__hint`) |
-| 4.2 | §3.5 (view-trigger 5-7rem em mobile) |
-| 4.3 | §3.5 (flex-wrap header) |
-| 4.4 | §3.5 (tablet preserva label) |
-| 4.5 | §3.5 (collapse-btn 24×24) |
-| 4.6 | §3.5 (`aria-label="Change chart view"`) |
-| 4.7 | §3.5 (CHART label preserved) |
-| 4.8 | §3.5 (font-size + hide "events" if < 60px) |
-| 5.1 | §3.5 (Pointer Events unificado), §7.1 |
-| 5.2 | §3.5 (tooltip touch + 3s timer) |
-| 5.3 | §3.5 (5% threshold preservado) |
-| 5.4 | §3.5 (`touch-action: pan-y`) |
-| 5.5 | §3.5 (pointer:fine preserva mouse behavior) |
-| 5.6 | §3.5 (tap-fora hides tooltip + overlay) |
-| 5.7 | §3.4 `usePointerType`, §3.5 (`@media (pointer: fine)` para cursor) |
-| 5.8 | §3.5 (4px threshold tap vs drag) |
-| 6.1 | §3.11 (time range panel max-width/dvh) |
-| 6.2 | §3.11 (alinhamento right/left dinâmico) |
-| 6.3 | §3.11 (tablet+ preserva atual) |
-| 6.4 | §3.11 (keyboard input, filterDateRangeMaxDays) |
-| 6.5 | §3.11 (`watch(bp.current)` fecha painel) |
-| 6.6 | §3.11 (isInvalidRange preservado) |
-| 7.1 | §3.12 saved-searches-overlay |
-| 7.2 | §3.12 query-history-overlay |
-| 7.3 | §3.5/§3.10 bottom-sheet, §7.2 |
-| 7.4 | §3.5 (orientationchange + visualViewport listeners) |
-| 7.5 | §3.8 (Dataset Dropdown max-width) |
-| 7.6 | §3.12 (aria-labels) |
-| 7.7 | §3.10/§3.12 (dismiss patterns) |
-| 8.1 | §3.11 (Refresh aria-label + 44×44) |
-| 8.2 | §3.11 (icon-only em mobile) |
-| 8.3 | §3.11 (loading state on Refresh) |
-| 8.4 | §3.11 (guard no document.activeElement) |
-| 8.5 | §3.11 (relative ranges preservados) |
-| 8.6 | §3.3 `useVisibility`, §3.11 (catch-up logic) |
-| 8.7 | §3.3 cleanup + §3.11 (no leak) |
-| 9.1 | §3.14 ResizableSplitter (8px tablet+) |
-| 9.2 | §3.14 (preserva touchstart.passive) |
-| 9.3 | §3.13 tab-panel-block (640px alinhado), §7.6 |
-| 9.4 | §3.14 (preserva desktop atual) |
-| 10.1 | §6.1 (rAF + debounce ≤150ms total) |
-| 10.2 | Sem deps novas (decisão de design) |
-| 10.3 | §3.5 (rAF + flag), §6.1, §7 risk row |
-| 10.4 | §3.10 (animação respeita reduced-motion), §6.2 |
-| 10.5 | §3.5 (buildToken preservado) |
-| 10.6 | §3.1-3.4 (composables com cleanup simétrico), §6.3 |
-| 10.7 | §3.1-3.4 (handlers nomeados, paths espelhados) |
-| 10.8 | §6.3 (test mount/unmount em loop ≥10) |
-| 11.1 | §3.5/§3.8/§3.9/§3.10 (24×24 / 44×44 touch targets) |
-| 11.2 | §3.8 (tab order preservada) |
-| 11.3 | §3.9 (scrollIntoView no focus) |
-| 11.4 | §6.2 (contrast preservado via CSS vars) |
-| 11.5 | §3.5/§3.8/§3.9/§3.10/§3.12 (aria-labels) |
-| 11.6 | §6.2 (`:focus-visible`) |
-| 11.7 | §3.5 (`aria-describedby` no chart wrapper) |
-| 12.1 | §7.1 (Pointer Events feature-detect), §6.1 |
-| 12.2 | §3.13 (100dvh substitui 100vh) |
-| 12.3 | §3.13 (safe-area-inset), §3.10 (sheet padding-bottom) |
-| 12.4 | §3.5 (rAF wrap previne loop) |
-| 12.5 | §3.10 (sheet `position: fixed` + safe-area fallback) |
-| 13.1 | §6.3 (data-testid lista preservada) |
-| 13.2 | §6.3 (convenção `rte-<componente>-<elemento>`) |
-| 13.3 | §6.3 (QA manual + testes) |
-| 13.4 | §6.3 (zero warnings/errors no console) |
+| Requirement | Covered by                                                         |
+| ----------- | ------------------------------------------------------------------ |
+| 1.1         | §3.5 event-chart (`.chart-container` height), §3.2 `useBreakpoint` |
+| 1.2         | §3.5, §3.2                                                         |
+| 1.3         | §3.5 (`@media` desktop/xl)                                         |
+| 1.4         | §3.6 `useChartBuilder` tick decimation, §7.4                       |
+| 1.5         | §3.6, §3.7 `pickEvenlyDistributed`                                 |
+| 1.6         | §3.6 (rotate logic), §7.4                                          |
+| 1.7         | §3.6 (format branch)                                               |
+| 1.8         | §3.6                                                               |
+| 1.9         | §3.5 (`ResizeObserver` debounce ≤100ms), §6.1                      |
+| 1.10        | §3.5, §3.2 (graceful at <320px)                                    |
+| 1.11        | §3.5 (preserve current CSS), §6.4 a11y contrast                    |
+| 1.12        | §3.5 (empty/loading/error heights aligned)                         |
+| 2.1         | §3.8 filter-bar (`is-single-row` class)                            |
+| 2.2         | §3.8 (`is-two-row` + flex-end)                                     |
+| 2.3         | §3.8 (`is-stack`)                                                  |
+| 2.4         | §3.8 (mobile-s Dataset 100%)                                       |
+| 2.5         | §3.8 (44px touch target)                                           |
+| 2.6         | §3.8 (no horizontal overflow)                                      |
+| 2.7         | §3.5/§3.8 (state preservation on rotation)                         |
+| 2.8         | §3.11 (visualViewport handling no AQL focus)                       |
+| 2.9         | §3.8 (height 2rem desktop, 2.75rem tablet+)                        |
+| 3.1         | §3.9 filterTagsDisplay (scroll-x universal)                        |
+| 3.2         | §3.9, §7.3 (CSS mask fade)                                         |
+| 3.3         | §3.9 (max-width by breakpoint)                                     |
+| 3.4         | §3.9 (24×24 touch target)                                          |
+| 3.5         | §3.9, §6.2 a11y aria-label                                         |
+| 3.6         | §3.9 (`overscroll-behavior-x: contain`), §3.5 (`touch-action`)     |
+| 3.7         | §3.9 (scrollIntoView no focus)                                     |
+| 3.8         | §3.9 (substitui overflow:hidden por scroll-x)                      |
+| 3.9         | §3.9 (v-if existente preservado)                                   |
+| 4.1         | §3.5 (`@media` ocultar `.chart-header__hint`)                      |
+| 4.2         | §3.5 (view-trigger 5-7rem em mobile)                               |
+| 4.3         | §3.5 (flex-wrap header)                                            |
+| 4.4         | §3.5 (tablet preserva label)                                       |
+| 4.5         | §3.5 (collapse-btn 24×24)                                          |
+| 4.6         | §3.5 (`aria-label="Change chart view"`)                            |
+| 4.7         | §3.5 (CHART label preserved)                                       |
+| 4.8         | §3.5 (font-size + hide "events" if < 60px)                         |
+| 5.1         | §3.5 (Pointer Events unificado), §7.1                              |
+| 5.2         | §3.5 (tooltip touch + 3s timer)                                    |
+| 5.3         | §3.5 (5% threshold preservado)                                     |
+| 5.4         | §3.5 (`touch-action: pan-y`)                                       |
+| 5.5         | §3.5 (pointer:fine preserva mouse behavior)                        |
+| 5.6         | §3.5 (tap-fora hides tooltip + overlay)                            |
+| 5.7         | §3.4 `usePointerType`, §3.5 (`@media (pointer: fine)` para cursor) |
+| 5.8         | §3.5 (4px threshold tap vs drag)                                   |
+| 6.1         | §3.11 (time range panel max-width/dvh)                             |
+| 6.2         | §3.11 (alinhamento right/left dinâmico)                            |
+| 6.3         | §3.11 (tablet+ preserva atual)                                     |
+| 6.4         | §3.11 (keyboard input, filterDateRangeMaxDays)                     |
+| 6.5         | §3.11 (`watch(bp.current)` fecha painel)                           |
+| 6.6         | §3.11 (isInvalidRange preservado)                                  |
+| 7.1         | §3.12 saved-searches-overlay                                       |
+| 7.2         | §3.12 query-history-overlay                                        |
+| 7.3         | §3.5/§3.10 bottom-sheet, §7.2                                      |
+| 7.4         | §3.5 (orientationchange + visualViewport listeners)                |
+| 7.5         | §3.8 (Dataset Dropdown max-width)                                  |
+| 7.6         | §3.12 (aria-labels)                                                |
+| 7.7         | §3.10/§3.12 (dismiss patterns)                                     |
+| 8.1         | §3.11 (Refresh aria-label + 44×44)                                 |
+| 8.2         | §3.11 (icon-only em mobile)                                        |
+| 8.3         | §3.11 (loading state on Refresh)                                   |
+| 8.4         | §3.11 (guard no document.activeElement)                            |
+| 8.5         | §3.11 (relative ranges preservados)                                |
+| 8.6         | §3.3 `useVisibility`, §3.11 (catch-up logic)                       |
+| 8.7         | §3.3 cleanup + §3.11 (no leak)                                     |
+| 9.1         | §3.14 ResizableSplitter (8px tablet+)                              |
+| 9.2         | §3.14 (preserva touchstart.passive)                                |
+| 9.3         | §3.13 tab-panel-block (640px alinhado), §7.6                       |
+| 9.4         | §3.14 (preserva desktop atual)                                     |
+| 10.1        | §6.1 (rAF + debounce ≤150ms total)                                 |
+| 10.2        | Sem deps novas (decisão de design)                                 |
+| 10.3        | §3.5 (rAF + flag), §6.1, §7 risk row                               |
+| 10.4        | §3.10 (animação respeita reduced-motion), §6.2                     |
+| 10.5        | §3.5 (buildToken preservado)                                       |
+| 10.6        | §3.1-3.4 (composables com cleanup simétrico), §6.3                 |
+| 10.7        | §3.1-3.4 (handlers nomeados, paths espelhados)                     |
+| 10.8        | §6.3 (test mount/unmount em loop ≥10)                              |
+| 11.1        | §3.5/§3.8/§3.9/§3.10 (24×24 / 44×44 touch targets)                 |
+| 11.2        | §3.8 (tab order preservada)                                        |
+| 11.3        | §3.9 (scrollIntoView no focus)                                     |
+| 11.4        | §6.2 (contrast preservado via CSS vars)                            |
+| 11.5        | §3.5/§3.8/§3.9/§3.10/§3.12 (aria-labels)                           |
+| 11.6        | §6.2 (`:focus-visible`)                                            |
+| 11.7        | §3.5 (`aria-describedby` no chart wrapper)                         |
+| 12.1        | §7.1 (Pointer Events feature-detect), §6.1                         |
+| 12.2        | §3.13 (100dvh substitui 100vh)                                     |
+| 12.3        | §3.13 (safe-area-inset), §3.10 (sheet padding-bottom)              |
+| 12.4        | §3.5 (rAF wrap previne loop)                                       |
+| 12.5        | §3.10 (sheet `position: fixed` + safe-area fallback)               |
+| 13.1        | §6.3 (data-testid lista preservada)                                |
+| 13.2        | §6.3 (convenção `rte-<componente>-<elemento>`)                     |
+| 13.3        | §6.3 (QA manual + testes)                                          |
+| 13.4        | §6.3 (zero warnings/errors no console)                             |
 
 **Cobertura: 94/94 critérios mapeados.**
 
@@ -526,15 +528,18 @@ As 5 decisões abaixo resolvem questões abertas levantadas durante a investiga�
 ### UX-D1 — Fade indicator dos chips: REMOVIDO + escopo de scroll-x reduzido
 
 **O que decidimos**:
+
 1. **Não introduzir** elemento visual de fade gradient nas bordas dos chips.
 2. **Aplicar `overflow-x: auto` (scroll horizontal) APENAS em mobile/tablet** (`viewport < 1024px`). Em desktop/xl o comportamento atual (`overflow: hidden`, clip silencioso) é preservado.
 
 **Por quê**:
+
 - O usuário pediu para não criar o elemento de fade e evitar mudanças que possam afetar a tela atual em desktop.
 - Em desktop, a quantidade de filtros simultâneos é tipicamente pequena (3-5 chips) e raramente excede a largura — manter `overflow: hidden` é zero risco visual.
 - Em mobile/tablet, a largura é tão restrita que QUALQUER chip já causa overflow — scroll-x é necessário para o usuário acessar os filtros aplicados.
 
 **Implicação no critério §3.2 dos requirements**: "indicação visual de overflow" passa a ser:
+
 - Em desktop/xl: **não se aplica** (não haverá scroll a indicar — chips são clipados como hoje).
 - Em mobile/tablet: **scrollbar nativo do browser** quando há overflow horizontal real.
 
@@ -562,6 +567,7 @@ Mobile (stack vertical da filter bar):
 **Por quê**: FAB (botão flutuante estilo Material) ocultaria parte do gráfico/lista durante um incidente — exatamente o conteúdo que o usuário precisa ver. Sticky-top competiria com o header global do Azion. Inline preserva a hierarquia já estabelecida e mantém o Refresh previsível dentro do contexto da filter bar.
 
 **Como implementar**:
+
 - Em mobile/mobile-s, container raiz da filter bar com `flex-direction: column`.
 - Refresh button como último item: `align-self: flex-end`, `min-width: 44px`, `min-height: 44px`.
 - Em mobile, exibir só o ícone (`pi pi-refresh`) com `aria-label="Refresh events"`.
@@ -577,6 +583,7 @@ Mobile (stack vertical da filter bar):
 **Por quê**: a saída mais curta (200ms vs 280ms) evita aquela sensação de "travou" no fechar. A curva iOS-like dá peso à interação sem o exagero "expressive" do Material. Reduced-motion preserva o sinal "algo apareceu" mas sem deslocamento físico.
 
 **Como implementar**:
+
 - `transition: transform 280ms cubic-bezier(0.32, 0.72, 0, 1)` no abrir.
 - `transition: transform 200ms cubic-bezier(0.32, 0.72, 0, 1)` no fechar.
 - Backdrop `opacity` com o mesmo timing.
@@ -593,6 +600,7 @@ Mobile (stack vertical da filter bar):
 **Por quê**: o critério §8.3 dos requirements aprovados só fala em **spinner durante fetch** e **disabled state**. Adicionar um indicador ambiente é nova capacidade que excede o contrato aprovado. O UX agent sugeriu, mas implementar agora exigiria reabrir os requirements (a numeração até §8.7 já é contrato com tasks.md).
 
 **O que será implementado nesta entrega** (§8.3 dos requirements):
+
 - **Idle** (sem fetch): ícone `pi pi-refresh` estático.
 - **Fetching** (manual ou tick automático): ícone vira spinner + botão `disabled`.
 - **Pós-fetch**: volta a idle.
@@ -610,6 +618,7 @@ Mobile (stack vertical da filter bar):
 **Por quê**: medir `getBoundingClientRect()` de um elemento off-screen custa ~1ms por chamada. A medição é necessária a cada re-render (mudança de breakpoint, novos dados, resize). Como o conjunto de chaves é pequeno (poucos formatos × poucos tamanhos), um cache trivial elimina trabalho repetido. Reset no unmount evita persistência entre páginas (font-family pode variar).
 
 **Como implementar**:
+
 - `const cache = new Map<string, number>()` no escopo do composable.
 - Chave: `${formatKey}|${fontSizePx}` (ex: `"MM/dd HH:mm|11"`).
 - Hit: retorna `cache.get(key)` direto, sem medir.

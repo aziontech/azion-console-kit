@@ -118,8 +118,8 @@ describe('tieredCacheServices', () => {
           summary: [
             { key: 'configurationId', value: fixtures.tieredCache.configurationId },
             { key: 'host', value: fixtures.tieredCache.host },
-            { key: 'requestMethod', value: fixtures.tieredCache.requestMethod },
             { key: 'requestUri', value: fixtures.tieredCache.requestUri },
+            { key: 'requestMethod', value: fixtures.tieredCache.requestMethod },
             { key: 'upstreamCacheStatus', value: fixtures.tieredCache.upstreamCacheStatus },
             { key: 'proxyHost', value: fixtures.tieredCache.proxyHost }
           ],

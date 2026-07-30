@@ -6,21 +6,11 @@ import { makeBeholderBaseUrl } from '../real-time-metrics-services/make-beholder
 import * as Errors from '@/services/axios/errors'
 import { resolveChartApi } from './chart-api-router'
 import { buildFilterParts } from './_shared/build-filter-parts'
-
-function inferArrayType(arr) {
-  if (!Array.isArray(arr) || !arr.length) return '[String]'
-  const sample = arr[0]
-  if (typeof sample === 'number') return Number.isInteger(sample) ? '[Int]' : '[Float]'
-  return '[String]'
-}
-
-function normalizeInFilterValues(values) {
-  if (!Array.isArray(values)) return values
-  return values.map((item) => {
-    const raw = item?.value !== undefined ? item.value : item
-    return String(raw)
-  })
-}
+import { cleanBuiltFilterForMetrics } from './_shared/filter/adapters'
+import { buildMetricsInlineFilter, toInlineSuffix } from './_shared/graphql/metrics-filter-inline'
+import { pivotTimeseries } from './_shared/graphql/pivot-timeseries'
+import { normalizeTsBounds } from './_shared/ts-normalize'
+import { getBucketInterval } from './_shared/buckets'
 
 // True when any clause in the filter (across `and`, `in`, or any `or` group)
 // targets a key starting with `fieldPrefix` (e.g. "status"). Handles both the
@@ -103,7 +93,9 @@ const parseHttpResponse = (response, dataset) => {
   }
 }
 
-const METRICS_DATASET_MAP = {
+// Exported: shared with useEventsData's count-source gate (P2) so "does this
+// events dataset have a rollup?" has a single source of truth.
+export const METRICS_DATASET_MAP = {
   workloadEvents: 'httpMetrics',
   functionEvents: 'edgeFunctionsMetrics',
   functionConsoleEvents: 'edgeFunctionsMetrics',
@@ -124,131 +116,6 @@ const METRICS_AGGREGATE_MAP = {
 }
 
 const EMPTY_RESULT = Object.freeze({ chartData: [], kpis: null })
-
-/**
- * Fields accepted as filter arguments by each Metrics dataset.
- * Source: https://www.azion.com/en/documentation/devtools/graphql-api/features/gql-real-time-metrics-fields/
- *
- * Fields NOT in this set (e.g. httpUserAgent, requestUri, remoteAddress) are
- * stripped before building the Metrics query. The chart renders with the
- * supported filters; the kpis.partialFilter flag tells the UI not to use the
- * chart total as "Documents found".
- */
-const METRICS_FILTER_FIELDS = {
-  httpMetrics: new Set([
-    'bytesSent',
-    'configurationId',
-    'geolocCountryName',
-    'geolocRegionName',
-    'host',
-    'proxyStatus',
-    'remoteAddressClass',
-    'requestLength',
-    'requestMethod',
-    'requestTime',
-    'requests',
-    'scheme',
-    'sentHttpXOriginalImageSize',
-    'serverProtocol',
-    'sourceLocPop',
-    'sslProtocol',
-    'status',
-    'upstreamBytesReceived',
-    'upstreamCacheStatus',
-    'upstreamResponseTime',
-    'upstreamStatus',
-    'wafAttackFamily',
-    'wafBlock',
-    'wafLearning'
-  ]),
-  edgeFunctionsMetrics: new Set([
-    'computeTime',
-    'configurationId',
-    'edgeFunctionId',
-    'edgeFunctionInstanceId',
-    'edgeFunctionsInstanceIdList',
-    'functionLanguage',
-    'initiatorType',
-    'invocations',
-    'sourceLocPop'
-  ]),
-  imagesProcessedMetrics: new Set([
-    'bytesSent',
-    'configurationId',
-    'host',
-    'remoteAddressClass',
-    'requestMethod',
-    'requestTime',
-    'requests',
-    'scheme',
-    'sourceLocPop',
-    'status',
-    'upstreamCacheStatus',
-    'upstreamResponseTime',
-    'upstreamStatus'
-  ]),
-  l2CacheMetrics: new Set([
-    'bytesSent',
-    'configurationId',
-    'host',
-    'proxyStatus',
-    'remoteAddressClass',
-    'requestLength',
-    'requestMethod',
-    'requestTime',
-    'requests',
-    'scheme',
-    'sourceLocPop',
-    'status',
-    'upstreamBytesReceived',
-    'upstreamCacheStatus',
-    'upstreamResponseTime',
-    'upstreamStatus'
-  ]),
-  idnsQueriesMetrics: new Set(['qtype', 'requests', 'sourceLocPop', 'zoneId']),
-  dataStreamedMetrics: new Set([
-    'configurationId',
-    'dataStreamed',
-    'endpointType',
-    'requests',
-    'sourceLocPop',
-    'streamedLines'
-  ])
-}
-
-function extractBaseField(filterKey) {
-  return filterKey.replace(/(Eq|Ne|Like|Ilike|Gte|Gt|Lte|Lt|In|Range|Contains)$/, '')
-}
-
-function filterForMetrics(filters, metricsDataset) {
-  const allowed = METRICS_FILTER_FIELDS[metricsDataset]
-  if (!allowed) return { cleaned: filters, partial: false }
-  let partial = false
-  const cleaned = {}
-  if (filters?.and) {
-    const kept = {}
-    Object.entries(filters.and).forEach(([key, value]) => {
-      if (allowed.has(extractBaseField(key))) {
-        kept[key] = value
-      } else {
-        partial = true
-      }
-    })
-    if (Object.keys(kept).length) cleaned.and = kept
-  }
-  if (filters?.in) {
-    const kept = {}
-    Object.entries(filters.in).forEach(([key, value]) => {
-      if (allowed.has(extractBaseField(key))) {
-        kept[key] = value
-      } else {
-        partial = true
-      }
-    })
-    if (Object.keys(kept).length) cleaned.in = kept
-  }
-  return { cleaned, partial }
-}
 
 const STATUS_METRICS_ALIASES = Object.freeze([
   { alias: 'status2xx', bucket: '2xx', rangeBegin: 200, rangeEnd: 299 },
@@ -285,44 +152,19 @@ function buildMetricsKpisFromStatusChart(chartData) {
 async function loadStatusChartFromMetricsApi({ dataset, tsRange, filters = {} }) {
   const metricsDataset = METRICS_DATASET_MAP[dataset]
   if (!metricsDataset) return EMPTY_RESULT
-  const tsRangeBegin =
-    tsRange.tsRangeBegin instanceof Date
-      ? tsRange.tsRangeBegin.toISOString()
-      : String(tsRange.tsRangeBegin)
-  const tsRangeEnd =
-    tsRange.tsRangeEnd instanceof Date
-      ? tsRange.tsRangeEnd.toISOString()
-      : String(tsRange.tsRangeEnd)
+  const { tsRangeBegin, tsRangeEnd } = normalizeTsBounds(tsRange)
   const statusFilters = { gte: null, lte: null, gt: null, lt: null }
   Object.entries(filters?.and || {}).forEach(([key, value]) => {
     const match = key.match(/^status(Gte|Lte|Gt|Lt)$/)
     if (match) statusFilters[match[1].toLowerCase()] = Number(value)
   })
-  const extraFilterFragments = []
-  const extraVariables = {}
-  const extraParamDeclarations = []
-  Object.entries(filters?.and || {}).forEach(([key, value]) => {
-    if (!key.startsWith('status')) {
-      const varName = `filter_${key}`
-      extraVariables[varName] = value
-      extraFilterFragments.push(`${key}: $${varName}`)
-      extraParamDeclarations.push(`$${varName}: ${typeof value === 'number' ? 'Int' : 'String'}`)
-    }
-  })
-  Object.entries(filters?.in || {}).forEach(([key, value]) => {
-    if (!key.startsWith('status')) {
-      const varName = `in_${key}`
-      const normalized = normalizeInFilterValues(value)
-      extraVariables[varName] = normalized
-      const gqlKey = key.endsWith('In') ? key : `${key}In`
-      extraFilterFragments.push(`${gqlKey}: $${varName}`)
-      extraParamDeclarations.push(`$${varName}: ${inferArrayType(normalized)}`)
-    }
-  })
-  const extraFilterStr =
-    extraFilterFragments.length > 0 ? `, ${extraFilterFragments.join(', ')}` : ''
-  const extraParamsStr =
-    extraParamDeclarations.length > 0 ? `, ${extraParamDeclarations.join(', ')}` : ''
+  const {
+    fragments: extraFilterFragments,
+    declarations: extraParamDeclarations,
+    variables: extraVariables
+  } = buildMetricsInlineFilter(filters, { skipStatus: true })
+  const extraFilterStr = toInlineSuffix(extraFilterFragments)
+  const extraParamsStr = toInlineSuffix(extraParamDeclarations)
   const aliasQuery = STATUS_METRICS_ALIASES.map(({ alias, rangeBegin, rangeEnd }) => {
     let effectiveBegin = rangeBegin
     let effectiveEnd = rangeEnd
@@ -362,35 +204,15 @@ async function loadStatusChartFromMetricsApi({ dataset, tsRange, filters = {} })
 async function loadRequestMethodChartFromMetricsApi({ dataset, tsRange, filters = {} }) {
   const metricsDataset = METRICS_DATASET_MAP[dataset]
   if (!metricsDataset) return EMPTY_RESULT
-  const tsRangeBegin =
-    tsRange.tsRangeBegin instanceof Date
-      ? tsRange.tsRangeBegin.toISOString()
-      : String(tsRange.tsRangeBegin)
-  const tsRangeEnd =
-    tsRange.tsRangeEnd instanceof Date
-      ? tsRange.tsRangeEnd.toISOString()
-      : String(tsRange.tsRangeEnd)
-  const extraFilterFragments = []
-  const variables = { tsRange_begin: tsRangeBegin, tsRange_end: tsRangeEnd }
-  const extraParamDeclarations = []
-  Object.entries(filters?.and || {}).forEach(([key, value]) => {
-    const varName = `filter_${key}`
-    variables[varName] = value
-    extraFilterFragments.push(`${key}: $${varName}`)
-    extraParamDeclarations.push(`$${varName}: ${typeof value === 'number' ? 'Int' : 'String'}`)
-  })
-  Object.entries(filters?.in || {}).forEach(([key, value]) => {
-    const varName = `in_${key}`
-    const normalized = normalizeInFilterValues(value)
-    variables[varName] = normalized
-    const gqlKey = key.endsWith('In') ? key : `${key}In`
-    extraFilterFragments.push(`${gqlKey}: $${varName}`)
-    extraParamDeclarations.push(`$${varName}: ${inferArrayType(normalized)}`)
-  })
-  const extraFilterStr =
-    extraFilterFragments.length > 0 ? `, ${extraFilterFragments.join(', ')}` : ''
-  const extraParamsStr =
-    extraParamDeclarations.length > 0 ? `, ${extraParamDeclarations.join(', ')}` : ''
+  const { tsRangeBegin, tsRangeEnd } = normalizeTsBounds(tsRange)
+  const {
+    fragments: extraFilterFragments,
+    declarations: extraParamDeclarations,
+    variables: extraVariables
+  } = buildMetricsInlineFilter(filters)
+  const variables = { tsRange_begin: tsRangeBegin, tsRange_end: tsRangeEnd, ...extraVariables }
+  const extraFilterStr = toInlineSuffix(extraFilterFragments)
+  const extraParamsStr = toInlineSuffix(extraParamDeclarations)
   const query = {
     query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!${extraParamsStr}) {
       ${metricsDataset} ( limit: 10000, aggregate: { sum: requests }, groupBy: [ts, requestMethod], orderBy: [ts_ASC]
@@ -407,17 +229,21 @@ async function loadRequestMethodChartFromMetricsApi({ dataset, tsRange, filters 
   if (response.statusCode !== 200) throw new Error(response.body?.detail || 'Metrics API error')
   const rawData = response.body?.data?.[metricsDataset]
   if (!rawData || !Array.isArray(rawData)) return { chartData: [], kpis: null }
-  const perTs = new Map()
+  // Pre-group rows by classified method bucket, then fold per-ts through the
+  // shared pivot routine (task 11.2). accumulate sums duplicate (ts, bucket)
+  // pairs; sort orders chronologically. No backfill — a ts only carries the
+  // buckets that appeared for it, matching the previous inline loop.
+  const bucketGroups = new Map()
   rawData.forEach((item) => {
     if (!item?.ts) return
     const method = String(item.requestMethod || 'OTHER').toUpperCase()
     const bucket = REQUEST_METHOD_BUCKETS.includes(method) ? method : 'OTHER'
-    if (!perTs.has(item.ts)) perTs.set(item.ts, { ts: item.ts })
-    const entry = perTs.get(item.ts)
-    entry[bucket] = (entry[bucket] || 0) + (item.sum || 0)
+    if (!bucketGroups.has(bucket)) bucketGroups.set(bucket, [])
+    bucketGroups.get(bucket).push(item)
   })
-  const chartData = Array.from(perTs.values()).sort(
-    (left, right) => new Date(left.ts) - new Date(right.ts)
+  const chartData = pivotTimeseries(
+    Array.from(bucketGroups, ([key, rows]) => ({ key, rows })),
+    { pickValue: (row) => row.sum || 0, accumulate: true, sort: true }
   )
   const totals = chartData.reduce((acc, row) => {
     REQUEST_METHOD_BUCKETS.forEach((method) => {
@@ -443,37 +269,17 @@ async function loadRequestMethodChartFromMetricsApi({ dataset, tsRange, filters 
 async function loadCacheStatusChartFromMetricsApi({ dataset, tsRange, filters = {} }) {
   const metricsDataset = METRICS_DATASET_MAP[dataset]
   if (!metricsDataset) return EMPTY_RESULT
-  const tsRangeBegin =
-    tsRange.tsRangeBegin instanceof Date
-      ? tsRange.tsRangeBegin.toISOString()
-      : String(tsRange.tsRangeBegin)
-  const tsRangeEnd =
-    tsRange.tsRangeEnd instanceof Date
-      ? tsRange.tsRangeEnd.toISOString()
-      : String(tsRange.tsRangeEnd)
+  const { tsRangeBegin, tsRangeEnd } = normalizeTsBounds(tsRange)
   const metricsAggregate = METRICS_AGGREGATE_MAP[metricsDataset] || 'sum: requests'
   const aggReturnField = metricsAggregate.startsWith('count') ? 'count' : 'sum'
-  const extraFilterFragments = []
-  const variables = { tsRange_begin: tsRangeBegin, tsRange_end: tsRangeEnd }
-  const extraParamDeclarations = []
-  Object.entries(filters?.and || {}).forEach(([key, value]) => {
-    const varName = `filter_${key}`
-    variables[varName] = value
-    extraFilterFragments.push(`${key}: $${varName}`)
-    extraParamDeclarations.push(`$${varName}: ${typeof value === 'number' ? 'Int' : 'String'}`)
-  })
-  Object.entries(filters?.in || {}).forEach(([key, value]) => {
-    const varName = `in_${key}`
-    const normalized = normalizeInFilterValues(value)
-    variables[varName] = normalized
-    const gqlKey = key.endsWith('In') ? key : `${key}In`
-    extraFilterFragments.push(`${gqlKey}: $${varName}`)
-    extraParamDeclarations.push(`$${varName}: ${inferArrayType(normalized)}`)
-  })
-  const extraFilterStr = extraFilterFragments.length ? `, ${extraFilterFragments.join(', ')}` : ''
-  const extraParamsStr = extraParamDeclarations.length
-    ? `, ${extraParamDeclarations.join(', ')}`
-    : ''
+  const {
+    fragments: extraFilterFragments,
+    declarations: extraParamDeclarations,
+    variables: extraVariables
+  } = buildMetricsInlineFilter(filters)
+  const variables = { tsRange_begin: tsRangeBegin, tsRange_end: tsRangeEnd, ...extraVariables }
+  const extraFilterStr = toInlineSuffix(extraFilterFragments)
+  const extraParamsStr = toInlineSuffix(extraParamDeclarations)
   const query = {
     query: `query ($tsRange_begin: DateTime!, $tsRange_end: DateTime!${extraParamsStr}) {
       ${metricsDataset} ( limit: 10000, aggregate: { ${metricsAggregate} }, groupBy: [ts, upstreamCacheStatus], orderBy: [ts_ASC]
@@ -490,26 +296,34 @@ async function loadCacheStatusChartFromMetricsApi({ dataset, tsRange, filters = 
   if (response.statusCode !== 200) throw new Error(response.body?.detail || 'Metrics API error')
   const rawData = response.body?.data?.[metricsDataset]
   if (!rawData || !Array.isArray(rawData)) return { chartData: [], kpis: null }
-  const perTs = new Map()
-  const seenStatuses = new Set()
+  // Pre-group rows by cache status, then fold per-ts through the shared pivot
+  // routine (task 11.2). accumulate sums duplicate (ts, status) pairs; every
+  // seen status is backfilled with 0 on every ts entry; sort orders
+  // chronologically. `seenStatuses` preserves first-appearance order (matches
+  // the previous `Array.from(seenStatuses)` backfill order).
+  const statusGroups = new Map()
+  const seenStatuses = []
   rawData.forEach((item) => {
     if (!item?.ts) return
     const status = String(item.upstreamCacheStatus || '-').toUpperCase()
-    seenStatuses.add(status)
-    if (!perTs.has(item.ts)) perTs.set(item.ts, { ts: item.ts })
-    perTs.get(item.ts)[status] = (perTs.get(item.ts)[status] || 0) + (item[aggReturnField] || 0)
-  })
-  const allStatuses = Array.from(seenStatuses)
-  for (const row of perTs.values()) {
-    for (const st of allStatuses) {
-      if (!(st in row)) row[st] = 0
+    if (!statusGroups.has(status)) {
+      statusGroups.set(status, [])
+      seenStatuses.push(status)
     }
-  }
-  const chartData = Array.from(perTs.values()).sort(
-    (itemA, itemB) => new Date(itemA.ts) - new Date(itemB.ts)
+    statusGroups.get(status).push(item)
+  })
+  const chartData = pivotTimeseries(
+    Array.from(statusGroups, ([key, rows]) => ({ key, rows })),
+    {
+      pickValue: (row) => row[aggReturnField] || 0,
+      accumulate: true,
+      backfill: true,
+      backfillKeys: seenStatuses,
+      sort: true
+    }
   )
   const total = chartData.reduce(
-    (sum, row) => sum + allStatuses.reduce((ss, st) => ss + (row[st] || 0), 0),
+    (sum, row) => sum + seenStatuses.reduce((ss, st) => ss + (row[st] || 0), 0),
     0
   )
   return {
@@ -546,7 +360,7 @@ export const loadEventsChartAggregation = async ({
   // Strip filter fields not supported by this Metrics dataset.
   // When fields are dropped, partialFilter=true tells the UI the chart total
   // does NOT reflect all active filters — the table count should be used instead.
-  const { cleaned: metricsFilters, partial: partialFilter } = filterForMetrics(
+  const { cleaned: metricsFilters, partial: partialFilter } = cleanBuiltFilterForMetrics(
     filters,
     metricsDataset
   )
@@ -571,39 +385,15 @@ export const loadEventsChartAggregation = async ({
   if (groupByField) return loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupByField })
 
   // Default path — simple count grouped by ts
-  const tsRangeBegin =
-    tsRange.tsRangeBegin instanceof Date
-      ? tsRange.tsRangeBegin.toISOString()
-      : String(tsRange.tsRangeBegin)
-  const tsRangeEnd =
-    tsRange.tsRangeEnd instanceof Date
-      ? tsRange.tsRangeEnd.toISOString()
-      : String(tsRange.tsRangeEnd)
-  const extraFilterFragments = []
-  const extraParamDeclarations = []
-  const variables = { tsRange_begin: tsRangeBegin, tsRange_end: tsRangeEnd }
-  Object.entries(metricsFilters?.and || {}).forEach(([key, value]) => {
-    if (!key.startsWith('status')) {
-      const varName = `filter_${key}`
-      variables[varName] = value
-      extraFilterFragments.push(`${key}: $${varName}`)
-      extraParamDeclarations.push(`$${varName}: ${typeof value === 'number' ? 'Int' : 'String'}`)
-    }
-  })
-  Object.entries(metricsFilters?.in || {}).forEach(([key, value]) => {
-    if (!key.startsWith('status')) {
-      const varName = `in_${key}`
-      const normalized = normalizeInFilterValues(value)
-      variables[varName] = normalized
-      const gqlKey = key.endsWith('In') ? key : `${key}In`
-      extraFilterFragments.push(`${gqlKey}: $${varName}`)
-      extraParamDeclarations.push(`$${varName}: ${inferArrayType(normalized)}`)
-    }
-  })
-  const extraFilterStr =
-    extraFilterFragments.length > 0 ? `, ${extraFilterFragments.join(', ')}` : ''
-  const extraParamsStr =
-    extraParamDeclarations.length > 0 ? `, ${extraParamDeclarations.join(', ')}` : ''
+  const { tsRangeBegin, tsRangeEnd } = normalizeTsBounds(tsRange)
+  const {
+    fragments: extraFilterFragments,
+    declarations: extraParamDeclarations,
+    variables: extraVariables
+  } = buildMetricsInlineFilter(metricsFilters, { skipStatus: true })
+  const variables = { tsRange_begin: tsRangeBegin, tsRange_end: tsRangeEnd, ...extraVariables }
+  const extraFilterStr = toInlineSuffix(extraFilterFragments)
+  const extraParamsStr = toInlineSuffix(extraParamDeclarations)
   const metricsAggregate = METRICS_AGGREGATE_MAP[metricsDataset] || 'count: rows'
   const metricsReturnField = metricsAggregate.startsWith('count') ? 'count' : 'sum'
   const query = {
@@ -654,24 +444,13 @@ const STACK_BUCKETS = {
   upstreamCacheStatus: (raw) => String(raw || '-').toUpperCase()
 }
 
+// Events/pivot bucket sizing now delegates to the SINGLE shared rule (task 11.6,
+// req 5.7). The only events-path nuance kept here is the zero/negative-duration
+// guard (→ 1 minute), which the shared table does not special-case. No cap is
+// passed, so the shared lookup is exact for this path.
 function pickBucketMs(durationMs) {
   if (!Number.isFinite(durationMs) || durationMs <= 0) return 60 * 1000
-  const SEC = 1000,
-    MIN = 60 * SEC,
-    HOUR = 60 * MIN,
-    DAY = 24 * HOUR
-  if (durationMs <= 1 * MIN) return 1 * SEC
-  if (durationMs <= 5 * MIN) return 5 * SEC
-  if (durationMs <= 15 * MIN) return 10 * SEC
-  if (durationMs <= 30 * MIN) return 30 * SEC
-  if (durationMs <= 1 * HOUR) return 1 * MIN
-  if (durationMs <= 3 * HOUR) return 5 * MIN
-  if (durationMs <= 6 * HOUR) return 10 * MIN
-  if (durationMs <= 12 * HOUR) return 30 * MIN
-  if (durationMs <= 1 * DAY) return 30 * MIN
-  if (durationMs <= 7 * DAY) return 3 * HOUR
-  if (durationMs <= 30 * DAY) return 12 * HOUR
-  return 1 * DAY
+  return getBucketInterval(durationMs)
 }
 
 function pivotGroupedRows(rows, groupByField, tsRange) {
@@ -768,31 +547,31 @@ const STATUS_CHART_ALIASES = Object.freeze([
 ])
 
 function mergeChartBucketAliases(data, aliasConfig) {
+  const groups = aliasConfig.map(({ alias, bucket }) => ({
+    key: bucket,
+    rows: Array.isArray(data?.[alias]) ? data[alias] : []
+  }))
+  // Only backfill buckets that carried at least one count (matches the legacy
+  // `totalsByBucket[bucket] > 0` gate; per-alias total, so buckets sharing an
+  // alias keep the last alias's total as the legacy did).
   const totalsByBucket = {}
-  const perTs = new Map()
-  aliasConfig.forEach(({ alias, bucket }) => {
-    const rows = Array.isArray(data?.[alias]) ? data[alias] : []
-    let bucketTotal = 0
-    rows.forEach((row) => {
-      if (!row?.ts) return
-      const count = Number(row.count) || 0
-      bucketTotal += count
-      if (!perTs.has(String(row.ts))) perTs.set(String(row.ts), { ts: row.ts })
-      perTs.get(String(row.ts))[bucket] = (perTs.get(String(row.ts))[bucket] || 0) + count
-    })
-    totalsByBucket[bucket] = bucketTotal
+  groups.forEach(({ key, rows }) => {
+    totalsByBucket[key] = rows.reduce(
+      (sum, row) => (row?.ts ? sum + (Number(row.count) || 0) : sum),
+      0
+    )
   })
   const activeBuckets = aliasConfig
     .map(({ bucket }) => bucket)
     .filter((bucket) => (totalsByBucket[bucket] || 0) > 0)
-  const result = []
-  perTs.forEach((entry) => {
-    activeBuckets.forEach((bucket) => {
-      if (entry[bucket] === undefined) entry[bucket] = 0
-    })
-    result.push(entry)
+  return pivotTimeseries(groups, {
+    pickValue: (row) => Number(row.count) || 0,
+    tsKeyOf: (row) => String(row.ts),
+    accumulate: true,
+    backfill: true,
+    backfillKeys: activeBuckets,
+    sort: true
   })
-  return result.sort((left, right) => new Date(left.ts) - new Date(right.ts))
 }
 
 /**
@@ -821,16 +600,7 @@ async function loadEventsChartFromEventsApi({ dataset, tsRange, filters, groupBy
   // ts-only time-series instead of failing the whole chart.
   let effectiveGroupByField = sanitizeGroupByField(dataset, groupByField, 'client')
 
-  const normalizedTsRange = {
-    tsRangeBegin:
-      tsRange.tsRangeBegin instanceof Date
-        ? tsRange.tsRangeBegin.toISOString()
-        : String(tsRange.tsRangeBegin),
-    tsRangeEnd:
-      tsRange.tsRangeEnd instanceof Date
-        ? tsRange.tsRangeEnd.toISOString()
-        : String(tsRange.tsRangeEnd)
-  }
+  const normalizedTsRange = normalizeTsBounds(tsRange)
   const isHttpLike = HTTP_LIKE_DATASETS.has(dataset)
   const hasExplicitStatusFilter = filterMentionsField(filters, 'status')
   // Task 10.3 — defense-in-depth: re-check at query-build time. If anything
@@ -984,16 +754,9 @@ async function loadSummaryKpisFromMetrics({ dataset, tsRange, filters = {} }) {
   const metricsDataset = METRICS_DATASET_MAP[dataset]
   if (!metricsDataset) return null
 
-  const { cleaned: metricsFilters } = filterForMetrics(filters, metricsDataset)
+  const { cleaned: metricsFilters } = cleanBuiltFilterForMetrics(filters, metricsDataset)
 
-  const tsRangeBegin =
-    tsRange.tsRangeBegin instanceof Date
-      ? tsRange.tsRangeBegin.toISOString()
-      : String(tsRange.tsRangeBegin)
-  const tsRangeEnd =
-    tsRange.tsRangeEnd instanceof Date
-      ? tsRange.tsRangeEnd.toISOString()
-      : String(tsRange.tsRangeEnd)
+  const { tsRangeBegin, tsRangeEnd } = normalizeTsBounds(tsRange)
 
   const statusFilters = { gte: null, lte: null, gt: null, lt: null }
   Object.entries(metricsFilters?.and || {}).forEach(([key, value]) => {
@@ -1001,32 +764,14 @@ async function loadSummaryKpisFromMetrics({ dataset, tsRange, filters = {} }) {
     if (match) statusFilters[match[1].toLowerCase()] = Number(value)
   })
 
-  const extraFilterFragments = []
-  const extraVariables = {}
-  const extraParamDeclarations = []
-  Object.entries(metricsFilters?.and || {}).forEach(([key, value]) => {
-    if (!key.startsWith('status')) {
-      const varName = `filter_${key}`
-      extraVariables[varName] = value
-      extraFilterFragments.push(`${key}: $${varName}`)
-      extraParamDeclarations.push(`$${varName}: ${typeof value === 'number' ? 'Int' : 'String'}`)
-    }
-  })
-  Object.entries(metricsFilters?.in || {}).forEach(([key, value]) => {
-    if (!key.startsWith('status')) {
-      const varName = `in_${key}`
-      const normalized = normalizeInFilterValues(value)
-      extraVariables[varName] = normalized
-      const gqlKey = key.endsWith('In') ? key : `${key}In`
-      extraFilterFragments.push(`${gqlKey}: $${varName}`)
-      extraParamDeclarations.push(`$${varName}: ${inferArrayType(normalized)}`)
-    }
-  })
+  const {
+    fragments: extraFilterFragments,
+    declarations: extraParamDeclarations,
+    variables: extraVariables
+  } = buildMetricsInlineFilter(metricsFilters, { skipStatus: true })
 
-  const extraFilterStr = extraFilterFragments.length ? `, ${extraFilterFragments.join(', ')}` : ''
-  const extraParamsStr = extraParamDeclarations.length
-    ? `, ${extraParamDeclarations.join(', ')}`
-    : ''
+  const extraFilterStr = toInlineSuffix(extraFilterFragments)
+  const extraParamsStr = toInlineSuffix(extraParamDeclarations)
 
   // Build aliased queries for each status bucket
   const aliasQuery = STATUS_METRICS_ALIASES.map(({ alias, rangeBegin, rangeEnd }) => {
@@ -1105,16 +850,7 @@ export async function loadSummaryKpis({ dataset, tsRange, filters = {}, signal }
     return loadSummaryKpisFromMetrics({ dataset, tsRange, filters })
   }
 
-  const normalizedTsRange = {
-    tsRangeBegin:
-      tsRange.tsRangeBegin instanceof Date
-        ? tsRange.tsRangeBegin.toISOString()
-        : String(tsRange.tsRangeBegin),
-    tsRangeEnd:
-      tsRange.tsRangeEnd instanceof Date
-        ? tsRange.tsRangeEnd.toISOString()
-        : String(tsRange.tsRangeEnd)
-  }
+  const normalizedTsRange = normalizeTsBounds(tsRange)
 
   const variables = { tsBegin: normalizedTsRange.tsRangeBegin, tsEnd: normalizedTsRange.tsRangeEnd }
   const {

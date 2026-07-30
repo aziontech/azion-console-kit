@@ -1,12 +1,12 @@
 <script setup>
-  import { ref, computed, watch, nextTick } from 'vue'
+  import { ref, computed, watch, nextTick, getCurrentInstance } from 'vue'
   import TabView from '@aziontech/webkit/tabview'
   import TabPanel from '@aziontech/webkit/tabpanel'
   import PrimeButton from '@aziontech/webkit/button'
   import InputText from '@aziontech/webkit/inputtext'
   import Skeleton from '@aziontech/webkit/skeleton'
   import { clipboardWrite } from '@/helpers/clipboard'
-  import { useClickToFilter } from '../../composables/useClickToFilter.js'
+  import { isFieldFilterable } from '../../composables/utils/filterable-fields'
 
   defineOptions({ name: 'EventDocumentView' })
 
@@ -14,14 +14,6 @@
     data: {
       type: Object,
       required: true
-    },
-    onAddFilter: {
-      type: Function,
-      default: null
-    },
-    onExcludeFilter: {
-      type: Function,
-      default: null
     },
     isLoading: {
       type: Boolean,
@@ -37,7 +29,14 @@
     }
   })
 
-  const emit = defineEmits(['notify', 'reset-scroll'])
+  const emit = defineEmits(['notify', 'reset-scroll', 'add-filter', 'exclude-filter'])
+
+  // Render the add/exclude filter buttons only when the parent actually listens
+  // (C1): mirrors the former onAddFilter/onExcludeFilter function-prop gating.
+  // Listeners are static, so a one-shot read of the bound handlers is exact.
+  const instance = getCurrentInstance()
+  const canAddFilter = computed(() => Boolean(instance?.vnode.props?.onAddFilter))
+  const canExcludeFilter = computed(() => Boolean(instance?.vnode.props?.onExcludeFilter))
   const activeTab = ref(0)
   const fieldSearch = ref('')
 
@@ -100,17 +99,9 @@
     })
   }
 
-  const handleAddFilter = (key, value) => {
-    if (props.onAddFilter) {
-      props.onAddFilter(key, value)
-    }
-  }
+  const handleAddFilter = (key, value) => emit('add-filter', key, value)
 
-  const handleExcludeFilter = (key, value) => {
-    if (props.onExcludeFilter) {
-      props.onExcludeFilter(key, value)
-    }
-  }
+  const handleExcludeFilter = (key, value) => emit('exclude-filter', key, value)
 
   const formatDisplayValue = (value) => {
     if (value === null || value === undefined) return '-'
@@ -125,14 +116,15 @@
     return str !== '' && str !== '-' && str !== 'null' && str !== 'undefined'
   }
 
-  const { onValueMouseDown, onValueMouseUp, onValueClick } = useClickToFilter({
-    onAdd: (key, value) => handleAddFilter(key, value),
-    onExclude: (key, value) => handleExcludeFilter(key, value)
-  })
-
   const clearSearch = () => {
     fieldSearch.value = ''
   }
+
+  // C8: single expression replacing the former nested class ternary. Expanded
+  // only when a non-compact caller opts in via growJsonToFit; otherwise compact.
+  const jsonPreClass = computed(() =>
+    !props.compact && props.growJsonToFit ? 'json-pre--expanded' : 'json-pre--compact'
+  )
 </script>
 
 <template>
@@ -246,14 +238,12 @@
               <span
                 class="doc-compact__value"
                 :title="String(entry.value).length > 100 ? String(entry.value) : undefined"
-                @mousedown="onValueMouseDown"
-                @mouseup="onValueMouseUp"
-                @click.stop="(e) => onValueClick(e, entry.key, entry.value)"
-                >{{ formatDisplayValue(entry.value)
-                }}<span class="doc-compact__actions">
+              >
+                <span class="doc-compact__value-text">{{ formatDisplayValue(entry.value) }}</span>
+                <span class="doc-compact__actions">
                   <PrimeButton
-                    v-if="onAddFilter && isValidValue(entry.value)"
-                    icon="pi pi-plus-circle"
+                    v-if="canAddFilter && isValidValue(entry.value) && isFieldFilterable(entry.key)"
+                    icon="pi pi-filter"
                     text
                     size="small"
                     class="!w-5 !h-5 !p-0"
@@ -262,8 +252,10 @@
                     data-testid="event-document-add-filter"
                   />
                   <PrimeButton
-                    v-if="onExcludeFilter && isValidValue(entry.value)"
-                    icon="pi pi-minus-circle"
+                    v-if="
+                      canExcludeFilter && isValidValue(entry.value) && isFieldFilterable(entry.key)
+                    "
+                    icon="pi pi-filter-slash"
                     text
                     size="small"
                     class="!w-5 !h-5 !p-0"
@@ -279,8 +271,9 @@
                     class="!w-5 !h-5 !p-0"
                     v-tooltip.top="{ value: 'Copy value', showDelay: 300 }"
                     @click.stop="handleCopy(entry.value)"
-                  /> </span
-              ></span>
+                  />
+                </span>
+              </span>
             </div>
           </div>
           <div
@@ -317,17 +310,14 @@
               <span
                 class="doc-list__value"
                 :title="String(entry.value).length > 30 ? String(entry.value) : undefined"
-                @mousedown="onValueMouseDown"
-                @mouseup="onValueMouseUp"
-                @click.stop="(e) => onValueClick(e, entry.key, entry.value)"
                 ><span class="doc-list__value-text">{{
                   formatDisplayValue(entry.value)
                 }}</span></span
               >
               <span class="doc-list__actions">
                 <PrimeButton
-                  v-if="onAddFilter && isValidValue(entry.value)"
-                  icon="pi pi-plus-circle"
+                  v-if="canAddFilter && isValidValue(entry.value) && isFieldFilterable(entry.key)"
+                  icon="pi pi-filter"
                   text
                   size="small"
                   class="!w-5 !h-5 !p-0"
@@ -336,8 +326,10 @@
                   data-testid="event-document-add-filter"
                 />
                 <PrimeButton
-                  v-if="onExcludeFilter && isValidValue(entry.value)"
-                  icon="pi pi-minus-circle"
+                  v-if="
+                    canExcludeFilter && isValidValue(entry.value) && isFieldFilterable(entry.key)
+                  "
+                  icon="pi pi-filter-slash"
                   text
                   size="small"
                   class="!w-5 !h-5 !p-0"
@@ -372,14 +364,8 @@
             data-testid="event-document-copy-json"
           />
           <pre
-            class="json-pre p-4 text-xs text-color surface-ground rounded-md overflow-x-auto leading-5"
-            :class="
-              compact
-                ? 'json-pre--compact'
-                : growJsonToFit
-                  ? 'json-pre--expanded'
-                  : 'json-pre--compact'
-            "
+            class="json-pre p-4 text-xs text-color surface-ground rounded-[var(--border-radius)] overflow-x-auto leading-5"
+            :class="jsonPreClass"
             data-testid="event-document-json"
             >{{ jsonDocument }}</pre>
         </div>
@@ -390,7 +376,6 @@
 
 <style scoped>
   .event-document-view {
-    --rte-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
     border: 1px solid var(--surface-border);
     border-radius: var(--border-radius);
     overflow: hidden;
@@ -467,7 +452,7 @@
   }
 
   .doc-search__count {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.7rem;
     color: var(--text-color-secondary);
     white-space: nowrap;
@@ -521,10 +506,10 @@
   }
 
   .doc-list__key {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.7rem;
     font-weight: 600;
-    color: var(--series-one-color, #fba86f);
+    color: var(--series-one-color);
     user-select: all;
     white-space: nowrap;
     letter-spacing: 0.01em;
@@ -545,7 +530,7 @@
   }
 
   .doc-list__value {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.7rem;
     line-height: 1;
     color: var(--text-color);
@@ -612,6 +597,7 @@
     height: 1.6rem;
     display: flex;
     align-items: center;
+    gap: 4px;
   }
 
   .doc-compact__row:last-child > .doc-compact__key,
@@ -625,10 +611,10 @@
   }
 
   .doc-compact__key {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.7rem;
     font-weight: 600;
-    color: var(--series-one-color, #fba86f);
+    color: var(--series-one-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -638,43 +624,46 @@
   }
 
   .doc-compact__value {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.7rem;
     line-height: 1.4;
     color: var(--text-color);
+    min-width: 0;
+  }
+  /* Real flex item (not anonymous flex text): text-overflow only applies here,
+     and the in-flow actions sibling can never sit on top of the value. */
+  .doc-compact__value-text {
+    flex: 1;
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 0;
     user-select: text;
     cursor: text;
-    position: relative;
-  }
-
-  .doc-compact__value:hover {
-    text-decoration: underline;
-    text-decoration-style: dotted;
-    text-underline-offset: 2px;
   }
 
   .doc-compact__actions {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
     display: flex;
     align-items: center;
     gap: 1px;
-    padding: 0 4px;
+    margin-left: auto;
+    flex-shrink: 0;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.1s ease;
-    background: var(--surface-hover);
   }
 
   .doc-compact__row:hover .doc-compact__actions {
     opacity: 1;
     pointer-events: auto;
+  }
+
+  /* Hover colors mirror the table badges' filter icons (single filter pattern). */
+  :deep([data-testid='event-document-add-filter']:hover) {
+    color: var(--primary-color) !important;
+  }
+  :deep([data-testid='event-document-exclude-filter']:hover) {
+    color: var(--danger-contrast) !important;
   }
 
   .doc-compact__footer {
@@ -683,7 +672,7 @@
     justify-content: flex-start;
     gap: 0.25rem;
     padding: 0.35rem 0.75rem;
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 0.65rem;
     color: var(--text-color-secondary);
     border-top: 1px solid var(--surface-border);
@@ -698,7 +687,7 @@
 
   /* ── JSON pre block ─────────────────────────────────────────── */
   .json-pre {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
   }
 
   .json-pre--compact {

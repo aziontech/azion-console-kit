@@ -1,3 +1,4 @@
+import { toRaw } from 'vue'
 import { OPERATOR_MAPPING } from '@/components/base/advanced-filter-system-v2/filterFields/filterRow/component'
 
 /**
@@ -47,7 +48,11 @@ export function useFilterActions({
     }
   }
 
-  // ── Initialise / refresh filter data from URL hash ──
+  // ── Initialise / refresh filter data from URL hash (one-way rehydrate) ──
+  // This is the ONLY reader of the hash into the SoT, and only on init: it seeds
+  // `filterData` (the SoT) from the URL once. After this, the hash is a
+  // write-only projection driven by `syncHash()` — it is never read back into
+  // `filterData`, so the two can't diverge (task 9.3, req 4.9/4.11).
   const refreshFilterData = () => {
     const filter = getFiltersFromHash()
     filterData.value = defaultFilter()
@@ -72,12 +77,43 @@ export function useFilterActions({
     }
   }
 
+  // ── Filter Single-Source-of-Truth → URL hash projection (task 9.3, req 4.9/4.11) ──
+  //
+  // `filterData` is the ONE writable source of truth for the active filter
+  // (tsRange + fields + dataset). The URL hash is a DERIVED projection of it,
+  // NOT a second independent source that could diverge: after the initial
+  // rehydrate (`refreshFilterData` reads the hash once into `filterData`), the
+  // hash is only ever WRITTEN from `filterData` and never read back into it.
+  //
+  // `syncHash()` is the SINGLE writer of that projection. Every filter mutation
+  // funnels its hash write through here so there is exactly one place that
+  // serializes the SoT into the URL. It enforces the two ordering invariants:
+  //   1. `initialLoadDone` guard — no hash write (nor reload) before the first
+  //      load has completed, so a premature write can't clobber the hash the
+  //      panel is still rehydrating from.
+  //   2. write-hash-before-load — the hash is updated to reflect the SoT
+  //      BEFORE `loadData()` runs, so a shared/reloaded URL always matches the
+  //      data being fetched.
+  // Returns the pending `setFilterInHash` promise when the projection is being
+  // written (guard passed), or `null` synchronously when the write is skipped
+  // because the initial load has not completed yet. Callers `await` the returned
+  // promise to preserve the write-hash-before-load ordering; the synchronous
+  // `null` lets a caller short-circuit without an extra microtask hop.
+  const syncHash = () => {
+    if (!initialLoadDone.value) return null
+    return setFilterInHash({ ...filterData.value, dataset: tabSelected.value?.dataset })
+  }
+
   // ── Persist filters in URL hash + reload ──
   // Query history is persisted by AzionQueryLanguage.markAsApplied (shared across
-  // Events and Metrics), so this composable only handles the hash + data reload.
+  // Events and Metrics), so this composable only handles the hash projection +
+  // data reload. The hash write goes through the single `syncHash()` writer,
+  // preserving the initialLoadDone guard and the write-hash-before-load order
+  // (exactly one awaited hash write before loadData, unchanged from before).
   const reloadListTableWithHash = async () => {
-    if (!initialLoadDone.value) return
-    await setFilterInHash({ ...filterData.value, dataset: tabSelected.value?.dataset })
+    const pending = syncHash()
+    if (pending === null) return
+    await pending
     loadData()
   }
 
@@ -179,8 +215,35 @@ export function useFilterActions({
     reloadListTableWithHash()
   }
 
-  const handleRemoveFilter = (index) => {
-    filterData.value.fields.splice(index, 1)
+  // ── Remove a filter chip BY IDENTITY, immutably ──
+  // FilterTagsDisplay renders a FILTERED + projected view of the raw
+  // `filterData.fields`: any raw filter whose field/operator isn't in the
+  // dataset catalogue (or is disabled) is dropped from the chip list. So the
+  // rendered chip position does NOT map to the raw array position. To avoid the
+  // C6/SR-4 desync (a hidden raw filter shifting the index and dropping the
+  // WRONG chip), the base component emits the SOURCE raw filter object itself —
+  // we drop exactly that one by reference instead of resolving a positional
+  // index.
+  //
+  // Removal produces a NEW fields array (immutable, §4.9) and preserves the
+  // relative order of every surviving chip; no in-place mutation of the base
+  // component's array is performed, so the emit is never reordered.
+  const handleRemoveFilter = (target) => {
+    const fields = filterData.value?.fields
+    if (!Array.isArray(fields)) return
+    if (target === undefined || target === null) return
+    // Compare through `toRaw`: the emitted `target` and the stored fields may be
+    // Vue reactive proxies of the same underlying object, so a plain `!==`
+    // reference check would wrongly report a mismatch.
+    const rawTarget = toRaw(target)
+    const next = fields.filter((filterField) => toRaw(filterField) !== rawTarget)
+    // Nothing matched → no-op (avoids a needless reload/hash write on a stale
+    // or already-removed reference).
+    if (next.length === fields.length) return
+    filterData.value = {
+      ...filterData.value,
+      fields: next
+    }
     reloadListTableWithHash()
   }
 
@@ -242,6 +305,7 @@ export function useFilterActions({
   return {
     defaultFilter,
     refreshFilterData,
+    syncHash,
     reloadListTableWithHash,
     handleAddFilter,
     handleAddRangeFilter,

@@ -7,6 +7,7 @@
   import { storeToRefs } from 'pinia'
   import { themeApply } from '@/helpers'
   import { captureFirstSessionUrl } from '@/helpers/first-session-url'
+  import { useAccountSync } from '@/composables/use-account-sync'
   import Layout from '@/layout'
   import '@modules/real-time-metrics/helpers/convert-date'
   import '@/helpers/store-handler'
@@ -23,6 +24,8 @@
   const themeStore = useThemeStore()
   const { hasActiveUserId, account } = storeToRefs(accountStore)
   const { currentTheme } = storeToRefs(themeStore)
+
+  useAccountSync()
 
   const route = useRoute()
 

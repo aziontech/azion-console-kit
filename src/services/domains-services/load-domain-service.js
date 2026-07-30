@@ -1,6 +1,7 @@
 import { AxiosHttpClientAdapter, parseHttpResponse } from '../axios/AxiosHttpClientAdapter'
 import { makeDomainsBaseUrl } from './make-domains-base-url'
 import { extractApiError } from '@/helpers/extract-api-error'
+import { digitalCertificatesService } from '@/services/v2/digital-certificates/digital-certificates-service'
 
 export const loadDomainService = async ({ id }) => {
   let httpResponse = await AxiosHttpClientAdapter.request({
@@ -10,7 +11,25 @@ export const loadDomainService = async ({ id }) => {
 
   httpResponse = adapt(httpResponse)
 
+  const certificateMetadata = await loadCertificateMetadata(httpResponse.body?.edgeCertificate)
+  httpResponse.body = { ...httpResponse.body, ...certificateMetadata }
+
   return parseHttpResponse(httpResponse)
+}
+
+const loadCertificateMetadata = async (certificateId) => {
+  if (!certificateId) {
+    return { authorityCertificate: null, subjectNameCertificate: null }
+  }
+
+  const certificate = await digitalCertificatesService
+    .loadDigitalCertificate({ id: certificateId })
+    .catch(() => null)
+
+  return {
+    authorityCertificate: certificate?.authority ?? null,
+    subjectNameCertificate: certificate?.subjectName ?? null
+  }
 }
 
 const adapt = (httpResponse) => {

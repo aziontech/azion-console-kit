@@ -85,7 +85,7 @@
               @update:filterData="onFilterDataUpdate"
               :fieldsInFilter="filterFields"
               :dataset="tabSelected?.dataset || ''"
-              :filterDateRangeMaxDays="365"
+              :filterDateRangeMaxDays="7"
               :hideFilterTags="true"
               @updatedFilter="emit('filter-updated')"
             />
@@ -155,14 +155,10 @@
     height: 2rem;
   }
 
-  /* Pre-existing project convention: unify ALL interactive controls in the
-     filter bar to 2rem so PrimeButton small (28px) aligns visually with
-     PrimeVue InputText / Dropdown defaults (~36px) which would otherwise
-     create a height mismatch.
-
-     The `.contenteditable.p-inputtext` selector targets the AQL input
-     specifically — without `min-height: 2rem` the contenteditable's
-     `h-auto` collapses below the button height. */
+  /* Unify interactive controls to 2rem so PrimeButton small aligns with the
+     PrimeVue InputText/Dropdown defaults. The `.contenteditable.p-inputtext`
+     rule below targets the AQL input, which needs an explicit min-height
+     (its `h-auto` would otherwise collapse below the button height). */
   :deep(.filter-bar__filters .p-button),
   :deep(.filter-bar__filters .p-inputtext),
   :deep(.filter-bar__filters .p-dropdown) {
@@ -176,18 +172,10 @@
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    /* Center the single line vertically WITHOUT flexbox. `display: flex` turns
-       every highlighted <span> (field/operator/AND) and whitespace text node
-       into a separate flex item, which breaks the inline layout and makes the
-       query tokens look misaligned. With normal inline flow the line is only
-       centered when its line-height fills the content box. The control is 2rem
-       (border-box) and `p-inputtext` has a 1px border top+bottom, so the
-       content box is `2rem - 2px` — set line-height to match exactly and zero
-       the vertical padding so the single line sits dead-center.
-       `!important` is required: the input's `text-sm` Tailwind class ships a
-       `line-height: 1.25rem !important` (the project sets Tailwind
-       `important: true`), which would otherwise win and pin the text to the
-       top. */
+    /* Center the single AQL line via line-height, not flex (flex would split
+       each highlighted token into its own item). line-height matches the
+       content box (2rem minus the 1px top/bottom border). !important beats the
+       Tailwind `text-sm` line-height, which ships !important via `important: true`. */
     display: block;
     line-height: calc(2rem - 2px) !important;
     padding-top: 0 !important;
@@ -213,36 +201,30 @@
     align-items: stretch;
   }
 
+  /* Clamp inputgroup children to the 2rem box. Height/min/max win by :deep
+     specificity over PrimeVue's own CSS, so no !important is needed here. */
   :deep(.filter-bar__filters .p-inputgroup > *) {
-    height: 2rem !important;
-    min-height: 2rem !important;
-    max-height: 2rem !important;
+    height: 2rem;
+    min-height: 2rem;
+    max-height: 2rem;
     box-sizing: border-box;
   }
 
-  :deep(.filter-bar__filters .p-inputgroup .p-button) {
-    height: 2rem !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    border-radius: 0;
-  }
-
-  :deep(.filter-bar__filters .p-inputgroup .p-inputtext) {
-    height: 2rem !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  :deep(.afs-filter-row__actions .p-button) {
-    height: 2rem !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
+  /* One grouped rule for every button/input forced to 2rem. Only the vertical
+     padding keeps !important: it comes from Tailwind utilities (`important:
+     true`), so nothing but !important wins. Height stays plain because :deep
+     specificity already beats PrimeVue's own height rules. */
+  :deep(.filter-bar__filters .p-inputgroup .p-button),
+  :deep(.filter-bar__filters .p-inputgroup .p-inputtext),
+  :deep(.afs-filter-row__actions .p-button),
   :deep(.filter-bar__filters-inner > .p-button) {
-    height: 2rem !important;
+    height: 2rem;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+  }
+
+  :deep(.filter-bar__filters .p-inputgroup .p-button) {
+    border-radius: 0;
   }
 
   .filter-bar__filters {
@@ -330,6 +312,14 @@
     width: 100%;
     max-width: 100%;
     min-width: 0;
+  }
+
+  /* Explicit width: as a column item the intrinsic (max-content) floor of the
+     AQL placeholder chain (~447px) can beat stretch, pushing the input past the
+     card on phones. width:100% pins it to the row like inner/aql below. */
+  .filter-bar.is-stack .filter-bar__filters {
+    width: 100%;
+    max-width: 100%;
   }
 
   /* The filters-inner only wraps the AQL block now (saved-searches moved

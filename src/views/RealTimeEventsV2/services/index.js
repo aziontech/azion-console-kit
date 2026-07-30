@@ -8,8 +8,13 @@
  * `@/services/real-time-events-service` module, wrapping each one with
  * `wrapServiceWithCompactTimestamp` so that every row returned to the UI
  * carries a pre-formatted `tsFormat` field in the compact timestamp format
- * (e.g. "2024-06-15 14:30:05.123"). Non-list services (chart aggregation
- * loaders) are re-exported unchanged because they do not return row data.
+ * (e.g. "2024-06-15 14:30:05.123"). Non-list document loaders (`loadX`) are
+ * re-exported unchanged because they do not return row-list data.
+ *
+ * Note: chart-aggregation loading (`loadEventsChartAggregation`) is NOT
+ * exposed here. It is imported directly from
+ * `@/services/real-time-events-service-v2/load-events-aggregation` by the
+ * router, since the service barrel does not export it.
  *
  * **How `wrapServiceWithCompactTimestamp` works:**
  * 1. Calls the original service function, forwarding all arguments.
@@ -89,7 +94,6 @@ export const listImageProcessor = wrapServiceWithCompactTimestamp(
 export const listTieredCache = wrapServiceWithCompactTimestamp(OriginalServices.listTieredCache)
 
 // Re-export other services that don't need wrapping
-export const loadEventsChartAggregation = OriginalServices.loadEventsChartAggregation
 export const loadActivityHistory = OriginalServices.loadActivityHistory
 export const loadEdgeFunctions = OriginalServices.loadEdgeFunctions
 export const loadEdgeFunctionsConsole = OriginalServices.loadEdgeFunctionsConsole

@@ -3,6 +3,7 @@
   import InputText from '@aziontech/webkit/inputtext'
   import Dropdown from '@aziontech/webkit/dropdown'
   import Menu from '@aziontech/webkit/menu'
+  import DivergenceIndicator from './divergence-indicator.vue'
   import { eventsPlaygroundOpener } from '@/helpers'
   import { ref } from 'vue'
 
@@ -11,6 +12,7 @@
   defineProps({
     sidebarVisible: { type: Boolean, default: true },
     recordsFound: { type: [String, Number], default: '' },
+    aggregateDivergence: { type: Boolean, default: false },
     documentSearchQuery: { type: String, default: '' },
     detailViewMode: { type: String, default: 'inline' },
     isFullscreen: { type: Boolean, default: false },
@@ -54,8 +56,13 @@
       <span
         v-if="recordsFound"
         class="discover-docs-badge"
-        >{{ recordsFound }} Documents found</span
       >
+        <span class="discover-docs-badge__text">{{ recordsFound }} Documents found</span>
+        <DivergenceIndicator
+          :visible="aggregateDivergence"
+          message="The chart is built from aggregated data, which is retained longer than raw documents — documents for this period are no longer available."
+        />
+      </span>
     </div>
     <div class="discover-toolbar__right">
       <div class="discover-toolbar__search">
@@ -139,7 +146,10 @@
 </template>
 
 <style scoped>
+  /* Container queries: breakpoints track the toolbar's own width (panel-driven),
+     not the viewport, so buttons don't clip on mid-width windows. */
   .discover-toolbar {
+    container-type: inline-size;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -210,15 +220,27 @@
 
   /* Documents found badge */
   .discover-docs-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
     font-size: 0.8125rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.04);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    border: 1px solid var(--surface-border);
+    background: var(--surface-hover);
     padding: 0.125rem 0.5rem;
     border-radius: 0.375rem;
     max-width: 20vw;
+  }
+
+  .discover-docs-badge__text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Inside the pill the indicator is a compact glyph, not a standalone box. */
+  .discover-docs-badge :deep(.divergence-indicator) {
+    width: auto;
+    height: auto;
   }
 
   /* Hide secondary buttons at smaller widths */
@@ -226,7 +248,7 @@
     display: inline-flex;
   }
 
-  @media (max-width: 1100px) {
+  @container (max-width: 1100px) {
     .discover-toolbar__btn-hide-sm {
       display: none;
     }
@@ -240,7 +262,7 @@
     }
   }
 
-  @media (max-width: 900px) {
+  @container (max-width: 900px) {
     .discover-toolbar__search {
       display: none;
     }

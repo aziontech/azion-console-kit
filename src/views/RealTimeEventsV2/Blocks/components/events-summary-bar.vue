@@ -122,11 +122,13 @@
           v-if="view.hasStatusBreakdown"
           class="events-summary-bar__inline-item"
         >
+          <i
+            class="pi pi-exclamation-triangle events-summary-bar__severity-icon events-summary-bar__severity-icon--warning"
+            aria-hidden="true"
+          />
           4xx
-          <span
-            class="events-summary-bar__inline-value"
-            :style="{ color: 'var(--yellow-400, #FACC15)' }"
-          >
+          <span class="events-summary-bar__sr-only">client errors</span>
+          <span class="events-summary-bar__inline-value events-summary-bar__inline-value--warning">
             {{ formatNumber(view.clientErrors) }}
           </span>
           <span class="events-summary-bar__inline-pct">({{ formatPctShort(view.clientPct) }})</span>
@@ -135,11 +137,13 @@
           v-if="view.hasStatusBreakdown"
           class="events-summary-bar__inline-item"
         >
+          <i
+            class="pi pi-times-circle events-summary-bar__severity-icon events-summary-bar__severity-icon--danger"
+            aria-hidden="true"
+          />
           5xx
-          <span
-            class="events-summary-bar__inline-value"
-            :style="{ color: 'var(--red-400, #F87171)' }"
-          >
+          <span class="events-summary-bar__sr-only">server errors</span>
+          <span class="events-summary-bar__inline-value events-summary-bar__inline-value--danger">
             {{ formatNumber(view.serverErrors) }}
           </span>
           <span class="events-summary-bar__inline-pct">({{ formatPctShort(view.serverPct) }})</span>
@@ -165,12 +169,15 @@
         </template>
       </div>
       <div class="events-summary-bar__card">
-        <span class="events-summary-bar__label">CLIENT ERRORS (4XX)</span>
+        <span class="events-summary-bar__label">
+          <i
+            class="pi pi-exclamation-triangle events-summary-bar__severity-icon events-summary-bar__severity-icon--warning"
+            aria-hidden="true"
+          />
+          CLIENT ERRORS (4XX)
+        </span>
         <template v-if="view.hasStatusBreakdown">
-          <span
-            class="events-summary-bar__value"
-            :style="{ color: 'var(--yellow-400, #FACC15)' }"
-          >
+          <span class="events-summary-bar__value events-summary-bar__value--warning">
             {{ formatNumber(view.clientErrors) }}
           </span>
           <span class="events-summary-bar__sub">{{ formatPct(view.clientPct) }}</span>
@@ -181,12 +188,15 @@
         </template>
       </div>
       <div class="events-summary-bar__card">
-        <span class="events-summary-bar__label">SERVER ERRORS (5XX)</span>
+        <span class="events-summary-bar__label">
+          <i
+            class="pi pi-times-circle events-summary-bar__severity-icon events-summary-bar__severity-icon--danger"
+            aria-hidden="true"
+          />
+          SERVER ERRORS (5XX)
+        </span>
         <template v-if="view.hasStatusBreakdown">
-          <span
-            class="events-summary-bar__value"
-            :style="{ color: 'var(--red-400, #F87171)' }"
-          >
+          <span class="events-summary-bar__value events-summary-bar__value--danger">
             {{ formatNumber(view.serverErrors) }}
           </span>
           <span class="events-summary-bar__sub">{{ formatPct(view.serverPct) }}</span>
@@ -202,8 +212,6 @@
 
 <style scoped>
   .events-summary-bar {
-    --rte-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-
     padding: 8px 12px 10px;
     display: flex;
     flex-direction: column;
@@ -254,15 +262,54 @@
   }
 
   .events-summary-bar__inline-value {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-weight: 600;
     color: var(--text-color);
+  }
+
+  .events-summary-bar__inline-value--warning,
+  .events-summary-bar__value--warning {
+    color: var(--text-warning);
+  }
+
+  .events-summary-bar__inline-value--danger,
+  .events-summary-bar__value--danger {
+    color: var(--text-danger);
+  }
+
+  .events-summary-bar__severity-icon {
+    font-size: 0.6875rem;
+  }
+
+  .events-summary-bar__severity-icon--warning {
+    color: var(--text-warning);
+  }
+
+  .events-summary-bar__severity-icon--danger {
+    color: var(--text-danger);
+  }
+
+  .events-summary-bar__label .events-summary-bar__severity-icon {
+    font-size: 0.5625rem;
+    margin-right: 4px;
+  }
+
+  .events-summary-bar__sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .events-summary-bar__inline-pct {
     font-size: 0.6875rem;
     color: var(--text-color-secondary);
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     margin-left: 2px;
   }
 
@@ -289,10 +336,12 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-color-secondary);
+    display: inline-flex;
+    align-items: center;
   }
 
   .events-summary-bar__value {
-    font-family: var(--rte-font-mono);
+    font-family: var(--font-code), ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 1.375rem;
     font-weight: 700;
     color: var(--text-color);
