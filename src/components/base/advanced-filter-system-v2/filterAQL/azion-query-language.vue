@@ -60,8 +60,7 @@
       >
         <template #option="slotProps">
           <div
-            class="w-full rounded-md"
-            style="font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace"
+            class="w-full rounded-md font-code"
             :data-testid="`azion-query-language-list-item${slotProps.index}`"
             @mousedown.prevent.stop="onOptionMouseDown(slotProps.option)"
             :class="[
@@ -542,7 +541,7 @@
     overflow: hidden;
     max-height: 400px;
     overflow-y: auto;
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    @apply font-code;
     font-size: 0.8125rem;
   }
 
@@ -627,7 +626,7 @@
 
   .aql-recent-queries__query {
     flex-shrink: 0;
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    @apply font-code;
     font-size: 0.8125rem;
     color: var(--text-color);
     white-space: nowrap;
@@ -635,7 +634,7 @@
 
   .aql-recent-queries__value {
     flex: 1;
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+    @apply font-code;
     font-size: 0.8125rem;
     color: var(--text-color);
     overflow: hidden;

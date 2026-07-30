@@ -56,7 +56,27 @@ export default {
         robotomono: ['Roboto Mono'],
         sora: ['Sora'],
         protomono: ['Proto Mono'],
-        mono: ['Proto Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'Courier New', 'monospace']
+        'proto-mono': ['Proto Mono'],
+        code: [
+          'ui-monospace',
+          'SFMono-Regular',
+          'SF Mono',
+          'Menlo',
+          'Consolas',
+          'Liberation Mono',
+          'monospace'
+        ],
+        mono: [
+          'Proto Mono',
+          'ui-monospace',
+          'SFMono-Regular',
+          'Menlo',
+          'Monaco',
+          'Cascadia Code',
+          'Roboto Mono',
+          'Courier New',
+          'monospace'
+        ]
       },
       animation: {
         fadeIn: 'fadeIn 220ms ease-in-out',
