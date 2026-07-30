@@ -54,7 +54,8 @@
     >
       <template #option="slotProps">
         <div
-          class="w-full rounded-md font-mono"
+          class="w-full rounded-md"
+          style="font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace"
           :data-testid="`azion-query-language-list-item${slotProps.index}`"
           @mousedown.prevent.stop="onOptionMouseDown(slotProps.option)"
           :class="[

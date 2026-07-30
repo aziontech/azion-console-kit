@@ -313,7 +313,8 @@
   }
 
   const updateRange = () => {
-    const parsedDate = parseDateSimple(tempInputValue.value)
+    const typedValue = tempInputValue.value
+    const parsedDate = parseDateSimple(typedValue)
 
     if (parsedDate) {
       const boundedParsedDate = clampToBounds(parsedDate)
@@ -350,6 +351,10 @@
       model.value.labelEnd = ''
     }
     emitSelectIfValid()
+
+    if (props.mode === 'absolute' && (parsedDate || !typedValue)) {
+      emit('close')
+    }
   }
 
   if (model.value.startDate) {
@@ -524,13 +529,14 @@
             :placeholder="props.editingField === 'start' ? startDateInput : endDateInput"
             class="w-full"
             :readonly="mode !== 'absolute'"
+            :disabled="mode !== 'absolute'"
             @keydown.enter="updateRange"
           />
           <PrimeButton
+            v-if="mode === 'absolute'"
             label="Apply"
             @click="updateRange"
             outlined
-            :disabled="mode !== 'absolute'"
             class="whitespace-nowrap w-20"
             size="small"
           />

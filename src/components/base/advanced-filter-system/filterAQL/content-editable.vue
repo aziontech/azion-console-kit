@@ -4,7 +4,7 @@
     ref="editable"
     contenteditable
     placeholder="Filter using Azion Query Language syntax..."
-    class="contenteditable p-inputtext font-normal text-sm w-full h-auto font-mono"
+    class="contenteditable p-inputtext font-normal text-sm w-full h-auto"
     @input="handleInput"
     @keyup="updateCursorOffset"
     @mouseup="updateCursorOffset"
@@ -79,6 +79,8 @@
 <style>
   .contenteditable {
     white-space: pre-wrap;
+    font-family:
+      ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
   }
 
   .contenteditable:empty:before {
