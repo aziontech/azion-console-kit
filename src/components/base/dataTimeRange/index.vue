@@ -83,7 +83,10 @@
               @close="closeOverlay"
             />
           </TabPanel>
-          <TabPanel header="Now">
+          <TabPanel
+            v-if="showNowTab"
+            header="Now"
+          >
             <div class="flex flex-col gap-4 max-w-[300px] mb-2">
               <div class="text-sm text-color-secondary">
                 Selecting 'Set Now' sets the time dynamically to the exact moment of each refresh.
@@ -171,6 +174,7 @@
   const overlayPanel = ref(null)
   const activeTab = ref(0)
   const editingField = ref('start')
+  const showNowTab = ref(true)
   const isOverlayOpen = ref(false)
   const hasInitializedUtcOffset = ref(false)
   const timezoneOptions = ref([])
@@ -303,6 +307,8 @@
     const field = tabIndex === 0 ? undefined : payload?.field
 
     if (field === 'start' || field === 'end') editingField.value = field
+
+    showNowTab.value = !(field === 'start' && !model.value?.label)
 
     if (!event) return
 
