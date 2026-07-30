@@ -17,6 +17,7 @@
 
   import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
   import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
+  import { moveItemToPosition } from '@/helpers/reorder-list-position'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -230,9 +231,8 @@
     )
     if (oldIndex === -1) return
 
-    const [movedItem] = data.value.splice(oldIndex, 1)
-    movedItem.position.altered = true
-    data.value.splice(newValue, 0, movedItem)
+    data.value[oldIndex].position.altered = true
+    data.value = moveItemToPosition(data.value, oldIndex, newValue)
     updateRowPositions(data.value)
   }
 
@@ -474,13 +474,16 @@
                 v-model="rowData.position.value"
                 showButtons
                 :allowEmpty="false"
+                :step="-1"
                 @update:modelValue="(value) => onPositionChange(rowData, value)"
                 @input="(value) => (valueInputedUser = value.value)"
                 buttonLayout="horizontal"
                 class="disabled-click-row"
-                :min="rowData.position.min"
-                :max="rowData.position.max"
-                :pt="{ input: { class: 'w-11 text-center' } }"
+                :pt="{
+                  input: { class: 'w-11 text-center' },
+                  incrementButton: { disabled: rowData.position.value <= rowData.position.min },
+                  decrementButton: { disabled: rowData.position.value >= rowData.position.max }
+                }"
                 data-testid="data-table-input-position"
               >
                 <template #incrementbuttonicon>

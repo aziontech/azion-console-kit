@@ -15,6 +15,7 @@
   import DataTable from '@aziontech/webkit/list-data-table'
   import { useDataTable } from '@/composables/useDataTable'
   import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
+  import { clampIndex, moveItemToPosition } from '@/helpers/reorder-list-position'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -259,24 +260,25 @@
     if (originalIndex === -1) return
 
     const maxAllowedPosition = rulesInCurrentPhase.length - 1
-    let newPosition = targetPosition
+    const newPosition = clampIndex(targetPosition, maxAllowedPosition)
 
-    if (newPosition > maxAllowedPosition) {
-      newPosition = maxAllowedPosition
+    if (targetPosition > maxAllowedPosition) {
       displayPositionExceededToast()
     }
 
     if (originalIndex === newPosition) return
 
-    const firstRule = rulesInCurrentPhase.splice(originalIndex, 1)[0]
-
+    const firstRule = rulesInCurrentPhase[originalIndex]
     firstRule.position.value = targetPosition
     firstRule.position.altered = newPosition !== firstRule.position.immutableValue
 
-    rulesInCurrentPhase.splice(newPosition, 0, firstRule)
+    const reorderedPhase = moveItemToPosition(rulesInCurrentPhase, originalIndex, targetPosition)
 
-    updateRowPositions(rulesInCurrentPhase)
-    data.value = [...request, ...response]
+    updateRowPositions(reorderedPhase)
+    data.value =
+      currentRulePhase === 'Response'
+        ? [...request, ...reorderedPhase]
+        : [...reorderedPhase, ...response]
   }
 
   const onPositionChange = (updatedRow, newValue) => {
@@ -592,13 +594,24 @@
                 v-model="rowData.position.value"
                 showButtons
                 :allowEmpty="false"
+                :step="-1"
                 @update:modelValue="(value) => onPositionChange(rowData, value)"
                 @input="(value) => (valueInputedUser = value.value)"
                 buttonLayout="horizontal"
                 class="disabled-click-row"
-                :min="rowData.position.min"
-                :max="rowData.position.max"
-                :pt="{ input: { class: 'w-11 text-center' } }"
+                :pt="{
+                  input: { class: 'w-11 text-center' },
+                  incrementButton: {
+                    disabled:
+                      hasContentDefault(rowData.phase?.content) ||
+                      rowData.position.value <= rowData.position.min
+                  },
+                  decrementButton: {
+                    disabled:
+                      hasContentDefault(rowData.phase?.content) ||
+                      rowData.position.value >= rowData.position.max
+                  }
+                }"
                 :disabled="hasContentDefault(rowData.phase?.content)"
                 data-testid="data-table-input-position"
               >
