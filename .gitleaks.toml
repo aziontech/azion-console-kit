@@ -22,4 +22,6 @@ paths = [
 regexes = [
   # Stripe PUBLISHABLE test keys (pk_test_*) are public by design.
   '''pk_test_[0-9a-zA-Z]+''',
+  # SSO provider config identifier (camelCase key), not a credential.
+  '''^ssoIdpScimE2e$''',
 ]
