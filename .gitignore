@@ -68,6 +68,7 @@ AGENTS.md
 .kilo/
 .kiro/
 /specs
+/plans
 storybook/yarn.lock
 
 # Test run artifacts (spec versioning-test-coverage)
