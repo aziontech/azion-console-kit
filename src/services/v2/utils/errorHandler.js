@@ -43,13 +43,64 @@ export class ErrorHandler {
     const { data } = error.response
 
     if (data?.errors && Array.isArray(data.errors)) {
-      return data.errors.map((err) => {
-        const fieldName = this._formatPath(err.source?.pointer)
-        return fieldName ? `${fieldName}: ${err.detail}` : err.detail
-      })
+      return data.errors.map((err) => this._composeMessage(err))
     }
 
     return [error.message || this.ERROR_MESSAGES.UNEXPECTED_ERROR]
+  }
+
+  static _composeMessage(err) {
+    const offendingRefs = Array.isArray(err?.meta?.offending_refs) ? err.meta.offending_refs : []
+    let detail = err?.detail ?? ''
+    if (detail.includes('{field}')) {
+      detail = detail.split('{field}').join(this._offendingField(err, offendingRefs))
+    }
+    const context = this._offendingContext(offendingRefs)
+    const message = context ? `${detail} ${context}` : detail
+    const fieldName = this._formatPath(err?.source?.pointer)
+    return fieldName ? `${fieldName}: ${message}` : message
+  }
+
+  static _offendingField(err, offendingRefs) {
+    const types = [
+      ...new Set(offendingRefs.map((ref) => this._humanizeType(ref?.resource_type)).filter(Boolean))
+    ]
+    if (types.length) return types.join(', ')
+    return this._pointerLeaf(err?.source?.pointer) ?? 'field'
+  }
+
+  static _offendingContext(offendingRefs) {
+    const parts = offendingRefs
+      .map((ref) => {
+        const expected = this._refValue(ref?.expected)
+        const got = this._refValue(ref?.got)
+        if (expected && got) return `expected ${expected}, got ${got}`
+        if (expected) return `expected ${expected}`
+        if (got) return `got ${got}`
+        return null
+      })
+      .filter(Boolean)
+    return parts.length ? `(${parts.join('; ')})` : ''
+  }
+
+  static _refValue(value) {
+    if (value === null || value === undefined) return null
+    const text = String(value).trim()
+    return text === '' ? null : text
+  }
+
+  static _humanizeType(type) {
+    if (!type) return null
+    return String(type)
+      .split('_')
+      .map((part) => (part ? `${part.charAt(0).toUpperCase()}${part.slice(1)}` : part))
+      .join(' ')
+  }
+
+  static _pointerLeaf(pointer) {
+    if (typeof pointer !== 'string' || !pointer) return null
+    const segments = pointer.split('/').filter(Boolean)
+    return segments.length ? segments[segments.length - 1] : null
   }
 
   static _formatPath(path) {

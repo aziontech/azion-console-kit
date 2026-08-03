@@ -1,6 +1,7 @@
 <script setup>
   import { computed, ref, watch, markRaw } from 'vue'
   import { useField } from 'vee-validate'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   import ResizableSplitter from '@/components/Splitter/ResizableSplitter.vue'
   import TabView from 'primevue/tabview'
@@ -45,6 +46,8 @@
   const activeTab = ref(0)
 
   const { value: name } = useField('name')
+
+  const { readOnly } = useVersionContext()
   const { value: azionForm } = useField('azionForm')
   const { value: isProprietaryCode } = useField('isProprietaryCode')
   const { value: defaultArgs, errorMessage: argsError } = useField('defaultArgs')
@@ -229,6 +232,7 @@
             name="name"
             placeholder="My function"
             :value="name"
+            :disabled="readOnly"
             description="Give a unique and descriptive name to identify the Function."
           />
         </template>
@@ -264,6 +268,7 @@
               required
               nameField="executionEnvironment"
               :options="executionEnvironmentOptions"
+              :disabled="readOnly"
               isCard
             />
           </div>
@@ -281,6 +286,7 @@
               name="active"
               auto
               :isCard="false"
+              :disabled="readOnly"
               title="Active"
             />
           </div>

@@ -10,6 +10,7 @@
         nameField="cdnCacheSettings"
         :isCard="false"
         :options="getEdgeCacheRadioOptions()"
+        :disabled="disabledFields"
         data-testid="edge-application-cache-settings-form__cdn-cache-settings-field"
       />
 
@@ -23,6 +24,7 @@
           showButtons
           v-model="cdnCacheSettingsMaximumTtl"
           id="cdnCacheSettingsMaximumTtl"
+          :disabled="disabledFields"
           :min="cdnCacheSettingsMaximumTtlMinimumValue"
           :max="CDN_CACHE_MAX_VALUE"
           :step="1"
@@ -44,6 +46,7 @@
         name="enableStaleCache"
         auto
         :isCard="false"
+        :disabled="disabledFields"
         title="Stale cache"
         data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field"
         description="Enable stale cache to serve expired content temporarily while fetching updated content from the origin."
@@ -54,6 +57,7 @@
         name="enableLargeFileCache"
         auto
         :isCard="false"
+        :disabled="disabledFields"
         @onSwitchChange="checkLargeFileCache"
         title="Large file optimization"
         data-testid="edge-application-cache-settings-form__slice-configuration-enabled-field"
@@ -102,6 +106,7 @@
             description="Optimize cache hierarchy by defining how content is cached across multiple layers of the edge network, with a fixed maximum caching time of 1 year"
             auto
             :isCard="false"
+            :disabled="disabledFields"
             title="Tiered Cache"
             data-testid="edge-application-cache-settings-form__tiered-cache-enabled-field"
           />
@@ -117,6 +122,7 @@
               optionValue="value"
               :options="TIERED_CACHE_REGION"
               :value="tieredCacheRegion"
+              :disabled="disabledFields"
               inputId="tieredCacheRegion"
               placeholder="Select an Tiered Cache Region"
               description="Choose an Tiered Cache Region suitable for your application."
@@ -153,6 +159,10 @@
     isTieredCacheEnabled: {
       type: Boolean,
       required: true
+    },
+    disabledFields: {
+      type: Boolean,
+      default: false
     }
   })
 

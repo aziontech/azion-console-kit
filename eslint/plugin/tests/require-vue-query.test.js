@@ -125,30 +125,32 @@ ruleTester.run('require-vue-query', rule, {
       filename: 'src/modules/users/composables/use-users.js'
     },
 
-    // Composable using queryClient.fetchQuery imperative API — allowed (Vue Query)
+    // Composable delegating to a v2 service (BaseService-backed) without a
+    // literal vue-query call — allowed. V2 services expose Vue Query internally,
+    // so the performance model is satisfied one layer down. Mirrors the
+    // isV2ServiceImport exemption in no-direct-http-in-components.
     {
       code: `
-        import { queryClient } from '../services/base/query/queryClient'
-        import { usersService } from '../services/users-service'
+        import { listUsers } from '@/services/v2/users/users-service'
 
-        export function useUsers() {
-          return queryClient.fetchQuery({ queryKey: ['users'], queryFn: () => usersService.list() })
+        export function useUserList() {
+          return listUsers()
         }
       `,
-      filename: 'src/modules/users/composables/use-users.js'
+      filename: 'src/modules/users/composables/useUserList.js'
     },
 
-    // Composable using queryClient.invalidateQueries imperative API — allowed
+    // Composable importing a v2 service instance and delegating imperatively
+    // (pagination/orchestration) — allowed for the same reason.
     {
       code: `
-        import { queryClient } from '../services/base/query/queryClient'
-        import { usersService } from '../services/users-service'
+        import { resourceUsageService } from '@/services/v2/deployment/resource-usage-service'
 
-        export function useDeleteUser() {
-          return usersService.delete().then(() => queryClient.invalidateQueries({ queryKey: ['users'] }))
+        export function useActiveVersions() {
+          return resourceUsageService.listResourceUsage({ page: 1 })
         }
       `,
-      filename: 'src/modules/users/composables/use-delete-user.js'
+      filename: 'src/composables/versioning/use-active-versions.js'
     },
 
     // Pure-utility file in a service folder (constants suffix) — allowed
@@ -246,10 +248,12 @@ ruleTester.run('require-vue-query', rule, {
       ]
     },
 
-    // Composable importing @/services without vue-query — forbidden
+    // Composable importing a LEGACY (non-v2) service without vue-query — forbidden.
+    // Legacy services are not BaseService-backed, so the composable bypasses the
+    // performance model.
     {
       code: `
-        import { listUsers } from '@/services/v2/users/users-service'
+        import { listUsers } from '@/services/users-services'
 
         export function useUserList() {
           return listUsers()
@@ -261,7 +265,7 @@ ruleTester.run('require-vue-query', rule, {
           messageId: 'requireVueQuery',
           data: {
             fileName: 'useUserList.js',
-            source: '@/services/v2/users/users-service'
+            source: '@/services/users-services'
           }
         }
       ]

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: window.open — the service opens the sales page in a new tab
 import { contactSalesRealTimePurgeService } from '@/services/real-time-purge/contact-sales-service'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 

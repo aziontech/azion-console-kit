@@ -1,0 +1,836 @@
+<script setup>
+  import { computed, nextTick, onMounted, ref, watch } from 'vue'
+  import { useField } from 'vee-validate'
+  import { RouterLink } from 'vue-router'
+  import FormHorizontal from '@/templates/create-form-block/form-horizontal'
+  import FieldText from '@aziontech/webkit/field-text'
+  import FieldDropdown from '@aziontech/webkit/field-dropdown'
+  import SelectButton from '@aziontech/webkit/selectbutton'
+  import PrimeButton from '@aziontech/webkit/button'
+  import DataTable from '@aziontech/webkit/datatable'
+  import Column from '@aziontech/webkit/column'
+  import { useToast } from '@aziontech/webkit/use-toast'
+  import { variablesService } from '@/services/v2/variables'
+  import { hasFlagUseV6Configurations } from '@/composables/user-flag'
+  import CodeEditor from '@/views/EdgeFunctions/components/code-editor.vue'
+  import { useResize } from '@/composables/useResize'
+  import ProtectionSection from '@/views/Environments/FormFields/blocks/ProtectionSection.vue'
+  import BranchTrackingSection from '@/views/Environments/FormFields/blocks/BranchTrackingSection.vue'
+
+  defineOptions({ name: 'form-fields-environment' })
+
+  const props = defineProps({
+    disabledFields: {
+      type: Boolean,
+      default: false
+    },
+    isEdit: {
+      type: Boolean,
+      default: false
+    }
+  })
+
+  const toast = useToast()
+  const { isMobile } = useResize()
+  const { value: name } = useField('name')
+  const { value: description } = useField('description')
+  const { value: deploymentVersionPolicy } = useField('deployment_policy')
+  const { value: logVerbosity } = useField('log_verbosity')
+  const { value: robotsPolicy } = useField('robots_policy')
+  const { value: environmentVariables, errorMessage: environmentVariablesError } =
+    useField('environmentVariables')
+
+  const deploymentVersionPolicyOptions = [
+    { label: 'Single Version', value: 'single_version' },
+    { label: 'Versioned URL', value: 'versioned_urls' }
+  ]
+
+  const logVerbosityOptions = [
+    { label: 'Normal', value: 'normal' },
+    { label: 'Verbose', value: 'verbose' }
+  ]
+
+  const robotsPolicyOptions = [
+    { label: 'Index', value: 'index' },
+    { label: 'No Index', value: 'noindex' }
+  ]
+
+  const isDeploymentVersionPolicyDisabled = computed(() => {
+    return props.disabledFields || props.isEdit
+  })
+
+  const allGlobalVariables = ref([])
+  const loadingGlobalVariables = ref(true)
+  const envFileInputRef = ref(null)
+  const customVariablesViewOptions = ['Form', 'JSON']
+  const customVariablesView = ref(customVariablesViewOptions[0])
+  const environmentVariablesJsonText = ref('{}')
+  const customVariablesEntries = ref([])
+  const environmentVariablesJsonError = ref('')
+  const environmentVariablesFormError = ref('')
+  const customVariablesFieldErrors = ref({})
+  const lastSyncSource = ref(null)
+  const keyRegex = /^[A-Z0-9_]+$/
+  let customVariableEntryId = 0
+
+  const markSyncSource = (source) => {
+    lastSyncSource.value = source
+    nextTick(() => {
+      lastSyncSource.value = null
+    })
+  }
+
+  const createCustomVariableEntry = (key = '', value = '') => ({
+    id: `custom-variable-entry-${customVariableEntryId++}`,
+    key,
+    value
+  })
+
+  const hasEnvironmentVariablesError = computed(
+    () =>
+      !!environmentVariablesError.value ||
+      !!environmentVariablesJsonError.value ||
+      !!environmentVariablesFormError.value
+  )
+
+  const canAddCustomVariableEntry = computed(() => {
+    if (customVariablesEntries.value.length === 0) return true
+
+    const lastEntry = customVariablesEntries.value[customVariablesEntries.value.length - 1]
+    const key = typeof lastEntry?.key === 'string' ? lastEntry.key.trim() : ''
+    const value = typeof lastEntry?.value === 'string' ? lastEntry.value.trim() : ''
+
+    return !!key && !!value
+  })
+
+  const normalizeEnvironmentVariablesObject = (value) => {
+    if (!value) return {}
+
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value)
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+
+        return Object.entries(parsed).reduce((acc, [key, itemValue]) => {
+          if (!key?.trim()) return acc
+          acc[key] = typeof itemValue === 'string' ? itemValue : String(itemValue ?? '')
+          return acc
+        }, {})
+      } catch {
+        return {}
+      }
+    }
+
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      return Object.entries(value).reduce((acc, [key, itemValue]) => {
+        if (!key?.trim()) return acc
+        acc[key] = typeof itemValue === 'string' ? itemValue : String(itemValue ?? '')
+        return acc
+      }, {})
+    }
+
+    return {}
+  }
+
+  const areEnvironmentVariablesEqual = (left, right) => {
+    const leftKeys = Object.keys(left)
+    const rightKeys = Object.keys(right)
+
+    if (leftKeys.length !== rightKeys.length) return false
+
+    return leftKeys.every((key) => right[key] === left[key])
+  }
+
+  const mapEnvironmentVariablesToEntries = (variables, currentEntries = []) => {
+    const idByKey = new Map()
+    currentEntries.forEach((entry) => {
+      const entryKey = typeof entry?.key === 'string' ? entry.key.trim() : ''
+      if (entryKey && !idByKey.has(entryKey)) {
+        idByKey.set(entryKey, entry.id)
+      }
+    })
+
+    return Object.entries(variables).map(([key, value]) => {
+      const existingId = idByKey.get(key)
+      if (existingId) {
+        return { id: existingId, key, value }
+      }
+      return createCustomVariableEntry(key, value)
+    })
+  }
+
+  const getInvalidEnvironmentVariableKeys = (variablesObject) => {
+    return Object.keys(variablesObject).filter((key) => !keyRegex.test(key.trim()))
+  }
+
+  const ensureCustomVariableEntry = () => {
+    if (customVariablesEntries.value.length > 0) return
+
+    customVariablesEntries.value = [createCustomVariableEntry()]
+  }
+
+  const mapEntriesToEnvironmentVariables = (entries) => {
+    const nextVariables = {}
+    const duplicatedKeys = new Set()
+    const duplicatedKeyIndices = new Set()
+    const emptyKeyIndices = new Set()
+    const emptyValueIndices = new Set()
+    const invalidKeyFormatIndices = new Set()
+    const keyOccurrences = new Map()
+
+    entries.forEach((entry, index) => {
+      const key = typeof entry?.key === 'string' ? entry.key.trim() : ''
+      const value = typeof entry?.value === 'string' ? entry.value : String(entry?.value ?? '')
+
+      if (!key && !value) {
+        return
+      }
+
+      if (!key) {
+        emptyKeyIndices.add(index)
+        return
+      }
+
+      if (!keyRegex.test(key)) {
+        invalidKeyFormatIndices.add(index)
+        return
+      }
+
+      if (!value.trim()) {
+        emptyValueIndices.add(index)
+        return
+      }
+
+      if (!keyOccurrences.has(key)) {
+        keyOccurrences.set(key, [])
+      }
+
+      keyOccurrences.get(key).push(index)
+      nextVariables[key] = value
+    })
+
+    keyOccurrences.forEach((indices, key) => {
+      if (indices.length > 1) {
+        duplicatedKeys.add(key)
+        indices.forEach((index) => duplicatedKeyIndices.add(index))
+      }
+    })
+
+    return {
+      nextVariables,
+      duplicatedKeys: Array.from(duplicatedKeys),
+      duplicatedKeyIndices,
+      emptyKeyIndices,
+      emptyValueIndices,
+      invalidKeyFormatIndices
+    }
+  }
+
+  const setCustomVariablesFieldErrors = ({
+    emptyKeyIndices,
+    emptyValueIndices,
+    invalidKeyFormatIndices,
+    duplicatedKeyIndices,
+    duplicatedKeys
+  }) => {
+    const nextErrors = {}
+
+    // eslint-disable-next-line id-length
+    customVariablesEntries.value.forEach((_, index) => {
+      nextErrors[index] = { key: '', value: '' }
+
+      if (emptyKeyIndices.has(index)) {
+        nextErrors[index].key = 'Key is required.'
+      } else if (invalidKeyFormatIndices.has(index)) {
+        nextErrors[index].key = 'Invalid key format.'
+      } else if (duplicatedKeyIndices.has(index)) {
+        nextErrors[index].key = `Duplicated key: ${duplicatedKeys.join(', ')}`
+      }
+
+      if (emptyValueIndices.has(index)) {
+        nextErrors[index].value = 'Value is required.'
+      }
+    })
+
+    customVariablesFieldErrors.value = nextErrors
+  }
+
+  const getCustomVariableFieldError = (index, field) => {
+    return customVariablesFieldErrors.value?.[index]?.[field] || ''
+  }
+
+  const syncEnvironmentVariablesViews = (source = 'external') => {
+    const normalized = normalizeEnvironmentVariablesObject(environmentVariables.value)
+
+    markSyncSource(source)
+
+    if (!areEnvironmentVariablesEqual(normalized, environmentVariables.value || {})) {
+      environmentVariables.value = normalized
+    }
+
+    if (source !== 'json') {
+      environmentVariablesJsonText.value = JSON.stringify(normalized, null, 2)
+    }
+
+    if (source !== 'form') {
+      customVariablesEntries.value = mapEnvironmentVariablesToEntries(
+        normalized,
+        customVariablesEntries.value
+      )
+      ensureCustomVariableEntry()
+    }
+  }
+
+  const handleCustomVariablesJsonUpdate = (value) => {
+    if (lastSyncSource.value !== null) return
+
+    environmentVariablesJsonText.value = value
+
+    if (!value?.trim()) {
+      environmentVariablesJsonError.value = ''
+      environmentVariablesFormError.value = ''
+      environmentVariables.value = {}
+      syncEnvironmentVariablesViews('json')
+      return
+    }
+
+    try {
+      const parsed = JSON.parse(value)
+
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        environmentVariablesJsonError.value =
+          'Environment Variables must be a JSON object with key/value pairs.'
+        return
+      }
+
+      const normalized = normalizeEnvironmentVariablesObject(parsed)
+      const invalidKeys = getInvalidEnvironmentVariableKeys(normalized)
+
+      if (invalidKeys.length > 0) {
+        environmentVariablesJsonError.value =
+          'Invalid key format. Use only uppercase letters, numbers, and underscore (_).'
+        return
+      }
+
+      environmentVariablesJsonError.value = ''
+      environmentVariablesFormError.value = ''
+      environmentVariables.value = normalized
+      syncEnvironmentVariablesViews('json')
+    } catch {
+      environmentVariablesJsonError.value = 'Environment Variables must be valid JSON.'
+    }
+  }
+
+  const handleEnvironmentVariablesFormChange = () => {
+    if (lastSyncSource.value !== null) return
+
+    const {
+      nextVariables,
+      duplicatedKeys,
+      duplicatedKeyIndices,
+      emptyKeyIndices,
+      emptyValueIndices,
+      invalidKeyFormatIndices
+    } = mapEntriesToEnvironmentVariables(customVariablesEntries.value)
+    const currentVariables = normalizeEnvironmentVariablesObject(environmentVariables.value)
+
+    setCustomVariablesFieldErrors({
+      emptyKeyIndices,
+      emptyValueIndices,
+      invalidKeyFormatIndices,
+      duplicatedKeyIndices,
+      duplicatedKeys
+    })
+
+    const invalidateEnvironmentVariables = (errorMessage) => {
+      environmentVariablesFormError.value = errorMessage
+      if (environmentVariables.value !== null) {
+        markSyncSource('form')
+        environmentVariables.value = null
+      }
+    }
+
+    if (emptyKeyIndices.size > 0) {
+      invalidateEnvironmentVariables('Key is required.')
+      return
+    }
+
+    if (emptyValueIndices.size > 0) {
+      invalidateEnvironmentVariables('Value is required.')
+      return
+    }
+
+    if (invalidKeyFormatIndices.size > 0) {
+      invalidateEnvironmentVariables(
+        'Invalid key format. Use only uppercase letters, numbers, and underscore (_).'
+      )
+      return
+    }
+
+    if (duplicatedKeys.length > 0) {
+      invalidateEnvironmentVariables(`Duplicated key: ${duplicatedKeys.join(', ')}`)
+      return
+    }
+
+    environmentVariablesFormError.value = ''
+    environmentVariablesJsonError.value = ''
+    customVariablesFieldErrors.value = {}
+
+    if (areEnvironmentVariablesEqual(currentVariables, nextVariables)) {
+      return
+    }
+
+    markSyncSource('form')
+    environmentVariables.value = nextVariables
+    syncEnvironmentVariablesViews('form')
+  }
+
+  const addCustomVariableEntry = () => {
+    if (!canAddCustomVariableEntry.value) return
+
+    customVariablesEntries.value = [...customVariablesEntries.value, createCustomVariableEntry()]
+  }
+
+  const updateCustomVariableEntry = (index, field, value) => {
+    const nextEntries = [...customVariablesEntries.value]
+    nextEntries[index] = {
+      ...nextEntries[index],
+      [field]: value
+    }
+
+    customVariablesEntries.value = nextEntries
+  }
+
+  const removeCustomVariableEntry = (index) => {
+    customVariablesEntries.value = customVariablesEntries.value.filter(
+      // eslint-disable-next-line id-length
+      (_, itemIndex) => itemIndex !== index
+    )
+    ensureCustomVariableEntry()
+    handleEnvironmentVariablesFormChange()
+  }
+
+  const parseEnvFile = (content) => {
+    const parsed = {}
+    const invalidLines = []
+    const lines = content.split(/\r?\n/)
+
+    lines.forEach((line, index) => {
+      const trimmedLine = line.trim()
+
+      if (!trimmedLine || trimmedLine.startsWith('#')) {
+        return
+      }
+
+      const normalizedLine = trimmedLine.startsWith('export ')
+        ? trimmedLine.slice(7).trim()
+        : trimmedLine
+
+      const match = normalizedLine.match(/^([A-Z0-9_]+)\s*=\s*(.*)$/)
+
+      if (!match) {
+        invalidLines.push(index + 1)
+        return
+      }
+
+      const key = match[1]
+      let value = match[2]
+
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
+        value = value.slice(1, -1)
+      }
+
+      parsed[key] = value
+    })
+
+    return { parsed, invalidLines }
+  }
+
+  const fetchGlobalVariables = async () => {
+    loadingGlobalVariables.value = true
+
+    try {
+      const params = hasFlagUseV6Configurations() ? { scope_type: 'global', skipCache: true } : {}
+      const response = await variablesService.list(params)
+      const allVariables = Array.isArray(response?.body) ? response.body : []
+      const variables = hasFlagUseV6Configurations()
+        ? allVariables.filter((variable) =>
+            (variable.scope ?? []).some((scope) => scope?.type === 'global')
+          )
+        : allVariables
+
+      allGlobalVariables.value = variables.map((variable) => ({
+        id: variable.id,
+        key: variable.key,
+        value: variable.value?.content ?? '',
+        isSecret: !!variable.value?.isSecret
+      }))
+    } catch {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to load global variables',
+        life: 5000
+      })
+    } finally {
+      loadingGlobalVariables.value = false
+    }
+  }
+
+  const triggerEnvFileUpload = () => {
+    if (props.disabledFields) return
+    envFileInputRef.value?.click()
+  }
+
+  const handleEnvFileUpload = async (event) => {
+    const file = event?.target?.files?.[0]
+
+    if (!file) return
+
+    const content = await file.text()
+    const { parsed, invalidLines } = parseEnvFile(content)
+
+    const hasAnyVariable = Object.keys(parsed).length > 0
+
+    if (!hasAnyVariable && invalidLines.length > 0) {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to parse the selected file as .env format',
+        life: 5000
+      })
+      event.target.value = ''
+      return
+    }
+
+    environmentVariablesJsonError.value = ''
+    environmentVariablesFormError.value = ''
+    customVariablesFieldErrors.value = {}
+    environmentVariables.value = normalizeEnvironmentVariablesObject(parsed)
+    syncEnvironmentVariablesViews()
+
+    if (invalidLines.length > 0) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: `Some lines were ignored: ${invalidLines.join(', ')}`,
+        life: 6000
+      })
+    }
+
+    event.target.value = ''
+  }
+
+  watch(
+    environmentVariables,
+    () => {
+      if (lastSyncSource.value !== null) return
+      if (environmentVariablesJsonError.value || environmentVariablesFormError.value) return
+      syncEnvironmentVariablesViews()
+    },
+    { deep: true, immediate: true }
+  )
+
+  watch(
+    customVariablesEntries,
+    () => {
+      if (customVariablesView.value !== 'Form') return
+      handleEnvironmentVariablesFormChange()
+    },
+    { deep: true }
+  )
+
+  onMounted(async () => {
+    ensureCustomVariableEntry()
+    await fetchGlobalVariables()
+  })
+</script>
+
+<template>
+  <FormHorizontal
+    title="General"
+    description="Configure the identification and lifecycle status of the environment."
+  >
+    <template #inputs>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldText
+          label="Name"
+          name="name"
+          required
+          placeholder="Production"
+          description="Use a clear name to identify this deployment stage."
+          :value="name"
+          :disabled="props.disabledFields"
+          data-testid="environment-form__name-field"
+        />
+
+        <FieldText
+          label="Description"
+          name="description"
+          placeholder="Environment purpose and constraints"
+          description="Optional description used for internal identification."
+          :value="description"
+          :disabled="props.disabledFields"
+          data-testid="environment-form__description-field"
+        />
+      </div>
+    </template>
+  </FormHorizontal>
+
+  <FormHorizontal
+    title="Settings"
+    description="Define environment behavior and URL strategy."
+  >
+    <template #inputs>
+      <div class="flex flex-col sm:max-w-lg w-full gap-2">
+        <FieldDropdown
+          label="Deployment Version Policy"
+          name="deployment_policy"
+          required
+          :options="deploymentVersionPolicyOptions"
+          :value="deploymentVersionPolicy"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="self"
+          description="Select how environment URLs are organized for deployments."
+          :disabled="isDeploymentVersionPolicyDisabled"
+          data-testid="environment-form__configuration-field"
+        />
+
+        <small
+          v-if="props.isEdit"
+          class="text-xs text-color-secondary font-normal leading-5"
+        >
+          Deployment Version Policy cannot be changed after the environment is created.
+        </small>
+
+        <FieldDropdown
+          label="Log Verbosity"
+          name="log_verbosity"
+          :options="logVerbosityOptions"
+          :value="logVerbosity"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="self"
+          description="Set how much detail is captured in the environment logs."
+          :disabled="props.disabledFields"
+          data-testid="environment-form__log-verbosity-field"
+        />
+
+        <FieldDropdown
+          label="Robots Policy"
+          name="robots_policy"
+          :options="robotsPolicyOptions"
+          :value="robotsPolicy"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="self"
+          description="Control whether search engines are allowed to index this environment."
+          :disabled="props.disabledFields"
+          data-testid="environment-form__robots-policy-field"
+        />
+      </div>
+    </template>
+  </FormHorizontal>
+
+  <ProtectionSection :disabledFields="props.disabledFields" />
+
+  <BranchTrackingSection :disabledFields="props.disabledFields" />
+
+  <FormHorizontal
+    title="Global Variables"
+    description="Global variables created in the platform are automatically applied to this environment. To override a value here, create a custom variable below using the same key."
+  >
+    <template #inputs>
+      <div class="flex flex-col sm:max-w-3xl w-full gap-2">
+        <div
+          v-if="loadingGlobalVariables"
+          class="text-sm text-color-secondary"
+          data-testid="environment-form__global-variables__loading"
+        >
+          Loading global variables...
+        </div>
+
+        <div
+          v-else-if="allGlobalVariables.length === 0"
+          class="flex flex-col gap-1 text-sm"
+          data-testid="environment-form__global-variables__empty"
+        >
+          <span class="text-color-secondary">No global variables created yet.</span>
+          <RouterLink
+            :to="{ name: 'list-variables' }"
+            class="text-color-link hover:underline w-fit"
+            data-testid="environment-form__global-variables__manage-link"
+          >
+            Manage global variables
+          </RouterLink>
+        </div>
+
+        <DataTable
+          v-else
+          :value="allGlobalVariables"
+          dataKey="id"
+          class="w-full"
+          data-testid="environment-form__global-variables__table"
+        >
+          <Column
+            field="key"
+            header="Key"
+            class="font-medium"
+          />
+          <Column
+            header="Value"
+            style="max-width: 320px"
+          >
+            <template #body="{ data }">
+              <span
+                class="text-color-secondary truncate block"
+                :title="data.isSecret ? '' : data.value"
+              >
+                {{ data.isSecret ? '••••••••' : data.value }}
+              </span>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+    </template>
+  </FormHorizontal>
+
+  <FormHorizontal
+    title="Variables"
+    description="Define environment-specific variables using the form or JSON editor, or import a .env file."
+  >
+    <template #inputs>
+      <div class="flex flex-col w-full gap-3">
+        <div class="flex items-center gap-2 self-end">
+          <PrimeButton
+            label="Upload"
+            icon="pi pi-upload"
+            outlined
+            size="small"
+            :disabled="props.disabledFields"
+            @click="triggerEnvFileUpload"
+            data-testid="environment-form__upload-env-file-btn"
+          />
+          <input
+            ref="envFileInputRef"
+            type="file"
+            class="hidden"
+            :disabled="props.disabledFields"
+            @change="handleEnvFileUpload"
+          />
+          <SelectButton
+            v-model="customVariablesView"
+            :options="customVariablesViewOptions"
+            :disabled="props.disabledFields"
+            aria-label="Variables view"
+            class="flex h-9 p-1 w-fit"
+            data-testid="environment-form__variables-view-toggle"
+          />
+        </div>
+        <template v-if="customVariablesView === 'Form'">
+          <div class="flex flex-col gap-3">
+            <div
+              v-for="(item, index) in customVariablesEntries"
+              :key="item.id"
+              class="flex flex-col md:flex-row gap-2 md:items-start"
+            >
+              <FieldText
+                :name="`customVariablesEntries.${index}.key`"
+                :label="index === 0 || isMobile ? 'Key' : ''"
+                :value="item.key"
+                placeholder="VARIABLE_KEY_NAME"
+                :additionalError="getCustomVariableFieldError(index, 'key')"
+                :disabled="props.disabledFields"
+                :data-testid="`environment-form__variables__key-input-${index}`"
+                @input="(value) => updateCustomVariableEntry(index, 'key', value)"
+              />
+
+              <div class="flex gap-2 w-full items-end">
+                <FieldText
+                  :name="`customVariablesEntries.${index}.value`"
+                  :label="index === 0 || isMobile ? 'Value' : ''"
+                  :value="item.value"
+                  placeholder="VARIABLE_VALUE"
+                  :additionalError="getCustomVariableFieldError(index, 'value')"
+                  :disabled="props.disabledFields"
+                  :data-testid="`environment-form__custom-variables__value-input-${index}`"
+                  @input="(value) => updateCustomVariableEntry(index, 'value', value)"
+                />
+
+                <PrimeButton
+                  v-if="customVariablesEntries.length > 1"
+                  icon="pi pi-trash"
+                  type="button"
+                  outlined
+                  severity="secondary"
+                  size="small"
+                  class="md:self-end"
+                  :disabled="props.disabledFields"
+                  @click="removeCustomVariableEntry(index)"
+                  data-testid="environment-form__custom-variables__remove-row-btn"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <PrimeButton
+              label="Add variable"
+              icon="pi pi-plus"
+              type="button"
+              text
+              size="small"
+              :disabled="props.disabledFields || !canAddCustomVariableEntry"
+              @click="addCustomVariableEntry"
+              data-testid="environment-form__custom-variables__add-row-btn"
+            />
+          </div>
+        </template>
+
+        <template v-else>
+          <CodeEditor
+            :modelValue="environmentVariablesJsonText"
+            runtime="json"
+            :initialValue="environmentVariablesJsonText"
+            :readOnly="props.disabledFields"
+            :errors="hasEnvironmentVariablesError"
+            :minimap="false"
+            @update:modelValue="handleCustomVariablesJsonUpdate"
+          />
+        </template>
+
+        <small
+          v-if="customVariablesView !== 'Form'"
+          class="text-xs text-color-secondary font-normal leading-5"
+        >
+          Use a JSON object format, for example: <code>{"API_URL":"https://example.com"}</code>
+        </small>
+
+        <small
+          v-if="environmentVariablesJsonError"
+          class="p-error text-xs font-normal leading-tight"
+        >
+          {{ environmentVariablesJsonError }}
+        </small>
+
+        <small
+          v-if="environmentVariablesFormError"
+          class="p-error text-xs font-normal leading-tight"
+        >
+          {{ environmentVariablesFormError }}
+        </small>
+
+        <small
+          v-if="environmentVariablesError"
+          class="p-error text-xs font-normal leading-tight"
+        >
+          {{ environmentVariablesError }}
+        </small>
+      </div>
+    </template>
+  </FormHorizontal>
+</template>

@@ -9,6 +9,17 @@ const domainSuffix = environment === 'production' ? 'net' : 'com'
 const edgeApiHost =
   environment === 'production' ? 'jkjuyhi0gza.map.azionedge.net' : 'urvlgkvpxla.map.azionedge.net'
 
+const deploymentApiHost =
+  environment === 'production' ? 'deployment-api.azion.app' : 'deployment-api-stage.azion.app'
+
+const environmentApiHost =
+  environment === 'production' ? 'environment-api.azion.app' : 'environment-api-stage.azion.app'
+
+const variablesApiHost =
+  environment === 'production' ? 'variables.azion.com' : 'stage-variables.azion.com'
+
+const tlsApiHost = environment === 'production' ? 'tls-api.azion.net' : 'stage-tls-api.azion.net'
+
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
     return origin?.map(({ hostHeader, addresses, ...rest }) => {
@@ -151,6 +162,30 @@ const config = {
         addresses: [`api.azion.com`]
       }
     ]),
+    {
+      name: 'origin-deployment-api',
+      type: 'single_origin',
+      hostHeader: deploymentApiHost,
+      addresses: [deploymentApiHost]
+    },
+    {
+      name: 'origin-environment-api',
+      type: 'single_origin',
+      hostHeader: environmentApiHost,
+      addresses: [environmentApiHost]
+    },
+    {
+      name: 'origin-variables-api',
+      type: 'single_origin',
+      hostHeader: variablesApiHost,
+      addresses: [variablesApiHost]
+    },
+    {
+      name: 'origin-tls-api',
+      type: 'single_origin',
+      hostHeader: tlsApiHost,
+      addresses: [tlsApiHost]
+    },
     {
       name: 'origin-console-feedback',
       type: 'single_origin',
@@ -321,31 +356,14 @@ const config = {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
-            inputValue: '^/api'
+            inputValue:
+              '^/(api|v4|deployment-api|environment-api|variables-api|tls-api|graphql|billing/invoices)'
           },
           {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
-            inputValue: '^/v4'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/graphql'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/billing/invoices'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/edge_api'
+            inputValue: '^/sse'
           },
           {
             variable: '${uri}',
@@ -525,22 +543,84 @@ const config = {
         }
       },
       {
-        name: 'Route Edge API Requests',
+        name: 'Route Deployment API Requests',
         description:
-          'Routes /edge_api requests to the edge API origin, stripping the /edge_api prefix before forwarding.',
-        match: '^/edge_api',
+          'Routes new deployment API requests to the deployment API origin, stripping the /deployment-api prefix.',
+        match: '^/deployment-api',
         behavior: {
           forwardCookies: true,
           setOrigin: {
-            name: 'origin-edge-api',
+            name: 'origin-deployment-api',
             type: 'single_origin'
           },
           capture: {
-            match: '/edge_api/(.*)',
+            match: '/deployment-api/(.*)',
             captured: 'captured',
             subject: 'request_uri'
           },
-          rewrite: `/%{captured[1]}`
+          rewrite: `/%{captured[1]}`,
+          bypassCache: true
+        }
+      },
+      {
+        name: 'Route Environment API Requests',
+        description:
+          'Routes new environment API requests to the environment API origin, stripping the /environment-api prefix.',
+        match: '^/environment-api',
+        behavior: {
+          forwardCookies: true,
+          setOrigin: {
+            name: 'origin-environment-api',
+            type: 'single_origin'
+          },
+          capture: {
+            match: '/environment-api/(.*)',
+            captured: 'captured',
+            subject: 'request_uri'
+          },
+          rewrite: `/%{captured[1]}`,
+          bypassCache: true
+        }
+      },
+      {
+        name: 'Route Variables API Requests',
+        description:
+          'Routes new variables API requests to the variables API origin, stripping the /variables-api prefix.',
+        match: '^/variables-api',
+        behavior: {
+          forwardCookies: true,
+          setOrigin: {
+            name: 'origin-variables-api',
+            type: 'single_origin'
+          },
+          capture: {
+            match: '/variables-api/(.*)',
+            captured: 'captured',
+            subject: 'request_uri'
+          },
+          rewrite: `/%{captured[1]}`,
+          bypassCache: true
+        }
+      },
+      {
+        name: 'Route TLS API Requests',
+        description:
+          'Routes TLS API requests to the TLS API origin, stripping the /tls-api prefix and setting the v4 Accept header.',
+        match: '^/tls-api',
+        behavior: {
+          forwardCookies: true,
+          setOrigin: {
+            name: 'origin-tls-api',
+            type: 'single_origin'
+          },
+          setHeaders: ['Accept: application/json; version=4'],
+          capture: {
+            match: '/tls-api/(.*)',
+            captured: 'captured',
+            subject: 'request_uri'
+          },
+          rewrite: `/%{captured[1]}`,
+          bypassCache: true
         }
       }
     ],
@@ -606,25 +686,8 @@ const config = {
             variable: '${uri}',
             conditional: 'and',
             operator: 'does_not_match',
-            inputValue: '^/api'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/v4'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/graphql'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/billing/invoices'
+            inputValue:
+              '^/(api|v4|deployment-api|environment-api|variables-api|tls-api|graphql|billing/invoices|sse)'
           },
           {
             variable: '${uri}',
@@ -632,18 +695,6 @@ const config = {
             operator: 'does_not_match',
             inputValue:
               '^(?!.*workspace/storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/sse'
-          },
-          {
-            variable: '${uri}',
-            conditional: 'and',
-            operator: 'does_not_match',
-            inputValue: '^/edge_api'
           }
         ],
         behavior: {

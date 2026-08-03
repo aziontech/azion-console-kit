@@ -1,0 +1,20 @@
+{
+  "id": 60001,
+  "version_id": "AVAPP0001",
+  "version": 3,
+  "state": "draft",
+  "description": "draft note",
+  "created_at": "2026-06-18T10:00:00Z",
+  "ready_at": "2026-06-18T10:05:00Z",
+  "last_editor": "user@azion.com",
+  "name": "my-app",
+  "active": true,
+  "debug": false,
+  "modules": {
+    "cache": { "enabled": true },
+    "functions": { "enabled": false },
+    "application_accelerator": { "enabled": true },
+    "image_processor": { "enabled": false },
+    "tiered_cache": { "enabled": true }
+  }
+}

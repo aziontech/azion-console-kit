@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: document.documentElement — themeApply toggles theme classes on the root element
 import { themeApply } from '@/helpers/theme-apply'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 

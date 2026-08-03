@@ -2,6 +2,17 @@ import { enrichByMatchingReference } from '../utils/enrichByMatchingReference'
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { EdgeFirewallFunctionAdapter } from './edge-firewall-function-adapter'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { versionedFirewallFunctionService } from '@/services/v2/edge-firewall/versioned/versioned-firewall-function-service'
+
+const dedupeFirewallFunctionInstances = (instances) => {
+  const countById = new Map()
+  for (const item of Array.isArray(instances) ? instances : []) {
+    const functionId = item?.edgeFunctionId ?? item?.function
+    if (functionId === null || functionId === undefined) continue
+    countById.set(functionId, (countById.get(functionId) ?? 0) + 1)
+  }
+  return Array.from(countById, ([functionId, instanceCount]) => ({ functionId, instanceCount }))
+}
 
 export class EdgeFirewallFunctionService extends BaseService {
   constructor() {
@@ -32,6 +43,14 @@ export class EdgeFirewallFunctionService extends BaseService {
       count: data.count,
       body: transformed
     }
+  }
+
+  listFunctionDependenciesByVersion = async (edgeFirewallId, versionId) => {
+    const { body } = await versionedFirewallFunctionService.list(edgeFirewallId, versionId, {
+      pageSize: 100
+    })
+
+    return dedupeFirewallFunctionInstances(body)
   }
 
   listFunctionsDropdownService = async (edgeFirewallId, params = { pageSize: 10 }) => {

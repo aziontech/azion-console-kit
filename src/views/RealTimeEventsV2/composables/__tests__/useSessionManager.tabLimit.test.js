@@ -1,3 +1,4 @@
+// does not — jsdom keeps the storage boundary deterministic across runtimes).
 /* global globalThis */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 

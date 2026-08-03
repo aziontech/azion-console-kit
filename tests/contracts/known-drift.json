@@ -1,0 +1,217 @@
+{
+  "$comment": "Known, ACCEPTED divergences between the published OpenAPI spec and the fields the front depends on (spec versioning-test-coverage §3.4). PRECISION IS THE CONTRACT: entries are per-resource with EXPLICIT field lists — field wildcards are not supported by the engine, so any NEW drifting field always fails, and every (entry, field) pair must still match real drift or the staleness test fails (retire fixed fields immediately). Each entry MUST carry a reason and an action.",
+  "entries": [
+    {
+      "resources": ["application"],
+      "kind": "missing",
+      "fields": [
+        "state",
+        "version",
+        "comment",
+        "description",
+        "ready_at",
+        "source_version_id",
+        "reference_count",
+        "meta",
+        "created_at"
+      ],
+      "reason": "The published spec still models version responses on the BARE resource schema, leaving part of the version envelope undocumented while the live API returns it (VersionShell works against stage). Re-derived field-by-field from the stage spec on 2026-07-23 (was blanket-listed on 2026-07-21; version_id/last_modified/last_editor have since been FIXED by the API team and were retired here).",
+      "action": "Report to the edge-api team: version endpoints should reference a Version response schema (resource fields + version envelope)."
+    },
+    {
+      "resources": ["workload"],
+      "kind": "missing",
+      "fields": [
+        "state",
+        "version",
+        "comment",
+        "description",
+        "ready_at",
+        "source_version_id",
+        "reference_count",
+        "meta",
+        "deployment_id",
+        "environment_id",
+        "last_error"
+      ],
+      "reason": "The published spec still models version responses on the BARE resource schema, leaving part of the version envelope undocumented while the live API returns it (VersionShell works against stage). Re-derived field-by-field from the stage spec on 2026-07-23 (was blanket-listed on 2026-07-21; version_id/last_modified/last_editor have since been FIXED by the API team and were retired here).",
+      "action": "Report to the edge-api team: version endpoints should reference a Version response schema (resource fields + version envelope)."
+    },
+    {
+      "resources": ["custom_page"],
+      "kind": "missing",
+      "fields": [
+        "state",
+        "version",
+        "comment",
+        "description",
+        "ready_at",
+        "source_version_id",
+        "reference_count",
+        "meta"
+      ],
+      "reason": "The published spec still models version responses on the BARE resource schema, leaving part of the version envelope undocumented while the live API returns it (VersionShell works against stage). Re-derived field-by-field from the stage spec on 2026-07-23 (was blanket-listed on 2026-07-21; version_id/last_modified/last_editor have since been FIXED by the API team and were retired here).",
+      "action": "Report to the edge-api team: version endpoints should reference a Version response schema (resource fields + version envelope)."
+    },
+    {
+      "resources": ["firewall"],
+      "kind": "missing",
+      "fields": [
+        "state",
+        "version",
+        "comment",
+        "description",
+        "ready_at",
+        "source_version_id",
+        "reference_count",
+        "meta",
+        "debug_rules",
+        "edge_functions_enabled",
+        "network_protection_enabled",
+        "waf_enabled",
+        "ddos_protection_unmetered"
+      ],
+      "reason": "The published spec still models version responses on the BARE resource schema, leaving part of the version envelope undocumented while the live API returns it (VersionShell works against stage). Re-derived field-by-field from the stage spec on 2026-07-23 (was blanket-listed on 2026-07-21; version_id/last_modified/last_editor have since been FIXED by the API team and were retired here). Includes the flat legacy module flags the adapter tolerates as fallbacks (nested modules.* is the documented form).",
+      "action": "Report to the edge-api team: version endpoints should reference a Version response schema (resource fields + version envelope)."
+    },
+    {
+      "resources": ["connector"],
+      "kind": "missing",
+      "fields": [
+        "state",
+        "version",
+        "comment",
+        "description",
+        "ready_at",
+        "source_version_id",
+        "reference_count",
+        "meta"
+      ],
+      "reason": "The published spec still models version responses on the BARE resource schema, leaving part of the version envelope undocumented while the live API returns it (VersionShell works against stage). Re-derived field-by-field from the stage spec on 2026-07-23 (was blanket-listed on 2026-07-21; version_id/last_modified/last_editor have since been FIXED by the API team and were retired here).",
+      "action": "Report to the edge-api team: version endpoints should reference a Version response schema (resource fields + version envelope)."
+    },
+    {
+      "resources": ["function"],
+      "kind": "missing",
+      "fields": [
+        "state",
+        "comment",
+        "description",
+        "created_at",
+        "ready_at",
+        "source_version_id",
+        "meta",
+        "language",
+        "runtime_environment",
+        "json_args"
+      ],
+      "reason": "The published spec still models version responses on the BARE resource schema, leaving part of the version envelope undocumented while the live API returns it (VersionShell works against stage). Re-derived field-by-field from the stage spec on 2026-07-23 (was blanket-listed on 2026-07-21; version_id/last_modified/last_editor have since been FIXED by the API team and were retired here). Includes the legacy aliases the adapter coalesces (runtime??language, execution_environment??runtime_environment, default_args??json_args).",
+      "action": "Report to the edge-api team: version endpoints should reference a Version response schema (resource fields + version envelope)."
+    },
+    {
+      "resources": ["network_list"],
+      "kind": "missing",
+      "fields": [
+        "state",
+        "version",
+        "comment",
+        "description",
+        "ready_at",
+        "source_version_id",
+        "reference_count",
+        "meta"
+      ],
+      "reason": "The published spec still models version responses on the BARE resource schema, leaving part of the version envelope undocumented while the live API returns it (VersionShell works against stage). Re-derived field-by-field from the stage spec on 2026-07-23 (was blanket-listed on 2026-07-21; version_id/last_modified/last_editor have since been FIXED by the API team and were retired here).",
+      "action": "Report to the edge-api team: version endpoints should reference a Version response schema (resource fields + version envelope)."
+    },
+    {
+      "resources": ["waf"],
+      "kind": "missing",
+      "fields": [
+        "state",
+        "version",
+        "comment",
+        "description",
+        "ready_at",
+        "source_version_id",
+        "reference_count",
+        "meta",
+        "created_at"
+      ],
+      "reason": "The published spec still models version responses on the BARE resource schema, leaving part of the version envelope undocumented while the live API returns it (VersionShell works against stage). Re-derived field-by-field from the stage spec on 2026-07-23 (was blanket-listed on 2026-07-21; version_id/last_modified/last_editor have since been FIXED by the API team and were retired here).",
+      "action": "Report to the edge-api team: version endpoints should reference a Version response schema (resource fields + version envelope)."
+    },
+    {
+      "resources": ["function"],
+      "kind": "type",
+      "fields": ["version"],
+      "reason": "Name collision on the bare-resource comparison: the published EdgeFunction schema declares its OWN version field (string) while our schema declares the version-envelope ordinal (number). Resolves itself when the API publishes a proper Version response schema.",
+      "action": "Report to the edge-api team: version endpoints should reference a Version response schema (resource fields + version envelope)."
+    },
+    {
+      "resources": ["application"],
+      "kind": "missing-strict",
+      "fields": ["name", "active", "debug", "modules", "trace_id"],
+      "reason": "The published spec models draft/build request bodies as STRICT schemas (additionalProperties:false) containing only comment/source_version — while the agreed payload contract (API team, 2026-06-12) and the working stage API accept the resource fields at the ROOT (and trace_id on build). Re-derived field-by-field per resource from the stage spec on 2026-07-23 (was a total wildcard that neutralized the entire request-side check).",
+      "action": "Report to the edge-api team: version request schemas should declare the resource root fields (or drop additionalProperties:false)."
+    },
+    {
+      "resources": ["workload"],
+      "kind": "missing-strict",
+      "fields": ["name", "active", "infrastructure", "protocols", "mtls"],
+      "reason": "The published spec models draft/build request bodies as STRICT schemas (additionalProperties:false) containing only comment/source_version — while the agreed payload contract (API team, 2026-06-12) and the working stage API accept the resource fields at the ROOT (and trace_id on build). Re-derived field-by-field per resource from the stage spec on 2026-07-23 (was a total wildcard that neutralized the entire request-side check).",
+      "action": "Report to the edge-api team: version request schemas should declare the resource root fields (or drop additionalProperties:false)."
+    },
+    {
+      "resources": ["custom_page"],
+      "kind": "missing-strict",
+      "fields": ["name", "active", "pages", "trace_id"],
+      "reason": "The published spec models draft/build request bodies as STRICT schemas (additionalProperties:false) containing only comment/source_version — while the agreed payload contract (API team, 2026-06-12) and the working stage API accept the resource fields at the ROOT (and trace_id on build). Re-derived field-by-field per resource from the stage spec on 2026-07-23 (was a total wildcard that neutralized the entire request-side check).",
+      "action": "Report to the edge-api team: version request schemas should declare the resource root fields (or drop additionalProperties:false)."
+    },
+    {
+      "resources": ["firewall"],
+      "kind": "missing-strict",
+      "fields": ["name", "active", "debug", "modules", "trace_id"],
+      "reason": "The published spec models draft/build request bodies as STRICT schemas (additionalProperties:false) containing only comment/source_version — while the agreed payload contract (API team, 2026-06-12) and the working stage API accept the resource fields at the ROOT (and trace_id on build). Re-derived field-by-field per resource from the stage spec on 2026-07-23 (was a total wildcard that neutralized the entire request-side check).",
+      "action": "Report to the edge-api team: version request schemas should declare the resource root fields (or drop additionalProperties:false)."
+    },
+    {
+      "resources": ["connector"],
+      "kind": "missing-strict",
+      "fields": ["name", "type", "active", "attributes", "trace_id"],
+      "reason": "The published spec models draft/build request bodies as STRICT schemas (additionalProperties:false) containing only comment/source_version — while the agreed payload contract (API team, 2026-06-12) and the working stage API accept the resource fields at the ROOT (and trace_id on build). Re-derived field-by-field per resource from the stage spec on 2026-07-23 (was a total wildcard that neutralized the entire request-side check).",
+      "action": "Report to the edge-api team: version request schemas should declare the resource root fields (or drop additionalProperties:false)."
+    },
+    {
+      "resources": ["function"],
+      "kind": "missing-strict",
+      "fields": [
+        "name",
+        "active",
+        "code",
+        "runtime",
+        "execution_environment",
+        "default_args",
+        "azion_form",
+        "trace_id"
+      ],
+      "reason": "The published spec models draft/build request bodies as STRICT schemas (additionalProperties:false) containing only comment/source_version — while the agreed payload contract (API team, 2026-06-12) and the working stage API accept the resource fields at the ROOT (and trace_id on build). Re-derived field-by-field per resource from the stage spec on 2026-07-23 (was a total wildcard that neutralized the entire request-side check).",
+      "action": "Report to the edge-api team: version request schemas should declare the resource root fields (or drop additionalProperties:false)."
+    },
+    {
+      "resources": ["network_list"],
+      "kind": "missing-strict",
+      "fields": ["name", "type", "items", "trace_id"],
+      "reason": "The published spec models draft/build request bodies as STRICT schemas (additionalProperties:false) containing only comment/source_version — while the agreed payload contract (API team, 2026-06-12) and the working stage API accept the resource fields at the ROOT (and trace_id on build). Re-derived field-by-field per resource from the stage spec on 2026-07-23 (was a total wildcard that neutralized the entire request-side check).",
+      "action": "Report to the edge-api team: version request schemas should declare the resource root fields (or drop additionalProperties:false)."
+    },
+    {
+      "resources": ["waf"],
+      "kind": "missing-strict",
+      "fields": ["name", "active", "engine_settings", "trace_id"],
+      "reason": "The published spec models draft/build request bodies as STRICT schemas (additionalProperties:false) containing only comment/source_version — while the agreed payload contract (API team, 2026-06-12) and the working stage API accept the resource fields at the ROOT (and trace_id on build). Re-derived field-by-field per resource from the stage spec on 2026-07-23 (was a total wildcard that neutralized the entire request-side check).",
+      "action": "Report to the edge-api team: version request schemas should declare the resource root fields (or drop additionalProperties:false)."
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: DOMParser — the helper strips tags by parsing real HTML
 import { describe, expect, it } from 'vitest'
 import { removeHtmlTagFromText } from '@/helpers'
 

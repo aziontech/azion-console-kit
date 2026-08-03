@@ -1,7 +1,9 @@
 import { inject } from 'vue'
 import { accountRoutes } from '@routes/account-routes'
+import { environmentRoutes } from '@routes/environment-routes'
 import { activityHistoryRoutes } from '@routes/activity-history-routes'
 import { azionAiRoutes } from '@routes/azion-ai-routes'
+import { deploymentRoutes } from '@routes/deployment-routes'
 
 import { cliCallbackRoutes } from '@routes/cli-callback-routes'
 import { createNewRoutes } from '@routes/create-new-routes'
@@ -87,7 +89,9 @@ const router = createRouter({
     signupRoutes,
     switchAccountRoutes,
     marketplaceRoutes,
+    deploymentRoutes,
     accountRoutes,
+    environmentRoutes,
     settingsRoutes,
     wafRulesRoutes,
     realTimeMetricsRoutes,
@@ -106,9 +110,7 @@ const router = createRouter({
     edgeSQLRoutes,
     edgeStorageRoutes,
     credentialsRoutes
-  ]
-    .filter(Boolean)
-    .concat(errorRoutes)
+  ].concat(errorRoutes)
 })
 
 router.beforeEach(async (to, from, next) => {

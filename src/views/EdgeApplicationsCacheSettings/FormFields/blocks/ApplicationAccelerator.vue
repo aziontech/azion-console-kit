@@ -28,6 +28,7 @@
                 :options="layerFileOptimizationRadioOptions"
                 :isCard="false"
                 :hasDivider="false"
+                :disabled="disabledFields"
                 data-testid="edge-application-cache-settings-form__slice-configuration-layer-field"
               />
             </div>
@@ -62,6 +63,7 @@
                   optionLabel="label"
                   optionValue="value"
                   :value="cacheByQueryString"
+                  :disabled="disabledFields"
                   appendTo="self"
                   description="Specify how the cache should handle query string parameters."
                   data-testid="edge-application-cache-settings-form__accelarator__cache-by-query-string-behavior-field"
@@ -76,6 +78,7 @@
                   required
                   name="queryStringFields"
                   :value="queryStringFields"
+                  :disabled="disabledFields"
                   :placeholder="`user_id\nsession_token\nproduct_id`"
                   description="Enter the query string parameters to be considered for cache variation. Use line breaks to add multiple entries."
                   data-testid="edge-application-cache-settings-form__query-string-fields-field"
@@ -88,6 +91,7 @@
                 auto
                 :isCard="false"
                 :value="enableQueryStringSort"
+                :disabled="disabledFields"
                 title="Sort"
                 description="Enable sorting of query string parameters to ensure consistent cache behavior regardless of parameter order."
                 data-testid="edge-connectors-form__address-management__enableQueryStringSort-field"
@@ -124,6 +128,7 @@
                   optionLabel="label"
                   optionValue="value"
                   :value="cacheByCookies"
+                  :disabled="disabledFields"
                   appendTo="self"
                   description="Define how the cache should handle cookies."
                   data-testid="edge-application-cache-settings-form__accelarator__cache-by-cookie-behavior-field"
@@ -140,6 +145,7 @@
                   required
                   name="cookieNames"
                   :value="cookieNames"
+                  :disabled="disabledFields"
                   :placeholder="`user_id\nsession_token\nproduct_id`"
                   description="Enter the cookie names to be considered for cache variation. Use line breaks to add multiple entries."
                   data-testid="edge-application-cache-settings-form__cache-by-cookie-fields-field"
@@ -178,6 +184,7 @@
                   :options="behaviorsByType.devices"
                   optionLabel="label"
                   optionValue="value"
+                  :disabled="disabledFields"
                   appendTo="self"
                   description="Configure whether the cache should vary based on the type of device making the request."
                   data-testid="edge-application-cache-settings-form__accelerator__cache-by-device-behavior-field"
@@ -194,6 +201,7 @@
                   class="w-full"
                   label="Device Group"
                   required
+                  :disabled="disabledFields"
                   :service="listDeviceGroupsWithDecorator"
                   :loadService="deviceGroupService.loadDeviceGroupService"
                   :optionLabel="'name'"
@@ -257,6 +265,13 @@
 
   import { computed, ref } from 'vue'
   import { useField } from 'vee-validate'
+
+  defineProps({
+    disabledFields: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const route = useRoute()
   const edgeApplicationId = route.params.id

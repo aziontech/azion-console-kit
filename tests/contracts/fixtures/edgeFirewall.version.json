@@ -1,0 +1,17 @@
+{
+  "id": 80001,
+  "version_id": "AVFW0002",
+  "version": 4,
+  "state": "draft",
+  "description": "my draft",
+  "created_at": "2026-06-16T10:30:00Z",
+  "last_modified": "2026-06-16T10:31:00Z",
+  "last_editor": "rafael.garbinatto@azion.com",
+  "name": "edge-firewall-prod",
+  "active": true,
+  "edge_functions_enabled": true,
+  "network_protection_enabled": false,
+  "waf_enabled": true,
+  "ddos_protection_unmetered": true,
+  "debug_rules": false
+}

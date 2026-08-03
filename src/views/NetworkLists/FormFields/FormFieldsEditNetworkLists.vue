@@ -9,6 +9,7 @@
   import { useField } from 'vee-validate'
   import { computed, onMounted, ref } from 'vue'
   import LabelBlock from '@aziontech/webkit/label'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   import { handleTypeNetwork } from '../Config/typeNetwork'
 
@@ -30,6 +31,8 @@
   const { value: networkListType } = useField('networkListType')
   const { value: itemsValuesCountry, errorMessage: itemsValuesCountryError } =
     useField('itemsValuesCountry')
+
+  const { readOnly } = useVersionContext()
 
   const networkGrouRadio = computed(() => handleTypeNetwork(true, networkListType.value))
 
@@ -65,6 +68,7 @@
         name="name"
         placeholder="My Network List"
         :value="name"
+        :disabled="readOnly"
         description="Give a unique and descriptive name to identify the network list."
         data-testid="network-list-form__name"
       />
@@ -79,6 +83,7 @@
         isCard
         nameField="networkListType"
         :options="networkGrouRadio"
+        :disabled="readOnly"
       >
         <template #footer="{ item }">
           <PrimeTag
@@ -102,6 +107,7 @@
           rows="2"
           :value="itemsValues"
           :loading="props.loading"
+          :disabled="readOnly"
           data-testid="network-list-form__asn-list"
           description="Enter one ASN per line (e.g., 13335). Public ASNs: 1–64511; private: 64512–65535. Duplicated entries are automatically removed."
         />
@@ -118,6 +124,7 @@
           rows="16"
           :value="itemsValues"
           :loading="props.loading"
+          :disabled="readOnly"
           data-testid="network-list-form__ipcidr-list"
         >
           <template #description>
@@ -143,7 +150,7 @@
           v-model="itemsValuesCountry"
           :options="countriesList"
           :loading="!countriesList.length"
-          :disabled="!countriesList.length"
+          :disabled="!countriesList.length || readOnly"
           name="itemsValuesCountry"
           filter
           autoFilterFocus

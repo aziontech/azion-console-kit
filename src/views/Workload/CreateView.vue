@@ -8,7 +8,7 @@
     </template>
     <template #content>
       <CreateFormBlock
-        :createService="workloadService.createWorkload"
+        :createService="createWorkload"
         disableToast
         @on-response="handleResponse"
         @on-response-fail="handleTrackFailedCreation"
@@ -36,17 +36,16 @@
   import CreateFormBlock from '@/templates/create-form-block'
   import ContentBlock from '@/templates/content-block'
   import PageHeadingBlock from '@/templates/page-heading-block'
-  import FormFieldsWorkload from './FormFields/FormFieldsWorkload.vue'
+  import FormFieldsWorkload from '@/views/Workload/FormFields/FormFieldsWorkload.vue'
   import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
   import { useRoute } from 'vue-router'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { validationSchema } from './Config/validation'
+  import { buildLegacySchema } from '@/views/Workload/Config/validation'
   import { clipboardWrite } from '@/helpers/clipboard'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
-
   const route = useRoute()
 
   const handleResponse = (response) => {
@@ -69,11 +68,7 @@
         secondary: {
           label: 'Copy Workload URL',
           icon: 'pi pi-copy',
-          animation: {
-            time: 3000,
-            icon: 'pi pi-check',
-            label: 'Copied'
-          },
+          animation: { time: 3000, icon: 'pi pi-check', label: 'Copied' },
           callback: () => clipboardWrite(response.domainName)
         }
       }
@@ -93,17 +88,15 @@
       .track()
   }
 
+  const validationSchema = buildLegacySchema()
+  const createWorkload = (payload) => workloadService.createWorkload(payload, false)
+
   const initialValues = {
     name: '',
     application: null,
     active: true,
     infrastructure: '1',
     firewall: null,
-    tls: {
-      certificate: 0,
-      ciphers: 7,
-      minimumVersion: 'tls_1_3'
-    },
     protocols: {
       http: {
         useHttps: true,
@@ -119,14 +112,10 @@
       certificate: null,
       crl: []
     },
-    domains: [
-      {
-        subdomain: '',
-        domain: ''
-      }
-    ],
-    workloadHostnameAllowAccess: true,
     useCustomDomain: false,
-    customDomain: ''
+    customDomain: '',
+    workloadHostnameAllowAccess: true,
+    tls: { certificate: 0, ciphers: 7, minimumVersion: 'tls_1_3' },
+    domains: [{ subdomain: '', domain: '' }]
   }
 </script>

@@ -9,9 +9,16 @@ env:
   HUSKY: 0
   CLI_VERSION: 4.15.0
 
+# spec ci-maturity (req 4.1): least-privilege token — deploy auth uses its own
+# secrets, the GITHUB_TOKEN only reads the repo.
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # spec ci-maturity (req 3.1): ~2x the measured typical duration (8.2 min).
+    timeout-minutes: 20
     concurrency:
       group: deploy-console-production
       cancel-in-progress: false
@@ -20,7 +27,9 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
         
       - name: Install SO deps
         run: apk add curl git bash jq
@@ -35,6 +44,30 @@ jobs:
 
       - name: Configure Azion CLI
         run: azion -t ${{ secrets.PLATFORM_KIT_TOKEN }}
+
+      # Contract drift pre-deploy check — validates the PRODUCTION published
+      # OpenAPI spec (open /schema/ URL, no token) against the adapter schemas
+      # before publishing. API-only (no browser); runs in this same
+      # node:22-alpine container after yarn install:lock above.
+      # reporting-only until the team promotes it to blocking (remove
+      # continue-on-error) — spec versioning-test-coverage ADR 7.6.
+      # Unreachable/non-JSON -> spec skips -> step is green. Real drift -> step is
+      # red but does NOT block the deploy (flip to blocking is an explicit decision).
+      - name: Contract drift pre-deploy check
+        id: drift
+        continue-on-error: true
+        run: npx playwright test --project=contract-drift
+        env:
+          OPENAPI_SCHEMA_URL: ${{ vars.OPENAPI_SCHEMA_URL_PROD || 'https://api.azion.com/v4/openapi/openapi.yaml' }}
+
+      # spec ci-maturity (req 2.2): real drift is notified even while the step
+      # stays non-blocking (continue-on-error above).
+      - name: Notify real contract drift
+        if: steps.drift.outcome == 'failure'
+        uses: ./.github/actions/notify-failure
+        with:
+          webhook-url: ${{ secrets.SLACK_CI_WEBHOOK_URL }}
+          context: 'Drift de contrato REAL detectado no pré-deploy (PRODUCTION) — deploy segue (não bloqueante)'
 
       - name: Build & Deploy
         run: azion deploy --auto --local --debug --config-dir azion/production
@@ -51,3 +84,11 @@ jobs:
           VITE_SENTRY_AUTH_TOKEN: ${{ secrets.PROD_SENTRY_AUTH_TOKEN }}
           VITE_SENTRY_UPLOAD: true
           VITE_APPCUES_ACCOUNT_ID: ${{ secrets.APPCUES_ACCOUNT_ID }}
+
+      # spec ci-maturity (req 2.3): a failed deploy is never silent.
+      - name: Notify deploy failure
+        if: failure()
+        uses: ./.github/actions/notify-failure
+        with:
+          webhook-url: ${{ secrets.SLACK_CI_WEBHOOK_URL }}
+          context: 'Deploy PRODUCTION FALHOU'

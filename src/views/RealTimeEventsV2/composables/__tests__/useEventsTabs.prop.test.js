@@ -1,6 +1,9 @@
+// does not — jsdom keeps the storage boundary deterministic across runtimes).
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { ref } from 'vue'
 import fc from 'fast-check'
+
+fc.configureGlobal({ seed: 1594213770 })
 import { useEventsTabs } from '../useEventsTabs.js'
 import { useTabLimit, MAX_TOTAL_TABS } from '../useTabLimit.js'
 
@@ -34,11 +37,6 @@ function createComposable() {
 function syncOpenTabs(openTabs, tabs) {
   openTabs.value = [{ id: null }, ...tabs.eventsTabs.value]
 }
-
-// ---------------------------------------------------------------------------
-// Task 4.2 — Property 1: Tab-structure invariants
-// **Validates: Property 1, Requirements 1.3, 1.5, 1.6, 1.7, 1.9, 1.11, 10.1**
-// ---------------------------------------------------------------------------
 
 describe('Property 1: Tab-structure invariants (fc.commands)', () => {
   const DATASETS = [
@@ -272,11 +270,6 @@ describe('Property 1: Tab-structure invariants (fc.commands)', () => {
   })
 })
 
-// ---------------------------------------------------------------------------
-// Task 4.3 — Property 2: Events-tab persistence round-trip
-// **Validates: Property 2, Requirements 2.1, 2.3, 2.7, 10.2**
-// ---------------------------------------------------------------------------
-
 describe('Property 2: Events-tab persistence round-trip', () => {
   beforeEach(() => {
     vi.useFakeTimers()
@@ -391,11 +384,6 @@ describe('Property 2: Events-tab persistence round-trip', () => {
     )
   })
 })
-
-// ---------------------------------------------------------------------------
-// Task 4.4 — Unit tests: malformed-payload fallback and filterData non-persistence
-// **Validates: Requirements 2.4, 2.5**
-// ---------------------------------------------------------------------------
 
 describe('Unit tests: malformed-payload fallback and filterData non-persistence', () => {
   beforeEach(() => {

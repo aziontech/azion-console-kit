@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, inject, onMounted, watch } from 'vue'
+  import { ref, computed, inject, onMounted, watch } from 'vue'
   import * as yup from 'yup'
   import { useToast } from '@aziontech/webkit/use-toast'
 
@@ -9,9 +9,12 @@
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { cacheSettingsService } from '@/services/v2/edge-app/edge-app-cache-settings-service'
   import { rulesEngineService } from '@/services/v2/edge-app/edge-app-rules-engine-service'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   import { refDebounced } from '@vueuse/core'
   defineOptions({ name: 'drawer-rules-engine' })
+
+  const { readOnly } = useVersionContext()
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
 
@@ -50,6 +53,14 @@
       type: String,
       required: false,
       default: 'request'
+    },
+    service: {
+      type: Object,
+      default: null
+    },
+    versionId: {
+      type: String,
+      default: null
     }
   })
 
@@ -67,6 +78,8 @@
   const selectedRulesEngineToEdit = ref({})
   const cacheSettingsOptions = ref([])
   const originsOptions = ref([])
+
+  const rulesSvc = computed(() => props.service ?? rulesEngineService)
   const initialPhase = ref(props.currentPhase)
 
   const initialValues = ref({
@@ -143,7 +156,7 @@
   }
 
   const createService = async (payload) => {
-    return await rulesEngineService.createRulesEngine({
+    return await rulesSvc.value.createRulesEngine({
       ...payload,
       edgeApplicationId: props.edgeApplicationId
     })
@@ -151,7 +164,7 @@
 
   const editService = async (payload) => {
     const payloadEdit = { phase: props.currentPhase, ...payload }
-    return await rulesEngineService.editRulesEngine({
+    return await rulesSvc.value.editRulesEngine({
       payload: payloadEdit,
       edgeApplicationId: props.edgeApplicationId
     })
@@ -191,7 +204,7 @@
   }
 
   const loadService = async () => {
-    return await rulesEngineService.loadRulesEngine({
+    return await rulesSvc.value.loadRulesEngine({
       ...selectedRulesEngineToEdit.value,
       edgeApplicationId: props.edgeApplicationId,
       phase: initialPhase.value
@@ -354,6 +367,7 @@
     :loadService="loadService"
     :editService="editService"
     :schema="validationSchema"
+    :readOnly="readOnly"
     @onSuccess="handleEditRulesEngine"
     :showBarGoBack="true"
     @onError="handleFailedToEdit"
@@ -377,6 +391,7 @@
         :hideApplicationAcceleratorInDescription="props.hideApplicationAcceleratorInDescription"
         :isEdgeFunctionEnabled="props.isEdgeFunctionEnabled"
         :initialPhase="initialPhase"
+        :disabledFields="readOnly"
         data-testid="rules-engine-edit-drawer-form-fields"
         :errors="errors"
       />

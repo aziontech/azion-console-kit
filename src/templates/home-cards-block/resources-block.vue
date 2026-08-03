@@ -5,7 +5,6 @@
   import PrimeButton from '@aziontech/webkit/button'
   import TEXT_DOMAIN_WORKLOAD from '@/helpers/handle-text-workload-domain-flag'
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { deleteDomainService } from '@/services/domains-services'
   import { set, get } from '@/helpers/local-storage-manager'
   import { edgeDNSService } from '@/services/v2/edge-dns/edge-dns-service'
   import { edgeStorageService } from '@/services/v2/edge-storage/edge-storage-service'
@@ -311,7 +310,7 @@
               data: rowData,
               deleteService: isWorkload.value
                 ? workloadService.deleteWorkload
-                : deleteDomainService,
+                : workloadService.deleteDomain,
               closeCallback: (opt) => {
                 if (opt?.data?.updated) {
                   loadDataForResource(selectedResource.value)

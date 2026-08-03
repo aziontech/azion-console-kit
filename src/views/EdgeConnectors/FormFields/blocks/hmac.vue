@@ -13,6 +13,7 @@
           auto
           :isCard="false"
           :value="hmacActive"
+          :disabled="readOnly"
           title="Active"
           data-testid="edge-connectors-form__hmac__hmac-active-field"
         />
@@ -43,6 +44,7 @@
           description="Region supported by the object storage provider."
           name="modules.originShield.config.hmac.config.attributes.region"
           :value="region"
+          :disabled="readOnly"
           placeholder="us-east-1"
           data-testid="edge-connectors-form__hmac__region-field"
         />
@@ -57,6 +59,7 @@
           description="Specify the service name for the object storage provider (e.g., s3)."
           name="modules.originShield.config.hmac.config.attributes.service"
           :value="service"
+          :disabled="readOnly"
           placeholder="s3"
           data-testid="edge-connectors-form__hmac__service-field"
         />
@@ -72,6 +75,7 @@
           description="Enter the Access Key provided by the object storage provider."
           name="modules.originShield.config.hmac.config.attributes.accessKey"
           :value="accessKey"
+          :disabled="readOnly"
           placeholder="Access Key"
           data-testid="edge-connectors-form__hmac__access-key-field"
         />
@@ -89,6 +93,7 @@
         <Password
           v-model="secretKey"
           :value="secretKey"
+          :disabled="readOnly"
           placeholder="**********"
           data-testid="edge-connectors-form__hmac__secret-key-field"
           toggleMask
@@ -114,6 +119,7 @@
   import FieldText from '@aziontech/webkit/field-text'
   import LabelBlock from '@aziontech/webkit/label'
   import Password from '@aziontech/webkit/password'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'EdgeConnectorsFormFieldsHmac' })
 
@@ -134,6 +140,7 @@
   const { value: secretKey, errorMessage: hasRequestErrorMessage } = useField(
     'modules.originShield.config.hmac.config.attributes.secretKey'
   )
+  const { readOnly } = useVersionContext()
 
   onMounted(() => {
     hmacType.value = 'aws4_hmac_sha256'

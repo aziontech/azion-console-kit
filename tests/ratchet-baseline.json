@@ -1,0 +1,10 @@
+{
+  "$comment": "Coverage ratchet cut point — spec versioning-test-coverage (design ADR 7.8, Q5/Q6). Code introduced by the two active branches (their diffs vs these merge-bases) is the 'new code' that must validate the test bar; everything before is grandfathered (non-regression only). Sonar 'New Code' period must be anchored on these SHAs (project settings → New Code → Reference branch/Specific analysis). Target: 90% new-code coverage.",
+  "newCodeCoverageTarget": 0.9,
+  "cutPoints": {
+    "feat/versioning": { "mergeBaseWithDev": "27d1c9d88283f7307655a796b05b9fe6e4f424e7" },
+    "feat/real-time-events-improvements": { "mergeBaseWithDev": "27d1c9d88283f7307655a796b05b9fe6e4f424e7" }
+  },
+  "grandfathered": "everything reachable from the merge-bases above",
+  "hardBarScope": "feat/versioning diff (this spec); feat/real-time-events via its own future spec — until then, non-regression only"
+}

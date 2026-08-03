@@ -1,0 +1,14 @@
+# GitHub Actions security configuration (zizmor).
+# Docs: https://docs.zizmor.sh/configuration/
+# NOTE: gated by CODEOWNERS (@aziontech/security-office) — additions here are
+# validated bypasses, never silent ones. The centralized ci-security action
+# runs zizmor with its own config; this file serves local runs (`uvx zizmor .`).
+
+rules:
+  # cla.yml uses pull_request_target by CLA Assistant design. Audited
+  # (spec ci-maturity ADR-13): the workflow never checks out nor executes PR
+  # code — API-only action. Accepted risk.
+  dangerous-triggers:
+    ignore:
+      - cla.yml
+

@@ -1,6 +1,6 @@
 const path = require('path')
 const { classifyPath } = require('../utils/path-classifier')
-const { isServiceImport, isVueQueryImport } = require('../utils/import-resolver')
+const { isServiceImport, isVueQueryImport, isV2ServiceImport } = require('../utils/import-resolver')
 
 module.exports = {
   meta: {
@@ -34,7 +34,7 @@ module.exports = {
       ImportDeclaration(node) {
         const source = node.source.value
 
-        if (isServiceImport(source)) {
+        if (isServiceImport(source) && !isV2ServiceImport(source)) {
           hasServiceImport = true
           serviceSource = source
         }
@@ -50,23 +50,12 @@ module.exports = {
       },
 
       // Detect usage of classes that extend BaseService (they have useQuery/useMutation internally)
-      // AND direct usage of the queryClient imperative API (fetchQuery, invalidateQueries, etc.) —
-      // both are official Vue Query surfaces.
       MemberExpression(node) {
-        const name = node.property.name
         if (
-          name === 'useQuery' ||
-          name === 'useMutation' ||
-          name === 'useEnsureQueryData' ||
-          name === 'usePrefetchQuery' ||
-          name === 'fetchQuery' ||
-          name === 'prefetchQuery' ||
-          name === 'ensureQueryData' ||
-          name === 'invalidateQueries' ||
-          name === 'setQueryData' ||
-          name === 'getQueryData' ||
-          name === 'removeQueries' ||
-          name === 'cancelQueries'
+          node.property.name === 'useQuery' ||
+          node.property.name === 'useMutation' ||
+          node.property.name === 'useEnsureQueryData' ||
+          node.property.name === 'usePrefetchQuery'
         ) {
           hasBaseServiceUsage = true
         }
@@ -78,7 +67,9 @@ module.exports = {
           // Find the service import node to report on
           const serviceImportNode = node.body.find(
             (bodyNode) =>
-              bodyNode.type === 'ImportDeclaration' && isServiceImport(bodyNode.source.value)
+              bodyNode.type === 'ImportDeclaration' &&
+              isServiceImport(bodyNode.source.value) &&
+              !isV2ServiceImport(bodyNode.source.value)
           )
 
           if (serviceImportNode) {

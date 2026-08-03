@@ -21,7 +21,9 @@ export class AbortManager {
         const groupSet = this.groups.get(group)
         if (groupSet) {
           groupSet.delete(identifier)
-          if (groupSet.size) {
+          // Only drop the group when it is EMPTY — deleting it while members
+          // remain orphans them (abortGroup would no longer find their ids).
+          if (!groupSet.size) {
             this.groups.delete(group)
           }
         }

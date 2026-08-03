@@ -1,0 +1,134 @@
+THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+Project: azion-console-kit
+Classification: Tier 1 (CLIENT_DISTRIBUTED)
+Generated: 2026-04-28
+
+This project incorporates components from the projects listed below.
+The original copyright notices and license terms are listed here.
+
+For the complete, machine-readable inventory of all third-party components
+and their licenses, see the CycloneDX SBOM published with each release and
+the license metadata in yarn.lock / node_modules.
+
+--------------------------------------------------------------------------------
+
+Package: @segment/loosely-validate-event
+License: MIT
+
+Package: @sentry/cli (and platform binaries)
+License: non-standard
+Copyright: Copyright (c) Sentry
+
+Package: @tootallnate/once
+License: MIT
+Copyright: Copyright (c) 2020 Nathan Rajlich
+
+Package: @whitespace/storybook-addon-html
+License: AGPL-3.0-or-later
+
+Package: backslash
+License: UNKNOWN
+Copyright: Copyright (c) 2015 JD Ballard
+
+Package: bn.js
+License: MIT
+Copyright: Copyright (c) Fedor Indutny
+
+Package: brace-expansion
+License: MIT
+Copyright: Copyright Julian Gruber <julian@juliangruber.com>
+
+Package: browser-assert
+License: MIT
+
+Package: buffers
+License: MIT
+Copyright: Copyright (c) James Halliday
+
+Package: diff
+License: BSD-3-Clause
+Copyright: Copyright (c) 2009-2015, Kevin Decker <kpdecker@gmail.com>
+
+Package: elliptic
+License: MIT
+Copyright: Copyright (c) Fedor Indutny
+
+Package: esbuild
+License: MIT
+Copyright: Copyright (c) 2020 Evan Wallace
+
+Package: format
+License: MIT
+
+Package: glob
+License: BlueOak-1.0.0
+
+Package: ip
+License: MIT
+Copyright: Copyright (c) Fedor Indutny
+
+Package: jackspeak
+License: BlueOak-1.0.0
+
+Package: js-yaml
+License: MIT
+Copyright: Copyright (C) 2011-2015 by Vitaly Puzrin
+
+Package: lru-cache
+License: BlueOak-1.0.0
+
+Package: mathjs
+License: Apache-2.0
+
+Package: minimatch
+License: BlueOak-1.0.0
+
+Package: minipass
+License: BlueOak-1.0.0
+
+Package: package-json-from-dist
+License: BlueOak-1.0.0
+Copyright: Copyright (c) Isaac Z. Schlueter
+
+Package: path-scurry
+License: BlueOak-1.0.0
+
+Package: picomatch
+License: MIT
+Copyright: Copyright (c) 2017-present, Jon Schlinkert.
+
+Package: postcss
+License: MIT
+
+Package: prismjs
+License: MIT
+
+Package: rimraf
+License: BlueOak-1.0.0
+
+Package: rollup
+License: MIT
+Copyright: Copyright (c) 2017 Rollup contributors
+
+Package: serialize-javascript
+License: BSD-3-Clause
+Copyright: Copyright (c) Eric Ferraiuolo
+
+Package: spawn-wrap
+License: BlueOak-1.0.0
+
+Package: spdx-exceptions
+License: CC-BY-3.0
+Copyright: Copyright (c) The Linux Foundation
+
+Package: uuid
+License: MIT
+
+Package: vite
+License: MIT
+Copyright: Copyright (c) 2019-present, VoidZero Inc. and Vite contributors
+
+--------------------------------------------------------------------------------
+
+The MIT, BSD-3-Clause, Apache-2.0, BlueOak-1.0.0 and CC-BY-3.0 license texts
+referenced above are available at https://spdx.org/licenses/.

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: window — c3 graph props read window for chart sizing (format-c3-graph-props.js:310)
 /* eslint-disable id-length */
 import { FormatC3GraphProps, formatYAxisLabels } from '@modules/real-time-metrics/chart'
 import { describe, expect, it } from 'vitest'

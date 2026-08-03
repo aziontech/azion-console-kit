@@ -1,3 +1,4 @@
+// @vitest-environment jsdom -- browser-coupled: window.location — accountHandler redirects the whole page after a switch
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AccountHandler } from '@/helpers/account-handler'
 import { useAccountStore } from '@/stores/account'

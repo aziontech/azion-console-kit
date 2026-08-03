@@ -12,7 +12,7 @@
   import { useField, useFieldArray } from 'vee-validate'
   import { computed, ref, watch, inject } from 'vue'
 
-  const edgeApplication = inject('edgeApplication')
+  const edgeApplication = inject('edgeApplication', ref(null))
 
   const props = defineProps({
     disabledFields: {

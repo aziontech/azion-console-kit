@@ -1,0 +1,120 @@
+import { edgeAppService } from '@/services/v2/edge-app/edge-app-service'
+import { edgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
+import { edgeFirewallService } from '@/services/v2/edge-firewall/edge-firewall-service'
+import { edgeFirewallVersionService } from '@/services/v2/edge-firewall/edge-firewall-version-service'
+import { customPageService } from '@/services/v2/custom-page/custom-page-service'
+import { customPageVersionService } from '@/services/v2/custom-page/custom-page-version-service'
+import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+import { edgeFunctionVersionService } from '@/services/v2/edge-function/edge-function-version-service'
+import { networkListsService } from '@/services/v2/network-lists/network-lists-service'
+import { networkListVersionService } from '@/services/v2/network-lists/network-list-version-service'
+import { edgeConnectorsService } from '@/services/v2/edge-connectors/edge-connectors-service'
+import { edgeConnectorVersionService } from '@/services/v2/edge-connectors/edge-connector-version-service'
+import { wafService } from '@/services/v2/waf/waf-service'
+import { wafVersionService } from '@/services/v2/waf/waf-version-service'
+
+const CATALOG_PAGE_SIZE = 100
+
+const VERSIONS_PAGE_SIZE = 100
+
+const toName = (name) => (name && typeof name === 'object' ? (name.text ?? '') : (name ?? ''))
+
+const toCatalogItem = (resource) => ({
+  id: resource.id,
+  name: toName(resource.name)
+})
+
+const fromBody = (result) => (Array.isArray(result?.body) ? result.body : []).map(toCatalogItem)
+
+const toLoadedItem = (resource) =>
+  resource?.id == null
+    ? null
+    : {
+        id: resource.id,
+        name: toName(resource.name)
+      }
+
+const toPage = (result) => ({ body: fromBody(result), count: result?.count ?? 0 })
+
+const firstPageParams = (params) => ({ page: 1, pageSize: CATALOG_PAGE_SIZE, ...params })
+
+export const RESOURCE_CATALOG_REGISTRY = {
+  application: {
+    versioned: true,
+    listCatalog: () =>
+      edgeAppService
+        .listEdgeApplicationsService({ page: 1, pageSize: CATALOG_PAGE_SIZE })
+        .then(fromBody),
+    listPage: (params) =>
+      edgeAppService.listEdgeApplicationsService(firstPageParams(params)).then(toPage),
+    loadById: (id) => edgeAppService.loadEdgeApplicationService({ id }).then(toLoadedItem),
+    listVersions: (id) => edgeAppVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
+  },
+  firewall: {
+    versioned: true,
+    listCatalog: () =>
+      edgeFirewallService
+        .listEdgeFirewallService({ page: 1, pageSize: CATALOG_PAGE_SIZE })
+        .then(fromBody),
+    listPage: (params) =>
+      edgeFirewallService.listEdgeFirewallService(firstPageParams(params)).then(toPage),
+    loadById: (id) => edgeFirewallService.loadEdgeFirewallService({ id }).then(toLoadedItem),
+    listVersions: (id) =>
+      edgeFirewallVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
+  },
+  custom_page: {
+    versioned: true,
+    listCatalog: () =>
+      customPageService.listCustomPagesService({ pageSize: CATALOG_PAGE_SIZE }).then(fromBody),
+    listPage: (params) =>
+      customPageService.listCustomPagesService(firstPageParams(params)).then(toPage),
+    loadById: (id) => customPageService.loadCustomPagesService({ id }).then(toLoadedItem),
+    listVersions: (id) =>
+      customPageVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
+  },
+  function: {
+    versioned: true,
+    listCatalog: () =>
+      edgeFunctionService
+        .listEdgeFunctionsService({ page: 1, pageSize: CATALOG_PAGE_SIZE })
+        .then(fromBody),
+    listPage: (params) =>
+      edgeFunctionService.listEdgeFunctionsService(firstPageParams(params)).then(toPage),
+    loadById: (id) => edgeFunctionService.loadEdgeFunctionService({ id }).then(toLoadedItem),
+    listVersions: (id) =>
+      edgeFunctionVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
+  },
+  network_list: {
+    versioned: true,
+    listCatalog: () =>
+      networkListsService.listNetworkLists({ page: 1, pageSize: CATALOG_PAGE_SIZE }).then(fromBody),
+    listPage: (params) =>
+      networkListsService.listNetworkLists(firstPageParams(params)).then(toPage),
+    loadById: (id) => networkListsService.loadNetworkList({ id }).then(toLoadedItem),
+    listVersions: (id) =>
+      networkListVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
+  },
+  connector: {
+    versioned: true,
+    listCatalog: () =>
+      edgeConnectorsService
+        .listEdgeConnectorsService({ page: 1, pageSize: CATALOG_PAGE_SIZE })
+        .then(fromBody),
+    listPage: (params) =>
+      edgeConnectorsService.listEdgeConnectorsService(firstPageParams(params)).then(toPage),
+    loadById: (id) => edgeConnectorsService.loadEdgeConnectorsService({ id }).then(toLoadedItem),
+    listVersions: (id) =>
+      edgeConnectorVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
+  },
+  waf: {
+    versioned: true,
+    listCatalog: () =>
+      wafService.listWafRules({ page: 1, pageSize: CATALOG_PAGE_SIZE }).then(fromBody),
+    listPage: (params) => wafService.listWafRules(firstPageParams(params)).then(toPage),
+    loadById: (id) => wafService.loadWafRule({ id }).then(toLoadedItem),
+    listVersions: (id) => wafVersionService.listVersions(id, { pageSize: VERSIONS_PAGE_SIZE })
+  }
+}
+
+export const isVersionedResourceType = (resourceType) =>
+  Boolean(RESOURCE_CATALOG_REGISTRY[resourceType]?.versioned)

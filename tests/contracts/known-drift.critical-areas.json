@@ -1,0 +1,4 @@
+{
+  "$comment": "Known, ACCEPTED divergences for the CRITICAL non-versioned areas (payment, MFA) — same precision contract as known-drift.json: per-resource entries, EXPLICIT field lists (wildcards are inert), every (entry, field) pair must still match real drift or the staleness test fails.",
+  "entries": []
+}

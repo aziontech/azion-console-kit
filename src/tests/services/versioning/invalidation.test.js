@@ -1,0 +1,313 @@
+/**
+ * Coverage-matrix claims (spec versioning-test-coverage / TEST-ARCHITECTURE §3.4).
+ * The matrix (tests/coverage-matrix.json) is DERIVED from these markers —
+ * run `node scripts/check-coverage-matrix.mjs --write` after changing them.
+ * @covers application,custom_page,firewall,waf,workload:J1 component partial
+ * @covers application,workload:J2 component
+ * @covers application,custom_page:J3 component partial
+ * @covers application,custom_page,firewall,waf,workload:J4 component
+ * @covers application,custom_page,firewall,network_list,waf,workload:J6 component
+ * @covers application,custom_page,firewall,network_list,waf,workload:J7 component
+ * @covers workload:J8 component
+ */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { httpService } from '@/services/v2/base/http/httpService'
+import { queryClient } from '@/services/v2/base/query/queryClient'
+import { queryKeys } from '@/services/v2/base/query/queryKeys'
+import { VersionServiceBase } from '@/services/v2/versioning/version-service-base'
+import { EdgeAppVersionService } from '@/services/v2/edge-app/edge-app-version-service'
+import { EdgeFirewallVersionService } from '@/services/v2/edge-firewall/edge-firewall-version-service'
+import { CustomPageVersionService } from '@/services/v2/custom-page/custom-page-version-service'
+import { WorkloadVersionService } from '@/services/v2/workload/workload-version-service'
+import { NetworkListVersionService } from '@/services/v2/network-lists/network-list-version-service'
+import { WafVersionService } from '@/services/v2/waf/waf-version-service'
+import { versionedWafExceptionsService } from '@/services/v2/waf/versioned/versioned-waf-exceptions-service'
+
+const RID = 'res-1'
+const VID = 'AV000001'
+
+const SERVICES = [
+  {
+    name: 'EdgeAppVersionService',
+    Service: EdgeAppVersionService,
+    keys: queryKeys.application.version,
+    baseURL: 'v4/workspace/applications'
+  },
+  {
+    name: 'EdgeFirewallVersionService',
+    Service: EdgeFirewallVersionService,
+    keys: queryKeys.firewall.version,
+    baseURL: 'v4/workspace/firewalls'
+  },
+  {
+    name: 'CustomPageVersionService',
+    Service: CustomPageVersionService,
+    keys: queryKeys.customPages.version,
+    baseURL: 'v4/workspace/custom_pages'
+  },
+  {
+    name: 'WorkloadVersionService',
+    Service: WorkloadVersionService,
+    keys: queryKeys.workload.version,
+    baseURL: 'v4/workspace/workloads'
+  },
+  {
+    name: 'NetworkListVersionService',
+    Service: NetworkListVersionService,
+    keys: queryKeys.networkList.version,
+    baseURL: 'v4/workspace/network_lists'
+  },
+  {
+    name: 'WafVersionService',
+    Service: WafVersionService,
+    keys: queryKeys.waf.version,
+    baseURL: 'v4/workspace/wafs'
+  }
+]
+
+const MUTATIONS = [
+  { name: 'createDraft', invoke: (svc) => svc.createDraft(RID, { sourceVersionId: VID }) },
+  { name: 'updateDraft', invoke: (svc) => svc.updateDraft(RID, VID, { name: 'x' }) },
+  { name: 'patchDraft', invoke: (svc) => svc.patchDraft(RID, VID, { name: 'x' }) },
+  { name: 'deleteVersion', invoke: (svc) => svc.deleteVersion(RID, VID) },
+  { name: 'build', invoke: (svc) => svc.build(RID, VID, { comment: 'go' }) },
+  { name: 'archive', invoke: (svc) => svc.archive(RID, VID, { comment: 'done' }) },
+  { name: 'cancelBuild', invoke: (svc) => svc.cancelBuild(RID, VID, {}) }
+]
+
+const stubRequest = () =>
+  vi.spyOn(httpService, 'request').mockResolvedValue({ data: { version_id: VID, state: 'draft' } })
+
+const stubEnsure = () =>
+  vi.spyOn(queryClient, 'ensureQueryData').mockImplementation(({ queryFn }) => queryFn())
+
+const stubAdapterTransforms = (service) => {
+  const passthrough = (value) => value ?? {}
+  for (const name of [
+    'transformCreateDraftPayload',
+    'transformDraftPayload',
+    'transformBuildPayload',
+    'transformArchivePayload',
+    'transformLoadVersion'
+  ]) {
+    if (typeof service.adapter?.[name] === 'function') {
+      vi.spyOn(service.adapter, name).mockImplementation(passthrough)
+    }
+  }
+}
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
+describe.each(SERVICES)('Property 7 — $name invalidates on every mutation', ({ Service, keys }) => {
+  let service
+
+  beforeEach(() => {
+    service = new Service()
+  })
+
+  it.each(MUTATIONS)('$name calls invalidateAfterMutation(resourceId)', async ({ invoke }) => {
+    stubRequest()
+    stubAdapterTransforms(service)
+    const hookSpy = vi.spyOn(service, 'invalidateAfterMutation').mockImplementation(() => {})
+
+    await invoke(service)
+
+    expect(hookSpy).toHaveBeenCalledTimes(1)
+    expect(hookSpy).toHaveBeenCalledWith(RID)
+  })
+
+  it.each(MUTATIONS)('$name removes the version cache via the hook', async ({ invoke }) => {
+    stubRequest()
+    stubAdapterTransforms(service)
+    const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+
+    await invoke(service)
+
+    expect(removeSpy).toHaveBeenCalledWith({ queryKey: keys.all(RID) })
+  })
+})
+
+describe('Property 7 — default hook contract on the base', () => {
+  it('invalidateAfterMutation removes queryKeys.<resource>.version.all', () => {
+    const service = new EdgeAppVersionService()
+    const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+
+    service.invalidateAfterMutation(RID)
+
+    expect(removeSpy).toHaveBeenCalledWith({ queryKey: queryKeys.application.version.all(RID) })
+  })
+
+  it('archive rejects without a non-empty comment, leaving the cache untouched', async () => {
+    const service = new CustomPageVersionService()
+    const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+
+    await expect(service.archive(RID, VID, { comment: '   ' })).rejects.toThrow(/comment/)
+    expect(removeSpy).not.toHaveBeenCalled()
+  })
+})
+
+const DEFAULT_LIST_PARAMS = { page: 1, page_size: 20 }
+
+describe('Regression — load/list keep their queryKeys/shape', () => {
+  it.each(SERVICES)(
+    '$name reads default to the normalized first-page version keys',
+    ({ Service, keys }) => {
+      const service = new Service()
+      const useQuerySpy = vi
+        .spyOn(service, 'useQuery')
+        .mockImplementation((queryKey) => ({ queryKey }))
+
+      const { queryKey: listKey } = service.useListVersionsQuery(RID)
+      const { queryKey: detailKey } = service.useLoadVersionQuery(RID, VID)
+
+      expect(listKey).toEqual(keys.list(RID, DEFAULT_LIST_PARAMS))
+      expect(detailKey).toEqual(keys.detail(RID, VID))
+      expect(useQuerySpy).toHaveBeenCalledTimes(2)
+    }
+  )
+
+  it.each(SERVICES)(
+    '$name list GETs /{base}/{id}/versions with an explicit first page',
+    async ({ Service, baseURL }) => {
+      const service = new Service()
+      const requestSpy = vi
+        .spyOn(httpService, 'request')
+        .mockResolvedValueOnce({ data: { count: 0, results: [] } })
+      vi.spyOn(service, 'useQuery').mockImplementation((_key, queryFn) => ({ queryFn }))
+
+      const { queryFn } = service.useListVersionsQuery(RID)
+      await queryFn()
+
+      expect(requestSpy).toHaveBeenCalledWith({
+        method: 'GET',
+        url: `${baseURL}/${RID}/versions`,
+        params: DEFAULT_LIST_PARAMS
+      })
+    }
+  )
+
+  it('list forwards params into both the fetch and the queryKey when provided', async () => {
+    const service = new EdgeAppVersionService()
+    const requestSpy = vi
+      .spyOn(httpService, 'request')
+      .mockResolvedValueOnce({ data: { count: 0, results: [] } })
+    const useQuerySpy = vi.spyOn(service, 'useQuery').mockImplementation((queryKey, queryFn) => ({
+      queryKey,
+      queryFn
+    }))
+
+    const { queryFn } = service.useListVersionsQuery(RID, { page: 2 })
+    await queryFn()
+
+    const expectedParams = { page: 2, page_size: 20 }
+    expect(useQuerySpy).toHaveBeenCalledWith(
+      queryKeys.application.version.list(RID, expectedParams),
+      expect.any(Function),
+      expect.objectContaining({ persist: true })
+    )
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'GET',
+      url: `v4/workspace/applications/${RID}/versions`,
+      params: expectedParams
+    })
+  })
+
+  it('skipCache is stripped from the request params and disables persist', async () => {
+    const service = new EdgeAppVersionService()
+    const requestSpy = vi
+      .spyOn(httpService, 'request')
+      .mockResolvedValueOnce({ data: { count: 0, results: [] } })
+    const useQuerySpy = vi.spyOn(service, 'useQuery').mockImplementation((queryKey, queryFn) => ({
+      queryKey,
+      queryFn
+    }))
+
+    const { queryFn } = service.useListVersionsQuery(RID, { skipCache: true })
+    await queryFn()
+
+    expect(useQuerySpy).toHaveBeenCalledWith(
+      queryKeys.application.version.list(RID, DEFAULT_LIST_PARAMS),
+      expect.any(Function),
+      expect.objectContaining({ persist: false, skipCache: true })
+    )
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'GET',
+      url: `v4/workspace/applications/${RID}/versions`,
+      params: DEFAULT_LIST_PARAMS
+    })
+  })
+
+  it('loadVersion GETs the version detail via the cache-aware path', async () => {
+    const service = new EdgeFirewallVersionService()
+    stubEnsure()
+    const requestSpy = vi
+      .spyOn(httpService, 'request')
+      .mockResolvedValueOnce({ data: { version_id: VID, state: 'ready' } })
+
+    const result = await service.loadVersion(RID, VID)
+
+    expect(requestSpy).toHaveBeenCalledWith({
+      method: 'GET',
+      url: `v4/workspace/firewalls/${RID}/versions/${VID}`
+    })
+    expect(result.id).toBe(VID)
+  })
+})
+
+describe('Regression — Workload rollback still invalidates the same version cache', () => {
+  it('rollback removes queryKeys.workload.version.all even though it bypasses the hook', async () => {
+    const service = new WorkloadVersionService()
+    stubRequest()
+    const hookSpy = vi.spyOn(service, 'invalidateAfterMutation')
+    const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+
+    await service.rollback(RID, VID, { comment: 'back' })
+
+    expect(removeSpy).toHaveBeenCalledWith({ queryKey: queryKeys.workload.version.all(RID) })
+    expect(hookSpy).not.toHaveBeenCalled()
+  })
+})
+
+describe('Property 7 — versioned WAF exceptions invalidate the version cache', () => {
+  const WAF_ID = 'waf-1'
+  const exceptionsKey = queryKeys.waf.version.exceptions.all(WAF_ID, VID)
+
+  const EXCEPTION_MUTATIONS = [
+    {
+      name: 'create',
+      invoke: (svc) => svc.create(WAF_ID, VID, { name: 'allow', ruleId: 9, conditions: [] }),
+      response: { data: { data: { id: 7 } } }
+    },
+    {
+      name: 'edit',
+      invoke: (svc) => svc.edit(WAF_ID, VID, { id: 5, name: 'allow', ruleId: 9, conditions: [] }),
+      response: { data: {} }
+    },
+    { name: 'remove', invoke: (svc) => svc.remove(WAF_ID, VID, 55), response: { data: {} } }
+  ]
+
+  it.each(EXCEPTION_MUTATIONS)(
+    '$name removes queryKeys.waf.version.exceptions.all(wafId, versionId)',
+    async ({ invoke, response }) => {
+      vi.spyOn(httpService, 'request').mockResolvedValueOnce(response)
+      const removeSpy = vi.spyOn(queryClient, 'removeQueries').mockImplementation(() => {})
+
+      await invoke(versionedWafExceptionsService)
+
+      expect(removeSpy).toHaveBeenCalledWith({ queryKey: exceptionsKey })
+    }
+  )
+})
+
+describe('Structural — every base mutation routes through the hook', () => {
+  it.each(MUTATIONS.map((mutation) => mutation.name))(
+    '%s is defined on VersionServiceBase.prototype or as an instance field',
+    (methodName) => {
+      const onPrototype = methodName in VersionServiceBase.prototype
+      const onInstance = typeof new EdgeAppVersionService()[methodName] === 'function'
+      expect(onPrototype || onInstance).toBe(true)
+    }
+  )
+})

@@ -2,7 +2,7 @@
   <CreateDrawerBlock
     v-if="loadCreateFunctionDrawer"
     v-model:visible="showCreateFunctionDrawer"
-    :createService="edgeApplicationFunctionService.createEdgeApplicationFunction"
+    :createService="createService"
     drawerId="create-function-instance-drawer"
     :schema="validationSchema"
     :initialValues="initialValues"
@@ -35,6 +35,7 @@
     :isOverlapped="isOverlapped"
     :editService="editService"
     :schema="validationSchema"
+    :readOnly="readOnly"
     :showShareUrl="true"
     @onSuccess="handleSuccessEdit"
     @onError="handleFailedToEdit"
@@ -44,10 +45,19 @@
       <FormFieldsDrawerFunction
         @toggleDrawer="handleToggleDrawer"
         @additionalErrors="handleAdditionalErrors"
+        :disabledFields="readOnly"
+        :deferUntilValue="true"
       />
     </template>
     <template #action-bar="{ onSubmit, onCancel, loading }">
       <ActionBarBlock
+        v-if="readOnly"
+        @onCancel="onCancel"
+        :hideSubmit="true"
+        secondaryActionLabel="Close"
+      />
+      <ActionBarBlock
+        v-else
         @onSubmit="formSubmit(onSubmit)"
         @onCancel="onCancel"
         :loading="isLoading || loading"
@@ -71,8 +81,11 @@
   const tracker = inject('tracker')
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineOptions({ name: 'drawer-origin' })
+
+  const { readOnly } = useVersionContext()
 
   const emit = defineEmits(['onSuccess'])
 
@@ -84,8 +97,20 @@
     allowedRuntime: {
       type: String,
       default: null // null = all, 'azion_lua' = only Lua
+    },
+    service: {
+      type: Object,
+      default: null
+    },
+    versionId: {
+      type: String,
+      default: null
     }
   })
+
+  const createService = props.service
+    ? (payload) => props.service.create(payload)
+    : edgeApplicationFunctionService.createEdgeApplicationFunction
 
   const showCreateFunctionDrawer = ref(false)
   const showEditFunctionDrawer = ref(false)
@@ -205,6 +230,12 @@
   })
 
   const editService = async (payload) => {
+    if (props.service) {
+      return await props.service.edit({
+        ...payload,
+        edgeApplicationID: props.edgeApplicationId
+      })
+    }
     return await edgeApplicationFunctionService.editEdgeApplicationFunction({
       ...payload,
       edgeApplicationID: props.edgeApplicationId
@@ -212,6 +243,12 @@
   }
 
   const loadService = async () => {
+    if (props.service) {
+      return await props.service.load({
+        edgeApplicationID: props.edgeApplicationId,
+        functionID: selectedFunctionToEdit.value
+      })
+    }
     const functions = await edgeApplicationFunctionService.loadEdgeApplicationFunction({
       edgeApplicationID: props.edgeApplicationId,
       functionID: selectedFunctionToEdit.value

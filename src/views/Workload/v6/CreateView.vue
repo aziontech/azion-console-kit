@@ -1,0 +1,122 @@
+<template>
+  <ContentBlock>
+    <template #heading>
+      <PageHeadingBlock
+        pageTitle="Create Workload"
+        description="Configure domains, protocols, certificates, and select the security and application settings executed by this Workload."
+      ></PageHeadingBlock>
+    </template>
+    <template #content>
+      <CreateFormBlock
+        :createService="createWorkload"
+        disableToast
+        @on-response="handleResponse"
+        @on-response-fail="handleTrackFailedCreation"
+        :schema="validationSchema"
+        :initialValues="initialValues"
+        disableAfterCreateToastFeedback
+      >
+        <template #form>
+          <FormFieldsWorkload />
+        </template>
+        <template #action-bar="{ onSubmit, onCancel, loading }">
+          <ActionBarTemplate
+            @onSubmit="onSubmit"
+            @onCancel="onCancel"
+            :loading="loading"
+          />
+        </template>
+      </CreateFormBlock>
+    </template>
+  </ContentBlock>
+</template>
+
+<script setup>
+  import { inject } from 'vue'
+  import CreateFormBlock from '@/templates/create-form-block'
+  import ContentBlock from '@/templates/content-block'
+  import PageHeadingBlock from '@/templates/page-heading-block'
+  import FormFieldsWorkload from '@/views/Workload/v6/FormFields/FormFieldsWorkload.vue'
+  import ActionBarTemplate from '@/templates/action-bar-block/action-bar-with-teleport'
+  import { useRoute } from 'vue-router'
+  import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { workloadService } from '@/services/v2/workload/workload-service'
+  import { buildV6Schema } from '@/views/Workload/Config/validation'
+  import { clipboardWrite } from '@/helpers/clipboard'
+
+  /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
+  const tracker = inject('tracker')
+  const route = useRoute()
+
+  const handleResponse = (response) => {
+    handleToast(response)
+    tracker.product.productCreated({
+      productName: 'Domain',
+      createdFrom: 'singleEntity',
+      from: route.query.origin
+    })
+  }
+
+  const handleToast = (response) => {
+    const toast = {
+      feedback: response.feedback,
+      actions: {
+        link: {
+          label: 'View Workload',
+          callback: () => response.redirectToUrl(response.urlToEditView)
+        },
+        secondary: {
+          label: 'Copy Workload URL',
+          icon: 'pi pi-copy',
+          animation: { time: 3000, icon: 'pi pi-check', label: 'Copied' },
+          callback: () => clipboardWrite(response.domainName)
+        }
+      }
+    }
+    response.showToastWithActions(toast)
+  }
+
+  const handleTrackFailedCreation = (error) => {
+    const { fieldName, message } = handleTrackerError(error)
+    tracker.product
+      .failedToCreate({
+        productName: 'Domains',
+        errorType: 'api',
+        fieldName: fieldName.trim(),
+        errorMessage: message
+      })
+      .track()
+  }
+
+  const validationSchema = buildV6Schema()
+  const createWorkload = (payload) => workloadService.createWorkload(payload, true)
+
+  const initialValues = {
+    name: '',
+    application: null,
+    active: true,
+    infrastructure: '1',
+    firewall: null,
+    protocols: {
+      http: {
+        useHttps: true,
+        useHttp3: true,
+        httpPorts: [{ name: '80 (Default)', value: 80 }],
+        httpsPorts: [{ name: '443 (Default)', value: 443 }],
+        quicPorts: [{ name: '443 (Default)', value: 443 }]
+      }
+    },
+    mtls: {
+      isEnabled: false,
+      verification: 'enforce',
+      certificate: null,
+      crl: []
+    },
+    useCustomDomain: false,
+    customDomain: '',
+    workloadHostnameAllowAccess: false,
+    tls: { ciphers: 7, minimumVersion: 'tls_1_3' },
+    domains: [],
+    environmentDeployments: {}
+  }
+</script>

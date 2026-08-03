@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { accountGuard } from '@/router/hooks/guards/accountGuard'
 
 // Hermetic: a dev's .env.local with VITE_DEBUG_LOGIN=true flips the guard into
@@ -21,6 +21,14 @@ vi.mock('@/services/v2/base/auth', () => ({
 }))
 
 describe('accountGuard hasSession check', () => {
+  beforeEach(() => {
+    vi.stubEnv('VITE_DEBUG_LOGIN', 'false')
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
   it('should redirect to login without calling API when hasSession=false', async () => {
     const { loadUserAndAccountInfo } = await import('@/helpers/account-data')
 

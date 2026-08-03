@@ -103,7 +103,8 @@ export const documentationAccountsProducts = {
 
 export const documentationDeployProducts = {
   edgeNode: () => openDocumentationProducts('deploy/orchestrator/edge-node/'),
-  edgeServices: () => openDocumentationProducts('deploy/orchestrator/edge-services/')
+  edgeServices: () => openDocumentationProducts('deploy/orchestrator/edge-services/'),
+  deployments: () => openDocumentationProducts('deploy/orchestrator/')
 }
 
 export const documentationObserveProducts = {

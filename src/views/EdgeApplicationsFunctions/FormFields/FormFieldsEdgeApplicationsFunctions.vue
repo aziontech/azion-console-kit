@@ -16,6 +16,7 @@
   import indentJsonStringify from '@/utils/indentJsonStringify'
   import { isValidFormBuilderSchema } from '@/utils/schemaFormBuilderValidation'
   import { edgeFunctionService } from '@/services/v2/edge-function/edge-function-service'
+  import { hasFlagUseV6Configurations } from '@/composables/user-flag'
 
   const emit = defineEmits(['toggleDrawer', 'additionalErrors'])
 
@@ -23,6 +24,14 @@
     allowedRuntime: {
       type: String,
       default: null // null = all, 'azion_lua' = only Lua
+    },
+    disabledFields: {
+      type: Boolean,
+      default: false
+    },
+    deferUntilValue: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -32,6 +41,20 @@
   const { value: edgeFunctionID } = useField('edgeFunctionID')
   const { value: args, errorMessage: argsError } = useField('args')
   const { value: azionForm } = useField('azionForm')
+
+  const hasResolvedInitialValue = ref(false)
+  watch(
+    edgeFunctionID,
+    (value) => {
+      if (value !== undefined && value !== null && value !== '') {
+        hasResolvedInitialValue.value = true
+      }
+    },
+    { immediate: true }
+  )
+  const functionDropdownKey = computed(() =>
+    props.deferUntilValue && hasResolvedInitialValue.value ? 'ready' : 'initial'
+  )
 
   const schemaAzionForm = ref({})
   const emptySchemaAzionForm = ref(true)
@@ -47,6 +70,7 @@
 
   const drawerRef = ref('')
   const isDropdownLoaded = ref(false)
+  const isV6 = hasFlagUseV6Configurations()
 
   const openDrawer = () => {
     drawerRef.value.openCreateDrawer()
@@ -228,6 +252,7 @@
         required
         name="name"
         v-model="name"
+        :disabled="disabledFields"
         placeholder="My Application function instance"
         description="Give a unique and descriptive name to identify the function instance."
       />
@@ -242,17 +267,20 @@
     <template #inputs>
       <div class="flex w-80 flex-col gap-2 sm:max-w-lg max-sm:w-full">
         <Drawer
+          v-if="!isV6"
           ref="drawerRef"
           @onSuccess="handleDrawerSuccess"
         />
 
         <div class="flex">
           <FieldDropdownLazyLoader
+            :key="functionDropdownKey"
             required
             disableEmitFirstRender
             data-testid="edge-application-function-instance-form__edge-function"
             label="Function"
             name="edgeFunctionID"
+            :disabled="disabledFields"
             optionLabel="name"
             optionValue="id"
             inputId="edgeFunctionID"
@@ -267,7 +295,10 @@
                 : ''
             "
           >
-            <template #footer>
+            <template
+              v-if="!isV6"
+              #footer
+            >
               <ul class="p-2">
                 <li>
                   <PrimeButton
@@ -320,6 +351,7 @@
                           class="overflow-clip surface-border border rounded-md"
                           :initialValue="schemaAzionFormString"
                           :errors="hasAzionFormError"
+                          :readOnly="disabledFields"
                           :minimap="false"
                           @update:modelValue="codeEditorFormBuilderUpdate"
                         />
@@ -386,6 +418,7 @@
               class="overflow-clip surface-border border rounded-md"
               :initialValue="args"
               :errors="hasArgsError"
+              :readOnly="disabledFields"
               :minimap="false"
             />
           </div>

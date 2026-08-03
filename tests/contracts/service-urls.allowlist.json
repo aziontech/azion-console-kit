@@ -1,0 +1,29 @@
+{
+  "$comment": "Service URL roots that legitimately live OUTSIDE the published v4 OpenAPI (spec test-effectiveness, req 9.1). Same precision contract as known-drift: explicit prefixes only, each with a reason; the staleness test fails when an entry stops matching any extracted URL.",
+  "entries": [
+    {
+      "prefix": "v4/iam/",
+      "reason": "IAM endpoints (users, teams, permissions, personal_tokens, account) are live on stage but NOT documented in the published v4 OpenAPI — report to the API team; retire when they publish."
+    },
+    {
+      "prefix": "v4/events/graphql",
+      "reason": "GraphQL surface — not representable in the REST OpenAPI document; consumer contracts are the gate."
+    },
+    {
+      "prefix": "v4/billing/graphql",
+      "reason": "GraphQL surface — consumer contract (critical-areas) is the gate."
+    },
+    {
+      "prefix": "v4/metrics/graphql",
+      "reason": "GraphQL surface — not in the REST OpenAPI document."
+    },
+    {
+      "prefix": "deployment-api/",
+      "reason": "deployment-api is a separate, unpublished API document (same decision as the deployment drift exclusion)."
+    },
+    {
+      "prefix": "api/v3/",
+      "reason": "legacy v3 surface (edge_nodes, waf domains) — outside the v4 OpenAPI by definition; dies with the v3 retirement."
+    }
+  ]
+}

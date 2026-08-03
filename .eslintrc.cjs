@@ -14,6 +14,10 @@ Module._resolveFilename = function (request, parent, isMain, options) {
 
 module.exports = {
   root: true,
+  // Binary test artifacts (browser-mode screenshots, vitest attachments) are not
+  // source: the anti-placebo lint globs match their `*version*`/`__screenshots__`
+  // paths, so exclude them explicitly to avoid parse errors on non-JS files.
+  ignorePatterns: ['**/__screenshots__/**', '**/*.png', '.vitest-attachments/**'],
   // Register security/xss/no-unsanitized plugins so eslint-disable directives for their rules
   // (added for .eslintrc-security.cjs) don't fail this main lint pass. Rule severities for those
   // plugins are configured in .eslintrc-security.cjs — here they stay 'off' (default).
@@ -25,7 +29,108 @@ module.exports = {
   ],
   overrides: [
     {
-      files: ['scripts/**/*.cjs'],
+      // versioned-only-subresources feature scope: design-system lint is a
+      // build-breaker (task 9.3). New/touched lines must use
+      // @aziontech/webkit + @aziontech/theme tokens — no raw colors,
+      // Tailwind palette/typography/spacing/radius/shadow utilities.
+      files: [
+        'src/templates/version-shell-block/**/*.{vue,js}',
+        'src/composables/versioning/**/*.{vue,js}',
+        'src/views/EdgeFunctions/v6/**/*.{vue,js}',
+        'src/views/NetworkLists/v6/**/*.{vue,js}',
+        'src/views/WafRules/v6/**/*.{vue,js}'
+      ],
+      rules: {
+        'azion-architecture/no-raw-design-values': 'error'
+      }
+    },
+    {
+      // deploy-drawer-block belongs to the new-release-drawer feature and is being
+      // refactored there with the project's existing utilities; keep the DS rule a
+      // non-blocking warning so it does not gate that feature mid-flight.
+      files: ['src/templates/deploy-drawer-block/**/*.{vue,js}'],
+      rules: {
+        'azion-architecture/no-raw-design-values': 'warn'
+      }
+    },
+    {
+      // new-release-screen feature (spec new-release-screen, Property 1).
+      // The full-page "Review & deploy" surface and its canonical, surface-agnostic
+      // composition blocks (relocated from deploy-drawer-block). The design-system
+      // rule (no raw hex/rgb, fixed-size/palette/typography utilities, non-token
+      // shadows) is a build-breaker on these paths: the feature is complete and the
+      // shared blocks are relocated, so it is promoted to error (task 15.1). The
+      // release store carries no markup, so it is excluded.
+      files: [
+        'src/views/Deployments/v6/**/*.{vue,js}',
+        'src/templates/release-composition/**/*.{vue,js}'
+      ],
+      rules: {
+        'azion-architecture/no-raw-design-values': 'error'
+      }
+    },
+    // NOTE: the legacy cypress override was removed here (spec
+    // versioning-test-coverage, req 8.5): the cypress/ tree no longer exists in
+    // the repo and eslint-plugin-cypress is not installed — the block was dead
+    // config that broke any eslint invocation resolving it.
+    {
+      // Anti-placebo test rules (spec versioning-test-coverage, req 1.x).
+      // RATCHET SCOPE: the hard bar applies only to versioning test paths and
+      // the new tests/ tree — legacy tests are grandfathered (design ADR 7.8).
+      // Source of truth: .claude/rules/testing-versioning.md
+      files: [
+        'src/tests/**/*version*',
+        // Case-sensitive globs let `Version*` files escape the ratchet (found
+        // in the 2026-07-23 deep review carrying wrapper.vm asserts).
+        'src/tests/**/*Version*',
+        'src/tests/**/versioning/**',
+        'src/tests/**/v6/**',
+        // new-release feature trees — recent code, no reason to grandfather.
+        'src/tests/templates/release-composition/**',
+        'src/tests/views/Deployments/**',
+        'src/tests/functional/**',
+        // flag-v6 coverage suites (spec flag-v6-coverage, req 8.2) — born under
+        // the hard bar from the first commit.
+        'src/tests/**/flag-v6/**',
+        // test-maturity fase 2 (critical areas) — ratchet: new tests under the bar.
+        'src/tests/services/v2/base/**',
+        'src/tests/services/v2/mfa/**',
+        'src/tests/services/v2/payment/**',
+        'src/tests/services/v2/billing/**',
+        'src/tests/services/v2/utils/**',
+        'src/tests/services/v2/account/**',
+        'src/tests/router/guards/**',
+        'src/tests/stores/**',
+        'src/tests/contracts/**',
+        'tests/**'
+      ],
+      plugins: ['vitest'],
+      rules: {
+        // P1 — no committed escape hatches (req 1.5)
+        'vitest/no-focused-tests': 'error',
+        'vitest/no-disabled-tests': 'error',
+        // P2 — every test asserts; asserts live inside tests (req 1.1)
+        'vitest/expect-expect': 'error',
+        'vitest/no-standalone-expect': 'error',
+        // P2 — no internal-state/class-string asserts (req 1.1, 1.7)
+        // P3 — never mock the versioning code under test (req 1.2, 1.3)
+        // Promoted to 'error' by spec task 2.3: enabling them as 'warn' surfaced
+        // 19 REAL placebo violations reachable by the scoped gate (2 vm-asserts,
+        // 17 module mocks); all were fixed (real HTTP-boundary mocks + observable
+        // assertions), so the bar is now hard. New violations break the build.
+        'azion-architecture/no-internal-state-assert': 'error',
+        'azion-architecture/no-versioning-module-mock': 'error',
+        // The "webkit razor" (spec test-effectiveness, req 3): never FAKE an
+        // environment capability (ResizeObserver/matchMedia/Intersection-
+        // Observer/getBoundingClientRect/focus) — the capability only truly
+        // exists in browser mode. The global setup-tests.js stubs are the
+        // single NAMED exemption (outside these globs; debt dies with the
+        // jsdom bucket, GUIA-DE-TESTES §11).
+        'azion-architecture/no-environment-capability-mock': 'error'
+      }
+    },
+    {
+      files: ['scripts/**/*.{cjs,mjs}'],
       env: { node: true },
       rules: {
         'no-console': 'off',

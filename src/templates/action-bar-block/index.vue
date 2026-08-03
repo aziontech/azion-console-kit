@@ -11,6 +11,8 @@
     loading: Boolean,
     inDrawer: Boolean,
     cancelDisabled: Boolean,
+    submitDisabled: Boolean,
+    hideSubmit: Boolean,
     primaryActionLabel: { type: String, default: 'Save' },
     secondaryActionLabel: { type: String, default: 'Cancel' }
   })
@@ -53,8 +55,10 @@
             @click="handleCancel"
           />
           <ButtonSave
+            v-if="!hideSubmit"
             :label="props.primaryActionLabel"
             :loading="isDisabledSubmit"
+            :disabled="props.submitDisabled"
             class="max-md:w-full md:min-w-[5rem]"
             data-testid="form-actions-submit-button"
             @click="handleSubmit"

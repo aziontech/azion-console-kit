@@ -1,3 +1,4 @@
+// does not — jsdom keeps the storage boundary deterministic across runtimes).
 /**
  * Feature: real-time-events-enhancements
  *

@@ -1,0 +1,1014 @@
+import { beforeEach, describe, expect, it } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
+
+import { DeploymentAdapter } from '@/services/v2/deployment/deployment-adapter'
+import { LATEST_READY } from '@/templates/release-composition/version-options'
+import { useReleaseStore } from '@/stores/release'
+
+const APPLICATION_TYPE = 'application'
+const SINGLE_VERSION = 'single_version'
+const VERSIONED_URLS = 'versioned_urls'
+
+const releaseWithApp = (hasApp) => ({
+  resources: hasApp ? [{ resource_type: APPLICATION_TYPE, global_id: 'app-1' }] : []
+})
+
+beforeEach(() => {
+  setActivePinia(createPinia())
+})
+
+describe('Property 4 — effDsId is the single deployment read path', () => {
+  const idUniverse = ['', 'ds-1', 'ds-2', 'ds-3']
+  const idsUniverse = [
+    [],
+    ['ds-1'],
+    ['ds-2'],
+    ['ds-1', 'ds-2'],
+    ['ds-2', 'ds-3', 'ds-1'],
+    ['ds-3', 'ds-1']
+  ]
+
+  const expectedEffDsId = (deploymentId, deploymentIds) => deploymentId || deploymentIds[0] || ''
+
+  it('matches deploymentId || deploymentIds[0] || "" for every raw state combo', () => {
+    const store = useReleaseStore()
+    let iterations = 0
+
+    idUniverse.forEach((deploymentId) => {
+      idsUniverse.forEach((deploymentIds) => {
+        store.deploymentId = deploymentId
+        store.deploymentIds = [...deploymentIds]
+
+        expect(store.effDsId).toBe(expectedEffDsId(deploymentId, deploymentIds))
+        iterations += 1
+      })
+    })
+
+    expect(iterations).toBe(idUniverse.length * idsUniverse.length)
+    expect(iterations).toBeGreaterThanOrEqual(24)
+  })
+
+  it('keeps deploymentId and deploymentIds[0] consistent after openRelease (>=100 iter)', () => {
+    const store = useReleaseStore()
+
+    const singulars = [undefined, null, '', 'ds-1', 'ds-9']
+    const arrays = [
+      undefined,
+      null,
+      [],
+      ['ds-1'],
+      ['ds-2', 'ds-3'],
+      ['ds-3', 'ds-2', 'ds-1'],
+      ['ds-7']
+    ]
+
+    let iterations = 0
+    for (let repeat = 0; repeat < 3; repeat += 1) {
+      singulars.forEach((deploymentId) => {
+        arrays.forEach((deploymentIds) => {
+          const payload = {}
+          if (deploymentId !== undefined) payload.deploymentId = deploymentId
+          if (deploymentIds !== undefined) payload.deploymentIds = deploymentIds
+
+          store.openRelease(payload)
+
+          expect(store.effDsId).toBe(store.deploymentId || store.deploymentIds[0] || '')
+
+          if (!store.deploymentId && store.deploymentIds.length === 0) {
+            expect(store.effDsId).toBe('')
+          } else {
+            const candidates = [store.deploymentId, ...store.deploymentIds].filter(Boolean)
+            expect(candidates).toContain(store.effDsId)
+          }
+
+          iterations += 1
+        })
+      })
+    }
+
+    expect(iterations).toBeGreaterThanOrEqual(100)
+  })
+
+  it('keeps the invariant across arbitrary pickDs toggle sequences (>=100 iter)', () => {
+    const store = useReleaseStore()
+    const toggles = ['ds-1', 'ds-2', 'ds-3', 'ds-4', 'ds-5']
+    let iterations = 0
+
+    for (let seed = 0; seed < 40; seed += 1) {
+      store.openRelease({})
+      for (let step = 0; step < 6; step += 1) {
+        const id = toggles[(seed * 7 + step * 3) % toggles.length]
+        store.pickDs(id)
+
+        expect(store.effDsId).toBe(store.deploymentId || store.deploymentIds[0] || '')
+        expect(store.deploymentId).toBe(store.deploymentIds[0] ?? '')
+        iterations += 1
+      }
+    }
+
+    expect(iterations).toBeGreaterThanOrEqual(100)
+  })
+
+  it('resolves the gate through effDsId (deployCtx default arg === effDsId target)', () => {
+    const store = useReleaseStore()
+
+    store.setDeployments([
+      { id: 'ds-1', deployment_policy: VERSIONED_URLS },
+      { id: 'ds-2', deployment_policy: SINGLE_VERSION }
+    ])
+    store.setActiveReleaseByDs('ds-1', releaseWithApp(true))
+    store.setActiveReleaseByDs('ds-2', releaseWithApp(true))
+
+    store.pickDs('ds-2')
+    store.pickDs('ds-1')
+    expect(store.effDsId).toBe('ds-2')
+
+    expect(store.deployCtx()).toEqual(store.deployCtx(store.effDsId))
+    expect(store.deployCtx().isVersioned).toBe(false)
+    expect(store.deployCtx().appEditable).toBe(false)
+  })
+})
+
+describe('Property 5 — deployCtx 5-case gate (exhaustive 2x2x2)', () => {
+  const expected = (isVersioned, deployed, hasApp) => {
+    const appEditable = hasApp && (isVersioned || !deployed)
+    const canDeploy = hasApp
+    return { appEditable, canDeploy }
+  }
+
+  const policies = [
+    { policy: SINGLE_VERSION, isVersioned: false },
+    { policy: VERSIONED_URLS, isVersioned: true }
+  ]
+
+  let iterations = 0
+
+  policies.forEach(({ policy, isVersioned }) => {
+    ;[true, false].forEach((deployed) => {
+      ;[true, false].forEach((hasApp) => {
+        it(`policy=${policy} deployed=${deployed} hasApp=${hasApp}`, () => {
+          const store = useReleaseStore()
+          const dsId = 'ds-x'
+
+          store.setDeployments([{ id: dsId, deployment_policy: policy }])
+          store.setActiveReleaseByDs(dsId, deployed ? releaseWithApp(hasApp) : null)
+          if (!deployed && hasApp) {
+            store.setResName(APPLICATION_TYPE, 'app-1')
+          }
+          store.pickDs(dsId)
+
+          const ctx = store.deployCtx(dsId)
+          const want = expected(isVersioned, deployed, hasApp)
+
+          expect(ctx.ok).toBe(true)
+          expect(ctx.isVersioned).toBe(isVersioned)
+          expect(ctx.deployed).toBe(deployed)
+          expect(ctx.hasApp).toBe(hasApp)
+          expect(ctx.appEditable).toBe(want.appEditable)
+          expect(ctx.canDeploy).toBe(want.canDeploy)
+
+          if (!hasApp) {
+            expect(ctx.canDeploy).toBe(false)
+            expect(ctx.appEditable).toBe(false)
+          }
+          if (policy === SINGLE_VERSION && deployed && hasApp) {
+            expect(ctx.appEditable).toBe(false)
+          }
+          if (isVersioned && hasApp) {
+            expect(ctx.appEditable).toBe(true)
+          }
+
+          iterations += 1
+        })
+      })
+    })
+  })
+
+  it('covers all 8 combinations exactly once', () => {
+    expect(iterations).toBe(8)
+  })
+})
+
+describe("Property 6 — 'LATEST' is resolved before the payload", () => {
+  const seedSelection = (store) => {
+    store.setResName(APPLICATION_TYPE, 'app-1')
+    store.setResVer(APPLICATION_TYPE, LATEST_READY)
+    store.setResName('firewall', 'fw-1')
+    store.setResVer('firewall', LATEST_READY)
+    store.addCollItem({
+      parent: 'application',
+      type: 'function',
+      item: { resourceId: 'fn-1', version: LATEST_READY }
+    })
+
+    store.setVersionsByResource(APPLICATION_TYPE, 'app-1', [
+      { value: 'app-v1', isCurrent: false },
+      { value: 'app-v2', isCurrent: true }
+    ])
+    store.setVersionsByResource('firewall', 'fw-1', [{ value: 'fw-v9', isCurrent: true }])
+    store.setVersionsByResource('function', 'fn-1', [
+      { value: 'fn-v3', isCurrent: false },
+      { value: 'fn-v5', isCurrent: true }
+    ])
+  }
+
+  it('composeResources() resolves LATEST to concrete version_ids', () => {
+    const store = useReleaseStore()
+    seedSelection(store)
+
+    const resources = store.composeResources()
+    const byType = Object.fromEntries(
+      resources.map((resource) => [resource.resource_type, resource])
+    )
+
+    expect(byType.application.resource_version).toBe('app-v2')
+    expect(byType.firewall.resource_version).toBe('fw-v9')
+    expect(byType.function.resource_version).toBe('fn-v5')
+
+    resources.forEach((resource) => {
+      expect(resource.resource_version).not.toBe(LATEST_READY)
+      expect(resource.resource_version).toBeTruthy()
+    })
+  })
+
+  it("the build_and_activate payload from composePayload() carries version_id and NO 'LATEST'", () => {
+    const store = useReleaseStore()
+    store.openRelease({ deploymentIds: ['ds-1'] })
+    seedSelection(store)
+
+    const composed = store.composePayload()
+    const payload = DeploymentAdapter.transformBuildAndActivatePayload(composed.resources)
+
+    const serialized = JSON.stringify(payload)
+    expect(serialized).not.toContain(LATEST_READY)
+
+    payload.resources.forEach((ref) => {
+      expect(ref.version_id).toBeTruthy()
+      expect(ref.version_id).not.toBe(LATEST_READY)
+    })
+
+    const appRef = payload.resources.find((ref) => ref.resource_type === APPLICATION_TYPE)
+    expect(appRef.resource_id).toBe('app-1')
+    expect(appRef.version_id).toBe('app-v2')
+  })
+})
+
+describe('coll — per-parent dependency isolation', () => {
+  it('seeds application and firewall functions into independent slots', () => {
+    const store = useReleaseStore()
+    store.seedApplicationFunctions([{ functionId: 'fn-app' }])
+    store.seedFirewallFunctions([{ functionId: 'fn-fw' }])
+
+    expect(store.coll.application.function).toEqual([
+      { resourceId: 'fn-app', version: null, locked: true, required: true }
+    ])
+    expect(store.coll.firewall.function).toEqual([
+      { resourceId: 'fn-fw', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('seeding one parent leaves the other parent untouched', () => {
+    const store = useReleaseStore()
+    store.seedFirewallFunctions([{ functionId: 'fn-fw' }])
+    store.seedFirewallWafs([{ wafId: 'waf-1' }])
+
+    store.seedApplicationFunctions([{ functionId: 'fn-app' }])
+
+    expect(store.coll.firewall.function).toEqual([
+      { resourceId: 'fn-fw', version: null, locked: true, required: true }
+    ])
+    expect(store.coll.firewall.waf).toEqual([
+      { resourceId: 'waf-1', version: null, locked: true, required: true }
+    ])
+    expect(store.coll.application.function).toEqual([
+      { resourceId: 'fn-app', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('an empty seed clears ONLY that parent slot (the leak fix)', () => {
+    const store = useReleaseStore()
+    store.seedApplicationFunctions([{ functionId: 'fn-app' }])
+    store.seedFirewallFunctions([{ functionId: 'fn-fw' }])
+
+    store.seedFirewallFunctions([])
+
+    expect(store.coll.firewall.function).toEqual([])
+    expect(store.coll.application.function).toEqual([
+      { resourceId: 'fn-app', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('application and custom_page connectors live in independent slots', () => {
+    const store = useReleaseStore()
+    store.seedApplicationConnectors([{ connectorId: 'cn-app' }])
+    store.seedCustomPageConnectors([{ connectorId: 'cn-cp' }])
+
+    expect(store.coll.application.connector).toEqual([
+      { resourceId: 'cn-app', version: null, locked: true, required: true }
+    ])
+    expect(store.coll.custom_page.connector).toEqual([
+      { resourceId: 'cn-cp', version: null, locked: true, required: true }
+    ])
+  })
+})
+
+describe('composeResources — dedupes a dependency shared by two parents', () => {
+  it('emits a single flat entry when the same function is under application and firewall', () => {
+    const store = useReleaseStore()
+    store.openRelease({ deploymentIds: ['ds-1'] })
+    store.setResName(APPLICATION_TYPE, 'app-1')
+    store.setResVer(APPLICATION_TYPE, 'app-v1')
+    store.setVersionsByResource(APPLICATION_TYPE, 'app-1', [{ value: 'app-v1', isCurrent: true }])
+
+    store.seedApplicationFunctions([{ functionId: 'fn-shared' }])
+    store.seedFirewallFunctions([{ functionId: 'fn-shared' }])
+    store.setVersionsByResource('function', 'fn-shared', [
+      { value: 'fn-shared-v2', isCurrent: true }
+    ])
+    store.setCollVer('application', 'function', 0, 'fn-shared-v2')
+    store.setCollVer('firewall', 'function', 0, 'fn-shared-v2')
+
+    const fnEntries = store
+      .composeResources()
+      .filter((res) => res.resource_type === 'function' && res.resource_id === 'fn-shared')
+
+    expect(fnEntries).toHaveLength(1)
+    expect(fnEntries[0].resource_version).toBe('fn-shared-v2')
+  })
+})
+
+describe('composePayload — discriminated by entry context', () => {
+  it('non-scoped → { scoped:false, resources, canary, canaryForm } (Scenario A)', () => {
+    const store = useReleaseStore()
+    store.openRelease({ deploymentIds: ['ds-1'] })
+    store.setResName(APPLICATION_TYPE, 'app-1')
+    store.setResVer(APPLICATION_TYPE, 'app-v1')
+    store.setVersionsByResource(APPLICATION_TYPE, 'app-1', [{ value: 'app-v1', isCurrent: true }])
+
+    const payload = store.composePayload()
+
+    expect(payload.scoped).toBe(false)
+    expect(payload).not.toHaveProperty('override')
+    expect(payload.resources).toEqual([
+      { resource_id: 'app-1', resource_version: 'app-v1', resource_type: APPLICATION_TYPE }
+    ])
+    expect(payload.canary).toBe(false)
+    expect(payload.canaryForm).toEqual({})
+  })
+
+  it('scoped → { scoped:true, override:{ type, id, version }, canary, canaryForm } (Scenario B)', () => {
+    const store = useReleaseStore()
+    store.openRelease({
+      fromVersion: true,
+      scopedType: APPLICATION_TYPE,
+      resourceId: '521846',
+      versionId: 'app-promoted'
+    })
+
+    const payload = store.composePayload()
+
+    expect(payload.scoped).toBe(true)
+    expect(payload).not.toHaveProperty('resources')
+    expect(payload.override).toEqual({
+      resource_type: APPLICATION_TYPE,
+      resource_id: '521846',
+      version: 'app-promoted'
+    })
+  })
+
+  it('scoped → resolves the LATEST sentinel to a concrete version before it leaves the store', () => {
+    const store = useReleaseStore()
+    store.openRelease({ scopedType: 'firewall', resourceId: 'fw-1' })
+    store.setVersionsByResource('firewall', 'fw-1', [
+      { value: 'fw-v1', isCurrent: false },
+      { value: 'fw-v9', isCurrent: true }
+    ])
+
+    const payload = store.composePayload()
+
+    expect(payload.scoped).toBe(true)
+    expect(payload.override.version).toBe('fw-v9')
+    expect(payload.override.version).not.toBe(LATEST_READY)
+  })
+
+  it('scoped → an explicit instance pick (resNames) overrides the route resourceId', () => {
+    const store = useReleaseStore()
+    store.openRelease({ scopedType: 'firewall', resourceId: 'fw-route' })
+    store.setResName('firewall', 'fw-picked')
+    store.setVersionsByResource('firewall', 'fw-picked', [{ value: 'fw-vX', isCurrent: true }])
+
+    const payload = store.composePayload()
+
+    expect(payload.override.resource_id).toBe('fw-picked')
+    expect(payload.override.version).toBe('fw-vX')
+  })
+})
+
+describe('openRelease — seed for a full first-release composition', () => {
+  it('seeds the resource into its singleton slot WITHOUT entering scoped mode', () => {
+    const store = useReleaseStore()
+    store.openRelease({
+      deploymentIds: ['ds-new'],
+      seed: { type: 'firewall', resourceId: 'fw-7', versionId: 'v-42' }
+    })
+
+    expect(store.scopedType).toBe(null)
+    expect(store.resNames.firewall).toBe('fw-7')
+    expect(store.resVers.firewall).toBe('v-42')
+    expect(store.resEnabled.firewall).toBe(true)
+  })
+
+  it('composes a NON-scoped payload that includes the seeded resource', () => {
+    const store = useReleaseStore()
+    store.openRelease({
+      deploymentIds: ['ds-new'],
+      seed: { type: 'firewall', resourceId: 'fw-7', versionId: 'v-42' }
+    })
+    store.setVersionsByResource('firewall', 'fw-7', [{ value: 'v-42', isCurrent: true }])
+
+    const payload = store.composePayload()
+
+    expect(payload.scoped).toBe(false)
+    expect(
+      payload.resources.find((resource) => resource.resource_type === 'firewall')
+    ).toMatchObject({ resource_id: 'fw-7', resource_version: 'v-42' })
+  })
+
+  it('ignores a seed for a non-singleton resource type', () => {
+    const store = useReleaseStore()
+    store.openRelease({
+      deploymentIds: ['ds-new'],
+      seed: { type: 'network_list', resourceId: 'nl-1', versionId: 'v-1' }
+    })
+
+    expect(store.resNames.network_list).toBeUndefined()
+  })
+})
+
+describe('seedApplicationFunctions — app-required function dependencies', () => {
+  it('maps each functionId to a locked, required, version:null entry under coll.function', () => {
+    const store = useReleaseStore()
+
+    store.seedApplicationFunctions([
+      { functionId: 'fn-100', name: 'auth' },
+      { functionId: 'fn-200', name: 'rewrite' }
+    ])
+
+    expect(store.coll.application.function).toEqual([
+      { resourceId: 'fn-100', version: null, locked: true, required: true },
+      { resourceId: 'fn-200', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('dedups by functionId, keeping the first occurrence', () => {
+    const store = useReleaseStore()
+
+    store.seedApplicationFunctions([
+      { functionId: 'fn-100' },
+      { functionId: 'fn-200' },
+      { functionId: 'fn-100' }
+    ])
+
+    expect(store.coll.application.function).toEqual([
+      { resourceId: 'fn-100', version: null, locked: true, required: true },
+      { resourceId: 'fn-200', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('skips entries with a null or missing functionId', () => {
+    const store = useReleaseStore()
+
+    store.seedApplicationFunctions([
+      { functionId: 'fn-100' },
+      { functionId: null },
+      { name: 'no-id' }
+    ])
+
+    expect(store.coll.application.function).toEqual([
+      { resourceId: 'fn-100', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('replaces ONLY coll.application.function and leaves other slots untouched', () => {
+    const store = useReleaseStore()
+    store.seedApplicationConnectors([{ connectorId: 'cn-9' }])
+    store.seedFirewallFunctions([{ functionId: 'fn-fw' }])
+
+    store.seedApplicationFunctions([{ functionId: 'fn-100' }])
+
+    expect(store.coll.application.function).toEqual([
+      { resourceId: 'fn-100', version: null, locked: true, required: true }
+    ])
+    expect(store.coll.application.connector).toEqual([
+      { resourceId: 'cn-9', version: null, locked: true, required: true }
+    ])
+    expect(store.coll.firewall.function).toEqual([
+      { resourceId: 'fn-fw', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('is idempotent — re-seeding REPLACES, never accumulates', () => {
+    const store = useReleaseStore()
+
+    store.seedApplicationFunctions([{ functionId: 'fn-old' }, { functionId: 'fn-keep' }])
+    expect(store.coll.application.function).toHaveLength(2)
+
+    store.seedApplicationFunctions([{ functionId: 'fn-keep' }])
+    expect(store.coll.application.function).toEqual([
+      { resourceId: 'fn-keep', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('clears coll.function when given a non-array argument', () => {
+    const store = useReleaseStore()
+    store.seedApplicationFunctions([{ functionId: 'fn-100' }])
+
+    store.seedApplicationFunctions(null)
+
+    expect(store.coll.application.function).toEqual([])
+  })
+})
+
+describe('seedApplicationConnectors — app-required connector dependencies', () => {
+  it('maps each connectorId to a locked, required, version:null entry under coll.connector', () => {
+    const store = useReleaseStore()
+
+    store.seedApplicationConnectors([
+      { connectorId: 'cn-100', ruleCount: 3 },
+      { connectorId: 'cn-200', ruleCount: 1 }
+    ])
+
+    expect(store.coll.application.connector).toEqual([
+      { resourceId: 'cn-100', version: null, locked: true, required: true },
+      { resourceId: 'cn-200', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('dedups by connectorId, keeping the first occurrence', () => {
+    const store = useReleaseStore()
+
+    store.seedApplicationConnectors([
+      { connectorId: 'cn-100' },
+      { connectorId: 'cn-200' },
+      { connectorId: 'cn-100' }
+    ])
+
+    expect(store.coll.application.connector).toEqual([
+      { resourceId: 'cn-100', version: null, locked: true, required: true },
+      { resourceId: 'cn-200', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('skips entries with a null or missing connectorId', () => {
+    const store = useReleaseStore()
+
+    store.seedApplicationConnectors([
+      { connectorId: 'cn-100' },
+      { connectorId: null },
+      { ruleCount: 5 }
+    ])
+
+    expect(store.coll.application.connector).toEqual([
+      { resourceId: 'cn-100', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('replaces ONLY coll.application.connector and leaves other slots untouched', () => {
+    const store = useReleaseStore()
+    store.seedApplicationFunctions([{ functionId: 'fn-1' }])
+    store.seedCustomPageConnectors([{ connectorId: 'cn-cp' }])
+
+    store.seedApplicationConnectors([{ connectorId: 'cn-100' }])
+
+    expect(store.coll.application.connector).toEqual([
+      { resourceId: 'cn-100', version: null, locked: true, required: true }
+    ])
+    expect(store.coll.application.function).toEqual([
+      { resourceId: 'fn-1', version: null, locked: true, required: true }
+    ])
+    expect(store.coll.custom_page.connector).toEqual([
+      { resourceId: 'cn-cp', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('is idempotent — re-seeding REPLACES, never accumulates', () => {
+    const store = useReleaseStore()
+
+    store.seedApplicationConnectors([{ connectorId: 'cn-old' }, { connectorId: 'cn-keep' }])
+    expect(store.coll.application.connector).toHaveLength(2)
+
+    store.seedApplicationConnectors([{ connectorId: 'cn-keep' }])
+    expect(store.coll.application.connector).toEqual([
+      { resourceId: 'cn-keep', version: null, locked: true, required: true }
+    ])
+  })
+
+  it('clears coll.connector when given a non-array argument', () => {
+    const store = useReleaseStore()
+    store.seedApplicationConnectors([{ connectorId: 'cn-100' }])
+
+    store.seedApplicationConnectors(null)
+
+    expect(store.coll.application.connector).toEqual([])
+  })
+})
+
+describe('appManagedVersionsChosen — every required dependency has a concrete version', () => {
+  it('is true when there are no required dependency entries', () => {
+    const store = useReleaseStore()
+    expect(store.appManagedVersionsChosen).toBe(true)
+
+    store.seedApplicationFunctions([])
+    store.seedApplicationConnectors([])
+    expect(store.appManagedVersionsChosen).toBe(true)
+  })
+
+  it('is false when a required function still has version:null', () => {
+    const store = useReleaseStore()
+    store.seedApplicationFunctions([{ functionId: 'fn-100' }])
+
+    expect(store.appManagedVersionsChosen).toBe(false)
+  })
+
+  it('is false when a required connector still has version:null', () => {
+    const store = useReleaseStore()
+    store.seedApplicationConnectors([{ connectorId: 'cn-100' }])
+
+    expect(store.appManagedVersionsChosen).toBe(false)
+  })
+
+  it('is true when a required entry tracks the LATEST sentinel (latest is allowed for deps)', () => {
+    const store = useReleaseStore()
+    store.seedApplicationFunctions([{ functionId: 'fn-100' }])
+    store.setCollVer('application', 'function', 0, LATEST_READY)
+
+    expect(store.appManagedVersionsChosen).toBe(true)
+  })
+
+  it('is true once every required function AND connector has a concrete version', () => {
+    const store = useReleaseStore()
+    store.seedApplicationFunctions([{ functionId: 'fn-100' }, { functionId: 'fn-200' }])
+    store.seedApplicationConnectors([{ connectorId: 'cn-100' }])
+    store.setCollVer('application', 'function', 0, 'fn-v3')
+    store.setCollVer('application', 'function', 1, 'fn-v7')
+    store.setCollVer('application', 'connector', 0, 'cn-v9')
+
+    expect(store.appManagedVersionsChosen).toBe(true)
+  })
+
+  it('stays false while a function is concrete but a connector is still pending', () => {
+    const store = useReleaseStore()
+    store.seedApplicationFunctions([{ functionId: 'fn-100' }])
+    store.seedApplicationConnectors([{ connectorId: 'cn-100' }])
+    store.setCollVer('application', 'function', 0, 'fn-v3')
+
+    expect(store.appManagedVersionsChosen).toBe(false)
+
+    store.setCollVer('application', 'connector', 0, 'cn-v9')
+    expect(store.appManagedVersionsChosen).toBe(true)
+  })
+
+  it('ignores non-required entries when computing the gate', () => {
+    const store = useReleaseStore()
+    store.coll = {
+      application: {
+        function: [
+          { resourceId: 'fn-required', version: 'fn-v3', required: true },
+          { resourceId: 'fn-optional', version: null, required: false }
+        ],
+        connector: [{ resourceId: 'cn-optional', version: null, required: false }]
+      }
+    }
+
+    expect(store.appManagedVersionsChosen).toBe(true)
+  })
+})
+
+describe('pendingDependencySelections — required dependencies still missing a version', () => {
+  it('lists { type, resourceId } only for required entries still missing a version (null); LATEST counts as chosen', () => {
+    const store = useReleaseStore()
+    store.seedApplicationFunctions([
+      { functionId: 'fn-null' },
+      { functionId: 'fn-latest' },
+      { functionId: 'fn-done' }
+    ])
+    store.seedApplicationConnectors([{ connectorId: 'cn-null' }])
+    store.setCollVer('application', 'function', 1, LATEST_READY)
+    store.setCollVer('application', 'function', 2, 'fn-v9')
+
+    const pending = store.pendingDependencySelections
+
+    expect(pending).toHaveLength(2)
+    expect(pending).toContainEqual({ type: 'function', resourceId: 'fn-null' })
+    expect(pending).toContainEqual({ type: 'connector', resourceId: 'cn-null' })
+  })
+
+  it('is empty when every required dependency has a concrete version', () => {
+    const store = useReleaseStore()
+    store.seedApplicationFunctions([{ functionId: 'fn-100' }])
+    store.seedApplicationConnectors([{ connectorId: 'cn-100' }])
+    store.setCollVer('application', 'function', 0, 'fn-v1')
+    store.setCollVer('application', 'connector', 0, 'cn-v1')
+
+    expect(store.pendingDependencySelections).toEqual([])
+  })
+
+  it('is empty when there are no dependency entries at all', () => {
+    const store = useReleaseStore()
+    expect(store.pendingDependencySelections).toEqual([])
+  })
+})
+
+describe('deployEnabled — the app-managed dependency gate', () => {
+  const satisfyNonDependencyGates = (store) => {
+    store.setDeployments([{ id: 'ds-1', deployment_policy: VERSIONED_URLS }])
+    store.setActiveReleaseByDs('ds-1', releaseWithApp(true))
+    store.pickDs('ds-1')
+    store.setResName(APPLICATION_TYPE, 'app-1')
+    store.setResVer(APPLICATION_TYPE, 'app-v1')
+  }
+
+  it('is true when all other gates pass and no dependencies are required', () => {
+    const store = useReleaseStore()
+    satisfyNonDependencyGates(store)
+
+    expect(store.deployEnabled).toBe(true)
+  })
+
+  it('flips to false when a required function version is still pending', () => {
+    const store = useReleaseStore()
+    satisfyNonDependencyGates(store)
+    expect(store.deployEnabled).toBe(true)
+
+    store.seedApplicationFunctions([{ functionId: 'fn-100' }])
+    expect(store.appManagedVersionsChosen).toBe(false)
+    expect(store.deployEnabled).toBe(false)
+  })
+
+  it('flips to false when a required connector version is still pending', () => {
+    const store = useReleaseStore()
+    satisfyNonDependencyGates(store)
+    expect(store.deployEnabled).toBe(true)
+
+    store.seedApplicationConnectors([{ connectorId: 'cn-100' }])
+    expect(store.appManagedVersionsChosen).toBe(false)
+    expect(store.deployEnabled).toBe(false)
+  })
+
+  it('returns to true once the pending function version is chosen', () => {
+    const store = useReleaseStore()
+    satisfyNonDependencyGates(store)
+    store.seedApplicationFunctions([{ functionId: 'fn-100' }])
+    expect(store.deployEnabled).toBe(false)
+
+    store.setCollVer('application', 'function', 0, 'fn-v3')
+    expect(store.deployEnabled).toBe(true)
+  })
+
+  it('stays blocked until BOTH a pending function and connector version are chosen', () => {
+    const store = useReleaseStore()
+    satisfyNonDependencyGates(store)
+    store.seedApplicationFunctions([{ functionId: 'fn-100' }])
+    store.seedApplicationConnectors([{ connectorId: 'cn-100' }])
+    expect(store.deployEnabled).toBe(false)
+
+    store.setCollVer('application', 'function', 0, 'fn-v3')
+    expect(store.deployEnabled).toBe(false)
+
+    store.setCollVer('application', 'connector', 0, 'cn-v9')
+    expect(store.deployEnabled).toBe(true)
+  })
+
+  it('is enabled when every required dependency tracks LATEST (latest allowed for deps)', () => {
+    const store = useReleaseStore()
+    satisfyNonDependencyGates(store)
+    store.seedApplicationFunctions([{ functionId: 'fn-100' }])
+    store.seedApplicationConnectors([{ connectorId: 'cn-100' }])
+    expect(store.deployEnabled).toBe(false)
+
+    store.setCollVer('application', 'function', 0, LATEST_READY)
+    store.setCollVer('application', 'connector', 0, LATEST_READY)
+    expect(store.deployEnabled).toBe(true)
+  })
+})
+
+describe('appVersionChosen — implicit latest default (pre-selected version)', () => {
+  it('is satisfied when the app is inherited from the active release and no version was picked', () => {
+    const store = useReleaseStore()
+    store.setDeployments([{ id: 'ds-1', deployment_policy: VERSIONED_URLS }])
+    store.setActiveReleaseByDs('ds-1', releaseWithApp(true))
+    store.pickDs('ds-1')
+
+    expect(store.resVers[APPLICATION_TYPE]).toBeUndefined()
+    expect(store.appVersionChosen).toBe(true)
+    expect(store.deployEnabled).toBe(true)
+  })
+
+  it('stays unsatisfied when no application is composed at all', () => {
+    const store = useReleaseStore()
+    store.setDeployments([{ id: 'ds-1', deployment_policy: VERSIONED_URLS }])
+    store.setActiveReleaseByDs('ds-1', releaseWithApp(false))
+    store.pickDs('ds-1')
+
+    expect(store.appVersionChosen).toBe(false)
+    expect(store.deployEnabled).toBe(false)
+  })
+})
+
+describe('composePayload scoped — dependencyOverrides', () => {
+  const seedScopedWithDependencies = (store) => {
+    store.openRelease({
+      fromVersion: true,
+      scopedType: APPLICATION_TYPE,
+      resourceId: 'app-route',
+      versionId: 'app-promoted'
+    })
+    store.seedApplicationFunctions([{ functionId: 'fn-1' }, { functionId: 'fn-2' }])
+    store.seedApplicationConnectors([{ connectorId: 'cn-1' }])
+  }
+
+  it('emits { resource_id, resource_type, version } for functions AND connectors with concrete versions', () => {
+    const store = useReleaseStore()
+    seedScopedWithDependencies(store)
+    store.setCollVer('application', 'function', 0, 'fn-1-v3')
+    store.setCollVer('application', 'function', 1, 'fn-2-v7')
+    store.setCollVer('application', 'connector', 0, 'cn-1-v5')
+
+    const payload = store.composePayload()
+
+    expect(payload.scoped).toBe(true)
+    expect(payload.dependencyOverrides).toEqual([
+      { resource_id: 'fn-1', resource_type: 'function', version: 'fn-1-v3' },
+      { resource_id: 'fn-2', resource_type: 'function', version: 'fn-2-v7' },
+      { resource_id: 'cn-1', resource_type: 'connector', version: 'cn-1-v5' }
+    ])
+  })
+
+  it('drives concrete picks via setVersionsByResource + setCollVer for both types', () => {
+    const store = useReleaseStore()
+    seedScopedWithDependencies(store)
+    store.setVersionsByResource('function', 'fn-1', [
+      { value: 'fn-1-v1', isCurrent: false },
+      { value: 'fn-1-v9', isCurrent: true }
+    ])
+    store.setVersionsByResource('connector', 'cn-1', [
+      { value: 'cn-1-v1', isCurrent: false },
+      { value: 'cn-1-v9', isCurrent: true }
+    ])
+    store.setCollVer('application', 'function', 0, LATEST_READY)
+    store.setCollVer('application', 'function', 1, 'fn-2-pinned')
+    store.setCollVer('application', 'connector', 0, LATEST_READY)
+
+    const payload = store.composePayload()
+
+    const fnEntry = payload.dependencyOverrides.find((entry) => entry.resource_id === 'fn-1')
+    const cnEntry = payload.dependencyOverrides.find((entry) => entry.resource_id === 'cn-1')
+    expect(fnEntry).toEqual({ resource_id: 'fn-1', resource_type: 'function', version: 'fn-1-v9' })
+    expect(cnEntry).toEqual({ resource_id: 'cn-1', resource_type: 'connector', version: 'cn-1-v9' })
+    payload.dependencyOverrides.forEach((override) => {
+      expect(override.version).not.toBe(LATEST_READY)
+    })
+  })
+
+  it('Property 2 — never emits a null version for any dependency override', () => {
+    const store = useReleaseStore()
+    seedScopedWithDependencies(store)
+    store.setVersionsByResource('function', 'fn-1', [{ value: 'fn-1-current', isCurrent: true }])
+    store.setVersionsByResource('function', 'fn-2', [{ value: 'fn-2-current', isCurrent: true }])
+    store.setVersionsByResource('connector', 'cn-1', [{ value: 'cn-1-current', isCurrent: true }])
+    store.setCollVer('application', 'function', 0, LATEST_READY)
+    store.setCollVer('application', 'function', 1, LATEST_READY)
+    store.setCollVer('application', 'connector', 0, LATEST_READY)
+
+    const payload = store.composePayload()
+
+    expect(payload.dependencyOverrides).toHaveLength(3)
+    payload.dependencyOverrides.forEach((override) => {
+      expect(override.version).not.toBeNull()
+      expect(override.version).toBeTruthy()
+    })
+  })
+
+  it('sets resource_type correctly per collection type', () => {
+    const store = useReleaseStore()
+    seedScopedWithDependencies(store)
+    store.setCollVer('application', 'function', 0, 'fn-1-v1')
+    store.setCollVer('application', 'function', 1, 'fn-2-v1')
+    store.setCollVer('application', 'connector', 0, 'cn-1-v1')
+
+    const payload = store.composePayload()
+
+    const types = payload.dependencyOverrides.map((entry) => entry.resource_type)
+    expect(types).toContain('function')
+    expect(types).toContain('connector')
+  })
+
+  it('is an empty list when the scoped release has no app-managed dependencies', () => {
+    const store = useReleaseStore()
+    store.openRelease({ scopedType: 'firewall', resourceId: 'fw-1' })
+    store.setVersionsByResource('firewall', 'fw-1', [{ value: 'fw-v1', isCurrent: true }])
+
+    const payload = store.composePayload()
+
+    expect(payload.scoped).toBe(true)
+    expect(payload.dependencyOverrides).toEqual([])
+  })
+
+  it('scoped firewall NEVER emits application functions as overrides (leak fix)', () => {
+    const store = useReleaseStore()
+    store.openRelease({
+      fromVersion: true,
+      scopedType: 'firewall',
+      resourceId: 'fw-1',
+      versionId: 'fw-promoted'
+    })
+    store.seedApplicationFunctions([{ functionId: 'fn-app' }])
+    store.setCollVer('application', 'function', 0, 'fn-app-v3')
+    store.seedFirewallFunctions([])
+
+    const payload = store.composePayload()
+
+    expect(payload.scoped).toBe(true)
+    const ids = payload.dependencyOverrides.map((entry) => entry.resource_id)
+    expect(ids).not.toContain('fn-app')
+    expect(payload.dependencyOverrides).toEqual([])
+  })
+})
+
+describe('deployCtx.degraded — a failed active-release read blocks canDeploy', () => {
+  const setupSelectedDs = (store) => {
+    store.setDeployments([{ id: 'ds-1', deployment_policy: VERSIONED_URLS }])
+    store.setActiveReleaseByDs('ds-1', releaseWithApp(true))
+    store.pickDs('ds-1')
+    store.setResName(APPLICATION_TYPE, 'app-1')
+    store.setResVer(APPLICATION_TYPE, 'app-v1')
+  }
+
+  it('defaults degraded=false and allows canDeploy when the read succeeded', () => {
+    const store = useReleaseStore()
+    setupSelectedDs(store)
+
+    const ctx = store.deployCtx('ds-1')
+    expect(ctx.degraded).toBe(false)
+    expect(ctx.canDeploy).toBe(true)
+    expect(store.deployEnabled).toBe(true)
+  })
+
+  it('sets degraded=true and blocks canDeploy/deployEnabled when the read failed', () => {
+    const store = useReleaseStore()
+    setupSelectedDs(store)
+
+    store.setActiveReleaseError('ds-1', true)
+
+    const ctx = store.deployCtx('ds-1')
+    expect(ctx.degraded).toBe(true)
+    expect(ctx.canDeploy).toBe(false)
+    expect(store.deployEnabled).toBe(false)
+  })
+
+  it('recovers once the error flag is cleared (read succeeds on retry)', () => {
+    const store = useReleaseStore()
+    setupSelectedDs(store)
+    store.setActiveReleaseError('ds-1', true)
+    expect(store.deployEnabled).toBe(false)
+
+    store.setActiveReleaseError('ds-1', false)
+    expect(store.deployCtx('ds-1').degraded).toBe(false)
+    expect(store.deployEnabled).toBe(true)
+  })
+
+  it('preserves the activeReleaseErrorByDs slot across openRelease (loaded data is not wiped)', () => {
+    const store = useReleaseStore()
+    store.setActiveReleaseError('ds-1', true)
+
+    store.openRelease({ deploymentId: 'ds-1' })
+
+    expect(store.activeReleaseErrorByDs['ds-1']).toBe(true)
+  })
+})
+
+describe('versionGateSatisfied — the extracted version gate', () => {
+  it('non-scoped: gates on the application version', () => {
+    const store = useReleaseStore()
+    expect(store.versionGateSatisfied).toBe(false)
+
+    store.setResVer(APPLICATION_TYPE, LATEST_READY)
+    expect(store.versionGateSatisfied).toBe(true)
+  })
+
+  it('scoped application: gates on the application version', () => {
+    const store = useReleaseStore()
+    store.openRelease({ fromVersion: true, scopedType: APPLICATION_TYPE, resourceId: 'app-1' })
+    store.setResVer(APPLICATION_TYPE, 'app-v9')
+    expect(store.versionGateSatisfied).toBe(true)
+  })
+
+  it('scoped non-application: gates on the SCOPED resource version, not the app', () => {
+    const store = useReleaseStore()
+    store.openRelease({ fromVersion: true, scopedType: 'firewall', resourceId: 'fw-1' })
+    expect(store.versionGateSatisfied).toBe(false)
+
+    store.setResVer('firewall', 'fw-v3')
+    expect(store.versionGateSatisfied).toBe(true)
+  })
+})

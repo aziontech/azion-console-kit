@@ -1,0 +1,31 @@
+# Gitleaks per-finding suppressions (fingerprints) — HISTORY-only findings.
+# Full triage 2026-07-22: 0 live credentials in HEAD; every entry below is a
+# documented false positive or an already-removed historical value.
+# Gated by CODEOWNERS (@aziontech/security-office).
+
+# .claude/skills/storybook-add-component/SKILL.md: jwt.io canonical example token fragment in a docs skill
+8610205d88cb820abfcd3c40c5acda5815168dd3:.claude/skills/storybook-add-component/SKILL.md:generic-api-key:292
+# .env.sample: historical sample env with a real-FORMAT personal token (file deleted). RESOLVED 2026-07-22: token revoked (confirmed by the team) — no live credential remains
+6abb7906b222c395aeb49a97b201cb0fdf803fa1:.env.sample:generic-api-key:1
+# docs/edge-api/VERSIONING_TLS_API_REQS.md: throwaway self-signed example.com key used ONLY as API-doc example (file deleted)
+093b5f3febe42ae30b0b240e787316a853d25242:docs/edge-api/VERSIONING_TLS_API_REQS.md:private-key:9
+093b5f3febe42ae30b0b240e787316a853d25242:docs/edge-api/VERSIONING_TLS_API_REQS.md:private-key:21
+# src/plugins/factories/analytics-tracking-factory.js: historical Segment write keys — public by design in any SPA bundle; removed from HEAD (token now injected via env)
+0e8f8cf48b9389b34ed1cca7186b5f4853db49a0:src/plugins/factories/analytics-tracking-factory.js:generic-api-key:11
+9037e4d1091fd5cb6c5f5b7a0c6f24a95d349192:src/plugins/factories/analytics-tracking-factory.js:generic-api-key:11
+9eb67fae4a3ab5b23f90017ede3e9ab2eea44cef:src/plugins/factories/analytics-tracking-factory.js:generic-api-key:11
+# src/plugins/tracking/analytics-tracking-factory.js: historical Segment write keys — public by design in any SPA bundle; removed from HEAD
+e6ba931fec0b2fa8a5081369a895016ab3e12905:src/plugins/tracking/analytics-tracking-factory.js:generic-api-key:5
+e6ba931fec0b2fa8a5081369a895016ab3e12905:src/plugins/tracking/analytics-tracking-factory.js:generic-api-key:8
+e6ba931fec0b2fa8a5081369a895016ab3e12905:src/plugins/tracking/analytics-tracking-factory.js:generic-api-key:11
+# src/services/edge-application-services/create-edge-application-service.js: regex FP: matches the code identifier `edgeAppV3Keys.*`, not a literal secret
+b8ab9490f4854058f4e14c81e245b283d2fb86df:src/services/edge-application-services/create-edge-application-service.js:generic-api-key:17
+2a63629a5e25b7d8b6ba2610ce18e3b6d6d523ae:src/services/edge-application-services/create-edge-application-service.js:generic-api-key:18
+# src/services/edge-application-services/delete-edge-application-service.js: regex FP: code identifier, not a literal secret
+9dff0a67e3639a90ab51ec71da8521716745b552:src/services/edge-application-services/delete-edge-application-service.js:generic-api-key:15
+b8ab9490f4854058f4e14c81e245b283d2fb86df:src/services/edge-application-services/delete-edge-application-service.js:generic-api-key:15
+# src/services/edge-application-services/edit-edge-application-service.js: regex FP: code identifier, not a literal secret
+9dff0a67e3639a90ab51ec71da8521716745b552:src/services/edge-application-services/edit-edge-application-service.js:generic-api-key:45
+b8ab9490f4854058f4e14c81e245b283d2fb86df:src/services/edge-application-services/edit-edge-application-service.js:generic-api-key:45
+# src/services/hubspot-services/hubspot-form-submit-service.js: HubSpot FORM id — public identifier, not an API key (file deleted from HEAD)
+d40a287545e92fd89995ea0adf1ba77ae86acb6b:src/services/hubspot-services/hubspot-form-submit-service.js:hubspot-api-key:3

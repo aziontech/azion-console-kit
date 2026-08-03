@@ -2,7 +2,7 @@
   <CreateDrawerBlock
     v-if="loadCreateFunctionDrawer"
     v-model:visible="showCreateFunctionDrawer"
-    :createService="edgeFirewallFunctionService.createEdgeFirewallService"
+    :createService="createService"
     :schema="validationSchema"
     :initialValues="initialValues"
     :isOverlapped="isOverlapped"
@@ -36,6 +36,7 @@
     :isOverlapped="isOverlapped"
     :editService="editService"
     :schema="validationSchema"
+    :readOnly="readOnly"
     :showBarGoBack="true"
     :showShareUrl="true"
     @onSuccess="handleSuccessEdit"
@@ -48,10 +49,19 @@
         @additionalErrors="handleAdditionalErrors"
         :listEdgeFunctionsService="edgeFunctionService.listEdgeFunctionsDropdown"
         :loadEdgeFunctionService="edgeFunctionService.loadEdgeFunction"
+        :disabledFields="readOnly"
+        :deferUntilValue="true"
       />
     </template>
     <template #action-bar="{ onSubmit, onCancel, loading }">
       <ActionBarBlock
+        v-if="readOnly"
+        @onCancel="onCancel"
+        :hideSubmit="true"
+        secondaryActionLabel="Close"
+      />
+      <ActionBarBlock
+        v-else
         @onSubmit="formSubmit(onSubmit)"
         @onCancel="onCancel"
         :loading="isLoading || loading"
@@ -69,6 +79,9 @@
   import EditDrawerBlock from '@templates/edit-drawer-block'
   import FormFieldsDrawerFunction from '@/views/EdgeFirewallFunctions/FormFields/FormFieldsEdgeApplicationsFunctions'
   import ActionBarBlock from '@/templates/action-bar-block'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
+
+  const { readOnly } = useVersionContext()
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -84,8 +97,17 @@
     edgeFirewallID: {
       type: String,
       required: true
+    },
+    service: {
+      type: Object,
+      default: null
     }
   })
+
+  const createService = async (payload) => {
+    if (props.service) return await props.service.create(payload)
+    return await edgeFirewallFunctionService.createEdgeFirewallService(payload)
+  }
 
   const showCreateFunctionDrawer = ref(false)
   const showEditFunctionDrawer = ref(false)
@@ -195,6 +217,7 @@
   }
 
   const editService = async (payload) => {
+    if (props.service) return await props.service.edit(payload)
     return await edgeFirewallFunctionService.editEdgeFirewallFunctionService({
       ...payload,
       edgeFirewallID: props.edgeFirewallID
@@ -202,6 +225,9 @@
   }
 
   const loadService = async () => {
+    if (props.service) {
+      return await props.service.load({ functionID: selectedFunctionToEdit.value })
+    }
     return await edgeFirewallFunctionService.loadFunctionsService(
       props.edgeFirewallID,
       selectedFunctionToEdit.value

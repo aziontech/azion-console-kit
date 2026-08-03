@@ -6,6 +6,9 @@
   import { pageSchema } from '@/views/CustomPages/Config/validationSchema'
   import ActionBarBlock from '@templates/action-bar-block'
   import { CODE_OPTIONS } from '@/views/CustomPages/Config/listStatusCode'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
+
+  const { readOnly } = useVersionContext()
 
   defineOptions({
     name: 'custom-pages-drawer'
@@ -135,7 +138,7 @@
         primaryActionLabel="Apply"
         @onSubmit="applyStatusCodes(handleSubmit, onCancel, scrollToErrorInDrawer)"
         @onCancel="onCancel"
-        :disabled="!formValid"
+        :disabled="!formValid || readOnly"
       />
     </template>
   </EditDrawerBlock>

@@ -1,86 +1,100 @@
 name: SCC Complexity Check
+
+# Complexity trend report on PRs (informational — posts a comment, never blocks).
+# spec ci-maturity ADR-11: targets `dev` (today's integration branch) AND `main`
+# (future branching model: main + release-x.y.z — ADR-16). SCC is pinned to a
+# fixed release with checksum verification (supply-chain, req 4.2-adjacent).
 on:
   pull_request:
-    branches: [main]
+    branches: [dev, main]
+
+permissions:
+  contents: read
+  # The report is posted as a PR comment through the issues API.
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: complexity-check-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SCC_VERSION: v3.7.0
+  SCC_SHA256: 3d9d65b00ca874c2b29151abe7e1480736f5229edc3ce8e4b2791460cdfabf5a
+
 jobs:
   scc-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - name: Install dependencies and SCC
+      - name: Install pinned SCC
         run: |
-          # Ensure jq and curl are installed
-          sudo apt-get update
-          sudo apt-get install -y jq curl
-
-          # Verify jq and curl installation
-          jq --version
-          curl --version
-
-          # Create bin directory if it doesn't exist
-          mkdir -p $HOME/bin
-
-          # Download and install SCC - using the latest release URL
-          LATEST_SCC_VERSION=$(curl -s https://api.github.com/repos/boyter/scc/releases/latest | jq -r '.tag_name')
-          curl -sSLf https://github.com/boyter/scc/releases/download/${LATEST_SCC_VERSION}/scc_Linux_x86_64.tar.gz -o scc.tar.gz
-
-          mkdir -p scc_temp && tar -xzf scc.tar.gz -C scc_temp
-          mv scc_temp/scc $HOME/bin/
+          curl -sSLf "https://github.com/boyter/scc/releases/download/${SCC_VERSION}/scc_Linux_x86_64.tar.gz" -o scc.tar.gz
+          echo "${SCC_SHA256}  scc.tar.gz" | sha256sum -c -
+          mkdir -p scc_temp "$HOME/bin"
+          tar -xzf scc.tar.gz -C scc_temp
+          mv scc_temp/scc "$HOME/bin/"
           rm -rf scc_temp scc.tar.gz
-          chmod +x $HOME/bin/scc
-          export PATH=$HOME/bin:$PATH
+          chmod +x "$HOME/bin/scc"
           echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
+          "$HOME/bin/scc" --version
 
-          # Verify SCC installation
-          scc --version
       # Checkout target branch (base_ref)
       - name: Checkout target branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           ref: ${{ github.base_ref }}
           fetch-depth: 0
-      - name: Debug target branch SCC
-        run: scc
+
       - name: Calculate target branch complexity
         id: target-complexity
         run: |
           echo "TARGET_COMPLEXITY=$(scc --format=json | jq -r '[.[].Complexity] | add')" >> $GITHUB_ENV
           echo "TARGET_CODE=$(scc --format=json | jq -r '[.[].Code] | add')" >> $GITHUB_ENV
+
       # Checkout source branch (head_ref)
       - name: Checkout source branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Debug source branch SCC
-        run: scc
       - name: Calculate source branch complexity
         id: source-complexity
         run: |
           echo "SOURCE_COMPLEXITY=$(scc --format=json | jq -r '[.[].Complexity] | add')" >> $GITHUB_ENV
           echo "SOURCE_CODE=$(scc --format=json | jq -r '[.[].Code] | add')" >> $GITHUB_ENV
+
       - name: Calculate differences
         id: calculate-diff
         run: |
           echo "COMPLEXITY_DIFF=$(($SOURCE_COMPLEXITY - $TARGET_COMPLEXITY))" >> $GITHUB_ENV
           echo "CODE_DIFF=$(($SOURCE_CODE - $TARGET_CODE))" >> $GITHUB_ENV
+
+      # SECURITY: nothing from the event is template-interpolated into the
+      # script — PR title/author are attacker-controlled on a public repo.
+      # Everything is read at runtime from `context`/`process.env`
+      # (zizmor template-injection, spec fix-compliance-check phase 2).
       - name: Add PR comment
-        uses: actions/github-script@v6
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { issue: { number: issue_number }, repo: { owner, repo } } = context;
+            const pr = context.payload.pull_request;
+            const env = process.env;
 
-            github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number,
-              body: `## SCC Complexity Analysis
-            - Title: ${{ github.event.pull_request.title }}
-            - Author: ${{ github.event.pull_request.user.login }}
+            const body = [
+              '## SCC Complexity Analysis',
+              `- Title: ${pr.title}`,
+              `- Author: ${pr.user.login}`,
+              '',
+              `| Metric | Source Branch (${pr.head.ref}) | Target Branch (${pr.base.ref}) | Difference |`,
+              '|--------|--------------|--------------|------------|',
+              `| Complexity | ${env.SOURCE_COMPLEXITY} | ${env.TARGET_COMPLEXITY} | ${env.COMPLEXITY_DIFF} |`,
+              `| Code | ${env.SOURCE_CODE} | ${env.TARGET_CODE} | ${env.CODE_DIFF} |`
+            ].join('\n');
 
-            | Metric | Source Branch (${{ github.head_ref }}) | Target Branch (${{ github.base_ref }}) | Difference |
-            |--------|--------------|--------------|------------|
-            | Complexity | ${{ env.SOURCE_COMPLEXITY }} | ${{ env.TARGET_COMPLEXITY }} | ${{ env.COMPLEXITY_DIFF }} |
-            | Code | ${{ env.SOURCE_CODE }} | ${{ env.TARGET_CODE }} | ${{ env.CODE_DIFF }} |`
-            });
+            github.rest.issues.createComment({ owner, repo, issue_number, body });

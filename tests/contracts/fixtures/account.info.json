@@ -1,0 +1,7 @@
+{
+  "id": 9001,
+  "name": "Acme Corp",
+  "kind": "client",
+  "client_id": "9001",
+  "utc_offset": "+0000"
+}

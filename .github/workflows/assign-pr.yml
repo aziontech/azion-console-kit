@@ -2,10 +2,17 @@ on:
   pull_request:
     types: [opened]
 name: Assign author to PR
+
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   assignAuthor:
     name: Auto assign author to PR
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Assign author to PR
-        uses: technote-space/assign-author@v1
+        # spec ci-maturity (req 4.2): third-party action pinned by commit SHA.
+        uses: technote-space/assign-author@9558557c5c4816f38bd06176fbc324ba14bb3160 # v1

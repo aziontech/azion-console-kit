@@ -1,0 +1,27 @@
+# Gitleaks configuration — documented false-positive allowlist.
+# Triage evidence: 2026-07-22 full-history scan (187 findings, ALL false
+# positives — see docs/RUNBOOK.md §6). Gated by CODEOWNERS
+# (@aziontech/security-office): every addition here requires security review.
+
+[extend]
+# Keep the full default ruleset — this file only allowlists, never disables.
+useDefault = true
+
+[allowlist]
+description = "Audited false positives (non-credentials)"
+paths = [
+  # Azion deploy manifests: resource UUIDs (function/application ids), not keys.
+  '''azion/.*/azion\.json''',
+  # Test fixtures and mocks: fabricated tokens/certs shipped for tests only.
+  '''src/services/.*/__mocks__/.*''',
+  '''src/tests/.*''',
+  '''cypress/fixtures/.*''',
+  # Storybook demos: the canonical jwt.io example token ("John Doe").
+  '''storybook/src/stories/.*''',
+]
+regexes = [
+  # Stripe PUBLISHABLE test keys (pk_test_*) are public by design.
+  '''pk_test_[0-9a-zA-Z]+''',
+  # SSO provider config identifier (camelCase key), not a credential.
+  '''^ssoIdpScimE2e$''',
+]

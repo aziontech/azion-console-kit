@@ -1,12 +1,21 @@
-import { hasAnyFieldChanged } from '../utils/hasAnyFieldChanged'
-const keysToCheck = ['common_name', 'alternative_names']
 import { BaseService } from '@/services/v2/base/query/baseService'
 import { WorkloadAdapter } from './workload-adapter'
 import { workloadDeploymentService } from './workload-deployments-service'
 import { digitalCertificatesService } from '../digital-certificates/digital-certificates-service'
 import { DigitalCertificatesAdapter } from '../digital-certificates/digital-certificates-adapter'
+import { hasAnyFieldChanged } from '../utils/hasAnyFieldChanged'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { edgeDNSService } from '../edge-dns/edge-dns-service'
+import { hasFlagUseV6Configurations } from '@/composables/user-flag'
+
+const LE_CREATE_NEW = 1
+const LE_REUSE = 2
+const keysToCheck = ['common_name', 'alternative_names']
+
+const buildFqdn = (domain) =>
+  `${domain.subdomain ? `${domain.subdomain}.` : ''}${domain.domain || ''}`
+
+const isLetsEncryptSentinel = (value) => value === LE_CREATE_NEW || value === LE_REUSE
 
 export class WorkloadService extends BaseService {
   constructor() {
@@ -19,6 +28,7 @@ export class WorkloadService extends BaseService {
     this.digitalCertificateAdapter = DigitalCertificatesAdapter
     this.edgeDNS = edgeDNSService
 
+    this._certificateIds = new Map()
     this._certificateId = null
     this._objLetEncrypt = null
     this._workloadData = null
@@ -39,8 +49,10 @@ export class WorkloadService extends BaseService {
   }
 
   #fetchOne = async ({ id }) => {
+    const isV6 = hasFlagUseV6Configurations()
+
     const [workloadDeployment, zonesResponse, workloadResponse] = await Promise.all([
-      this.workloadDeployment.listWorkloadDeployment(id),
+      isV6 ? Promise.resolve(null) : this.workloadDeployment.listWorkloadDeployment(id),
       this.edgeDNS
         .listEdgeDNSService({ fields: ['domain'], active: 'True' })
         .catch(() => ({ body: [] })),
@@ -49,9 +61,13 @@ export class WorkloadService extends BaseService {
 
     const zones = (zonesResponse?.body || []).map((zone) => zone.domain?.content ?? zone.domain)
 
+    // dev: certificate enrichment · ours: optional chaining on the deployment
     const workload =
-      this.adapter?.transformLoadWorkload?.(workloadResponse.data, workloadDeployment[0], zones) ??
-      workloadResponse.data
+      this.adapter?.transformLoadWorkload?.(
+        workloadResponse.data,
+        workloadDeployment?.[0],
+        zones
+      ) ?? workloadResponse.data
 
     const certificateMetadata = await this.#loadCertificateMetadata(workload.tls?.certificate)
 
@@ -73,6 +89,12 @@ export class WorkloadService extends BaseService {
     }
   }
 
+  loadWorkloadBindings = async (id) => {
+    const { data } = await this.http.request({ method: 'GET', url: `${this.baseURL}/${id}` })
+    const workload = data?.data ?? data
+    return Array.isArray(workload?.bindings) ? workload.bindings : []
+  }
+
   prefetchList = (pageSize = 10) => {
     const params = {
       page: 1,
@@ -83,8 +105,57 @@ export class WorkloadService extends BaseService {
     return this.usePrefetchQuery(queryKeys.workload.list(params), () => this.#fetchList(params))
   }
 
-  #ensureCertificate = async (payload) => {
-    if (!payload.tls || (payload.tls.certificate !== 1 && payload.tls.certificate !== 2)) return
+  useWorkloadsListQuery = ({
+    enabled,
+    params = { page: 1, pageSize: 100, ordering: '-last_modified' }
+  } = {}) =>
+    this.useQuery(queryKeys.workload.list(params), () => this.#fetchList(params), {
+      persist: false,
+      enabled
+    })
+
+  #createDomainLetEncrypt = async (payload, domain) => {
+    const fqdn = buildFqdn(domain)
+    if (!fqdn) return null
+
+    const cached = this._certificateIds.get(fqdn)
+    if (cached) {
+      domain.certificate = cached
+      return cached
+    }
+
+    const letEncryptPayload = {
+      ...payload,
+      letEncrypt: { commonName: fqdn, alternativeNames: [] },
+      tls: { ...(payload.tls || {}), certificate: domain.certificate }
+    }
+
+    const opts = domain.certificate === LE_REUSE ? domain.certificate : null
+    const { id } = await this.digitalCertificate.createDigitalCertificateLetEncrypt(
+      letEncryptPayload,
+      opts
+    )
+
+    domain.certificate = id
+    this._certificateIds.set(fqdn, id)
+    return id
+  }
+
+  #ensureCertificateV6 = async (payload) => {
+    if (!Array.isArray(payload.domains) || !payload.domains.length) return
+
+    for (const domain of payload.domains) {
+      if (!isLetsEncryptSentinel(domain.certificate)) continue
+      await this.#createDomainLetEncrypt(payload, domain)
+    }
+  }
+
+  #ensureCertificateLegacy = async (payload) => {
+    if (
+      !payload.tls ||
+      (payload.tls.certificate !== LE_CREATE_NEW && payload.tls.certificate !== LE_REUSE)
+    )
+      return
     const shouldCreate =
       this._certificateId == null ||
       hasAnyFieldChanged(this.digitalCertificateAdapter, this._objLetEncrypt, payload, keysToCheck)
@@ -143,10 +214,16 @@ export class WorkloadService extends BaseService {
     this._workloadData = null
   }
 
-  createWorkload = async (payload) => {
-    await this.#ensureCertificate(payload)
+  createWorkload = async (payload, isV6 = false) => {
+    if (isV6) {
+      await this.#ensureCertificateV6(payload)
+    } else {
+      await this.#ensureCertificateLegacy(payload)
+    }
     const workload = await this.#ensureWorkload(payload)
-    await this.#ensureDeployment(payload, workload.id)
+    if (!isV6) {
+      await this.#ensureDeployment(payload, workload.id)
+    }
 
     this.queryClient.invalidateQueries({ queryKey: queryKeys.workload.all })
     this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
@@ -186,13 +263,19 @@ export class WorkloadService extends BaseService {
     return workload
   }
 
-  editWorkload = async (payload) => {
-    await this.#ensureCertificateForEdit(payload)
-    await this.#updateWorkload(payload)
-    if (payload.workloadDeploymentId) {
-      await this.#updateDeployment(payload)
+  editWorkload = async (payload, isV6 = false) => {
+    if (isV6) {
+      await this.#ensureCertificateForEditV6(payload)
     } else {
-      await this.#ensureDeployment(payload, payload.id)
+      await this.#ensureCertificateForEditLegacy(payload)
+    }
+    await this.#updateWorkload(payload)
+    if (!isV6) {
+      if (payload.workloadDeploymentId) {
+        await this.#updateDeployment(payload)
+      } else {
+        await this.#ensureDeployment(payload, payload.id)
+      }
     }
 
     this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
@@ -200,19 +283,12 @@ export class WorkloadService extends BaseService {
     return 'Your workload has been updated'
   }
 
-  #dropFirstAzion = (domains) => {
-    return domains.filter((domain, index) => !(index === 0 && domain.endsWith('.azion.app')))
-  }
-
-  #handleDomains = (payload) => {
-    const [first, ...rest] = payload.domains
-
-    const commonName = `${first.subdomain ? `${first.subdomain}.` : ''}${first.domain}`
-    const alternativeNames = rest
-      .map(({ subdomain, domain }) => `${subdomain ? `${subdomain}.` : ''}${domain}`)
-      .filter((name) => name.trim() !== '.')
-    payload.letEncrypt.commonName = commonName
-    payload.letEncrypt.alternativeNames = alternativeNames.filter((name) => name !== '')
+  #initialFqdnSet = () => {
+    return new Set(
+      (this.initialDomains || [])
+        .map((domain) => (typeof domain === 'string' ? domain : domain?.name))
+        .filter(Boolean)
+    )
   }
 
   #certificateIsWildcard = (subjctName) => {
@@ -265,8 +341,55 @@ export class WorkloadService extends BaseService {
     return this.#hasUncoveredHostnamesForWildcard(subjctName, hostnames)
   }
 
-  #ensureCertificateForEdit = async (payload) => {
-    const isNewCertificate = payload.tls.certificate === 1
+  #ensureCertificateForEditV6 = async (payload) => {
+    if (!Array.isArray(payload.domains) || !payload.domains.length) return
+
+    const initialFqdns = this.#initialFqdnSet()
+
+    for (const domain of payload.domains) {
+      if (!isLetsEncryptSentinel(domain.certificate)) continue
+
+      const fqdn = buildFqdn(domain)
+      if (!fqdn) continue
+
+      const isNewCertificate = domain.certificate === LE_CREATE_NEW
+      let shouldCreate = isNewCertificate
+
+      if (!isNewCertificate) {
+        const hostnameChanged = !initialFqdns.has(fqdn)
+        const skipRecreation = this.#shouldSkipLetsEncryptRecreation({
+          changed: hostnameChanged,
+          subjctName: payload.subjctName,
+          hostnames: [fqdn]
+        })
+
+        if (skipRecreation) continue
+        shouldCreate = hostnameChanged
+      }
+
+      if (!shouldCreate) continue
+
+      await this.#createDomainLetEncrypt(payload, domain)
+    }
+  }
+
+  #dropFirstAzion = (domains) => {
+    return domains.filter((domain, index) => !(index === 0 && domain.endsWith('.azion.app')))
+  }
+
+  #handleDomains = (payload) => {
+    const [first, ...rest] = payload.domains
+
+    const commonName = `${first.subdomain ? `${first.subdomain}.` : ''}${first.domain}`
+    const alternativeNames = rest
+      .map(({ subdomain, domain }) => `${subdomain ? `${subdomain}.` : ''}${domain}`)
+      .filter((name) => name.trim() !== '.')
+    payload.letEncrypt.commonName = commonName
+    payload.letEncrypt.alternativeNames = alternativeNames.filter((name) => name !== '')
+  }
+
+  #ensureCertificateForEditLegacy = async (payload) => {
+    const isNewCertificate = payload.tls.certificate === LE_CREATE_NEW
     const isLetsEncrypt = payload.authorityCertificate === 'lets_encrypt'
 
     const [commonName, ...alternativeNames] = this.#dropFirstAzion(this.initialDomains)
@@ -347,6 +470,18 @@ export class WorkloadService extends BaseService {
     this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
 
     return `Workload successfully deleted.`
+  }
+
+  deleteDomain = async (id) => {
+    await this.http.request({
+      method: 'DELETE',
+      url: `v3/domains/${id}`,
+      config: { baseURL: '/api' }
+    })
+
+    this.queryClient.removeQueries({ queryKey: queryKeys.workload.all })
+
+    return `Domain successfully deleted.`
   }
 
   getWorkloadFromCache = (id) => {

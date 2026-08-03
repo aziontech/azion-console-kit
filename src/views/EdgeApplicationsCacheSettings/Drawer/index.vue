@@ -6,6 +6,7 @@
   import { refDebounced } from '@vueuse/core'
   import { ref, inject, computed } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   import {
     CDN_MAXIMUM_TTL_MAX_VALUE,
@@ -20,6 +21,9 @@
   defineOptions({
     name: 'edge-application-cache-settings-drawer'
   })
+
+  const { readOnly } = useVersionContext()
+
   const emit = defineEmits(['onSuccess'])
 
   const props = defineProps({
@@ -298,15 +302,17 @@
     :loadService="loadCacheSettingsServiceWithDecorator"
     :editService="editCacheSettingsServiceWithDecorator"
     :schema="validationSchema"
+    :readOnly="readOnly"
     @onSuccess="handleEditedCacheSettings"
     @onError="handleFailedToEdit"
     title="Edit Cache Settings"
     :isOverlapped="props.isOverlapped"
   >
-    <template #formFields>
+    <template #formFields="{ disabledFields }">
       <FormFieldsEdgeApplicationCacheSettings
         :isApplicationAcceleratorEnabled="isApplicationAcceleratorEnabled"
         :showTieredCache="props.showTieredCache"
+        :disabledFields="disabledFields"
         @tiered-caching-enabled="setNewMinimumValue"
       />
     </template>

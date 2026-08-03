@@ -25,6 +25,8 @@ const normalizeParams = (params) => {
   return normalized
 }
 
+const normalizeId = (id) => (id === null || id === undefined ? id : String(id))
+
 export const queryKeys = {
   account: {
     all: ['account'],
@@ -146,12 +148,113 @@ export const queryKeys = {
         'detail',
         id
       ]
+    },
+    version: {
+      all: (parentId) => [...queryKeys.application.detail(normalizeId(parentId)), 'versions'],
+      list: (parentId, params) =>
+        params === undefined
+          ? [...queryKeys.application.version.all(parentId), 'list']
+          : [...queryKeys.application.version.all(parentId), 'list', normalizeParams(params)],
+      detail: (parentId, versionId) => [
+        ...queryKeys.application.version.all(parentId),
+        'detail',
+        normalizeId(versionId)
+      ],
+      cacheSettings: {
+        all: (parentId, versionId) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'cache-settings'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'cache-settings',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'cache-settings',
+          'detail',
+          id
+        ]
+      },
+      deviceGroups: {
+        all: (parentId, versionId) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'device-groups'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'device-groups',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'device-groups',
+          'detail',
+          id
+        ]
+      },
+      functions: {
+        all: (parentId, versionId) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'functions'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'functions',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'functions',
+          'detail',
+          id
+        ]
+      },
+      rulesEngine: {
+        all: (parentId, versionId) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'rules-engine'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'rules-engine',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.application.version.detail(parentId, versionId),
+          'rules-engine',
+          'detail',
+          id
+        ]
+      }
     }
   },
   workload: {
     all: ['workloads'],
     list: (params) => [...queryKeys.workload.all, 'list', normalizeParams(params)],
-    detail: (id) => [...queryKeys.workload.all, 'detail', id]
+    detail: (id) => [...queryKeys.workload.all, 'detail', id],
+    metrics: (id, params) => [...queryKeys.workload.detail(id), 'metrics', normalizeParams(params)],
+    version: {
+      all: (parentId) => [...queryKeys.workload.detail(normalizeId(parentId)), 'versions'],
+      list: (parentId) => [...queryKeys.workload.version.all(parentId), 'list'],
+      detail: (parentId, versionId) => [
+        ...queryKeys.workload.version.all(parentId),
+        'detail',
+        normalizeId(versionId)
+      ]
+    },
+    versions: (id, params) => [
+      ...queryKeys.workload.detail(id),
+      'versions',
+      normalizeParams(params)
+    ],
+    currentVersion: (id) => [...queryKeys.workload.detail(id), 'current-version'],
+    versionStats: (id) => [...queryKeys.workload.detail(id), 'version-stats']
   },
   firewall: {
     all: ['edge-firewalls'],
@@ -180,6 +283,51 @@ export const queryKeys = {
         'detail',
         id
       ]
+    },
+    version: {
+      all: (parentId) => [...queryKeys.firewall.detail(normalizeId(parentId)), 'versions'],
+      list: (parentId) => [...queryKeys.firewall.version.all(parentId), 'list'],
+      detail: (parentId, versionId) => [
+        ...queryKeys.firewall.version.all(parentId),
+        'detail',
+        normalizeId(versionId)
+      ],
+      functions: {
+        all: (parentId, versionId) => [
+          ...queryKeys.firewall.version.detail(parentId, versionId),
+          'functions'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.firewall.version.detail(parentId, versionId),
+          'functions',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.firewall.version.detail(parentId, versionId),
+          'functions',
+          'detail',
+          id
+        ]
+      },
+      rulesEngine: {
+        all: (parentId, versionId) => [
+          ...queryKeys.firewall.version.detail(parentId, versionId),
+          'rules-engine'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.firewall.version.detail(parentId, versionId),
+          'rules-engine',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.firewall.version.detail(parentId, versionId),
+          'rules-engine',
+          'detail',
+          id
+        ]
+      }
     }
   },
   teams: {
@@ -198,10 +346,114 @@ export const queryKeys = {
     all: ['variables'],
     list: () => [...queryKeys.variables.all, 'list']
   },
+  variablesV6: {
+    all: ['variables-v6'],
+    list: (params) => [...queryKeys.variablesV6.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.variablesV6.all, 'detail', id],
+    versions: {
+      all: (id) => [...queryKeys.variablesV6.detail(normalizeId(id)), 'versions'],
+      list: (id, params) => [
+        ...queryKeys.variablesV6.versions.all(id),
+        'list',
+        normalizeParams(params)
+      ]
+    }
+  },
+  environments: {
+    all: ['environments'],
+    list: (params) => [...queryKeys.environments.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.environments.all, 'detail', id]
+  },
+  deployments: {
+    all: ['deployments'],
+    list: (params) => [...queryKeys.deployments.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.deployments.all, 'detail', id],
+    versions: {
+      all: (deploymentId) => [
+        ...queryKeys.deployments.detail(normalizeId(deploymentId)),
+        'versions'
+      ],
+      list: (deploymentId, params) => [
+        ...queryKeys.deployments.versions.all(deploymentId),
+        'list',
+        normalizeParams(params)
+      ],
+      detail: (deploymentId, versionId) => [
+        ...queryKeys.deployments.versions.all(deploymentId),
+        'detail',
+        normalizeId(versionId)
+      ]
+    },
+    history: {
+      all: ['deployments-history'],
+      global: (params) => [...queryKeys.deployments.history.all, 'global', normalizeParams(params)],
+      byDeployment: (deploymentId, params) => [
+        ...queryKeys.deployments.history.all,
+        'by-deployment',
+        deploymentId,
+        normalizeParams(params)
+      ]
+    },
+    releases: {
+      all: (deploymentId) => [...queryKeys.deployments.detail(deploymentId), 'releases'],
+      list: (deploymentId, params) => [
+        ...queryKeys.deployments.releases.all(deploymentId),
+        'list',
+        normalizeParams(params)
+      ],
+      detail: (deploymentId, releaseId) => [
+        ...queryKeys.deployments.releases.all(deploymentId),
+        'detail',
+        releaseId
+      ],
+      logs: (traceId, begin, end) => [
+        ...queryKeys.deployments.all,
+        'releases',
+        'logs',
+        traceId,
+        begin,
+        end
+      ]
+    }
+  },
+  deployment: {
+    all: ['deployment'],
+    list: (params) => [...queryKeys.deployment.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.deployment.all, 'detail', id]
+  },
+  release: {
+    all: (deploymentId) => [...queryKeys.deployment.detail(deploymentId), 'releases'],
+    list: (deploymentId, params) => [
+      ...queryKeys.release.all(deploymentId),
+      'list',
+      normalizeParams(params)
+    ],
+    detail: (deploymentId, releaseId) => [
+      ...queryKeys.release.all(deploymentId),
+      'detail',
+      releaseId
+    ],
+    activeComposition: (deploymentId) => [
+      ...queryKeys.release.all(deploymentId),
+      'active-composition'
+    ]
+  },
   edgeFunction: {
     all: ['edge-functions'],
     list: (params) => [...queryKeys.edgeFunction.all, 'list', normalizeParams(params)],
-    detail: (id) => [...queryKeys.edgeFunction.all, 'detail', id]
+    detail: (id) => [...queryKeys.edgeFunction.all, 'detail', id],
+    version: {
+      all: (parentId) => [...queryKeys.edgeFunction.detail(normalizeId(parentId)), 'versions'],
+      list: (parentId, params) =>
+        params === undefined
+          ? [...queryKeys.edgeFunction.version.all(parentId), 'list']
+          : [...queryKeys.edgeFunction.version.all(parentId), 'list', normalizeParams(params)],
+      detail: (parentId, versionId) => [
+        ...queryKeys.edgeFunction.version.all(parentId),
+        'detail',
+        normalizeId(versionId)
+      ]
+    }
   },
   edgeDNS: {
     all: ['edge-dns'],
@@ -254,6 +506,23 @@ export const queryKeys = {
     list: (params) => [...queryKeys.edgeConnectors.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.edgeConnectors.all, 'detail', id]
   },
+  connector: {
+    all: ['connectors'],
+    list: (params) => [...queryKeys.connector.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.connector.all, 'detail', id],
+    version: {
+      all: (parentId) => [...queryKeys.connector.detail(normalizeId(parentId)), 'versions'],
+      list: (parentId, params) =>
+        params === undefined
+          ? [...queryKeys.connector.version.all(parentId), 'list']
+          : [...queryKeys.connector.version.all(parentId), 'list', normalizeParams(params)],
+      detail: (parentId, versionId) => [
+        ...queryKeys.connector.version.all(parentId),
+        'detail',
+        normalizeId(versionId)
+      ]
+    }
+  },
   teamPermission: {
     all: ['team-permissions'],
     list: (params) => [...queryKeys.teamPermission.all, 'list', normalizeParams(params)],
@@ -264,7 +533,37 @@ export const queryKeys = {
     list: (params) => [...queryKeys.waf.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.waf.all, 'detail', id],
     allowed: (wafId, params) => [...queryKeys.waf.all, 'allowed', wafId, normalizeParams(params)],
-    domains: (wafId) => [...queryKeys.waf.all, 'domains', wafId]
+    domains: (wafId) => [...queryKeys.waf.all, 'domains', wafId],
+    version: {
+      all: (parentId) => [...queryKeys.waf.detail(normalizeId(parentId)), 'versions'],
+      list: (parentId, params) =>
+        params === undefined
+          ? [...queryKeys.waf.version.all(parentId), 'list']
+          : [...queryKeys.waf.version.all(parentId), 'list', normalizeParams(params)],
+      detail: (parentId, versionId) => [
+        ...queryKeys.waf.version.all(parentId),
+        'detail',
+        normalizeId(versionId)
+      ],
+      exceptions: {
+        all: (parentId, versionId) => [
+          ...queryKeys.waf.version.detail(parentId, versionId),
+          'exceptions'
+        ],
+        list: (parentId, versionId, params) => [
+          ...queryKeys.waf.version.detail(parentId, versionId),
+          'exceptions',
+          'list',
+          normalizeParams(params)
+        ],
+        detail: (parentId, versionId, id) => [
+          ...queryKeys.waf.version.detail(parentId, versionId),
+          'exceptions',
+          'detail',
+          id
+        ]
+      }
+    }
   },
   edgeSql: {
     all: ['edge-sql'],
@@ -282,20 +581,71 @@ export const queryKeys = {
     detail: (id) => [...queryKeys.networkLists.all, 'detail', id],
     dropdown: (params) => [...queryKeys.networkLists.all, 'dropdown', normalizeParams(params)]
   },
+  networkList: {
+    all: ['network-list'],
+    detail: (id) => [...queryKeys.networkList.all, 'detail', id],
+    version: {
+      all: (parentId) => [...queryKeys.networkList.detail(normalizeId(parentId)), 'versions'],
+      list: (parentId, params) =>
+        params === undefined
+          ? [...queryKeys.networkList.version.all(parentId), 'list']
+          : [...queryKeys.networkList.version.all(parentId), 'list', normalizeParams(params)],
+      detail: (parentId, versionId) => [
+        ...queryKeys.networkList.version.all(parentId),
+        'detail',
+        normalizeId(versionId)
+      ]
+    }
+  },
   digitalCertificates: {
     all: ['digital-certificates'],
     list: (params) => [...queryKeys.digitalCertificates.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.digitalCertificates.all, 'detail', id]
   },
+  digitalCertificatesV6: {
+    all: ['digital-certificates-v6'],
+    list: (params) => [...queryKeys.digitalCertificatesV6.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.digitalCertificatesV6.all, 'detail', id],
+    versions: {
+      all: (id) => [...queryKeys.digitalCertificatesV6.detail(normalizeId(id)), 'versions'],
+      list: (id, params) => [
+        ...queryKeys.digitalCertificatesV6.versions.all(id),
+        'list',
+        normalizeParams(params)
+      ]
+    }
+  },
   customPages: {
     all: ['custom-pages'],
     list: (params) => [...queryKeys.customPages.all, 'list', normalizeParams(params)],
-    detail: (id) => [...queryKeys.customPages.all, 'detail', id]
+    detail: (id) => [...queryKeys.customPages.all, 'detail', id],
+    version: {
+      all: (parentId) => [...queryKeys.customPages.detail(normalizeId(parentId)), 'versions'],
+      list: (parentId) => [...queryKeys.customPages.version.all(parentId), 'list'],
+      detail: (parentId, versionId) => [
+        ...queryKeys.customPages.version.all(parentId),
+        'detail',
+        normalizeId(versionId)
+      ]
+    }
   },
   digitalCertificatesCRL: {
     all: ['digital-certificates-crl'],
     list: (params) => [...queryKeys.digitalCertificatesCRL.all, 'list', normalizeParams(params)],
     detail: (id) => [...queryKeys.digitalCertificatesCRL.all, 'detail', id]
+  },
+  digitalCertificatesCRLV6: {
+    all: ['digital-certificates-crl-v6'],
+    list: (params) => [...queryKeys.digitalCertificatesCRLV6.all, 'list', normalizeParams(params)],
+    detail: (id) => [...queryKeys.digitalCertificatesCRLV6.all, 'detail', id],
+    versions: {
+      all: (id) => [...queryKeys.digitalCertificatesCRLV6.detail(normalizeId(id)), 'versions'],
+      list: (id, params) => [
+        ...queryKeys.digitalCertificatesCRLV6.versions.all(id),
+        'list',
+        normalizeParams(params)
+      ]
+    }
   },
   users: {
     all: ['users'],

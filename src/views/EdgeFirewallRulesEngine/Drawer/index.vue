@@ -6,9 +6,12 @@
   import * as yup from 'yup'
   import { ref, inject } from 'vue'
   import { handleTrackerError } from '@/utils/errorHandlingTracker'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   import { edgeFirewallRulesEngineService } from '@/services/v2/edge-firewall/edge-firewall-rules-engine-service'
   import { wafService } from '@/services/v2/waf/waf-service'
+
+  const { readOnly } = useVersionContext()
 
   /**@type {import('@/plugins/adapters/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
@@ -43,8 +46,18 @@
     loadNetworkListService: {
       type: Function,
       required: true
+    },
+    service: {
+      type: Object,
+      default: null
+    },
+    enabledModules: {
+      type: Object,
+      default: null
     }
   })
+
+  const rulesEngineService = props.service ?? edgeFirewallRulesEngineService
 
   const showCreateRulesEngineDrawer = ref(false)
   const showEditRulesEngineDrawer = ref(false)
@@ -187,20 +200,20 @@
   }
 
   const createEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
-    return await edgeFirewallRulesEngineService.createEdgeFirewallRulesEngineService(
+    return await rulesEngineService.createEdgeFirewallRulesEngineService(
       props.edgeFirewallId,
       payload
     )
   }
 
   const loadEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
-    return await edgeFirewallRulesEngineService.loadEdgeFirewallRulesEngineService({
+    return await rulesEngineService.loadEdgeFirewallRulesEngineService({
       edgeFirewallId: props.edgeFirewallId,
       id: payload.id
     })
   }
   const editEdgeFirewallRulesEngineServiceWithDecorator = async (payload) => {
-    return await edgeFirewallRulesEngineService.editEdgeFirewallRulesEngineService(
+    return await rulesEngineService.editEdgeFirewallRulesEngineService(
       props.edgeFirewallId,
       payload
     )
@@ -230,6 +243,7 @@
   >
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
+        :enabledModules="enabledModules"
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :listWafRulesService="wafService.listWafRules"
         :listNetworkListService="listNetworkListService"
@@ -247,6 +261,7 @@
     :loadService="loadEdgeFirewallRulesEngineServiceWithDecorator"
     :editService="editEdgeFirewallRulesEngineServiceWithDecorator"
     :schema="validationSchema"
+    :readOnly="readOnly"
     :isOverlapped="isOverlapped"
     @onError="handleFailedEditEdgeFirewallRules"
     @onSuccess="handleEditWithSuccess"
@@ -254,12 +269,13 @@
   >
     <template #formFields>
       <FormFieldsEdgeFirewallRulesEngine
-        :enabledModules="edgeFirewallModules"
+        :enabledModules="enabledModules"
         :hasEdgeFunctionsProductAccess="hasEdgeFunctionsProductAccess"
         :listWafRulesService="wafService.listWafRules"
         :listNetworkListService="listNetworkListService"
         :loadNetworkListService="loadNetworkListService"
         :loadWafRulesService="wafService.loadWafRule"
+        :disabledFields="readOnly"
         @isOverlapped="handleIsOverlapped"
       />
     </template>

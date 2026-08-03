@@ -2,9 +2,9 @@
   import { onMounted, computed, ref, inject } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import PrimeButton from '@aziontech/webkit/button'
-  import { columnBuilder } from '@/components/list-table/columns/column-builder'
   import ListTable from '@/components/list-table/ListTable.vue'
   import { edgeApplicationFunctionService } from '@/services/v2/edge-app/edge-application-functions-service'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
   import DrawerFunction from './Drawer'
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
@@ -20,8 +20,18 @@
     documentationService: {
       required: true,
       type: Function
+    },
+    service: {
+      type: Object,
+      default: null
+    },
+    versionId: {
+      type: String,
+      default: null
     }
   })
+
+  const { readOnly, isVersioned } = useVersionContext()
 
   const router = useRouter()
   const route = useRoute()
@@ -47,15 +57,8 @@
       {
         field: 'name',
         header: 'Name',
-        type: 'component',
         filterPath: 'name.text',
-        style: 'max-width: 300px',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-format-with-popup'
-          })
-        }
+        style: 'max-width: 300px'
       },
       {
         field: 'functionInstanced',
@@ -78,6 +81,9 @@
   })
 
   const listEdgeApplicationFunctions = async (query) => {
+    if (props.service) {
+      return await props.service.list(query)
+    }
     return await edgeApplicationFunctionService.listEdgeApplicationFunctions(
       props.edgeApplicationId,
       query
@@ -85,6 +91,9 @@
   }
 
   const deleteFunctionsWithDecorator = async (functionId) => {
+    if (props.service) {
+      return await props.service.remove(functionId)
+    }
     return await edgeApplicationFunctionService.deleteEdgeApplicationFunction(
       functionId,
       props.edgeApplicationId
@@ -113,15 +122,22 @@
     drawerFunctionRef.value.openDrawerEdit(data.id)
   }
 
-  const actions = [
-    {
-      label: 'Delete',
-      type: 'delete',
-      title: 'function instance',
-      icon: 'pi pi-trash',
-      service: deleteFunctionsWithDecorator
+  const actions = computed(() => {
+    if (readOnly.value) {
+      return []
     }
-  ]
+    return [
+      {
+        label: 'Delete',
+        type: 'delete',
+        title: 'function instance',
+        icon: 'pi pi-trash',
+        service: deleteFunctionsWithDecorator
+      }
+    ]
+  })
+
+  const editInDrawer = openEditFunctionDrawer
 
   const handleTrackClickToCreate = () => {
     tracker.product
@@ -159,19 +175,21 @@
   <DrawerFunction
     ref="drawerFunctionRef"
     :edgeApplicationId="edgeApplicationId"
+    :service="service"
+    :versionId="versionId"
     @onSuccess="reloadList"
   />
   <ListTable
     ref="listTableRef"
     :listService="listEdgeApplicationFunctions"
     :columns="getColumns"
-    :editInDrawer="openEditFunctionDrawer"
+    :editInDrawer="editInDrawer"
     :actions="actions"
     defaultOrderingFieldName="name"
     :apiFields="FUNCTIONS_API_FIELDS"
     exportFileName="Application Function Instances"
     :lazy="true"
-    :isTabs="true"
+    :isTabs="!isVersioned"
     :emptyBlock="{
       title: 'No Functions have been instantiated',
       description: 'Click the button below to instantiate your first Function.',
@@ -181,8 +199,17 @@
     }"
     @on-before-go-to-edit="handleBeforeGoToEdit"
   >
+    <template #column-name="{ data }">
+      <span
+        class="block truncate"
+        data-testid="list-table-block__column__name__row"
+      >
+        {{ data.name?.text ?? data.name }}
+      </span>
+    </template>
     <template #emptyBlockButton>
       <PrimeButton
+        v-if="!readOnly"
         icon="pi pi-plus"
         data-testid="functions-instance__create-button"
         severity="secondary"

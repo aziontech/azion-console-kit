@@ -1,0 +1,26 @@
+{
+  "id": "AVDEP0001",
+  "deployment_id": "ADEP0001",
+  "name": "release-42",
+  "state": "ready",
+  "state_detail": null,
+  "description": "ship it",
+  "updated_at": "2026-06-18T10:05:00Z",
+  "created_at": "2026-06-18T10:00:00Z",
+  "last_modified_by": { "email": "editor@azion.com" },
+  "created_by": "creator@azion.com",
+  "resources": [
+    {
+      "resource_id": 900,
+      "resource_type": "application",
+      "resource_name": "my-app",
+      "resource_version_id": "AVAPP0007"
+    },
+    {
+      "resource_id": 901,
+      "resource_type": "firewall",
+      "resource_name": "my-fw",
+      "resource_version_id": "AVFW0007"
+    }
+  ]
+}

@@ -1,4 +1,13 @@
 import * as Helpers from '@/helpers'
+import { hasFlagUseV6Configurations } from '@/composables/user-flag'
+
+export const certificatesTabGuard = (to) => {
+  if (to.params.tab && !hasFlagUseV6Configurations()) {
+    return '/not-found'
+  }
+
+  return true
+}
 
 const certificateTypeMapping = {
   certificateRevogationList: {
@@ -26,7 +35,10 @@ export const digitalCertificatesRoutes = {
     {
       path: '',
       name: 'list-digital-certificates',
-      component: () => import('@views/DigitalCertificates/ListView.vue'),
+      component: () =>
+        hasFlagUseV6Configurations()
+          ? import('@views/DigitalCertificates/v6/ListView.vue')
+          : import('@views/DigitalCertificates/ListView.vue'),
       meta: {
         title: 'Certificate Manager',
         breadCrumbs: [
@@ -40,7 +52,10 @@ export const digitalCertificatesRoutes = {
     {
       path: 'create',
       name: 'create-digital-certificates',
-      component: () => import('@views/DigitalCertificates/CreateView.vue'),
+      component: () =>
+        hasFlagUseV6Configurations()
+          ? import('@views/DigitalCertificates/v6/CreateView.vue')
+          : import('@views/DigitalCertificates/CreateView.vue'),
       meta: {
         title: 'Create Digital Certificate',
         breadCrumbs: [
@@ -68,11 +83,16 @@ export const digitalCertificatesRoutes = {
       }
     },
     {
-      path: 'edit/:id',
+      path: 'edit/:id/:tab?',
       name: 'edit-digital-certificates',
-      component: () => import('@views/DigitalCertificates/EditView.vue'),
+      component: () =>
+        hasFlagUseV6Configurations()
+          ? import('@views/DigitalCertificates/v6/EditView.vue')
+          : import('@views/DigitalCertificates/EditView.vue'),
+      beforeEnter: certificatesTabGuard,
       props: {
-        documentationService: Helpers.documentationGuideProducts.generateLetsEncryptCertificate
+        documentationService: Helpers.documentationGuideProducts.generateLetsEncryptCertificate,
+        resourceKind: 'certificate'
       },
       meta: {
         title: 'Edit Digital Certificate',
@@ -91,6 +111,27 @@ export const digitalCertificatesRoutes = {
           },
           {
             to: '/digital-certificates/edit',
+            dynamic: true,
+            routeParam: 'id'
+          }
+        ]
+      }
+    },
+    {
+      path: 'edit-crl/:id/:tab?',
+      name: 'edit-crl-digital-certificates',
+      component: () => import('@views/DigitalCertificates/v6/EditView.vue'),
+      props: { resourceKind: 'crl' },
+      meta: {
+        title: 'Edit CRL',
+        flag: 'use_v6_configurations',
+        breadCrumbs: [
+          {
+            label: 'Certificate Manager',
+            to: '/digital-certificates'
+          },
+          {
+            to: '/digital-certificates/edit-crl',
             dynamic: true,
             routeParam: 'id'
           }

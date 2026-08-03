@@ -1,0 +1,23 @@
+{
+  "count": 2,
+  "results": [
+    {
+      "id": 41,
+      "card_holder": "JOAO SANTOS",
+      "card_brand": "Mastercard",
+      "card_last_4_digits": "1111",
+      "card_expiration_month": 1,
+      "card_expiration_year": 2024,
+      "is_default": false
+    },
+    {
+      "id": 42,
+      "card_holder": "ANA SILVA",
+      "card_brand": "Visa",
+      "card_last_4_digits": "4242",
+      "card_expiration_month": 12,
+      "card_expiration_year": 2099,
+      "is_default": true
+    }
+  ]
+}

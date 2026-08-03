@@ -8,7 +8,6 @@
 
   const handleTextDomainWorkload = TEXT_DOMAIN_WORKLOAD()
   import { workloadService } from '@/services/v2/workload/workload-service'
-  import { deleteDomainService } from '@/services/domains-services'
   import {
     documentationSecureProducts,
     documentationBuildProducts
@@ -20,6 +19,13 @@
 
   /**@type {import('@/plugins/analytics/AnalyticsTrackerAdapter').AnalyticsTrackerAdapter} */
   const tracker = inject('tracker')
+
+  const props = defineProps({
+    isV6: {
+      type: Boolean,
+      default: false
+    }
+  })
 
   const router = useRouter()
   const createDomainPath = `${handleTextDomainWorkload.pluralLabel}/create?origin=list`
@@ -38,7 +44,7 @@
       title: `${handleTextDomainWorkload.singularTitle}`,
       icon: 'pi pi-trash',
       tooltip: 'Delete',
-      service: isWorkload.value ? workloadService.deleteWorkload : deleteDomainService
+      service: isWorkload.value ? workloadService.deleteWorkload : workloadService.deleteDomain
     }
   ]
 
@@ -78,7 +84,7 @@
   })
 
   const getColumns = computed(() => {
-    return [
+    const columns = [
       {
         field: 'name',
         header: 'Name',
@@ -161,6 +167,8 @@
         filterPath: 'lastModified'
       }
     ]
+
+    return props.isV6 ? columns.filter((column) => column.field !== 'workloadHostname') : columns
   })
 
   const allowedFilters = computed(() =>

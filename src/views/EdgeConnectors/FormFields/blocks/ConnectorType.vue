@@ -13,7 +13,7 @@
           :options="connectorTypeList"
           :value="type"
           data-testid="edge-connectors-form__connector-type__type-field"
-          :disabled="isEditRoute"
+          :disabled="isEditRoute || readOnly"
         />
       </div>
     </template>
@@ -26,6 +26,7 @@
   import { computed } from 'vue'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
   import FieldGroupRadio from '@aziontech/webkit/field-group-radio'
+  import { useVersionContext } from '@/composables/versioning/use-version-context'
 
   defineProps({
     isDrawer: {
@@ -37,6 +38,7 @@
   defineOptions({ name: 'EdgeConnectorsFormFieldsConnectorType' })
 
   const { value: type } = useField('type')
+  const { readOnly } = useVersionContext()
 
   const connectorTypeList = [
     {

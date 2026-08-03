@@ -1,0 +1,153 @@
+import { describe, it, expect } from 'vitest'
+import { buildVersionMenuItems } from '@/composables/versioning/version-actions'
+import { VERSION_STATES } from '@/composables/versioning/version-machine'
+
+const FIXED_ORDER = [
+  'OPEN_CONFIGURATION',
+  'BUILD',
+  'DEPLOY',
+  'PROMOTE',
+  'ROLLBACK',
+  'ARCHIVE',
+  'DELETE'
+]
+const ORDER_WITHOUT_DELETE = FIXED_ORDER.slice(0, -1)
+
+const ALL_STATES = [...Object.values(VERSION_STATES), 'deleted', 'totally-unknown']
+
+const RESOURCE_TYPES = ['edge_application', 'edge_firewall', 'edge_connector', 'custom_pages']
+
+const BUILD_ENABLED_STATES = [VERSION_STATES.DRAFT, VERSION_STATES.CANCELED, VERSION_STATES.ERROR]
+const DEPLOY_ENABLED_STATES = [VERSION_STATES.READY, VERSION_STATES.ACTIVE]
+const PROMOTE_ENABLED_STATES = [VERSION_STATES.READY]
+const ARCHIVE_ENABLED_STATES = [VERSION_STATES.READY, VERSION_STATES.ERROR, VERSION_STATES.CANCELED]
+
+const actionsOf = (items) => items.map((entry) => entry.action)
+const byAction = (items, action) => items.find((entry) => entry.action === action)
+
+describe('buildVersionMenuItems — P1: same set + order regardless of resourceType', () => {
+  it.each(ALL_STATES)('state "%s" yields the fixed order across resourceTypes', (state) => {
+    const expectedOrder = state === 'deleted' ? ORDER_WITHOUT_DELETE : FIXED_ORDER
+
+    RESOURCE_TYPES.forEach((resourceType) => {
+      const items = buildVersionMenuItems(state, { resourceType })
+      expect(actionsOf(items)).toEqual(expectedOrder)
+    })
+  })
+
+  it('produces an identical item set for two different resourceTypes (same state)', () => {
+    const fromApp = buildVersionMenuItems(VERSION_STATES.READY, {
+      resourceType: 'edge_application'
+    })
+    const fromFw = buildVersionMenuItems(VERSION_STATES.READY, { resourceType: 'edge_firewall' })
+    expect(fromApp).toEqual(fromFw)
+  })
+})
+
+describe('buildVersionMenuItems — P2: never hide (items present, disabled not absent)', () => {
+  it.each(ALL_STATES.filter((state) => state !== 'deleted'))(
+    'state "%s" keeps all 7 items present',
+    (state) => {
+      const items = buildVersionMenuItems(state)
+      expect(items).toHaveLength(7)
+      expect(actionsOf(items)).toEqual(FIXED_ORDER)
+    }
+  )
+
+  it('omits ONLY Delete when the version is already deleted', () => {
+    const items = buildVersionMenuItems('deleted')
+    expect(items).toHaveLength(6)
+    expect(actionsOf(items)).toEqual(ORDER_WITHOUT_DELETE)
+    expect(byAction(items, 'DELETE')).toBeUndefined()
+  })
+
+  it.each(ALL_STATES)('unavailable actions are disabled, never removed (state "%s")', (state) => {
+    const items = buildVersionMenuItems(state)
+    items.forEach((entry) => expect(typeof entry.disabled).toBe('boolean'))
+    ;['OPEN_CONFIGURATION', 'BUILD', 'DEPLOY', 'PROMOTE', 'ROLLBACK', 'ARCHIVE'].forEach(
+      (action) => {
+        expect(byAction(items, action)).toBeDefined()
+      }
+    )
+  })
+})
+
+describe('buildVersionMenuItems — P3: enablement matrix', () => {
+  it.each(ALL_STATES)('Open configuration is always enabled (state "%s")', (state) => {
+    expect(byAction(buildVersionMenuItems(state), 'OPEN_CONFIGURATION').disabled).toBe(false)
+  })
+
+  it.each(ALL_STATES)('Build is enabled iff the state is editable (state "%s")', (state) => {
+    const expectedEnabled = BUILD_ENABLED_STATES.includes(state)
+    const build = byAction(buildVersionMenuItems(state), 'BUILD')
+    expect(build.disabled).toBe(!expectedEnabled)
+    if (!expectedEnabled) expect(build.tooltip).toBeTruthy()
+  })
+
+  it.each(ALL_STATES)('Deploy is enabled iff the state is ready/active (state "%s")', (state) => {
+    const expectedEnabled = DEPLOY_ENABLED_STATES.includes(state)
+    const deploy = byAction(buildVersionMenuItems(state), 'DEPLOY')
+    expect(deploy.disabled).toBe(!expectedEnabled)
+    if (!expectedEnabled) expect(deploy.tooltip).toBeTruthy()
+  })
+
+  it.each(ALL_STATES)('Rollback is always disabled with a tooltip (state "%s")', (state) => {
+    const rollback = byAction(buildVersionMenuItems(state), 'ROLLBACK')
+    expect(rollback.disabled).toBe(true)
+    expect(rollback.tooltip).toBeTruthy()
+  })
+
+  it.each(ALL_STATES)('Promote is enabled iff the state is ready (state "%s")', (state) => {
+    const expectedEnabled = PROMOTE_ENABLED_STATES.includes(state)
+    const promote = byAction(buildVersionMenuItems(state), 'PROMOTE')
+    expect(promote.disabled).toBe(!expectedEnabled)
+    if (!expectedEnabled) expect(promote.tooltip).toBeTruthy()
+  })
+
+  it.each(ALL_STATES)(
+    'Archive is enabled iff state ∈ {ready, error, canceled} (state "%s")',
+    (state) => {
+      const expectedEnabled = ARCHIVE_ENABLED_STATES.includes(state)
+      const archive = byAction(buildVersionMenuItems(state), 'ARCHIVE')
+      expect(archive.disabled).toBe(!expectedEnabled)
+    }
+  )
+
+  it.each(ALL_STATES)(
+    'Delete is present (enabled) iff state is not deleted (state "%s")',
+    (state) => {
+      const deleteItem = byAction(buildVersionMenuItems(state), 'DELETE')
+      if (state === 'deleted') {
+        expect(deleteItem).toBeUndefined()
+      } else {
+        expect(deleteItem).toBeDefined()
+        expect(deleteItem.disabled).toBe(false)
+        expect(deleteItem.danger).toBe(true)
+        expect(deleteItem.separatorBefore).toBe(true)
+      }
+    }
+  )
+})
+
+describe('buildVersionMenuItems — P4: purity (same input → same output, no side effects)', () => {
+  it.each(ALL_STATES)('returns deep-equal output for repeated calls (state "%s")', (state) => {
+    const first = buildVersionMenuItems(state, { resourceType: 'edge_application' })
+    const second = buildVersionMenuItems(state, { resourceType: 'edge_application' })
+    expect(first).toEqual(second)
+  })
+
+  it('does not mutate the ctx argument', () => {
+    const ctx = { resourceType: 'edge_application', resourceId: 42 }
+    const snapshot = JSON.stringify(ctx)
+    buildVersionMenuItems(VERSION_STATES.READY, ctx)
+    expect(JSON.stringify(ctx)).toBe(snapshot)
+  })
+
+  it('returns a fresh array each call (no shared mutable reference)', () => {
+    const first = buildVersionMenuItems(VERSION_STATES.READY)
+    const second = buildVersionMenuItems(VERSION_STATES.READY)
+    expect(first).not.toBe(second)
+    first[0].label = 'mutated'
+    expect(second[0].label).not.toBe('mutated')
+  })
+})

@@ -1,0 +1,13 @@
+{
+  "data": {
+    "lastTrialCredit": [
+      {
+        "created": "2026-07-01",
+        "amount": 300,
+        "clientId": "9001",
+        "entryType": "trial_credit",
+        "expirationDate": "2026-08-01"
+      }
+    ]
+  }
+}

@@ -15,6 +15,10 @@ const getConfig = () => {
   const DomainSuffix = IS_PROD ? 'net' : 'com'
   const DEBUG_PROXY = env.VITE_DEBUG_PROXY === 'true' && !IS_PROD
   const BEHOLDER_URL = env.VITE_BEHOLDER_URL
+  const deploymentApiUrl = IS_PROD ? 'https://deployment-api.azion.app' : 'https://deployment-api-stage.azion.app'
+  const environmentApiUrl = IS_PROD ? 'https://environment-api.azion.app' : 'https://environment-api-stage.azion.app'
+  const variablesApiUrl = IS_PROD ? 'https://variables.azion.com' : 'https://stage-variables.azion.com'
+  const tlsApiUrl = IS_PROD ? 'https://tls-api.azion.net' : 'https://stage-tls-api.azion.net'
 
   const createProxyConfig = ({ target, rewrite, changeOrigin = true, cookieDomainRewrite }) => ({
     target,
@@ -136,6 +140,22 @@ const getConfig = () => {
             ? 'https://jkjuyhi0gza.map.azionedge.net'
             : 'https://urvlgkvpxla.map.azionedge.net',
           rewrite: (path) => path.replace(/^\/edge_api/, '')
+        }),
+        '/deployment-api': createProxyConfig({
+          target: deploymentApiUrl,
+          rewrite: (path) => path.replace(/^\/deployment-api/, '')
+        }),
+        '/environment-api': createProxyConfig({
+          target: environmentApiUrl,
+          rewrite: (path) => path.replace(/^\/environment-api/, '')
+        }),
+        '/variables-api': createProxyConfig({
+          target: variablesApiUrl,
+          rewrite: (path) => path.replace(/^\/variables-api/, '')
+        }),
+        '/tls-api': createProxyConfig({
+          target: tlsApiUrl,
+          rewrite: (path) => path.replace(/^\/tls-api/, '')
         })
       }
     }

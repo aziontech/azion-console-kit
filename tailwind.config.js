@@ -6,21 +6,12 @@ export default {
   content: [
     './index.html',
     './src/**/*.{vue,js,ts,jsx,tsx}',
-    './node_modules/@aziontech/webkit/**/*.{vue,js,ts,jsx,tsx}'
+    './node_modules/@aziontech/webkit/**/*.{vue,js,ts,jsx,tsx}' 
   ],
   darkMode: ['class', '.dark', '.azion.azion-dark'],
   theme: {
     fontFamily: {
-      sans: [
-        'Sora',
-        'ui-sans-serif',
-        'system-ui',
-        'sans-serif',
-        'Apple Color Emoji',
-        'Segoe UI Emoji',
-        'Segoe UI Symbol',
-        'Noto Color Emoji'
-      ]
+      sans: ['Sora', 'ui-sans-serif', 'system-ui', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji']
     },
     listStyleType: {
       none: 'none',
@@ -92,12 +83,12 @@ export default {
         fadeOut: 'fadeOut 220ms ease-in-out',
         slideDown: 'slideDown 220ms ease-in-out',
         blink: 'blink 1.4s infinite both',
-        'highlight-fade': 'highlight ease-in forwards'
+        'highlight-fade': 'highlight ease-in forwards',
       },
       keyframes: {
         highlight: {
-          '0%': { backgroundColor: 'var(--surface-hover)', fontWeight: '500' },
-          '100%': { backgroundColor: 'var(--surface-hover)', fontWeight: '500' }
+          '0%': { backgroundColor: 'var(--surface-hover)', fontWeight: '500'},
+          '100%': { backgroundColor: 'var(--surface-hover)',  fontWeight: '500'}
         },
         fadeIn: {
           '0%': { opacity: '0' },

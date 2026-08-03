@@ -13,6 +13,17 @@ export const useBreadcrumbs = defineStore({
       }
 
       this.items = items.map((item) => {
+        const to =
+          item.toRoute && route
+            ? {
+                name: item.toRoute.name,
+                params: (item.toRoute.params || []).reduce((acc, key) => {
+                  if (route.params[key] !== undefined) acc[key] = route.params[key]
+                  return acc
+                }, {})
+              }
+            : item.to
+
         if (item.dynamic && item.queryParam && item.baseLabel) {
           const paramValue = route.query[item.queryParam]
 
@@ -22,6 +33,7 @@ export const useBreadcrumbs = defineStore({
             if (mappedValue) {
               return {
                 ...item,
+                to,
                 label: mappedValue
               }
             }
@@ -29,19 +41,31 @@ export const useBreadcrumbs = defineStore({
             const routeType = item.baseLabel.toLowerCase().includes('create') ? 'create' : 'edit'
             return {
               ...item,
+              to,
               label: item.typeMapping[paramValue][routeType] || item.label || item.baseLabel
             }
           }
 
           return {
             ...item,
+            to,
             label: item.label || (paramValue ? `${item.baseLabel} - ${paramValue}` : item.baseLabel)
+          }
+        }
+
+        if (item.dynamic && item.routeParam && item.useParamValue) {
+          const paramValue = route.params[item.routeParam]
+          return {
+            ...item,
+            to,
+            label: paramValue || item.label
           }
         }
 
         if (item.dynamic && item.routeParam && entityName) {
           return {
             ...item,
+            to,
             label: entityName
           }
         }
@@ -51,6 +75,7 @@ export const useBreadcrumbs = defineStore({
           const isNumericId = paramValue && !isNaN(paramValue)
           return {
             ...item,
+            to,
             label: isNumericId ? null : paramValue || item.label,
             isLoading: isNumericId
           }

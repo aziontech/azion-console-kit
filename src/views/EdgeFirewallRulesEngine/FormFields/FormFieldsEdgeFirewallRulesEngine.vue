@@ -42,6 +42,14 @@
     loadNetworkListService: {
       type: Function,
       required: true
+    },
+    enabledModules: {
+      type: Object,
+      default: null
+    },
+    disabledFields: {
+      type: Boolean,
+      default: false
     }
   })
   const route = useRoute()
@@ -65,7 +73,8 @@
   }
 
   const YEAR_IN_SECONDS = 31536000
-  const enabledModules = ref({})
+  const loadedModules = ref({})
+  const enabledModules = computed(() => props.enabledModules ?? loadedModules.value)
   const DEFAULT_CRITERIA_OPTION = {
     variable: '',
     operator: '',
@@ -81,7 +90,7 @@
   const { push: pushCriteria, remove: removeCriteria, fields: criteria } = useFieldArray('criteria')
   const hasWafAccess = ref(true)
   onMounted(async () => {
-    loaderEdgeFirewall()
+    if (!props.enabledModules) loaderEdgeFirewall()
   })
 
   const listWafRulesServiceOptions = async (query) => {
@@ -448,7 +457,7 @@
       edgeFunctionsEnabled: edgeFunctions
     } = edgeFirewall
 
-    enabledModules.value = {
+    loadedModules.value = {
       webApplicationFirewall,
       debugRules,
       networkProtectionLayer,
@@ -530,6 +539,7 @@
         name="name"
         data-testid="edge-firewall-rule-form__name"
         :value="name"
+        :disabled="disabledFields"
         placeholder="My rule"
         description="Give a unique and descriptive name to identify the rule."
       />
@@ -538,6 +548,7 @@
         name="description"
         data-testid="edge-firewall-rule-form__description"
         :value="description"
+        :disabled="disabledFields"
         description="Add a short description or comment to the rule."
       />
     </template>
@@ -596,6 +607,7 @@
                 optionDisabled="disabled"
                 class="w-full"
                 icon="pi pi-dollar"
+                :disabled="disabledFields"
               />
             </div>
 
@@ -613,7 +625,9 @@
                 :data-testid="`edge-firewall-rules-form__operator[${criteriaInnerRowIndex}]`"
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].operator`"
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
-                :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].variable"
+                :disabled="
+                  !criteria[criteriaIndex].value[criteriaInnerRowIndex].variable || disabledFields
+                "
               />
             </div>
 
@@ -623,7 +637,9 @@
                 :name="`criteria[${criteriaIndex}][${criteriaInnerRowIndex}].argument`"
                 :value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
                 inputClass="w-full"
-                :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
+                :disabled="
+                  !criteria[criteriaIndex].value[criteriaInnerRowIndex].operator || disabledFields
+                "
                 :data-testid="`edge-firewall-rules-form__argument[${criteriaIndex}][${criteriaInnerRowIndex}]`"
               />
               <FieldDropdown
@@ -635,7 +651,9 @@
                 optionValue="value"
                 v-bind:value="criteria[criteriaIndex].value[criteriaInnerRowIndex].argument"
                 class="w-full"
-                :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
+                :disabled="
+                  !criteria[criteriaIndex].value[criteriaInnerRowIndex].operator || disabledFields
+                "
               />
               <FieldDropdownLazyLoader
                 v-if="showNetworkListDropdownField({ criteriaIndex, criteriaInnerRowIndex })"
@@ -648,7 +666,9 @@
                 optionValue="id"
                 :value="Number(criteria[criteriaIndex].value[criteriaInnerRowIndex].argument)"
                 inputClass="w-full"
-                :disabled="!criteria[criteriaIndex].value[criteriaInnerRowIndex].operator"
+                :disabled="
+                  !criteria[criteriaIndex].value[criteriaInnerRowIndex].operator || disabledFields
+                "
               >
                 <template #footer>
                   <ul class="p-2">
@@ -784,6 +804,7 @@
               :key="`${behaviorItem.key}-name`"
               :name="`behaviors[${behaviorItemIndex}].name`"
               :options="behaviorsOptions(behaviors[behaviorItemIndex].value)"
+              :disabled="disabledFields"
               filter
               placeholder="Select a behavior"
               optionLabel="label"
@@ -807,6 +828,7 @@
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]-function`"
                 :key="`${behaviorItem.key}-run-function`"
                 :name="`behaviors[${behaviorItemIndex}].functionId`"
+                :disabled="disabledFields"
                 placeholder="Select an function"
                 optionLabel="name"
                 optionValue="id"
@@ -839,6 +861,7 @@
               <FieldDropdownLazyLoader
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf`"
                 :name="`behaviors[${behaviorItemIndex}].id`"
+                :disabled="disabledFields"
                 :service="listWafRulesServiceOptions"
                 :loadService="loadWafRulesService"
                 @onAccessDenied="notPermission"
@@ -873,6 +896,7 @@
                 :data-testid="`edge-firewall-rule-form__behaviors[${behaviorItemIndex}]__waf-mode`"
                 :key="`${behaviorItem.key}-mode`"
                 :name="`behaviors[${behaviorItemIndex}].mode`"
+                :disabled="disabledFields"
                 :options="[
                   {
                     label: 'Logging',
@@ -896,6 +920,7 @@
                 :key="`${behaviorItem.key}-type`"
                 placeholder="Select rate limit type"
                 :name="`behaviors[${behaviorItemIndex}].type`"
+                :disabled="disabledFields"
                 :options="[
                   { label: 'Req/s', value: 'second' },
                   { label: 'Req/min', value: 'minute' }
@@ -914,6 +939,7 @@
                 inputClass="w-full mb-3"
                 :value="behaviors[behaviorItemIndex].value.average_rate_limit"
                 :name="`behaviors[${behaviorItemIndex}].average_rate_limit`"
+                :disabled="disabledFields"
                 :min="0"
                 :max="YEAR_IN_SECONDS"
                 :step="1"
@@ -923,6 +949,7 @@
                 :key="`${behaviorItem.key}-limitBy`"
                 placeholder="Select limit by"
                 :name="`behaviors[${behaviorItemIndex}].limit_by`"
+                :disabled="disabledFields"
                 :options="[
                   { label: 'Client IP address', value: 'client_ip' },
                   { label: 'Global', value: 'global' }
@@ -942,6 +969,7 @@
                   inputClass="w-full mb-3"
                   :value="behaviors[behaviorItemIndex].value.maximum_burst_size"
                   :name="`behaviors[${behaviorItemIndex}].maximum_burst_size`"
+                  :disabled="disabledFields"
                   :min="0"
                   :step="1"
                 />
@@ -956,6 +984,7 @@
                 inputClass="w-full mb-3"
                 :value="behaviors[behaviorItemIndex].value.status_code"
                 :name="`behaviors[${behaviorItemIndex}].status_code`"
+                :disabled="disabledFields"
                 :min="200"
                 :max="499"
               />
@@ -967,6 +996,7 @@
                 class="w-full mb-3"
                 :value="behaviors[behaviorItemIndex].value.content_type"
                 :name="`behaviors[${behaviorItemIndex}].content_type`"
+                :disabled="disabledFields"
               />
               <FieldText
                 id="`behaviors[${behaviorItemIndex}].content_body`"
@@ -975,6 +1005,7 @@
                 class="w-full mb-3"
                 :value="behaviors[behaviorItemIndex].value.content_body"
                 :name="`behaviors[${behaviorItemIndex}].content_body`"
+                :disabled="disabledFields"
               />
             </template>
           </div>
@@ -1006,6 +1037,7 @@
           auto
           :isCard="false"
           title="Active"
+          :disabled="disabledFields"
         />
       </div>
     </template>

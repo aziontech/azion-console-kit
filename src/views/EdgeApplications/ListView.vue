@@ -135,8 +135,12 @@
 
   const frozenColumns = ['name']
 
+  const nonFilterableHeaders = ['Last Modified', 'Last Version']
+
   const allowedFilters = computed(() => {
-    return getColumns.value.filter((col) => col.header && col.header !== 'Last Modified')
+    return getColumns.value.filter(
+      (col) => col.header && !nonFilterableHeaders.includes(col.header)
+    )
   })
 
   const handleBeforeGoToAddPage = () => {
