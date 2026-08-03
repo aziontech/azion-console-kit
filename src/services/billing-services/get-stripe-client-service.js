@@ -9,9 +9,7 @@ const LEGACY_STRIPE_ENV_VAR = {
 }
 
 const resolveStripeToken = (environment) => {
-  return (
-    getRuntimeConfig().stripeToken || import.meta.env[LEGACY_STRIPE_ENV_VAR[environment]]
-  )
+  return getRuntimeConfig().stripeToken || import.meta.env[LEGACY_STRIPE_ENV_VAR[environment]]
 }
 
 const makeStripeClient = async (environment) => {
