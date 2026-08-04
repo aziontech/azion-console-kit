@@ -24,7 +24,7 @@ const transformScopePayload = (scope) => {
   return scope.map((item) => {
     if (item.type === 'global') return { resource_type: 'global' }
     const type = item.type === 'resource' ? item.resourceType : item.type
-    return { resource_type: type, [`${type}_id`]: item.id }
+    return { resource_type: type, resource_id: item.id }
   })
 }
 
