@@ -1,6 +1,6 @@
 <script setup>
   import { computed, ref, watch } from 'vue'
-  import { useField } from 'vee-validate'
+  import { useField, useFormValues } from 'vee-validate'
   import PrimeButton from '@aziontech/webkit/button'
   import FieldDropdown from '@aziontech/webkit/field-dropdown'
   import { environmentService } from '@/services/v2/environment/environment-service'
@@ -24,6 +24,40 @@
   const { value: typeValue } = useField(typeFieldName.value)
   const { value: resourceTypeValue } = useField(resourceTypeFieldName.value)
   const { value: idValue } = useField(idFieldName.value)
+
+  const formValues = useFormValues()
+  const allScopes = computed(() => formValues.value?.scope ?? [])
+
+  const isGlobalTakenElsewhere = computed(() =>
+    allScopes.value.some((scope, position) => position !== props.index && scope?.type === 'global')
+  )
+
+  const scopeTypeOptions = computed(() =>
+    SCOPE_TYPE_OPTIONS.map((option) =>
+      option.value === 'global' ? { ...option, disabled: isGlobalTakenElsewhere.value } : option
+    )
+  )
+
+  const currentInstanceKey = computed(() =>
+    typeValue.value === 'resource' ? resourceTypeValue.value : typeValue.value
+  )
+
+  const takenInstanceIds = computed(() => {
+    const taken = new Set()
+    allScopes.value.forEach((scope, position) => {
+      if (position === props.index || !scope?.id) return
+      const scopeKey = scope.type === 'resource' ? scope.resourceType : scope.type
+      if (scopeKey && scopeKey === currentInstanceKey.value) taken.add(scope.id)
+    })
+    return taken
+  })
+
+  const instanceOptions = computed(() =>
+    options.value.map((option) => ({
+      ...option,
+      disabled: takenInstanceIds.value.has(option.value)
+    }))
+  )
 
   const isResource = computed(() => typeValue.value === 'resource')
   const showResourceType = computed(() => isResource.value)
@@ -105,12 +139,13 @@
     <div class="flex items-end gap-2">
       <div class="flex flex-wrap gap-3 w-full">
         <FieldDropdown
-          :options="SCOPE_TYPE_OPTIONS"
+          :options="scopeTypeOptions"
           :name="typeFieldName"
           label="Type"
           placeholder="Select a scope type"
           optionLabel="label"
           optionValue="value"
+          optionDisabled="disabled"
           required
           class="flex-1 min-w-[12rem]"
           :data-testid="`variables-form__scope-type-${index}`"
@@ -129,12 +164,13 @@
         />
         <FieldDropdown
           v-if="showInstance"
-          :options="options"
+          :options="instanceOptions"
           :name="idFieldName"
           :label="instanceLabel"
           :placeholder="loadingOptions ? 'Loading...' : `Select a ${instanceLabel.toLowerCase()}`"
           optionLabel="label"
           optionValue="value"
+          optionDisabled="disabled"
           filter
           :loading="loadingOptions"
           :disabled="loadingOptions"
