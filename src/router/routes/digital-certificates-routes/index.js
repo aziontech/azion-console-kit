@@ -131,7 +131,13 @@ export const digitalCertificatesRoutes = {
             to: '/digital-certificates'
           },
           {
-            to: '/digital-certificates/edit-crl',
+            label: 'CRL',
+            to: {
+              path: '/digital-certificates',
+              query: { certificate: 'certificateRevogationList' }
+            }
+          },
+          {
             dynamic: true,
             routeParam: 'id'
           }

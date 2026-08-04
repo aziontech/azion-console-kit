@@ -1,5 +1,5 @@
 <script setup>
-  import { useFieldArray } from 'vee-validate'
+  import { useFieldArray, useFormValues } from 'vee-validate'
   import PrimeButton from '@aziontech/webkit/button'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import FormHorizontal from '@/templates/create-form-block/form-horizontal'
@@ -8,9 +8,12 @@
   defineOptions({ name: 'form-fields-scope' })
 
   const { fields, push, remove } = useFieldArray('scope')
+  const formValues = useFormValues()
 
   const addScope = () => {
-    push({ type: 'global', resourceType: '', id: '' })
+    const scopes = formValues.value?.scope ?? []
+    const hasGlobal = scopes.some((scope) => scope?.type === 'global')
+    push({ type: hasGlobal ? '' : 'global', resourceType: '', id: '' })
   }
 </script>
 
