@@ -282,27 +282,27 @@ describe('VariablesV6Adapter — transformCreatePayload scope', () => {
     ])
   })
 
-  it('maps environment and deployment scopes to their <type>_id', () => {
+  it('maps environment and deployment scopes to resource_id', () => {
     expect(
       buildScope([
         { type: 'environment', resourceType: '', id: '123' },
         { type: 'deployment', resourceType: '', id: '456' }
       ])
     ).toEqual([
-      { resource_type: 'environment', environment_id: '123' },
-      { resource_type: 'deployment', deployment_id: '456' }
+      { resource_type: 'environment', resource_id: '123' },
+      { resource_type: 'deployment', resource_id: '456' }
     ])
   })
 
-  it('maps a resource scope to its concrete resourceType and <resourceType>_id', () => {
+  it('maps a resource scope to its concrete resourceType and resource_id', () => {
     expect(
       buildScope([
         { type: 'resource', resourceType: 'application', id: '1001' },
         { type: 'resource', resourceType: 'firewall', id: '999' }
       ])
     ).toEqual([
-      { resource_type: 'application', application_id: '1001' },
-      { resource_type: 'firewall', firewall_id: '999' }
+      { resource_type: 'application', resource_id: '1001' },
+      { resource_type: 'firewall', resource_id: '999' }
     ])
   })
 
