@@ -6,7 +6,7 @@ name: SCC Complexity Check
 # fixed release with checksum verification (supply-chain, req 4.2-adjacent).
 on:
   pull_request:
-    branches: [dev, main]
+    branches: [main, feat/oss-decoupling-dev]
 
 permissions:
   contents: read

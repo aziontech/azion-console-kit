@@ -10,6 +10,8 @@ on:
     branches: ['main', 'master', 'dev', 'develop', 'stage']
   schedule:
     - cron: '0 6 * * 1' # weekly measurement on the default branch
+  push:
+    branches: [main, feat/oss-decoupling-dev]
   workflow_dispatch:
 
 permissions: {}

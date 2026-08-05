@@ -2,11 +2,9 @@ name: Package Audit
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-    branches:
-      - dev
+    branches: [main, feat/oss-decoupling-dev]
   push:
-    branches:
-      - dev
+    branches: [main, feat/oss-decoupling-dev]
   
 env:
   HUSKY: 0

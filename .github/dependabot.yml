@@ -1,7 +1,7 @@
 # Dependency updates (skill fix-compliance-check, phase 2).
 version: 2
 updates:
-  - package-ecosystem: npm
+  - package-ecosystem: yarn
     directory: '/'
     schedule:
       interval: weekly
