@@ -9,6 +9,9 @@ const domainSuffix = environment === 'production' ? 'net' : 'com'
 const edgeApiHost =
   environment === 'production' ? 'jkjuyhi0gza.map.azionedge.net' : 'urvlgkvpxla.map.azionedge.net'
 
+const billingApiHost =
+  environment === 'production' ? 'billing-api.azion.app' : 'billing-api-stage.azion.app'
+
 const addStagePrefix = (origin) => {
   if (environment === 'stage') {
     return origin?.map(({ hostHeader, addresses, ...rest }) => {
@@ -158,6 +161,12 @@ const config = {
       addresses: [`automate.azion.net`]
     },
     {
+      name: 'origin-billing-api',
+      type: 'single_origin',
+      hostHeader: billingApiHost,
+      addresses: [billingApiHost]
+    },
+    {
       name: 'origin-help-center',
       type: 'single_origin',
       hostHeader: 'storage.googleapis.com',
@@ -275,7 +284,7 @@ const config = {
         name: 'Set Cache for Static Assets',
         description: 'Sets the cache for all requests using the default object storage.',
         match:
-          '^(?!.*workspace/storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$',
+          '^(?!.*workspace/storage)(?!/v4/).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml)$',
         behavior: {
           enableGZIP: true,
           setCache: 'Statics - Cache'
@@ -297,7 +306,7 @@ const config = {
         description:
           'Sets the storage origin and deliver for all requests using the default object storage.',
         match:
-          '^(?!.*workspace/storage).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml|html)$',
+          '^(?!.*workspace/storage)(?!/v4/).*.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml|html)$',
         behavior: {
           setOrigin: {
             name: 'origin-storage-default',
@@ -491,6 +500,20 @@ const config = {
             name: 'origin-api',
             type: 'single_origin'
           }
+        }
+      },
+      {
+        name: 'Route Billing API v4 Requests',
+        description:
+          'Routes billing v4 account and billing_accounts requests to the billing API origin.',
+        match: '^/v4/(account/(billing|payments|subscriptions)|billing_accounts)',
+        behavior: {
+          setOrigin: {
+            name: 'origin-billing-api',
+            type: 'single_origin'
+          },
+          forwardCookies: true,
+          bypassCache: true
         }
       },
       {
