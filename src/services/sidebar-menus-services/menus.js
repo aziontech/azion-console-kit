@@ -203,7 +203,6 @@ function createStoreItems() {
       label: 'SQL Database',
       to: '/sql-database',
       icon: 'ai ai-edge-sql',
-      tag: 'Preview',
       id: 'sql-database'
     }
   ]
