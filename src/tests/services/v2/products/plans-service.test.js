@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { productsPlansService } from '@/services/v2/products/plans-service'
 import { ProductsPlansAdapter } from '@/services/v2/products/plans-adapter'
 
-describe('ProductsPlansService.listPlans (mocked products-api /plans)', () => {
+describe('ProductsPlansService.listPlans (static plans catalog)', () => {
   it('returns the catalogue transformed to the app plan shape', async () => {
     const plans = await productsPlansService.listPlans()
 

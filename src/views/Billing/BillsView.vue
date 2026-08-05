@@ -350,7 +350,7 @@
     return promise
   }
 
-  const { defaultPaymentMethod } = useWallet()
+  const { defaultPaymentMethod, refetch: refetchWallet } = useWallet()
 
   const formatBrandName = (brand) => {
     if (!brand) return ''
@@ -999,11 +999,13 @@
   ])
 
   const reloadList = async () => {
+    const tasks = [refetchWallet()]
     if (hasContentToList.value) {
-      await listTableRef.value?.reload()
-      return
+      tasks.push(listTableRef.value?.reload())
+    } else {
+      hasContentToList.value = true
     }
-    hasContentToList.value = true
+    await Promise.allSettled(tasks)
   }
 
   defineExpose({

@@ -6,6 +6,7 @@
     >
       <span class="text-base leading-none text-default">Payment Method</span>
       <ActionButton
+        v-if="showCancel"
         kind="text"
         size="small"
         label="Cancel"
@@ -110,7 +111,8 @@
   const props = defineProps({
     stripeClientService: { type: Function, required: true },
     clientSecret: { type: String, default: '' },
-    showHeader: { type: Boolean, default: true }
+    showHeader: { type: Boolean, default: true },
+    showCancel: { type: Boolean, default: true }
   })
 
   const themeStore = useThemeStore()

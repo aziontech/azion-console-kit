@@ -29,12 +29,6 @@
       field="service"
       class="font-medium !text-base"
     />
-    <Column
-      field="value"
-      class="font-medium !text-sm"
-      bodyStyle="text-align:right"
-      v-if="accountIsNotRegular"
-    />
     <template #expansion="slotProps">
       <div class="p-0 m-0">
         <DataTable
@@ -60,12 +54,6 @@
             }"
             bodyStyle="text-align:right"
           />
-          <Column
-            field="price"
-            :header="expansionColuns.price"
-            bodyStyle="text-align:right"
-            v-if="accountIsNotRegular"
-          />
         </DataTable>
       </div>
     </template>
@@ -77,12 +65,6 @@
   import DataTable from '@aziontech/webkit/datatable'
   import Column from '@aziontech/webkit/column'
   import SkeletonBlock from '@/templates/skeleton-block'
-  import { useAccountStore } from '@/stores/account'
-  import { storeToRefs } from 'pinia'
-
-  const accountStore = useAccountStore()
-
-  const { accountIsNotRegular } = storeToRefs(accountStore)
 
   defineOptions({
     name: 'table-services-products'

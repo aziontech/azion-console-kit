@@ -52,7 +52,7 @@ vi.mock('@/templates/checkout-block/payment-method-block.vue', () =>
   stubBlock('PaymentMethodBlock', ['checkoutSessionClientSecret'])
 )
 vi.mock('@/templates/checkout-block/payment-method-setup-block.vue', () =>
-  stubBlock('PaymentMethodSetupBlock', ['clientSecret'])
+  stubBlock('PaymentMethodSetupBlock', ['clientSecret', 'showCancel'])
 )
 vi.mock('@/templates/checkout-block/address-information-block.vue', () =>
   stubBlock('AddressInformationBlock')
@@ -101,6 +101,7 @@ describe('DrawerPlanInfo — card capture for entitled subscriptions', () => {
     const setupBlock = findByName(wrapper, 'PaymentMethodSetupBlock')
     expect(setupBlock.exists()).toBe(true)
     expect(setupBlock.props('clientSecret')).toBe('seti_minted_secret_123')
+    expect(setupBlock.props('showCancel')).toBe(false)
   })
 
   it('adopts a prepared seti_ secret in subscribe mode instead of the checkout element', async () => {
@@ -154,8 +155,18 @@ describe('DrawerPlanInfo — card capture for entitled subscriptions', () => {
     await flush()
 
     expect(walletMutations.createSetupIntent).toHaveBeenCalledOnce()
-    expect(findByName(wrapper, 'PaymentMethodSetupBlock').props('clientSecret')).toBe(
-      'seti_minted_secret_123'
-    )
+    const setupBlock = findByName(wrapper, 'PaymentMethodSetupBlock')
+    expect(setupBlock.props('clientSecret')).toBe('seti_minted_secret_123')
+    expect(setupBlock.props('showCancel')).toBe(true)
+  })
+
+  it('hides the swap cancel when the subscribe capture starts without a default card', async () => {
+    const wrapper = mountDrawer({
+      mode: 'subscribe',
+      initialClientSecret: 'seti_prepared_secret_456'
+    })
+    await flush()
+
+    expect(findByName(wrapper, 'PaymentMethodSetupBlock').props('showCancel')).toBe(false)
   })
 })

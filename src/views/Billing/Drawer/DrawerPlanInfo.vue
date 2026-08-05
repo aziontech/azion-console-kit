@@ -51,6 +51,7 @@
               ref="paymentSetupRef"
               :stripeClientService="getStripeClientService"
               :clientSecret="setupIntentClientSecret"
+              :showCancel="canCancelCardSwap"
               @readiness-change="handlePaymentReadinessChange"
               @cancel="handleCancelPaymentSwap"
             />
@@ -175,6 +176,8 @@
   const needsCardCapture = computed(
     () => !showDefaultPaymentSummary.value && (isChangeCycleMode.value || isSetupSecret.value)
   )
+
+  const canCancelCardSwap = computed(() => Boolean(defaultPaymentCard.value))
 
   const ensureSetupIntentSecret = async () => {
     if (setupIntentClientSecret.value) return

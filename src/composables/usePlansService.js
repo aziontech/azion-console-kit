@@ -13,7 +13,7 @@ const PLANS_QUERY = {
 }
 
 /**
- * Composable for fetching the plan catalogue from products-api.
+ * Composable for reading the plan catalogue (static JSON shipped with the app).
  * Always revalidates on mount and is not persisted (`staleTime: 0`,
  * `gcTime: 0`). Shares `queryKeys.plans.list()` with `ensurePlansList`, so
  * both consumers reuse the same in-flight request and cache entry.

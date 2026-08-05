@@ -89,7 +89,7 @@ sequenceDiagram
     G->>S: loadUserAndAccountInfo() → getAccountIdentity()
     Note over S: onboarding gate = first_login (switch-account) — billing_type only picks the billing screen
     G-->>AD: redirect to additional-data (if first_login)
-    AD->>AD: GET products-api /plans (mocked today)
+    AD->>AD: read static plans catalogue (plans.json)
     Note over AD: usePlans() holds plan + billingCycle (client-side)
     alt Pro (paid) selected
         AD->>BA: POST /v4/account/subscriptions {plan_id, period}
@@ -109,7 +109,7 @@ sequenceDiagram
 1. **Signup** — `SignupView` via `signup-services` (Manager). No billing-api.
 2. **Post-login routing** — `AccountHandler.switchAndReturnAccountPage` returns `additional-data` when `POST /api/switch-account/{id}` answers `first_login: true`. The `accountGuard` only hydrates the account (`loadUserAndAccountInfo`) — it does not decide onboarding.
 3. **Onboarding gate** — `first_login`, revalidated by the `additional-data` route's `beforeEnter` via the store getter `isFirstLogin`. `has_service_order_plan` is **not** read; the former `needsOnboarding` / `hasServiceOrderPlan` getters no longer exist.
-4. **Plan catalogue** — `AdditionalDataView` → `usePlansService`. Now sourced from **products-api `/plans`** (prod `products-api.azion.net`, stage `stage-products-api.azion.net`), **mocked until that endpoint is publicly reachable** — grep `productsPlansService` / `PLANS_MOCK_RESPONSE`, flip `USE_MOCK` to un-mock.
+4. **Plan catalogue** — `AdditionalDataView` → `usePlansService`. Sourced from a **static JSON shipped with the app** (`src/services/v2/products/plans.json`, adapted by `ProductsPlansAdapter`) — this is the official data source, not a temporary mock. Grep `productsPlansService`.
 5. **Pro pre-checkout** — debounced `prepareProCheckout` → `preparePaidSignupCheckout` → `useSubscriptionPlanChange().createSubscription` → **`POST /v4/account/subscriptions`** → `payment.clientSecret` (grep `extractCheckoutClientSecret`; the old multi-key secret hunt is gone). `Idempotency-Key` is minted per intent.
 6. **Submit (hobby/pro)** — `submitSignupPlan`, same create op; pro reuses the `clientSecret` and mounts Stripe. `tos_acceptance` is **not** sent: the composable accepts `tosVersion` but the real create schema has no such field (§III.12) — contract question, not console work.
 7. **Payment confirmation** — client-side `stripe.confirmCheckoutSession()` (grep `payment-method-block`, `get-stripe-client-service`). No billing-api call.

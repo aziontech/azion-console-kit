@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { PLANS_MOCK_RESPONSE } from '@/services/v2/products/plans-mock'
+import plansCatalog from '@/services/v2/products/plans.json'
 import { ProductsPlansAdapter } from '@/services/v2/products/plans-adapter'
 import { getPlanIdFromSku } from '@/composables/signup-checkout-preparation'
 import { toBillingPeriod } from '@/services/v2/utils/billing-period'
 import { SubscriptionsAdapter } from '@/services/v2/billing-api/subscriptions/subscriptions-adapter'
 
-const wirePlans = PLANS_MOCK_RESPONSE.results
-const plans = ProductsPlansAdapter.transformPlansList(PLANS_MOCK_RESPONSE)
+const wirePlans = plansCatalog.results
+const plans = ProductsPlansAdapter.transformPlansList(plansCatalog)
 
 const cases = wirePlans.flatMap((wirePlan) =>
   wirePlan.pricings.map((wirePricing) => ({
