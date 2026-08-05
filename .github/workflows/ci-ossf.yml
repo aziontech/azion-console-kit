@@ -6,7 +6,7 @@ on:
   schedule:
     - cron: '30 5 * * 2'
   push:
-    branches: [main]
+    branches: [main, feat/oss-decoupling]
   workflow_dispatch:
 
 permissions: read-all
