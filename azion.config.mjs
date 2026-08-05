@@ -1,17 +1,7 @@
 import { defineConfig } from 'azion'
 import process from 'node:process'
 
-/**
- * Reference edge configuration for the Azion Console Kit SPA.
- *
- * This file lets anyone deploy the app to their own Azion account
- * (`azion deploy`) and documents the routing the app expects. It is NOT the
- * source of truth for Azion's own environments — the deploy pipeline lives
- * in a separate infrastructure repository, which injects its own
- * environment-specific configuration at build/deploy time.
- */
 const { VITE_ENVIRONMENT } = process.env
-
 const environment = VITE_ENVIRONMENT || 'production'
 const domainSuffix = environment === 'production' ? 'net' : 'com'
 
