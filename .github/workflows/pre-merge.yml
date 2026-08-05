@@ -11,8 +11,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
   push:
-    branches:
-      - dev
+    branches: [main, dev, feat/oss-decoupling]
 
 env:
   HUSKY: 0
