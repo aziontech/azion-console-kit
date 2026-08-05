@@ -26,6 +26,7 @@
   import { ref, onMounted } from 'vue'
   import NotificationPayment from '@/views/Billing/components/notification-payment'
   import { loadBillingData, loadContractData } from '@/helpers/account-data'
+  import { useAccountStore } from '@/stores/account'
 
   const props = defineProps({
     loadPaymentMethodDefaultService: { type: Function, required: true },
@@ -90,6 +91,7 @@
   }
 
   onMounted(() => {
+    if (!useAccountStore().isRegularAccount) return
     loadBillingData()
     loadContractData()
     loadCardDefault()

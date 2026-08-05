@@ -1,3 +1,5 @@
+import { normalizeSubscriptionStatus } from './subscriptions-constants'
+
 const transformPendingTransition = (item) =>
   item
     ? {
@@ -11,7 +13,8 @@ const transformPendingTransition = (item) =>
 const transformSubscription = (item = {}) => ({
   id: item.id,
   type: item.type ?? null,
-  status: item.status,
+  status: normalizeSubscriptionStatus(item.status),
+  rawStatus: item.status ?? null,
   planId: item.plan_id ?? null,
   planPricingId: item.plan_pricing_id ?? null,
   accountMode: item.account_mode ?? null,
@@ -21,7 +24,7 @@ const transformSubscription = (item = {}) => ({
   currentPeriodStart: item.current_period_start ?? null,
   currentPeriodEnd: item.current_period_end ?? null,
   autoRenew: item.auto_renew ?? null,
-  renew: item.renew ?? null,
+  renew: item.renew ?? item.period ?? null,
   productVersion: item.product_version ?? null,
   onDemandEnabled: item.on_demand_enabled ?? null,
   pendingTransition: transformPendingTransition(item.pending_transition),
@@ -122,9 +125,15 @@ const unwrap = (envelope) => (envelope && envelope.data !== undefined ? envelope
 
 const transformSubscriptionDetailResponse = (envelope = {}) => {
   const data = unwrap(envelope)
+  const source = data?.subscription
+    ? {
+        ...data.subscription,
+        pending_transition: data.subscription.pending_transition ?? data.pending_transition ?? null
+      }
+    : data
   return {
     state: envelope?.state ?? null,
-    data: data?.id ? transformSubscription(data) : null
+    data: source?.id ? transformSubscription(source) : null
   }
 }
 
@@ -159,7 +168,7 @@ const toChangePayload = (payload = {}) => ({
 
 const toCreatePayload = (payload = {}) => ({
   plan_id: payload.planId,
-  ...(payload.planPricingId != null && { plan_pricing_id: payload.planPricingId })
+  ...(payload.period != null && { period: payload.period })
 })
 
 const toCancelPayload = (payload = {}) => ({

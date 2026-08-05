@@ -9,7 +9,7 @@
         kind="outlined"
         size="medium"
         icon="pi pi-file-o"
-        :disabled="!invoice.redirectId"
+        :disabled="!detailsBillId"
         @click="emitViewDetails"
       />
     </template>
@@ -89,13 +89,13 @@
 </template>
 
 <script setup>
-  import { computed, onMounted, ref } from 'vue'
+  import { computed } from 'vue'
   import ActionButton from '@aziontech/webkit/actions/button'
   import CardBox from '@aziontech/webkit/content/card-box'
   import Currency from '@aziontech/webkit/content/currency'
   import SubscriptionPlanRow from './SubscriptionPlanRow.vue'
   import SkeletonBlock from '@/templates/skeleton-block'
-  import { billingInvoicesService } from '@/services/v2/billing-api/invoices/invoices-service'
+  import { useLatestInvoice } from '@/composables/useLatestInvoice'
 
   defineOptions({ name: 'current-invoice-card' })
 
@@ -104,24 +104,12 @@
     subscription: { type: Object, default: () => ({}) }
   })
 
-  const latestInvoiceTotal = ref(null)
-  const isLoadingInvoice = ref(true)
+  const { latestInvoice, latestInvoiceTotal, isLoading: isLoadingInvoice } = useLatestInvoice()
 
-  const extractTotal = (invoice) => {
-    const cents = invoice?.amount
-    if (typeof cents !== 'number' || !Number.isFinite(cents)) return null
-    return cents / 100
-  }
-
-  onMounted(async () => {
-    try {
-      const result = await billingInvoicesService.listInvoices({ page: 1, pageSize: 1 })
-      latestInvoiceTotal.value = extractTotal(result?.results?.[0])
-    } catch {
-      latestInvoiceTotal.value = null
-    } finally {
-      isLoadingInvoice.value = false
-    }
+  const detailsBillId = computed(() => {
+    const v4BillRef = latestInvoice.value?.billRefs?.[0] ?? null
+    if (v4BillRef) return v4BillRef
+    return props.invoice?.redirectId ? props.invoice.billId : null
   })
 
   const emit = defineEmits(['view-details'])
@@ -144,9 +132,6 @@
     return 0
   }
 
-  // Plan price drives "Plan Charge". Sourced from the SO's pricing (resolved
-  // by `useCurrentSubscription` against the plans catalog) — the legacy
-  // invoice endpoint doesn't carry it.
   const billingPeriodLabel = computed(
     () => props.subscription?.billingPeriod || props.invoice?.billingPeriod || '--'
   )
@@ -166,11 +151,7 @@
   const totalValue = computed(() => formatAmount(latestInvoiceTotal.value))
 
   const emitViewDetails = () => {
-    // `redirectId` is the "is the details page reachable?" flag the legacy
-    // service exposes, but the actual route param is `billId`. Emit the
-    // whole invoice so BillsView's handler can pick the right field — same
-    // pattern dev branch uses.
-    if (!props.invoice?.redirectId) return
-    emit('view-details', props.invoice)
+    if (!detailsBillId.value) return
+    emit('view-details', { ...props.invoice, billId: detailsBillId.value })
   }
 </script>

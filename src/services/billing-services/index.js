@@ -1,5 +1,4 @@
 import { listPaymentHistoryService } from './list-payment-history-service'
-import { listPaymentHistoryWithInvoicesService } from './list-payment-history-with-invoices-service'
 import { loadYourServicePlanService } from './load-your-service-plan-service'
 import { makeBillingBaseUrl } from './make-billing-base-url'
 import { loadCurrentInvoiceService } from './load-current-invoice-service'
@@ -15,7 +14,6 @@ import {
 
 export {
   listPaymentHistoryService,
-  listPaymentHistoryWithInvoicesService,
   loadYourServicePlanService,
   makeBillingBaseUrl,
   loadCurrentInvoiceService,

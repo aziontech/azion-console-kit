@@ -111,9 +111,13 @@
     submitSignupPlan
   } from '@/composables/signup-checkout-preparation'
   import { useAdditionalDataFormState } from '@/composables/useAdditionalDataFormState'
-  import { markAwaitingActiveServiceOrder } from '@/composables/post-payment-flag'
+  import {
+    clearAwaitingActiveServiceOrder,
+    markAwaitingActiveServiceOrder
+  } from '@/composables/post-payment-flag'
+  import { waitForActiveSubscription } from '@/composables/useSubscriptionState'
   import * as Sentry from '@sentry/vue'
-  import { loadUserAndAccountInfo } from '@/helpers/account-data'
+  import { loadUserAndAccountInfo, loadSubscriptionIdentity } from '@/helpers/account-data'
   import { useWarmStripe } from '@/composables/useWarmStripe'
   import { persistOnboardingData } from '@/helpers/persist-onboarding-data'
   import { trackSignUpSafely } from '@/helpers/track-auth-event'
@@ -435,6 +439,8 @@
 
         invalidateBillingCaches()
         await loadUserAndAccountInfo({ force: true })
+        accountStore.setAccountData({ first_login: false })
+        loadSubscriptionIdentity()
         trackSignUpToHubspot()
         handleProceedToCheckout()
       } catch (err) {
@@ -504,7 +510,11 @@
     try {
       await persistOnboardingData({ plan: selectedPlan.value })
       invalidateBillingCaches()
+      const activeSubscription = await waitForActiveSubscription()
+      if (activeSubscription) clearAwaitingActiveServiceOrder()
       await loadUserAndAccountInfo({ force: true })
+      accountStore.setAccountData({ first_login: false })
+      loadSubscriptionIdentity()
       trackSignUpToHubspot()
     } catch (err) {
       Sentry.captureException(err)
@@ -536,6 +546,7 @@
 
   const handleStartFromSuccess = () => {
     invalidateBillingCaches()
+    accountStore.setAccountData({ first_login: false })
     router.push({ name: 'home' })
   }
 

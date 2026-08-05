@@ -1,4 +1,4 @@
-import { loadUserAndAccountInfo } from '@/helpers/account-data'
+import { loadUserAndAccountInfo, loadSubscriptionIdentity } from '@/helpers/account-data'
 import { setRedirectRoute } from '@/helpers'
 import { sessionManager } from '@/services/v2/base/auth'
 
@@ -21,7 +21,11 @@ export async function accountGuard({ to, accountStore, tracker }) {
 
     try {
       await loadUserAndAccountInfo()
-      sessionManager.afterLogin()
+
+      if (!accountStore.isFirstLogin) {
+        sessionManager.afterLogin()
+        loadSubscriptionIdentity()
+      }
 
       if (to.meta.isPublic) {
         return '/'

@@ -13,6 +13,17 @@ export class PaymentMethodsService extends BaseService {
     return PaymentMethodsAdapter.transformList(response.data)
   }
 
+  listPaymentMethodsWithMeta = async () => {
+    const response = await this.http.request({
+      method: 'GET',
+      url: `${this.#baseURL}/payment_methods`
+    })
+    return {
+      paymentMethods: PaymentMethodsAdapter.transformList(response.data),
+      isStale: PaymentMethodsAdapter.readStaleFlag(response.headers)
+    }
+  }
+
   useListPaymentMethodsQuery() {
     return this.useQuery(queryKeys.paymentMethods.list(), () => this.listPaymentMethods())
   }

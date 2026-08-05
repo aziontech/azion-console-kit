@@ -46,7 +46,7 @@
             @swap="handleSwapPaymentMethod"
           />
 
-          <template v-else-if="isChangeCycleMode">
+          <template v-else-if="needsCardCapture">
             <PaymentMethodSetupBlock
               ref="paymentSetupRef"
               :stripeClientService="getStripeClientService"
@@ -99,7 +99,11 @@
   import TermsAcceptanceBlock from '@/templates/checkout-block/terms-acceptance-block.vue'
   import CheckoutSubmissionFooter from '@/views/Billing/Drawer/CheckoutSubmissionFooter.vue'
   import { usePlans } from '@/composables/usePlans'
-  import { useWallet, useWalletMutations } from '@/composables/billing/useWallet'
+  import {
+    useWallet,
+    useWalletMutations,
+    waitForPaymentMethod
+  } from '@/composables/billing/useWallet'
   import { useToast } from '@aziontech/webkit/use-toast'
 
   defineOptions({ name: 'drawer-plan-info' })
@@ -164,9 +168,22 @@
     () => useDefaultPaymentMethod.value && Boolean(defaultPaymentCard.value)
   )
 
-  const handleSwapPaymentMethod = async () => {
-    useDefaultPaymentMethod.value = false
-    if (!isChangeCycleMode.value) return
+  const isSetupSecret = computed(() =>
+    String(checkoutSessionClientSecret.value || '').startsWith('seti_')
+  )
+
+  const needsCardCapture = computed(
+    () => !showDefaultPaymentSummary.value && (isChangeCycleMode.value || isSetupSecret.value)
+  )
+
+  const ensureSetupIntentSecret = async () => {
+    if (setupIntentClientSecret.value) return
+
+    if (isSetupSecret.value) {
+      setupIntentClientSecret.value = checkoutSessionClientSecret.value
+      return
+    }
+
     isPaymentFormReady.value = false
     try {
       const { clientSecret } = await createSetupIntent()
@@ -175,9 +192,13 @@
       }
       setupIntentClientSecret.value = clientSecret
     } catch (err) {
-      useDefaultPaymentMethod.value = true
+      if (defaultPaymentCard.value) useDefaultPaymentMethod.value = true
       showError(err?.message || 'Unable to initialize payment method update.')
     }
+  }
+
+  const handleSwapPaymentMethod = () => {
+    useDefaultPaymentMethod.value = false
   }
 
   const handleCancelPaymentSwap = () => {
@@ -208,7 +229,7 @@
   const isConfirmDisabled = computed(() => {
     if (isSubmitting.value) return true
     if (!isTermsAccepted.value) return true
-    if (isChangeCycleMode.value) {
+    if (isChangeCycleMode.value || isSetupSecret.value) {
       if (showDefaultPaymentSummary.value) return false
       return !setupIntentClientSecret.value || !isPaymentFormReady.value
     }
@@ -254,6 +275,14 @@
   )
 
   watch(
+    [() => props.visible, needsCardCapture],
+    ([visible, capture]) => {
+      if (visible && capture) ensureSetupIntentSecret()
+    },
+    { immediate: true }
+  )
+
+  watch(
     () => props.initialClientSecret,
     (secret) => {
       if (secret && secret !== checkoutSessionClientSecret.value) {
@@ -266,16 +295,20 @@
     if (isSubmitting.value) return
     isSubmitting.value = true
     try {
-      if (isChangeCycleMode.value) {
-        if (!showDefaultPaymentSummary.value) {
-          const newPaymentMethodId = await paymentSetupRef.value?.confirmSetup?.()
-          if (!newPaymentMethodId) {
-            throw new Error('Unable to confirm new payment method.')
-          }
-          await setDefaultPaymentMethod(newPaymentMethodId)
-          setupIntentClientSecret.value = ''
-          useDefaultPaymentMethod.value = true
+      let capturedPaymentMethodId = null
+
+      if (needsCardCapture.value) {
+        capturedPaymentMethodId = await paymentSetupRef.value?.confirmSetup?.()
+        if (!capturedPaymentMethodId) {
+          throw new Error('Unable to confirm new payment method.')
         }
+        await waitForPaymentMethod(capturedPaymentMethodId)
+        await setDefaultPaymentMethod(capturedPaymentMethodId)
+        setupIntentClientSecret.value = ''
+        useDefaultPaymentMethod.value = true
+      }
+
+      if (isChangeCycleMode.value) {
         await new Promise((resolve, reject) => {
           emit('submitCycleChange', {
             plan: props.plan,
@@ -288,12 +321,12 @@
         return
       }
 
-      if (showDefaultPaymentSummary.value) {
+      if (capturedPaymentMethodId || showDefaultPaymentSummary.value) {
         emit('submit', {
           plan: props.plan,
           billingCycle: billingCycle.value,
           useDefaultPaymentMethod: true,
-          paymentMethodId: defaultPaymentCard.value?.id ?? null
+          paymentMethodId: capturedPaymentMethodId ?? defaultPaymentCard.value?.id ?? null
         })
         return
       }

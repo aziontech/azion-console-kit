@@ -22,14 +22,6 @@
       <p class="whitespace-pre-line text-[13px] leading-5 text-default">
         Confirm to remove the scheduled downgrade. Your current plan will continue without changes.
       </p>
-
-      <InlineMessage
-        v-if="error"
-        severity="error"
-        class="text-xs break-all"
-      >
-        {{ error }}
-      </InlineMessage>
     </div>
 
     <template #footer>
@@ -44,7 +36,7 @@
         <ActionButton
           kind="primary"
           size="medium"
-          :label="error ? 'Retry' : 'Keep current plan'"
+          label="Keep current plan"
           :loading="isSubmitting"
           :disabled="isSubmitting"
           @click="confirm"
@@ -58,7 +50,7 @@
   import { computed, ref } from 'vue'
   import Dialog from '@aziontech/webkit/dialog'
   import ActionButton from '@aziontech/webkit/actions/button'
-  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import { useToast } from '@aziontech/webkit/use-toast'
 
   defineOptions({ name: 'dialog-cancel-downgrade' })
 
@@ -68,15 +60,12 @@
 
   const emit = defineEmits(['update:visible', 'confirm'])
 
+  const toast = useToast()
   const isSubmitting = ref(false)
-  const error = ref('')
 
   const isVisible = computed({
     get: () => props.visible,
-    set: (value) => {
-      if (!value) error.value = ''
-      emit('update:visible', value)
-    }
+    set: (value) => emit('update:visible', value)
   })
 
   const close = () => {
@@ -87,7 +76,6 @@
   const confirm = async () => {
     if (isSubmitting.value) return
     isSubmitting.value = true
-    error.value = ''
     try {
       await new Promise((resolve, reject) => {
         emit('confirm', {
@@ -98,9 +86,14 @@
       })
       isVisible.value = false
     } catch (err) {
-      error.value =
-        (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
-        'Unable to cancel scheduled downgrade. Please try again.'
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail:
+          (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
+          'Unable to cancel scheduled downgrade. Please try again.',
+        closable: true
+      })
     } finally {
       isSubmitting.value = false
     }

@@ -25,7 +25,23 @@ const transformPaymentMethod = (envelope = {}) => ({
   data: envelope?.data ? mapPaymentMethod(envelope.data) : null
 })
 
-const transformList = (response) => (Array.isArray(response) ? response.map(mapPaymentMethod) : [])
+const toResults = (response) => {
+  if (Array.isArray(response)) return response
+  if (Array.isArray(response?.results)) return response.results
+  if (Array.isArray(response?.data)) return response.data
+  return []
+}
+
+const transformList = (response) => toResults(response).map(mapPaymentMethod)
+
+const readStaleFlag = (headers) => {
+  if (!headers) return false
+  const raw =
+    typeof headers.get === 'function'
+      ? headers.get('x-stale')
+      : (headers['x-stale'] ?? headers['X-Stale'])
+  return String(raw ?? '').toLowerCase() === 'true'
+}
 
 const transformSetupSession = (envelope = {}) => {
   const data = envelope?.data ?? {}
@@ -86,6 +102,7 @@ const toWalletRows = (methods) =>
 export const PaymentMethodsAdapter = {
   transformPaymentMethod,
   transformList,
+  readStaleFlag,
   transformSetupSession,
   toSetupSessionPayload,
   toWalletRow,

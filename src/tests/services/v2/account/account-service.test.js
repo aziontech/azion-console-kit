@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AccountService, accountService } from '@/services/v2/account/account-service'
 import { httpService } from '@/services/v2/base/http/httpService'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
@@ -6,155 +6,24 @@ import { queryKeys } from '@/services/v2/base/query/queryKeys'
 vi.mock('@/services/v2/base/http/httpService')
 
 describe('AccountService._adaptAccountInfo', () => {
-  beforeEach(() => {
-    vi.stubEnv('VITE_BILLING_TYPE', '')
-    vi.stubEnv('VITE_BILLING_TYPE_OVERRIDE', '')
-  })
-
-  afterEach(() => {
-    vi.unstubAllEnvs()
-    localStorage.clear()
-  })
-
-  it('passes through the backend billing_type value', () => {
+  it('passes the backend payload through and derives the account type presentation', () => {
     const service = new AccountService()
 
     const result = service._adaptAccountInfo({
       id: 1,
       kind: 'client',
-      billing_type: 'plan'
+      status: 'ONLINE'
     })
 
-    expect(result.billing_type).toBe('plan')
+    expect(result.id).toBe(1)
+    expect(result.status).toBe('ONLINE')
+    expect(result.accountTypeName).toBe('Client')
+    expect(result.accountTypeIcon).toBe('pi pi-box')
   })
 
-  it('normalizes a missing billing_type to null', () => {
+  it('returns a nullish payload untouched', () => {
     const service = new AccountService()
-
-    const result = service._adaptAccountInfo({
-      id: 1,
-      kind: 'client'
-    })
-
-    expect(result.billing_type).toBeNull()
-  })
-
-  it('forces billing_type to null when the override is set to null', () => {
-    vi.stubEnv('VITE_BILLING_TYPE_OVERRIDE', 'null')
-    const service = new AccountService()
-
-    const result = service._adaptAccountInfo({
-      id: 1,
-      kind: 'client',
-      billing_type: 'plan'
-    })
-
-    expect(result.billing_type).toBeNull()
-  })
-
-  it('forces billing_type to the override value when set', () => {
-    vi.stubEnv('VITE_BILLING_TYPE_OVERRIDE', 'custom')
-    const service = new AccountService()
-
-    const result = service._adaptAccountInfo({
-      id: 1,
-      kind: 'client',
-      billing_type: null
-    })
-
-    expect(result.billing_type).toBe('custom')
-  })
-
-  it('falls back to the localStorage override when the env override is not set', () => {
-    localStorage.setItem('billing_type_override', 'custom')
-    const service = new AccountService()
-
-    const result = service._adaptAccountInfo({
-      id: 1,
-      kind: 'client',
-      billing_type: 'plan'
-    })
-
-    expect(result.billing_type).toBe('custom')
-  })
-
-  it('forces billing_type to null when the localStorage override is set to null', () => {
-    localStorage.setItem('billing_type_override', 'null')
-    const service = new AccountService()
-
-    const result = service._adaptAccountInfo({
-      id: 1,
-      kind: 'client',
-      billing_type: 'plan'
-    })
-
-    expect(result.billing_type).toBeNull()
-  })
-
-  it('prefers the env configuration over the localStorage one', () => {
-    vi.stubEnv('VITE_BILLING_TYPE_OVERRIDE', 'internal')
-    localStorage.setItem('billing_type_override', 'custom')
-    const service = new AccountService()
-
-    const result = service._adaptAccountInfo({
-      id: 1,
-      kind: 'client',
-      billing_type: 'plan'
-    })
-
-    expect(result.billing_type).toBe('internal')
-  })
-
-  it('ignores a configured value outside plan/internal/custom/null', () => {
-    vi.stubEnv('VITE_BILLING_TYPE_OVERRIDE', 'something-new')
-    const service = new AccountService()
-
-    const result = service._adaptAccountInfo({
-      id: 1,
-      kind: 'client',
-      billing_type: 'custom'
-    })
-
-    expect(result.billing_type).toBe('custom')
-  })
-
-  it('reads the billing type from VITE_BILLING_TYPE as well', () => {
-    vi.stubEnv('VITE_BILLING_TYPE', 'custom')
-    const service = new AccountService()
-
-    const result = service._adaptAccountInfo({
-      id: 1,
-      kind: 'client',
-      billing_type: 'plan'
-    })
-
-    expect(result.billing_type).toBe('custom')
-  })
-
-  it('does not flag the backend value as overridden', () => {
-    const service = new AccountService()
-
-    const result = service._adaptAccountInfo({
-      id: 1,
-      kind: 'client',
-      billing_type: 'plan'
-    })
-
-    expect(result.billing_type_overridden).toBe(false)
-  })
-
-  it('flags a configured billing_type as overridden', () => {
-    vi.stubEnv('VITE_BILLING_TYPE_OVERRIDE', 'null')
-    const service = new AccountService()
-
-    const result = service._adaptAccountInfo({
-      id: 1,
-      kind: 'client',
-      billing_type: 'custom'
-    })
-
-    expect(result.billing_type).toBeNull()
-    expect(result.billing_type_overridden).toBe(true)
+    expect(service._adaptAccountInfo(null)).toBeNull()
   })
 })
 

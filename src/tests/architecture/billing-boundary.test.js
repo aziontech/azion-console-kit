@@ -15,11 +15,7 @@ const PLANS_SURFACE = [
   'composables/useLatestInvoice.js'
 ]
 
-const LEGACY_SURFACE = [
-  'services/v2/billing-legacy',
-  'composables/billing-legacy',
-  'views/Billing/legacy'
-]
+const LEGACY_SURFACE = ['services/v2/billing-legacy', 'views/Billing/legacy']
 
 const LEGACY_IMPORT =
   /from\s+['"][^'"]*(?:services\/v2\/billing-legacy|composables\/billing-legacy)/

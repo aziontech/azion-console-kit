@@ -54,6 +54,29 @@ describe('PaymentMethodsService', () => {
     expect(result).toEqual([])
   })
 
+  it('surfaces the X-Stale header alongside the list, for the degraded-gateway state', async () => {
+    httpMock.mockResolvedValue({
+      data: [wirePaymentMethod],
+      headers: { 'x-stale': 'true' }
+    })
+
+    const result = await service.listPaymentMethodsWithMeta()
+
+    expect(result.paymentMethods).toHaveLength(1)
+    expect(result.isStale).toBe(true)
+  })
+
+  it('reads X-Stale from an axios headers object and defaults to fresh', async () => {
+    httpMock.mockResolvedValue({
+      data: [wirePaymentMethod],
+      headers: { get: (name) => (name === 'x-stale' ? 'TRUE' : null) }
+    })
+    expect((await service.listPaymentMethodsWithMeta()).isStale).toBe(true)
+
+    httpMock.mockResolvedValue({ data: [wirePaymentMethod] })
+    expect((await service.listPaymentMethodsWithMeta()).isStale).toBe(false)
+  })
+
   it('creates a setup session without an idempotency header', async () => {
     httpMock.mockResolvedValue({
       data: {

@@ -8,7 +8,7 @@ import { sessionManager } from '@/services/v2/base/auth'
 /** @type {import('vue-router').NavigationHookAfter} */
 export default function afterEachRoute(to, from, failure) {
   const loadingStore = useLoadingStore()
-  const { hasActiveUserId, userId } = useAccountStore()
+  const { hasActiveUserId, userId, isFirstLogin } = useAccountStore()
   loadingStore.finishLoading()
 
   if (failure || !hasActiveUserId) return
@@ -31,7 +31,7 @@ export default function afterEachRoute(to, from, failure) {
 
   const isOnboardingStep = to.name === 'additional-data'
   const isPublicRoute = to.meta?.isPublic === true
-  const shouldSkipPrefetch = isOnboardingStep || isPublicRoute
+  const shouldSkipPrefetch = isOnboardingStep || isPublicRoute || isFirstLogin === true
 
   if (!shouldSkipPrefetch) {
     sessionManager.afterLogin()

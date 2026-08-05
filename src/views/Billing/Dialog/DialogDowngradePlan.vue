@@ -33,14 +33,6 @@
         :fromPlanLabel="getPlanLabel(fromPlan)"
         :toPlanLabel="getPlanLabel(toPlan)"
       />
-
-      <InlineMessage
-        v-if="error"
-        severity="error"
-        class="text-xs break-all"
-      >
-        {{ error }}
-      </InlineMessage>
     </div>
 
     <template #footer>
@@ -69,7 +61,7 @@
   import { computed, ref } from 'vue'
   import Dialog from '@aziontech/webkit/dialog'
   import ActionButton from '@aziontech/webkit/actions/button'
-  import InlineMessage from '@aziontech/webkit/inlinemessage'
+  import { useToast } from '@aziontech/webkit/use-toast'
   import PlanFeatureComparison from '@/views/Billing/Dialog/PlanFeatureComparison.vue'
   import { getPlanLabel } from '@/templates/checkout-block/helpers/plan-features'
   import { formatBillingDate } from '@/utils/billing-date'
@@ -96,15 +88,12 @@
 
   const emit = defineEmits(['update:visible', 'confirm', 'view-usage'])
 
+  const toast = useToast()
   const isSubmitting = ref(false)
-  const error = ref('')
 
   const isVisible = computed({
     get: () => props.visible,
-    set: (value) => {
-      if (!value) error.value = ''
-      emit('update:visible', value)
-    }
+    set: (value) => emit('update:visible', value)
   })
 
   const cycleLabel = (cycle) => (cycle === 'yearly' ? 'yearly billing' : 'monthly billing')
@@ -117,10 +106,7 @@
     return `Downgrade to ${getPlanLabel(props.toPlan)}`
   })
 
-  const confirmLabel = computed(() => {
-    if (error.value) return 'Retry'
-    return 'Downgrade plan'
-  })
+  const confirmLabel = computed(() => 'Downgrade plan')
 
   const keepLabel = computed(() => {
     if (props.cycleChange) {
@@ -157,7 +143,6 @@
   const confirm = async () => {
     if (isSubmitting.value) return
     isSubmitting.value = true
-    error.value = ''
     try {
       await new Promise((resolve, reject) => {
         emit('confirm', {
@@ -173,9 +158,14 @@
       })
       isVisible.value = false
     } catch (err) {
-      error.value =
-        (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
-        'Unable to downgrade. Please try again.'
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail:
+          (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
+          'Unable to downgrade. Please try again.',
+        closable: true
+      })
     } finally {
       isSubmitting.value = false
     }

@@ -7,8 +7,6 @@
   import BillsView from '@/views/Billing/BillsView.vue'
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
 
-  const emit = defineEmits(['loadCard', 'openDrawerAddCredit'])
-
   const subscription = useCurrentSubscription()
   const isRefreshing = ref(false)
   const viewBillsRef = ref(null)
@@ -17,22 +15,6 @@
   const invoiceLastUpdated = computed(() => {
     const value = subscription.lastUpdate.value
     return value ? `Last Update: ${value}` : 'Last Update: --'
-  })
-
-  const props = defineProps({
-    loadPaymentMethodDefaultService: { type: Function, required: true },
-    getStripeClientService: { type: Function, required: true },
-    loadCurrentInvoiceService: { type: Function, required: true },
-    loadInvoiceDataService: { type: Function, required: true },
-    listServiceAndProductsChangesService: { type: Function, required: true },
-    documentPaymentMethodService: { type: Function, required: true },
-    listPaymentHistoryService: { type: Function, required: true },
-    documentPaymentHistoryService: { type: Function, required: true },
-    loadYourServicePlanService: { type: Function, required: true },
-    openPlans: { type: Function, required: true },
-    loadContractServicePlan: { type: Function, required: true },
-    loadInvoiceLastUpdatedService: { type: Function, required: true },
-    cardDefault: { type: Object, required: true }
   })
 
   const callBackDrawer = async () => {
@@ -50,12 +32,6 @@
       isRefreshing.value = false
     }
   }
-
-  const propsNotification = () => ({
-    linkText: { hidden: true },
-    buttonCredit: {},
-    buttonPaymentMethod: { hidden: true }
-  })
 
   defineExpose({
     callBackDrawer
@@ -90,18 +66,9 @@
       </PageHeadingBlock>
     </template>
     <template #content>
-      <div class="mb-2">
-        <slot
-          name="notification"
-          v-bind="propsNotification()"
-        />
-      </div>
       <BillsView
         ref="viewBillsRef"
-        v-bind="props"
         :isReloading="isRefreshing"
-        @loadCard="emit('loadCard')"
-        @openDrawerAddCredit="emit('openDrawerAddCredit')"
       />
     </template>
   </ContentBlock>

@@ -1,9 +1,10 @@
-# billing-legacy — the OLD billing, kept alive for managed accounts
+# billing-legacy — the OLD billing, kept alive for regular accounts
 
-Everything here serves the **managed billing experience** only: accounts whose
-`billing_type` is `internal` or `custom` (store getter `isManagedBillingAccount`).
-Those clients stay on the old billing until the product decides to move them, so
-this layer must keep working exactly as it is.
+Everything here serves the **legacy billing experience** only: accounts whose
+`status` is `REGULAR` (store getter `isRegularAccount`). Every other account
+uses the plans experience on billing-api v4. Regular clients stay on the old
+billing until the product decides to move them, so this layer must keep working
+exactly as it is.
 
 ## Rules
 
@@ -11,18 +12,21 @@ this layer must keep working exactly as it is.
    belongs in `../billing-api/`.
 2. **No imports from `../billing-api/`.** The two layers never mix — enforced by
    `no-restricted-imports` in `.eslintrc.cjs`.
-3. **Only the legacy screens consume this.** `src/views/Billing/legacy/**` and
-   `src/composables/billing-legacy/**`. If a plans-experience view needs
-   something from here, the answer is a v4 endpoint, not an import.
+3. **Only the legacy screens consume this.** `src/views/Billing/legacy/**`. If a
+   plans-experience view needs something from here, the answer is a v4
+   endpoint, not an import.
 
 ## What lives here
 
-| Folder        | Surface                                                                                  | Consumed by                                                         |
-| ------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `wallet/`     | `/edge_api/v4/service_orders/billing/payment_methods` (+ `setup_intents`, `set_default`) | `useLegacyWallet` → legacy billing screen                           |
-| `payments/`   | `/v4/payments/credit_cards` · `/credits` · `/history` (payments-api)                     | add-credit drawer, add-payment-method block, legacy payment history |
-| `invoices/`   | `/edge_api/v4/service_orders/billing/invoices` (Stripe invoice objects)                  | legacy payment history merge                                        |
-| `accounting/` | accounting GraphQL — account credit and expiration                                       | account hydration (`loadBillingData`)                               |
+| Folder        | Surface                                                              | Consumed by                                                         |
+| ------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `payments/`   | `/v4/payments/credit_cards` · `/credits` · `/history` (payments-api) | add-credit drawer, add-payment-method block, legacy payment history |
+| `accounting/` | accounting GraphQL — account credit and expiration                   | account hydration (`loadBillingData`)                               |
+
+The former `wallet/` and `invoices/` folders were removed with the
+`/edge_api/v4/service_orders/*` surface — service_orders no longer exists in
+the API, and the legacy screen (regular accounts) never rendered the surfaces
+that consumed them.
 
 ## Two things that are legacy for _everyone_
 
@@ -37,4 +41,4 @@ here:
 ## The new layer
 
 `src/services/v2/billing-api/` — billing-api v4, the plans experience. See its
-README, and `docs/billing-v4-flows/FLOW-GUIDE.md` for the flow contract.
+README, and `docs/billing-spec.md` for the flow contract.

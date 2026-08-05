@@ -1,38 +1,35 @@
 import { computed, unref } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
-import { getActivePinia } from 'pinia'
 import { subscriptionsService } from '@/services/v2/billing-api/subscriptions/subscriptions-service'
-import { SUBSCRIPTION_ENTITLED_STATUSES } from '@/services/v2/billing-api/subscriptions/subscriptions-constants'
+import { isEntitledStatus } from '@/services/v2/billing-api/subscriptions/subscriptions-constants'
 import { queryClient } from '@/services/v2/base/query/queryClient'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { waitForPersistenceRestore } from '@/services/v2/base/query/queryPlugin'
 import { isNotFound } from '@/services/v2/utils/is-not-found'
 import { isNotImplemented } from '@/services/v2/utils/is-not-implemented'
-import { useAccountStore } from '@/stores/account'
 
 const NO_CACHE_META = { persist: false }
 
 const NO_SUBSCRIPTION = { data: null }
-const UNAVAILABLE = { data: null, unavailable: true }
+
+const SUBSCRIPTION_STALE_TIME = 15_000
+
+export const UNAVAILABLE_REASON = Object.freeze({
+  AMBIGUOUS_CONTEXT: 'ambiguous_context',
+  NOT_IMPLEMENTED: 'not_implemented'
+})
+
+const unavailable = (reason) => ({ data: null, unavailable: true, reason })
 
 const isConflict = (error) => error?.status === 409 || error?.statusCode === 409
 
-const syncAccountMode = (subscription) => {
-  if (!getActivePinia()) return
-  useAccountStore().setSubscriptionAccountMode(subscription?.accountMode ?? null)
-}
-
 const fetchCurrentSubscription = async () => {
   try {
-    const current = await subscriptionsService.getCurrentSubscription()
-    syncAccountMode(current?.data)
-    return current
+    return await subscriptionsService.getCurrentSubscription()
   } catch (error) {
-    if (isNotFound(error)) {
-      syncAccountMode(null)
-      return NO_SUBSCRIPTION
-    }
-    if (isConflict(error) || isNotImplemented(error)) return UNAVAILABLE
+    if (isNotFound(error)) return NO_SUBSCRIPTION
+    if (isConflict(error)) return unavailable(UNAVAILABLE_REASON.AMBIGUOUS_CONTEXT)
+    if (isNotImplemented(error)) return unavailable(UNAVAILABLE_REASON.NOT_IMPLEMENTED)
     throw error
   }
 }
@@ -40,13 +37,12 @@ const fetchCurrentSubscription = async () => {
 const currentSubscriptionQuery = () => ({
   queryKey: queryKeys.subscriptions.current(),
   queryFn: fetchCurrentSubscription,
-  staleTime: 0,
-  gcTime: 0,
+  staleTime: SUBSCRIPTION_STALE_TIME,
+  gcTime: SUBSCRIPTION_STALE_TIME,
   meta: NO_CACHE_META
 })
 
-export const isEntitled = (subscription) =>
-  SUBSCRIPTION_ENTITLED_STATUSES.includes(subscription?.status)
+export const isEntitled = (subscription) => isEntitledStatus(subscription?.status)
 
 /**
  * Current subscription — the single read the plans experience needs.
@@ -61,12 +57,16 @@ export function useSubscriptionState(options = {}) {
   const subscriptionQuery = useQuery({
     ...currentSubscriptionQuery(),
     enabled: computed(() => Boolean(unref(enabled))),
-    refetchOnMount: 'always',
+    refetchOnMount: true,
     refetchOnWindowFocus: false
   })
 
   const subscription = computed(() => subscriptionQuery.data.value?.data ?? null)
   const isUnavailable = computed(() => subscriptionQuery.data.value?.unavailable === true)
+  const unavailableReason = computed(() => subscriptionQuery.data.value?.reason ?? null)
+  const isAmbiguousContext = computed(
+    () => unavailableReason.value === UNAVAILABLE_REASON.AMBIGUOUS_CONTEXT
+  )
   const subscriptionId = computed(() => subscription.value?.id ?? null)
   const planId = computed(() => subscription.value?.planId ?? null)
   const planPricingId = computed(() => subscription.value?.planPricingId ?? null)
@@ -93,15 +93,35 @@ export function useSubscriptionState(options = {}) {
     hasSubscription,
     isActive,
     isUnavailable,
+    unavailableReason,
+    isAmbiguousContext,
     isLoading: subscriptionQuery.isLoading,
     isFetching: subscriptionQuery.isFetching,
     refetch
   }
 }
 
-export async function ensureCurrentSubscription() {
+export async function ensureCurrentSubscription({ fresh = false } = {}) {
   await waitForPersistenceRestore()
-  return queryClient.fetchQuery(currentSubscriptionQuery())
+  return queryClient.fetchQuery({
+    ...currentSubscriptionQuery(),
+    ...(fresh && { staleTime: 0 })
+  })
+}
+
+export async function waitForActiveSubscription({ attempts = 4, delayMs = 1200 } = {}) {
+  let current = null
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    current = await ensureCurrentSubscription({ fresh: true })
+    if (isEntitled(current?.data)) return current.data
+    if (current?.unavailable === true) return null
+    if (attempt < attempts - 1) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs))
+    }
+  }
+
+  return null
 }
 
 export function getCachedCurrentSubscription() {

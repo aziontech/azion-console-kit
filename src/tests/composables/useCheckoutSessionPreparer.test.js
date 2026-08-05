@@ -36,7 +36,7 @@ describe('prepareCheckoutSessionForSubscription', () => {
 
     expect(createSubscription).toHaveBeenCalledWith({
       planId: 'plan_pro',
-      planPricingId: 'price_pro_monthly'
+      period: 'monthly'
     })
     expect(createCardSetupSession).not.toHaveBeenCalled()
     expect(secret).toBe('seti_first_payment')
@@ -73,6 +73,66 @@ describe('prepareCheckoutSessionForSubscription', () => {
     expect(secret).toBe('seti_env')
   })
 
+  it('re-creates the subscription when the existing one is still awaiting its first payment', async () => {
+    const createSubscription = vi.fn().mockResolvedValue({
+      subscription: { id: 10, status: 'DRAFT' },
+      payment: { clientSecret: 'seti_new_draft' }
+    })
+    const createCardSetupSession = vi.fn()
+
+    const secret = await prepareCheckoutSessionForSubscription({
+      plan: 'pro',
+      cycle: 'monthly',
+      plans,
+      ensureSubscription: () => Promise.resolve({ data: { id: 10, status: 'DRAFT' } }),
+      createSubscription,
+      createCardSetupSession
+    })
+
+    expect(createSubscription).toHaveBeenCalledOnce()
+    expect(createCardSetupSession).not.toHaveBeenCalled()
+    expect(secret).toBe('seti_new_draft')
+  })
+
+  it('treats the lowercase incomplete status the same way', async () => {
+    const createSubscription = vi.fn().mockResolvedValue({
+      subscription: { id: 10, status: 'incomplete' },
+      payment: { clientSecret: 'seti_incomplete' }
+    })
+    const createCardSetupSession = vi.fn()
+
+    const secret = await prepareCheckoutSessionForSubscription({
+      plan: 'pro',
+      cycle: 'monthly',
+      plans,
+      ensureSubscription: () => Promise.resolve({ data: { id: 10, status: 'incomplete' } }),
+      createSubscription,
+      createCardSetupSession
+    })
+
+    expect(createSubscription).toHaveBeenCalledOnce()
+    expect(createCardSetupSession).not.toHaveBeenCalled()
+    expect(secret).toBe('seti_incomplete')
+  })
+
+  it('captures a card for a PAST_DUE subscription (plan change is local pro-rata)', async () => {
+    const createSubscription = vi.fn()
+    const createCardSetupSession = vi.fn().mockResolvedValue({ clientSecret: 'seti_past_due' })
+
+    const secret = await prepareCheckoutSessionForSubscription({
+      plan: 'pro',
+      cycle: 'monthly',
+      plans,
+      ensureSubscription: () => Promise.resolve({ data: { id: 10, status: 'PAST_DUE' } }),
+      createSubscription,
+      createCardSetupSession
+    })
+
+    expect(createCardSetupSession).toHaveBeenCalledOnce()
+    expect(createSubscription).not.toHaveBeenCalled()
+    expect(secret).toBe('seti_past_due')
+  })
+
   it('creates a new subscription after a CANCELED one', async () => {
     const createSubscription = vi.fn().mockResolvedValue({
       subscription: { id: 11, status: 'incomplete' },
@@ -92,7 +152,7 @@ describe('prepareCheckoutSessionForSubscription', () => {
     expect(secret).toBe('seti_resubscribe')
   })
 
-  it('sends the pricing id that matches the chosen cycle', async () => {
+  it('sends the period that matches the chosen cycle', async () => {
     const createSubscription = vi.fn().mockResolvedValue({
       subscription: { id: 12 },
       payment: { clientSecret: 'seti_annual' }
@@ -109,7 +169,7 @@ describe('prepareCheckoutSessionForSubscription', () => {
 
     expect(createSubscription).toHaveBeenCalledWith({
       planId: 'plan_pro',
-      planPricingId: 'price_pro_yearly'
+      period: 'annual'
     })
   })
 

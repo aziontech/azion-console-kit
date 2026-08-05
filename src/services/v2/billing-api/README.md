@@ -1,12 +1,12 @@
 # billing-api v4 — the NEW billing, for the plans experience
 
 This is the console's integration layer for **billing-api v4** (ENG-46458). It
-serves the **plans experience**: accounts whose `billing_type` is `plan` or
-`null` — everything that is not managed.
+serves the **plans experience**: every account whose `status` is not `REGULAR`
+(store getter `isRegularAccount` decides the billing screen).
 
-The old billing lives in `../billing-legacy/` and stays alive for managed
-accounts (`internal` / `custom`). **The two never import each other** — enforced
-by `no-restricted-imports` in `.eslintrc.cjs`.
+The old billing lives in `../billing-legacy/` and stays alive for regular
+accounts. **The two never import each other** — enforced by
+`no-restricted-imports` in `.eslintrc.cjs`.
 
 ## What lives here
 
@@ -21,24 +21,20 @@ by `no-restricted-imports` in `.eslintrc.cjs`.
 
 ## Contract facts that shape this layer
 
-- **`Subscription` carries no `plan_id`.** The plan, period and fee snapshot live
-  on `SubscriptionVersion`, so plan identity needs `current` **plus** `versions`
-  (`useSubscriptionState` does both and picks the version with no `effective_to`).
-- **`change` and `scheduled_changes` key on `service_order_id`**, not on the
-  subscription id — read it off the subscription (`Subscription.service_order_id`,
-  required by the schema).
-- **The pending downgrade is not a subscription field.** `pending_transition`
-  only comes back from `POST …/change`, so a page load must call
-  `GET …/scheduled_changes` to survive a refresh.
+- **`Subscription` (v1.0.0) carries the plan identity inline** — `plan_id`,
+  `plan_pricing_id`, `renew` and `pending_transition` all come back from
+  `GET …/current`, so one read answers the whole plan card.
+- **Nested routes key on `{subscription_id}`** (`change`, `change/preview`,
+  `cancel`, `scheduled_changes`) — the id comes from `current`.
 - **Period vocabulary differs from the catalogue.** products-api says `yearly`,
   billing-api says `annual` — translate through
   `services/v2/utils/billing-period.js`, never inline.
-- **`plan_id` is an opaque token.** UUID in the catalogue, `integer int64` in the
-  contract. Pass it through; never parse or `Number()` it.
+- **`plan_id` is an opaque UUID.** Pass it through; never parse or `Number()` it.
 - **Money is integer cents** on the wire; the catalogue quotes major units.
 - Divergences from the written contract (`preview` answers 200 not 202, deletes
   answer 204, `payment_methods` breaks the v4 envelope, setup session ignores
-  `type`) are documented in `docs/billing-v4-flows/FLOW-GUIDE.md` §10.
+  `type`, set-default is `POST …/default` while the spec-view doc says
+  `PUT/PATCH {pm_id}`) are documented in `docs/billing-spec.md` §III.10.
 
 ## Conventions
 

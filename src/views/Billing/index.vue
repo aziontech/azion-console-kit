@@ -1,7 +1,6 @@
 <template>
-  <BillingGateSkeleton v-if="!isResolved" />
   <LegacyBillingScreen
-    v-else-if="isManagedBillingAccount"
+    v-if="isRegularAccount"
     ref="childRef"
     v-bind="props"
     @loadCard="emit('loadCard')"
@@ -18,25 +17,15 @@
   <TabsView
     v-else
     ref="childRef"
-    v-bind="props"
-    @loadCard="emit('loadCard')"
-    @openDrawerAddCredit="emit('openDrawerAddCredit')"
-  >
-    <template #notification="slotProp">
-      <slot
-        name="notification"
-        v-bind="slotProp"
-      />
-    </template>
-  </TabsView>
+  />
 </template>
 
 <script setup>
   import { ref } from 'vue'
-  import { useBillingExperience } from '@/composables/useBillingExperience'
+  import { storeToRefs } from 'pinia'
+  import { useAccountStore } from '@/stores/account'
   import TabsView from '@/views/Billing/TabsView.vue'
   import LegacyBillingScreen from '@/views/Billing/legacy/LegacyBillingScreen.vue'
-  import BillingGateSkeleton from '@/views/Billing/components/BillingGateSkeleton.vue'
 
   defineOptions({ name: 'BillingScreen' })
 
@@ -58,7 +47,7 @@
 
   const emit = defineEmits(['loadCard', 'openDrawerAddCredit', 'openDrawerAddPaymentMethod'])
 
-  const { isManagedBillingAccount, isResolved } = useBillingExperience()
+  const { isRegularAccount } = storeToRefs(useAccountStore())
 
   const childRef = ref(null)
 

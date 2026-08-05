@@ -72,7 +72,8 @@ vi.mock('@/composables/useWarmStripe', () => ({
 }))
 
 vi.mock('@/helpers/account-data', () => ({
-  loadUserAndAccountInfo: vi.fn()
+  loadUserAndAccountInfo: vi.fn(),
+  loadSubscriptionIdentity: vi.fn()
 }))
 
 vi.mock('@/helpers/persist-onboarding-data', () => ({
@@ -91,7 +92,7 @@ vi.mock('@/services/v2/base/query/queryClient', () => ({
 
 vi.mock('@/services/v2/base/query/queryKeys', () => ({
   queryKeys: {
-    serviceOrders: { all: ['service-orders'] },
+    subscriptions: { all: ['subscriptions'] },
     billing: { all: ['billing'] },
     plans: { all: ['plans'] }
   }

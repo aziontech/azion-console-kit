@@ -6,7 +6,8 @@ import { accountGuard } from '@/router/hooks/guards/accountGuard'
 vi.stubEnv('VITE_DEBUG_LOGIN', 'false')
 
 vi.mock('@/helpers/account-data', () => ({
-  loadUserAndAccountInfo: vi.fn()
+  loadUserAndAccountInfo: vi.fn(),
+  loadSubscriptionIdentity: vi.fn()
 }))
 
 vi.mock('@/helpers', () => ({
@@ -39,10 +40,12 @@ describe('accountGuard hasSession check', () => {
   })
 
   it('should attempt session restore when hasSession=true', async () => {
-    const { loadUserAndAccountInfo } = await import('@/helpers/account-data')
+    const { loadUserAndAccountInfo, loadSubscriptionIdentity } =
+      await import('@/helpers/account-data')
     const { sessionManager } = await import('@/services/v2/base/auth')
     loadUserAndAccountInfo.mockReset()
     loadUserAndAccountInfo.mockResolvedValue(undefined)
+    loadSubscriptionIdentity.mockClear()
     sessionManager.afterLogin.mockClear()
 
     const result = await accountGuard({
@@ -57,7 +60,34 @@ describe('accountGuard hasSession check', () => {
 
     expect(loadUserAndAccountInfo).toHaveBeenCalled()
     expect(sessionManager.afterLogin).toHaveBeenCalledOnce()
+    expect(loadSubscriptionIdentity).toHaveBeenCalledOnce()
     expect(result).toBeUndefined()
+  })
+
+  it('holds the prefetch and subscription reads while onboarding is pending', async () => {
+    const { loadUserAndAccountInfo, loadSubscriptionIdentity } =
+      await import('@/helpers/account-data')
+    const { sessionManager } = await import('@/services/v2/base/auth')
+    loadUserAndAccountInfo.mockReset()
+    loadUserAndAccountInfo.mockResolvedValue(undefined)
+    loadSubscriptionIdentity.mockClear()
+    sessionManager.afterLogin.mockClear()
+
+    const result = await accountGuard({
+      to: { meta: { isPublic: false }, fullPath: '/products', name: 'home' },
+      accountStore: {
+        hasActiveUserId: false,
+        hasSession: true,
+        isFirstLogin: true,
+        accountData: { id: 1 }
+      },
+      tracker: { reset: vi.fn() }
+    })
+
+    expect(loadUserAndAccountInfo).toHaveBeenCalled()
+    expect(sessionManager.afterLogin).not.toHaveBeenCalled()
+    expect(loadSubscriptionIdentity).not.toHaveBeenCalled()
+    expect(result).toEqual({ name: 'additional-data' })
   })
 
   it('should not interfere when user is already logged in', async () => {

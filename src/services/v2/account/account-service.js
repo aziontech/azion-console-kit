@@ -6,42 +6,6 @@ import { accountSettingsService } from './account-settings-service'
 
 const IDENTITY_QUERY_OPTIONS = { persist: false, staleTime: 0 }
 
-const BILLING_TYPE_STORAGE_KEY = 'billing_type_override'
-
-const BILLING_TYPES = ['plan', 'internal', 'custom']
-
-const readStoredBillingType = () => {
-  if (typeof window === 'undefined') {
-    return null
-  }
-  try {
-    return window.localStorage.getItem(BILLING_TYPE_STORAGE_KEY)
-  } catch {
-    return null
-  }
-}
-
-const normalizeConfiguredBillingType = (value) => {
-  if (value === null || value === undefined || value === '') return undefined
-  if (value === 'null') return null
-  return BILLING_TYPES.includes(value) ? value : undefined
-}
-
-const resolveBillingType = (billingType) => {
-  const configuredSources = [
-    import.meta.env.VITE_BILLING_TYPE,
-    import.meta.env.VITE_BILLING_TYPE_OVERRIDE,
-    readStoredBillingType()
-  ]
-
-  for (const source of configuredSources) {
-    const configured = normalizeConfiguredBillingType(source)
-    if (configured !== undefined) return { value: configured, isOverridden: true }
-  }
-
-  return { value: billingType ?? null, isOverridden: false }
-}
-
 export class AccountService extends BaseService {
   baseUrl = 'account/info'
 
@@ -102,12 +66,8 @@ export class AccountService extends BaseService {
   _adaptAccountInfo(response) {
     if (!response) return response
 
-    const billingType = resolveBillingType(response.billing_type)
-
     return {
       ...response,
-      billing_type: billingType.value,
-      billing_type_overridden: billingType.isOverridden,
       accountTypeIcon: getAccountTypeIcon(response.kind),
       accountTypeName: getAccountTypeName(response.kind)
     }

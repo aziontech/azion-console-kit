@@ -1,8 +1,4 @@
 import { defineStore } from 'pinia'
-import {
-  BILLING_EXPERIENCE,
-  resolveBillingExperience
-} from '@/services/v2/billing-api/billing-experience'
 
 const PRESERVED_EXTRA_KEYS = [
   'credit',
@@ -30,7 +26,6 @@ export const useAccountStore = defineStore({
       signup_email: false
     },
     currentPlanSku: null,
-    subscriptionAccountMode: null,
     accountStatuses: {
       BLOCKED: 'BLOCKED',
       DEFAULTING: 'DEFAULTING',
@@ -120,9 +115,6 @@ export const useAccountStore = defineStore({
     accountStatus(state) {
       return state.account?.status
     },
-    redirectToExternalBillingNeeded(state) {
-      return !state.account?.status || state.accountStatuses.REGULAR === state.account?.status
-    },
     showExportBilling(state) {
       return [state.accountStatuses.ONLINE, state.accountStatuses.TRIAL].includes(
         state.account?.status
@@ -133,34 +125,11 @@ export const useAccountStore = defineStore({
       return account?.client_flags?.includes(flags.MARKETPLACE_PRODUCTS)
     },
     accountIsNotRegular(state) {
-      return (
-        state.account?.status !== state.accountStatuses.REGULAR &&
-        this.billingExperience !== BILLING_EXPERIENCE.CUSTOM
-      )
+      return state.account?.status !== state.accountStatuses.REGULAR
     },
-    billingType(state) {
-      return state.account?.billing_type ?? null
+    isRegularAccount(state) {
+      return state.account?.status === state.accountStatuses.REGULAR
     },
-    isBillingTypeOverridden(state) {
-      return state.account?.billing_type_overridden === true
-    },
-    accountMode(state) {
-      return state.subscriptionAccountMode ?? null
-    },
-    billingExperience() {
-      return resolveBillingExperience({
-        billingType: this.billingType,
-        accountMode: this.accountMode,
-        isOverridden: this.isBillingTypeOverridden
-      })
-    },
-    isPlansBillingAccount() {
-      return this.billingExperience === BILLING_EXPERIENCE.PLAN
-    },
-    isManagedBillingAccount() {
-      return !this.isPlansBillingAccount
-    },
-
     hasHideCreateOptionsFlag(state) {
       return state.account?.client_flags?.includes(state.flags.HIDE_CREATE_OPTIONS)
     },
@@ -182,7 +151,7 @@ export const useAccountStore = defineStore({
           preservedExtras[key] = this.account[key]
         }
       }
-      if (account?.id !== this.account?.id) this.subscriptionAccountMode = null
+      if (account?.id !== this.account?.id) this.currentPlanSku = null
       this.account = { ...account, ...preservedExtras }
     },
     setAccountData(account) {
@@ -193,9 +162,6 @@ export const useAccountStore = defineStore({
     },
     setCurrentPlan(sku) {
       this.currentPlanSku = sku ?? null
-    },
-    setSubscriptionAccountMode(accountMode) {
-      this.subscriptionAccountMode = accountMode ?? null
     },
     resetAccount() {
       this.account = {}
@@ -210,7 +176,6 @@ export const useAccountStore = defineStore({
         signup_email: false
       }
       this.currentPlanSku = null
-      this.subscriptionAccountMode = null
     },
     setSsoSignUpMethod(method) {
       this.identifySignUpProvider = method

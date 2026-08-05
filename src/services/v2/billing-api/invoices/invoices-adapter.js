@@ -93,6 +93,41 @@ const toPayPayload = (payload = {}) => ({
     payload.paymentMethodId !== null && { payment_method_id: payload.paymentMethodId })
 })
 
+const INVOICE_STATUS_TAGS = Object.freeze({
+  open: { content: 'Open', icon: 'pi pi-calendar', severity: 'warning' },
+  paid: { content: 'Paid', icon: 'pi pi-check-circle', severity: 'success' },
+  partially_paid: { content: 'Partially Paid', icon: 'pi pi-clock', severity: 'info' },
+  void: { content: 'Void', icon: 'pi pi-ban', severity: 'info' },
+  uncollectible: { content: 'Uncollectible', icon: 'pi pi-times-circle', severity: 'danger' }
+})
+
+const UNKNOWN_STATUS_TAG = Object.freeze({ content: 'Pending', severity: 'info' })
+
+const formatRowAmount = (cents, currency) => {
+  if (typeof cents !== 'number' || !Number.isFinite(cents)) return '---'
+  const value = (cents / 100).toFixed(2)
+  return currency ? `${currency} ${value}` : value
+}
+
+const toHistoryRow = (invoice, { formatDate } = {}) => {
+  const issuedAt = invoice.issuedAt ?? invoice.audit?.createdAt ?? null
+
+  return {
+    id: invoice.id,
+    invoiceId: invoice.id,
+    amount: formatRowAmount(invoice.amount, invoice.currency),
+    invoiceNumber: { content: invoice.id, id: invoice.id },
+    status: INVOICE_STATUS_TAGS[invoice.status] ?? UNKNOWN_STATUS_TAG,
+    paymentDate: formatDate && issuedAt ? formatDate(issuedAt) : issuedAt,
+    invoiceUrl: invoice.pdfUrl ?? null,
+    disabled: false,
+    isFallback: false
+  }
+}
+
+const toHistoryRows = (invoices, options = {}) =>
+  (Array.isArray(invoices) ? invoices : []).map((invoice) => toHistoryRow(invoice, options))
+
 export const InvoicesAdapter = {
   transformInvoice,
   transformInvoiceLineItem,
@@ -104,5 +139,8 @@ export const InvoicesAdapter = {
   transformPdfResponse,
   transformPaymentResponse,
   toListParams,
-  toPayPayload
+  toPayPayload,
+  toHistoryRow,
+  toHistoryRows,
+  INVOICE_STATUS_TAGS
 }

@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { PLANS_MOCK_RESPONSE } from '@/services/v2/products/plans-mock'
 import { ProductsPlansAdapter } from '@/services/v2/products/plans-adapter'
-import {
-  getPlanIdFromSku,
-  getPlanPricingIdFromSku
-} from '@/composables/signup-checkout-preparation'
+import { getPlanIdFromSku } from '@/composables/signup-checkout-preparation'
+import { toBillingPeriod } from '@/services/v2/utils/billing-period'
 import { SubscriptionsAdapter } from '@/services/v2/billing-api/subscriptions/subscriptions-adapter'
 
 const wirePlans = PLANS_MOCK_RESPONSE.results
@@ -15,43 +13,44 @@ const cases = wirePlans.flatMap((wirePlan) =>
     sku: wirePlan.sku,
     periodicity: wirePricing.periodicity,
     expectedPlanId: wirePlan.plan_id,
-    expectedPlanPricingId: wirePricing.plan_pricing_id
+    expectedPeriod: wirePricing.periodicity === 'yearly' ? 'annual' : 'monthly'
   }))
 )
 
-describe('subscription create payload maps the catalogue ids one-to-one', () => {
+describe('subscription create payload carries the plan and its period', () => {
   it.each(cases)(
-    '$sku/$periodicity sends the plan_id and the matching plan_pricing_id',
-    ({ sku, periodicity, expectedPlanId, expectedPlanPricingId }) => {
+    '$sku/$periodicity sends the plan_id and the matching period',
+    ({ sku, periodicity, expectedPlanId, expectedPeriod }) => {
       const body = SubscriptionsAdapter.toCreatePayload({
         planId: getPlanIdFromSku(plans, sku),
-        planPricingId: getPlanPricingIdFromSku(plans, sku, periodicity)
+        period: toBillingPeriod(periodicity)
       })
 
       expect(body).toEqual({
         plan_id: expectedPlanId,
-        plan_pricing_id: expectedPlanPricingId
+        period: expectedPeriod
       })
-      expect(body.plan_pricing_id).not.toBe(body.plan_id)
     }
   )
 
-  it('never reuses a plan_id as a plan_pricing_id across the catalogue', () => {
-    const planIds = new Set(wirePlans.map((plan) => plan.plan_id))
-    const pricingIds = wirePlans.flatMap((plan) =>
-      plan.pricings.map((pricing) => pricing.plan_pricing_id)
-    )
+  it('never sends a plan_pricing_id — the pricing is a server-side snapshot in v4', () => {
+    const body = SubscriptionsAdapter.toCreatePayload({
+      planId: getPlanIdFromSku(plans, 'pro'),
+      period: toBillingPeriod('yearly')
+    })
 
-    expect(pricingIds.filter((id) => planIds.has(id))).toEqual([])
+    expect(body).not.toHaveProperty('plan_pricing_id')
+    expect(Object.keys(body)).toEqual(['plan_id', 'period'])
   })
 
-  it('keeps the two ids distinct for the same plan on both cycles', () => {
-    const pro = plans.find((plan) => plan.sku === 'pro')
-    const monthly = getPlanPricingIdFromSku(plans, 'pro', 'monthly')
-    const yearly = getPlanPricingIdFromSku(plans, 'pro', 'yearly')
+  it('maps both catalogue cycles of the same plan onto distinct periods', () => {
+    const planId = getPlanIdFromSku(plans, 'pro')
 
-    expect(monthly).not.toBe(yearly)
-    expect(monthly).not.toBe(pro.id)
-    expect(yearly).not.toBe(pro.id)
+    expect(
+      SubscriptionsAdapter.toCreatePayload({ planId, period: toBillingPeriod('monthly') })
+    ).toEqual({ plan_id: planId, period: 'monthly' })
+    expect(
+      SubscriptionsAdapter.toCreatePayload({ planId, period: toBillingPeriod('yearly') })
+    ).toEqual({ plan_id: planId, period: 'annual' })
   })
 })

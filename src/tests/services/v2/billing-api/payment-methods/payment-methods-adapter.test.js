@@ -138,10 +138,28 @@ describe('PaymentMethodsAdapter.transformList', () => {
     expect(result[1].audit.lastEditor).toBeNull()
   })
 
-  it('returns an empty array for a non-array response', () => {
+  it('also accepts the v4 list envelope, in case the wallet stops returning a bare array', () => {
+    const fromEnvelope = PaymentMethodsAdapter.transformList({
+      count: 1,
+      page: 1,
+      page_size: 20,
+      results: [wirePaymentMethod]
+    })
+    const fromArray = PaymentMethodsAdapter.transformList([wirePaymentMethod])
+
+    expect(fromEnvelope).toEqual(fromArray)
+    expect(fromEnvelope).toHaveLength(1)
+  })
+
+  it('also accepts a data-wrapped list', () => {
+    expect(PaymentMethodsAdapter.transformList({ data: [wirePaymentMethod] })).toHaveLength(1)
+  })
+
+  it('returns an empty array for a response with no list in it', () => {
     expect(PaymentMethodsAdapter.transformList(undefined)).toEqual([])
     expect(PaymentMethodsAdapter.transformList(null)).toEqual([])
     expect(PaymentMethodsAdapter.transformList({})).toEqual([])
+    expect(PaymentMethodsAdapter.transformList({ results: null })).toEqual([])
   })
 })
 

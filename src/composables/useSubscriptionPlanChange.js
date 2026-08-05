@@ -25,11 +25,16 @@ const EMPTY_SCHEDULED_CHANGES = { results: [], count: 0, unavailable: true }
 export const PLAN_CHANGE_MESSAGES = Object.freeze({
   MISSING_SUBSCRIPTION: 'No active subscription to change.',
   MISSING_PLAN: 'A target plan is required to change the subscription.',
+  MISSING_PERIOD: 'A billing period is required to create the subscription.',
   MISSING_SCHEDULED_CHANGE: 'No scheduled change to cancel.'
 })
 
 const assertPlanId = (planId) => {
   if (!planId) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_PLAN)
+}
+
+const assertPeriod = (period) => {
+  if (!period) throw new Error(PLAN_CHANGE_MESSAGES.MISSING_PERIOD)
 }
 
 const intentKeys = new Map()
@@ -53,11 +58,13 @@ const fetchScheduledChanges = async (subscriptionId) => {
   }
 }
 
+const SCHEDULED_CHANGES_STALE_TIME = 15_000
+
 const buildScheduledChangesQuery = (subscriptionId) => ({
   queryKey: queryKeys.subscriptions.scheduledChanges(subscriptionId),
   queryFn: () => fetchScheduledChanges(subscriptionId),
-  staleTime: 0,
-  gcTime: 0,
+  staleTime: SCHEDULED_CHANGES_STALE_TIME,
+  gcTime: SCHEDULED_CHANGES_STALE_TIME,
   meta: NO_CACHE_META
 })
 
@@ -91,9 +98,9 @@ export function useScheduledChanges(subscriptionIdRef, options = {}) {
     queryKey: computed(() => queryKeys.subscriptions.scheduledChanges(subscriptionId.value)),
     queryFn: () => fetchScheduledChanges(subscriptionId.value),
     enabled: computed(() => Boolean(subscriptionId.value) && Boolean(unref(enabled))),
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: 'always',
+    staleTime: SCHEDULED_CHANGES_STALE_TIME,
+    gcTime: SCHEDULED_CHANGES_STALE_TIME,
+    refetchOnMount: true,
     refetchOnWindowFocus: false,
     meta: NO_CACHE_META
   })
@@ -184,18 +191,13 @@ export function useSubscriptionPlanChange() {
     when: when ?? CHANGE_TIMING.NOW
   })
 
-  const createSubscription = async ({
-    planId,
-    planPricingId,
-    accountId,
-    paymentMethodId,
-    tosVersion
-  }) => {
+  const createSubscription = async ({ planId, period }) => {
     assertPlanId(planId)
+    assertPeriod(period)
 
-    const intentId = `create:${planId}:${planPricingId ?? ''}`
+    const intentId = `create:${planId}:${period}`
     const response = await createMutation.mutateAsync({
-      payload: { planId, planPricingId, accountId, paymentMethodId, tosVersion },
+      payload: { planId, period },
       idempotencyKey: takeIdempotencyKey(intentId)
     })
 

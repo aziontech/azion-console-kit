@@ -20,7 +20,6 @@
         v-if="subscriptionState.isHobby"
         :loading="preparingPlan === 'pro'"
         @upgrade="openUpgradeToPro"
-        @upgrade-intent="handleUpgradeIntent"
       />
       <CurrentInvoiceCard
         v-else
@@ -54,7 +53,6 @@
       :allowedFilters="allowedFilters"
       emptyListMessage="No payment activity found."
       @on-load-data="handleLoadData"
-      @on-before-go-to-edit="goToEnvoiceDetails"
     />
   </div>
 
@@ -63,7 +61,7 @@
     title="No payment activity yet."
     description="Add a payment method and start using services and products to view your activity."
     :inTabs="true"
-    :documentationService="props.documentPaymentHistoryService"
+    :documentationService="documentPaymentHistoryService"
   >
     <template #default>
       <PrimeButton
@@ -95,7 +93,7 @@
     :mode="drawerMode"
     :lockedCycle="lockedCycle"
     :initialClientSecret="checkoutSessionClientSecret"
-    :getStripeClientService="props.getStripeClientService"
+    :getStripeClientService="getStripeClientService"
     :indented="showChangePlanDrawer"
     @submit="handlePlanInfoSubmit"
     @submitCycleChange="handleCycleUpgradeSubmit"
@@ -120,7 +118,7 @@
 
   <DialogChangePaymentMethod
     v-model:visible="showChangePaymentMethodDialog"
-    :getStripeClientService="props.getStripeClientService"
+    :getStripeClientService="getStripeClientService"
   />
 </template>
 
@@ -142,9 +140,10 @@
   import { usePlansList } from '@/composables/usePlansService'
   import { useCurrentSubscription } from '@/composables/useCurrentSubscription'
   import { useWallet } from '@/composables/billing/useWallet'
-  import { paymentsService } from '@/services/v2/billing-api/payments/payments-service'
-  import { PaymentsAdapter } from '@/services/v2/billing-api/payments/payments-adapter'
-  import { paymentMethodsService } from '@/services/v2/billing-api/payment-methods/payment-methods-service'
+  import { billingInvoicesService } from '@/services/v2/billing-api/invoices/invoices-service'
+  import { InvoicesAdapter } from '@/services/v2/billing-api/invoices/invoices-adapter'
+  import { getStripeClientService, loadCurrentInvoiceService } from '@/services/billing-services'
+  import { documentationGuideProducts } from '@/helpers'
   import { formatDateToDayMonthYearHour } from '@/helpers/convert-date'
   import { useCheckoutSessionPreparer } from '@/composables/useCheckoutSessionPreparer'
   import { useSubscriptionPlanChange } from '@/composables/useSubscriptionPlanChange'
@@ -182,50 +181,11 @@
       .catch(Sentry.captureException)
   }
 
-  const { showExportBilling, accountIsNotRegular } = storeToRefs(accountStore)
+  const { showExportBilling } = storeToRefs(accountStore)
+
+  const documentPaymentHistoryService = documentationGuideProducts.paymentHistory
 
   const props = defineProps({
-    documentPaymentHistoryService: {
-      type: Function,
-      required: true
-    },
-    loadYourServicePlanService: {
-      type: Function,
-      required: true
-    },
-    openPlans: {
-      type: Function,
-      required: true
-    },
-    loadContractServicePlan: {
-      type: Function,
-      required: true
-    },
-    loadCurrentInvoiceService: {
-      type: Function,
-      required: true
-    },
-    cardDefault: {
-      type: Object
-    },
-    loadPaymentMethodDefaultService: {
-      type: Function
-    },
-    loadInvoiceDataService: {
-      type: Function
-    },
-    listServiceAndProductsChangesService: {
-      type: Function
-    },
-    getStripeClientService: {
-      type: Function
-    },
-    documentPaymentMethodService: {
-      type: Function
-    },
-    loadInvoiceLastUpdatedService: {
-      type: Function
-    },
     isReloading: {
       type: Boolean,
       default: false
@@ -246,37 +206,59 @@
     hasContentToList.value = event
   }
 
-  const navigateMethod = (name, params) => {
-    router.push({ name, params })
+  const PDF_POLL_ATTEMPTS = 5
+  const PDF_POLL_DELAY_MS = 2000
+
+  const downloadInvoicePdf = async (item) => {
+    trackBilling('invoiceDownloaded', { invoiceId: item.invoiceId, format: 'pdf' })
+
+    if (item.invoiceUrl) {
+      window.open(item.invoiceUrl, '_blank')
+      return
+    }
+
+    try {
+      for (let attempt = 0; attempt < PDF_POLL_ATTEMPTS; attempt += 1) {
+        const { pdfUrl, isGenerating } = await billingInvoicesService.getInvoicePdf(item.invoiceId)
+        if (pdfUrl) {
+          window.open(pdfUrl, '_blank')
+          return
+        }
+        if (!isGenerating) break
+        if (attempt < PDF_POLL_ATTEMPTS - 1) {
+          await new Promise((resolve) => setTimeout(resolve, PDF_POLL_DELAY_MS))
+        }
+      }
+      toast.add({
+        severity: 'info',
+        summary: 'Invoice PDF',
+        detail: 'The invoice PDF is still being generated. Please try again in a few moments.',
+        life: 6000,
+        closable: true
+      })
+    } catch (err) {
+      Sentry.captureException(err)
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Unable to download the invoice.',
+        closable: true
+      })
+    }
   }
 
   const actionsRow = computed(() => {
-    const actions = [
-      {
-        label: 'Details',
-        icon: 'pi pi-file',
-        type: 'action',
-        disabled: (item) => item.isFallback,
-        commandAction: (item) => goToEnvoiceDetails(item)
-      }
-    ]
+    if (!showExportBilling.value) return []
 
-    if (showExportBilling.value) {
-      actions.push({
+    return [
+      {
         label: 'Download Invoice',
         icon: 'pi pi-download',
         type: 'action',
         disabled: (item) => item.disabled || item.isFallback,
-        commandAction: (item) => {
-          if (item.invoiceUrl) {
-            trackBilling('invoiceDownloaded', { billId: item.billId, format: 'pdf' })
-            window.open(item.invoiceUrl, '_blank')
-          }
-        }
-      })
-    }
-
-    return actions
+        commandAction: (item) => downloadInvoicePdf(item)
+      }
+    ]
   })
 
   const showChangePlanDrawer = ref(false)
@@ -368,19 +350,6 @@
     return promise
   }
 
-  const schedulePrepareForPro = (preferredCycle = null) => {
-    if (subscription.isPro.value) return
-    const cycle = preferredCycle || storedBillingCycle.value || 'monthly'
-    const key = buildPreparationKey('pro', cycle)
-    if (
-      checkoutPreparationKey.value === key &&
-      (checkoutSessionClientSecret.value || currentCheckoutPreparationPromise)
-    ) {
-      return
-    }
-    prepareCheckoutAhead({ plan: 'pro', preferredCycle: cycle }).catch(Sentry.captureException)
-  }
-
   const { defaultPaymentMethod } = useWallet()
 
   const formatBrandName = (brand) => {
@@ -414,11 +383,19 @@
 
   const loadCurrentInvoice = async () => {
     try {
-      currentInvoice.value = (await props.loadCurrentInvoiceService()) || {}
+      currentInvoice.value = (await loadCurrentInvoiceService()) || {}
     } catch {
       currentInvoice.value = {}
     }
   }
+
+  watch(
+    () => subscriptionState.isPro,
+    (isPro) => {
+      if (isPro) loadCurrentInvoice()
+    },
+    { immediate: true }
+  )
 
   const refreshInvoiceAndHistory = async () => {
     if (!hasContentToList.value) {
@@ -428,19 +405,6 @@
     }
     await Promise.allSettled([loadCurrentInvoice(), listTableRef.value?.reload?.()])
   }
-
-  // Re-fetch the legacy invoice service whenever the subscription transitions
-  // into Pro (initial mount included). No timer/retry loop here — the
-  // post-checkout invoice freshness used to be papered over by 6×2s polling;
-  // now it relies on the SO mutation `onSuccess` invalidating subscription
-  // state and `loadCurrentInvoice` running again on this watch.
-  watch(
-    () => subscriptionState.isPro,
-    (isPro) => {
-      if (isPro) loadCurrentInvoice()
-    },
-    { immediate: true }
-  )
 
   onMounted(async () => {
     // Warm Stripe.js up front: the plan-info, add-payment and change-cycle
@@ -472,15 +436,15 @@
   }
 
   const listPaymentHistory = async ({ page = 1, pageSize = 20, status } = {}) => {
-    const [payments, paymentMethods] = await Promise.all([
-      paymentsService.listPayments({ page, pageSize, ...(status && { status }) }),
-      paymentMethodsService.listPaymentMethods().catch(() => [])
-    ])
+    const invoices = await billingInvoicesService.listInvoices({
+      page,
+      pageSize,
+      ...(status && { status })
+    })
 
     return {
-      count: payments.count,
-      body: PaymentsAdapter.toHistoryRows(payments.results, {
-        paymentMethods,
+      count: invoices.count,
+      body: InvoicesAdapter.toHistoryRows(invoices.results, {
         formatDate: formatDateToDayMonthYearHour
       })
     }
@@ -540,10 +504,6 @@
     } finally {
       preparingPlan.value = null
     }
-  }
-
-  const handleUpgradeIntent = () => {
-    schedulePrepareForPro('monthly')
   }
 
   // Stripe rejected the previously issued client secret (session expired or
@@ -990,7 +950,7 @@
           }
         : { billId }
     trackBilling('invoiceViewed', invoicePayload)
-    navigateMethod('billing-invoice-details', { billId })
+    router.push({ name: 'billing-invoice-details', params: { billId } })
   }
 
   const goToPayment = () => {
@@ -1001,75 +961,42 @@
     showChangePaymentMethodDialog.value = true
   }
 
-  const loaderPaymentHistoryColumns = computed(() => {
-    if (accountIsNotRegular.value) {
-      return [
-        {
-          field: 'paymentDate',
-          header: 'Payment Date'
-        },
-        {
-          field: 'invoiceNumber',
-          header: 'Invoice ID',
-          filterPath: 'invoiceNumber.content',
-          sortField: 'invoiceNumber.content',
-          type: 'component',
-          component: (columnData) => {
-            return columnBuilder({
-              data: columnData,
-              columnAppearance: 'text-full-with-clipboard'
-            })
-          }
-        },
-        {
-          field: 'paymentMethod',
-          header: 'Payment Method',
-          filterPath: 'paymentMethod.value',
-          sortField: 'paymentMethod.value',
-          type: 'component',
-          component: (columnData) =>
-            columnBuilder({ data: columnData, columnAppearance: 'credit-card-column' })
-        },
-        {
-          field: 'amount',
-          header: 'Transactions Amount'
-        },
-        {
-          field: 'status',
-          header: 'Status',
-          type: 'component',
-          sortField: 'status.content',
-          filterPath: 'status.content',
-          component: (columnData) => {
-            return columnBuilder({
-              data: columnData,
-              columnAppearance: 'tag'
-            })
-          }
-        }
-      ]
-    }
-
-    return [
-      {
-        field: 'paymentDate',
-        header: 'Payment Date'
-      },
-      {
-        field: 'invoiceNumber',
-        header: 'Invoice ID',
-        filterPath: 'invoiceNumber.content',
-        sortField: 'invoiceNumber.content',
-        type: 'component',
-        component: (columnData) => {
-          return columnBuilder({
-            data: columnData,
-            columnAppearance: 'text-full-with-clipboard'
-          })
-        }
+  const loaderPaymentHistoryColumns = computed(() => [
+    {
+      field: 'paymentDate',
+      header: 'Issued At'
+    },
+    {
+      field: 'invoiceNumber',
+      header: 'Invoice ID',
+      filterPath: 'invoiceNumber.content',
+      sortField: 'invoiceNumber.content',
+      type: 'component',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'text-full-with-clipboard'
+        })
       }
-    ]
-  })
+    },
+    {
+      field: 'amount',
+      header: 'Amount'
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      type: 'component',
+      sortField: 'status.content',
+      filterPath: 'status.content',
+      component: (columnData) => {
+        return columnBuilder({
+          data: columnData,
+          columnAppearance: 'tag'
+        })
+      }
+    }
+  ])
 
   const reloadList = async () => {
     if (hasContentToList.value) {

@@ -318,12 +318,6 @@ export const queryKeys = {
     all: ['plans'],
     list: () => [...queryKeys.plans.all, 'list']
   },
-  billingLegacy: {
-    all: ['billing-legacy'],
-    paymentMethods: () => [...queryKeys.billingLegacy.all, 'payment-methods'],
-    invoices: () => [...queryKeys.billingLegacy.all, 'invoices'],
-    paymentHistory: () => [...queryKeys.billingLegacy.all, 'payment-history']
-  },
   subscriptions: {
     all: ['subscriptions'],
     list: (params) => [...queryKeys.subscriptions.all, 'list', normalizeParams(params)],
@@ -331,18 +325,6 @@ export const queryKeys = {
     detail: (id) => [...queryKeys.subscriptions.all, 'detail', id],
     versions: (id) => [...queryKeys.subscriptions.detail(id), 'versions'],
     scheduledChanges: (id) => [...queryKeys.subscriptions.detail(id), 'scheduled-changes']
-  },
-  serviceOrders: {
-    all: ['service-orders'],
-    list: (params) => [...queryKeys.serviceOrders.all, 'list', normalizeParams(params)],
-    detail: (id) => [...queryKeys.serviceOrders.all, 'detail', id],
-    actions: (id) => [...queryKeys.serviceOrders.detail(id), 'actions'],
-    terms: (id) => [...queryKeys.serviceOrders.detail(id), 'terms'],
-    bySubscription: (subscriptionId) => [
-      ...queryKeys.serviceOrders.all,
-      'by-subscription',
-      subscriptionId
-    ]
   },
   paymentMethods: {
     all: ['payment-methods'],

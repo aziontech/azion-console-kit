@@ -124,41 +124,6 @@
           </SkeletonBlock>
         </div>
         <div
-          class="flex justify-between items-center"
-          v-if="accountIsNotRegular"
-        >
-          <span class="text-color-secondary text-sm">Payment Method</span>
-          <div class="flex items-center gap-2">
-            <SkeletonBlock
-              class="font-medium text-color text-sm"
-              width="8rem"
-              sizeHeight="small"
-              :isLoaded="defaultCardStatus.loaded"
-              elementType="span"
-            >
-              <span
-                class="flex gap-2 items-center"
-                v-if="defaultCardStatus.hasData"
-              >
-                <cardFlagBlock
-                  v-if="paymentMethodBrand"
-                  :cardFlag="paymentMethodBrand"
-                />
-                {{ paymentMethodLabel }}
-              </span>
-              <span v-else>---</span>
-            </SkeletonBlock>
-            <PrimeButton
-              v-if="defaultCardStatus.hasData"
-              outlined
-              size="small"
-              label="Change"
-              @click="openChangePaymentMethod"
-            />
-          </div>
-        </div>
-
-        <div
           class="flex justify-between"
           v-if="accountIsNotRegular"
         >
@@ -227,21 +192,6 @@
     description="Start using services and products to view your activity."
     :inTabs="true"
     :documentationService="props.documentPaymentHistoryService"
-  >
-    <template #default>
-      <PrimeButton
-        class="max-md:w-full w-fit"
-        severity="secondary"
-        icon="pi pi-plus"
-        label="Payment Method"
-        @click="openChangePaymentMethod"
-      />
-    </template>
-  </EmptyResultsBlock>
-
-  <DialogChangePaymentMethod
-    v-model:visible="showChangePaymentMethodDialog"
-    :getStripeClientService="props.getStripeClientService"
   />
 </template>
 
@@ -253,9 +203,6 @@
   import ListTable from '@/components/list-table/ListTable.vue'
   import PrimeButton from '@aziontech/webkit/button'
   import Tag from '@aziontech/webkit/prime-tag'
-  import cardFlagBlock from '@templates/card-flag-block'
-  import DialogChangePaymentMethod from '@/views/Billing/legacy/DialogChangePaymentMethod.vue'
-  import { useLegacyWallet } from '@/composables/billing-legacy/useLegacyWallet'
   import { useAccountStore } from '@/stores/account'
   import { storeToRefs } from 'pinia'
 
@@ -268,8 +215,7 @@
   const accountStore = useAccountStore()
   const listTableRef = ref(null)
 
-  const { accountData, accountIsNotRegular, showExportBilling, billingExperience } =
-    storeToRefs(accountStore)
+  const { accountData, accountIsNotRegular, showExportBilling } = storeToRefs(accountStore)
 
   const user = accountData
 
@@ -320,44 +266,6 @@
 
   const currentInvoice = ref({})
   const disabledCurrentInvoice = ref(true)
-  const showChangePaymentMethodDialog = ref(false)
-
-  const openChangePaymentMethod = () => {
-    showChangePaymentMethodDialog.value = true
-  }
-
-  const SUPPORTED_CARD_FLAGS = ['visa', 'mastercard', 'amex', 'discover', 'diners', 'jcb']
-  const CARD_BRAND_ALIASES = {
-    american_express: 'amex',
-    americanexpress: 'amex',
-    diners_club: 'diners',
-    dinersclub: 'diners'
-  }
-
-  const {
-    defaultPaymentMethod,
-    isLoading: isPaymentMethodLoading,
-    refetch: refetchPaymentMethod
-  } = useLegacyWallet()
-
-  const paymentMethodBrand = computed(() => {
-    const raw = (defaultPaymentMethod.value?.brand || '').toLowerCase()
-    if (!raw) return null
-    const normalized = CARD_BRAND_ALIASES[raw] ?? raw
-    return SUPPORTED_CARD_FLAGS.includes(normalized) ? normalized : null
-  })
-
-  const paymentMethodLabel = computed(() => {
-    const method = defaultPaymentMethod.value
-    if (!method?.last4) return '---'
-    const brand = method.brand ? method.brand.charAt(0).toUpperCase() + method.brand.slice(1) : ''
-    return [brand, method.last4].filter(Boolean).join(' •••• ')
-  })
-
-  const defaultCardStatus = computed(() => ({
-    loaded: !isPaymentMethodLoading.value,
-    hasData: !!defaultPaymentMethod.value?.last4
-  }))
 
   const allowedFilters = [
     {
@@ -444,17 +352,7 @@
     }
   }
 
-  const billingExperiencePlanLabels = {
-    custom: 'Custom Plan',
-    internal: 'Internal/Free Plan'
-  }
-
   const getLoadContractService = async () => {
-    const presetLabel = billingExperiencePlanLabels[billingExperience.value]
-    if (presetLabel) {
-      servicePlan.value = presetLabel
-      return
-    }
     const { yourServicePlan } = await props.loadContractServicePlan({
       clientId: user.value.client_id
     })
@@ -465,9 +363,7 @@
     await Promise.all([getLoadContractService(), getYourServicePlan()])
   }
 
-  const isTrail = computed(
-    () => user.value.status === 'TRIAL' && billingExperience.value !== 'custom'
-  )
+  const isTrail = computed(() => user.value.status === 'TRIAL')
 
   const loaderPaymentHistoryColumns = computed(() => {
     if (accountIsNotRegular.value) {
@@ -548,12 +444,7 @@
   }
 
   const reloadAll = async () => {
-    await Promise.allSettled([
-      getAllInfos(),
-      loaderCurrentInvoice(),
-      reloadList(),
-      refetchPaymentMethod()
-    ])
+    await Promise.allSettled([getAllInfos(), loaderCurrentInvoice(), reloadList()])
   }
 
   onMounted(async () => {

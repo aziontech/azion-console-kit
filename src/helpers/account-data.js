@@ -4,6 +4,9 @@ import { queryClient } from '@/services/v2/base/query/queryClient'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { useAccountStore } from '@/stores/account'
 import { setFeatureFlags } from '@/composables/user-flag'
+import { ensureCurrentSubscription } from '@/composables/useSubscriptionState'
+import { ensurePlansList } from '@/composables/usePlansService'
+import { findPlanById, resolvePlanSku } from '@/composables/subscription-helpers'
 
 const invalidateAccountCaches = () => {
   queryClient.removeQueries({ queryKey: queryKeys.account.info() })
@@ -46,6 +49,27 @@ export const loadUserAndAccountInfo = async ({ force = false } = {}) => {
 
   accountStore.setIdentity(identity)
   setFeatureFlags(identity.client_flags)
+}
+
+export const loadSubscriptionIdentity = async () => {
+  const accountStore = useAccountStore()
+
+  if (accountStore.isFirstLogin || accountStore.isRegularAccount) return
+
+  try {
+    const current = await ensureCurrentSubscription()
+    const subscription = current?.data ?? null
+
+    if (!subscription) {
+      accountStore.setCurrentPlan(null)
+      return
+    }
+
+    const plans = await ensurePlansList()
+    accountStore.setCurrentPlan(resolvePlanSku(findPlanById(plans, subscription.planId)))
+  } catch {
+    accountStore.setCurrentPlan(null)
+  }
 }
 
 export const loadBillingData = async () => {

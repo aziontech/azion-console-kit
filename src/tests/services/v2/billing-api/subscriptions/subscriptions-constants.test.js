@@ -8,7 +8,12 @@ import {
   PRORATION_BEHAVIOR,
   CHANGE_TIMING,
   SCHEDULED_CHANGE_TYPE,
-  SCHEDULED_CHANGE_STATUS
+  SCHEDULED_CHANGE_STATUS,
+  normalizeSubscriptionStatus,
+  isEntitledStatus,
+  isTerminalStatus,
+  isCheckoutPendingStatus,
+  isSuspendedStatus
 } from '@/services/v2/billing-api/subscriptions/subscriptions-constants'
 
 describe('subscriptions constants mirror the v4 contract enums', () => {
@@ -51,5 +56,56 @@ describe('subscriptions constants mirror the v4 contract enums', () => {
       APPLIED: 'applied',
       CANCELLED: 'cancelled'
     })
+  })
+})
+
+describe('normalizeSubscriptionStatus bridges the UPPERCASE read DTO and the lowercase spec enum', () => {
+  it('keeps the uppercase statuses the API returns today', () => {
+    expect(normalizeSubscriptionStatus('DRAFT')).toBe('DRAFT')
+    expect(normalizeSubscriptionStatus('ACTIVE')).toBe('ACTIVE')
+    expect(normalizeSubscriptionStatus('PAST_DUE')).toBe('PAST_DUE')
+    expect(normalizeSubscriptionStatus('BLOCKED')).toBe('BLOCKED')
+    expect(normalizeSubscriptionStatus('CANCELED')).toBe('CANCELED')
+    expect(normalizeSubscriptionStatus('EXPIRED')).toBe('EXPIRED')
+  })
+
+  it('maps the lowercase spec enum onto the same canonical set', () => {
+    expect(normalizeSubscriptionStatus('incomplete')).toBe('DRAFT')
+    expect(normalizeSubscriptionStatus('active')).toBe('ACTIVE')
+    expect(normalizeSubscriptionStatus('past_due')).toBe('PAST_DUE')
+    expect(normalizeSubscriptionStatus('suspended')).toBe('BLOCKED')
+    expect(normalizeSubscriptionStatus('cancelled')).toBe('CANCELED')
+    expect(normalizeSubscriptionStatus('expired')).toBe('EXPIRED')
+  })
+
+  it('tolerates the double-l cancelled spelling in either case', () => {
+    expect(normalizeSubscriptionStatus('CANCELLED')).toBe('CANCELED')
+    expect(normalizeSubscriptionStatus('canceled')).toBe('CANCELED')
+  })
+
+  it('returns null for an absent status and passes an unknown one through uppercased', () => {
+    expect(normalizeSubscriptionStatus(null)).toBeNull()
+    expect(normalizeSubscriptionStatus(undefined)).toBeNull()
+    expect(normalizeSubscriptionStatus('')).toBeNull()
+    expect(normalizeSubscriptionStatus('something_new')).toBe('SOMETHING_NEW')
+  })
+
+  it('answers the entitlement questions in both formats', () => {
+    expect(isEntitledStatus('ACTIVE')).toBe(true)
+    expect(isEntitledStatus('past_due')).toBe(true)
+    expect(isEntitledStatus('DRAFT')).toBe(false)
+    expect(isEntitledStatus('suspended')).toBe(false)
+
+    expect(isTerminalStatus('cancelled')).toBe(true)
+    expect(isTerminalStatus('EXPIRED')).toBe(true)
+    expect(isTerminalStatus('ACTIVE')).toBe(false)
+
+    expect(isCheckoutPendingStatus('DRAFT')).toBe(true)
+    expect(isCheckoutPendingStatus('incomplete')).toBe(true)
+    expect(isCheckoutPendingStatus('ACTIVE')).toBe(false)
+
+    expect(isSuspendedStatus('BLOCKED')).toBe(true)
+    expect(isSuspendedStatus('suspended')).toBe(true)
+    expect(isSuspendedStatus('PAST_DUE')).toBe(false)
   })
 })

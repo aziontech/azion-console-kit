@@ -6,19 +6,25 @@ import { queryClient } from '@/services/v2/base/query/queryClient'
 import { queryKeys } from '@/services/v2/base/query/queryKeys'
 import { isNotFound } from '@/services/v2/utils/is-not-found'
 
-const UNAVAILABLE = { paymentMethods: [], defaultPaymentMethod: null, unavailable: true }
+const UNAVAILABLE = {
+  paymentMethods: [],
+  defaultPaymentMethod: null,
+  isStale: false,
+  unavailable: true
+}
 
-const normalize = (methods) => {
-  const paymentMethods = Array.isArray(methods) ? methods : []
+const normalize = ({ paymentMethods, isStale } = {}) => {
+  const methods = Array.isArray(paymentMethods) ? paymentMethods : []
   return {
-    paymentMethods,
-    defaultPaymentMethod: paymentMethods.find((method) => method.isDefault) ?? null
+    paymentMethods: methods,
+    defaultPaymentMethod: methods.find((method) => method.isDefault) ?? null,
+    isStale: isStale === true
   }
 }
 
 const fetchWallet = async () => {
   try {
-    return normalize(await paymentMethodsService.listPaymentMethods())
+    return normalize(await paymentMethodsService.listPaymentMethodsWithMeta())
   } catch (error) {
     if (isNotFound(error)) return UNAVAILABLE
     throw error
@@ -31,6 +37,35 @@ export const invalidateWallet = () =>
   queryClient.invalidateQueries({ queryKey: queryKeys.paymentMethods.all })
 
 /**
+ * A captured card only reaches billing-api through the gateway webhook
+ * (`payment_method.attached`), so it is not in the wallet the instant
+ * `confirmSetup` resolves. Re-reads the list until the reference shows up.
+ */
+export const waitForPaymentMethod = async (
+  paymentMethodId,
+  { attempts = 5, delayMs = 1200 } = {}
+) => {
+  if (!paymentMethodId) return null
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const wallet = await queryClient.fetchQuery({
+      queryKey: walletQueryKey(),
+      queryFn: fetchWallet,
+      staleTime: 0,
+      gcTime: 0,
+      meta: { persist: false }
+    })
+    const found = wallet?.paymentMethods?.find((method) => method.id === paymentMethodId) ?? null
+    if (found) return found
+    if (attempt < attempts - 1) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs))
+    }
+  }
+
+  return null
+}
+
+/**
  * Card wallet for the plans experience — billing-api v4. The list is read live
  * from the gateway and comes back as a raw array (no v4 envelope).
  */
@@ -40,9 +75,9 @@ export function useWallet(options = {}) {
   const query = useQuery({
     queryKey: walletQueryKey(),
     queryFn: fetchWallet,
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: 'always',
+    staleTime: 15_000,
+    gcTime: 15_000,
+    refetchOnMount: true,
     refetchOnWindowFocus: false,
     meta: { persist: false },
     enabled
@@ -56,6 +91,7 @@ export function useWallet(options = {}) {
     paymentMethods,
     defaultPaymentMethod,
     hasPaymentMethods: computed(() => paymentMethods.value.length > 0),
+    isStale: computed(() => query.data.value?.isStale === true),
     isUnavailable: computed(() => query.data.value?.unavailable === true),
     isLoading: query.isLoading,
     isFetching: query.isFetching,

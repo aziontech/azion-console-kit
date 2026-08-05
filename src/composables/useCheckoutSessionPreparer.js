@@ -6,10 +6,17 @@ import { useWalletMutations } from '@/composables/billing/useWallet'
 import { ensureCurrentSubscription } from '@/composables/useSubscriptionState'
 import { ensurePlansList } from '@/composables/usePlansService'
 import { loadUserAndAccountInfo } from '@/helpers/account-data'
-import { SUBSCRIPTION_TERMINAL_STATUSES } from '@/services/v2/billing-api/subscriptions/subscriptions-constants'
+import { toBillingPeriod } from '@/services/v2/utils/billing-period'
+import {
+  isCheckoutPendingStatus,
+  isTerminalStatus
+} from '@/services/v2/billing-api/subscriptions/subscriptions-constants'
 
 const resolvePlan = (plans, sku) =>
   plans?.find((item) => item.sku?.toLowerCase() === String(sku).toLowerCase()) ?? null
+
+const needsFirstPayment = (subscription) =>
+  isTerminalStatus(subscription?.status) || isCheckoutPendingStatus(subscription?.status)
 
 export const prepareCheckoutSessionForSubscription = async ({
   plan,
@@ -21,24 +28,24 @@ export const prepareCheckoutSessionForSubscription = async ({
 }) => {
   const catalogPlan = resolvePlan(plans, plan)
   const planId = catalogPlan?.id
-  const planPricingId =
-    catalogPlan?.pricings?.find((pricing) => pricing.periodicity === cycle)?.id ?? null
+  const period = toBillingPeriod(cycle)
+  const offersCycle = catalogPlan?.pricings?.some((pricing) => pricing.periodicity === cycle)
 
-  if (!planId || (catalogPlan?.pricings?.length && !planPricingId)) {
+  if (!planId || !period || (catalogPlan?.pricings?.length && !offersCycle)) {
     throw new Error(`Plan pricing not found for ${plan} (${cycle}).`)
   }
 
   const current = await ensureSubscription()
   const subscription = current?.data ?? null
 
-  if (subscription && !SUBSCRIPTION_TERMINAL_STATUSES.includes(subscription.status)) {
+  if (subscription && !needsFirstPayment(subscription)) {
     const session = await createCardSetupSession()
     const secret = session?.clientSecret ?? session?.data?.clientSecret ?? ''
     if (!secret) throw new Error('Unable to start the card capture session.')
     return secret
   }
 
-  const response = await createSubscription({ planId, planPricingId })
+  const response = await createSubscription({ planId, period })
   const secret = response?.payment?.clientSecret ?? ''
 
   if (!secret) {
@@ -50,11 +57,12 @@ export const prepareCheckoutSessionForSubscription = async ({
 /**
  * Prepares the Stripe client secret the plan drawer mounts.
  *
- * With no subscription yet, `POST /v4/account/subscriptions` creates it as
- * `incomplete` and returns the client secret for the first payment. When a
- * subscription already exists the plan change is local pro-rata, so the drawer
- * only needs to capture a card (setup session) — committing the plan is the
- * caller's job, via `useSubscriptionPlanChange().applyChange`.
+ * With no subscription yet — or with one still awaiting its first payment
+ * (`DRAFT`/`incomplete`), or a terminal one — `POST /v4/account/subscriptions`
+ * mints the checkout and returns the client secret for that payment. When an
+ * effective subscription already exists the plan change is local pro-rata, so
+ * the drawer only needs to capture a card (setup session) — committing the plan
+ * is the caller's job, via `useSubscriptionPlanChange().applyChange`.
  *
  * Callers that can fire multiple preparations in parallel must keep their own
  * "latest request wins" guard before applying returned secrets.

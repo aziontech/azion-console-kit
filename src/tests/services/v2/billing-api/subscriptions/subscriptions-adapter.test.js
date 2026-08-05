@@ -32,6 +32,7 @@ describe('SubscriptionsAdapter.transformSubscription', () => {
       id: '019c9fa2-aaaa-4bbb-8ccc-000000000001',
       type: 'plan_subscription',
       status: 'ACTIVE',
+      rawStatus: 'ACTIVE',
       planId: '019c9fa2-ee78-7a7a-a266-796f750d8261',
       planPricingId: '019c9fa2-ee75-743c-8b0b-a1de319b9bfb',
       accountMode: null,
@@ -129,12 +130,47 @@ describe('SubscriptionsAdapter change response (202)', () => {
 
     expect(result.state).toBe('executed')
     expect(result.data.id).toBe(42)
-    expect(result.data.status).toBe('active')
+    expect(result.data.status).toBe('ACTIVE')
+    expect(result.data.rawStatus).toBe('active')
   })
 
   it('defaults the subscription to null when the envelope carries no data', () => {
     const result = SubscriptionsAdapter.transformSubscriptionDetailResponse({ state: 'executed' })
     expect(result.data).toBeNull()
+  })
+
+  it('unwraps the nested {subscription, proration, pending_transition} change body (stage 2026-08-05)', () => {
+    const result = SubscriptionsAdapter.transformSubscriptionDetailResponse({
+      state: 'executed',
+      data: {
+        subscription: {
+          id: '5cd6c8e9-7541-474c-ae84-8d6808f0172a',
+          service_order_id: '5cd6c8e9-7541-474c-ae84-8d6808f0172a',
+          status: 'active',
+          plan_id: '019c9fa2-ee78-7a7a-a266-796f750d8261',
+          period: 'annual',
+          current_period_start: '2026-08-05T12:36:23.000Z',
+          current_period_end: '2027-08-05T12:36:23.000Z',
+          cancel_at_period_end: false
+        },
+        proration: { currency: 'usd', immediate_total: 21561 },
+        pending_transition: {
+          type: 'downgrade',
+          to_plan_id: 'plan-b',
+          effective_date: '2027-08-05T12:36:23.000Z'
+        }
+      }
+    })
+
+    expect(result.data.id).toBe('5cd6c8e9-7541-474c-ae84-8d6808f0172a')
+    expect(result.data.status).toBe('ACTIVE')
+    expect(result.data.renew).toBe('annual')
+    expect(result.data.pendingTransition).toEqual({
+      type: 'downgrade',
+      toPlanId: 'plan-b',
+      toPlanPricingId: null,
+      effectiveDate: '2027-08-05T12:36:23.000Z'
+    })
   })
 })
 
@@ -242,7 +278,7 @@ describe('SubscriptionsAdapter.toChangePayload', () => {
 })
 
 describe('SubscriptionsAdapter.toCreatePayload', () => {
-  it('carries only plan_id and plan_pricing_id — the pricing already encodes the period', () => {
+  it('carries only plan_id and period — plan_pricing_id does not exist in v4', () => {
     expect(
       SubscriptionsAdapter.toCreatePayload({
         planId: '019c9fa2-ee78-7a7a-a266-796f750d8261',
@@ -251,7 +287,7 @@ describe('SubscriptionsAdapter.toCreatePayload', () => {
       })
     ).toEqual({
       plan_id: '019c9fa2-ee78-7a7a-a266-796f750d8261',
-      plan_pricing_id: '019c9fa2-ee75-743c-8b0b-a1de319b9bfb'
+      period: 'annual'
     })
   })
 
@@ -259,13 +295,15 @@ describe('SubscriptionsAdapter.toCreatePayload', () => {
     expect(
       SubscriptionsAdapter.toCreatePayload({
         planId: 'plan-uuid',
+        period: 'monthly',
         accountId: 9999,
         paymentMethodId: 44,
         tosVersion: '2026-07-01',
         bogus: 'x'
       })
     ).toEqual({
-      plan_id: 'plan-uuid'
+      plan_id: 'plan-uuid',
+      period: 'monthly'
     })
   })
 

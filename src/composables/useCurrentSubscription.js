@@ -5,7 +5,6 @@ import { useSubscriptionState } from '@/composables/useSubscriptionState'
 import { useScheduledChanges } from '@/composables/useSubscriptionPlanChange'
 import { usePlansList } from '@/composables/usePlansService'
 import { toBillingPeriod, toCataloguePeriodicity } from '@/services/v2/utils/billing-period'
-import { loadUserAndAccountInfo } from '@/helpers/account-data'
 import {
   findPlanById,
   formatPlanStartDate,
@@ -13,6 +12,12 @@ import {
   toFiniteNumber
 } from '@/composables/subscription-helpers'
 import { formatBillingPeriod, formatLastUpdate, formatNextChargeDate } from '@/utils/billing-date'
+import {
+  SUBSCRIPTION_STATUS,
+  isCheckoutPendingStatus,
+  isSuspendedStatus,
+  normalizeSubscriptionStatus
+} from '@/services/v2/billing-api/subscriptions/subscriptions-constants'
 
 const findPricing = (plan, period) => {
   const pricings = plan?.pricings ?? []
@@ -87,7 +92,15 @@ export function useCurrentSubscription() {
     if (isHobby.value) return 'Hobby'
     return activePlan.value?.name ?? null
   })
-  const planTag = computed(() => (hasContractedPlan.value ? 'Current Plan' : null))
+  const isCheckoutPending = computed(() => isCheckoutPendingStatus(subscription.value?.status))
+  const isSuspended = computed(() => isSuspendedStatus(subscription.value?.status))
+  const isPastDue = computed(
+    () => normalizeSubscriptionStatus(subscription.value?.status) === SUBSCRIPTION_STATUS.PAST_DUE
+  )
+
+  const planTag = computed(() =>
+    hasContractedPlan.value && !isCheckoutPending.value ? 'Current Plan' : null
+  )
 
   const planStartDate = computed(() => formatPlanStartDate(subscription.value?.currentPeriodStart))
   const billingPeriod = computed(() =>
@@ -108,20 +121,6 @@ export function useCurrentSubscription() {
   })
 
   const scheduledDowngrade = computed(() => {
-    const transition = pendingTransition.value
-    if (transition?.toPlanId) {
-      const toPlan = findPlanById(plansData.value, transition.toPlanId)
-      const toPricing =
-        toPlan?.pricings?.find((pricing) => pricing.id === transition.toPlanPricingId) ?? null
-      return {
-        id: pendingChange.value?.id ?? null,
-        effectiveAt: transition.effectiveDate,
-        toPlanId: transition.toPlanId,
-        toPlanPricingId: transition.toPlanPricingId ?? null,
-        toPeriod: toBillingPeriod(toPricing?.periodicity) ?? null
-      }
-    }
-
     const pending = pendingChange.value
     if (!pending) return null
     return {
@@ -129,7 +128,7 @@ export function useCurrentSubscription() {
       effectiveAt: pending.effectiveAt,
       toPlanId: pending.change?.planId ?? null,
       toPlanPricingId: null,
-      toPeriod: pending.change?.period ?? null
+      toPeriod: toBillingPeriod(pending.change?.period) ?? pending.change?.period ?? null
     }
   })
 
@@ -153,7 +152,6 @@ export function useCurrentSubscription() {
   })
 
   const refetch = async () => {
-    await loadUserAndAccountInfo({ force: true })
     if (!accountId.value) return
     await refetchSubscription()
     if (subscriptionId.value) await refetchScheduledChanges()
@@ -189,6 +187,9 @@ export function useCurrentSubscription() {
     nextChargeValue,
     lastUpdate,
     hasContractedPlan,
+    isCheckoutPending,
+    isSuspended,
+    isPastDue,
     isHobby,
     isPro,
     isLoading,

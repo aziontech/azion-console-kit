@@ -4,17 +4,44 @@ export class ErrorHandler {
     UNEXPECTED_ERROR: 'An unexpected error occurred. Please try again.'
   }
 
-  constructor(status, messages, code) {
+  constructor(status, messages, code, { requestId = null, errors = [] } = {}) {
     this.status = status
     this.message = Array.isArray(messages) ? messages : [messages]
     this.code = code
+    this.requestId = requestId
+    this.errors = errors
   }
 
   static create(error) {
     const status = error?.response?.status || 500
     const code = error?.code || null
     const messages = this._extractMessages(error)
-    return new ErrorHandler(status, messages, code)
+    return new ErrorHandler(status, messages, code, {
+      requestId: this._extractRequestId(error),
+      errors: this._extractErrors(error)
+    })
+  }
+
+  static _extractErrors(error) {
+    const errors = error?.response?.data?.errors
+    if (!Array.isArray(errors)) return []
+
+    return errors.map((err) => ({
+      status: err.status ?? null,
+      code: err.code ?? null,
+      title: err.title ?? null,
+      detail: err.detail ?? null,
+      pointer: err.source?.pointer ?? null,
+      field: this._formatPath(err.source?.pointer),
+      requestId: err.meta?.request_id ?? null
+    }))
+  }
+
+  static _extractRequestId(error) {
+    const errors = error?.response?.data?.errors
+    if (!Array.isArray(errors)) return null
+
+    return errors.find((err) => err?.meta?.request_id)?.meta?.request_id ?? null
   }
 
   static createMeta(axiosError) {
@@ -56,8 +83,11 @@ export class ErrorHandler {
     const prefix = '/data/'
     if (!path?.startsWith(prefix)) return null
 
-    const rest = path.slice(prefix.length)
-    if (!rest) return null
+    let rest = path.slice(prefix.length)
+    if (rest.startsWith('attributes/')) {
+      rest = rest.slice('attributes/'.length)
+    }
+    if (!rest || rest === 'attributes') return null
 
     return rest
       .split('/')

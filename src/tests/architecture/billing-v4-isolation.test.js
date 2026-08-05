@@ -5,11 +5,7 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 
-const ISOLATED_TREES = [
-  'src/views/BillingV4',
-  'src/services/v2/billing-api',
-  'src/router/routes/billing-routes/billing-v4-routes.js'
-]
+const ISOLATED_TREES = ['src/services/v2/billing-api']
 
 const FORBIDDEN_IMPORTS = [
   '@/services/v2/billing-legacy',
@@ -18,8 +14,7 @@ const FORBIDDEN_IMPORTS = [
   '@/helpers/account-data',
   '@/views/Billing/',
   'billingGqlService',
-  'legacyPaymentsService',
-  'legacy-invoices-service'
+  'legacyPaymentsService'
 ]
 
 const collectFiles = (target) => {
@@ -56,16 +51,16 @@ describe('billing v4 flow stays isolated from the legacy billing surface', () =>
     expect(offenders).toEqual([])
   })
 
-  it('keeps the legacy route tree reachable so it can be deleted in one move', () => {
-    const legacy = readFileSync(
-      join(ROOT, 'src/router/routes/billing-routes/billing-legacy-routes.js'),
-      'utf8'
-    )
-    expect(legacy).toContain('billingLegacyRoutes')
+  it('keeps a single billing route tree gated by the billing screen component', () => {
+    const routes = readFileSync(join(ROOT, 'src/router/routes/billing-routes/index.js'), 'utf8')
+    expect(routes).toContain('billingRoutes')
+    expect(routes).not.toContain('isBillingV4Enabled')
+    expect(routes).not.toContain('service_orders')
+  })
 
-    const gate = readFileSync(join(ROOT, 'src/router/routes/billing-routes/index.js'), 'utf8')
-    expect(gate).toContain('isBillingV4Enabled')
-    expect(gate).toContain('billingLegacyRoutes')
-    expect(gate).toContain('billingV4Routes')
+  it('keeps the service_orders surface deleted', () => {
+    expect(() => statSync(join(ROOT, 'src/services/v2/billing-api/service-orders'))).toThrow()
+    expect(() => statSync(join(ROOT, 'src/services/v2/billing-legacy/wallet'))).toThrow()
+    expect(() => statSync(join(ROOT, 'src/services/v2/billing-legacy/invoices'))).toThrow()
   })
 })
