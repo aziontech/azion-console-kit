@@ -3,6 +3,13 @@
 
   import LazyResourceSelectField from '@/templates/release-composition/components/LazyResourceSelectField.vue'
   import ResourceVersionField from '@/templates/release-composition/components/ResourceVersionField.vue'
+  import MessageCard from '@/components/MessageCard'
+  import {
+    asFieldLabel,
+    pluralNounFor,
+    singularNounFor,
+    withArticle
+  } from '@/templates/release-composition/resource-nouns'
 
   defineOptions({ name: 'release-dependencies-section' })
 
@@ -43,6 +50,11 @@
   const onVersionChange = (type, id, value) => emit('update:instance-version', { type, id, value })
 
   const onRemove = (type, id) => emit('remove-instance', { type, id })
+
+  const fieldLabelFor = (type) => asFieldLabel(singularNounFor(type))
+
+  const sharedDescriptionFor = (instance) =>
+    `This dependency is also used by ${instance.sharedWith.join(' and ')}. The version selected here applies to all of them.`
 </script>
 
 <template>
@@ -117,7 +129,7 @@
         >
           <div class="min-h-0 overflow-hidden">
             <div
-              class="flex flex-col gap-[var(--spacing-2)] border-t border-[var(--surface-border)] p-[var(--spacing-3)]"
+              class="flex flex-col gap-[var(--spacing-4)] border-t border-[var(--surface-border)] p-[var(--spacing-3)]"
               :data-testid="`release-composition__deps-body-${collection.type}`"
             >
               <p
@@ -125,7 +137,7 @@
                 class="text-body-sm text-[var(--text-color-secondary)]"
                 :data-testid="`release-composition__deps-empty-${collection.type}`"
               >
-                No {{ collection.label }} instances in this release.
+                No {{ pluralNounFor(collection.type) }} in this release.
               </p>
 
               <template v-else>
@@ -143,15 +155,7 @@
                       <label
                         class="flex items-center gap-[var(--spacing-2)] text-body-sm font-medium text-[var(--text-color-secondary)]"
                       >
-                        {{ collection.label }}
-                        <span
-                          v-if="instance.sharedWith && instance.sharedWith.length"
-                          class="inline-flex items-center gap-[var(--spacing-1)] rounded-[var(--shape-elements)] bg-[var(--surface-200)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm font-normal text-[var(--text-color-secondary)]"
-                          :data-testid="`release-composition__deps-shared-badge-${collection.type}-${instance.id}`"
-                        >
-                          <i class="pi pi-link" />
-                          Shared
-                        </span>
+                        {{ fieldLabelFor(collection.type) }}
                       </label>
                       <div
                         class="flex justify-between items-center gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-3)] py-[var(--spacing-2)] text-body-sm text-[var(--text-color)]"
@@ -166,9 +170,9 @@
                       :modelValue="instance.resourceId"
                       :service="instance.nameService"
                       :load-service="instance.nameLoadService"
-                      :label="collection.label"
+                      :label="fieldLabelFor(collection.type)"
                       :required="false"
-                      :placeholder="`Select a ${collection.label}`"
+                      :placeholder="`Select ${withArticle(singularNounFor(collection.type))}`"
                       @update:modelValue="onResourceChange(collection.type, instance.id, $event)"
                     />
 
@@ -188,38 +192,25 @@
                       icon="pi pi-trash"
                       severity="secondary"
                       text
-                      :aria-label="`Remove ${instance.name || collection.label} instance`"
+                      :aria-label="`Remove ${instance.name || singularNounFor(collection.type)}`"
                       class="shrink-0"
                       :data-testid="`release-composition__deps-remove-${collection.type}-${instance.id}`"
                       @click="onRemove(collection.type, instance.id)"
                     />
                   </div>
 
-                  <div
+                  <MessageCard
                     v-if="instance.sharedWith && instance.sharedWith.length"
-                    class="grid gap-[var(--spacing-3)]"
-                    :class="
-                      instance.locked
-                        ? 'grid-cols-[1fr_1fr]'
-                        : 'grid-cols-[1fr_1fr_var(--spacing-8)] max-[600px]:grid-cols-[1fr_1fr_auto]'
-                    "
-                  >
-                    <span aria-hidden="true" />
-                    <div
-                      class="flex items-center mt-[var(--spacing-2)] gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
-                      :data-testid="`release-composition__deps-shared-hint-${collection.type}-${instance.id}`"
-                    >
-                      <i class="pi pi-link" />
-                      <span>
-                        Shared with {{ instance.sharedWith.join(', ') }} — one version applies to
-                        all.
-                      </span>
-                    </div>
-                  </div>
+                    type="info"
+                    icon="pi pi-link"
+                    title="Shared dependency"
+                    :description="sharedDescriptionFor(instance)"
+                    :data-testid="`release-composition__deps-shared-hint-${collection.type}-${instance.id}`"
+                  />
 
                   <div
                     v-if="instance.required && !instance.versionOptions.length"
-                    class="grid gap-[var(--spacing-3)]"
+                    class="[display:grid] gap-[var(--spacing-3)]"
                     :class="
                       instance.locked
                         ? 'grid-cols-[1fr_1fr]'
@@ -228,12 +219,12 @@
                   >
                     <span aria-hidden="true" />
                     <div
-                      class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--color-orange-500)] mt-[var(--spacing-2)]"
+                      class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--color-orange-500)]"
                       :data-testid="`release-composition__deps-no-versions-${collection.type}-${instance.id}`"
                     >
                       <div class="flex gap-[var(--spacing-1)]">
                         <i class="pi pi-exclamation-triangle" />
-                        <span>No Ready version available — publish is blocked.</span>
+                        <span>No Ready version available, so this release can't be deployed.</span>
                       </div>
                       <router-link
                         v-if="instance.buildRoute"
@@ -256,7 +247,7 @@
                 icon="pi pi-plus"
                 size="small"
                 outlined
-                :label="`Add ${collection.label}`"
+                :label="`Add ${singularNounFor(collection.type)}`"
                 class="self-start"
                 :data-testid="`release-composition__deps-add-${collection.type}`"
                 @click="onAdd(collection.type)"

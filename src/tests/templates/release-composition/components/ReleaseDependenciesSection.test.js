@@ -118,7 +118,7 @@ describe('ReleaseDependenciesSection', () => {
     expect(panel.attributes('aria-hidden')).toBe('true')
   })
 
-  it('shows the empty "No {label} instances" message for an open group with no instances', () => {
+  it('shows the empty "No {plural noun}" message for an open group with no instances', () => {
     const wrapper = makeWrapper({
       collections: [
         {
@@ -134,7 +134,7 @@ describe('ReleaseDependenciesSection', () => {
 
     const empty = wrapper.find('[data-testid="release-composition__deps-empty-waf"]')
     expect(empty.exists()).toBe(true)
-    expect(empty.text()).toBe('No WAF Rule instances in this release.')
+    expect(empty.text()).toBe('No WAFs in this release.')
   })
 
   it('emits toggle-group with the collection type when the group header is clicked', async () => {

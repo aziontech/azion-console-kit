@@ -6,6 +6,8 @@
   import ProgressBar from '@aziontech/webkit/progressbar'
   import SelectButton from '@aziontech/webkit/selectbutton'
 
+  import { skipMessageFor } from '@/templates/release-composition/skip-messages'
+
   defineOptions({ name: 'deployment-progress-dialog' })
 
   const props = defineProps({
@@ -34,7 +36,7 @@
   const emit = defineEmits(['retry-failed', 'close'])
 
   const STATUS_VISUAL = {
-    deploying: { severity: 'info', label: 'Activating', icon: 'pi pi-spinner animate-spin' },
+    deploying: { severity: 'info', label: 'Deploying', icon: 'pi pi-spinner animate-spin' },
     done: { severity: 'success', label: 'Done', icon: 'pi pi-check-circle' },
     failed: { severity: 'danger', label: 'Failed', icon: 'pi pi-times-circle' },
     skipped: { severity: 'warning', label: 'Skipped', icon: 'pi pi-minus-circle' }
@@ -56,7 +58,7 @@
 
   const summaryText = computed(() => {
     const { done, failed } = props.counts
-    return `${done} succeeded · ${failed} failed. Each activates independently; successful ones stay live.`
+    return `${done} succeeded, ${failed} failed. Each deployment runs independently, and the ones that succeeded stay live.`
   })
 
   const progressValue = computed(() => {
@@ -67,7 +69,7 @@
   const filter = ref('all')
 
   const filterOptions = computed(() => [
-    { label: `In Progress ${props.counts.inProgress}`, value: 'progress' },
+    { label: `In progress ${props.counts.inProgress}`, value: 'progress' },
     { label: `Failed ${props.counts.failed}`, value: 'failed' },
     { label: `Done ${props.counts.done}`, value: 'done' },
     { label: 'All', value: 'all' }
@@ -91,12 +93,6 @@
 
   const visualFor = (item) => STATUS_VISUAL[item.status] ?? STATUS_VISUAL.deploying
 
-  const SKIP_MESSAGES = {
-    degraded: 'Could not read the active release; deployment skipped.',
-    mismatch: 'The resource is not part of this deployment; skipped.',
-    unresolved_version: 'No ready version resolved for the resource; skipped.'
-  }
-
   const errorLinesFor = (item) => {
     const raw = item?.error?.message
     if (Array.isArray(raw)) return raw.filter(Boolean).map(String)
@@ -107,10 +103,15 @@
   const feedbackFor = (item) => {
     if (item.status === 'failed') {
       const lines = errorLinesFor(item)
-      return { tone: 'error', lines: lines.length ? lines : ['Something went wrong.'] }
+      return {
+        tone: 'error',
+        lines: lines.length
+          ? lines
+          : ['Retry, or check the release for a resource without a Ready version.']
+      }
     }
     if (item.status === 'skipped') {
-      return { tone: 'muted', lines: [SKIP_MESSAGES[item.skipReason] ?? 'Deployment skipped.'] }
+      return { tone: 'muted', lines: [skipMessageFor(item.skipReason)] }
     }
     return { tone: 'muted', lines: [] }
   }
@@ -157,10 +158,7 @@
         data-testid="deployment-progress__active"
       >
         <i class="pi pi-spinner animate-spin" />
-        <span>
-          Activating
-          <strong class="font-semibold text-[var(--text-color)]">{{ activeName }}</strong>
-        </span>
+        <span>Deploying {{ activeName }}</span>
       </div>
 
       <SelectButton
@@ -206,7 +204,7 @@
           </div>
           <div
             v-if="feedbackFor(item).lines.length"
-            class="flex flex-col gap-[2px] pl-[var(--spacing-6)]"
+            class="flex flex-col gap-[var(--spacing-1)] pl-[var(--spacing-6)]"
             :data-testid="`deployment-progress__item-${item.id}-error`"
           >
             <span
