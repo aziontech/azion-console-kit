@@ -26,7 +26,9 @@ export default {
   storage: [
     {
       name: 'console-kit-storybook',
-      prefix: '20260406184524',
+      // deploy-time rotation state must not be committed here; the CLI
+      // manages real prefixes per deploy
+      prefix: '',
       dir: './dist',
       workloadsAccess: 'read_only'
     }
@@ -38,7 +40,7 @@ export default {
       type: 'storage',
       attributes: {
         bucket: 'console-kit-storybook',
-        prefix: '20260406184524'
+        prefix: ''
       }
     }
   ],
