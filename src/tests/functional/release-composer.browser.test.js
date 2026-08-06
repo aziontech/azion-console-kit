@@ -78,7 +78,7 @@ describe('Deploy Composer — real-browser smoke', () => {
     expect(document.querySelector('[data-testid="release-composition__view"]')).toBeTruthy()
     expect(
       document.querySelector('[data-testid="release-composition__heading-title"]').textContent
-    ).toContain('Review & deploy')
+    ).toContain('Review and deploy')
     expect(
       document.querySelector('[data-testid="release-composition__composition-card"]')
     ).toBeTruthy()
