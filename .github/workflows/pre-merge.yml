@@ -343,7 +343,7 @@ jobs:
   # ── Stage 2: real browser (runs only on a green contract foundation) ──
   # Functional suite = Vitest BROWSER MODE (real Chromium via Playwright).
   # Runs in the official Playwright image pinned to the SAME version resolved in
-  # yarn.lock (playwright 1.61.1) so the pre-installed browsers match the
+  # yarn.lock (playwright 1.62.0) so the pre-installed browsers match the
   # @vitest/browser-playwright runtime exactly — no browser download at runtime.
   functional:
     # contract-consumer is a prerequisite (req 1.7): a broken contract fails in
@@ -357,7 +357,7 @@ jobs:
       # SENTINEL: this tag MUST match the playwright version pinned in yarn.lock
       # (see the playwright entry in yarn.lock). A lockfile bump without bumping this tag
       # causes silent browser/runtime skew in the functional job.
-      image: mcr.microsoft.com/playwright:v1.61.1-jammy
+      image: mcr.microsoft.com/playwright:v1.62.0-jammy
     strategy:
       fail-fast: false
       matrix:
