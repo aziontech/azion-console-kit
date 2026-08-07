@@ -12,13 +12,16 @@
   import ReleaseCompositionTree from '@/templates/release-composition/components/ReleaseCompositionTree.vue'
   import ReleaseDependenciesSection from '@/templates/release-composition/components/ReleaseDependenciesSection.vue'
   import DeploymentSettingsPicker from '@/templates/release-composition/components/DeploymentSettingsPicker.vue'
-  import CanaryStrategyField from '@/templates/release-composition/components/CanaryStrategyField.vue'
+  // import CanaryStrategyField from '@/templates/release-composition/components/CanaryStrategyField.vue'
   import ImpactPanel from '@/templates/release-composition/components/ImpactPanel.vue'
   import DeploymentProgressDialog from '@/templates/release-composition/components/DeploymentProgressDialog.vue'
+  import MessageCard from '@/components/MessageCard'
 
   import { useReleaseStore, ADDITIONAL_PARENT } from '@/stores/release'
   import { useBreadcrumbs } from '@/stores/breadcrumbs'
   import { LATEST_READY } from '@/templates/release-composition/version-options'
+  import { singularNounFor } from '@/templates/release-composition/resource-nouns'
+  import { SKIP_MESSAGES } from '@/templates/release-composition/skip-messages'
   import { useReleaseComposition } from '@/templates/release-composition/use-release-composition'
   import { useReleaseDeployProgress } from '@/templates/release-composition/use-release-deploy-progress'
   import { classifyDeploymentsForResource } from '@/templates/release-composition/classify-deployments-for-resource'
@@ -58,14 +61,17 @@
   const COMPOSITION_LABELS = {
     application: 'Application',
     firewall: 'Firewall',
-    custom_page: 'Custom Pages',
+    custom_page: 'Custom page',
     function: 'Functions',
     connector: 'Connectors',
     network_list: 'Network Lists',
     waf: 'WAF',
-    [ADDITIONAL_PARENT]: 'Additional dependencies'
+    [ADDITIONAL_PARENT]: 'Include dependencies'
   }
   const labelFor = (type) => COMPOSITION_LABELS[type] ?? resolveResourceMeta(type).label
+
+  const sharedParentLabel = (parent) =>
+    parent === ADDITIONAL_PARENT ? 'the included dependencies' : `the ${singularNounFor(parent)}`
 
   const route = useRoute()
   const router = useRouter()
@@ -334,9 +340,9 @@
   })
 
   const DEPENDENCIES_LOADING_MESSAGES = {
-    application: 'Detecting Functions and Connectors used by this Application…',
-    firewall: 'Detecting Functions, Network Lists and WAF used by this Firewall…',
-    custom_page: 'Detecting Connectors used by this Custom Page…'
+    application: 'Detecting functions and connectors used by this application…',
+    firewall: 'Detecting functions, network lists, and WAFs used by this firewall…',
+    custom_page: 'Detecting connectors used by this custom page…'
   }
 
   const applicationDependenciesLoading = computed(
@@ -622,13 +628,15 @@
   watch(breadcrumbItems, (items) => breadcrumbs.update(items), { immediate: true })
 
   //   Scenario B / global → the scoped resource (or "resources") + DS count.
-  const scopedLabel = computed(() => (scopedType.value ? labelFor(scopedType.value) : ''))
-
   const versionGateLabel = computed(() =>
-    scopedType.value && scopedType.value !== 'application' ? scopedLabel.value : 'Application'
+    scopedType.value && scopedType.value !== 'application'
+      ? singularNounFor(scopedType.value)
+      : 'application'
   )
 
-  const noticeLabel = computed(() => (isScoped.value ? scopedLabel.value : 'selected resource'))
+  const noticeLabel = computed(() =>
+    isScoped.value ? singularNounFor(scopedType.value) : 'selected resource'
+  )
 
   const activeReleaseResources = computed(() => {
     const byType = {}
@@ -662,7 +670,7 @@
         buildRoute: resourceBuildRoute({ type, resourceId: instance.resourceId }),
         sharedWith: store
           .sharedDependencyParentsFor(type, instance.resourceId, parentType)
-          .map((parent) => labelFor(parent))
+          .map((parent) => sharedParentLabel(parent))
       }))
       return {
         type,
@@ -742,6 +750,7 @@
         label: labelFor(type),
         icon: meta.icon,
         required: isApp,
+        versionRequired: enabled,
         readonly: !editable,
         canToggle,
         enabled,
@@ -758,14 +767,12 @@
         hasOwned: owned.length > 0,
         dependenciesLoading: dependenciesLoadingFor(type),
         dependenciesLoadingMessage: DEPENDENCIES_LOADING_MESSAGES[type],
-        lockReason: 'Kept from the active release'
+        lockReason: 'Kept from the active release.'
       }
     })
   })
 
-  const showDeploymentSettingsCard = computed(
-    () => !isFromDeployment.value || showComposition.value
-  )
+  const showDeploymentSettingsCard = computed(() => !isFromDeployment.value)
 
   watch(
     versionedResources,
@@ -834,7 +841,8 @@
         toast.add({
           severity: 'warn',
           summary: 'Already in this release',
-          detail: 'This resource is already a dependency — set its version where it appears.',
+          detail:
+            'This resource is already a dependency. Select its version in the group that lists it.',
           life: 5000
         })
         return
@@ -848,8 +856,8 @@
 
   const onAdditionalRemove = ({ type, id }) => store.removeCollItem(ADDITIONAL_PARENT, type, id)
 
-  const onCanaryEnabled = (value) => store.toggleCanary(value)
-  const onCanaryForm = (values) => store.setCanaryForm(values)
+  // const onCanaryEnabled = (value) => store.toggleCanary(value)
+  // const onCanaryForm = (values) => store.setCanaryForm(values)
 
   const retryImpact = () => {
     impact.retry()
@@ -910,29 +918,39 @@
       scopedResourceId: store.resourceId,
       failedDsIds: failedDsIds.value
     })
+    const scopedToApplication = scopedType.value === 'application'
     const LABELS = {
       linked: 'Already using this resource',
-      available: 'Available — not linked yet',
+      available: 'Not using this resource yet',
       needsFirstRelease: 'Needs a first release',
       loadFailed: "Couldn't load the active release"
     }
     const NOTICES = {
-      needsFirstRelease:
-        'No active release — compose a full first release (with an Application) to publish here.',
-      loadFailed: "Couldn't read the active release — retry before publishing here."
+      needsFirstRelease: 'Create a full first release, including an application, to deploy here.',
+      loadFailed: "Couldn't read the active release. Retry before deploying here."
+    }
+    const STATUS_TAGS = {
+      needsFirstRelease: 'No active release yet'
     }
     const ACTIONS = {
-      needsFirstRelease: { label: 'Compose first release', icon: 'pi pi-arrow-right' },
+      needsFirstRelease: { label: 'Create first release', icon: 'pi pi-arrow-right' },
       loadFailed: { label: 'Retry', icon: 'pi pi-refresh' }
     }
-    return groups.map((group) => ({
-      key: group.key,
-      label: LABELS[group.key],
-      selectable: !NON_SELECTABLE_GROUPS.includes(group.key),
-      notice: NOTICES[group.key] ?? null,
-      action: ACTIONS[group.key] ?? null,
-      deployments: group.deployments
-    }))
+    const firstReleaseSelectableInScope = (key) =>
+      key === 'needsFirstRelease' && scopedToApplication
+    return groups.map((group) => {
+      const selectable =
+        firstReleaseSelectableInScope(group.key) || !NON_SELECTABLE_GROUPS.includes(group.key)
+      return {
+        key: group.key,
+        label: LABELS[group.key],
+        selectable,
+        notice: selectable ? null : (NOTICES[group.key] ?? null),
+        statusTag: STATUS_TAGS[group.key] ?? null,
+        action: selectable ? null : (ACTIONS[group.key] ?? null),
+        deployments: group.deployments
+      }
+    })
   })
 
   const onPickDs = (ids) => {
@@ -990,7 +1008,7 @@
 
   const missingReadyVersionLabel = computed(() => {
     const first = resourcesMissingReadyVersion.value[0]
-    return first ? labelFor(first.resourceType) : ''
+    return first ? singularNounFor(first.resourceType) : ''
   })
 
   const canBuildAndActivate = computed(
@@ -1031,17 +1049,11 @@
     confirmVisible.value = true
   }
 
-  const SKIP_MESSAGES = {
-    degraded: 'Could not read the active release; deployment skipped.',
-    mismatch: 'The resource is not part of this deployment; skipped.',
-    unresolved_version: 'No ready version resolved for the resource; skipped.'
-  }
-
   const surfaceOutcome = (outcome) => {
     const match = deployments.value.find((ds) => String(ds.id) === String(outcome.id))
     const name = match?.name ?? String(outcome.id)
     if (outcome.ok) {
-      toast.add({ closable: true, severity: 'success', summary: 'Build started', detail: name })
+      toast.add({ closable: true, severity: 'success', summary: 'Deploy started', detail: name })
       return
     }
     if (outcome.skipped) {
@@ -1049,7 +1061,7 @@
         closable: true,
         severity: 'warn',
         summary: 'Deployment skipped',
-        detail: `${name}: ${SKIP_MESSAGES[outcome.skipReason] ?? 'Skipped.'}`
+        detail: `${name}: ${SKIP_MESSAGES[outcome.skipReason] ?? 'No reason reported.'}`
       })
       return
     }
@@ -1061,8 +1073,10 @@
     toast.add({
       closable: true,
       severity: 'error',
-      summary: 'Build failed',
-      detail: `${name}: ${error?.message ?? 'Something went wrong'}`
+      summary: 'Deploy failed',
+      detail: `${name}: ${
+        error?.message ?? 'Retry, or check the release for a resource without a Ready version.'
+      }`
     })
   }
 
@@ -1107,28 +1121,29 @@
         class="flex flex-col gap-[var(--spacing-1)]"
         data-testid="release-composition__heading"
       >
-        <PageHeadingBlock page-title="Review & deploy" />
+        <PageHeadingBlock page-title="Review and deploy" />
         <h1
           class="text-heading-md font-semibold text-[var(--text-color)]"
           data-testid="release-composition__heading-title"
         >
-          Review & deploy
+          Review and deploy
         </h1>
         <p
           class="text-body-sm text-[var(--text-color-secondary)]"
           data-testid="release-composition__heading-description"
         >
-          Compose the release on the left, review the impact on the right, then build & activate.
+          Confirm which Deployment Settings receive this release and the version of each resource it
+          carries, then review the impact before deploying.
         </p>
       </div>
     </template>
 
     <template #content>
       <div
-        class="grid grid-cols-[minmax(0,1fr)_minmax(var(--container-xs),var(--container-md))] gap-[var(--spacing-5)] max-[880px]:grid-cols-1"
+        class="flex gap-[var(--spacing-6)] max-[880px]:flex-col max-[880px]:gap-[var(--spacing-5)]"
         data-testid="release-composition__grid"
       >
-        <div class="flex min-w-0 flex-col gap-[var(--spacing-5)]">
+        <div class="flex min-w-0 flex-1 flex-col gap-[var(--spacing-5)]">
           <section
             class="flex flex-col overflow-hidden rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)]"
             data-testid="release-composition__composition-card"
@@ -1141,7 +1156,7 @@
               >
                 <i class="pi pi-sitemap" />
               </span>
-              <h2 class="text-body-lg font-semibold text-[var(--text-color)]">Composition</h2>
+              <h2 class="text-body-lg text-[var(--text-color)]">Deployment topology</h2>
             </div>
 
             <div class="flex flex-col gap-[var(--spacing-6)] p-[var(--spacing-4)]">
@@ -1150,42 +1165,28 @@
                 class="flex flex-col gap-[var(--spacing-3)]"
                 data-testid="release-composition__composition"
               >
-                <div
-                  class="flex items-start gap-[var(--spacing-2)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-50)] px-[var(--spacing-4)] py-[var(--spacing-3)]"
+                <MessageCard
+                  type="info"
                   data-testid="release-composition__scoped-notice"
                 >
-                  <i
-                    class="pi pi-info-circle mt-[var(--spacing-1)] text-[var(--text-color-secondary)]"
-                  />
-                  <span class="text-body-sm text-[var(--text-color-secondary)]">
-                    <template v-if="isFromDeployment">
-                      This release applies to
-                      <strong class="font-semibold text-[var(--text-color)]">{{
-                        deploymentName || 'this deployment'
-                      }}</strong>
-                      and reaches every environment that uses it — review the impact on the right
-                      before activating.
-                    </template>
-                    <template v-else-if="isFromWorkload">
-                      This Workload is bound to
-                      <strong class="font-semibold text-[var(--text-color)]">{{
-                        workloadCandidateDsIds.length
-                      }}</strong>
-                      Deployment Settings — one per environment. The release goes live on each
-                      selected one; deselect any you want to skip and review the impact on the
-                      right.
-                    </template>
-                    <template v-else>
-                      Only the
-                      <strong class="font-semibold text-[var(--text-color)]">{{
-                        noticeLabel
-                      }}</strong>
-                      version below changes. Every selected Deployment Settings keeps its own
-                      composition and policy — each gets a new Release with just this resource
-                      swapped.
-                    </template>
-                  </span>
-                </div>
+                  <template v-if="isFromDeployment">
+                    This release applies to
+                    {{ deploymentName || 'this deployment' }}
+                    and reaches every environment bound to it. Review the impact before deploying.
+                  </template>
+                  <template v-else-if="isFromWorkload">
+                    This workload is bound to
+                    {{ workloadCandidateDsIds.length }}
+                    Deployment Settings, one for each environment it runs in. Deselect the ones you
+                    want to skip before deploying.
+                  </template>
+                  <template v-else>
+                    Only the
+                    {{ noticeLabel }}
+                    version changes. Every selected Deployment Settings keeps its own topology and
+                    policy, and gets a new release where only this resource is replaced.
+                  </template>
+                </MessageCard>
 
                 <div
                   v-if="dependenciesError"
@@ -1196,7 +1197,7 @@
                     class="flex items-center gap-[var(--spacing-2)] text-body-sm text-[var(--text-color-secondary)]"
                   >
                     <i class="pi pi-exclamation-triangle text-[var(--warning-contrast)]" />
-                    Couldn't detect the dependencies used by this Application.
+                    Couldn't detect the dependencies used by this application.
                   </span>
                   <PrimeButton
                     label="Retry"
@@ -1227,7 +1228,7 @@
                 >
                   <div class="flex flex-col gap-[var(--spacing-1)]">
                     <span class="text-body-sm font-medium text-[var(--text-color)]">
-                      Additional dependencies
+                      Include dependencies
                     </span>
                     <span class="text-body-xs text-[var(--text-color-secondary)]">
                       Add connectors or network lists referenced dynamically by functions that
@@ -1261,9 +1262,7 @@
               >
                 <i class="pi pi-cog" />
               </span>
-              <h2 class="text-body-lg font-semibold text-[var(--text-color)]">
-                Deployment Settings
-              </h2>
+              <h2 class="text-body-lg text-[var(--text-color)]">Deployment Settings</h2>
             </div>
 
             <div class="flex flex-col gap-[var(--spacing-6)] p-[var(--spacing-4)]">
@@ -1280,6 +1279,7 @@
                 @group-action="onGroupAction"
               />
 
+              <!--
               <CanaryStrategyField
                 v-if="showComposition"
                 :class="[
@@ -1289,12 +1289,13 @@
                 @update:enabled="onCanaryEnabled"
                 @update:form="onCanaryForm"
               />
+              -->
             </div>
           </section>
         </div>
 
         <section
-          class="sticky top-[var(--spacing-4)] flex flex-col self-start overflow-hidden rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] max-[880px]:static"
+          class="sticky top-[calc(3.5rem+var(--spacing-4))] flex basis-[var(--container-md)] min-w-[var(--container-xs)] flex-col self-start overflow-hidden rounded-[var(--shape-elements)] border border-[var(--surface-border)] bg-[var(--surface-section)] max-[880px]:static max-[880px]:min-w-0 max-[880px]:basis-auto"
           data-testid="release-composition__impact-card"
         >
           <div
@@ -1305,7 +1306,7 @@
             >
               <i class="pi pi-bullseye" />
             </span>
-            <h2 class="text-body-lg font-semibold text-[var(--text-color)]">Impact</h2>
+            <h2 class="text-body-lg text-[var(--text-color)]">Impact</h2>
           </div>
 
           <div class="p-[var(--spacing-4)]">
@@ -1333,7 +1334,8 @@
         data-testid="release-composition__footer-hint"
       >
         <i class="pi pi-info-circle" />
-        Build &amp; activate creates, builds and activates in one action.
+        Deploy release creates a new release on every selected Deployment Settings and deploys it in
+        a single action.
       </span>
       <div class="flex items-center justify-end gap-[var(--spacing-3)]">
         <span
@@ -1341,7 +1343,7 @@
           class="flex items-center gap-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
           data-testid="release-composition__footer-degraded"
         >
-          Couldn't read the active release for {{ blockingDs.name }} — retry before publishing.
+          Couldn't read the active release for {{ blockingDs.name }}. Retry before deploying.
           <PrimeButton
             label="Retry"
             icon="pi pi-refresh"
@@ -1356,14 +1358,14 @@
           class="text-body-xs text-[var(--text-color-secondary)]"
           data-testid="release-composition__footer-blocked"
         >
-          {{ blockingDs.name }} has no Application — resolve it to publish.
+          {{ blockingDs.name }} has no application. Add one to the release to deploy.
         </span>
         <span
           v-else-if="pendingDependencySelections.length"
           class="text-body-xs text-[var(--text-color-secondary)]"
           data-testid="release-composition__footer-pending-dependencies"
         >
-          Select a version for each Function and Connector to publish.
+          Select a version for each function and connector to deploy.
         </span>
         <span
           v-else-if="versionsStillLoading"
@@ -1378,14 +1380,14 @@
           class="text-body-xs text-[var(--text-color-secondary)]"
           data-testid="release-composition__footer-missing-version"
         >
-          Build a Ready version of {{ missingReadyVersionLabel }} to publish.
+          Build a Ready version of the {{ missingReadyVersionLabel }} to deploy.
         </span>
         <span
           v-else-if="!versionGateSatisfied"
           class="text-body-xs text-[var(--text-color-secondary)]"
           data-testid="release-composition__footer-confirm-version"
         >
-          Confirm the {{ versionGateLabel }} version to publish.
+          Confirm the {{ versionGateLabel }} version to deploy.
         </span>
         <PrimeButton
           label="Cancel"
@@ -1413,7 +1415,7 @@
     modal
     :block-scroll="true"
     class="max-w-[var(--container-xl)]"
-    header="Build & activate this release?"
+    header="Deploy this release?"
     data-testid="release-composition__confirm-dialog"
   >
     <p

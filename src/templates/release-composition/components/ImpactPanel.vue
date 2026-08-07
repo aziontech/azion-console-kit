@@ -26,16 +26,16 @@
 
   const UNAVAILABLE_MESSAGES = {
     fetch_failed:
-      "Couldn't load the workloads needed to compute the impact. Retry, or publish anyway — the impact won't be shown.",
+      "Couldn't load the workloads needed to compute the impact. Retry, or deploy anyway without seeing the impact.",
     legacy_no_bindings:
-      "These deployments' workloads have no environment bindings yet, so the blast radius can't be computed. You can still publish.",
+      "The workloads of these Deployment Settings have no environment bindings yet, so the impact can't be computed. You can still deploy.",
     capped:
-      'The workloads list was truncated, so the impact shown is partial. You can still publish.'
+      'The workloads list was truncated, so the impact shown is partial. You can still deploy.'
   }
   const unavailableMessage = computed(
     () =>
       UNAVAILABLE_MESSAGES[props.degradationReason] ??
-      "The blast radius (environments · workloads · domains) couldn't be computed. You can still publish, but the impact won't be shown."
+      "The impact couldn't be computed. You can still deploy without seeing it."
   )
 
   const isPartial = computed(() => props.degradationReason === 'capped')
@@ -65,16 +65,20 @@
 
     <div
       v-else-if="impact.impactUnavailable"
-      class="flex flex-col rounded-[var(--shape-card)] border border-[var(--surface-border)] bg-[var(--surface-50)] p-[var(--spacing-4)]"
+      class="flex flex-col gap-[var(--spacing-3)] rounded-[var(--shape-card)] border border-[var(--surface-border)] bg-[var(--surface-50)] p-[var(--spacing-4)]"
       data-testid="release-composition__impact-unavailable"
     >
-      <div class="mb-[var(--spacing-2)] flex items-center gap-[var(--spacing-2)]">
-        <i class="pi pi-exclamation-triangle text-[var(--warning-contrast)]" />
-        <span class="text-body-sm font-semibold text-[var(--text-color)]">Impact unavailable</span>
+      <div class="flex flex-col gap-[var(--spacing-2)]">
+        <div class="flex items-center gap-[var(--spacing-2)]">
+          <i class="pi pi-exclamation-triangle text-[var(--warning-contrast)]" />
+          <span class="text-body-sm font-semibold text-[var(--text-color)]"
+            >Impact unavailable</span
+          >
+        </div>
+        <p class="text-body-xs text-[var(--text-color-secondary)]">
+          {{ unavailableMessage }}
+        </p>
       </div>
-      <p class="mb-[var(--spacing-3)] text-body-xs text-[var(--text-color-secondary)]">
-        {{ unavailableMessage }}
-      </p>
       <div
         class="flex items-center gap-[var(--spacing-2)] rounded-[var(--shape-card)] border border-[var(--surface-border)] bg-[var(--surface-section)] px-[var(--spacing-3)] py-[var(--spacing-2)] text-body-xs text-[var(--text-color-secondary)]"
       >
@@ -82,11 +86,11 @@
         <span>{{ impact.totals.dsCount }} Deployment Settings selected</span>
       </div>
       <PrimeButton
-        label="Retry impact"
+        label="Retry"
         icon="pi pi-refresh"
         severity="secondary"
         size="small"
-        class="mt-[var(--spacing-3)] w-full"
+        class="w-full"
         data-testid="release-composition__impact-retry"
         @click="onRetry"
       />
@@ -104,7 +108,7 @@
       >
         <i class="pi pi-exclamation-triangle text-[var(--warning-contrast)]" />
         <span class="text-body-xs text-[var(--text-color-secondary)]">
-          Partial impact — the workloads list was truncated, so these numbers may be incomplete.
+          Partial impact. The workloads list was truncated, so these numbers may be incomplete.
         </span>
       </div>
 
@@ -169,22 +173,18 @@
       </div>
 
       <div
-        class="flex items-center gap-[var(--spacing-2)] mt-[var(--spacing-3)] rounded-[var(--shape-card)] border border-[var(--surface-border)] bg-[var(--surface-50)] px-[var(--spacing-3)] py-[var(--spacing-2)]"
+        class="flex items-center gap-[var(--spacing-2)] rounded-[var(--shape-card)] border border-[var(--surface-border)] bg-[var(--surface-50)] px-[var(--spacing-3)] py-[var(--spacing-2)]"
         data-testid="release-composition__impact-summary"
       >
         <i class="pi pi-info-circle text-[var(--text-color-secondary)]" />
         <p class="text-body-xs text-[var(--text-color-secondary)]">
           Routes
-          <strong class="font-semibold text-[var(--text-color)]"
-            >{{ impact.totals.totalDomains }} domains</strong
-          >
+          <span class="text-[var(--text-color)]">{{ impact.totals.totalDomains }} domains</span>
           across
-          <strong class="font-semibold text-[var(--text-color)]"
-            >{{ impact.totals.totalWorkloads }} workloads</strong
-          >
+          <span class="text-[var(--text-color)]">{{ impact.totals.totalWorkloads }} workloads</span>
           in
-          <strong class="font-semibold text-[var(--text-color)]"
-            >{{ impact.totals.dsCount }} Deployment Settings</strong
+          <span class="text-[var(--text-color)]"
+            >{{ impact.totals.dsCount }} Deployment Settings</span
           >.
         </p>
       </div>

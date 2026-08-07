@@ -17,7 +17,7 @@
     },
     label: {
       type: String,
-      default: 'Version (Ready)'
+      default: 'Version'
     },
     required: {
       type: Boolean,
@@ -210,7 +210,7 @@
           class="p-error text-body-xs font-normal"
           data-testid="release-composition__version-error"
         >
-          Version is required
+          Select a version.
         </small>
       </template>
       <template v-else>

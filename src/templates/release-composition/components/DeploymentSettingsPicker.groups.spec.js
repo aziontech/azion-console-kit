@@ -112,6 +112,26 @@ describe('DeploymentSettingsPicker (grouped mode)', () => {
     expect(withLinked.emitted('update:modelValue')?.at(-1)).toEqual([['ds-1', 'ds-3']])
   })
 
+  it('renders the status tag on a selectable row when the group carries one', () => {
+    const wrapper = makeWrapper({
+      groups: [
+        {
+          key: 'needsFirstRelease',
+          label: 'Needs a first release',
+          selectable: true,
+          statusTag: 'No active release yet',
+          deployments: [{ id: 'ds-first', name: 'fresh-edge', policyLabel: 'Single Version' }]
+        }
+      ]
+    })
+
+    const row = wrapper.find('[data-testid="release-composition__ds-row-ds-first"]')
+    expect(row.attributes('role')).toBe('checkbox')
+    const status = wrapper.find('[data-testid="release-composition__ds-status-ds-first"]')
+    expect(status.exists()).toBe(true)
+    expect(status.text()).toBe('No active release yet')
+  })
+
   it('renders no environment or workloads elements for any row', () => {
     const wrapper = makeWrapper()
 
@@ -159,9 +179,8 @@ describe('DeploymentSettingsPicker (non-selectable group)', () => {
     key: 'needsFirstRelease',
     label: 'Needs a first release',
     selectable: false,
-    notice:
-      'No active release — compose a full first release (with an Application) to publish here.',
-    action: { label: 'Compose first release', icon: 'pi pi-arrow-right' },
+    notice: 'Create a full first release, including an application, to deploy here.',
+    action: { label: 'Create first release', icon: 'pi pi-arrow-right' },
     deployments: [{ id: 'ds-new', name: 'brand-new-edge', policyLabel: 'Versioned URLs' }]
   }
 
@@ -187,9 +206,9 @@ describe('DeploymentSettingsPicker (non-selectable group)', () => {
         .find('[data-testid="release-composition__ds-action-needsFirstRelease-ds-new"]')
         .exists()
     ).toBe(true)
-    expect(wrapper.find('[data-testid="release-composition__ds-notice-ds-new"]').exists()).toBe(
-      true
-    )
+    expect(
+      wrapper.find('[data-testid="release-composition__ds-notice-needsFirstRelease"]').exists()
+    ).toBe(true)
   })
 
   it('emits group-action with the group key and DS id when the action is clicked', async () => {

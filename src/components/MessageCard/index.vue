@@ -87,6 +87,13 @@
       >
         {{ description }}
       </p>
+      <p
+        v-if="$slots.default"
+        class="text-xs leading-tight text-color-secondary m-0"
+        :data-testid="`${dataTestid}__description`"
+      >
+        <slot />
+      </p>
     </div>
 
     <div

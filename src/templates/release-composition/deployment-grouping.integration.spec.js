@@ -3,7 +3,7 @@ import { classifyDeploymentsForResource } from '@/templates/release-composition/
 
 const GROUP_LABELS = {
   linked: 'Already using this resource',
-  available: 'Available — not linked yet',
+  available: 'Not using this resource yet',
   needsFirstRelease: 'Needs a first release',
   loadFailed: "Couldn't load the active release"
 }
@@ -65,7 +65,7 @@ describe('release-composition deployment grouping (integration)', () => {
 
       expect(groups.map(labelFor)).toEqual([
         'Already using this resource',
-        'Available — not linked yet',
+        'Not using this resource yet',
         'Needs a first release',
         "Couldn't load the active release"
       ])
@@ -169,7 +169,7 @@ describe('release-composition deployment grouping (integration)', () => {
 
       expect(groups.map(labelFor)).toEqual([
         'Already using this resource',
-        'Available — not linked yet',
+        'Not using this resource yet',
         'Needs a first release',
         "Couldn't load the active release"
       ])

@@ -48,7 +48,7 @@ ruleTester.run('no-io-in-components', rule, {
 
     // Innocuous string in a component — no violation
     {
-      code: `const label = 'Review & deploy'`,
+      code: `const label = 'Review and deploy'`,
       filename: 'src/components/Release/release-row.vue'
     }
   ],

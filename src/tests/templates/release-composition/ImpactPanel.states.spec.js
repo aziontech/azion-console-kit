@@ -52,7 +52,7 @@ describe('ImpactPanel states', () => {
       expect(wrapper.find(testid('tree')).exists()).toBe(false)
     })
 
-    it('emits retry when the Retry impact action is clicked', async () => {
+    it('emits retry when the Retry action is clicked', async () => {
       const wrapper = makeWrapper(unavailable, 'fetch_failed')
 
       await wrapper.find(testid('retry')).trigger('click')

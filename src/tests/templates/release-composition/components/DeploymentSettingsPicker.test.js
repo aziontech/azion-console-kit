@@ -81,12 +81,12 @@ describe('DeploymentSettingsPicker', () => {
     )
   })
 
-  it('shows a search field placeholder counting the listed Deployment Settings', () => {
+  it('shows a search field placeholder naming what is searched', () => {
     const wrapper = makeWrapper()
 
     const search = wrapper.find('[data-testid="release-composition__ds-search"]')
     expect(search.exists()).toBe(true)
-    expect(search.attributes('placeholder')).toBe('Search 2 Deployment Settings')
+    expect(search.attributes('placeholder')).toBe('Search Deployment Settings')
   })
 
   it('emits update:query as the search string is typed', async () => {

@@ -62,7 +62,7 @@ export const deploymentRoutes = {
       name: 'release-composer',
       component: () => import('@views/Deployments/v6/ReleaseComposerView.vue'),
       meta: {
-        title: 'Review & deploy',
+        title: 'Review and deploy',
         flag: 'use_v6_configurations',
         breadCrumbs: [
           {
@@ -75,7 +75,7 @@ export const deploymentRoutes = {
             routeParam: 'id'
           },
           {
-            label: 'New release'
+            label: 'Review and deploy'
           }
         ]
       }

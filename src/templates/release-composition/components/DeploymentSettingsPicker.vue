@@ -4,6 +4,7 @@
   import InputText from '@aziontech/webkit/inputtext'
   import InlineMessage from '@aziontech/webkit/inlinemessage'
   import PrimeButton from '@aziontech/webkit/button'
+  import MessageCard from '@/components/MessageCard'
 
   defineOptions({ name: 'release-deployment-settings-picker' })
 
@@ -41,7 +42,7 @@
   const extraEnvCount = (ds) => remainingEnvNames(ds).length
   const hasWorkloads = (ds) => Number.isFinite(ds.workloadsCount) && ds.workloadsCount > 0
   const workloadsLabel = (ds) =>
-    `${ds.workloadsCount} ${ds.workloadsCount === 1 ? 'Workload' : 'Workloads'} affected`
+    `${ds.workloadsCount} ${ds.workloadsCount === 1 ? 'workload' : 'workloads'} affected`
 
   const emit = defineEmits([
     'update:modelValue',
@@ -88,7 +89,7 @@
   const total = computed(() => listedDeployments.value.length)
   const selectedCount = computed(() => props.modelValue.length)
 
-  const searchPlaceholder = computed(() => `Search ${total.value} Deployment Settings`)
+  const searchPlaceholder = 'Search Deployment Settings'
 
   const hasDeployments = computed(() => total.value > 0)
   const hasSelectable = computed(() => selectableListed.value.length > 0)
@@ -100,6 +101,7 @@
           label: group.label,
           selectable: group.selectable !== false,
           notice: group.notice ?? null,
+          statusTag: group.statusTag ?? null,
           action: group.action ?? null,
           deployments: group.deployments
         }))
@@ -109,6 +111,7 @@
             label: null,
             selectable: true,
             notice: null,
+            statusTag: null,
             action: null,
             deployments: props.deployments
           }
@@ -148,9 +151,8 @@
         class="text-body-xs text-[var(--text-color-secondary)]"
         data-testid="release-composition__ds-helper"
       >
-        Pick the Deployment Settings to publish into. A DS is the atomic unit — selecting it affects
-        <strong class="font-bold text-[var(--text-color)]">all</strong> Environments &amp; Workloads
-        bound to it (shown on the right).
+        Select the Deployment Settings you want to deploy to. A release always applies to the whole
+        Deployment Settings, so every environment and workload bound to it receives this release.
       </span>
     </div>
 
@@ -209,6 +211,12 @@
         >
           {{ section.label }}
         </span>
+        <MessageCard
+          v-if="section.notice"
+          type="warning"
+          :description="section.notice"
+          :data-testid="`release-composition__ds-notice-${section.key}`"
+        />
         <div
           v-for="ds in section.selectable ? section.deployments : []"
           :key="ds.id"
@@ -235,10 +243,18 @@
             :inputId="`release-composition__ds-checkbox-${ds.id}`"
             :data-testid="`release-composition__ds-checkbox-${ds.id}`"
           />
-          <div class="flex flex-1 flex-col gap-[var(--spacing-1)]">
+          <div class="flex flex-1 flex-col gap-[var(--spacing-2)]">
             <span class="flex flex-wrap items-center gap-[var(--spacing-2)]">
               <i class="ai ai-deploy-pillar text-[var(--text-color-secondary)]" />
               <span class="text-body-sm text-[var(--text-color)]">{{ ds.name }}</span>
+
+              <span
+                v-if="section.statusTag"
+                class="inline-flex shrink-0 items-center rounded-[var(--shape-elements)] bg-[var(--warning)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm text-[var(--text-warning)]"
+                :data-testid="`release-composition__ds-status-${ds.id}`"
+              >
+                {{ section.statusTag }}
+              </span>
 
               <span
                 v-if="!isLoadingMeta && visibleEnvNames(ds).length"
@@ -258,7 +274,7 @@
                   v-tooltip.top="remainingEnvNames(ds).join(', ')"
                   tabindex="0"
                   role="button"
-                  :aria-label="`${extraEnvCount(ds)} more Environments: ${remainingEnvNames(ds).join(', ')}`"
+                  :aria-label="`${extraEnvCount(ds)} more environments: ${remainingEnvNames(ds).join(', ')}`"
                   class="inline-flex cursor-default items-center rounded-[var(--shape-elements)] bg-[var(--surface-200)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm text-[var(--text-color-secondary)] focus:outline-none focus-visible:ring-1 focus-visible:ring-[var(--border-selected)]"
                   :data-testid="`release-composition__ds-env-more-${ds.id}`"
                 >
@@ -334,18 +350,18 @@
               <i class="ai ai-deploy-pillar text-[var(--text-color-secondary)]" />
               <span class="text-body-sm text-[var(--text-color)]">{{ ds.name }}</span>
               <span
+                v-if="section.statusTag"
+                class="inline-flex shrink-0 items-center rounded-[var(--shape-elements)] bg-[var(--warning)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm text-[var(--text-warning)]"
+                :data-testid="`release-composition__ds-status-${ds.id}`"
+              >
+                {{ section.statusTag }}
+              </span>
+              <span
                 class="inline-flex shrink-0 items-center rounded-[var(--shape-elements)] bg-[var(--surface-200)] px-[var(--spacing-2)] py-[var(--spacing-1)] text-tag-sm text-[var(--text-color-secondary)]"
                 :data-testid="`release-composition__ds-policy-${ds.id}`"
               >
                 {{ ds.policyLabel }}
               </span>
-            </span>
-            <span
-              v-if="section.notice"
-              class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
-              :data-testid="`release-composition__ds-notice-${ds.id}`"
-            >
-              {{ section.notice }}
             </span>
           </div>
           <PrimeButton
@@ -368,9 +384,11 @@
       class="flex flex-col gap-[var(--spacing-3)]"
       data-testid="release-composition__ds-empty"
     >
-      <InlineMessage severity="secondary">No Deployment Settings</InlineMessage>
+      <InlineMessage severity="secondary">
+        No Deployment Settings yet. Bind an environment to deploy this release.
+      </InlineMessage>
       <PrimeButton
-        label="Bind Environment"
+        label="Bind environment"
         icon="pi pi-external-link"
         iconPos="right"
         size="small"

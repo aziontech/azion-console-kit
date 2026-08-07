@@ -185,6 +185,10 @@ export const useReleaseStore = defineStore('release', {
     openRelease(payload = {}) {
       this.$patch(freshSelectionState())
 
+      MANUAL_DEP_TYPES.forEach((type) => {
+        this.collOpen[`${ADDITIONAL_PARENT}:${type}`] = false
+      })
+
       const source = isObject(payload) ? payload : {}
 
       if ('fromVersion' in source) this.fromVersion = Boolean(source.fromVersion)

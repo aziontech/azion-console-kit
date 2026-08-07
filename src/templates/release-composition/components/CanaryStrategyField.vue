@@ -48,7 +48,7 @@
       return 'How long the candidate cookie stays valid.'
     }
     const hours = Math.round(seconds / 3600)
-    return `How long the candidate cookie stays valid — ${hours} hour(s).`
+    return `How long the candidate cookie stays valid: ${hours} hour(s).`
   })
 
   watch(

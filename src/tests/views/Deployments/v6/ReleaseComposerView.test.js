@@ -345,6 +345,7 @@ vi.mock('@/templates/release-composition/components/DeploymentSettingsPicker.vue
   default: {
     name: 'DeploymentSettingsPicker',
     inheritAttrs: true,
+    props: ['groups', 'modelValue', 'query', 'isLoadingMeta', 'metaUnavailable'],
     template: '<div :class="$attrs.class" data-stub="DeploymentSettingsPicker" />'
   }
 }))
@@ -395,12 +396,12 @@ describe('ReleaseComposerView — entry', () => {
 })
 
 describe('ReleaseComposerView — composition blocks', () => {
-  it('renders the composition tree, the DS picker and the Canary block', async () => {
+  it('renders the composition tree and the DS picker, with the Canary block hidden', async () => {
     const wrapper = await mountView()
 
     expect(wrapper.findComponent({ name: 'ReleaseCompositionTree' }).exists()).toBe(true)
     expect(wrapper.findComponent({ name: 'DeploymentSettingsPicker' }).exists()).toBe(true)
-    expect(wrapper.findComponent({ name: 'CanaryStrategyField' }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: 'CanaryStrategyField' }).exists()).toBe(false)
   })
 })
 
@@ -610,5 +611,49 @@ describe('ReleaseComposerView — first-release CTA', () => {
         seedVersionId: 'v-42'
       }
     })
+  })
+})
+
+describe('ReleaseComposerView — first-release group selectability', () => {
+  const withScopedFirstRelease = (scopedType, resourceId) => {
+    storeState.scopedType = scopedType
+    storeState.resourceId = resourceId
+    storeState.deploymentIds = []
+    storeState.deployments = [
+      { id: 'ds-new', name: 'brand-new-edge', deployment_policy: 'single_version' }
+    ]
+    storeState.activeReleaseByDs = {}
+    storeState.activeReleaseErrorByDs = {}
+  }
+
+  const firstReleaseGroupOf = (wrapper) => {
+    const picker = wrapper.findComponent({ name: 'DeploymentSettingsPicker' })
+    return (picker.props('groups') ?? []).find((group) => group.key === 'needsFirstRelease')
+  }
+
+  it('makes the needs-first-release group selectable and drops its CTA under application scope', async () => {
+    withScopedFirstRelease('application', 'app-1')
+
+    const wrapper = await mountView()
+    await flushPromises()
+
+    const group = firstReleaseGroupOf(wrapper)
+    expect(group.deployments.map((deployment) => deployment.id)).toEqual(['ds-new'])
+    expect(group.selectable).toBe(true)
+    expect(group.action).toBeNull()
+    expect(group.notice).toBeNull()
+    expect(group.statusTag).toBe('No active release yet')
+  })
+
+  it('keeps the needs-first-release group non-selectable with its CTA under firewall scope', async () => {
+    withScopedFirstRelease('firewall', 'fw-7')
+
+    const wrapper = await mountView()
+    await flushPromises()
+
+    const group = firstReleaseGroupOf(wrapper)
+    expect(group.selectable).toBe(false)
+    expect(group.action).toEqual({ label: 'Create first release', icon: 'pi pi-arrow-right' })
+    expect(group.statusTag).toBe('No active release yet')
   })
 })

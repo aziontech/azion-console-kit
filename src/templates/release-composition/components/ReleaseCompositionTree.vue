@@ -4,6 +4,7 @@
   import LazyResourceSelectField from '@/templates/release-composition/components/LazyResourceSelectField.vue'
   import ResourceVersionField from '@/templates/release-composition/components/ResourceVersionField.vue'
   import ReleaseDependenciesSection from '@/templates/release-composition/components/ReleaseDependenciesSection.vue'
+  import { singularNounFor, withArticle } from '@/templates/release-composition/resource-nouns'
 
   defineOptions({ name: 'release-composition-tree' })
 
@@ -57,7 +58,7 @@
     <div
       v-for="resource in resources"
       :key="resource.type"
-      class="flex flex-col gap-[var(--spacing-4)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] px-[var(--spacing-4)] py-[var(--spacing-5)]"
+      class="flex flex-col gap-[var(--spacing-4)] rounded-[var(--shape-elements)] border border-[var(--surface-border)] p-[var(--spacing-4)]"
       :data-testid="`release-composition__card-${resource.type}`"
     >
       <div class="flex items-center gap-[var(--spacing-2)]">
@@ -108,8 +109,8 @@
             :service="resource.nameService"
             :load-service="resource.nameLoadService"
             :disabled="resource.readonly"
-            label="Resource"
-            :placeholder="`Select ${resource.label}`"
+            :label="resource.label"
+            :placeholder="`Select ${withArticle(singularNounFor(resource.type))}`"
             :required="resource.required"
             @update:model-value="onResource(resource.type, $event)"
           />
@@ -117,20 +118,20 @@
             :model-value="resource.version"
             :versions="resource.versionOptions"
             :show-resource="false"
-            :required="resource.required"
+            :required="resource.versionRequired"
             :loading="resource.isLoadingVersions"
             :disabled="resource.readonly || resource.isLoadingVersions"
             :build-route="resource.buildRoute"
-            :resource-label="resource.label"
+            :resource-label="singularNounFor(resource.type)"
             @update:model-value="onVersion(resource.type, $event)"
           />
         </div>
         <p
           v-if="resource.readonly"
-          class="flex items-center gap-[var(--spacing-1)] text-body-xs text-[var(--text-color-secondary)]"
+          class="text-body-xs text-[var(--text-color-secondary)]"
           :data-testid="`release-composition__readonly-${resource.type}`"
         >
-          <i class="pi pi-lock" /> {{ resource.lockReason }}
+          {{ resource.lockReason }}
         </p>
       </div>
 
