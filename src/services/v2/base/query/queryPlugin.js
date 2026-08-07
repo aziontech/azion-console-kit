@@ -1,6 +1,6 @@
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import { persistQueryClient } from '@tanstack/query-persist-client-core'
-import { queryClient, clearAllCache } from './queryClient'
+import { queryClient, clearAllCache, initQueryBroadcast } from './queryClient'
 import { createIDBPersister } from './indexedDbPersister'
 import { PERSISTENCE_CONFIG } from './config'
 
@@ -40,6 +40,8 @@ const loadConfig = () => {
 
 export const queryPlugin = {
   install(app) {
+    initQueryBroadcast()
+
     restorePromise = new Promise((resolve) => {
       resolveRestore = resolve
     })

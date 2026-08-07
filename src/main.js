@@ -19,36 +19,53 @@ import TrackerPlugin from '@/plugins/AnalyticsTrackerAdapterPlugin'
 import SentryPlugin from '@/plugins/sentry'
 import { queryPlugin } from '@/services/v2/base/query/queryPlugin'
 import { initOAuthSecurity } from '@/helpers/oauth-security'
+import { loadRuntimeConfig } from '@/helpers/runtime-config'
 
 import App from './App.vue'
 import router from './router'
 
-initOAuthSecurity()
+async function bootstrap() {
+  // Runtime config must be resolved before anything reads environment values
+  // (Sentry DSN, analytics tokens, SSO ids). Consumers evaluated during the
+  // static import graph must stay lazy — read config at call time, never at
+  // module scope.
+  await loadRuntimeConfig()
 
-const app = createApp(App)
+  initOAuthSecurity()
 
-const pinia = createPinia()
-pinia.use(piniaPluginPersistedstate)
-setActivePinia(pinia)
+  const app = createApp(App)
 
-app.config.globalProperties.HelpCenterServices = HelpCenterServices
-app.use(WebkitPlugin)
-app.directive('prompt', customAiPrompt)
-app.use(pinia)
+  const pinia = createPinia()
+  pinia.use(piniaPluginPersistedstate)
+  setActivePinia(pinia)
 
-app.use(router)
-app.use(queryPlugin)
-app.use(TrackerPlugin)
-app.use(SentryPlugin, {
-  router
+  app.config.globalProperties.HelpCenterServices = HelpCenterServices
+  app.use(WebkitPlugin)
+  app.directive('prompt', customAiPrompt)
+  app.use(pinia)
+
+  app.use(router)
+  app.use(queryPlugin)
+  app.use(TrackerPlugin)
+  app.use(SentryPlugin, {
+    router
+  })
+  app.use(VueMonacoEditorPlugin, {
+    paths: {
+      vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.38.0/min/vs'
+    },
+    options: {
+      showSlider: 'mouseover'
+    }
+  })
+
+  app.mount('#app')
+}
+
+bootstrap().catch((error) => {
+  // Surface bootstrap failures: without this they become silent unhandled
+  // rejections (blank page, nothing in window.onerror-based monitoring).
+  // eslint-disable-next-line no-console
+  console.error('[bootstrap] failed to start the application', error)
+  throw error
 })
-app.use(VueMonacoEditorPlugin, {
-  paths: {
-    vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.38.0/min/vs'
-  },
-  options: {
-    showSlider: 'mouseover'
-  }
-})
-
-app.mount('#app')

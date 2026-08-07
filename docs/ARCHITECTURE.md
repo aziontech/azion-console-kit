@@ -1,7 +1,7 @@
 # Architecture — Azion Console Kit
 
 > High-level architecture of the Azion Console (web management UI).
-> Complements: [VERSION-SHELL.md](./VERSION-SHELL.md), [CI-OPERATIONS.md](./CI-OPERATIONS.md),
+> Complements: [VERSION-SHELL.md](./VERSION-SHELL.md),
 > [TESTING-VERSIONING.md](./TESTING-VERSIONING.md) and the ADRs under [docs/adr](./adr).
 
 ## 1. System context
@@ -68,7 +68,7 @@ integration.
 | Flag coverage | Vitest (`src/tests/flag-v6/`) | Both flows, all fork points |
 
 All suites converge into a single required check (`pre-merge-gate`) — see
-[CI-OPERATIONS.md](./CI-OPERATIONS.md) for the pipeline design and gate status.
+the internal CI operations guide for the pipeline design and gate status.
 
 ## 6. Build & deploy
 
@@ -84,4 +84,4 @@ All suites converge into a single required check (`pre-merge-gate`) — see
 Architecture Decision Records live in [docs/adr](./adr). Cross-cutting recent
 decisions are also captured in the spec documents referenced by
 [VERSIONING-TESTING-REPORT.md](./VERSIONING-TESTING-REPORT.md) (test
-architecture) and [CI-OPERATIONS.md](./CI-OPERATIONS.md) (CI maturity).
+architecture) and the internal CI operations guide (CI maturity).

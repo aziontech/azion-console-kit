@@ -9,7 +9,7 @@
 #
 # NON-BLOCKING BY DESIGN: this is a scheduled *warning*, not a gate. It never
 # blocks a merge or a deploy — it surfaces drift early so the team can react
-# before the pre-deploy check (deploy-stage.yml / deploy-production.yml) turns red.
+# before the pre-deploy check in the deploy pipeline turns red.
 #
 # GUARD: the spec itself skips cleanly (exit 0) when OPENAPI_SCHEMA_URL is unset
 # or the URL is unreachable/non-JSON (see

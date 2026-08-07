@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "postbuild": "node scripts/generate-runtime-config.js",
     "preview": "vite preview",
     "install:lock": "yarn install --frozen-lockfile",
     "test:unit": "TZ=UTC vitest --ui",

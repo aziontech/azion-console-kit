@@ -1,7 +1,12 @@
 import { BaseService } from '@/services/v2/base/query/baseService'
 import appcuesApi from '@/services/axios/makeAppcuesApi'
+import { getRuntimeConfig } from '@/helpers/runtime-config'
 
-const ACCOUNT_ID = import.meta.env.VITE_APPCUES_ACCOUNT_ID
+// Resolved at call time: the exported singleton is constructed during the
+// static import graph, before loadRuntimeConfig() resolves.
+const getAccountId = () => {
+  return getRuntimeConfig().appcuesAccountId || import.meta.env.VITE_APPCUES_ACCOUNT_ID
+}
 
 class AppcuesService extends BaseService {
   #api = null
@@ -25,7 +30,7 @@ class AppcuesService extends BaseService {
     return this.useEnsureQueryData(
       this.queryKeys.appcues.tags(),
       async () => {
-        const response = await api.get(`/accounts/${ACCOUNT_ID}/tags`)
+        const response = await api.get(`/accounts/${getAccountId()}/tags`)
         return response.data || []
       },
       { cacheType: this.cacheType.STATIC }
@@ -39,7 +44,7 @@ class AppcuesService extends BaseService {
     return this.useEnsureQueryData(
       this.queryKeys.appcues.launchpads(),
       async () => {
-        const response = await api.get(`/accounts/${ACCOUNT_ID}/launchpads`)
+        const response = await api.get(`/accounts/${getAccountId()}/launchpads`)
         return response.data || []
       },
       { cacheType: this.cacheType.STATIC }

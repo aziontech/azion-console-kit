@@ -1,10 +1,9 @@
-const { VITE_ENVIRONMENT } = import.meta.env
+import { isProduction } from './get-environment'
 
 const getLinkDownloadInvoice = (period) => {
-  const URL =
-    VITE_ENVIRONMENT === 'production'
-      ? `https://console.azion.com/billing/invoices/${period}`
-      : `https://stage-console.azion.com/billing/invoices/${period}`
+  const URL = isProduction()
+    ? `https://console.azion.com/billing/invoices/${period}`
+    : `https://stage-console.azion.com/billing/invoices/${period}`
   return URL
 }
 
