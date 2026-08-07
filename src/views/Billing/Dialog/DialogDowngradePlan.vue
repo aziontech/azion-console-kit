@@ -158,14 +158,16 @@
       })
       isVisible.value = false
     } catch (err) {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail:
-          (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
-          'Unable to downgrade. Please try again.',
-        closable: true
-      })
+      if (err && typeof err.showErrors === 'function') {
+        err.showErrors(toast)
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.message || 'Unable to downgrade. Please try again.',
+          closable: true
+        })
+      }
     } finally {
       isSubmitting.value = false
     }

@@ -116,7 +116,7 @@ describe('DrawerPlanInfo — card capture for entitled subscriptions', () => {
     expect(setupBlock.exists()).toBe(true)
     expect(setupBlock.props('clientSecret')).toBe('seti_prepared_secret_456')
     expect(findByName(wrapper, 'PaymentMethodBlock').exists()).toBe(false)
-    expect(findByName(wrapper, 'AddressInformationBlock').exists()).toBe(false)
+    expect(findByName(wrapper, 'AddressInformationBlock').exists()).toBe(true)
   })
 
   it('keeps the checkout-session element for a cs_ first-payment secret', async () => {

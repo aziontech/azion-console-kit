@@ -79,10 +79,9 @@
             />
             {{ paymentMethodLabel }}
             <ActionButton
-              v-if="hasPaymentMethod"
               kind="outlined"
               size="small"
-              label="Change"
+              :label="hasPaymentMethod ? 'Change' : 'Add'"
               @click="emit('change-payment-method')"
             />
           </span>

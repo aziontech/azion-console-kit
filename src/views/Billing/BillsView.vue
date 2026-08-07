@@ -238,12 +238,7 @@
       })
     } catch (err) {
       Sentry.captureException(err)
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Unable to download the invoice.',
-        closable: true
-      })
+      showRequestError(err, 'Unable to download the invoice.')
     }
   }
 
@@ -281,6 +276,22 @@
     toCycle: null
   })
   const toast = useToast()
+
+  const resolveErrorDetail = (err, fallback) =>
+    (Array.isArray(err?.message) ? err.message[0] : err?.message) || fallback
+
+  const showRequestError = (err, fallback) => {
+    if (err && typeof err.showErrors === 'function') {
+      err.showErrors(toast)
+      return
+    }
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: resolveErrorDetail(err, fallback),
+      closable: true
+    })
+  }
 
   const {
     initialize: initializePlans,
@@ -486,21 +497,14 @@
         mode: 'subscribe'
       })
     } catch (err) {
-      const detail =
-        (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
-        'Unable to initialize payment session.'
+      const detail = resolveErrorDetail(err, 'Unable to initialize payment session.')
       trackBilling('planChangeFailed', {
         plan,
         billingCycle: preferredCycle,
         errorType: 'checkout-session',
         errorMessage: detail
       })
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail,
-        closable: true
-      })
+      showRequestError(err, detail)
     } finally {
       preparingPlan.value = null
     }
@@ -525,14 +529,7 @@
       checkoutPreparationKey.value = buildPreparationKey(targetPlan, targetCycle)
     } catch (err) {
       Sentry.captureException(err)
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail:
-          (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
-          'Unable to refresh the checkout session.',
-        closable: true
-      })
+      showRequestError(err, 'Unable to refresh the checkout session.')
     }
   }
 
@@ -704,16 +701,14 @@
         closable: true
       })
     } catch (err) {
-      const detail =
-        (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
-        'Unable to update billing cycle.'
+      const detail = resolveErrorDetail(err, 'Unable to update billing cycle.')
       trackBilling('planChangeFailed', {
         plan,
         billingCycle,
         errorType: 'cycle-upgrade',
         errorMessage: detail
       })
-      fail?.(detail)
+      fail?.(err)
     }
   }
 
@@ -787,15 +782,14 @@
         isPostPaymentReloading.value = false
       }
     } catch (err) {
-      const detail =
-        (Array.isArray(err?.message) ? err.message[0] : err?.message) || 'Unable to downgrade plan.'
+      const detail = resolveErrorDetail(err, 'Unable to downgrade plan.')
       trackBilling('planChangeFailed', {
         plan: toPlan,
         billingCycle: cycleChange ? toCycle : fromCycle,
         errorType: 'downgrade',
         errorMessage: detail
       })
-      fail?.(detail)
+      fail?.(err)
     }
   }
 
@@ -834,22 +828,21 @@
 
       done?.()
     } catch (err) {
-      const detail =
-        (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
-        'Unable to cancel scheduled downgrade.'
+      const detail = resolveErrorDetail(err, 'Unable to cancel scheduled downgrade.')
       trackBilling('planChangeFailed', {
         plan: fromPlan,
         billingCycle: subscription.billingCycle.value,
         errorType: 'cancel-downgrade',
         errorMessage: detail
       })
-      fail?.(detail)
+      fail?.(err)
     }
   }
 
   const planLabel = (sku) => (sku === 'pro' ? 'Pro Plan' : sku === 'hobby' ? 'Hobby Plan' : 'plan')
 
   const handlePlanInfoSubmit = async (submitPayload = {}) => {
+    const { done, fail } = submitPayload
     const targetPlan = selectedPlan.value
     const targetPlanId = targetPlan ? findPlanIdBySku(targetPlan) : null
     const fromPlan = subscription.planSku.value
@@ -874,21 +867,24 @@
           when: CHANGE_TIMING.NOW
         })
       } catch (err) {
-        const detail =
-          (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
+        const detail = resolveErrorDetail(
+          err,
           'Unable to change the plan after the payment method was saved.'
+        )
         trackBilling('planChangeFailed', {
           plan: targetPlan,
           billingCycle: submittedCycle,
           errorType: 'plan-change',
           errorMessage: detail
         })
-        toast.add({ severity: 'error', summary: 'Error', detail, closable: true })
+        fail?.(err)
         return
       }
     }
 
     markAwaitingActiveServiceOrder()
+
+    done?.()
 
     showPlanInfoDrawer.value = false
     showChangePlanDrawer.value = false

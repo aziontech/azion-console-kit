@@ -65,13 +65,13 @@
               @readiness-change="handlePaymentReadinessChange"
               @stale-session="$emit('stale-session', { plan, billingCycle })"
             />
-
-            <AddressInformationBlock
-              ref="addressRef"
-              :showUseOwnerInfo="true"
-              @readiness-change="handleAddressReadinessChange"
-            />
           </template>
+
+          <AddressInformationBlock
+            ref="addressRef"
+            :showUseOwnerInfo="true"
+            @readiness-change="handleAddressReadinessChange"
+          />
 
           <TermsAcceptanceBlock v-model="isTermsAccepted" />
         </div>
@@ -196,7 +196,7 @@
       setupIntentClientSecret.value = clientSecret
     } catch (err) {
       if (defaultPaymentCard.value) useDefaultPaymentMethod.value = true
-      showError(err?.message || 'Unable to initialize payment method update.')
+      showError(err, 'Unable to initialize payment method update.')
     }
   }
 
@@ -232,14 +232,13 @@
   const isConfirmDisabled = computed(() => {
     if (isSubmitting.value) return true
     if (!isTermsAccepted.value) return true
+    if (!isAddressFormReady.value) return true
     if (isChangeCycleMode.value || isSetupSecret.value) {
       if (showDefaultPaymentSummary.value) return false
       return !setupIntentClientSecret.value || !isPaymentFormReady.value
     }
     if (showDefaultPaymentSummary.value) return !checkoutSessionClientSecret.value
-    return (
-      !checkoutSessionClientSecret.value || !isPaymentFormReady.value || !isAddressFormReady.value
-    )
+    return !checkoutSessionClientSecret.value || !isPaymentFormReady.value
   })
 
   const handleBillingCycleChange = (value) => {
@@ -262,7 +261,12 @@
     emit('update:visible', false)
   }
 
-  const showError = (detail) => {
+  const showError = (err, fallback) => {
+    if (err && typeof err.showErrors === 'function') {
+      err.showErrors(toast)
+      return
+    }
+    const detail = (typeof err === 'string' && err) || err?.message || fallback
     toast.add({ severity: 'error', summary: 'Error', detail: String(detail), closable: true })
   }
 
@@ -294,10 +298,16 @@
     }
   )
 
+  const rejectWithError = (reject) => (err) =>
+    reject(typeof err === 'string' ? new Error(err) : err || new Error('Failed'))
+
   const handleSubmit = async () => {
     if (isSubmitting.value) return
     isSubmitting.value = true
     try {
+      const address = await addressRef.value?.saveAddress?.()
+      if (!address) return
+
       let capturedPaymentMethodId = null
 
       if (needsCardCapture.value) {
@@ -317,19 +327,22 @@
             plan: props.plan,
             billingCycle: billingCycle.value,
             done: resolve,
-            fail: (err) =>
-              reject(typeof err === 'string' ? new Error(err) : err || new Error('Failed'))
+            fail: rejectWithError(reject)
           })
         })
         return
       }
 
       if (capturedPaymentMethodId || showDefaultPaymentSummary.value) {
-        emit('submit', {
-          plan: props.plan,
-          billingCycle: billingCycle.value,
-          useDefaultPaymentMethod: true,
-          paymentMethodId: capturedPaymentMethodId ?? defaultPaymentCard.value?.id ?? null
+        await new Promise((resolve, reject) => {
+          emit('submit', {
+            plan: props.plan,
+            billingCycle: billingCycle.value,
+            useDefaultPaymentMethod: true,
+            paymentMethodId: capturedPaymentMethodId ?? defaultPaymentCard.value?.id ?? null,
+            done: resolve,
+            fail: rejectWithError(reject)
+          })
         })
         return
       }
@@ -337,32 +350,31 @@
       const paymentErrors = await paymentRef.value?.validate?.()
       if (paymentErrors && Object.keys(paymentErrors).length > 0) return
 
-      const address = await addressRef.value?.saveAddress?.()
-      if (!address) return
-
       const checkoutConfirmation = await paymentRef.value?.confirmCheckoutSession?.()
       if (checkoutConfirmation?.type !== 'success') {
         throw new Error('Payment could not be completed. Please try again.')
       }
 
-      emit('submit', {
-        plan: props.plan,
-        billingCycle: billingCycle.value,
-        paymentIntentId: checkoutConfirmation?.paymentIntent?.id,
-        paymentStatus: checkoutConfirmation?.paymentIntent?.status,
-        address: {
-          postalCode: address.postalCode,
-          country: addressRef.value?.getCountry?.(Number(address.country)) || '',
-          countryId: address.country,
-          region: address.region,
-          city: address.city,
-          address: address.address
-        }
+      await new Promise((resolve, reject) => {
+        emit('submit', {
+          plan: props.plan,
+          billingCycle: billingCycle.value,
+          paymentIntentId: checkoutConfirmation?.paymentIntent?.id,
+          paymentStatus: checkoutConfirmation?.paymentIntent?.status,
+          address: {
+            postalCode: address.postalCode,
+            country: addressRef.value?.getCountry?.(Number(address.country)) || '',
+            countryId: address.country,
+            region: address.region,
+            city: address.city,
+            address: address.address
+          },
+          done: resolve,
+          fail: rejectWithError(reject)
+        })
       })
     } catch (err) {
-      const detail =
-        (Array.isArray(err?.message) ? err.message[0] : err?.message) || 'Unable to subscribe.'
-      showError(detail)
+      showError(err, 'Unable to subscribe.')
     } finally {
       isSubmitting.value = false
     }

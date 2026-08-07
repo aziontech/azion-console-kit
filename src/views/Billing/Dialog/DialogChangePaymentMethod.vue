@@ -91,7 +91,12 @@
   const isPaymentFormReady = ref(false)
   const setupIntentClientSecret = ref('')
 
-  const showError = (detail) => {
+  const showError = (err, fallback) => {
+    if (err && typeof err.showErrors === 'function') {
+      err.showErrors(toast)
+      return
+    }
+    const detail = (typeof err === 'string' && err) || err?.message || fallback
     toast.add({ severity: 'error', summary: 'Error', detail: String(detail), closable: true })
   }
 
@@ -114,7 +119,7 @@
   }
 
   const handleStripeLoadError = (detail) => {
-    showError(detail || 'Unable to load payment fields.')
+    showError(detail, 'Unable to load payment fields.')
     isVisible.value = false
   }
 
@@ -128,7 +133,7 @@
       }
       setupIntentClientSecret.value = clientSecret
     } catch (err) {
-      showError(err?.message || 'Unable to initialize payment method update.')
+      showError(err, 'Unable to initialize payment method update.')
       isVisible.value = false
     }
   }
@@ -166,10 +171,7 @@
       emit('updated')
       isVisible.value = false
     } catch (err) {
-      showError(
-        (Array.isArray(err?.message) ? err.message[0] : err?.message) ||
-          'Unable to update payment method.'
-      )
+      showError(err, 'Unable to update payment method.')
     } finally {
       isSubmitting.value = false
     }
