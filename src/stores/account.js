@@ -26,6 +26,7 @@ export const useAccountStore = defineStore({
       signup_email: false
     },
     currentPlanSku: null,
+    hasCompletedOnboarding: false,
     accountStatuses: {
       BLOCKED: 'BLOCKED',
       DEFAULTING: 'DEFAULTING',
@@ -92,6 +93,7 @@ export const useAccountStore = defineStore({
       return !client_flags.includes(state.flags.FORCE_REDIRECT_TO_CONSOLE)
     },
     isFirstLogin(state) {
+      if (state.hasCompletedOnboarding) return false
       return state.account?.first_login
     },
     accountUtcOffset(state) {
@@ -151,8 +153,14 @@ export const useAccountStore = defineStore({
           preservedExtras[key] = this.account[key]
         }
       }
-      if (account?.id !== this.account?.id) this.currentPlanSku = null
+      if (account?.id !== this.account?.id) {
+        this.currentPlanSku = null
+        this.hasCompletedOnboarding = false
+      }
       this.account = { ...account, ...preservedExtras }
+    },
+    completeOnboarding() {
+      this.hasCompletedOnboarding = true
     },
     setAccountData(account) {
       this.account = { ...this.account, ...account }

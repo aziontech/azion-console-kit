@@ -439,7 +439,7 @@
 
         invalidateBillingCaches()
         await loadUserAndAccountInfo({ force: true })
-        accountStore.setAccountData({ first_login: false })
+        accountStore.completeOnboarding()
         loadSubscriptionIdentity()
         trackSignUpToHubspot()
         handleProceedToCheckout()
@@ -513,7 +513,7 @@
       const activeSubscription = await waitForActiveSubscription()
       if (activeSubscription) clearAwaitingActiveServiceOrder()
       await loadUserAndAccountInfo({ force: true })
-      accountStore.setAccountData({ first_login: false })
+      accountStore.completeOnboarding()
       loadSubscriptionIdentity()
       trackSignUpToHubspot()
     } catch (err) {
@@ -546,7 +546,7 @@
 
   const handleStartFromSuccess = () => {
     invalidateBillingCaches()
-    accountStore.setAccountData({ first_login: false })
+    accountStore.completeOnboarding()
     router.push({ name: 'home' })
   }
 

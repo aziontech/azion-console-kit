@@ -32,6 +32,41 @@ describe('account store setIdentity', () => {
     expect(store.account.legacyOnlyField).toBeUndefined()
   })
 
+  it('keeps isFirstLogin false after completeOnboarding even when a refetch still reports true', () => {
+    const store = useAccountStore()
+
+    store.setIdentity({ id: 1, kind: 'client', first_login: true })
+    store.completeOnboarding()
+
+    expect(store.isFirstLogin).toBe(false)
+
+    store.setIdentity({ id: 1, kind: 'client', first_login: true })
+
+    expect(store.isFirstLogin).toBe(false)
+    expect(store.account.first_login).toBe(true)
+  })
+
+  it('resets the onboarding latch when switching to another account', () => {
+    const store = useAccountStore()
+
+    store.setIdentity({ id: 1, kind: 'client', first_login: true })
+    store.completeOnboarding()
+
+    store.setIdentity({ id: 2, kind: 'client', first_login: true })
+
+    expect(store.isFirstLogin).toBe(true)
+  })
+
+  it('follows the server first_login when onboarding was never completed locally', () => {
+    const store = useAccountStore()
+
+    store.setIdentity({ id: 1, kind: 'client', first_login: true })
+    expect(store.isFirstLogin).toBe(true)
+
+    store.setIdentity({ id: 1, kind: 'client', first_login: false })
+    expect(store.isFirstLogin).toBe(false)
+  })
+
   it('preserves additive billing/contract extras across an identity refetch', () => {
     const store = useAccountStore()
 
